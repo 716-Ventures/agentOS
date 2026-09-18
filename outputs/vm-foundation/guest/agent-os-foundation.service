@@ -1,0 +1,17 @@
+[Unit]
+Description=Agent OS development foundation boot record
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/lib/agent-os/record-boot.py
+RemainAfterExit=yes
+StateDirectory=agent-os
+StateDirectoryMode=0755
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=multi-user.target

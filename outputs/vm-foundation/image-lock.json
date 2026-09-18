@@ -1,0 +1,10 @@
+{
+  "base_url": "https://cloud.debian.org/images/cloud/trixie/20260914-2601/debian-13-generic-arm64-20260914-2601.qcow2",
+  "sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
+  "debian_build": "20260914-2601",
+  "architecture": "arm64",
+  "disk_size": "20G",
+  "memory_mib": 2048,
+  "cpus": 2,
+  "ssh_port": 22220
+}

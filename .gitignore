@@ -1,0 +1,19 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+target/
+node_modules/
+.venv/
+.env
+.env.*
+!.env.example
+/work/
+/outputs/vm-foundation/runtime/
+# Local test captures and runtime reports
+/outputs/agent-shell/*verification*.json
+/outputs/agent-shell/*verification*.txt
+/outputs/agent-shell/terminal-*.png
+/outputs/agent-shell/terminal-*.txt
+/outputs/agent-shell/models-*.png
+/outputs/agent-shell/models-*.txt
+/outputs/vm-foundation/verification.json

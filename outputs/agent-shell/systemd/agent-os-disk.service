@@ -1,0 +1,27 @@
+[Unit]
+Description=Agent OS fixed read-only disk metadata collector
+After=local-fs.target
+
+[Service]
+User=root
+Group=agentos-ai
+ExecStart=/usr/bin/python3 /usr/local/lib/agent-os/services/disk.py
+Restart=on-failure
+RuntimeDirectory=agent-os-disk
+RuntimeDirectoryMode=0750
+UMask=0077
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateNetwork=yes
+NoNewPrivileges=yes
+CapabilityBoundingSet=CAP_DAC_READ_SEARCH
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+RestrictAddressFamilies=AF_UNIX
+MemoryMax=128M
+TasksMax=8
+
+[Install]
+WantedBy=multi-user.target

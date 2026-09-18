@@ -1,0 +1,21 @@
+[Unit]
+Description=Agent OS general system execution broker
+After=local-fs.target
+
+[Service]
+User=root
+Group=agentos
+ExecStart=/usr/bin/python3 /usr/local/lib/agent-os/services/broker.py
+Restart=on-failure
+StateDirectory=agent-os-broker
+StateDirectoryMode=0700
+RuntimeDirectory=agent-os-broker
+RuntimeDirectoryMode=0750
+UMask=0077
+ProtectHome=yes
+PrivateTmp=yes
+MemoryMax=192M
+TasksMax=64
+
+[Install]
+WantedBy=multi-user.target

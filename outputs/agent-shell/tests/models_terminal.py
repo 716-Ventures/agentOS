@@ -1,0 +1,21 @@
+"""Exercise the Models view in a real guest SSH terminal without creating work."""
+from pathlib import Path
+__file__ = str(Path(__file__).with_name('terminal_pty.py').resolve())
+exec(Path(__file__).read_text().split("pump()\nkeys('nTerminal")[0])
+pump(1.5); keys('p'); capture('models-panel')
+assert any('Ling 3.0 Flash' in line for line in screen.display)
+assert any('Agent OS' in line for line in screen.display)
+assert any('Conversation' in line for line in screen.display)
+assert next(line.index(' Models ') for line in screen.display if ' Models ' in line)>80
+keys('\t');keys('a');assert any('Reply to Agent' in line for line in screen.display)
+assert any(' Models ' in line for line in screen.display)
+keys('\x1b');keys('p');keys('p')
+assert any('Structured advice' in line for line in screen.display)
+keys('\x1b[6~'*4)
+assert any('Billing & credit' in line for line in screen.display)
+size(50,24); screen.resize(24,50); pump(1); capture('models-compact')
+assert any(' Models ' in line for line in screen.display)
+keys('\x1b'); size(140,40); screen.resize(40,140); pump(1)
+keys('T'); keys('p'); capture('models-light'); keys('\x1b'); keys('T')
+keys('q'); process.wait(timeout=10)
+print('Models side panel: alongside conversation, reply while open, scrolling, narrow terminal, light theme passed.')
