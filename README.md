@@ -26,3 +26,7 @@ cargo test --manifest-path outputs/agent-shell/Cargo.toml
 ```
 
 Guest integration and terminal tests are under `outputs/agent-shell/tests`; these require the running development VM and can modify its state.
+
+## License
+
+Original agentOS code and documentation are licensed under the [Apache License 2.0](LICENSE). Third-party components and assets retain their own licenses; see [THIRD_PARTY.md](THIRD_PARTY.md). The repository license does not relicense the Linux kernel or Debian packages used to build the guest.
