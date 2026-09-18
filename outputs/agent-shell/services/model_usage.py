@@ -49,8 +49,8 @@ def configure(cfg, default_model, recover=False):
             data['configuration'] = [
                 {'provider': 'Vercel AI Gateway', 'model': cfg.get('gateway_model', default_model),
                  'configured': bool(cfg.get('gateway_key')), 'role': 'Conversation, reasoning, and tool planning'},
-                {'provider': 'Typesafe', 'model': 'jev-latest', 'configured': bool(cfg.get('jev_key')),
-                 'role': 'Runtime action risk assessment; broker enforces decisions'}]
+                {'provider': 'Typesafe', 'model': 'jev-1.13.0', 'configured': bool(cfg.get('jev_key')),
+                 'role': 'Action assessment, context, recovery, completion and learning'}]
             if recover:
                 for row in data['models'].values():
                     row['interrupted'] += row.get('active', 0)

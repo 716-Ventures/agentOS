@@ -287,7 +287,7 @@ def model_lines(data):
         matching=[r for r in rows if r['provider']==cfg['provider'] and r['model']==cfg['model']]
         row=matching[0] if matching else None
         title='Ling 3.0 Flash' if cfg['model']=='inclusionai/ling-3.0-flash' else 'Jev' if cfg['provider']=='Typesafe' else cfg['model']
-        role='Reasoning & action planning' if cfg['provider']=='Vercel AI Gateway' else 'Action effects & risk assessment'
+        role='Reasoning & action planning' if cfg['provider']=='Vercel AI Gateway' else 'Decisions, context & verification'
         lines += [title,role,cfg['provider']+' · '+('Configured' if cfg['configured'] else 'Not configured')]
         if row:
             shown.add((row['provider'],row['model']))

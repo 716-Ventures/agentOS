@@ -1,6 +1,6 @@
 # Agent OS 0.4 — general system broker
 
-A full Debian-based Linux VM with persistent activities, a terminal interface, and a Gateway agent that can use general Linux execution and filesystem tools. Jev assesses execution effects at runtime; Ling plans and reasons. Versioned memory and reusable skills persist across activities. Voice and the graphical desktop are future work.
+A full Debian-based Linux VM with persistent activities, a terminal interface, and a Gateway agent that can use general Linux execution and filesystem tools. Jev assesses actions, selects relevant context, advises on recovery, checks completion and reviews learning; Ling plans and reasons. See [the decision layer](JEV.md). Versioned memory and reusable skills persist across activities. Voice and the graphical desktop are future work.
 
 ## Open and use
 
@@ -21,7 +21,7 @@ agent-os providers
 
 Hidden prompts save credentials only inside the VM. Conversation uses the Gateway key; autonomous action assessment uses the Jev key. Unavailable assessment requires review rather than silently allowing actions. Existing keys are preserved by installation.
 
-The selected Gateway model is checked for unambiguous zero input/output pricing before every request. No automatic paid fallback is used. Free-provider rate limits are reported explicitly. Questions, selected command output and file contents requested through agent tools may be sent to the model provider. Credentials and private service state are excluded from normal execution.
+The Gateway supports verified free models or explicitly configured paid models. The development VM uses inclusionai/ling-3.0-flash; no automatic paid fallback is used. Free-provider rate limits are reported explicitly. Questions, selected command output and file contents requested through agent tools may be sent to the model provider. Credentials and private service state are excluded from normal execution.
 
 ## Scriptable commands
 
@@ -41,7 +41,7 @@ Replace IDs with those returned on your machine. `ask` and `disk` return a core 
 
 ## Persistence and boundaries
 
-The Rust core retains activities, explicit jobs, logs and history. A separate assistant service owns credentials and conversation/tool traces. A root broker launches each general command in a systemd service under an isolated activity identity. Normal writes are restricted to the activity's broker workspace; administrator commands require local approval. The original explicit-command core remains for recovery and compatibility, with its earlier shared-identity limitations.
+The Rust core retains activities, explicit jobs, logs and history. A separate assistant service owns credentials and conversation/tool traces. A root broker launches each assessed general command in a supervised systemd service with OS-level authority. Activities organize work and supply a default directory; they are not filesystem sandboxes. Harmful effects require matching user authorization, including explicit instructions already given in context. The original explicit-command core remains for recovery and compatibility, with its earlier shared-identity limitations.
 
 The terminal and future desktop can use the same service boundaries. This is a single-user development OS; it is not a multi-user policy system. General execution is broader than a diagnostic menu, but it does not promise automatic rollback for arbitrary programs or unrestricted root access.
 

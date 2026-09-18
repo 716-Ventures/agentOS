@@ -148,9 +148,10 @@ def handle(req, uid):
                 finally:
                     LOCK.acquire()
                 if not isinstance(assessment,dict):assessment={}
-                if req.get('current_request') and assessment.get('task_fit')!='aligned':
+                if req.get('current_request') and assessment.get('status')=='available' and assessment.get('task_fit')!='aligned':
                     return {'status':'outside_request','next_step':'This action is not established as part of the current request. Research and answer the question instead of changing state; clarify only if needed. This is not a permissions restriction.','assessment':assessment}
                 policy['assessment']=assessment
+                policy['thresholds']={'routine':.8,'task_fit':.8,'authorization':.6,'calibration':'provisional; see labeled Jev evaluation'}
                 routine=(not deterministic_harm and assessment.get('status')=='available' and assessment.get('risk')=='routine'
                     and type(assessment.get('confidence')) in (int,float) and .8<=assessment['confidence']<=1)
                 authorized=(bool(req.get('current_request')) and assessment.get('status')=='available'
