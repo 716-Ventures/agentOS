@@ -1,5 +1,7 @@
 # An Operating System Built Around Intelligence
 
+**Architecture update · September 18, 2026:** The [native windowing specification v0.1](agent-os-windowing-specification.md) is the authoritative graphical design. agentOS adopts typed declarative native surfaces, live source bindings, explicit action references and atomic workspace transactions, inspired by json-render's composition model. No JavaScript or webview shell is adopted. This paper explains the rationale; the specification defines the contracts. The graphical implementation remains future work.
+
 *Founding vision, architectural direction, and development strategy*
 
 **Working white paper · Version 0.4 · September 17, 2026**
@@ -128,7 +130,7 @@ The renderer and agent consume appropriate views of this shared state. Applicati
 
 The agent acts through operations such as presenting objects, arranging comparisons, preserving visibility, setting aside activities, and restoring arrangements. Operations identify actual objects, state their preconditions, and return observable results.
 
-Layout machinery calculates positions from constraints and available space. This supports consistent composition without requiring the model to calculate every coordinate. Related changes can form a transaction with a meaningful undo operation.
+Layout machinery calculates positions from constraints and available space. The agent composes two related documents: SurfaceDocument describes typed native content, and WorkspaceDocument places native and conventional application surfaces in tiled or floating arrangements. A versioned catalog and native registry establish consistent components, accessibility and visual behavior. Live bindings reflect source-owned state; event references dispatch through trusted host handlers and the existing action broker. Atomic revisioned transactions preserve interaction ownership and provide presentation undo without claiming to undo system actions. See the [native specification](agent-os-windowing-specification.md) for schemas, lifecycle and acceptance criteria.
 
 ### 5.3 Immediate behavior and deliberative behavior
 
@@ -162,21 +164,21 @@ A model gateway should support replaceable local and remote inference backends. 
 
 Model unavailability should produce a defined reduction in capability. Existing content, direct manipulation, and essential system controls must remain usable. Background inference must be managed so that it does not compromise the interactive environment.
 
-### 5.7 Jev as a candidate for fast semantic decisions
+### 5.7 Jev for bounded semantic decisions
 
 TypeSafe Jev evaluates supplied state using predefined answer spaces. It is a candidate for the desktop agent's fast decision path. It accepts textual state; raw voice and visual inputs therefore need separate processing before their relevant evidence can reach this component.[7]
 
-For the first integration, the environment core will assemble a versioned snapshot of a spoken instruction, timestamped interaction events, candidate objects, and existing constraints. Jev will evaluate narrow questions. The core will validate the resulting action as a whole, including object existence, compatible arguments, permissions, and state freshness. A model's confidence will never grant authority.
+For the future graphical integration, the environment core will assemble a versioned snapshot of a spoken instruction, timestamped interaction events, candidate objects, and existing constraints. Jev will evaluate narrow questions. The core will validate the resulting action as a whole, including object existence, compatible arguments, permissions, and state freshness. A model's confidence will never grant authority.
 
 The decision interface must include unresolved and unsupported outcomes. Candidate generation matters: choosing from an incomplete list can produce a confident but incorrect answer. Ambiguity should lead to a restrained interaction, such as highlighting alternatives, or escalation to another reasoning step.
 
 We will use event-triggered evaluation with bounded requests and cancellation. We will not make rendering, dragging, or keyboard delivery depend on a hosted decision service. Changes in inferred intent must not cause repeated rearrangement; direct user choices and persistent layout constraints govern subsequent behavior.
 
-Jev is an evaluation candidate rather than a verified production dependency. Its usefulness for this project depends on measured action accuracy, latency, uncertainty behavior, and correction burden. Local deployment, data handling, account limits, and current model limitations require verification. The adapter must remain replaceable.
+Jev is integrated in the current terminal agent loop; see [the implementation guide](agent-shell/JEV.md). Its future graphical roles still require measured action accuracy, latency, uncertainty behavior, and correction burden. Local deployment, data handling, account limits, and current model limitations require verification. The adapter must remain replaceable.
 
 ## 6. Agency, trust, and recovery
 
-An agent's ability to propose an action must be separate from its authority to execute it. A broker enforces permissions outside the model, including access to files, applications, network destinations, and privileged operations.
+The agent works across the operating system through a broker that enforces authority outside the model. Requested non-destructive work proceeds automatically. Potentially harmful effects require authorization unless the user's existing instruction already covers them. Presentation and model confidence cannot expand that authorization.
 
 Content read from a document or website is evidence, not a source of new authority. Sensitive credentials should be handled through scoped services where possible.
 
@@ -206,7 +208,7 @@ Distinguish natural-language requests, explicit commands, and application input.
 
 Integrate deliberate microphone activation, transcription, timestamped text selection and job focus, and visible listening state. Voice must work in the intended Linux session, not merely in a development environment. A replaceable speech backend remains the proposed approach.[5]
 
-Evaluate Jev for intent routing, candidate job or file reference selection, and bounded failure classification. Begin with synthetic or approved cases, compare against exact rules and a reasoning-model baseline, and validate complete actions before execution. Extended planning and generation use a separate provider interface. Providers do not receive credentials for tools they do not need.
+Use the reasoning model for open-ended intent and planning; evaluate Jev for bounded candidate job or file reference selection and failure classification. Begin with synthetic or approved cases, compare against exact rules and a reasoning-model baseline, and validate complete actions before execution. Extended planning and generation use a separate provider interface. Providers do not receive credentials for tools they do not need.
 
 ### Phase 3: Prove daily usability on Linux
 
@@ -216,13 +218,13 @@ Test restart and reboot explicitly. Restoring an activity restores its records a
 
 ### Phase 4: Complete the terminal-first operating-system release
 
-Complete the bootable image established in Phase 0, initially for one virtual-machine profile and then selected hardware. Include login, network setup, audio and microphone setup, storage, updates, recovery, and an ordinary rescue shell. Privileged operations use narrowly scoped system adapters with enforceable policy.
+Complete the bootable image established in Phase 0, initially for one virtual-machine profile and then selected hardware. Include login, network setup, audio and microphone setup, storage, updates, recovery, and an ordinary rescue shell. Privileged operations use the general system broker with the same effect-based authorization policy as other actions.
 
 An image-based update system remains a candidate. bootc supports transactional OS updates and rollback; user data and database migrations require separate recovery policies.[6] Packaging follows demonstrated usefulness of the installed agent shell.
 
 ### Phase 5: Build the graphical environment
 
-Introduce a nested Smithay compositor and a graphical presentation client using the established activity, object, job, permission, and agent interfaces. The earlier Tauri prototype proposal is deferred; final graphical rendering remains an open decision.
+Implement the [native windowing specification](agent-os-windowing-specification.md): first a headless Rust presentation contract and transaction tests, then a native component renderer, followed by a nested compositor integrating native and conventional application surfaces. Smithay remains the candidate compositor foundation. Agent composition and Jev candidate evaluation use the established activity, object, job and broker interfaces. The earlier Tauri/webview shell proposal is superseded; the native drawing/text toolkit remains to be selected through validation.
 
 The terminal release validates semantic input, execution, system integration, and continuity. It does not validate spatial composition, graphical application integration, pointer-and-voice interaction, or the full aesthetic ambition. These require dedicated graphical prototypes and acceptance tests.
 
@@ -255,7 +257,7 @@ The founding principles are established. Several product and engineering decisio
 - How much proactive rearrangement users want, and how those preferences are expressed.
 - Default voice activation, conversational-session behavior, and spoken feedback.
 - The capability baseline available entirely offline.
-- Final rendering technology, distribution base, and supported hardware.
+- Native drawing/text toolkit and supported hardware. The current distribution is Debian ARM64; the graphical contract is adopted, while compositor integration remains to be implemented.
 - The application integration contract and extent of compatibility with existing software.
 - Whether Jev meets the fast-path acceptance criteria, and which capabilities remain available when its service is unavailable.
 
@@ -274,7 +276,7 @@ The sources below establish capabilities of proposed building blocks. They do no
 1. [Wayland architecture](https://wayland.freedesktop.org/architecture.html).
 2. [Smithay compositor framework](https://github.com/Smithay/smithay/) and [Anvil reference implementation](https://github.com/Smithay/smithay/blob/master/anvil/README.md).
 3. [AT-SPI accessible object interfaces](https://gnome.pages.gitlab.gnome.org/at-spi2-core/libatspi/class.Accessible.html).
-4. [Tauri architecture](https://tauri.app/concept/architecture/).
+4. [json-render catalog](https://json-render.dev/docs/catalog), [state bindings](https://json-render.dev/docs/data-binding), and [experimental Jev composition](https://json-render.dev/docs/jev), architectural references for the native specification; no runtime dependency adopted.
 5. [whisper.cpp](https://github.com/ggml-org/whisper.cpp).
 6. [bootc upgrades and rollback](https://bootc.dev/bootc/upgrades.html).
 7. [TypeSafe System One](https://docs.typesafe.ai/concepts/system-one), [state and input support](https://docs.typesafe.ai/concepts/state), and [confidence semantics](https://docs.typesafe.ai/confidence). Reviewed September 17, 2026. See the companion review for the full Jev source list.
@@ -286,4 +288,4 @@ The founder specifies a calm, welcoming and beautiful GUI, with equally consider
 
 An agentic smart launcher is a central interaction mechanism. It interprets intentions in the context of current work rather than merely searching for applications. The system must provide clear visible feedback while the user speaks or types instructions, distinguishing input reception from interpretation and actual execution. Detailed launcher form, invocation placement and visual materials remain open.
 
-These decisions supersede earlier open-ended references to conventional desktop chrome. The explicit tiling requirement currently applies to the terminal; graphical tiling remains a separate decision. See [the experience design brief](agent-os-experience-design.md) for confirmed requirements and separately labelled interaction proposals. Earlier Jev routing proposals are also superseded by the Gateway tool-using agent and general system broker; Jev is optional for bounded evaluations.
+These decisions supersede earlier open-ended references to conventional desktop chrome. The September 18 native windowing specification adopts graphical tiling alongside floating placement, superseding the earlier undecided graphical layout model. See [the experience design brief](agent-os-experience-design.md) for confirmed requirements and separately labelled interaction proposals. Earlier Jev routing proposals are also superseded by the Gateway tool-using agent and general system broker; Jev is optional for bounded evaluations.

@@ -1,5 +1,7 @@
 # Jev decision layer
 
+**Future native presentation:** [Windowing specification §10](../agent-os-windowing-specification.md#10-jev-and-the-reasoning-model) extends this division of responsibilities to referent selection, component candidates and arrangement choices. These graphical uses are specified, not deployed. Jev remains probabilistic; deterministic code validates documents and enforces authority, revisions and interaction ownership.
+
 The implementation plan is in [JEV-IMPLEMENTATION-PLAN.md](JEV-IMPLEMENTATION-PLAN.md). Jev is pinned to `jev-1.13.0`. Ling remains responsible for research, open-ended planning, commands, writing and conversation. Jev supplies probabilistic typed judgments; deterministic code validates results and enforces lifecycle and authorization rules.
 
 ## Integrated uses

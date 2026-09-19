@@ -1,5 +1,7 @@
 # Jev integration plan
 
+**Scope of delivery:** The delivery status below covers the current agent-loop integration. Additional native presentation uses are specified in the [windowing architecture](../agent-os-windowing-specification.md#10-jev-and-the-reasoning-model) and are future implementation work.
+
 ## Principle
 
 Ling investigates, invents plans and commands, writes and communicates. Jev answers bounded questions against supplied evidence. Code validates answers, enforces authorization, preserves state and executes. The OS remains the workspace; no subsystem recipes or new application-specific command allowlists.

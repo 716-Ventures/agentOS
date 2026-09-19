@@ -2,7 +2,7 @@
 
 **Technical assessment and proposed integration · September 17, 2026**
 
-**Plan update:** The first delivery target is now the terminal-first Linux agent shell. Evaluate Jev first on intent routing, job/file references, and bounded failure classification. Desktop layout experiments described below remain later-stage applications. See the [terminal-first release plan](terminal-first-release-plan.md).
+**Superseding status · September 18:** This is the historical initial review. The [current Jev integration](agent-shell/JEV.md) now supports bounded assessments, context selection, recovery, completion and learning; the reasoning model handles open-ended requests. The [adopted native windowing specification](agent-os-windowing-specification.md) defines future component/reference selection and workspace composition. Its native contracts supersede the earlier SDK and desktop experiment proposals below. No JavaScript UI or intent router is adopted.
 
 ## Recommendation
 
@@ -88,7 +88,7 @@ TypeSafe publishes a function-calling pattern for mapping natural-language reque
 ## Implementation and evaluation sequence
 
 1. **Create a replay corpus.** Begin with 200–300 independently labeled cases covering compare, keep visible, set aside, restore, and cancel. Include missing candidates, misleading document text, transcription errors, interrupted utterances, and user intervention. Split tuning from held-out evaluation; this starter corpus cannot establish rare-failure safety.
-2. **Add a replaceable decision adapter.** Use a trusted backend process for credentials. The official TypeScript SDK can support the prototype; the Rust service can use the documented HTTP endpoint. Keep the renderer away from API keys. [Official SDK](https://github.com/typesafe-ai/typesafe-sdk-js), [HTTP API](https://docs.typesafe.ai/api)
+2. **Add a replaceable decision adapter.** Use a trusted backend process for credentials. Use the existing decision service adapter; a future Rust implementation can use the documented HTTP endpoint without adopting a TypeScript runtime. Keep the renderer away from API keys. [Official SDK](https://github.com/typesafe-ai/typesafe-sdk-js), [HTTP API](https://docs.typesafe.ai/api)
 3. **Compare execution paths.** Test deterministic handling, the existing reasoning-model approach, Jev, and Jev with escalation. Use the same state and labels. Measure candidate retrieval separately from candidate selection.
 4. **Measure the whole interaction.** Record time from utterance completion to committed change, transcription time, request latency at p50/p95/p99, errors, cost, action accuracy, autonomous coverage, correction rate, and unnecessary clarification. Include actual network conditions and service outages.
 5. **Validate probabilities.** Use reliability plots and scoring rules against labeled outcomes. Report results separately by action and input condition, with uncertainty estimates. Choose thresholds on tuning data and assess them on held-out cases. Confidence never supplies authorization.

@@ -1,5 +1,7 @@
 # Shared layout milestone — Agent OS 0.5
 
+**Graphical successor:** [Native windowing specification v0.1](../agent-os-windowing-specification.md). The API below remains the implemented terminal contract. The new specification defines separate surface-content and workspace documents, catalog discovery, live bindings and atomic cross-document transactions; those extensions are not yet implemented.
+
 The terminal and agent now operate on the same persistent activity layout. This is the presentation control foundation for a future graphical shell; no graphical compositor is installed by this milestone.
 
 ## Architecture
@@ -29,4 +31,4 @@ The live Gateway model called layout_snapshot successfully in this deployment. I
 
 ## Next architectural extension
 
-A graphical renderer should consume this contract, with new surface kinds and capability discovery for native windows. The current six-tile terminal schema is a tested starting point, not a complete Wayland protocol or final desktop scene model. Window lifetime, display outputs, pointer input, accessibility, interactive PTYs and voice remain separate milestones.
+Evolve the shared layout service through an adapter to the adopted native presentation contract. Preserve stable surface IDs, activities, revisions, undo and existing terminal operations. Introduce SurfaceDocument for typed content and WorkspaceDocument for tiled/floating placement; extend three-second editing leases into field- and geometry-aware interaction ownership. The current API and six-tile terminal projection remain supported. The graphical service must add catalog negotiation, source subscriptions, atomic transactions, output handling and application reconciliation. Window lifetime, pointer input, accessibility, interactive PTYs and voice remain unimplemented graphical milestones.

@@ -1,12 +1,12 @@
 # Agent OS experience direction
 
-Design requirements derived from the founder's principles. This document proposes interaction behavior; it does not claim that a graphical desktop or tiling engine is installed.
+Design requirements derived from the founder's principles. The [native windowing specification](agent-os-windowing-specification.md) defines the adopted graphical architecture and normative interaction contracts. This document supplies experience context; no graphical desktop is installed.
 
 ## Quality bar
 
 The environment should feel composed, responsive and dependable. macOS is a benchmark for coherence and craft, not a template for chrome, iconography or window behavior. An agentic OS should make ordinary work easier, with a distinct identity and equally good direct controls.
 
-The current terminal client is a functional activity/job dashboard. It has fixed regions, terse keyboard commands and a single selected output view. The new terminal implementation adds user-managed tiling, independent views, saved layouts and light/dark themes. See agent-shell/TERMINAL.md. Agent-issued layout operations and PTY-backed shell surfaces are not yet implemented.
+The current terminal client supports user-managed tiling, independent views, persistent shared layouts and light/dark themes. The agent and direct controls share revisioned layout operations; see [the implementation contract](agent-shell/LAYOUT.md). PTY-backed shell surfaces and the native graphical environment remain future work.
 
 ## Activities and surfaces
 
@@ -27,7 +27,7 @@ Tiling is a layout mode, not an obligation to memorize a window manager's rules.
 - Preserve layout per activity and adapt it when the available display changes.
 - Keep a visible route to layout actions; shortcuts accelerate discoverable controls.
 
-The terminal stage uses tiled text surfaces inside one terminal. The graphical stage can extend the model to application windows and richer documents. These are distinct implementations and must be labelled honestly. Live interactive shell panes require PTY/session support; displaying a command's log does not constitute a terminal session.
+The terminal stage uses tiled text surfaces inside one terminal. The adopted graphical model combines native declarative surfaces and conventional application windows, with tiled and floating placement. Surface contents and workspace arrangement are separate revisioned documents. These are distinct implementations and must be labelled honestly. Live interactive shell panes require PTY/session support; displaying a command's log does not constitute a terminal session.
 
 ## Agent participation
 
@@ -75,7 +75,7 @@ The following are design proposals, not additional founder decisions:
 
 ### Remaining visual decisions
 
-The launcher invocation control, spatial placement, dimensions, transitions, voice activation method, type system, palette and material treatment remain to be explored. The system bar is intentionally limited to date/time, signed-in identity and agent status; there is no dock. GUI tiling has not been independently confirmed; the explicit tiling request concerned the terminal.
+The launcher invocation control, spatial placement, dimensions, transitions, voice activation method, type system, palette and material treatment remain to be explored. The system bar is intentionally limited to date/time, signed-in identity and agent status; there is no dock. The September 18 adopted windowing specification now includes graphical tiling and floating placement; this supersedes the earlier undecided GUI layout model.
 
 
 ## Agent Monitor — confirmed refinement

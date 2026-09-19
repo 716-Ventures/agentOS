@@ -1,5 +1,7 @@
 # Agent OS 0.4 — general system broker
 
+**Windowing design:** The [native windowing specification](../agent-os-windowing-specification.md) defines the adopted graphical architecture: native component catalog, surface documents, source bindings, broker action references and revisioned tiled/floating workspaces. It is planned implementation, not a graphical feature of this release.
+
 A full Debian-based Linux VM with persistent activities, a terminal interface, and a Gateway agent that can use general Linux execution and filesystem tools. Jev assesses actions, selects relevant context, advises on recovery, checks completion and reviews learning; Ling plans and reasons. See [the decision layer](JEV.md). Versioned memory and reusable skills persist across activities. Voice and the graphical desktop are future work.
 
 ## Open and use

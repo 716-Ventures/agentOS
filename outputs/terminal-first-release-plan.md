@@ -1,5 +1,7 @@
 # Terminal-First Agentic OS: First Release Plan
 
+**Graphical architecture update · September 18:** The [native windowing specification](agent-os-windowing-specification.md) is the accepted successor to the terminal presentation layer. Both share activities, object identity, execution and continuity. Native surfaces and tiled/floating workspace composition add new contracts; they are not implemented by this terminal release.
+
 **Accepted direction · September 17, 2026**
 
 ## Product decision
@@ -26,7 +28,7 @@ See the [VM foundation and launch instructions](vm-foundation/README.md) and [ve
 
 ## Current agent architecture — general system broker
 
-Ask uses the Gateway model with general execution, filesystem and job-control tools, not subsystem-specific intent routing. The model can discover installed Linux utilities and combine them across domains. A root broker launches normal commands under separate per-activity accounts and systemd sandboxes; normal writes stay in the activity workspace. Exact administrative command proposals require local root approval before execution. Jev remains optional for future bounded evaluations.
+Ask uses the Gateway model with general execution, filesystem and job-control tools, not subsystem-specific intent routing. The operating system is the agent's workspace. The root broker supervises commands across it; activity directories organize work rather than restrict authority. Requested routine work proceeds automatically; harmful effects need authorization unless the existing user instruction already covers them. Jev supplies bounded assessments, context selection, recovery, completion and learning checks. See [the current Jev guide](agent-shell/JEV.md).
 
 See [the broker guide](agent-shell/BROKER.md) for implemented limits, command authority, persistence, recovery, and remaining UI/PTY work. Existing explicit-command activities and the disk shortcut remain available. This replaces the earlier plan to build one tool per subsystem.
 
@@ -44,9 +46,9 @@ The model must receive the selected failure and relevant context, not an indiscr
 | Activities | Create, switch, set aside, restore; preserve workspace and relevant objects |
 | Jobs | Start, inspect output, attach where supported, interrupt, and record exit status |
 | Files | Scoped reads and inspectable edits with supported recovery |
-| Agent | Route bounded requests, plan supported work, explain failures, report observed results |
+| Agent | Research and plan open-ended requests, use general system tools, explain failures, report observed results |
 | Jev | Optional bounded evaluations where measured value justifies its use |
-| System integration | Read service health and resource use; narrowly authorized service actions |
+| System integration | Inspect and act across the OS through the broker under the established effect-based authority policy |
 | Persistence | Durable actions, results, revisions, and restart reconciliation |
 | Recovery | Direct controls and conventional rescue shell remain available without models |
 
@@ -80,7 +82,7 @@ Keep provider credentials in a trusted backend. Store model and question version
 - Descriptive progress comes from observed execution state. Proposed work and completed work have distinct representations.
 - The terminal provides navigable activities, job status, output, and action history. It must remain useful without relying exclusively on color or animation.
 - Confidence can determine whether to resolve ambiguity or escalate reasoning. It does not create permissions.
-- File scope must be enforced by execution mechanisms. A working directory alone does not sandbox a subprocess.
+- Activity directories are organizational context, not a restricted workspace. The broker enforces effect-based authorization; a working directory is not a security boundary.
 
 ## Implementation milestones
 

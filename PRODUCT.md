@@ -1,5 +1,7 @@
 # Agent OS product context
 
+**Adopted windowing architecture:** [Native windowing specification v0.1](outputs/agent-os-windowing-specification.md). The agent composes typed native surfaces and workspace arrangements through validated transactions. This is the graphical design target; the current implementation remains terminal-based.
+
 ## Register
 
 product
@@ -26,7 +28,7 @@ A conventional desktop with a chatbot attached. A developer-only interface that 
 2. Give the person and the agent shared control through a coherent environment model.
 3. Make voice a first-class input path while preserving effective non-voice operation.
 4. Maintain continuity across activities, processes, conversations and client sessions.
-5. Make tiling a first-class capability in the terminal. GUI tiling remains a separate design decision.
+5. Make tiling a first-class capability in the terminal and the native graphical workspace. The graphical specification also supports floating application windows and preserved manual arrangements.
 6. Give the GUI equally considered light and dark appearances, with a minimal system bar and no dock. The bar shows date/time, the signed-in user and an agent-status entry that opens a standalone Agent Monitor window.
 7. Provide an agentic launcher accessible through voice, keyboard and mouse, with clear visible feedback while receiving and acting on instructions.
 

@@ -1,5 +1,7 @@
 # Tiled terminal environment
 
+**Future desktop:** The [native windowing specification](../agent-os-windowing-specification.md) adopts the terminal's shared-control principles and extends them to typed native surfaces and graphical workspace composition. This guide describes the terminal implementation only.
+
 The installed terminal client now supports up to six independent tiles per activity, a quieter conversation view, light/dark themes, editable input, and persistent layouts.
 
 Exit the old client with **q**, then run `agent-os` again. No VM restart is needed.

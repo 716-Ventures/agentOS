@@ -1,4 +1,12 @@
-# Agent OS terminal design system
+# Agent OS design system
+
+## Native graphical direction
+
+The [native windowing specification](outputs/agent-os-windowing-specification.md) is authoritative for the future desktop. The agent composes stable typed elements and workspace arrangements; native components own visual quality, accessibility and immediate interaction. Live bindings reflect authoritative system state. Atomic revisioned updates preserve focus, selection and drafts. Tiling and floating placement share the same environment model; direct controls stay available without inference.
+
+Both light and dark appearances, a minimal system bar, no dock, the contextual voice/keyboard/pointer launcher and an independent Agent Monitor remain requirements. Generated surfaces use the native token system and component vocabulary, never arbitrary model-generated styling or executable UI code. The native typography, materials and renderer need implementation and visual validation.
+
+The following sections document the **implemented terminal** design. Terminal palette indices and the six-tile limit do not constrain the graphical specification.
 
 ## Surface and intent
 

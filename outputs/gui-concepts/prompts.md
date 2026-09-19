@@ -1,5 +1,7 @@
 # GUI concept image prompts
 
+**Architecture note:** These are visual exploration prompts, not implementation contracts. The [native windowing specification](../agent-os-windowing-specification.md) governs the graphical system. Historical depictions must not override its interaction, layout or authority rules.
+
 Generated using the built-in image-generation tool. Exploratory concepts, not implemented screenshots or a committed visual identity. Colors, wallpaper, symbols, and arrangements are illustrative.
 
 ## Light workspace

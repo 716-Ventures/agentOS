@@ -2,7 +2,7 @@
 
 An agent-first operating system built on Linux. The operating system is the agent's workspace: it can inspect the machine, plan and execute requested work, and retain useful knowledge. Explicit user authorization is required for harmful effects that the request does not already cover.
 
-The current prototype is a complete Debian ARM64 virtual machine with a tiling terminal interface, persistent activities, a Rust runtime, and Python services. Ling through Vercel AI Gateway handles reasoning; Jev supplies typed action assessments that the execution broker validates and applies. Voice and a custom graphical desktop are planned.
+The current prototype is a complete Debian ARM64 virtual machine with a tiling terminal interface, persistent activities, a Rust runtime, and Python services. Ling through Vercel AI Gateway handles reasoning; Jev supplies typed action assessments that the execution broker validates and applies. Voice and a custom native graphical desktop are planned. The adopted windowing model uses typed declarative surfaces, live state bindings and revisioned workspace composition, with native rendering and immediate direct controls.
 
 ## Source map
 
@@ -10,6 +10,7 @@ The current prototype is a complete Debian ARM64 virtual machine with a tiling t
 - [Linux VM build and launch tooling](outputs/vm-foundation/)
 - [Interactive design prototype](outputs/dark-interaction/)
 - [GUI concepts and design assets](outputs/gui-concepts/)
+- [Native windowing specification](outputs/agent-os-windowing-specification.md) — adopted architecture; graphical implementation is future work
 - [White paper](outputs/agentic-operating-system-white-paper.md)
 - [Terminal release plan](outputs/terminal-first-release-plan.md)
 - [Product principles](PRODUCT.md) and [design direction](DESIGN.md)

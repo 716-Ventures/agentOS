@@ -1,5 +1,7 @@
 # Agent OS — dark interaction prototype
 
+**Historical visual prototype:** The [native windowing specification](../agent-os-windowing-specification.md) is now authoritative. This browser demonstration is a design artifact, not the production shell technology. Its review step illustrates correction; routine requested arrangement in the native system does not require an extra approval step.
+
 A browser-based design prototype for the flow: select a note → type or speak an instruction → review and correct the interpretation → arrange references → stop/resume/undo.
 
 ## Preview
