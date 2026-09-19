@@ -68,6 +68,18 @@ Each catalog entry defines compatible presentation variants, density, minimum us
 
 A conventional application is managed through compositor placement and any available application/accessibility adapter. It need not be rewritten in this vocabulary. An unsupported rich component has an explicit fallback representation with its primary information and available actions; it is never silently omitted.
 
+### Standalone component library — September 19 decision
+
+The reusable native component library is [716 UI](https://github.com/716-Ventures/716-ui), a standalone public repository under 716-Ventures with its own release lifecycle. Its initial repository contains specifications and release groundwork; native implementation remains future work. Original work uses Apache-2.0; incorporated or adapted upstream material retains the required license notices. agentOS consumes versioned releases rather than maintaining a private fork of the component implementations.
+
+shadcn is the visual and interaction reference for corresponding components, including states and animations. Before implementation, pin the reference source revision, style, theme, fonts, icons and underlying interaction primitives. Record each component's appearance, keyboard/pointer behavior, focus management, accessibility semantics and motion—including interruption and reduced-motion behavior—in a reproducible parity specification. Validate native implementations against reference scenarios and captures, not just static screenshots.
+
+The public library owns semantic design tokens, reusable native controls, component state machines, animation behavior, accessibility integration, typed component metadata, documentation, a standalone gallery and visual/interaction regression tests. It must be usable without agentOS, an agent, Jev, provider credentials or a network connection. Rust remains the implementation direction; the native renderer choice remains open.
+
+agentOS owns activities, workspace placement, the compositor, system authority, broker integration, agent orchestration and OS-specific views. Its presentation registry adapts library components to SurfaceDocument, bindings and action references. The library emits typed application events; it does not execute privileged commands or prescribe an application's authorization policy. Window-management behavior remains in this specification; a reusable split-view control may live in the library without taking over desktop placement.
+
+Develop the public repository independently of the private OS history. Publish reusable source and deliberately public examples, with no VM state, account configuration or credentials. Establish a changelog, supported platform matrix and versioned APIs; mark early releases experimental until their native interaction and accessibility requirements are verified. Select one renderer for the first implementation rather than promising an untested universal backend abstraction.
+
 ## 5. Surface contract
 
 Protocol v1 uses UTF-8 JSON over local authenticated IPC, independent of any programming language. IDs and component versions are strings; revisions are unsigned integers. Documents use a flat element map and an ordered list of child IDs per named slot.

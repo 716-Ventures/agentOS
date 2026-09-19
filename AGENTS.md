@@ -9,3 +9,9 @@
 ## User licensing preference
 - Default to Apache License 2.0 (Apache-2.0, also called ASL 2.0) wherever legally compatible.
 - Preserve third-party licenses; do not relicense dependencies or inherited code without the necessary rights.
+
+## 716 UI
+- Public repository: https://github.com/716-Ventures/716-ui.
+- Local root: `/Users/chrisjdavis/development/716-ui`.
+- Standalone native component library; shadcn visual/interaction reference, Apache-2.0 for original work.
+- Use `chrisjdavis` and repository-local Git identity.

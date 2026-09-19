@@ -8,6 +8,10 @@ Both light and dark appearances, a minimal system bar, no dock, the contextual v
 
 The following sections document the **implemented terminal** design. Terminal palette indices and the six-tile limit do not constrain the graphical specification.
 
+## Reusable component foundation
+
+[716 UI](https://github.com/716-Ventures/716-ui) is the standalone public native component library, to be consumed by agentOS through versioned releases. The repository currently contains its specification and release groundwork. shadcn is the reference for corresponding component visuals, interaction and motion. Pin a concrete upstream style/theme/revision and verify parity in a standalone component gallery. The library owns reusable controls and tokens; agentOS owns desktop composition and system behavior. See the [library boundary](outputs/agent-os-windowing-specification.md#standalone-component-library--september-19-decision).
+
 ## Surface and intent
 
 The implemented surface is a curses terminal client, not a graphical desktop. It is intended for sustained work in a host terminal alongside other applications. The existing cyan identity is retained in a restrained dark theme; a light theme supports bright environments and user preference. Both are direct controls, independent of model availability.
