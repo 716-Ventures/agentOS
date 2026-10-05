@@ -16,7 +16,7 @@ def request(op,**fields):
 
 def main():
     p=argparse.ArgumentParser(description='Review and control general system broker operations')
-    p.add_argument('op',choices=['list','poll','cancel','approve'])
+    p.add_argument('op',choices=['list','poll','cancel','approve','input'])
     p.add_argument('job_id',nargs='?')
     args=p.parse_args()
     print(json.dumps(request(args.op,**({'job_id':args.job_id} if args.job_id else {})),indent=2))

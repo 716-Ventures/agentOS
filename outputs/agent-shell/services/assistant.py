@@ -4,6 +4,7 @@ import knowledge
 import model_usage
 import datetime
 import json
+import hashlib
 from pathlib import Path
 import socket
 import uuid
@@ -162,8 +163,16 @@ def handle(req, conn):
                     job=broker_request('execute',activity=activity,current_request=prompt,conversation_context=conversation_context,**args)
                 else:
                     operation={'read_file':'read','list_directory':'list','write_file':'write'}[name]
-                    job=broker_request('execute',activity=activity,argv=['/usr/bin/python3',
-                        '/usr/local/lib/agent-os/services/files.py',json.dumps({'op':operation,**args})],
+                    fields={}
+                    descriptor={'op':operation,**args}
+                    argv=['/usr/bin/python3','/usr/local/lib/agent-os/services/files.py']
+                    if name=='write_file':
+                        content=descriptor.pop('content')
+                        descriptor['content_sha256']=hashlib.sha256(content.encode('utf-8')).hexdigest()
+                        argv.append('--stdin-content')
+                        fields['stdin']=content
+                    argv.append(json.dumps(descriptor))
+                    job=broker_request('execute',activity=activity,argv=argv,**fields,
                         purpose=name+': '+args['path'],timeout_seconds=15,scope='system',current_request=prompt,conversation_context=conversation_context)
                 if job['status'] in ('inspection_required','outside_request'):return job
                 ident=job['id']

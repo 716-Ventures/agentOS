@@ -14,18 +14,21 @@ Commands use an absolute executable and an argument array. Shell syntax requires
 
 Routine actions execute automatically when assessment passes. Agent requests also require confident task alignment. Explicit current user instructions may cover exact harmful effects; otherwise uncovered harmful effects produce a review proposal. Uncertain, low-confidence, unavailable or malformed assessments require further inspection. After inspection, `request_confirmation` can create a proposal if uncertainty remains. Unknown command names are not automatically refused.
 
-A proposal records exact argv, cwd, activity, lifetime, authority and requester identity. Review and control it locally:
+A proposal records exact argv, cwd, activity, lifetime, authority, requester identity and, when supplied, the SHA-256 and byte count of stdin. Review and control it locally:
 
 ```sh
 agent-os-broker list
 agent-os-broker poll JOB_ID
+sudo agent-os-broker input JOB_ID
 sudo agent-os-broker approve JOB_ID
 agent-os-broker cancel JOB_ID
 ```
 
 Approval requires UID 0 from Unix peer credentials, rather than a request field. The terminal offers locally handled approval replies. Root execution means a previously admitted root program also has administrative authority; peer credentials do not prove that a request came from a human. Approval binds the command arguments and working directory, not immutable copies of scripts or other external inputs. Inspect those inputs when reviewing a proposal.
 
-Pending proposals survive restart without execution. Identical pending requests reuse one proposal. Already active identical background requests reuse their job. Both paths match activity, normalized argv, resolved working directory, execution authority, foreground/background mode and deadline. A foreground job or a job with a different lifetime cannot satisfy a background retry. Different settings create a separate assessed operation; they do not extend an existing unit’s lifetime.
+Pending proposals survive restart without execution. Identical pending requests reuse one proposal. Already active identical background requests reuse their job. Both paths match activity, normalized argv, resolved working directory, execution authority, foreground/background mode, deadline and stdin hash. A foreground job or a job with a different lifetime cannot satisfy a background retry. Different settings create a separate assessed operation; they do not extend an existing unit’s lifetime.
+
+Commands may receive a single UTF-8 stdin payload of up to 64 KiB. Assessment receives the full input as untrusted data; authorization and retry identity bind its exact byte hash. Input is stored in private broker records and omitted from ordinary job views. The root-only `input` command exposes it for review. Input is fed concurrently with output draining, and closed afterward; this is not an interactive session.
 
 ## Jobs and direct controls
 
@@ -37,7 +40,7 @@ Broker records/logs live under `/var/lib/agent-os-broker`; conversations and tra
 
 ## Guarded files and recovery
 
-File tools read regular UTF-8 files up to 64 KiB. The assistant collects every broker output page before parsing the file result, preserving full content and the hash. Byte-offset polling retains incomplete UTF-8 suffixes for the next page so Unicode characters are not corrupted at chunk boundaries. Helper output uses UTF-8 with JSON escapes for undecodable filename bytes. If JSON escaping expands a result past the 256 KiB broker output cap, or the result is incomplete/malformed, the tool returns an explicit error rather than claiming it returned a complete file. Writes require the current content hash or literal `missing` for creation. Replacements preserve previous bytes under `/var/lib/agent-os-file-backups`, use atomic replacement, and preserve the original owner and permission bits. Guarded writers serialize per resolved path, so two writers cannot both replace the same revision. Non-regular files are rejected without waiting for FIFO input. Failed replacements remove temporary files.
+File tools read regular UTF-8 files up to 64 KiB. The assistant collects every broker output page before parsing the file result, preserving full content and the hash. Byte-offset polling retains incomplete UTF-8 suffixes for the next page so Unicode characters are not corrupted at chunk boundaries. Helper output uses UTF-8 with JSON escapes for undecodable filename bytes. If JSON escaping expands a result past the 256 KiB broker output cap, or the result is incomplete/malformed, the tool returns an explicit error rather than claiming it returned a complete file. Write content travels over bounded stdin with a small argument descriptor, so the 32,000-character argument limit does not reduce the supported file size. The helper verifies the input hash before editing. Writes require the current content hash or literal `missing` for creation. Replacements preserve previous bytes under `/var/lib/agent-os-file-backups`, use atomic replacement, and preserve the original owner and permission bits. Guarded writers serialize per resolved path, so two writers cannot both replace the same revision. Non-regular files are rejected without waiting for FIFO input. Failed replacements remove temporary files.
 
 Arbitrary programs do not participate in those locks and can still race a guarded edit. Backups are prior content, not full metadata snapshots or automatic rollback. Arbitrary commands have no automatic recovery. System-wide snapshots and transactional configuration changes remain future work.
 
@@ -50,5 +53,7 @@ Run the local Python unit suite and Rust tests described in [README.md](README.m
 `tests/broker_reuse_guest.py` verifies distinct foreground/background units, distinct lifetimes and their actual systemd deadlines, and reuse of an identical background retry without another launch. It approves only its harmless sleep fixtures and cancels them afterward.
 
 `tests/file_result_guest.py` checks complete ASCII, CJK and emoji content and hashes through real broker output and the assistant dispatcher. It uses explicit provider fixtures and approves only its harmless file reads; it does not test live model inference.
+
+`tests/write_transport_guest.py`, run as root in the development guest, verifies 64 KiB ASCII, emoji and NUL writes and empty input through the assistant and real broker, exact hashes, prior-content backups, stale revisions, mismatched input and size limits. It also checks output-before-input execution for pipe deadlocks. It approves only its harmless fixtures and uses provider fixtures.
 
 Live model quality is evaluated separately. The retained Jev action set is a small regression sample, not a calibrated safety guarantee. Local tests do not establish systemd behavior or live provider quality.

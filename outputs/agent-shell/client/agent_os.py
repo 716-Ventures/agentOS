@@ -67,7 +67,7 @@ def approval_target(text, proposals):
 def approve_operation(proposal):
     # Only the local human client crosses this boundary. Never a model tool.
     current=broker_request('poll',job_id=proposal['id'])
-    if current['status']!='approval_required' or any(current[k]!=proposal[k] for k in ('argv','activity','scope')):
+    if current['status']!='approval_required' or any(current.get(k)!=proposal.get(k) for k in ('argv','activity','scope','stdin_sha256')):
         raise RuntimeError('This proposal changed or was already handled. Nothing was approved.')
     result=subprocess.run(['/usr/bin/sudo','-n','/usr/local/bin/agent-os-broker','approve',proposal['id']],
                           capture_output=True,text=True,timeout=15)

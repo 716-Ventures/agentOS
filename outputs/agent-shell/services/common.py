@@ -5,6 +5,7 @@ import socket
 
 LIMIT = 512 * 1024
 BROKER_OUTPUT_LIMIT = 256 * 1024
+BROKER_INPUT_LIMIT = 64 * 1024
 AI_SOCKET = '/run/agent-os-ai/api.sock'
 DISK_SOCKET = '/run/agent-os-disk/api.sock'
 

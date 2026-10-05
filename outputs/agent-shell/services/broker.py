@@ -3,6 +3,7 @@
 import json
 import codecs
 import math
+import hashlib
 import os
 from pathlib import Path
 import pwd
@@ -13,7 +14,7 @@ import subprocess
 import threading
 import time
 import uuid
-from common import BROKER_OUTPUT_LIMIT, listen, read_line, send
+from common import BROKER_INPUT_LIMIT, BROKER_OUTPUT_LIMIT, listen, read_line, send
 from effects import assess
 
 SOCKET = '/run/agent-os-broker/api.sock'
@@ -49,6 +50,12 @@ def validate(req):
         any(not isinstance(a, str) or '\0' in a or len(a) > 32000 for a in argv)
         or not argv[0].startswith('/')):
         raise ValueError('argv must contain an absolute executable and at most 128 bounded text arguments')
+    if 'stdin' in req:
+        content=req['stdin']
+        if not isinstance(content,str):raise ValueError('stdin must be UTF-8 text')
+        try: size=len(content.encode('utf-8'))
+        except UnicodeEncodeError:raise ValueError('stdin must be UTF-8 text') from None
+        if size>BROKER_INPUT_LIMIT:raise ValueError('stdin exceeds the 64 KiB input limit')
     background=req.get('background',False)
     if type(background) is not bool:raise ValueError('background must be boolean')
     timeout = req.get('lifetime_seconds',86400) if background else req.get('timeout_seconds',30)
@@ -65,9 +72,11 @@ def validate(req):
 
 def launch(job):
     ident = job['id']
+    content=job.get('stdin')
     props = ['Type=exec', 'KillMode=control-group', 'TimeoutStopSec=2',
              f"RuntimeMaxSec={job['timeout_seconds']}", 'MemoryMax=256M', 'TasksMax=64',
-             'UMask=0077', 'StandardInput=null']
+             'UMask=0077']
+    if content is None:props.append('StandardInput=null')
     # All assessed actions operate on the Linux OS with system authority.
     props += ['User=root', 'Group=root']
     command = ['/usr/bin/systemd-run', '--quiet', '--wait', '--pipe', '--collect',
@@ -82,9 +91,21 @@ def launch(job):
                 job['status'] = 'cancelled'
                 return
             # Starting while holding the lock makes a concurrent cancellation observe a launched request.
-            proc = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            proc = subprocess.Popen(command, stdin=subprocess.PIPE if content is not None else subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                     env={'PATH':'/usr/bin:/bin', 'LANG':'C.UTF-8'})
             job['status'] = 'running'; persist(job)
+        if content is not None:
+            # Feed while draining output: a child may write before reading stdin.
+            def feed():
+                try:
+                    proc.stdin.write(content.encode('utf-8'))
+                    proc.stdin.flush()
+                except (BrokenPipeError,OSError):
+                    pass
+                finally:
+                    try:proc.stdin.close()
+                    except (BrokenPipeError,OSError):pass
+            threading.Thread(target=feed,daemon=True).start()
         count = 0
         with (STATE / (ident+'.log')).open('wb') as f:
             while True:
@@ -113,7 +134,7 @@ def start(job):
 
 
 def view(job, offset=0):
-    result = dict(job)
+    result = {k:v for k,v in job.items() if k!='stdin'}
     p = STATE / (job['id']+'.log')
     if p.exists():
         with p.open('rb') as f:
@@ -129,12 +150,13 @@ def view(job, offset=0):
     return result
 
 
-def same_operation(job, activity, argv, cwd, background, timeout, scope):
+def same_operation(job, activity, argv, cwd, background, timeout, scope, stdin_sha256=None):
     """Deduplication must preserve the requested execution contract."""
     return (job['activity'] == activity and job['argv'] == argv
             and job.get('cwd', job['workspace']) == cwd
             and job.get('background', False) == background
-            and job['timeout_seconds'] == timeout and job['scope'] == scope)
+            and job['timeout_seconds'] == timeout and job['scope'] == scope
+            and job.get('stdin_sha256') == stdin_sha256)
 
 
 def handle(req, uid):
@@ -142,27 +164,31 @@ def handle(req, uid):
     with LOCK:
         if op == 'list':
             activity = req.get('activity')
-            return [dict(j) for j in sorted(JOBS.values(),key=lambda j:j['created_at'],reverse=True)
+            return [{k:v for k,v in j.items() if k!='stdin'} for j in sorted(JOBS.values(),key=lambda j:j['created_at'],reverse=True)
                     if activity is None or j['activity']==activity][:100]
         if op in ('execute','preview'):
             argv, timeout, scope, purpose = validate(req)
+            content=req.get('stdin')
+            input_hash=hashlib.sha256(content.encode('utf-8')).hexdigest() if content is not None else None
             path = workspace(req.get('activity'))
             cwd=req.get('cwd',path)
             if not isinstance(cwd,str):raise ValueError('cwd must be a directory')
             cwd=str((Path(path)/cwd).resolve())
             if not Path(cwd).is_dir():raise ValueError('Working directory does not exist')
             policy=assess(argv,scope)
+            if content is not None:
+                policy.update(stdin_sha256=input_hash,stdin_bytes=len(content.encode('utf-8')))
             deterministic_harm=policy['decision']=='approve'
             if policy['decision']=='inspect' or (deterministic_harm and req.get('current_request')):
                 LOCK.release()
                 try:
                     completed=subprocess.run(['/usr/sbin/runuser','-u','agentos-ai','-g','agentos','-G','agentos-ai','--',
                         '/usr/bin/python3','/usr/local/lib/agent-os/services/assess_action.py'],
-                        input=json.dumps({'argv':policy['argv'],'scope':scope,'cwd':cwd,'background':req.get('background',False),
+                        input=json.dumps({'stdin_untrusted':content,'stdin_sha256':input_hash,'argv':policy['argv'],'scope':scope,'cwd':cwd,'background':req.get('background',False),
                             'lifetime_seconds':timeout,'purpose_untrusted':purpose,'current_request':str(req.get('current_request',''))[:4000],
                             'evidence_untrusted':str(req.get('evidence',''))[:8000],
                             'conversation_context':req.get('conversation_context',[]),
-                            'authority':'Linux guest root with full OS access. Activity directory is only a default cwd, not a filesystem boundary.'}),
+                            'authority':'Linux guest root with full OS access. Activity directory is only a default cwd, not a filesystem boundary.'},ensure_ascii=False),
                         text=True,capture_output=True,timeout=18)
                     try:assessment=json.loads(completed.stdout) if completed.returncode==0 else {}
                     except ValueError:assessment={}
@@ -187,7 +213,7 @@ def handle(req, uid):
                     and confident(assessment.get('authorization_confidence'), .6))
                 if authorized:
                     policy['authorization']={'source':'current_user_request','request':req['current_request'],
-                        'context':req.get('conversation_context',[]),'argv':policy['argv'],'cwd':cwd}
+                        'context':req.get('conversation_context',[]),'argv':policy['argv'],'cwd':cwd,'stdin_sha256':input_hash}
                 policy.update(decision='allow' if routine or authorized else 'approve' if deterministic_harm or assessment.get('risk')=='harmful' or req.get('request_confirmation') is True else 'inspect',effect='assessed_routine' if routine else 'potential_harm',
                     reason='The current user instruction explicitly authorizes this exact action and its effects.' if authorized else 'Jev assessed this exact action as routine; execution uses supervised OS-level authority.' if routine else
                     'This action may have harmful effects or its material effects remain uncertain. Inspect further or obtain confirmation for this exact action.')
@@ -198,7 +224,7 @@ def handle(req, uid):
             argv,scope=policy['argv'],policy['scope']
             # Reuse exact proposals, preserving identity across retries and consent.
             matches=[j for j in JOBS.values() if j['status']=='approval_required'
-                and same_operation(j, req['activity'], argv, cwd, req.get('background',False), timeout, scope)]
+                and same_operation(j, req['activity'], argv, cwd, req.get('background',False), timeout, scope, input_hash)]
             if matches:
                 existing=min(matches,key=lambda j:j['created_at'])
                 for duplicate in matches:
@@ -210,12 +236,14 @@ def handle(req, uid):
                 return view(existing)
             if req.get('background',False):
                 for existing in JOBS.values():
-                    if existing['status'] in ('starting','running') and same_operation(existing, req['activity'], argv, cwd, True, timeout, scope):
+                    if existing['status'] in ('starting','running') and same_operation(existing, req['activity'], argv, cwd, True, timeout, scope, input_hash):
                         return view(existing)
             job = {'id':uuid.uuid4().hex, 'activity':req['activity'], 'argv':argv,
                    'timeout_seconds':timeout, 'scope':scope, 'purpose':purpose, 'workspace':path, 'cwd':cwd, 'background':req.get('background',False),
                    'policy':policy,'requested_argv':original_argv,'requested_by_uid':uid, 'created_at':time.time(), 'exit_code':None,
                    'status':'approval_required' if policy['decision']=='approve' else 'starting'}
+            if content is not None:
+                job.update(stdin=content,stdin_sha256=input_hash,stdin_bytes=len(content.encode('utf-8')))
             JOBS[job['id']] = job
             if policy['decision']=='approve': persist(job)
             else:
@@ -227,6 +255,9 @@ def handle(req, uid):
         if not isinstance(ident,str) or not re.fullmatch('[a-f0-9]{32}',ident) or ident not in JOBS:
             raise ValueError('Unknown broker job')
         job = JOBS[ident]
+        if op == 'input':
+            if uid != 0:raise ValueError('Only a local administrator may inspect stored input')
+            return {'stdin':job.get('stdin'),'stdin_sha256':job.get('stdin_sha256'),'stdin_bytes':job.get('stdin_bytes',0)}
         if op == 'poll':
             offset=req.get('offset',0)
             if type(offset) is not int or not 0 <= offset <= LIMIT: raise ValueError('Invalid offset')

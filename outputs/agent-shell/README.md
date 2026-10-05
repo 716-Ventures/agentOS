@@ -56,6 +56,7 @@ Run `python3 deploy.py` from this directory on the Mac to copy source and build/
 - `tests/broker_integration.py`: real guest execution, OS authority, file recovery, deadlines, cancellation and administrator approval.
 - `tests/broker_restart_guest.py`: verified shutdown of root commands and detached children on broker restart, proposal persistence, completion times and no replay.
 - `tests/broker_reuse_guest.py`: matching background retries, foreground/background separation and real systemd lifetime settings.
+- `tests/write_transport_guest.py`: bounded stdin delivery for full-size guarded writes, exact hashes, backups, stale revisions and pipe behavior; run as root in the guest with provider fixtures.
 - `tests/file_result_guest.py`: complete large file results and hashes across broker output pages, including Unicode, through the assistant dispatcher with provider fixtures.
 - `broker-verification.json`: broker integration and restart results.
 - `verification.json`: original activity/supervisor milestone checks.

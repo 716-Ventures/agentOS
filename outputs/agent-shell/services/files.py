@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Filesystem primitives for OS-wide guarded reads and edits."""
+from common import BROKER_INPUT_LIMIT
 import hashlib
 import fcntl
 import json
@@ -75,11 +76,29 @@ def write_guarded(target, req):
         temporary.unlink(missing_ok=True)
     return {'path':str(target),'sha256':hashlib.sha256(content).hexdigest(),'backup':str(backup) if backup else None}
 
+def read_request(args, stream):
+    if args and args[0]=='--stdin-content':
+        if len(args)!=2:raise ValueError('Use a guarded write descriptor with stdin content')
+        req=json.loads(args[1])
+        if not isinstance(req,dict) or req.get('op')!='write' or 'content' in req:
+            raise ValueError('stdin content requires a guarded write')
+        data=stream.read(BROKER_INPUT_LIMIT+1)
+        if len(data)>BROKER_INPUT_LIMIT:raise ValueError('Content too large')
+        expected=req.pop('content_sha256',None)
+        if hashlib.sha256(data).hexdigest()!=expected:raise ValueError('Input content hash mismatch')
+        req['content']=data.decode('utf-8')
+        return req
+    if len(args)!=1:raise ValueError('Use a file operation descriptor')
+    req=json.loads(args[0])
+    if not isinstance(req,dict):raise ValueError('Use a file operation descriptor')
+    return req
+
+
 if __name__=='__main__':
     try:
         # Use UTF-8 for ordinary text, but JSON-escape undecodable filename
         # surrogates instead of emitting invalid UTF-8 into the broker stream.
-        payload=json.dumps(run(json.loads(sys.argv[1])), ensure_ascii=False)
+        payload=json.dumps(run(read_request(sys.argv[1:],sys.stdin.buffer)), ensure_ascii=False)
         sys.stdout.buffer.write(payload.encode('utf-8','backslashreplace')+b'\n')
     except (OSError,ValueError,KeyError) as exc:
         print(json.dumps({'error':str(exc)}));sys.exit(1)
