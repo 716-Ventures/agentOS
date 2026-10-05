@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """General execution broker. Only this trusted service talks to systemd as root."""
 import json
+import codecs
 import math
 import os
 from pathlib import Path
@@ -12,14 +13,14 @@ import subprocess
 import threading
 import time
 import uuid
-from common import listen, read_line, send
+from common import BROKER_OUTPUT_LIMIT, listen, read_line, send
 from effects import assess
 
 SOCKET = '/run/agent-os-broker/api.sock'
 STATE = Path('/var/lib/agent-os-broker')
 WORK = Path('/var/lib/agent-os-workspaces')
 LOCK = threading.RLock()
-LIMIT = 256 * 1024
+LIMIT = BROKER_OUTPUT_LIMIT
 JOBS = {}
 
 
@@ -117,7 +118,13 @@ def view(job, offset=0):
     if p.exists():
         with p.open('rb') as f:
             f.seek(offset); data = f.read(32768)
-        result.update(output=data.decode('utf-8','replace'), next_offset=offset+len(data))
+        # Keep an incomplete UTF-8 suffix for the next byte-offset poll. Decoding
+        # each page independently otherwise corrupts valid multibyte characters.
+        final = job['status'] not in ('starting', 'running', 'cancelling') and offset + len(data) >= p.stat().st_size
+        decoder = codecs.getincrementaldecoder('utf-8')(errors='replace')
+        output = decoder.decode(data, final=final)
+        pending = decoder.getstate()[0]
+        result.update(output=output, next_offset=offset+len(data)-len(pending))
     else: result.update(output='', next_offset=offset)
     return result
 

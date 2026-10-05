@@ -8,7 +8,7 @@ from pathlib import Path
 import socket
 import uuid
 import time
-from common import AI_SOCKET, DISK_SOCKET, connect, listen, read_line, send
+from common import BROKER_OUTPUT_LIMIT, AI_SOCKET, DISK_SOCKET, connect, listen, read_line, send
 from providers import CONFIG, DEFAULT_MODEL, ProviderError, config, explain
 
 from agent import run as run_agent
@@ -45,6 +45,46 @@ def summary(report):
         if item.get('rows_omitted'): lines.append('  Additional rows omitted from evidence.')
     lines.extend(report['limitations'])
     return '\n'.join(lines)
+
+
+def collect_file_result(job):
+    """Collect a completed helper's bounded JSON across byte-offset broker pages."""
+    result = {**job, 'job_id': job['id']}
+    if job.get('output_truncated'):
+        result['error'] = 'File result exceeded the broker output limit; no complete content or hash was returned. Inspect a smaller range with execute.'
+        return result
+    output = [job.get('output', '')]
+    offset = job.get('next_offset', 0)
+    if type(offset) is not int or not 0 <= offset <= BROKER_OUTPUT_LIMIT:
+        raise ValueError('Invalid file result offset')
+    # A complete result fits in at most eight 32 KiB pages plus an EOF poll.
+    # Allow additional polls for UTF-8 boundary suffixes, still with a byte cap.
+    for _ in range(16):
+        page = broker_request('poll', job_id=job['id'], offset=offset)
+        following = page.get('next_offset')
+        if type(following) is not int or not offset <= following <= BROKER_OUTPUT_LIMIT:
+            raise ValueError('Invalid file result offset')
+        if page.get('output_truncated'):
+            result['error'] = 'File result exceeded the broker output limit; no complete content or hash was returned. Inspect a smaller range with execute.'
+            return result
+        text = page.get('output', '')
+        if following == offset:
+            if text:
+                raise ValueError('File result did not advance')
+            break
+        output.append(text)
+        offset = following
+    else:
+        raise ValueError('File result exceeded the page limit')
+    result.update(output=''.join(output), next_offset=offset)
+    try:
+        value = json.loads(result['output'])
+        if not isinstance(value, dict):
+            raise ValueError('Expected a file result object')
+        result['file_result'] = value
+    except ValueError:
+        result['error'] = 'File helper returned an incomplete or invalid result; no complete content or hash was returned.'
+    return result
 
 
 def handle(req, conn):
@@ -136,11 +176,10 @@ def handle(req, conn):
                     job=broker_request('poll',job_id=ident)
                 emit(conn,'Broker job '+ident+': '+job['status']+
                     (' · exit '+str(job['exit_code']) if job['exit_code'] is not None else ''))
-                if job.get('output'):emit(conn,job['output'])
                 result={**job,'job_id':ident}
                 if name in ('read_file','list_directory','write_file') and job['status'] not in ('starting','running','cancelling'):
-                    try:result['file_result']=json.loads(job.get('output',''))
-                    except ValueError:pass
+                    result=collect_file_result(job)
+                if result.get('output'):emit(conn,result['output'])
                 return result
             except (RuntimeError,ValueError,OSError) as exc:
                 return {'error':str(exc)}

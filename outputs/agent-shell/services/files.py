@@ -76,6 +76,10 @@ def write_guarded(target, req):
     return {'path':str(target),'sha256':hashlib.sha256(content).hexdigest(),'backup':str(backup) if backup else None}
 
 if __name__=='__main__':
-    try:print(json.dumps(run(json.loads(sys.argv[1]))))
+    try:
+        # Use UTF-8 for ordinary text, but JSON-escape undecodable filename
+        # surrogates instead of emitting invalid UTF-8 into the broker stream.
+        payload=json.dumps(run(json.loads(sys.argv[1])), ensure_ascii=False)
+        sys.stdout.buffer.write(payload.encode('utf-8','backslashreplace')+b'\n')
     except (OSError,ValueError,KeyError) as exc:
         print(json.dumps({'error':str(exc)}));sys.exit(1)
