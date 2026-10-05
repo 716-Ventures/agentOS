@@ -24,7 +24,7 @@ class BrokerControls(unittest.TestCase):
                 job = dict(id='a'*32, activity=1, argv=['/bin/sleep', '60'], purpose='Wait for cancellation', status=status)
                 def broker(op, **fields):
                     if op == 'list':
-                        self.assertEqual(fields, {'activity': 1})
+                        self.assertEqual(fields, {})
                         return [job]
                     if op == 'poll': return {**job, 'output': ''}
                     if op == 'cancel': return {'status': 'cancelled'}

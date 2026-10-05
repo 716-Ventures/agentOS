@@ -44,6 +44,22 @@ def workspace(activity):
     return str(path)
 
 
+def activity_generation(activity):
+    if type(activity) is not int or not 1 <= activity <= 2147483647:
+        raise ValueError('Invalid activity id')
+    path=STATE / f'activity-{activity}.generation'
+    return int(path.read_text()) if path.exists() else 0
+
+
+def cancel_job(job):
+    if job['status']=='approval_required':
+        job.update(status='rejected',finished_at=time.time());persist(job)
+    elif job['status'] in ('starting','running','cancelling'):
+        job['cancel_requested']=True; job['status']='cancelling';persist(job)
+        threading.Thread(target=stop_unit,args=(job,),daemon=True).start()
+    return view(job)
+
+
 def validate(req):
     argv = req.get('argv')
     if (not isinstance(argv, list) or not 1 <= len(argv) <= 128 or
@@ -162,12 +178,36 @@ def same_operation(job, activity, argv, cwd, background, timeout, scope, stdin_s
 def handle(req, uid):
     op = req.get('op')
     with LOCK:
+        if op == 'activity_state':
+            return {'generation':activity_generation(req.get('activity'))}
+        if op == 'stop_activity':
+            activity=req.get('activity');generation=activity_generation(activity)+1
+            path=STATE / f'activity-{activity}.generation'
+            tmp=path.with_suffix('.tmp');tmp.write_text(str(generation));tmp.replace(path)
+            affected=[cancel_job(j) for j in JOBS.values() if j['activity']==activity
+                      and j['status'] in ('starting','running','cancelling','approval_required')]
+            return {'activity':activity,'generation':generation,'jobs':affected}
         if op == 'list':
             activity = req.get('activity')
-            return [{k:v for k,v in j.items() if k!='stdin'} for j in sorted(JOBS.values(),key=lambda j:j['created_at'],reverse=True)
-                    if activity is None or j['activity']==activity][:100]
+            selected=sorted((j for j in JOBS.values() if activity is None or j['activity']==activity),
+                            key=lambda j:j['created_at'],reverse=True)
+            recent={j['id'] for j in selected[:100]}
+            return [{k:v for k,v in j.items() if k!='stdin'} for j in selected
+                    if j['id'] in recent or j['status'] in ('starting','running','cancelling','approval_required')]
         if op in ('execute','preview'):
             argv, timeout, scope, purpose = validate(req)
+            generation=activity_generation(req.get('activity'))
+            expected=req.get('expected_generation',generation)
+            if type(expected) is not int or expected!=generation:
+                raise ValueError('Activity work was stopped; start a new request before launching more work')
+            origin=req.get('origin')
+            if origin is not None:
+                if (not isinstance(origin,dict) or set(origin)-{'conversation_id','core_job_id'}
+                    or not isinstance(origin.get('conversation_id'),str)
+                    or not re.fullmatch('[a-f0-9]{32}',origin['conversation_id'])
+                    or (origin.get('core_job_id') is not None and
+                        (type(origin['core_job_id']) is not int or origin['core_job_id']<=0))):
+                    raise ValueError('Invalid job origin')
             content=req.get('stdin')
             input_hash=hashlib.sha256(content.encode('utf-8')).hexdigest() if content is not None else None
             path = workspace(req.get('activity'))
@@ -217,6 +257,9 @@ def handle(req, uid):
                 policy.update(decision='allow' if routine or authorized else 'approve' if deterministic_harm or assessment.get('risk')=='harmful' or req.get('request_confirmation') is True else 'inspect',effect='assessed_routine' if routine else 'potential_harm',
                     reason='The current user instruction explicitly authorizes this exact action and its effects.' if authorized else 'Jev assessed this exact action as routine; execution uses supervised OS-level authority.' if routine else
                     'This action may have harmful effects or its material effects remain uncertain. Inspect further or obtain confirmation for this exact action.')
+            # Assessment releases LOCK; a stop can revoke this request meanwhile.
+            if activity_generation(req['activity'])!=generation:
+                raise ValueError('Activity work was stopped during assessment; this action was not launched')
             if op=='preview':return policy
             if policy['decision']=='inspect':
                 return {'status':'inspection_required','policy':policy,'authority':'root; full Linux OS access','next_step':'Assessment is inconclusive, not a permissions failure. Inspect effects or simplify the plan and reassess. If material uncertainty remains, request_confirmation=true creates a human-review proposal for this exact action.'}
@@ -242,6 +285,8 @@ def handle(req, uid):
                    'timeout_seconds':timeout, 'scope':scope, 'purpose':purpose, 'workspace':path, 'cwd':cwd, 'background':req.get('background',False),
                    'policy':policy,'requested_argv':original_argv,'requested_by_uid':uid, 'created_at':time.time(), 'exit_code':None,
                    'status':'approval_required' if policy['decision']=='approve' else 'starting'}
+            job['activity_generation']=generation
+            if origin is not None:job['origin']=dict(origin)
             if content is not None:
                 job.update(stdin=content,stdin_sha256=input_hash,stdin_bytes=len(content.encode('utf-8')))
             JOBS[job['id']] = job
@@ -269,13 +314,7 @@ def handle(req, uid):
             start(job)
             job['approved_by_uid']=uid; job['approved_at']=time.time(); persist(job)
             return view(job)
-        if op == 'cancel':
-            if job['status']=='approval_required':
-                job['status']='rejected';persist(job)
-            elif job['status'] in ('starting','running','cancelling'):
-                job['cancel_requested']=True; job['status']='cancelling';persist(job)
-                threading.Thread(target=stop_unit,args=(job,),daemon=True).start()
-            return view(job)
+        if op == 'cancel':return cancel_job(job)
         raise ValueError('Unknown broker operation')
 
 

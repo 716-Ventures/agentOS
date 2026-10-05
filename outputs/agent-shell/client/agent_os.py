@@ -51,6 +51,75 @@ def broker_request(op, **fields):
     return result['result']
 
 
+def work_reference(value):
+    if type(value) is int and value>0:return ('core',value)
+    if isinstance(value,str):
+        if value.isdigit() and int(value)>0:return ('core',int(value))
+        if value.startswith('core:') and value[5:].isdigit() and int(value[5:])>0:return ('core',int(value[5:]))
+        if re.fullmatch(r'broker:[a-f0-9]{32}',value):return ('broker',value[7:])
+    raise ValueError('Use a core job number or broker:JOB_ID')
+
+
+def work_projection(snapshot, broker_jobs):
+    names={a['id']:a['name'] for a in snapshot['activities']}
+    result=[]
+    for source,rows in (('core',snapshot['jobs']),('broker',broker_jobs)):
+        for row in rows:
+            activity=row['activity_id'] if source=='core' else row['activity']
+            ref=f"{source}:{row['id']}"
+            result.append({**row,'id':row['id'] if source=='core' else ref,'native_id':row['id'],
+                           'work_ref':ref,'source':source,'activity_id':activity,
+                           'activity_name':names.get(activity,f'Activity {activity} (removed or unavailable)')})
+    return result
+
+
+def work_label(job):
+    origin=job.get('origin') or {}
+    parent=origin.get('core_job_id')
+    provenance=(' · from core:'+str(parent)) if parent else (' · conversation '+origin['conversation_id'][:8] if origin else '')
+    return job['work_ref']+' · '+job['activity_name']+' · '+job_label(job['argv'])+' · '+job['status']+provenance
+
+
+def stop_work(value):
+    source,ident=work_reference(value)
+    return (request if source=='core' else broker_request)('cancel',job_id=ident)
+
+
+def work_log(value,offset=0):
+    source,ident=work_reference(value)
+    if source=='core':return request('log',job_id=ident,offset=offset)
+    job=broker_request('poll',job_id=ident,offset=offset)
+    return {'text':job.get('output',''),'offset':job.get('next_offset',offset),
+            'output_truncated':job.get('output_truncated',False)}
+
+
+def stop_activity_work(activity,timeout=25):
+    # Revoke immediately, then again after callers exit to close the startup race.
+    stopped=broker_request('stop_activity',activity=activity)
+    affected={j['id']:j for j in stopped['jobs']}
+    deadline=time.monotonic()+timeout
+    cancelled=set()
+    while True:
+        live=[j for j in request('snapshot')['jobs'] if j['activity_id']==activity and j['status'] in LIVE]
+        for job in live:
+            if job['id'] not in cancelled:
+                request('cancel',job_id=job['id']);cancelled.add(job['id'])
+        if not live:break
+        if time.monotonic()>=deadline:
+            raise RuntimeError('Core work has not finished stopping. Broker cancellation was requested; inspect active work and retry.')
+        time.sleep(.1)
+    stopped=broker_request('stop_activity',activity=activity)
+    affected.update({j['id']:j for j in stopped['jobs']})
+    while True:
+        pending=[j for j in affected.values() if broker_request('poll',job_id=j['id'])['status'] in LIVE]
+        if not pending:break
+        if time.monotonic()>=deadline:
+            raise RuntimeError('Broker work is still stopping. Inspect active work before assuming it ended.')
+        time.sleep(.1)
+    return {'activity':activity,'status':'stopped','core_jobs':sorted(cancelled),
+            'broker_jobs':sorted(affected),'generation':stopped['generation']}
+
+
 def approval_target(text, proposals):
     words=text.lower().strip().rstrip('.!').split()
     if not words or words[0] not in ('approved','approve'):return None
@@ -212,7 +281,7 @@ def valid_tree(t, depth=0):
     if not isinstance(t,dict) or depth>5: return False
     if 'id' in t:
         return (isinstance(t['id'],str) and t.get('view') in ('answer','output','history','jobs')
-                and (t.get('job') is None or type(t['job']) is int)
+                and (t.get('job') is None or type(t['job']) is int or (isinstance(t['job'],str) and re.fullmatch(r'broker:[a-f0-9]{32}',t['job'])))
                 and type(t.get('scroll')) is int and t['scroll']>=0)
     return (t.get('axis') in ('x','y') and type(t.get('ratio')) in (int,float)
             and .15<=t['ratio']<=.85 and valid_tree(t.get('first'),depth+1) and valid_tree(t.get('second'),depth+1))
@@ -471,7 +540,7 @@ def dashboard(screen):
              ('view','Change tile view','t'),('zoom','Maximize / restore tile','z'),('grow','Grow tile','+'),
              ('shrink','Shrink tile','−'),('swap','Swap with next tile','m'),('close','Close tile; keep work running','w'),
              ('undo','Undo last layout change','u'),('remove','Remove activity from sidebar','d'),('sidebar','Show / hide activities','b'),
-             ('mouse','Toggle mouse controls / text selection','M'),('theme','Switch light / dark theme','T'),('new','New activity','n'),('disk','Inspect disk usage','i'),('stop','Stop selected core job','x'),('broker_stop','Stop or reject a broker job','X')]
+             ('mouse','Toggle mouse controls / text selection','M'),('theme','Switch light / dark theme','T'),('new','New activity','n'),('disk','Inspect disk usage','i'),('stop','Stop selected job','x'),('broker_stop','Stop or reject any active work','X'),('activity_stop','Stop all work in this activity','Y')]
 
     def action(name):
         nonlocal focus,zoom,sidebar,dirty,menu,theme,rail_focus,mouse_enabled,models_open,models_scroll,models_focus
@@ -485,20 +554,22 @@ def dashboard(screen):
             return
         if name=='new':ask_input('new');return
         if name=='remove' and activity:
-            choose('remove',[(False,'Cancel'),(True,'Remove from sidebar; files and existing work are retained')]);return
+            choose('remove',[(False,'Cancel'),(True,'Remove from sidebar; files and existing work are retained'),('stop','Stop all work, then remove from sidebar')]);return
         if name=='theme':theme='light' if theme=='dark' else 'dark';set_theme();dirty=True;return
         if name=='sidebar':sidebar=not sidebar;dirty=True;return
+        if name=='activity_stop' and activity:
+            choose('activity_stop',[(False,'Cancel'),(True,'Stop all commands and reject pending actions in this activity')]);return
         if name=='broker_stop':
-            current_jobs=broker_request('list',activity=activity) if activity else []
-            choose('broker_stop',[(j['id'],job_label(j['argv'])+'  ·  '+j['status'])
-                for j in current_jobs if j['status'] in LIVE or j['status']=='approval_required']);return
+            current_jobs=work_projection(request('snapshot'),broker_request('list'))
+            choose('broker_stop',[(j['work_ref'],work_label(j)) for j in current_jobs
+                if j['status'] in LIVE or j['status']=='approval_required']);return
         if name=='ask' and not pane:rail_focus=False;ask_input('ask');return
         if not pane:notify('Press Enter to ask, or n to name an activity.');return
         if name in ('ask','run'):rail_focus=False;ask_input(name);return
         if name=='view':
             choose('view',[('answer','Conversation'),('output','Full output'),('history','Activity history'),('jobs','Work list')]);return
         if name=='jobs':
-            choose('jobs',[(j['id'],job_label(j['argv'])+'  ·  '+j['status']) for j in jobs]);return
+            choose('jobs',[(j['id'],work_label(j)) for j in jobs]);return
         if name in ('split_x','split_y'):
             mutate('split',axis='x' if name=='split_x' else 'y')
             notify('New tile · o chooses work · a asks · r runs a command')
@@ -513,12 +584,13 @@ def dashboard(screen):
         elif name=='disk':submit(workflow_argv('disk',activity),'output')
         elif name=='stop':
             if pane['job']:
-                result=request('cancel',job_id=pane['job']);notify('Job '+str(pane['job'])+': '+result['status']+'. Broker jobs have separate controls.')
+                result=stop_work(pane['job']);notify('Job '+str(pane['job'])+': '+result['status'])
         dirty=True
 
     def remove_selected(confirm):
         nonlocal activity,state,dirty,last_fetch,broker_jobs
         if not confirm:return
+        if confirm=='stop':stop_activity_work(activity)
         request('remove_activity',activity_id=activity)
         state=request('snapshot');activity=state['activities'][0]['id'] if state['activities'] else None
         broker_jobs=[]
@@ -540,7 +612,9 @@ def dashboard(screen):
             events=history_cache.get(activity,[])
             return 'Activity history','\n'.join(stamp(e['at'])+'  '+e['kind']+'\n  '+json.dumps(e['detail'],ensure_ascii=False) for e in reversed(events)),None
         if pane['view']=='jobs':
-            return 'Work in this activity','\n\n'.join(str(j['id'])+'  '+j['status']+'\n'+job_label(j['argv']) for j in jobs),None
+            return 'Work across activities',('Work state incomplete: '+broker_error+'\n\n' if broker_error else '')+'\n\n'.join(work_label(j) for j in all_work if j['activity_id']==activity or j['status'] in LIVE or j['status']=='approval_required'),None
+        if job is None and isinstance(pane['job'],str) and broker_error:
+            return 'Work unavailable',broker_error,None
         if job is None:
             return 'Ready',proposal_text()+'\n\nMake room for your work.\n\nAsk a question, run a command, or open existing work in this tile.\n\na  Ask Agent\nr  Run a command\no  Choose work\n\nv  Split side by side\ns  Split top / bottom',None
         raw=cache.get(job['id'],{}).get('text','')
@@ -554,7 +628,7 @@ def dashboard(screen):
         if pane['view']=='answer':raw+='\n\n'+proposal_text()
         if pane['view']=='output':
             for pending in broker_jobs:
-                if pending['status']=='approval_required':raw+='\n\nPending approval: '+pending['id']+'\n'+shlex.join(pending['argv'])
+                if pending['status']=='approval_required' and pending['activity']==activity:raw+='\n\nPending approval: '+pending['id']+'\n'+shlex.join(pending['argv'])
         return label,raw,job
 
     def proposal_text():
@@ -572,7 +646,7 @@ def dashboard(screen):
             lines.append('Reply “approved” to continue.' if len(pending)==1 else 'Reply “approve 1”, “approve 2”, and so on.')
             return '\n'.join(lines)
         if broker_error:return 'I can’t check approvals right now. Please reconnect and try again.'
-        recent=[j for j in broker_jobs if j.get('approved_at')]
+        recent=[j for j in broker_jobs if j.get('approved_at') and j['activity']==activity]
         if any(j['status'] in LIVE for j in recent):return 'Taking care of the action you approved…'
         if recent and recent[0]['status'] in ('failed','interrupted'):return 'The approved action didn’t finish successfully. I’ll need to check what happened.'
         return ''
@@ -601,23 +675,24 @@ def dashboard(screen):
                     ids.update(j['id'] for j in [j for j in state['jobs'] if j['activity_id']==activity and job_label(j['argv']).startswith('Ask: ')][:20])
                     for ident in ids:
                         item=cache.setdefault(ident,{'offset':0,'text':''})
-                        data=request('log',job_id=ident,offset=item['offset'])
+                        data=work_log(ident,offset=item['offset'])
                         item['offset']=data['offset'];item['text']=(item['text']+data['text'])[-262144:]
                     if any(p['view']=='history' for p in leaves(current()['tree'])):
                         history_cache[activity]=request('history',activity_id=activity)
                 try:
-                    broker_jobs=broker_request('list',activity=activity);broker_error='';attention=[]
+                    broker_jobs=broker_request('list');broker_error='';attention=[]
                     for task in broker_jobs:
-                        if task['status'] in LIVE:
+                        if task['status'] in LIVE and task['activity']==activity:
                             live=broker_request('poll',job_id=task['id'])
                             output=clean(live.get('output',''))
                             if live['status'] in LIVE and any(marker in output.lower() for marker in ('one-time code','device code','open this url','visit this url')):
                                 attention.append('Needs your attention\n'+'\n'.join(output.strip().splitlines()[-8:]))
                 except (OSError,RuntimeError,ValueError) as exc:broker_jobs=[];attention=[];broker_error=str(exc)
-            jobs=[j for j in state['jobs'] if j['activity_id']==activity]
+            all_work=work_projection(state,broker_jobs)
+            jobs=[j for j in all_work if j['activity_id']==activity]
             if dirty and now-last_save>.4:save()
         except (OSError,RuntimeError,ValueError) as exc:
-            connected=False;last_fetch=now;notify(str(exc));jobs=[j for j in state['jobs'] if j['activity_id']==activity]
+            connected=False;last_fetch=now;notify(str(exc));all_work=work_projection(state,broker_jobs);jobs=[j for j in all_work if j['activity_id']==activity]
         panel_width=min(52,max(24,w//3)) if models_open and w>=44 else 0
         work_right=w-panel_width
         screen.erase();buttons=[];rail_hits=[];menu_hits=[];active_rects=[];visible_links=[]
@@ -730,7 +805,7 @@ def dashboard(screen):
             if menu:
                 items=menu['items'];mw=min(68,w-6);mh=min(len(items)+4,h-4);mx=(w-mw)//2;my=(h-mh)//2
                 for yy in range(my,my+mh):fill(yy,mx,mw,'bar')
-                put(my+1,mx+2,{'actions':'Actions','jobs':'Open work in this tile','broker_stop':'Stop or reject a broker job','view':'Tile view','remove':'Remove '+next((a['name'] for a in state['activities'] if a['id']==activity),'activity')+'?'}[menu['kind']],mw-4,'bar',True)
+                put(my+1,mx+2,{'actions':'Actions','jobs':'Open work in this tile','broker_stop':'Stop or reject any active work','activity_stop':'Stop all work in this activity?','view':'Tile view','remove':'Remove '+next((a['name'] for a in state['activities'] if a['id']==activity),'activity')+'?'}[menu['kind']],mw-4,'bar',True)
                 begin=max(0,menu_index-(mh-4))
                 for row,(value,label) in enumerate(items[begin:begin+mh-3],my+2):
                     idx=begin+row-my-2;kind='selected' if idx==menu_index else 'bar'
@@ -790,9 +865,11 @@ def dashboard(screen):
                     value=menu['items'][menu_index][0];kind=menu['kind'];menu=None
                     if kind=='actions':action(value)
                     elif kind=='remove':remove_selected(value)
+                    elif kind=='activity_stop':
+                        if value:stop_activity_work(activity);notify('All activity work stopped.');last_fetch=0
                     elif kind=='jobs':mutate('bind',job_id=value);last_fetch=0
                     elif kind=='broker_stop':
-                        result=broker_request('cancel',job_id=value);notify('Broker job: '+result['status']);last_fetch=0
+                        result=stop_work(value);notify('Job: '+result['status']);last_fetch=0
                     else:mutate('view',view=value)
                 elif key==curses.KEY_MOUSE:
                     _,mx,my,_,state_mouse=curses.getmouse()
@@ -802,9 +879,11 @@ def dashboard(screen):
                                 value=menu['items'][idx][0];kind=menu['kind'];menu=None
                                 if kind=='actions':action(value)
                                 elif kind=='remove':remove_selected(value)
+                                elif kind=='activity_stop':
+                                    if value:stop_activity_work(activity);notify('All activity work stopped.');last_fetch=0
                                 elif kind=='jobs':mutate('bind',job_id=value);last_fetch=0
                                 elif kind=='broker_stop':
-                                    result=broker_request('cancel',job_id=value);notify('Broker job: '+result['status']);last_fetch=0
+                                    result=stop_work(value);notify('Job: '+result['status']);last_fetch=0
                                 else:mutate('view',view=value)
                                 break
                 continue
@@ -865,7 +944,7 @@ def dashboard(screen):
                             if act=='menu':choose('actions',[(n,l+'    '+s) for n,l,s in actions])
                             else:action(act)
                 continue
-            mapping={'M':'mouse','D':'remove','a':'ask','r':'run','n':'new','v':'split_x','s':'split_y','z':'zoom','w':'close','+':'grow','=':'grow','-':'shrink','m':'swap','b':'sidebar','u':'undo','o':'jobs','t':'view','d':'remove','i':'disk','x':'stop','X':'broker_stop','T':'theme'}
+            mapping={'M':'mouse','D':'remove','a':'ask','r':'run','n':'new','v':'split_x','s':'split_y','z':'zoom','w':'close','+':'grow','=':'grow','-':'shrink','m':'swap','b':'sidebar','u':'undo','o':'jobs','t':'view','d':'remove','i':'disk','x':'stop','X':'broker_stop','Y':'activity_stop','T':'theme'}
             if key in mapping:action(mapping[key])
             elif key=='h' and selected():mutate('view',view='history');last_fetch=0
         except (OSError,RuntimeError,ValueError,subprocess.SubprocessError,curses.error) as exc:notify(str(exc))
@@ -895,9 +974,10 @@ def main():
     c=sub.add_parser('create');c.add_argument('name')
     c=sub.add_parser('run');c.add_argument('activity',type=int);c.add_argument('argv',nargs=argparse.REMAINDER)
     c=sub.add_parser('jobs');c.add_argument('activity',type=int,nargs='?')
-    c=sub.add_parser('stop');c.add_argument('job',type=int)
+    c=sub.add_parser('stop');c.add_argument('job')
+    c=sub.add_parser('stop-activity');c.add_argument('activity',type=int)
     c=sub.add_parser('history');c.add_argument('activity',type=int)
-    c=sub.add_parser('logs');c.add_argument('job',type=int);c.add_argument('--follow',action='store_true')
+    c=sub.add_parser('logs');c.add_argument('job');c.add_argument('--follow',action='store_true')
     args=p.parse_args()
     if not args.cmd:
         if not sys.stdin.isatty(): p.error('Interactive dashboard requires a terminal; use status for JSON.')
@@ -918,18 +998,20 @@ def main():
     elif args.cmd=='run':
         argv=args.argv[1:] if args.argv[:1]==['--'] else args.argv
         result=request('run',activity_id=args.activity,argv=argv)
-    elif args.cmd=='jobs': result=[j for j in request('snapshot')['jobs'] if args.activity is None or j['activity_id']==args.activity]
-    elif args.cmd=='stop': result=request('cancel',job_id=args.job)
+    elif args.cmd=='jobs': result=[j for j in work_projection(request('snapshot'),broker_request('list')) if args.activity is None or j['activity_id']==args.activity]
+    elif args.cmd=='stop': result=stop_work(args.job)
+    elif args.cmd=='stop-activity': result=stop_activity_work(args.activity)
     elif args.cmd=='history': result=request('history',activity_id=args.activity)
     elif args.cmd=='logs':
         offset=0
         while True:
-            chunk=request('log',job_id=args.job,offset=offset)
+            chunk=work_log(args.job,offset=offset)
             print(clean(chunk['text']),end='',flush=True)
             progressed=chunk['offset']!=offset;offset=chunk['offset']
             if progressed: continue
             if not args.follow: return
-            job=next((j for j in request('snapshot')['jobs'] if j['id']==args.job),None)
+            source,ident=work_reference(args.job)
+            job=(next((j for j in request('snapshot')['jobs'] if j['id']==ident),None) if source=='core' else broker_request('poll',job_id=ident))
             if not job or job['status'] not in LIVE: return
             time.sleep(.2)
     print(json.dumps(result,indent=2,ensure_ascii=False))

@@ -2,6 +2,7 @@
 """Supervised job entry point; streams workflow output without holding credentials."""
 import argparse
 import json
+import os
 import sys
 import unicodedata
 from common import AI_SOCKET, connect, read_line
@@ -19,6 +20,11 @@ def main():
     args = p.parse_args()
     req = {'op': args.op, 'activity': args.activity}
     if args.prompt is not None: req['prompt'] = args.prompt
+    if args.op=='ask':
+        from broker_client import request
+        req['expected_generation']=request('activity_state',activity=args.activity)['generation']
+        parent=os.environ.get('AGENT_OS_JOB_ID')
+        if parent:req['core_job_id']=int(parent)
     with connect(AI_SOCKET, req, timeout=240) as conn:
         with conn.makefile('rb') as f:
             while True:

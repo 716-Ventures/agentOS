@@ -114,8 +114,18 @@ def handle(req, conn):
         conversation_path = STATE / f'conversation-{activity}.json'
         turns = json.loads(conversation_path.read_text()) if conversation_path.exists() else []
         trace = {'id': uuid.uuid4().hex, 'activity': activity, 'request': prompt, 'events': [], 'status': 'running'}
+        generation=req.get('expected_generation')
+        if generation is None:generation=broker_request('activity_state',activity=activity)['generation']
+        def check_generation():
+            if broker_request('activity_state',activity=activity)['generation']!=generation:
+                raise ValueError('Activity work was stopped; this conversation request is no longer active')
+        check_generation()
+        origin={'conversation_id':trace['id'],'core_job_id':req.get('core_job_id')}
+        def execute_broker(op, **fields):
+            return broker_request(op,activity=activity,expected_generation=generation,origin=origin,**fields)
         trace_path = STATE / ('agent-' + trace['id'] + '.json')
         def record(event):
+            check_generation()
             trace['events'].append(event)
             save(trace_path, trace)
         decisions=Decisions(cfg,record)
@@ -148,19 +158,20 @@ def handle(req, conn):
                 if name in ('layout_snapshot','layout_change'):
                     with connect('/run/agent-os/runtime.sock',{'op':'snapshot'},timeout=3) as core:
                         with core.makefile('rb') as f: core_state=read_line(f)['result']
-                    jobs=[j for j in core_state['jobs'] if j['activity_id']==activity]
+                    jobs=[{**j,'source':'core'} for j in core_state['jobs'] if j['activity_id']==activity]
+                    jobs.extend({**j,'id':'broker:'+j['id'],'native_id':j['id'],'source':'broker'} for j in broker_request('list',activity=activity))
                     if name=='layout_snapshot':
                         return {**layout_request('ensure',activity=activity),'available_jobs':jobs}
                     action={k:v for k,v in args.items() if k!='expected_revision'}
                     if 'job_id' in action and action['job_id'] not in [j['id'] for j in jobs]:
                         raise ValueError('Job does not belong to this activity')
                     return layout_request('apply',activity=activity,expected_revision=args['expected_revision'],action=action)
-                if name=='preview_execution': return broker_request('preview',activity=activity,current_request=prompt,conversation_context=conversation_context,**args)
+                if name=='preview_execution': return execute_broker('preview',current_request=prompt,conversation_context=conversation_context,**args)
                 if name=='list_jobs': return broker_request('list',activity=activity)
                 if name=='stop_job': return broker_request('cancel',**args)
                 if name=='job_output': return broker_request('poll',**args)
                 if name=='execute':
-                    job=broker_request('execute',activity=activity,current_request=prompt,conversation_context=conversation_context,**args)
+                    job=execute_broker('execute',current_request=prompt,conversation_context=conversation_context,**args)
                 else:
                     operation={'read_file':'read','list_directory':'list','write_file':'write'}[name]
                     fields={}
@@ -172,7 +183,7 @@ def handle(req, conn):
                         argv.append('--stdin-content')
                         fields['stdin']=content
                     argv.append(json.dumps(descriptor))
-                    job=broker_request('execute',activity=activity,argv=argv,**fields,
+                    job=execute_broker('execute',argv=argv,**fields,
                         purpose=name+': '+args['path'],timeout_seconds=15,scope='system',current_request=prompt,conversation_context=conversation_context)
                 if job['status'] in ('inspection_required','outside_request'):return job
                 ident=job['id']

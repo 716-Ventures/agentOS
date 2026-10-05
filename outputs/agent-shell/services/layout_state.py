@@ -1,6 +1,7 @@
 """Renderer-independent surface layout operations and validation."""
 import copy
 import math
+import re
 import uuid
 
 VIEWS = ('answer', 'output', 'history', 'jobs')
@@ -23,7 +24,7 @@ def canonical(value):
         if 'id' in t:
             ident=t['id'];job=t.get('job');view=t.get('view','answer')
             if (not isinstance(ident,str) or not 1<=len(ident)<=64 or not ident.isalnum() or ident in ids
-                or view not in VIEWS or (job is not None and (type(job) is not int or job<=0))):
+                or view not in VIEWS or (job is not None and not ((type(job) is int and job>0) or (isinstance(job,str) and re.fullmatch(r'broker:[a-f0-9]{32}',job))))):
                 raise ValueError('Invalid or duplicate surface')
             ids.add(ident)
             return {'id':ident,'job':job,'view':view,'scroll':0}

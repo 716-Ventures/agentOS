@@ -12,7 +12,7 @@ Clients send newline-delimited JSON with `op` and `activity`. Operations are `en
 
 The terminal polls for revisions every 600 ms. Direct input controls use the same apply contract as the agent. Rendering, terminal-size adaptation, themes, sidebar visibility and scroll position stay in the client. Legacy arrangements import only when an activity has no shared layout yet; the original file remains available.
 
-The assistant exposes `layout_snapshot` and `layout_change` to the Gateway model, scoped to the current activity. Snapshot supplies bindable core jobs, and dispatch rejects bindings to jobs outside the activity. Broker job identifiers are not yet bindable as independent terminal surfaces.
+The assistant exposes `layout_snapshot` and `layout_change` to the Gateway model, scoped to the current activity. Snapshot supplies bindable core and broker jobs, and dispatch rejects bindings to jobs outside the activity. Core bindings retain positive integer IDs; broker bindings use `broker:JOB_ID`. Both persist through layout restart and undo and display output through their own supervisor.
 
 ## Interaction authority
 

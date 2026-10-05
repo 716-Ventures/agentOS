@@ -331,6 +331,7 @@ impl Core {
             .env_clear()
             .env("PATH", "/usr/local/bin:/usr/bin:/bin")
             .env("LANG", "C.UTF-8")
+            .env("AGENT_OS_JOB_ID", job.to_string())
             .env(
                 "HOME",
                 self.root.join("workspaces").join(activity.to_string()),

@@ -23,14 +23,16 @@ Exit the old client with **q**, then run `agent-os` again. No VM restart is need
 | **n** / **b** | New activity / toggle activity rail |
 | **T** | Switch light and dark themes |
 | **Space** / **?** | Open the actions menu |
-| **d** / **x** | Disk-inspection shortcut / stop selected core job |
+| **i** / **x** | Disk-inspection shortcut / stop selected core or broker job |
+| **X** | Choose active work or a proposal to stop across activities |
+| **Y** | Stop all work in this activity, with confirmation |
 | **q** | Leave the client; jobs continue |
 
 The input line supports arrow keys, Home/End (or Ctrl-A/Ctrl-E), Backspace/Delete, Ctrl-U, Enter to submit and Escape to cancel. Questions can extend beyond the visible width.
 
 Each activity restores its splits, tile contents and view modes when reopened. On narrow terminals the rail hides; if all tiles cannot fit, the focused tile fills the available area. Tab still accesses the other tiles, and widening the terminal restores the arrangement. The shared layout service stores arrangements and the last 20 undo snapshots in `/var/lib/agent-os-layout/state.sqlite3`. Existing `layouts-v1.json` arrangements are imported once per activity. Theme, sidebar and scroll preferences remain in `~/.local/state/agent-os/layout-client.json`.
 
-These tiles display conversations and job output. They are not interactive PTY shell sessions. Explicit commands retain the existing core's permissions; agent commands use the separate system broker. **x** stops the selected core/conversation job, not every broker job it may have launched. Use the broker controls for those jobs.
+These tiles display conversations and job output. They are not interactive PTY shell sessions. Explicit commands retain the existing core's permissions; agent commands use the separate system broker. **x** stops the job bound to the selected tile. **o** offers core and broker jobs in this activity; the work-list view includes retained live work across activities. **X** chooses any active job or pending proposal to stop, including work in a removed activity. **Y** stops all work in the current activity and rejects its proposals. Stopping one conversation worker retains its separate broker commands unless you explicitly stop them or the activity. The removal dialog offers either retention or stopping all work before removal.
 
 Validation included real commands inside the Linux VM, both split orientations, resize, swap/undo, maximize/restore, long Unicode input with cancellation, narrow/wide terminal resizing, light/dark themes, actions-menu access and reopening the saved layout. Four layout/Unicode unit tests also pass. Preview PNGs render the actual captured SSH terminal grid using a host monospace font.
 
@@ -95,10 +97,16 @@ in-flight work, and latency. Esc returns to your work; arrows and Page Up / Down
 scroll. `agent-os models` provides JSON. See [MODELS.md](MODELS.md) for accounting
 and persistence details.
 
-## Direct broker cancellation
+## Direct work controls
 
-Press **X** or choose **Stop or reject a broker job** in the Space actions menu.
-The menu fetches current active jobs and pending proposals for this activity.
-Selecting a job cancels its systemd service; selecting a proposal rejects it.
-This control works without a model. Lowercase **x** continues to stop the selected
-core job only; broker work can outlive a conversation worker.
+Press **X** or choose **Stop or reject any active work** in the actions menu.
+The menu lists active core and broker jobs and pending proposals across activities,
+including removed activities. **x** stops the selected tile's job. **Y** offers an
+activity-wide stop with confirmation. These controls work without a model.
+
+`agent-os jobs [ACTIVITY_ID]` lists both supervisors with source, activity and origin.
+`agent-os logs broker:JOB_ID --follow` observes broker output; numeric core job
+references still work. `agent-os stop broker:JOB_ID` stops one broker job, and
+`agent-os stop-activity ACTIVITY_ID` stops core/broker activity work and rejects
+pending proposals. A stop reports success after job states settle; incomplete
+stops produce an error. New explicit requests can start work afterward.

@@ -53,6 +53,8 @@ Run `python3 deploy.py` from this directory on the Mac to copy source and build/
 
 - `tests/agent_test.py`: tool-loop contract and validation tests with explicit fixtures.
 - `tests/providers_test.py`: provider/price checks, including the retained optional Jev adapter.
+- `tests/work_lifecycle_guest.py`: unified work visibility, origin links, activity stop, detached children, retained background work and durable stop generations; run as root in an idle guest.
+- `tests/work_lifecycle_terminal.py`: real SSH terminal picker, broker output and direct job/activity stop controls.
 - `tests/broker_integration.py`: real guest execution, OS authority, file recovery, deadlines, cancellation and administrator approval.
 - `tests/broker_restart_guest.py`: verified shutdown of root commands and detached children on broker restart, proposal persistence, completion times and no replay.
 - `tests/broker_reuse_guest.py`: matching background retries, foreground/background separation and real systemd lifetime settings.
