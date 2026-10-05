@@ -54,6 +54,7 @@ Run `python3 deploy.py` from this directory on the Mac to copy source and build/
 - `tests/agent_test.py`: tool-loop contract and validation tests with explicit fixtures.
 - `tests/providers_test.py`: provider/price checks, including the retained optional Jev adapter.
 - `tests/broker_integration.py`: real guest execution, OS authority, file recovery, deadlines, cancellation and administrator approval.
+- `tests/broker_restart_guest.py`: verified shutdown of root commands and detached children on broker restart, proposal persistence, completion times and no replay.
 - `broker-verification.json`: broker integration and restart results.
 - `verification.json`: original activity/supervisor milestone checks.
 - `disk-verification.json` and `agent-verification.json`: earlier disk and model-loop checks.
@@ -93,7 +94,7 @@ cargo test --locked --manifest-path outputs/agent-shell/Cargo.toml
 ```
 
 The local suite covers effect/authorization gates, launch cancellation, protocol
-validation, guarded-write concurrency, conversation recovery and layout behavior.
+validation, truthful broker restart recovery, guarded-write concurrency, conversation recovery and layout behavior.
 Rust tests cover persistence, revisions, activity removal and restart reconciliation;
 two additional execution/cancellation tests run on Linux.
 

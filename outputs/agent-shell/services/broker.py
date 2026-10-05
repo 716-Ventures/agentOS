@@ -257,13 +257,37 @@ def serve(conn):
             except OSError: pass
 
 
-def main():
+def recover_jobs():
+    """Reconcile saved jobs before accepting new commands; never replay them."""
+    recovered = {}
     for p in STATE.glob('*.json'):
-        job=json.loads(p.read_text())
-        if job['status'] in ('starting','running','cancelling'):
-            subprocess.run(['/usr/bin/systemctl','stop','agent-os-exec-'+job['id']+'.service'],capture_output=True,timeout=10)
-            job.update(status='interrupted',error='Broker restarted; operation was not replayed');persist(job)
-        JOBS[job['id']]=job
+        job = json.loads(p.read_text())
+        if job['status'] in ('starting', 'running', 'cancelling'):
+            unit = 'agent-os-exec-' + job['id'] + '.service'
+            # A stop error can mean the collected unit is already gone. Inspect
+            # systemd rather than treating either exit code as proof of completion.
+            subprocess.run(['/usr/bin/systemctl', 'stop', unit], capture_output=True, timeout=10)
+            result = subprocess.run(['/usr/bin/systemctl', 'show', unit,
+                '--property=LoadState,ActiveState,MainPID,ControlPID,TasksCurrent,ControlGroup'],
+                capture_output=True, text=True, timeout=10)
+            state = dict(line.split('=', 1) for line in result.stdout.splitlines() if '=' in line)
+            stopped = (state.get('ActiveState') in ('inactive', 'failed')
+                       and state.get('MainPID') == '0' and state.get('ControlPID') == '0'
+                       and (state.get('ControlGroup') == '' or state.get('TasksCurrent') == '0')
+                       and (result.returncode == 0 or state.get('LoadState') == 'not-found'))
+            if not stopped:
+                raise RuntimeError('Broker recovery cannot confirm that ' + unit +
+                    ' stopped. Saved status retained; new execution is unavailable until recovery succeeds.')
+            job.update(status='interrupted', finished_at=time.time(),
+                       error='Broker restarted; operation was stopped and was not replayed')
+            persist(job)
+        recovered[job['id']] = job
+    JOBS.clear()
+    JOBS.update(recovered)
+
+
+def main():
+    recover_jobs()
     server=listen(SOCKET)
     while True:
         conn,_=server.accept()
