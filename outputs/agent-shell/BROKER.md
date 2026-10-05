@@ -25,7 +25,7 @@ agent-os-broker cancel JOB_ID
 
 Approval requires UID 0 from Unix peer credentials, rather than a request field. The terminal offers locally handled approval replies. Root execution means a previously admitted root program also has administrative authority; peer credentials do not prove that a request came from a human. Approval binds the command arguments and working directory, not immutable copies of scripts or other external inputs. Inspect those inputs when reviewing a proposal.
 
-Pending proposals survive restart without execution. Identical pending requests reuse one proposal. Already active identical background requests reuse their job.
+Pending proposals survive restart without execution. Identical pending requests reuse one proposal. Already active identical background requests reuse their job. Both paths match activity, normalized argv, resolved working directory, execution authority, foreground/background mode and deadline. A foreground job or a job with a different lifetime cannot satisfy a background retry. Different settings create a separate assessed operation; they do not extend an existing unit’s lifetime.
 
 ## Jobs and direct controls
 
@@ -46,5 +46,7 @@ Arbitrary programs do not participate in those locks and can still race a guarde
 Run the local Python unit suite and Rust tests described in [README.md](README.md). The Rust suite covers persistence, stale mutation rejection, reversible activity removal and restart reconciliation; Linux additionally exercises command results and cancellation.
 
 `tests/broker_integration.py` must run inside a provisioned development guest. It exercises real root execution, OS-wide and cross-activity access, guarded files/backups, exit codes, output caps, deadlines, cgroup cancellation and root-only proposal approval. It may approve its documented harmless fixtures, write test files and create activities. It does not read credentials. `tests/broker_restart_guest.py` additionally restarts the broker around a root command with a detached child, checks both processes are gone, preserves an unapproved proposal, and verifies a second restart does not replay work or change retained evidence. It stops only its own fixtures, but restarting the broker also interrupts any other active broker work; run it on an idle development guest. Historical reports from the removed activity sandbox are not evidence of the current authority policy.
+
+`tests/broker_reuse_guest.py` verifies distinct foreground/background units, distinct lifetimes and their actual systemd deadlines, and reuse of an identical background retry without another launch. It approves only its harmless sleep fixtures and cancels them afterward.
 
 Live model quality is evaluated separately. The retained Jev action set is a small regression sample, not a calibrated safety guarantee. Local tests do not establish systemd behavior or live provider quality.

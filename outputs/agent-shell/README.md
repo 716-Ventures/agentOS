@@ -55,6 +55,7 @@ Run `python3 deploy.py` from this directory on the Mac to copy source and build/
 - `tests/providers_test.py`: provider/price checks, including the retained optional Jev adapter.
 - `tests/broker_integration.py`: real guest execution, OS authority, file recovery, deadlines, cancellation and administrator approval.
 - `tests/broker_restart_guest.py`: verified shutdown of root commands and detached children on broker restart, proposal persistence, completion times and no replay.
+- `tests/broker_reuse_guest.py`: matching background retries, foreground/background separation and real systemd lifetime settings.
 - `broker-verification.json`: broker integration and restart results.
 - `verification.json`: original activity/supervisor milestone checks.
 - `disk-verification.json` and `agent-verification.json`: earlier disk and model-loop checks.

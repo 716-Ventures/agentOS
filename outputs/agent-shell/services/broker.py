@@ -122,6 +122,14 @@ def view(job, offset=0):
     return result
 
 
+def same_operation(job, activity, argv, cwd, background, timeout, scope):
+    """Deduplication must preserve the requested execution contract."""
+    return (job['activity'] == activity and job['argv'] == argv
+            and job.get('cwd', job['workspace']) == cwd
+            and job.get('background', False) == background
+            and job['timeout_seconds'] == timeout and job['scope'] == scope)
+
+
 def handle(req, uid):
     op = req.get('op')
     with LOCK:
@@ -182,9 +190,8 @@ def handle(req, uid):
             original_argv=argv
             argv,scope=policy['argv'],policy['scope']
             # Reuse exact proposals, preserving identity across retries and consent.
-            matches=[j for j in JOBS.values() if j['activity']==req['activity'] and j['argv']==argv
-                and j.get('cwd',j['workspace'])==cwd and j.get('background',False)==req.get('background',False)
-                and j['timeout_seconds']==timeout and j['scope']==scope and j['status']=='approval_required']
+            matches=[j for j in JOBS.values() if j['status']=='approval_required'
+                and same_operation(j, req['activity'], argv, cwd, req.get('background',False), timeout, scope)]
             if matches:
                 existing=min(matches,key=lambda j:j['created_at'])
                 for duplicate in matches:
@@ -196,7 +203,7 @@ def handle(req, uid):
                 return view(existing)
             if req.get('background',False):
                 for existing in JOBS.values():
-                    if existing['activity']==req['activity'] and existing['argv']==argv and existing.get('cwd',existing['workspace'])==cwd and existing['status'] in ('starting','running'):
+                    if existing['status'] in ('starting','running') and same_operation(existing, req['activity'], argv, cwd, True, timeout, scope):
                         return view(existing)
             job = {'id':uuid.uuid4().hex, 'activity':req['activity'], 'argv':argv,
                    'timeout_seconds':timeout, 'scope':scope, 'purpose':purpose, 'workspace':path, 'cwd':cwd, 'background':req.get('background',False),
