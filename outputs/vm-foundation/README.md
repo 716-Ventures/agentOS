@@ -2,14 +2,14 @@
 
 This is the first full-system milestone: a complete ARM64 Linux guest with UEFI boot, its own kernel, systemd, persistent storage, networking, login, and a small boot-record service. The upstream base is Debian 13, pinned to build `20260914-2601` and its published SHA-512 checksum.
 
-**The running image now also includes M0.1: the activity and job environment.** Run `agent-os` inside the guest or use the [Agent launcher](../agent-shell/Open%20Agent.command). See the [agent-shell instructions](../agent-shell/README.md). Jev, reasoning models, and voice remain pending. The build recipe in this folder reproduces the M0 foundation; apply the agent-shell deployment afterward to reproduce the current installed functionality. Debian identity is retained; current guest build metadata lives in `/etc/agent-os/release.json`.
+**The running image now also includes M0.1: the activity and job environment.** Run `agent-os` inside the guest or use the [Agent launcher](../agent-shell/Open%20Agent.command). See the [agent-shell instructions](../agent-shell/README.md). The separately deployed runtime now includes Gateway reasoning and Jev assessments; voice remains pending. The build recipe in this folder reproduces the M0 foundation; apply the agent-shell deployment afterward to reproduce the current installed functionality. Debian identity is retained; current guest build metadata lives in `/etc/agent-os/release.json`.
 
 ## Use the VM already built here
 
-The VM is left running after verification.
+UTM is the development VM platform. The verified guest uses UTM’s QEMU backend with Apple Hypervisor Framework acceleration, accelerated VirtIO graphics, and Intel HDA audio. Runtime files are excluded from Git; inspect `python3 vm.py status` before assuming a guest exists.
 
 - Open **Connect.command** to enter the guest through SSH.
-- Open **Console.command** for the guest's actual serial console; press **Ctrl-]** to detach.
+- Open **Console.command** for the guest’s serial console using the PTY exposed by `utmctl attach`; press **Ctrl-]** to detach. The UTM window also provides display and serial access.
 - For serial login, use the account and generated password in `runtime/console-credentials.txt`.
 - If stopped, open **Start.command** to start the VM and enter it.
 
@@ -39,30 +39,40 @@ sudo systemctl poweroff
 
 | Artifact | Role |
 |---|---|
-| `runtime/disk.qcow2` | Standalone bootable guest disk; 20 GB virtual capacity, sparse allocation |
-| `runtime/uefi-code.fd`, `runtime/uefi-vars.fd` | Firmware and persistent firmware variables |
+| `runtime/agentOS.utm/` | UTM bundle: standalone guest disk, seed ISO, firmware state, display/audio configuration |
+| `runtime/utm.json` | UUID and path of the active UTM bundle; the migrated verification guest retains its existing bundle name |
 | `runtime/seed.iso` | First-boot account and guest configuration |
-| `runtime/console.log` | Guest boot and serial-console output |
-| `runtime/build.json` | Original foundation build identity; inspect guest release metadata for subsequent installations |
+| `runtime/build.json` | Original foundation identity; inspect guest release metadata after deployments |
 | `image-lock.json` | Pinned upstream URL, digest, resources, and SSH port |
-| `guest/` | Custom boot-record service and diagnostic command sources |
-| `verification.json` | Recorded checks against the running guest |
+| `utm-template.plist` | UTM-generated configuration structure, with instance identity supplied by the builder |
+| `guest/` | Boot-record service and diagnostic command sources |
+| `verification.json` | Local lifecycle checks against the running guest |
 
-The VM has 2 vCPUs and 2 GB RAM, uses QEMU with Apple's Hypervisor Framework acceleration, and forwards host `127.0.0.1:22220` to guest SSH. It has outbound networking through QEMU's user-mode network. It has no host directory shares, host Docker socket, or physical disk passthrough.
+The VM has 4 vCPUs and 4 GB RAM and forwards host `127.0.0.1:22220` to guest SSH. UTM manages its bundled QEMU, UEFI and firmware variables. Graphics use `virtio-gpu-gl-pci`; audio uses `intel-hda`. Outbound networking uses emulated NAT. Host directory sharing and clipboard sharing are disabled. No physical disks are passed through.
 
 The development account has passwordless sudo inside this guest. SSH accepts the locally generated key, not passwords; root SSH login is disabled. The serial-console password is generated locally. Runtime files contain credentials and machine identity: do not publish or distribute `runtime/` as a general release image. This directory is excluded by the supplied `.gitignore`.
 
 ## Reproduce the build
 
-Requirements: Apple silicon macOS, Python 3, Homebrew QEMU, and `hdiutil`. Tested with QEMU 11.1.1 on macOS 27. Run these from a fresh copy of this directory without `runtime/`:
+Requirements: Apple silicon macOS, Python 3, UTM, Homebrew `qemu-img` (provided by QEMU), OpenSSL 3, and `hdiutil`. Verified with UTM 4.7.5 on macOS 27.0.1 / M2 Ultra. UTM runs its own bundled QEMU; Homebrew QEMU is used only for disk preparation.
+
+From a fresh checkout without `runtime/`:
 
 ```sh
-brew install qemu
+brew install --cask utm
+brew install qemu openssl@3
 python3 vm.py prepare
+```
+
+Open the printed `.utm` bundle once in UTM to register it. Registration is a UTM application step; `utmctl` operates registered machines. Then:
+
+```sh
 python3 vm.py start
 python3 vm.py wait --seconds 60
 python3 verify.py
 ```
+
+`start --hide` runs without showing the display window. For an existing stopped guest made by the earlier runner, `python3 vm.py bundle` moves its disk into a UTM bundle and retains its seed and SSH identity. Stop the old runner first. The current migration used a verified copy and preserved the original disk; `runtime/utm.json` selects the authoritative UTM guest.
 
 Alternatively, reuse a downloaded base:
 
@@ -72,7 +82,7 @@ python3 vm.py prepare --base /absolute/path/to/debian-base.qcow2
 
 The builder verifies the pinned digest before conversion. It creates a standalone disk rather than a fragile backing-file chain. First-boot configuration is carried on a NoCloud seed ISO. It does not install unpinned packages during provisioning. The base is checked against Debian's published checksum over HTTPS; no detached-signature verification was performed.
 
-This is a reproducible provisioning recipe, not a claim of bit-for-bit image reproducibility: credentials, host keys, instance IDs, timestamps, and machine state are intentionally instance-specific. Firmware and QEMU versions also affect reproducibility. Preserve the tested host tool versions when comparing builds. `prepare` refuses to overwrite an existing guest disk.
+This is a reproducible provisioning recipe, not a claim of bit-for-bit image reproducibility: credentials, host keys, instance IDs, timestamps, and machine state are intentionally instance-specific. UTM and its bundled firmware/QEMU versions also affect reproducibility. Preserve the tested host tool versions when comparing builds. `prepare` refuses to overwrite an existing guest disk.
 
 ## Verification
 
@@ -82,24 +92,22 @@ This test intentionally restarts **this development VM**. Save guest work before
 
 Serial-console password login was additionally exercised during initial validation. The guest's ordinary shell provides recovery access independent of future model services.
 
-Outside the original M0 validation: microphone/audio devices, agent behavior, Jev, OS update/rollback, installer, physical hardware, graphical compositor, or arbitrary process sandboxing. The separate agent-shell verification covers the subsequently installed activities and job supervisor. The current VM is isolated from the Mac, but its development account deliberately has administrative control over the guest.
+UTM platform verification on 2026-10-05 passed UEFI boot, SSH, systemd health, guest reboot, graceful poweroff/cold start, and persistent data. Weston ran on the DRM backend with the GL renderer reporting `virgl (ANGLE (Apple, Apple M2 Ultra, OpenGL 4.1 Metal - 91.7))`. Its desktop and terminal rendered in the UTM window; pointer and keyboard events reached the guest. Rapid synthetic typing through UI automation dropped characters, so automated tests should use SSH rather than simulated typing.
 
-## Host installation note
+ALSA enumerated capture/playback devices and completed two-second 48 kHz stereo capture and silent playback streams. This verifies guest audio plumbing, **not microphone signal quality, audible speaker routing, or end-to-end voice**. Host microphone permission and a real speech/playback check remain part of voice acceptance. Accelerated graphics remain an experimental UTM feature; the current tests establish feasibility, not production desktop performance.
 
-QEMU installed and successfully booted the guest. Homebrew's `glib`, `gnutls`, and `openssl@3` post-install hooks could not complete inside the automation sandbox (`sandbox-exec: sandbox_apply: Operation not permitted`). Finish those hooks in a normal macOS Terminal:
-
-```sh
-brew postinstall glib gnutls openssl@3
-```
-
-This is a host dependency-installation follow-up, not a guest boot failure. Homebrew installed QEMU and its dependencies and upgraded some existing dependency versions; it did not install UTM.
+Weston, Mesa, Wayland utilities, ALSA utilities, seatd, qemu-guest-agent and build tools were installed in the verification guest for these checks. They are not yet part of the pinned M0 provisioning recipe. The transient Weston test session is not an implemented agentOS desktop. The separate agent-shell deployment and tests verify the installed runtime. Live model/provider behavior, OS updates/rollback and physical hardware remain separate acceptance work.
 
 ## Next implementation milestone
 
-The environment core and terminal client are now installed: persistent activities, supervised jobs, action records, and cancellation. Next, integrate scoped Jev decisions and extended reasoning, with voice required before declaring the first usable release. The system image and lifecycle tests remain the acceptance environment throughout.
+The environment core and terminal client are now installed: persistent activities, supervised jobs, action records, and cancellation. Gateway reasoning, general execution and Jev decisions are now implemented in agent-shell. Current work hardens those paths; voice remains required before declaring the first usable release. The system image and lifecycle tests remain the acceptance environment throughout.
 
 ## Sources
 
 - [Debian cloud images](https://cloud.debian.org/images/cloud/trixie/)
 - [QEMU ARM virtual platform](https://www.qemu.org/docs/master/system/arm/virt)
 - [cloud-init NoCloud datasource](https://docs.cloud-init.io/en/latest/reference/datasources/nocloud.html)
+
+- [UTM scripting and CLI](https://docs.getutm.app/scripting/scripting/)
+- [UTM display configuration](https://docs.getutm.app/settings-qemu/devices/display/)
+- [UTM audio configuration](https://docs.getutm.app/settings-qemu/devices/sound/)

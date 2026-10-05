@@ -6,17 +6,25 @@ Deterministic hazard checks first catch obvious destructive/disruptive commands.
 Other operations are submitted to Jev under the credential-isolated assistant
 identity. Ling plans work; it cannot submit its own safety verdict.
 
-Jev returns a validated choice: routine, harmful, or uncertain, plus confidence.
-A routine assessment with confidence at least 0.8 executes automatically. Harmful,
-uncertain, low-confidence, unavailable or malformed assessments return an inspection request. The agent can gather evidence and reassess; explicit request_confirmation creates a proposal when material uncertainty remains. Harmful actions require confirmation of the exact action. Unknown command names alone do not
-cause refusal. The agent can inspect and resubmit with evidence or ask the user
-to review a concrete plan where material effects remain uncertain.
+Jev returns validated risk, task-fit and authorization choices. Routine risk
+requires confidence at least 0.8. For an agent request, task_fit must also be
+aligned with confidence at least 0.8. A beyond-request classification returns
+outside_request without a job. Uncertain alignment or missing/invalid confidence
+cannot authorize execution. Direct operator commands without current_request
+still require effect assessment.
+
+Harmful effects require a matching current instruction with confident alignment
+and explicit authorization (at least 0.6 authorization confidence), or local
+review of the exact proposal. Known hazards cannot be waived merely by a routine
+risk classification. Uncertain, low-confidence, unavailable or malformed
+assessments require inspection; request_confirmation creates a review proposal
+when uncertainty remains. Unknown command names alone do not cause refusal.
 
 These are probabilistic assessments plus deterministic enforcement, not a proof
 that arbitrary programs are safe. The confidence threshold is an operational
 policy, not a calibrated safety probability. Shell text, purpose, knowledge and
-supplied evidence are untrusted data. Known hazard gates cannot be overridden by
-Jev, claimed intent, or saved skills. All agent execution uses real root authority on the Linux guest and is assessed as such. Activities are organizational working directories, not filesystem or privilege boundaries. Legacy workspace scope is normalized to system; old restricted proposals must be reassessed before approval. Package installs
+supplied evidence are untrusted data. Known hazard gates require matching contextual authorization or local review;
+a routine risk label, claimed purpose or saved skill cannot waive them. All agent execution uses real root authority on the Linux guest and is assessed as such. Activities are organizational working directories, not filesystem or privilege boundaries. Legacy workspace scope is normalized to system; old restricted proposals must be reassessed before approval. Package installs
 retain the no-removal guard when applicable.
 
 Processes have explicit working directories and foreground/background lifetimes.

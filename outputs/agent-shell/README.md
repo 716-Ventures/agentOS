@@ -1,4 +1,4 @@
-# Agent OS 0.4 — general system broker
+# Agent OS 0.5 — general system broker
 
 **Windowing design:** The [native windowing specification](../agent-os-windowing-specification.md) defines the adopted graphical architecture: native component catalog, surface documents, source bindings, broker action references and revisioned tiled/floating workspaces. It is planned implementation, not a graphical feature of this release.
 
@@ -6,7 +6,7 @@ A full Debian-based Linux VM with persistent activities, a terminal interface, a
 
 ## Open and use
 
-Open **Open Agent.command** on the Mac, or enter `agent-os` after connecting to the VM. The terminal now has resizable, persistent tiles and light/dark themes: see [terminal controls](TERMINAL.md). Create/select an activity, then press **a** to ask. Press **d** for the explicit disk-inspection shortcut, **r** for an explicit legacy command, **h** for core job history, and **q** to leave. Tab switches tiles; [ and ] change activities; arrows and PgUp/PgDn scroll output. Press v or s to split, +/− to resize, z to maximize, and Space for all actions.
+Open **Open Agent.command** on the Mac, or enter `agent-os` after connecting to the VM. The terminal now has resizable, persistent tiles and light/dark themes: see [terminal controls](TERMINAL.md). Create/select an activity, then press **a** to ask. Press **i** for the explicit disk-inspection shortcut, **r** for an explicit legacy command, the view menu for core job history, and **q** to leave. Tab switches tiles; F6 focuses the activity list; arrows and PgUp/PgDn scroll output. Press v or s to split, +/− to resize, z to maximize, and Space for all actions.
 
 Try “Inspect the network interfaces and default route,” “What services have failed?” or “Create a notes file in this activity and read it back.” The agent discovers and uses installed tools rather than matching those requests to subsystem-specific intent categories.
 
@@ -23,7 +23,7 @@ agent-os providers
 
 Hidden prompts save credentials only inside the VM. Conversation uses the Gateway key; autonomous action assessment uses the Jev key. Unavailable assessment requires review rather than silently allowing actions. Existing keys are preserved by installation.
 
-The Gateway supports verified free models or explicitly configured paid models. The development VM uses inclusionai/ling-3.0-flash; no automatic paid fallback is used. Free-provider rate limits are reported explicitly. Questions, selected command output and file contents requested through agent tools may be sent to the model provider. Credentials and private service state are excluded from normal execution.
+The Gateway supports verified free models or explicitly configured paid models. The development VM uses inclusionai/ling-3.0-flash; no automatic paid fallback is used. Free-provider rate limits are reported explicitly. Questions, selected command output and file contents requested through agent tools may be sent to the model provider. Credentials are held by the assistant service, but admitted root commands can access private guest state. This is effect assessment, not filesystem isolation.
 
 ## Scriptable commands
 
@@ -39,7 +39,7 @@ agent-os history 12
 agent-os stop 28
 ```
 
-Replace IDs with those returned on your machine. `ask` and `disk` return a core job ID. General execution may also create broker job IDs, shown in the output. Broker jobs have their own lifecycle; stopping the conversation does not necessarily stop a launched broker job. Ask the agent to stop it or use the broker CLI described in the guide.
+Replace IDs with those returned on your machine. `ask` and `disk` return a core job ID. General execution may also create broker job IDs, shown in the output. Broker jobs have their own lifecycle; stopping the conversation does not necessarily stop a launched broker job. Press X to stop a broker job directly, or use the broker CLI described in the guide.
 
 ## Persistence and boundaries
 
@@ -53,7 +53,7 @@ Run `python3 deploy.py` from this directory on the Mac to copy source and build/
 
 - `tests/agent_test.py`: tool-loop contract and validation tests with explicit fixtures.
 - `tests/providers_test.py`: provider/price checks, including the retained optional Jev adapter.
-- `tests/broker_integration.py`: real guest execution, isolation, file recovery, deadlines, cancellation and administrator approval.
+- `tests/broker_integration.py`: real guest execution, OS authority, file recovery, deadlines, cancellation and administrator approval.
 - `broker-verification.json`: broker integration and restart results.
 - `verification.json`: original activity/supervisor milestone checks.
 - `disk-verification.json` and `agent-verification.json`: earlier disk and model-loop checks.
@@ -82,3 +82,24 @@ Git, and GCC versions were measured without reinstalling packages.
 Current runtime policy: [EFFECTS.md](EFFECTS.md). Durable memory, skill revisions and inspection commands: [LEARNING.md](LEARNING.md). The command allowlist and server-specific workaround have been removed.
 
 OS-authority update: the Linux guest is the agent’s workspace. Broker commands use root authority by default; activity directories are organizational, not a sandbox. Jev assesses both effects and alignment with the current request. See EFFECTS.md.
+
+## Hardening validation
+
+Run from the repository root:
+
+```sh
+python3 -m unittest discover -s outputs/agent-shell/tests -p '*_test.py'
+cargo test --locked --manifest-path outputs/agent-shell/Cargo.toml
+```
+
+The local suite covers effect/authorization gates, launch cancellation, protocol
+validation, guarded-write concurrency, conversation recovery and layout behavior.
+Rust tests cover persistence, revisions, activity removal and restart reconciliation;
+two additional execution/cancellation tests run on Linux.
+
+Guest acceptance requires a provisioned VM: deploy, run `cargo test --locked` in
+`/home/developer/agent-os-source`, then the core, broker and layout integration
+scripts. These tests create activities/files and the core integration script
+restarts its service. Historical verification reports do not substitute for a
+fresh run of the current source. Voice, native graphics, release updates and
+formal accessibility validation remain outside this runtime hardening scope.

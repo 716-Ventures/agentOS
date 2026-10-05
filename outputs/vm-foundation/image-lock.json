@@ -4,7 +4,7 @@
   "debian_build": "20260914-2601",
   "architecture": "arm64",
   "disk_size": "20G",
-  "memory_mib": 2048,
-  "cpus": 2,
+  "memory_mib": 4096,
+  "cpus": 4,
   "ssh_port": 22220
 }

@@ -20,7 +20,7 @@ The initial artifact can be a preinstalled bootable virtual disk plus a reproduc
 
 Validate microphone capture inside the guest. A host audio bridge may support interim interaction testing, but must be identified as such and cannot count as verified native guest audio. VM validation also does not establish physical-hardware compatibility.
 
-## Implementation status — September 17, 2026
+## Historical implementation status — September 17, 2026
 
 M0 is implemented and verified on this Mac using QEMU with hardware acceleration. The Debian-based ARM64 guest boots through UEFI, runs systemd, supports SSH and serial-console login, reaches the network, and preserves data through reboot and a full shutdown/start cycle. No failed guest services were reported. M0.1 is also implemented: the Rust activity and job core, separate terminal dashboard, structured history, cancellation, and restart reconciliation. M1 now has an installed Gateway tool-using agent with real system-information and disk tools. Live Gateway tool calls have been exercised; Jev is reserved for bounded tasks outside the conversational path. Voice remains unimplemented.
 
@@ -126,4 +126,4 @@ Acceptance: boot, configure network and microphone, complete the first workflow,
 
 The terminal release tests whether an agent can coordinate useful work across system layers. It cannot establish graphical usability, arbitrary GUI application control, compositor performance, or the final visual identity. Those remain explicit requirements for the subsequent desktop release.
 
-M0 and M0.1 are complete for the development VM; M1 adapters and a disk-inspection workflow are installed, with initial authenticated Gateway tool calls verified and broader quality evaluation next. Agent features will be integrated and tested inside this image. M1 can be designed with fixtures while account configuration is pending, but measured Jev performance and behavior require real API evaluation. Live speech requires testing on the selected Linux audio stack. The current Mac can support portable development; Linux integration must be exercised in Linux.
+M0 and M0.1 were verified in the original development VM. The current source also implements general broker execution, Jev assessments, durable knowledge and shared terminal layouts. Fresh guest validation is required after deployment; broader live quality evaluation and voice remain outstanding. Agent features will be integrated and tested inside this image. M1 can be designed with fixtures while account configuration is pending, but measured Jev performance and behavior require real API evaluation. Live speech requires testing on the selected Linux audio stack. The current Mac can support portable development; Linux integration must be exercised in Linux.

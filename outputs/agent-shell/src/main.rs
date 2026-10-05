@@ -129,7 +129,7 @@ impl Core {
             .collect::<std::result::Result<Vec<_>, _>>()
             .map_err(err)?;
         Ok(
-            json!({"revision":revision(&db)?,"activities":activities,"jobs":jobs,"version":"0.4.0","mode":"Gateway agent with effects-based broker; Jev typed advisory; voice pending"}),
+            json!({"revision":revision(&db)?,"activities":activities,"jobs":jobs,"version":env!("CARGO_PKG_VERSION"),"mode":"Gateway agent with effects-based broker; Jev typed advisory; voice pending"}),
         )
     }
     fn create(&self, v: &Value) -> Result<Value> {
@@ -162,14 +162,35 @@ impl Core {
         let activity = id(v, "activity_id")?;
         let mut db = self.db.lock().unwrap();
         check_revision(&db, v)?;
-        db.query_row("SELECT id FROM activities WHERE id=?", [activity], |r| r.get::<_,i64>(0)).map_err(err)?;
+        db.query_row("SELECT id FROM activities WHERE id=?", [activity], |r| {
+            r.get::<_, i64>(0)
+        })
+        .map_err(err)?;
         let tx = db.transaction().map_err(err)?;
         if restore {
-            tx.execute("DELETE FROM removed_activities WHERE activity_id=?", [activity]).map_err(err)?;
+            tx.execute(
+                "DELETE FROM removed_activities WHERE activity_id=?",
+                [activity],
+            )
+            .map_err(err)?;
         } else {
-            tx.execute("INSERT OR IGNORE INTO removed_activities VALUES(?,?)", params![activity,now()]).map_err(err)?;
+            tx.execute(
+                "INSERT OR IGNORE INTO removed_activities VALUES(?,?)",
+                params![activity, now()],
+            )
+            .map_err(err)?;
         }
-        event(&tx, Some(activity), None, if restore {"activity.restored"} else {"activity.removed"}, &json!({"retained":"files, history, layouts and existing jobs"}))?;
+        event(
+            &tx,
+            Some(activity),
+            None,
+            if restore {
+                "activity.restored"
+            } else {
+                "activity.removed"
+            },
+            &json!({"retained":"files, history, layouts and existing jobs"}),
+        )?;
         tx.commit().map_err(err)?;
         Ok(json!({"id":activity,"removed":!restore}))
     }
@@ -392,11 +413,17 @@ impl Core {
             "remove_activity" => self.remove_activity(v, false),
             "restore_activity" => self.remove_activity(v, true),
             "removed_activities" => {
-                let db=self.db.lock().unwrap();
+                let db = self.db.lock().unwrap();
                 let mut q=db.prepare("SELECT a.id,a.name FROM activities a JOIN removed_activities r ON a.id=r.activity_id ORDER BY r.removed_at DESC").map_err(err)?;
-                let rows=q.query_map([],|r|Ok(json!({"id":r.get::<_,i64>(0)?,"name":r.get::<_,String>(1)?}))).map_err(err)?.collect::<std::result::Result<Vec<_>,_>>().map_err(err)?;
+                let rows = q
+                    .query_map([], |r| {
+                        Ok(json!({"id":r.get::<_,i64>(0)?,"name":r.get::<_,String>(1)?}))
+                    })
+                    .map_err(err)?
+                    .collect::<std::result::Result<Vec<_>, _>>()
+                    .map_err(err)?;
                 Ok(json!(rows))
-            },
+            }
             "run" => self.run(v),
             "cancel" => self.cancel(v),
             "log" => {
@@ -484,7 +511,11 @@ fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     }
     let listener = UnixListener::bind(&socket)?;
     fs::set_permissions(&socket, fs::Permissions::from_mode(0o660))?;
-    println!("Agent OS core 0.1.0 listening on {}", socket.display());
+    println!(
+        "Agent OS core {} listening on {}",
+        env!("CARGO_PKG_VERSION"),
+        socket.display()
+    );
     for stream in listener.incoming() {
         match stream {
             Ok(s) => {
@@ -495,4 +526,244 @@ fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    struct Fixture(PathBuf);
+    impl Fixture {
+        fn new() -> Self {
+            let nonce = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_nanos();
+            let root =
+                std::env::temp_dir().join(format!("agent-os-test-{}-{nonce}", std::process::id()));
+            Self(root)
+        }
+        fn open(&self) -> Arc<Core> {
+            Core::open(self.0.clone()).unwrap()
+        }
+    }
+    impl Drop for Fixture {
+        fn drop(&mut self) {
+            let _ = fs::remove_dir_all(&self.0);
+        }
+    }
+
+    #[test]
+    fn activities_and_history_survive_reopen() {
+        let fixture = Fixture::new();
+        let core = fixture.open();
+        let a = core.create(&json!({"name":"Research"})).unwrap();
+        fs::write(
+            fixture
+                .0
+                .join("workspaces")
+                .join(a["id"].to_string())
+                .join("note"),
+            "retained",
+        )
+        .unwrap();
+        drop(core);
+        let core = fixture.open();
+        assert_eq!(
+            core.snapshot().unwrap()["activities"][0]["name"],
+            "Research"
+        );
+        assert_eq!(
+            fs::read_to_string(
+                fixture
+                    .0
+                    .join("workspaces")
+                    .join(a["id"].to_string())
+                    .join("note")
+            )
+            .unwrap(),
+            "retained"
+        );
+        let events = core
+            .handle(&json!({"op":"history","activity_id":a["id"]}))
+            .unwrap();
+        assert_eq!(events[0]["kind"], "activity.created");
+    }
+
+    #[test]
+    fn stale_mutations_leave_state_unchanged() {
+        let fixture = Fixture::new();
+        let core = fixture.open();
+        let old = core.snapshot().unwrap()["revision"].clone();
+        let a = core.create(&json!({"name":"Current"})).unwrap();
+        let before = core.snapshot().unwrap();
+        for request in [
+            json!({"op":"create","name":"Stale","expected_revision":old}),
+            json!({"op":"remove_activity","activity_id":a["id"],"expected_revision":old}),
+            json!({"op":"run","activity_id":a["id"],"argv":["/bin/true"],"expected_revision":old}),
+        ] {
+            assert!(core.handle(&request).unwrap_err().contains("State changed"));
+        }
+        assert_eq!(core.snapshot().unwrap(), before);
+    }
+
+    #[test]
+    fn removing_an_activity_preserves_files_and_can_be_reversed() {
+        let fixture = Fixture::new();
+        let core = fixture.open();
+        let a = core.create(&json!({"name":"Keep"})).unwrap();
+        let note = fixture
+            .0
+            .join("workspaces")
+            .join(a["id"].to_string())
+            .join("note");
+        fs::write(&note, "work").unwrap();
+        core.remove_activity(&json!({"activity_id":a["id"]}), false)
+            .unwrap();
+        assert!(core.snapshot().unwrap()["activities"]
+            .as_array()
+            .unwrap()
+            .is_empty());
+        assert!(core
+            .run(&json!({"activity_id":a["id"],"argv":["/bin/true"]}))
+            .is_err());
+        assert_eq!(fs::read_to_string(&note).unwrap(), "work");
+        core.remove_activity(&json!({"activity_id":a["id"]}), true)
+            .unwrap();
+        assert_eq!(core.snapshot().unwrap()["activities"][0]["id"], a["id"]);
+    }
+
+    #[test]
+    fn restart_marks_unfinished_jobs_without_replaying_them() {
+        let fixture = Fixture::new();
+        let core = fixture.open();
+        let a = core.create(&json!({"name":"Restart"})).unwrap();
+        {
+            let db = core.db.lock().unwrap();
+            for status in ["starting", "running", "cancelling", "succeeded"] {
+                db.execute(
+                    "INSERT INTO jobs(activity_id,argv,status,created_at) VALUES(?,?,?,?)",
+                    params![
+                        a["id"].as_i64().unwrap(),
+                        "[\"/does/not/exist\"]",
+                        status,
+                        now()
+                    ],
+                )
+                .unwrap();
+            }
+        }
+        drop(core);
+        let core = fixture.open();
+        let snapshot = core.snapshot().unwrap();
+        let jobs = snapshot["jobs"].as_array().unwrap();
+        assert_eq!(
+            jobs.iter().filter(|j| j["status"] == "interrupted").count(),
+            3
+        );
+        assert_eq!(
+            jobs.iter().filter(|j| j["status"] == "succeeded").count(),
+            1
+        );
+        let events = core
+            .handle(&json!({"op":"history","activity_id":a["id"]}))
+            .unwrap();
+        assert_eq!(
+            events
+                .as_array()
+                .unwrap()
+                .iter()
+                .filter(|e| e["kind"] == "job.interrupted")
+                .count(),
+            3
+        );
+        assert!(core.active.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn invalid_commands_create_no_jobs() {
+        let fixture = Fixture::new();
+        let core = fixture.open();
+        let a = core.create(&json!({"name":"Validation"})).unwrap();
+        for argv in [
+            json!([]),
+            json!([""]),
+            json!(["/bin/echo", 1]),
+            json!(["/bin/echo", "bad\u{0}argument"]),
+        ] {
+            assert!(core
+                .run(&json!({"activity_id":a["id"],"argv":argv}))
+                .is_err());
+        }
+        assert!(core.snapshot().unwrap()["jobs"]
+            .as_array()
+            .unwrap()
+            .is_empty());
+    }
+    #[cfg(target_os = "linux")]
+    fn finish(core: &Arc<Core>, job: i64) -> Value {
+        let deadline = Instant::now() + Duration::from_secs(5);
+        loop {
+            let snapshot = core.snapshot().unwrap();
+            let row = snapshot["jobs"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|j| j["id"] == job)
+                .unwrap()
+                .clone();
+            if !["starting", "running", "cancelling"].contains(&row["status"].as_str().unwrap()) {
+                return row;
+            }
+            assert!(Instant::now() < deadline, "job did not finish: {row}");
+            thread::sleep(Duration::from_millis(20));
+        }
+    }
+
+    #[test]
+    #[cfg(target_os = "linux")]
+    fn execution_records_real_exit_output_and_spawn_failure() {
+        let fixture = Fixture::new();
+        let core = fixture.open();
+        let a = core.create(&json!({"name":"Execution"})).unwrap();
+        let job = core
+            .run(&json!({"activity_id":a["id"],"argv":["/bin/sh","-c","echo observed; exit 7"]}))
+            .unwrap()["id"]
+            .as_i64()
+            .unwrap();
+        let result = finish(&core, job);
+        assert_eq!(result["status"], "failed");
+        assert_eq!(result["exit_code"], 7);
+        assert!(
+            fs::read_to_string(fixture.0.join("logs").join(format!("{job}.log")))
+                .unwrap()
+                .contains("observed")
+        );
+        let missing = core
+            .run(&json!({"activity_id":a["id"],"argv":["/does/not/exist"]}))
+            .unwrap()["id"]
+            .as_i64()
+            .unwrap();
+        let result = finish(&core, missing);
+        assert_eq!(result["status"], "failed");
+        assert!(result["error"].is_string());
+    }
+
+    #[test]
+    #[cfg(target_os = "linux")]
+    fn cancellation_is_idempotent_and_finishes_the_job() {
+        let fixture = Fixture::new();
+        let core = fixture.open();
+        let a = core.create(&json!({"name":"Cancellation"})).unwrap();
+        let job = core
+            .run(&json!({"activity_id":a["id"],"argv":["/bin/sleep","60"]}))
+            .unwrap()["id"]
+            .as_i64()
+            .unwrap();
+        core.cancel(&json!({"job_id":job})).unwrap();
+        assert_eq!(finish(&core, job)["status"], "cancelled");
+        assert_eq!(
+            core.cancel(&json!({"job_id":job})).unwrap()["status"],
+            "cancelled"
+        );
+    }
 }

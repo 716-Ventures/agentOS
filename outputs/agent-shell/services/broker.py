@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """General execution broker. Only this trusted service talks to systemd as root."""
 import json
+import math
 import os
 from pathlib import Path
 import pwd
@@ -20,6 +21,10 @@ WORK = Path('/var/lib/agent-os-workspaces')
 LOCK = threading.RLock()
 LIMIT = 256 * 1024
 JOBS = {}
+
+
+def confident(value, threshold):
+    return type(value) in (int, float) and math.isfinite(value) and threshold <= value <= 1
 
 
 def persist(job):
@@ -72,6 +77,9 @@ def launch(job):
     command += ['--', *job['argv']]
     try:
         with LOCK:
+            if job.get('cancel_requested'):
+                job['status'] = 'cancelled'
+                return
             # Starting while holding the lock makes a concurrent cancellation observe a launched request.
             proc = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                     env={'PATH':'/usr/bin:/bin', 'LANG':'C.UTF-8'})
@@ -148,19 +156,20 @@ def handle(req, uid):
                 finally:
                     LOCK.acquire()
                 if not isinstance(assessment,dict):assessment={}
-                if req.get('current_request') and assessment.get('status')=='available' and assessment.get('task_fit')!='aligned':
+                if req.get('current_request') and assessment.get('status')=='available' and assessment.get('task_fit')=='beyond_request':
                     return {'status':'outside_request','next_step':'This action is not established as part of the current request. Research and answer the question instead of changing state; clarify only if needed. This is not a permissions restriction.','assessment':assessment}
                 policy['assessment']=assessment
                 policy['thresholds']={'routine':.8,'task_fit':.8,'authorization':.6,'calibration':'provisional; see labeled Jev evaluation'}
-                routine=(not deterministic_harm and assessment.get('status')=='available' and assessment.get('risk')=='routine'
-                    and type(assessment.get('confidence')) in (int,float) and .8<=assessment['confidence']<=1)
+                aligned=(not req.get('current_request') or
+                    (assessment.get('task_fit')=='aligned' and confident(assessment.get('task_fit_confidence'), .8)))
+                routine=(not deterministic_harm and aligned and assessment.get('status')=='available' and assessment.get('risk')=='routine'
+                    and confident(assessment.get('confidence'), .8))
                 authorized=(bool(req.get('current_request')) and assessment.get('status')=='available'
                     and assessment.get('risk') in ('routine','harmful')
                     and assessment.get('task_fit')=='aligned'
-                    and type(assessment.get('task_fit_confidence')) in (int,float) and .8<=assessment['task_fit_confidence']<=1
+                    and confident(assessment.get('task_fit_confidence'), .8)
                     and assessment.get('authorization')=='explicit'
-                    and type(assessment.get('authorization_confidence')) in (int,float)
-                    and .6<=assessment['authorization_confidence']<=1)
+                    and confident(assessment.get('authorization_confidence'), .6))
                 if authorized:
                     policy['authorization']={'source':'current_user_request','request':req['current_request'],
                         'context':req.get('conversation_context',[]),'argv':policy['argv'],'cwd':cwd}
@@ -212,7 +221,8 @@ def handle(req, uid):
             if uid != 0: raise ValueError('Only a local administrator may approve system operations')
             if job['status'] != 'approval_required': raise ValueError('This operation is not awaiting approval')
             if job['scope']!='system':raise ValueError('This proposal used the retired restricted authority. Reassess it with current OS authority before approval.')
-            job['approved_by_uid']=uid; job['approved_at']=time.time(); start(job)
+            start(job)
+            job['approved_by_uid']=uid; job['approved_at']=time.time(); persist(job)
             return view(job)
         if op == 'cancel':
             if job['status']=='approval_required':

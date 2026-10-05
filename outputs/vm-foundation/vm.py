@@ -7,19 +7,18 @@ import os
 from pathlib import Path
 import secrets
 import select
+import termios
+import tty
 import shutil
-import socket
 import subprocess
 import sys
 import time
-import termios
-import tty
+import plistlib
+import uuid
 
 ROOT = Path(__file__).resolve().parent
 RUN = ROOT / 'runtime'
 LOCK = json.loads((ROOT / 'image-lock.json').read_text())
-QMP = Path('/tmp') / ('agent-os-' + hashlib.sha256(str(ROOT).encode()).hexdigest()[:12] + '.sock')
-SERIAL = QMP.with_suffix('.serial')
 
 
 def call(args, **kwargs):
@@ -34,37 +33,62 @@ def digest(path):
     return h.hexdigest()
 
 
-def qmp(command):
-    with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
-        s.settimeout(5)
-        s.connect(str(QMP))
-        with s.makefile('rwb', buffering=0) as stream:
-            json.loads(stream.readline())
-            for cmd in ['qmp_capabilities', command]:
-                stream.write(json.dumps({'execute': cmd}).encode() + b'\n')
-                while True:
-                    message = json.loads(stream.readline())
-                    if 'error' in message:
-                        raise RuntimeError(message['error'])
-                    if 'return' in message:
-                        break
-            return message['return']
+def machine():
+    path = RUN / 'utm.json'
+    if not path.exists():
+        raise RuntimeError('Run prepare first, or migrate the existing disk with bundle.')
+    return json.loads(path.read_text())
+
+
+def status():
+    if not (RUN / 'utm.json').exists():
+        return 'stopped'
+    current = machine()
+    try:
+        result = call(['utmctl', 'status', current['uuid']], capture_output=True, text=True)
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(f'UTM cannot find/control this guest. Open {current["bundle"]} in UTM to register it.\n{exc.stderr.strip()}') from exc
+    return result.stdout.strip()
 
 
 def alive():
-    if not QMP.exists():
-        return False
-    try:
-        qmp('query-status')
-        return True
-    except (OSError, ValueError):
-        return False
+    return status() != 'stopped'
+
+
+def bundle():
+    """Move a stopped standalone guest into a UTM bundle without rebuilding it."""
+    if (RUN / 'utm.json').exists():
+        raise RuntimeError('A UTM bundle already exists; it will not be overwritten.')
+    if not (RUN / 'disk.qcow2').exists() or not (RUN / 'seed.iso').exists():
+        raise RuntimeError('Run prepare first.')
+    # A legacy runner must be stopped before migration; a locked disk rejects this probe.
+    call(['qemu-img', 'check', '-q', RUN / 'disk.qcow2'], stdout=subprocess.DEVNULL)
+    target = RUN / 'agentOS.utm'
+    target.mkdir(mode=0o700)
+    data = target / 'Data'
+    data.mkdir(mode=0o700)
+    config = plistlib.loads((ROOT / 'utm-template.plist').read_bytes())
+    ident = str(uuid.uuid4()).upper()
+    config['Information']['UUID'] = ident
+    config['System']['CPUCount'] = LOCK['cpus']
+    config['System']['MemorySize'] = LOCK['memory_mib']
+    config['Network'][0]['MacAddress'] = '02:' + ':'.join(f'{v:02X}' for v in secrets.token_bytes(5))
+    config['Network'][0]['PortForward'][0]['HostPort'] = LOCK['ssh_port']
+    for drive in config['Drive']:
+        drive['Identifier'] = str(uuid.uuid4()).upper()
+    (target / 'config.plist').write_bytes(plistlib.dumps(config, sort_keys=False))
+    # Move, rather than duplicate, the authoritative guest disk. Runtime remains ignored.
+    shutil.move(RUN / 'disk.qcow2', data / 'disk.qcow2')
+    shutil.copyfile(RUN / 'seed.iso', data / 'seed.iso')
+    (RUN / 'utm.json').write_text(json.dumps({'uuid': ident, 'bundle': str(target)}, indent=2) + '\n')
+    print('Prepared UTM bundle:', target)
+    print('Open this bundle once in UTM to register it, then run start.')
 
 
 def prepare(source=None):
     if alive():
         raise RuntimeError('Stop the VM before preparing its image.')
-    if (RUN / 'disk.qcow2').exists():
+    if (RUN / 'disk.qcow2').exists() or (RUN / 'utm.json').exists():
         raise RuntimeError('An existing disk will not be overwritten. Use it with start.')
     RUN.mkdir(mode=0o700, exist_ok=True)
     RUN.chmod(0o700)
@@ -128,73 +152,65 @@ def prepare(source=None):
                                               'local-hostname': 'agent-os-dev'}))
     call(['hdiutil', 'makehybrid', '-iso', '-joliet', '-default-volume-name', 'CIDATA',
           '-o', RUN / 'seed.iso', seed])
-    prefix = Path(call(['brew', '--prefix'], text=True, capture_output=True).stdout.strip())
-    shutil.copyfile(prefix / 'share/qemu/edk2-aarch64-code.fd', RUN / 'uefi-code.fd')
-    shutil.copyfile(prefix / 'share/qemu/edk2-arm-vars.fd', RUN / 'uefi-vars.fd')
     (RUN / 'build.json').write_text(json.dumps(build, indent=2) + '\n')
     (RUN / 'prepared').touch()
-    print('Prepared standalone disk and first-boot configuration. Credentials:', credentials)
+    bundle()
+    print('First-boot configuration ready. Credentials:', credentials)
 
 
-def start(accel):
+def start(hide=False):
     if alive():
-        raise RuntimeError('VM is already running.')
-    if not (RUN / 'prepared').exists():
-        raise RuntimeError('Run prepare first.')
-    if QMP.exists():
-        QMP.unlink()
-    if SERIAL.exists():
-        SERIAL.unlink()
-    pidfile = RUN / 'qemu.pid'
-    if pidfile.exists():
-        pidfile.unlink()
-    args = ['qemu-system-aarch64', '-name', 'agent-os-dev', '-machine', 'virt',
-            '-accel', accel, '-cpu', 'host' if accel == 'hvf' else 'cortex-a72',
-            '-smp', str(LOCK['cpus']), '-m', str(LOCK['memory_mib']),
-            '-drive', f'if=pflash,format=raw,readonly=on,file={RUN}/uefi-code.fd',
-            '-drive', f'if=pflash,format=raw,file={RUN}/uefi-vars.fd',
-            '-drive', f'if=none,id=os,format=qcow2,file={RUN}/disk.qcow2',
-            '-device', 'virtio-blk-pci,drive=os',
-            '-drive', f'if=none,id=seed,format=raw,readonly=on,file={RUN}/seed.iso',
-            '-device', 'virtio-blk-pci,drive=seed',
-            '-netdev', f'user,id=net,hostfwd=tcp:127.0.0.1:{LOCK["ssh_port"]}-:22',
-            '-device', 'virtio-net-pci,netdev=net', '-device', 'virtio-rng-pci',
-            '-display', 'none',
-            '-chardev', f'socket,id=console,path={SERIAL},server=on,wait=off,logfile={RUN}/console.log,logappend=on',
-            '-serial', 'chardev:console',
-            '-monitor', 'none', '-qmp', f'unix:{QMP},server=on,wait=off',
-            '-pidfile', str(pidfile), '-daemonize']
-    call(args)
-    print(f'VM started ({accel}); SSH is forwarded on localhost:{LOCK["ssh_port"]}.')
-    print('Boot log:', RUN / 'console.log')
+        raise RuntimeError('VM is already running or suspended; inspect UTM before restarting.')
+    call(['utmctl', 'start'] + (['--hide'] if hide else []) + [machine()['uuid']])
+    print(f'UTM guest started; SSH is forwarded on localhost:{LOCK["ssh_port"]}.')
+
+
+def stop():
+    if alive():
+        call(['utmctl', 'stop', machine()['uuid'], '--request'])
+        print('Requested orderly guest shutdown. Check status before restarting.')
+    else:
+        print('VM already stopped.')
 
 
 def console():
     if not sys.stdin.isatty():
         raise RuntimeError('Open console in an interactive terminal.')
+    # UTM 4.7.5 attach prints the PTY path but does not relay input/output.
+    result = call(['utmctl', 'attach', machine()['uuid']], capture_output=True, text=True)
+    paths = [line.split(':', 1)[1].strip() for line in result.stdout.splitlines()
+             if line.startswith('PTTY:')]
+    if len(paths) != 1 or not paths[0].startswith('/dev/tty'):
+        raise RuntimeError('UTM did not expose a serial PTY; open the serial console in UTM.')
     print('Guest serial console. Press Ctrl-] to detach without stopping the VM.')
-    print('Local credentials:', RUN / 'console-credentials.txt')
+    print('Local credentials:', RUN / 'console-credentials.txt', flush=True)
+    fd = os.open(paths[0], os.O_RDWR | os.O_NOCTTY)
     original = termios.tcgetattr(sys.stdin)
-    with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
-        s.connect(str(SERIAL))
+    serial_original = termios.tcgetattr(fd)
+    try:
+        tty.setraw(sys.stdin.fileno())
+        tty.setraw(fd)
+        os.write(fd, b'\r')
+        while True:
+            ready, _, _ = select.select([fd, sys.stdin], [], [])
+            if fd in ready:
+                data = os.read(fd, 16384)
+                if not data:
+                    break
+                os.write(sys.stdout.fileno(), data)
+            if sys.stdin in ready:
+                data = os.read(sys.stdin.fileno(), 1024)
+                if b'\x1d' in data or not data:
+                    break
+                os.write(fd, data)
+    finally:
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, original)
         try:
-            tty.setraw(sys.stdin.fileno())
-            s.sendall(b'\r')
-            while True:
-                ready, _, _ = select.select([s, sys.stdin], [], [])
-                if s in ready:
-                    data = s.recv(16384)
-                    if not data:
-                        break
-                    os.write(sys.stdout.fileno(), data)
-                if sys.stdin in ready:
-                    data = os.read(sys.stdin.fileno(), 1024)
-                    if b'\x1d' in data or not data:
-                        break
-                    s.sendall(data)
+            termios.tcsetattr(fd, termios.TCSANOW, serial_original)
         finally:
-            termios.tcsetattr(sys.stdin, termios.TCSADRAIN, original)
-            print()
+            os.close(fd)
+        print()
+
 
 
 def ssh_args():
@@ -217,34 +233,32 @@ def wait_ready(seconds):
             print('Guest login and foundation service are ready.')
             return
         time.sleep(2)
-    raise RuntimeError('Guest readiness deadline exceeded; inspect runtime/console.log.')
+    raise RuntimeError('Guest readiness deadline exceeded; inspect the display or serial console in UTM.')
 
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     commands = p.add_subparsers(dest='command', required=True)
     b = commands.add_parser('prepare'); b.add_argument('--base')
-    s = commands.add_parser('start'); s.add_argument('--accel', choices=['hvf', 'tcg'], default='hvf')
+    s = commands.add_parser('start'); s.add_argument('--hide', action='store_true')
+    commands.add_parser('bundle')
     w = commands.add_parser('wait'); w.add_argument('--seconds', type=int, default=60)
     c = commands.add_parser('ssh'); c.add_argument('remote', nargs=argparse.REMAINDER)
     for cmd in ['status', 'stop', 'reboot', 'console']:
         commands.add_parser(cmd)
     args = p.parse_args()
     if args.command == 'prepare': prepare(args.base)
-    elif args.command == 'start': start(args.accel)
+    elif args.command == 'bundle': bundle()
+    elif args.command == 'start': start(args.hide)
     elif args.command == 'wait': wait_ready(args.seconds)
     elif args.command == 'console': console()
     elif args.command == 'ssh':
         os.execvp('ssh', ssh_args() + args.remote)
     elif args.command == 'status':
-        print(json.dumps(qmp('query-status'), indent=2) if alive() else 'VM stopped')
+        print('UTM guest:', status(), flush=True)
         if alive():
             sys.exit(ssh('agent-os-status').returncode)
-    elif args.command == 'stop':
-        if alive():
-            qmp('system_powerdown')
-            print('Requested orderly guest shutdown. Check status before restarting.')
-        else: print('VM already stopped.')
+    elif args.command == 'stop': stop()
     elif args.command == 'reboot':
         sys.exit(ssh('sudo systemctl reboot').returncode)
 

@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Read-only investigation workflow; separate from arbitrary supervised jobs."""
+"""Credential-owning assistant, conversation history and broker tool dispatch."""
 import knowledge
 import model_usage
 import datetime
@@ -56,7 +56,7 @@ def handle(req, conn):
     if req.get('op') == 'status':
         send(conn, {'status': {'gateway_configured': bool(cfg.get('gateway_key')),
             'jev_configured': bool(cfg.get('jev_key')), 'gateway_model': cfg.get('gateway_model', DEFAULT_MODEL),
-            'mode': 'Gateway agent with effects-based execution; destructive actions require approval', 'jev_role': 'action assessment, context selection, recovery, completion and learning checks'}, 'done': True})
+            'mode': 'Gateway agent with effects-based execution; uncovered harmful effects require approval', 'jev_role': 'action assessment, context selection, recovery, completion and learning checks'}, 'done': True})
         return
     if req.get('op') not in ('disk', 'ask', 'report'): raise ValueError('Unsupported operation')
     activity = req.get('activity')

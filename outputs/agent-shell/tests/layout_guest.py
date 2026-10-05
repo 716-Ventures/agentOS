@@ -7,7 +7,7 @@ with connect('/run/agent-os/runtime.sock',{'op':'create','name':'Shared layout v
  with c.makefile('rb') as f:activity=read_line(f)['result']['id']
 def agent(payload):
  code="import sys,json;sys.path.insert(0,'/usr/local/lib/agent-os/services');from layout_client import request; p=json.loads(sys.argv[1]);print(json.dumps(request(**p)))"
- return subprocess.run(['sudo','-u','agentos-ai','-g','agentos','python3','-c',code,json.dumps(payload)],capture_output=True,text=True)
+ return subprocess.run(['sudo','-n','sudo','-n','-u','agentos-ai','-g','agentos','python3','-c',code,json.dumps(payload)],capture_output=True,text=True)
 s=request('ensure',activity=activity)
 request('editing',activity=activity,client_id='qa',active=True)
 p={'op':'apply','activity':activity,'expected_revision':0,'action':{'operation':'split','axis':'x','surface_id':s['focus'],'view':'history'}}

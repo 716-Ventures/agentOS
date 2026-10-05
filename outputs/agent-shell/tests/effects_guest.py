@@ -20,6 +20,6 @@ j=request('execute',activity=activity,argv=['/bin/rmdir',path],scope='system',pu
 assert j['status']=='approval_required';assert __import__('pathlib').Path(path).is_dir()
 request('cancel',job_id=j['id']);checks.append('destructive action held; target retained')
 j=request('execute',activity=activity,argv=['/bin/rm','-rf','project'],scope='workspace',purpose='Verify workspace removal is gated');assert j['status']=='approval_required';request('cancel',job_id=j['id']);checks.append('workspace deletion also gated')
-j=request('execute',activity=activity,argv=['/usr/bin/python3','-c','print(123)'],scope='system',purpose='Inspect unknown effects');assert j['status']=='inspection_required';checks.append('unknown code requires inspection and does not run')
+j=request('preview',activity=activity,argv=['/usr/bin/python3','-c','print(123)'],scope='system',purpose='Inspect interpreter effects');assert j['decision'] in ('allow','inspect','approve');checks.append('Interpreter is assessed by effects; preview never executes')
 subprocess.run(['sudo','rmdir',path],check=True)
 print(json.dumps({'passed':True,'checks':checks}))

@@ -471,7 +471,7 @@ def dashboard(screen):
              ('view','Change tile view','t'),('zoom','Maximize / restore tile','z'),('grow','Grow tile','+'),
              ('shrink','Shrink tile','−'),('swap','Swap with next tile','m'),('close','Close tile; keep work running','w'),
              ('undo','Undo last layout change','u'),('remove','Remove activity from sidebar','d'),('sidebar','Show / hide activities','b'),
-             ('mouse','Toggle mouse controls / text selection','M'),('theme','Switch light / dark theme','T'),('new','New activity','n'),('disk','Inspect disk usage','i'),('stop','Stop selected core job','x')]
+             ('mouse','Toggle mouse controls / text selection','M'),('theme','Switch light / dark theme','T'),('new','New activity','n'),('disk','Inspect disk usage','i'),('stop','Stop selected core job','x'),('broker_stop','Stop or reject a broker job','X')]
 
     def action(name):
         nonlocal focus,zoom,sidebar,dirty,menu,theme,rail_focus,mouse_enabled,models_open,models_scroll,models_focus
@@ -488,6 +488,10 @@ def dashboard(screen):
             choose('remove',[(False,'Cancel'),(True,'Remove from sidebar; files and existing work are retained')]);return
         if name=='theme':theme='light' if theme=='dark' else 'dark';set_theme();dirty=True;return
         if name=='sidebar':sidebar=not sidebar;dirty=True;return
+        if name=='broker_stop':
+            current_jobs=broker_request('list',activity=activity) if activity else []
+            choose('broker_stop',[(j['id'],job_label(j['argv'])+'  ·  '+j['status'])
+                for j in current_jobs if j['status'] in LIVE or j['status']=='approval_required']);return
         if name=='ask' and not pane:rail_focus=False;ask_input('ask');return
         if not pane:notify('Press Enter to ask, or n to name an activity.');return
         if name in ('ask','run'):rail_focus=False;ask_input(name);return
@@ -726,7 +730,7 @@ def dashboard(screen):
             if menu:
                 items=menu['items'];mw=min(68,w-6);mh=min(len(items)+4,h-4);mx=(w-mw)//2;my=(h-mh)//2
                 for yy in range(my,my+mh):fill(yy,mx,mw,'bar')
-                put(my+1,mx+2,{'actions':'Actions','jobs':'Open work in this tile','view':'Tile view','remove':'Remove '+next((a['name'] for a in state['activities'] if a['id']==activity),'activity')+'?'}[menu['kind']],mw-4,'bar',True)
+                put(my+1,mx+2,{'actions':'Actions','jobs':'Open work in this tile','broker_stop':'Stop or reject a broker job','view':'Tile view','remove':'Remove '+next((a['name'] for a in state['activities'] if a['id']==activity),'activity')+'?'}[menu['kind']],mw-4,'bar',True)
                 begin=max(0,menu_index-(mh-4))
                 for row,(value,label) in enumerate(items[begin:begin+mh-3],my+2):
                     idx=begin+row-my-2;kind='selected' if idx==menu_index else 'bar'
@@ -787,6 +791,8 @@ def dashboard(screen):
                     if kind=='actions':action(value)
                     elif kind=='remove':remove_selected(value)
                     elif kind=='jobs':mutate('bind',job_id=value);last_fetch=0
+                    elif kind=='broker_stop':
+                        result=broker_request('cancel',job_id=value);notify('Broker job: '+result['status']);last_fetch=0
                     else:mutate('view',view=value)
                 elif key==curses.KEY_MOUSE:
                     _,mx,my,_,state_mouse=curses.getmouse()
@@ -797,6 +803,8 @@ def dashboard(screen):
                                 if kind=='actions':action(value)
                                 elif kind=='remove':remove_selected(value)
                                 elif kind=='jobs':mutate('bind',job_id=value);last_fetch=0
+                                elif kind=='broker_stop':
+                                    result=broker_request('cancel',job_id=value);notify('Broker job: '+result['status']);last_fetch=0
                                 else:mutate('view',view=value)
                                 break
                 continue
@@ -857,7 +865,7 @@ def dashboard(screen):
                             if act=='menu':choose('actions',[(n,l+'    '+s) for n,l,s in actions])
                             else:action(act)
                 continue
-            mapping={'M':'mouse','D':'remove','a':'ask','r':'run','n':'new','v':'split_x','s':'split_y','z':'zoom','w':'close','+':'grow','=':'grow','-':'shrink','m':'swap','b':'sidebar','u':'undo','o':'jobs','t':'view','d':'remove','i':'disk','x':'stop','T':'theme'}
+            mapping={'M':'mouse','D':'remove','a':'ask','r':'run','n':'new','v':'split_x','s':'split_y','z':'zoom','w':'close','+':'grow','=':'grow','-':'shrink','m':'swap','b':'sidebar','u':'undo','o':'jobs','t':'view','d':'remove','i':'disk','x':'stop','X':'broker_stop','T':'theme'}
             if key in mapping:action(mapping[key])
             elif key=='h' and selected():mutate('view',view='history');last_fetch=0
         except (OSError,RuntimeError,ValueError,subprocess.SubprocessError,curses.error) as exc:notify(str(exc))

@@ -53,12 +53,12 @@ def main():
     assert remote('cat /home/developer/m0-persistence-probe') == token
     assert rebooted['recorded_boots'] == before['recorded_boots'] + 1
     print('PASS: guest reboot, changed boot ID, persistent user data and boot history', flush=True)
-    vm.qmp('system_powerdown')
+    vm.stop()
     deadline = time.monotonic() + 30
     while vm.alive() and time.monotonic() < deadline:
         time.sleep(1)
     assert not vm.alive(), 'Guest failed to shut down'
-    vm.start('hvf')
+    vm.start()
     cold = wait_new_boot(rebooted['boot_id'])
     assert remote('cat /home/developer/m0-persistence-probe') == token
     assert cold['recorded_boots'] == before['recorded_boots'] + 2

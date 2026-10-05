@@ -16,7 +16,12 @@ def read_line(f):
     line = f.readline(LIMIT + 1)
     if not line or len(line) > LIMIT or not line.endswith(b'\n'):
         raise ValueError('Invalid or oversized local request')
-    return json.loads(line)
+    def invalid_constant(value):
+        raise ValueError('Non-finite JSON number')
+    value = json.loads(line, parse_constant=invalid_constant)
+    if not isinstance(value, dict):
+        raise ValueError('Local messages must be JSON objects')
+    return value
 
 
 def connect(path, value, timeout=180):

@@ -8,7 +8,7 @@ def remote(code):
 pump(1.5);keys('nConversation approval verification\n',1.2)
 activity=json.loads(subprocess.check_output(vm.ssh_args()+['cat ~/.local/state/agent-os/selection.json'],text=True))['activity_id']
 base="import sys,json;sys.path.insert(0,'/usr/local/lib/agent-os/services');from broker_client import request\n"
-proposal=json.loads(remote(base+"print(json.dumps(request('execute',activity="+str(activity)+",argv=['/usr/bin/printf','conversation-approval-ok'],purpose='Verify in-tile approval with harmless output',scope='system')))"))
+proposal=json.loads(remote(base+"print(json.dumps(request('execute',activity="+str(activity)+",argv=['/usr/bin/printf','conversation-approval-ok %s','rm '],purpose='Verify in-tile approval with harmless output',scope='system')))"))
 pump(1.2)
 assert any('Awaiting your approval' in line for line in screen.display),'\n'.join(screen.display)
 assert any('conversation-approval-ok' in line for line in screen.display)
@@ -16,7 +16,7 @@ keys('\n');assert any('Reply to Agent' in line for line in screen.display)
 keys('approved\n',2)
 result=json.loads(remote(base+"print(json.dumps(request('poll',job_id='"+proposal['id']+"')))"))
 assert result['status']=='succeeded',result
-assert result['output']=='conversation-approval-ok',result
+assert result['output']=='conversation-approval-ok rm ',result
 assert result['approved_by_uid']==0
 pump(4);capture('terminal-conversation-approval')
 assert any('Approved operation' in line for line in screen.display),'\n'.join(screen.display)

@@ -94,3 +94,11 @@ It shows configured models and roles, measured requests and tokens, errors,
 in-flight work, and latency. Esc returns to your work; arrows and Page Up / Down
 scroll. `agent-os models` provides JSON. See [MODELS.md](MODELS.md) for accounting
 and persistence details.
+
+## Direct broker cancellation
+
+Press **X** or choose **Stop or reject a broker job** in the Space actions menu.
+The menu fetches current active jobs and pending proposals for this activity.
+Selecting a job cancels its systemd service; selecting a proposal rejects it.
+This control works without a model. Lowercase **x** continues to stop the selected
+core job only; broker work can outlive a conversation worker.
