@@ -49,8 +49,10 @@ The terminal and future desktop can use the same service boundaries. This is a s
 
 ## Build and validation
 
-Run `python3 deploy.py` from this directory on the Mac to copy source and build/install inside the running guest. The installer preserves credentials and user activity data. It restarts the core, assistant and broker; unfinished work is interrupted rather than replayed.
+Follow [Rebuild and verify agentOS](../vm-foundation/REPRODUCING.md) for a clean guest and the complete acceptance path. Run `python3 deploy.py` from this directory to update a running selected guest. `install.sh` installs the captured snapshot dependencies, builds with Cargo.lock, stages a complete release and activates it with a durable recovery journal. Credentials and user activity data are preserved; unfinished work is interrupted rather than replayed. Recovery from the ordinary shell is `sudo python3 /usr/local/lib/agent-os/install-recovery.py --recover`.
 
+- `tests/installation_test.py`: release staging, integrity, preflight validation, recovery journal and authenticated dependency-source scope.
+- `tests/installation_guest.py`: forced interruption and recovery, configuration/state preservation and reboot persistence probes.
 - `tests/agent_test.py`: tool-loop contract and validation tests with explicit fixtures.
 - `tests/providers_test.py`: provider/price checks, including the retained optional Jev adapter.
 - `tests/work_lifecycle_guest.py`: unified work visibility, origin links, activity stop, detached children, retained background work and durable stop generations; run as root in an idle guest.

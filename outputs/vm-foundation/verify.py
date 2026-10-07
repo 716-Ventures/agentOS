@@ -73,7 +73,7 @@ def main():
         'not_tested': ['agent runtime', 'Jev', 'voice/audio', 'installer', 'OS updates/rollback',
                        'physical hardware', 'graphical desktop'],
     }
-    path = vm.ROOT / 'verification.json'
+    path = vm.RUN / 'foundation-verification.json'
     path.write_text(json.dumps(report, indent=2) + '\n')
     print('Evidence:', path)
 

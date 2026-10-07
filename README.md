@@ -15,7 +15,7 @@ The current prototype is a complete Debian ARM64 virtual machine with a tiling t
 - [Terminal release plan](outputs/terminal-first-release-plan.md)
 - [Product principles](PRODUCT.md) and [design direction](DESIGN.md)
 
-Start with the [VM foundation instructions](outputs/vm-foundation/README.md), then the [agent installation and deployment guide](outputs/agent-shell/README.md). Configure provider keys inside the guest using `sudo agent-os-configure`.
+For the complete fresh-guest build and acceptance path, use [Rebuild and verify agentOS](outputs/vm-foundation/REPRODUCING.md). Start with the [VM foundation instructions](outputs/vm-foundation/README.md), then the [agent installation and deployment guide](outputs/agent-shell/README.md). Configure provider keys inside the guest using `sudo agent-os-configure`.
 
 VM disks, generated SSH keys, credentials, caches, build products, runtime state and local test captures are excluded from version control. A fresh checkout requires building the VM and configuring its providers.
 

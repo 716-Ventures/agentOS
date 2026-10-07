@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "base": "Debian 13 arm64",
+  "snapshot": "20261006T000000Z",
+  "archives": [
+    {"name": "debian", "suites": ["trixie", "trixie-updates"]},
+    {"name": "debian-security", "suites": ["trixie-security"]}
+  ],
+  "packages": [
+    "build-essential", "cargo", "rustc", "pkg-config", "python3", "ca-certificates",
+    "curl", "openssh-server", "sudo", "systemd", "weston", "mesa-utils",
+    "libgl1-mesa-dri", "wayland-utils", "alsa-utils", "seatd", "qemu-guest-agent"
+  ]
+}

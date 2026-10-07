@@ -17,8 +17,12 @@ import plistlib
 import uuid
 
 ROOT = Path(__file__).resolve().parent
-RUN = ROOT / 'runtime'
+RUN = Path(os.environ.get('AGENT_OS_VM_RUNTIME',str(ROOT / 'runtime'))).expanduser().resolve()
 LOCK = json.loads((ROOT / 'image-lock.json').read_text())
+if os.environ.get('AGENT_OS_VM_SSH_PORT'):
+    LOCK['ssh_port']=int(os.environ['AGENT_OS_VM_SSH_PORT'])
+if not 1024 <= LOCK['ssh_port'] <= 65535:
+    raise ValueError('Use a non-privileged SSH port between 1024 and 65535')
 
 
 def call(args, **kwargs):
@@ -37,7 +41,14 @@ def machine():
     path = RUN / 'utm.json'
     if not path.exists():
         raise RuntimeError('Run prepare first, or migrate the existing disk with bundle.')
-    return json.loads(path.read_text())
+    current=json.loads(path.read_text())
+    config=plistlib.loads((Path(current['bundle'])/'config.plist').read_bytes())
+    if config['Information']['UUID']!=current['uuid']:
+        raise RuntimeError('Selected VM metadata does not match the bundle UUID')
+    actual=config['Network'][0]['PortForward'][0]['HostPort']
+    if actual!=LOCK['ssh_port']:
+        raise RuntimeError(f'Selected VM forwards SSH on {actual}, but the requested port is {LOCK["ssh_port"]}. Set AGENT_OS_VM_SSH_PORT to match.')
+    return current
 
 
 def status():
@@ -70,6 +81,7 @@ def bundle():
     config = plistlib.loads((ROOT / 'utm-template.plist').read_bytes())
     ident = str(uuid.uuid4()).upper()
     config['Information']['UUID'] = ident
+    config['Information']['Name'] = 'agentOS '+RUN.name
     config['System']['CPUCount'] = LOCK['cpus']
     config['System']['MemorySize'] = LOCK['memory_mib']
     config['Network'][0]['MacAddress'] = '02:' + ':'.join(f'{v:02X}' for v in secrets.token_bytes(5))
@@ -80,7 +92,7 @@ def bundle():
     # Move, rather than duplicate, the authoritative guest disk. Runtime remains ignored.
     shutil.move(RUN / 'disk.qcow2', data / 'disk.qcow2')
     shutil.copyfile(RUN / 'seed.iso', data / 'seed.iso')
-    (RUN / 'utm.json').write_text(json.dumps({'uuid': ident, 'bundle': str(target)}, indent=2) + '\n')
+    (RUN / 'utm.json').write_text(json.dumps({'uuid': ident, 'bundle': str(target), 'ssh_port': LOCK['ssh_port']}, indent=2) + '\n')
     print('Prepared UTM bundle:', target)
     print('Open this bundle once in UTM to register it, then run start.')
 
@@ -214,6 +226,7 @@ def console():
 
 
 def ssh_args():
+    machine()  # Verify that SSH and lifecycle operations select the same guest.
     return ['ssh', '-p', str(LOCK['ssh_port']), '-i', str(RUN / 'id_ed25519'),
             '-o', 'IdentitiesOnly=yes', '-o', 'StrictHostKeyChecking=accept-new',
             '-o', f'UserKnownHostsFile={RUN}/known_hosts', '-o', 'ConnectTimeout=3',

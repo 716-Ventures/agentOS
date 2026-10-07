@@ -2,7 +2,9 @@
 
 This is the first full-system milestone: a complete ARM64 Linux guest with UEFI boot, its own kernel, systemd, persistent storage, networking, login, and a small boot-record service. The upstream base is Debian 13, pinned to build `20260914-2601` and its published SHA-512 checksum.
 
-**The running image now also includes M0.1: the activity and job environment.** Run `agent-os` inside the guest or use the [Agent launcher](../agent-shell/Open%20Agent.command). See the [agent-shell instructions](../agent-shell/README.md). The separately deployed runtime now includes Gateway reasoning and Jev assessments; voice remains pending. The build recipe in this folder reproduces the M0 foundation; apply the agent-shell deployment afterward to reproduce the current installed functionality. Debian identity is retained; current guest build metadata lives in `/etc/agent-os/release.json`.
+**The running image now also includes M0.1: the activity and job environment.** Run `agent-os` inside the guest or use the [Agent launcher](../agent-shell/Open%20Agent.command). See the [agent-shell instructions](../agent-shell/README.md). The separately deployed runtime now includes Gateway reasoning and Jev assessments; voice remains pending. `vm.py prepare` builds the M0 foundation; `reproduce.py` provisions and verifies the current runtime on it. Debian identity is retained; current guest build metadata lives in `/etc/agent-os/release.json`.
+
+For a fresh build with runtime dependencies, installation recovery and automated acceptance, follow [Rebuild and verify agentOS](REPRODUCING.md).
 
 ## Use the VM already built here
 
@@ -12,6 +14,8 @@ UTM is the development VM platform. The verified guest uses UTM’s QEMU backend
 - Open **Console.command** for the guest’s serial console using the PTY exposed by `utmctl attach`; press **Ctrl-]** to detach. The UTM window also provides display and serial access.
 - For serial login, use the account and generated password in `runtime/console-credentials.txt`.
 - If stopped, open **Start.command** to start the VM and enter it.
+
+Use `AGENT_OS_VM_RUNTIME` and `AGENT_OS_VM_SSH_PORT` together to select an alternate guest for `vm.py`, deployment and terminal tests. The bundle UUID and forwarded port are checked before operations so lifecycle controls and SSH cannot silently select different guests.
 
 From a terminal in this directory:
 
@@ -46,7 +50,8 @@ sudo systemctl poweroff
 | `image-lock.json` | Pinned upstream URL, digest, resources, and SSH port |
 | `utm-template.plist` | UTM-generated configuration structure, with instance identity supplied by the builder |
 | `guest/` | Boot-record service and diagnostic command sources |
-| `verification.json` | Local lifecycle checks against the running guest |
+| `runtime/foundation-verification.json` | Lifecycle evidence for the selected guest |
+| `runtime/reproduction.json` | Complete provisioning and acceptance results for the selected guest |
 
 The VM has 4 vCPUs and 4 GB RAM and forwards host `127.0.0.1:22220` to guest SSH. UTM manages its bundled QEMU, UEFI and firmware variables. Graphics use `virtio-gpu-gl-pci`; audio uses `intel-hda`. Outbound networking uses emulated NAT. Host directory sharing and clipboard sharing are disabled. No physical disks are passed through.
 
@@ -86,7 +91,7 @@ This is a reproducible provisioning recipe, not a claim of bit-for-bit image rep
 
 ## Verification
 
-`verify.py` checks SSH login, the ARM64 kernel, systemd PID 1, ext4 root, cloud-init completion, system health, DNS, outbound HTTPS, and service restart. It writes a random test marker in the guest, reboots it, verifies persistence, powers it off, starts it again, and verifies persistence and new boot IDs. It leaves the VM running and writes `verification.json`.
+`verify.py` checks SSH login, the ARM64 kernel, systemd PID 1, ext4 root, cloud-init completion, system health, DNS, outbound HTTPS, and service restart. It writes a random test marker in the guest, reboots it, verifies persistence, powers it off, starts it again, and verifies persistence and new boot IDs. It leaves the VM running and writes `runtime/foundation-verification.json` for the selected guest.
 
 This test intentionally restarts **this development VM**. Save guest work before rerunning it. The boot-record service records each boot once even when restarted within a boot.
 
@@ -96,7 +101,7 @@ UTM platform verification on 2026-10-05 passed UEFI boot, SSH, systemd health, g
 
 ALSA enumerated capture/playback devices and completed two-second 48 kHz stereo capture and silent playback streams. This verifies guest audio plumbing, **not microphone signal quality, audible speaker routing, or end-to-end voice**. Host microphone permission and a real speech/playback check remain part of voice acceptance. Accelerated graphics remain an experimental UTM feature; the current tests establish feasibility, not production desktop performance.
 
-Weston, Mesa, Wayland utilities, ALSA utilities, seatd, qemu-guest-agent and build tools were installed in the verification guest for these checks. They are not yet part of the pinned M0 provisioning recipe. The transient Weston test session is not an implemented agentOS desktop. The separate agent-shell deployment and tests verify the installed runtime. Live model/provider behavior, OS updates/rollback and physical hardware remain separate acceptance work.
+Weston, Mesa, Wayland utilities, ALSA utilities, seatd, qemu-guest-agent and build tools were installed in the verification guest for these checks. They are now captured by the pinned runtime dependency recipe used by `reproduce.py`; the M0 cloud-init seed itself remains minimal. The transient Weston test session is not an implemented agentOS desktop. The separate agent-shell deployment and tests verify the installed runtime. Live model/provider behavior, OS updates/rollback and physical hardware remain separate acceptance work.
 
 ## Next implementation milestone
 
