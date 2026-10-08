@@ -25,6 +25,8 @@ Logs, package versions, host tool versions, release identity and acceptance resu
 
 ## Dependency inputs
 
+The terminal screen keeper uses the captured tmux package; its version and dependency versions are included in the installed manifest.
+
 `outputs/agent-shell/dependencies.json` selects Debian and Debian Security snapshot `20261006T000000Z` and the required packages. `bootstrap.py` uses isolated APT sources and lists for this invocation, retains Debian archive signature verification, and scopes expiry relaxation to the fixed snapshot. Normal guest security-update sources are preserved. See the [Debian snapshot instructions](https://snapshot.debian.org/).
 
 The pinned base determines already installed packages; snapshot metadata determines additional dependencies. The complete installed package/version manifest is recorded under `/var/lib/agent-os-install/dependencies.json` and included in each staged runtime release. Existing newer packages are not automatically downgraded. A fresh base is the acceptance environment for reproducibility. Deliberate dependency updates require updating the snapshot/profile and rerunning fresh-guest acceptance.
@@ -49,6 +51,6 @@ Recovery completes the recorded installation; it does not provide automatic OS/p
 
 ## Verified acceptance
 
-The clean UTM guest built on 2026-10-07 used the pinned base and this dependency recipe, without additional package setup. Checks cover local Python/Rust tests; real core, broker, guarded-file, layout and lifecycle behavior; real SSH terminal controls and interactive PTYs (prompts, full-screen curses, resize, Ctrl-C, reconnect, cancellation and restart); forced installer termination at stopped and activated phases; recovery from staged files; retained state and configuration; guest reboot/cold start; and stable release identity on repeated installation.
+The clean UTM guest built on 2026-10-07 used the pinned base and this dependency recipe, without additional package setup. Checks cover local Python/Rust tests; real core, broker, guarded-file, layout and lifecycle behavior; real SSH terminal controls and interactive PTYs (prompts, full-screen curses, resize, Ctrl-C, reconnect, screen restoration after heavy output and connection loss, vi editing, cancellation and restart); forced installer termination at stopped and activated phases; recovery from staged files; retained state and configuration; guest reboot/cold start; and stable release identity on repeated installation.
 
 Live provider inference, microphone/speaker signal quality, graphical application behavior, physical hardware and OS update rollback remain separate acceptance work. Installed graphics/audio packages reproduce the platform prerequisites; they do not constitute an agentOS desktop or voice implementation.

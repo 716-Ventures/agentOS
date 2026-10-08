@@ -63,9 +63,10 @@ def attach_terminal(value):
         raise ValueError('Attach requires an interactive terminal')
     job=broker_request('poll',job_id=ident)
     if not job.get('terminal'):raise ValueError('This job has no interactive terminal')
-    token=broker_request('terminal_attach',job_id=ident)['token']
+    initial=os.get_terminal_size(sys.stdout.fileno())
+    token=broker_request('terminal_attach',job_id=ident,rows=min(500,initial.lines),cols=min(1000,initial.columns))['token']
     saved=termios.tcgetattr(sys.stdin.fileno())
-    cursor=0;size=None;pending=b'';detach=False
+    cursor=0;size=initial;pending=b'';detach=False
     def call(op,**fields):return broker_request(op,job_id=ident,token=token,**fields)
     def output(data):
         while data:
@@ -78,8 +79,8 @@ def attach_terminal(value):
             if current!=size and job['status'] in LIVE:
                 call('terminal_resize',rows=min(500,current.lines),cols=min(1000,current.columns));size=current
             result=call('terminal_read',cursor=cursor)
-            if result['dropped']:
-                output(b'\x1b[0m\x1b[2J\x1b[H[Older terminal output discarded]\r\n')
+            if result.get('reset'):
+                output(b'\x18\x1b[0m\x1b[2J\x1b[H')
             output(base64.b64decode(result['data']));cursor=result['cursor']
             if result['closed'] and not result['data']:break
             if pending:

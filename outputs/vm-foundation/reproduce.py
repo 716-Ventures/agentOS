@@ -45,7 +45,7 @@ def main():
         remote('cd /home/developer/agent-os-source && python3 -m unittest discover -s tests -p "*_test.py" && cargo test --locked','unit-suites')
         for test,root in [('integration',False),('activity_removal',False),('broker_integration',False),
                           ('broker_restart_guest',False),('broker_reuse_guest',False),('file_result_guest',False),
-                          ('write_transport_guest',True),('layout_guest',False),('work_lifecycle_guest',True),('terminal_guest',False)]:
+                          ('write_transport_guest',True),('layout_guest',False),('work_lifecycle_guest',True),('terminal_guest',False),('terminal_screen_guest',False)]:
             remote(('sudo -n ' if root else '')+'python3 /home/developer/agent-os-source/tests/'+test+'.py',test)
         local([sys.executable,str(SHELL/'tests/work_lifecycle_terminal.py')],'terminal')
         local([sys.executable,str(SHELL/'tests/interactive_terminal.py')],'interactive-terminal')

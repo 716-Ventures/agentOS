@@ -1,11 +1,7 @@
 #!/usr/bin/python3
 """General execution broker. Only this trusted service talks to systemd as root."""
 import json
-import errno
-import fcntl
-import pty
 import select
-import termios
 import terminal_sessions
 import codecs
 import math
@@ -101,37 +97,33 @@ def launch(job):
     ident = job['id']
     content=job.get('stdin')
     terminal=job.get('terminal',False)
-    master=slave=None
     proc=None
+    terminal_socket=terminal_exit=None
+    decoder=terminal_sessions.ControlOutput() if terminal else None
     props = ['Type=exec', 'KillMode=control-group', 'TimeoutStopSec=2',
              f"RuntimeMaxSec={job['timeout_seconds']}", 'MemoryMax=256M', 'TasksMax=64',
              'UMask=0077']
     if content is None and not terminal:props.append('StandardInput=null')
     # All assessed actions operate on the Linux OS with system authority.
     props += ['User=root', 'Group=root']
-    command = ['/usr/bin/systemd-run', '--quiet', '--wait', '--pty' if terminal else '--pipe', '--collect',
+    command = ['/usr/bin/systemd-run', '--quiet', '--wait', '--pipe', '--collect',
                '--unit=agent-os-exec-'+ident, '--working-directory='+job.get('cwd',job['workspace']),
                '--setenv=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
                '--setenv=LANG=C.UTF-8', '--setenv=HOME='+job['workspace']]
     if terminal:command += ['--setenv=TERM=xterm-256color']
     for prop in props: command += ['--property='+prop]
-    command += ['--', *job['argv']]
     try:
+        argv=job['argv']
+        if terminal:terminal_socket,terminal_exit,argv=terminal_sessions.command(job,STATE)
+        command += ['--', *argv]
         with LOCK:
             if job.get('cancel_requested'):
                 job['status'] = 'cancelled'
                 return
             # Starting while holding the lock makes a concurrent cancellation observe a launched request.
-            if terminal:
-                master,slave=pty.openpty()
-                fcntl.ioctl(slave,termios.TIOCSWINSZ,terminal_sessions.dimensions(job['rows'],job['cols']))
-                proc=subprocess.Popen(command,stdin=slave,stdout=slave,stderr=slave,
-                    start_new_session=True,env={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8','TERM':'xterm-256color'})
-                os.close(slave);slave=None
-                terminal_sessions.register(ident,master,proc)
-            else:
-                proc = subprocess.Popen(command, stdin=subprocess.PIPE if content is not None else subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                        env={'PATH':'/usr/bin:/bin', 'LANG':'C.UTF-8'})
+            proc = subprocess.Popen(command, stdin=subprocess.PIPE if content is not None or terminal else subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                    env={'PATH':'/usr/bin:/bin', 'LANG':'C.UTF-8'})
+            if terminal:terminal_sessions.register(ident,proc,terminal_socket,job['rows'],job['cols'])
             job['status'] = 'running'; persist(job)
         if content is not None:
             # Feed while draining output: a child may write before reading stdin.
@@ -149,21 +141,25 @@ def launch(job):
         with (STATE / (ident+'.log')).open('wb') as f:
             while True:
                 if terminal:
-                    if not select.select([master],[],[],.1)[0]:
+                    if not select.select([proc.stdout],[],[],.1)[0]:
+                        if terminal_exit.exists():
+                            subprocess.run(['/usr/bin/tmux','-S',str(terminal_socket),'kill-server'],
+                                stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,timeout=3)
                         if proc.poll() is not None:break
                         continue
-                    try:data=os.read(master,4096)
-                    except OSError as exc:
-                        if exc.errno==errno.EIO:break
-                        raise
-                    with LOCK:terminal_sessions.append(ident,data)
-                else:data = proc.stdout.read1(4096)
-                if not data: break
+                data=proc.stdout.read1(4096)
+                if not data:break
+                if terminal:
+                    data=decoder.feed(data)
+                    if not data:continue
                 take = min(len(data), max(0,LIMIT-count))
                 if take: f.write(data[:take]); f.flush(); count += take
                 if take < len(data):
                     with LOCK: job['output_truncated'] = True
         code = proc.wait()
+        if terminal and terminal_exit.exists():
+            status,sig=terminal_exit.read_text().split(':')
+            code=int(status) if status else 128+int(sig) if sig else code
         with LOCK:
             job['exit_code'] = code
             job['status'] = 'cancelled' if job.get('cancel_requested') else ('succeeded' if code == 0 else 'failed')
@@ -171,11 +167,10 @@ def launch(job):
         with LOCK: job.update(status='failed', error='Could not start or supervise command')
     finally:
         with LOCK:
-            if terminal:
-                if ident in terminal_sessions.SESSIONS:terminal_sessions.finish(ident)
-                elif master is not None:os.close(master)
-                if slave is not None:os.close(slave)
-            if proc is not None and proc.stdout is not None:proc.stdout.close()
+            if terminal:terminal_sessions.finish(ident)
+            if proc is not None:
+                if proc.stdout is not None:proc.stdout.close()
+                if terminal and proc.stdin is not None:proc.stdin.close()
             job['finished_at'] = time.time(); persist(job)
 
 
@@ -224,6 +219,7 @@ def human_terminal_user(uid):
 def handle(req, uid):
     op = req.get('op')
     with LOCK:
+        terminal_sessions.reap_expired()
         if op == 'activity_state':
             return {'generation':activity_generation(req.get('activity'))}
         if op == 'stop_activity':
@@ -428,6 +424,11 @@ def recover_jobs():
 
 def main():
     recover_jobs()
+    def reap_terminals():
+        while True:
+            time.sleep(.5)
+            with LOCK:terminal_sessions.reap_expired()
+    threading.Thread(target=reap_terminals,daemon=True).start()
     server=listen(SOCKET)
     while True:
         conn,_=server.accept()

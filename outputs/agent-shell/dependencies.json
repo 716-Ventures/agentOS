@@ -9,6 +9,6 @@
   "packages": [
     "build-essential", "cargo", "rustc", "pkg-config", "python3", "ca-certificates",
     "curl", "openssh-server", "sudo", "systemd", "weston", "mesa-utils",
-    "libgl1-mesa-dri", "wayland-utils", "alsa-utils", "seatd", "qemu-guest-agent"
+    "libgl1-mesa-dri", "wayland-utils", "alsa-utils", "seatd", "qemu-guest-agent", "tmux"
   ]
 }
