@@ -49,6 +49,6 @@ Recovery completes the recorded installation; it does not provide automatic OS/p
 
 ## Verified acceptance
 
-The clean UTM guest built on 2026-10-07 used the pinned base and this dependency recipe, without additional package setup. Checks cover local Python/Rust tests; real core, broker, guarded-file, layout and lifecycle behavior; real SSH terminal controls; forced installer termination at stopped and activated phases; recovery from staged files; retained state and configuration; guest reboot/cold start; and stable release identity on repeated installation.
+The clean UTM guest built on 2026-10-07 used the pinned base and this dependency recipe, without additional package setup. Checks cover local Python/Rust tests; real core, broker, guarded-file, layout and lifecycle behavior; real SSH terminal controls and interactive PTYs (prompts, full-screen curses, resize, Ctrl-C, reconnect, cancellation and restart); forced installer termination at stopped and activated phases; recovery from staged files; retained state and configuration; guest reboot/cold start; and stable release identity on repeated installation.
 
 Live provider inference, microphone/speaker signal quality, graphical application behavior, physical hardware and OS update rollback remain separate acceptance work. Installed graphics/audio packages reproduce the platform prerequisites; they do not constitute an agentOS desktop or voice implementation.

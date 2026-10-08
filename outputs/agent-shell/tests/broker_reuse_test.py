@@ -12,7 +12,7 @@ import broker
 
 
 class BrokerReuse(unittest.TestCase):
-    def run_request(self, changes=None, status='running'):
+    def run_request(self, changes=None, status='running', terminal=False):
         with tempfile.TemporaryDirectory() as tmp:
             tmp = str(Path(tmp).resolve())
             existing = dict(id='a' * 32, activity=1, argv=['/usr/bin/sleep', '60'],
@@ -24,9 +24,10 @@ class BrokerReuse(unittest.TestCase):
             with patch.object(broker, 'STATE', Path(tmp)), patch.object(broker, 'workspace', return_value=tmp), \
                  patch.object(broker, 'JOBS', {existing['id']: existing}), \
                  patch.object(broker.subprocess, 'run', return_value=assessment), \
+                 patch.object(broker, 'human_terminal_user'), \
                  patch.object(broker, 'start') as start:
                 result = broker.handle(dict(op='execute', activity=1, argv=['/usr/bin/sleep', '60'],
-                    purpose='Keep a task running', background=True, lifetime_seconds=120), 123)
+                    purpose='Keep a task running', background=True, lifetime_seconds=120,terminal=terminal), 123)
                 return existing, result, start.call_count, len(broker.JOBS)
 
     def test_identical_background_retry_reuses_starting_or_running_job(self):
@@ -36,6 +37,13 @@ class BrokerReuse(unittest.TestCase):
                 self.assertEqual(result['id'], existing['id'])
                 self.assertEqual(starts, 0)
                 self.assertEqual(count, 1)
+
+    def test_new_terminal_does_not_reuse_running_terminal(self):
+        existing,result,starts,count=self.run_request({'terminal':True},terminal=True)
+        self.assertNotEqual(result['id'],existing['id'])
+        self.assertTrue(result['terminal'])
+        self.assertEqual(starts,1)
+        self.assertEqual(count,2)
 
     def test_foreground_job_does_not_satisfy_background_request(self):
         existing, result, starts, count = self.run_request({'background': False})

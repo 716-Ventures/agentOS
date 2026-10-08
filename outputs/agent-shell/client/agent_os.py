@@ -1,6 +1,10 @@
 #!/usr/bin/python3
 """Terminal client and scriptable interface for the Agent OS environment core."""
 import argparse
+import base64
+import select
+import termios
+import tty
 import curses
 import datetime
 import json
@@ -51,6 +55,50 @@ def broker_request(op, **fields):
     return result['result']
 
 
+def attach_terminal(value):
+    """Use the host terminal's emulator; Ctrl-] returns without stopping work."""
+    source,ident=work_reference(value)
+    if source!='broker':raise ValueError('Attach requires a broker terminal job')
+    if not sys.stdin.isatty() or not sys.stdout.isatty():
+        raise ValueError('Attach requires an interactive terminal')
+    job=broker_request('poll',job_id=ident)
+    if not job.get('terminal'):raise ValueError('This job has no interactive terminal')
+    token=broker_request('terminal_attach',job_id=ident)['token']
+    saved=termios.tcgetattr(sys.stdin.fileno())
+    cursor=0;size=None;pending=b'';detach=False
+    def call(op,**fields):return broker_request(op,job_id=ident,token=token,**fields)
+    def output(data):
+        while data:
+            count=os.write(sys.stdout.fileno(),data);data=data[count:]
+    try:
+        tty.setraw(sys.stdin.fileno())
+        output(b'\x1b[?1049h\x1b[2J\x1b[H')
+        while True:
+            current=os.get_terminal_size(sys.stdout.fileno())
+            if current!=size and job['status'] in LIVE:
+                call('terminal_resize',rows=min(500,current.lines),cols=min(1000,current.columns));size=current
+            result=call('terminal_read',cursor=cursor)
+            if result['dropped']:
+                output(b'\x1b[0m\x1b[2J\x1b[H[Older terminal output discarded]\r\n')
+            output(base64.b64decode(result['data']));cursor=result['cursor']
+            if result['closed'] and not result['data']:break
+            if pending:
+                sent=call('terminal_write',data=base64.b64encode(pending).decode())['written']
+                pending=pending[sent:]
+            if detach and not pending:break
+            if not detach and not pending and select.select([sys.stdin],[],[],.02)[0]:
+                data=os.read(sys.stdin.fileno(),4096)
+                if not data:break
+                if b'\x1d' in data:
+                    data=data.split(b'\x1d',1)[0];detach=True
+                pending=data
+    finally:
+        termios.tcsetattr(sys.stdin.fileno(),termios.TCSADRAIN,saved)
+        output(b'\x1b[0m\x1b[?25h\x1b[?1000l\x1b[?1002l\x1b[?1003l\x1b[?1006l\x1b[?2004l\x1b[?1049l')
+        try:call('terminal_detach')
+        except (OSError,RuntimeError,ValueError):pass
+
+
 def work_reference(value):
     if type(value) is int and value>0:return ('core',value)
     if isinstance(value,str):
@@ -77,7 +125,7 @@ def work_label(job):
     origin=job.get('origin') or {}
     parent=origin.get('core_job_id')
     provenance=(' · from core:'+str(parent)) if parent else (' · conversation '+origin['conversation_id'][:8] if origin else '')
-    return job['work_ref']+' · '+job['activity_name']+' · '+job_label(job['argv'])+' · '+job['status']+provenance
+    return job['work_ref']+' · '+job['activity_name']+' · '+job_label(job['argv'])+(' · terminal' if job.get('terminal') else '')+' · '+job['status']+provenance
 
 
 def stop_work(value):
@@ -136,7 +184,7 @@ def approval_target(text, proposals):
 def approve_operation(proposal):
     # Only the local human client crosses this boundary. Never a model tool.
     current=broker_request('poll',job_id=proposal['id'])
-    if current['status']!='approval_required' or any(current.get(k)!=proposal.get(k) for k in ('argv','activity','scope','stdin_sha256')):
+    if current['status']!='approval_required' or any(current.get(k)!=proposal.get(k) for k in ('argv','activity','scope','stdin_sha256','terminal')):
         raise RuntimeError('This proposal changed or was already handled. Nothing was approved.')
     result=subprocess.run(['/usr/bin/sudo','-n','/usr/local/bin/agent-os-broker','approve',proposal['id']],
                           capture_output=True,text=True,timeout=15)
@@ -535,7 +583,7 @@ def dashboard(screen):
         nonlocal menu,menu_index
         menu={'kind':kind,'items':items};menu_index=0
 
-    actions=[('models','Models and usage','p'),('ask','Reply to Agent','Enter / a'),('run','Run a command','r'),('split_x','Split side by side','v'),
+    actions=[('models','Models and usage','p'),('ask','Reply to Agent','Enter / a'),('run','Run a command','r'),('terminal','New interactive terminal','R'),('attach','Attach selected terminal / review approval','I'),('split_x','Split side by side','v'),
              ('split_y','Split top / bottom','s'),('jobs','Choose work for this tile','o'),
              ('view','Change tile view','t'),('zoom','Maximize / restore tile','z'),('grow','Grow tile','+'),
              ('shrink','Shrink tile','−'),('swap','Swap with next tile','m'),('close','Close tile; keep work running','w'),
@@ -565,7 +613,20 @@ def dashboard(screen):
                 if j['status'] in LIVE or j['status']=='approval_required']);return
         if name=='ask' and not pane:rail_focus=False;ask_input('ask');return
         if not pane:notify('Press Enter to ask, or n to name an activity.');return
-        if name in ('ask','run'):rail_focus=False;ask_input(name);return
+        if name in ('ask','run','terminal'):rail_focus=False;ask_input(name);return
+        if name=='attach':
+            if not pane['job']:raise ValueError('Choose a terminal job with o first')
+            source,ident=work_reference(pane['job'])
+            if source!='broker':raise ValueError('Choose a terminal job with o first')
+            proposal=broker_request('poll',job_id=ident)
+            if not proposal.get('terminal'):raise ValueError('This job has no interactive terminal')
+            if proposal['status']=='approval_required':
+                choose('terminal_approve',[(False,'Cancel'),(True,'Allow root terminal: '+shlex.join(proposal['argv']))])
+                menu['proposal']=proposal;return
+            curses.def_prog_mode();curses.endwin()
+            try:attach_terminal(pane['job'])
+            finally:curses.reset_prog_mode();screen.clear();screen.refresh()
+            notify('Terminal detached. Work continues; x stops it.');return
         if name=='view':
             choose('view',[('answer','Conversation'),('output','Full output'),('history','Activity history'),('jobs','Work list')]);return
         if name=='jobs':
@@ -619,6 +680,7 @@ def dashboard(screen):
             return 'Ready',proposal_text()+'\n\nMake room for your work.\n\nAsk a question, run a command, or open existing work in this tile.\n\na  Ask Agent\nr  Run a command\no  Choose work\n\nv  Split side by side\ns  Split top / bottom',None
         raw=cache.get(job['id'],{}).get('text','')
         label=job_label(job['argv'])
+        if job.get('terminal'):label='Terminal: '+label
         if pane['view']=='answer' and label.startswith('Ask: '):
             exchanges=sorted((j for j in jobs if job_label(j['argv']).startswith('Ask: ')),key=lambda j:j['id'])[-20:]
             raw='\n\n────────────────────\n\n'.join(conversation_turn(j,cache.get(j['id'],{}).get('text','')) for j in exchanges)
@@ -768,7 +830,7 @@ def dashboard(screen):
             put(h-2,2,note if now<note_until else hints,w-4,'muted')
             if editor:
                 fill(h-3,0,w,'selected');fill(h-2,0,w,'base')
-                label={'ask':'Reply to Agent','run':'Run command','new':'Name activity · this is a label, not a message'}[editor['kind']]
+                label={'ask':'Reply to Agent','run':'Run command','terminal':'Terminal command · root authority · I attaches · Ctrl-] detaches','new':'Name activity · this is a label, not a message'}[editor['kind']]
                 put(h-3,2,label+'  ·  Enter submit / Esc cancel',w-4,'selected')
                 available=w-6;prefix=editor['text'][:cursor];start=max(0,cursor-available+2)
                 while cells(prefix[start:])>available-1:start+=1
@@ -805,7 +867,7 @@ def dashboard(screen):
             if menu:
                 items=menu['items'];mw=min(68,w-6);mh=min(len(items)+4,h-4);mx=(w-mw)//2;my=(h-mh)//2
                 for yy in range(my,my+mh):fill(yy,mx,mw,'bar')
-                put(my+1,mx+2,{'actions':'Actions','jobs':'Open work in this tile','broker_stop':'Stop or reject any active work','activity_stop':'Stop all work in this activity?','view':'Tile view','remove':'Remove '+next((a['name'] for a in state['activities'] if a['id']==activity),'activity')+'?'}[menu['kind']],mw-4,'bar',True)
+                put(my+1,mx+2,{'actions':'Actions','jobs':'Open work in this tile','broker_stop':'Stop or reject any active work','activity_stop':'Stop all work in this activity?','terminal_approve':'Allow interactive root input? (full OS authority)','view':'Tile view','remove':'Remove '+next((a['name'] for a in state['activities'] if a['id']==activity),'activity')+'?'}[menu['kind']],mw-4,'bar',True)
                 begin=max(0,menu_index-(mh-4))
                 for row,(value,label) in enumerate(items[begin:begin+mh-3],my+2):
                     idx=begin+row-my-2;kind='selected' if idx==menu_index else 'bar'
@@ -844,6 +906,11 @@ def dashboard(screen):
                     if text:
                         if kind=='new':switch(request('create',name=text)['id'])
                         elif kind=='ask':reply(text,proposals)
+                        elif kind=='terminal':
+                            task=broker_request('execute',activity=activity,argv=shlex.split(text),purpose='Human interactive terminal session',
+                                terminal=True,background=True,lifetime_seconds=86400,request_confirmation=True)
+                            mutate('bind',job_id='broker:'+task['id'],view='output');last_fetch=0
+                            notify('Press I to review approval or attach. Ctrl-] detaches; x stops.')
                         else:submit(shlex.split(text),'output')
                     continue
                 if key in (curses.KEY_BACKSPACE,'\x7f','\b'):
@@ -862,8 +929,10 @@ def dashboard(screen):
                 if key in (curses.KEY_UP,'k'):menu_index=max(0,menu_index-1)
                 elif key in (curses.KEY_DOWN,'j'):menu_index=min(len(menu['items'])-1,menu_index+1)
                 elif key in ('\n','\r',curses.KEY_ENTER) and menu['items']:
-                    value=menu['items'][menu_index][0];kind=menu['kind'];menu=None
+                    value=menu['items'][menu_index][0];kind=menu['kind'];proposal=menu.get('proposal');menu=None
                     if kind=='actions':action(value)
+                    elif kind=='terminal_approve':
+                        if value:approve_operation(proposal);notify('Terminal approved. Press I to attach.');last_fetch=0
                     elif kind=='remove':remove_selected(value)
                     elif kind=='activity_stop':
                         if value:stop_activity_work(activity);notify('All activity work stopped.');last_fetch=0
@@ -876,8 +945,10 @@ def dashboard(screen):
                     if state_mouse & (curses.BUTTON1_CLICKED | curses.BUTTON1_RELEASED):
                         for row,idx in menu_hits:
                             if my==row and (w-min(68,w-6))//2<=mx<(w+min(68,w-6))//2:
-                                value=menu['items'][idx][0];kind=menu['kind'];menu=None
+                                value=menu['items'][idx][0];kind=menu['kind'];proposal=menu.get('proposal');menu=None
                                 if kind=='actions':action(value)
+                                elif kind=='terminal_approve':
+                                    if value:approve_operation(proposal);notify('Terminal approved. Press I to attach.');last_fetch=0
                                 elif kind=='remove':remove_selected(value)
                                 elif kind=='activity_stop':
                                     if value:stop_activity_work(activity);notify('All activity work stopped.');last_fetch=0
@@ -944,7 +1015,7 @@ def dashboard(screen):
                             if act=='menu':choose('actions',[(n,l+'    '+s) for n,l,s in actions])
                             else:action(act)
                 continue
-            mapping={'M':'mouse','D':'remove','a':'ask','r':'run','n':'new','v':'split_x','s':'split_y','z':'zoom','w':'close','+':'grow','=':'grow','-':'shrink','m':'swap','b':'sidebar','u':'undo','o':'jobs','t':'view','d':'remove','i':'disk','x':'stop','X':'broker_stop','Y':'activity_stop','T':'theme'}
+            mapping={'M':'mouse','D':'remove','a':'ask','r':'run','R':'terminal','I':'attach','n':'new','v':'split_x','s':'split_y','z':'zoom','w':'close','+':'grow','=':'grow','-':'shrink','m':'swap','b':'sidebar','u':'undo','o':'jobs','t':'view','d':'remove','i':'disk','x':'stop','X':'broker_stop','Y':'activity_stop','T':'theme'}
             if key in mapping:action(mapping[key])
             elif key=='h' and selected():mutate('view',view='history');last_fetch=0
         except (OSError,RuntimeError,ValueError,subprocess.SubprocessError,curses.error) as exc:notify(str(exc))
@@ -973,6 +1044,10 @@ def main():
     c=sub.add_parser('report');c.add_argument('activity',type=int)
     c=sub.add_parser('create');c.add_argument('name')
     c=sub.add_parser('run');c.add_argument('activity',type=int);c.add_argument('argv',nargs=argparse.REMAINDER)
+    c=sub.add_parser('terminal',help='Start an assessed interactive broker command; attach with Ctrl-] to detach')
+    c.add_argument('activity',type=int);c.add_argument('--lifetime',type=int,default=86400)
+    c.add_argument('argv',nargs=argparse.REMAINDER)
+    c=sub.add_parser('attach',help='Attach a terminal job; Ctrl-] detaches without stopping it');c.add_argument('job')
     c=sub.add_parser('jobs');c.add_argument('activity',type=int,nargs='?')
     c=sub.add_parser('stop');c.add_argument('job')
     c=sub.add_parser('stop-activity');c.add_argument('activity',type=int)
@@ -998,6 +1073,13 @@ def main():
     elif args.cmd=='run':
         argv=args.argv[1:] if args.argv[:1]==['--'] else args.argv
         result=request('run',activity_id=args.activity,argv=argv)
+    elif args.cmd=='attach':attach_terminal(args.job);return
+    elif args.cmd=='terminal':
+        argv=args.argv[1:] if args.argv[:1]==['--'] else args.argv
+        if not argv:raise ValueError('Supply an absolute command, for example /bin/bash')
+        result=broker_request('execute',activity=args.activity,argv=argv,purpose='Human interactive terminal session',
+            terminal=True,background=True,lifetime_seconds=args.lifetime,request_confirmation=True)
+        result['work_ref']='broker:'+result['id']
     elif args.cmd=='jobs': result=[j for j in work_projection(request('snapshot'),broker_request('list')) if args.activity is None or j['activity_id']==args.activity]
     elif args.cmd=='stop': result=stop_work(args.job)
     elif args.cmd=='stop-activity': result=stop_activity_work(args.activity)

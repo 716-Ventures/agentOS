@@ -1,4 +1,4 @@
-# Agent OS 0.5 — general system broker
+# Agent OS 0.6 — interactive terminal sessions
 
 **Windowing design:** The [native windowing specification](../agent-os-windowing-specification.md) defines the adopted graphical architecture: native component catalog, surface documents, source bindings, broker action references and revisioned tiled/floating workspaces. It is planned implementation, not a graphical feature of this release.
 
@@ -6,7 +6,7 @@ A full Debian-based Linux VM with persistent activities, a terminal interface, a
 
 ## Open and use
 
-Open **Open Agent.command** on the Mac, or enter `agent-os` after connecting to the VM. The terminal now has resizable, persistent tiles and light/dark themes: see [terminal controls](TERMINAL.md). Create/select an activity, then press **a** to ask. Press **i** for the explicit disk-inspection shortcut, **r** for an explicit legacy command, the view menu for core job history, and **q** to leave. Tab switches tiles; F6 focuses the activity list; arrows and PgUp/PgDn scroll output. Press v or s to split, +/− to resize, z to maximize, and Space for all actions.
+Open **Open Agent.command** on the Mac, or enter `agent-os` after connecting to the VM. The terminal now has resizable, persistent tiles and light/dark themes: see [terminal controls](TERMINAL.md). Create/select an activity, then press **a** to ask. Press **R** to create an interactive terminal and **I** to review approval or attach; **Ctrl-]** detaches while work continues. Press **i** for the explicit disk-inspection shortcut, **r** for an explicit legacy command, the view menu for core job history, and **q** to leave. Tab switches tiles; F6 focuses the activity list; arrows and PgUp/PgDn scroll output. Press v or s to split, +/− to resize, z to maximize, and Space for all actions.
 
 Try “Inspect the network interfaces and default route,” “What services have failed?” or “Create a notes file in this activity and read it back.” The agent discovers and uses installed tools rather than matching those requests to subsystem-specific intent categories.
 
@@ -51,6 +51,8 @@ The terminal and future desktop can use the same service boundaries. This is a s
 
 Follow [Rebuild and verify agentOS](../vm-foundation/REPRODUCING.md) for a clean guest and the complete acceptance path. Run `python3 deploy.py` from this directory to update a running selected guest. `install.sh` installs the captured snapshot dependencies, builds with Cargo.lock, stages a complete release and activates it with a durable recovery journal. Credentials and user activity data are preserved; unfinished work is interrupted rather than replayed. Recovery from the ordinary shell is `sudo python3 /usr/local/lib/agent-os/install-recovery.py --recover`.
 
+- `tests/terminal_sessions_test.py`: bounded raw transport, controller leases, backpressure and service-identity separation.
+- `tests/terminal_guest.py` and `tests/interactive_terminal.py`: real controlling PTYs, prompts, signals, resizing, reconnect, full-screen curses and dashboard controls.
 - `tests/installation_test.py`: release staging, integrity, preflight validation, recovery journal and authenticated dependency-source scope.
 - `tests/installation_guest.py`: forced interruption and recovery, configuration/state preservation and reboot persistence probes.
 - `tests/agent_test.py`: tool-loop contract and validation tests with explicit fixtures.

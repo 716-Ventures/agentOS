@@ -30,7 +30,7 @@ See the [VM foundation and launch instructions](vm-foundation/README.md) and [ve
 
 Ask uses the Gateway model with general execution, filesystem and job-control tools, not subsystem-specific intent routing. The operating system is the agent's workspace. The root broker supervises commands across it; activity directories organize work rather than restrict authority. Requested routine work proceeds automatically; harmful effects need authorization unless the existing user instruction already covers them. Jev supplies bounded assessments, context selection, recovery, completion and learning checks. See [the current Jev guide](agent-shell/JEV.md).
 
-See [the broker guide](agent-shell/BROKER.md) for implemented limits, command authority, persistence, recovery, and remaining UI/PTY work. Existing explicit-command activities and the disk shortcut remain available. This replaces the earlier plan to build one tool per subsystem.
+See [the broker guide](agent-shell/BROKER.md) for implemented limits, command authority, persistence, recovery, and interactive terminal controls and remaining UI work. Existing explicit-command activities and the disk shortcut remain available. This replaces the earlier plan to build one tool per subsystem.
 
 ## Subsequent complete workflow
 

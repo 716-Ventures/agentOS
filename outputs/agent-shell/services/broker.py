@@ -1,6 +1,12 @@
 #!/usr/bin/python3
 """General execution broker. Only this trusted service talks to systemd as root."""
 import json
+import errno
+import fcntl
+import pty
+import select
+import termios
+import terminal_sessions
 import codecs
 import math
 import hashlib
@@ -72,6 +78,11 @@ def validate(req):
         try: size=len(content.encode('utf-8'))
         except UnicodeEncodeError:raise ValueError('stdin must be UTF-8 text') from None
         if size>BROKER_INPUT_LIMIT:raise ValueError('stdin exceeds the 64 KiB input limit')
+    terminal=req.get('terminal',False)
+    if type(terminal) is not bool:raise ValueError('terminal must be boolean')
+    if terminal:
+        if 'stdin' in req:raise ValueError('Terminal sessions cannot use stored stdin')
+        terminal_sessions.dimensions(req.get('rows',24),req.get('cols',80))
     background=req.get('background',False)
     if type(background) is not bool:raise ValueError('background must be boolean')
     timeout = req.get('lifetime_seconds',86400) if background else req.get('timeout_seconds',30)
@@ -89,16 +100,20 @@ def validate(req):
 def launch(job):
     ident = job['id']
     content=job.get('stdin')
+    terminal=job.get('terminal',False)
+    master=slave=None
+    proc=None
     props = ['Type=exec', 'KillMode=control-group', 'TimeoutStopSec=2',
              f"RuntimeMaxSec={job['timeout_seconds']}", 'MemoryMax=256M', 'TasksMax=64',
              'UMask=0077']
-    if content is None:props.append('StandardInput=null')
+    if content is None and not terminal:props.append('StandardInput=null')
     # All assessed actions operate on the Linux OS with system authority.
     props += ['User=root', 'Group=root']
-    command = ['/usr/bin/systemd-run', '--quiet', '--wait', '--pipe', '--collect',
+    command = ['/usr/bin/systemd-run', '--quiet', '--wait', '--pty' if terminal else '--pipe', '--collect',
                '--unit=agent-os-exec-'+ident, '--working-directory='+job.get('cwd',job['workspace']),
                '--setenv=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
                '--setenv=LANG=C.UTF-8', '--setenv=HOME='+job['workspace']]
+    if terminal:command += ['--setenv=TERM=xterm-256color']
     for prop in props: command += ['--property='+prop]
     command += ['--', *job['argv']]
     try:
@@ -107,8 +122,16 @@ def launch(job):
                 job['status'] = 'cancelled'
                 return
             # Starting while holding the lock makes a concurrent cancellation observe a launched request.
-            proc = subprocess.Popen(command, stdin=subprocess.PIPE if content is not None else subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                    env={'PATH':'/usr/bin:/bin', 'LANG':'C.UTF-8'})
+            if terminal:
+                master,slave=pty.openpty()
+                fcntl.ioctl(slave,termios.TIOCSWINSZ,terminal_sessions.dimensions(job['rows'],job['cols']))
+                proc=subprocess.Popen(command,stdin=slave,stdout=slave,stderr=slave,
+                    start_new_session=True,env={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8','TERM':'xterm-256color'})
+                os.close(slave);slave=None
+                terminal_sessions.register(ident,master,proc)
+            else:
+                proc = subprocess.Popen(command, stdin=subprocess.PIPE if content is not None else subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                        env={'PATH':'/usr/bin:/bin', 'LANG':'C.UTF-8'})
             job['status'] = 'running'; persist(job)
         if content is not None:
             # Feed while draining output: a child may write before reading stdin.
@@ -125,7 +148,16 @@ def launch(job):
         count = 0
         with (STATE / (ident+'.log')).open('wb') as f:
             while True:
-                data = proc.stdout.read1(4096)
+                if terminal:
+                    if not select.select([master],[],[],.1)[0]:
+                        if proc.poll() is not None:break
+                        continue
+                    try:data=os.read(master,4096)
+                    except OSError as exc:
+                        if exc.errno==errno.EIO:break
+                        raise
+                    with LOCK:terminal_sessions.append(ident,data)
+                else:data = proc.stdout.read1(4096)
                 if not data: break
                 take = min(len(data), max(0,LIMIT-count))
                 if take: f.write(data[:take]); f.flush(); count += take
@@ -139,6 +171,11 @@ def launch(job):
         with LOCK: job.update(status='failed', error='Could not start or supervise command')
     finally:
         with LOCK:
+            if terminal:
+                if ident in terminal_sessions.SESSIONS:terminal_sessions.finish(ident)
+                elif master is not None:os.close(master)
+                if slave is not None:os.close(slave)
+            if proc is not None and proc.stdout is not None:proc.stdout.close()
             job['finished_at'] = time.time(); persist(job)
 
 
@@ -166,13 +203,22 @@ def view(job, offset=0):
     return result
 
 
-def same_operation(job, activity, argv, cwd, background, timeout, scope, stdin_sha256=None):
+def same_operation(job, activity, argv, cwd, background, timeout, scope, stdin_sha256=None, terminal=False):
     """Deduplication must preserve the requested execution contract."""
     return (job['activity'] == activity and job['argv'] == argv
             and job.get('cwd', job['workspace']) == cwd
             and job.get('background', False) == background
             and job['timeout_seconds'] == timeout and job['scope'] == scope
-            and job.get('stdin_sha256') == stdin_sha256)
+            and job.get('stdin_sha256') == stdin_sha256
+            and job.get('terminal',False) == terminal)
+
+
+def human_terminal_user(uid):
+    # Interactive input grants arbitrary effects beyond the initially assessed argv.
+    # Keep that channel out of the credential-owning AI and core service identities.
+    user=pwd.getpwuid(uid)
+    if uid!=0 and (uid<1000 or user.pw_name in ('agentos','agentos-ai')):
+        raise ValueError('Interactive terminals require a local human login')
 
 
 def handle(req, uid):
@@ -196,6 +242,7 @@ def handle(req, uid):
                     if j['id'] in recent or j['status'] in ('starting','running','cancelling','approval_required')]
         if op in ('execute','preview'):
             argv, timeout, scope, purpose = validate(req)
+            if req.get('terminal'):human_terminal_user(uid)
             generation=activity_generation(req.get('activity'))
             expected=req.get('expected_generation',generation)
             if type(expected) is not int or expected!=generation:
@@ -216,6 +263,7 @@ def handle(req, uid):
             cwd=str((Path(path)/cwd).resolve())
             if not Path(cwd).is_dir():raise ValueError('Working directory does not exist')
             policy=assess(argv,scope)
+            if req.get('terminal'):policy['interactive_input']='local_human_only; root authority'
             if content is not None:
                 policy.update(stdin_sha256=input_hash,stdin_bytes=len(content.encode('utf-8')))
             deterministic_harm=policy['decision']=='approve'
@@ -224,7 +272,7 @@ def handle(req, uid):
                 try:
                     completed=subprocess.run(['/usr/sbin/runuser','-u','agentos-ai','-g','agentos','-G','agentos-ai','--',
                         '/usr/bin/python3','/usr/local/lib/agent-os/services/assess_action.py'],
-                        input=json.dumps({'stdin_untrusted':content,'stdin_sha256':input_hash,'argv':policy['argv'],'scope':scope,'cwd':cwd,'background':req.get('background',False),
+                        input=json.dumps({'terminal':req.get('terminal',False),'stdin_untrusted':content,'stdin_sha256':input_hash,'argv':policy['argv'],'scope':scope,'cwd':cwd,'background':req.get('background',False),
                             'lifetime_seconds':timeout,'purpose_untrusted':purpose,'current_request':str(req.get('current_request',''))[:4000],
                             'evidence_untrusted':str(req.get('evidence',''))[:8000],
                             'conversation_context':req.get('conversation_context',[]),
@@ -267,7 +315,7 @@ def handle(req, uid):
             argv,scope=policy['argv'],policy['scope']
             # Reuse exact proposals, preserving identity across retries and consent.
             matches=[j for j in JOBS.values() if j['status']=='approval_required'
-                and same_operation(j, req['activity'], argv, cwd, req.get('background',False), timeout, scope, input_hash)]
+                and same_operation(j, req['activity'], argv, cwd, req.get('background',False), timeout, scope, input_hash, req.get('terminal',False))]
             if matches:
                 existing=min(matches,key=lambda j:j['created_at'])
                 for duplicate in matches:
@@ -277,15 +325,17 @@ def handle(req, uid):
                     existing['policy']=policy
                     start(existing)
                 return view(existing)
-            if req.get('background',False):
+            if req.get('background',False) and not req.get('terminal',False):
                 for existing in JOBS.values():
-                    if existing['status'] in ('starting','running') and same_operation(existing, req['activity'], argv, cwd, True, timeout, scope, input_hash):
+                    if existing['status'] in ('starting','running') and same_operation(existing, req['activity'], argv, cwd, True, timeout, scope, input_hash, req.get('terminal',False)):
                         return view(existing)
             job = {'id':uuid.uuid4().hex, 'activity':req['activity'], 'argv':argv,
                    'timeout_seconds':timeout, 'scope':scope, 'purpose':purpose, 'workspace':path, 'cwd':cwd, 'background':req.get('background',False),
                    'policy':policy,'requested_argv':original_argv,'requested_by_uid':uid, 'created_at':time.time(), 'exit_code':None,
                    'status':'approval_required' if policy['decision']=='approve' else 'starting'}
             job['activity_generation']=generation
+            if req.get('terminal'):
+                job.update(terminal=True,rows=req.get('rows',24),cols=req.get('cols',80))
             if origin is not None:job['origin']=dict(origin)
             if content is not None:
                 job.update(stdin=content,stdin_sha256=input_hash,stdin_bytes=len(content.encode('utf-8')))
@@ -300,6 +350,12 @@ def handle(req, uid):
         if not isinstance(ident,str) or not re.fullmatch('[a-f0-9]{32}',ident) or ident not in JOBS:
             raise ValueError('Unknown broker job')
         job = JOBS[ident]
+        if isinstance(op,str) and op.startswith('terminal_'):
+            human_terminal_user(uid)
+            if not job.get('terminal'):raise ValueError('This job has no interactive terminal')
+            if op in ('terminal_write','terminal_resize') and job['status']!='running':
+                raise ValueError('Terminal is not running')
+            return terminal_sessions.control(ident,req)
         if op == 'input':
             if uid != 0:raise ValueError('Only a local administrator may inspect stored input')
             return {'stdin':job.get('stdin'),'stdin_sha256':job.get('stdin_sha256'),'stdin_bytes':job.get('stdin_bytes',0)}

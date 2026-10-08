@@ -32,7 +32,7 @@ The input line supports arrow keys, Home/End (or Ctrl-A/Ctrl-E), Backspace/Delet
 
 Each activity restores its splits, tile contents and view modes when reopened. On narrow terminals the rail hides; if all tiles cannot fit, the focused tile fills the available area. Tab still accesses the other tiles, and widening the terminal restores the arrangement. The shared layout service stores arrangements and the last 20 undo snapshots in `/var/lib/agent-os-layout/state.sqlite3`. Existing `layouts-v1.json` arrangements are imported once per activity. Theme, sidebar and scroll preferences remain in `~/.local/state/agent-os/layout-client.json`.
 
-These tiles display conversations and job output. They are not interactive PTY shell sessions. Explicit commands retain the existing core's permissions; agent commands use the separate system broker. **x** stops the job bound to the selected tile. **o** offers core and broker jobs in this activity; the work-list view includes retained live work across activities. **X** chooses any active job or pending proposal to stop, including work in a removed activity. **Y** stops all work in the current activity and rejects its proposals. Stopping one conversation worker retains its separate broker commands unless you explicitly stop them or the activity. The removal dialog offers either retention or stopping all work before removal.
+Tiles display conversations and job output. Interactive PTY jobs use full-screen attachment through the host terminal’s emulator; **I** attaches the selected terminal job. Explicit commands retain the existing core's permissions; agent commands use the separate system broker. **x** stops the job bound to the selected tile. **o** offers core and broker jobs in this activity; the work-list view includes retained live work across activities. **X** chooses any active job or pending proposal to stop, including work in a removed activity. **Y** stops all work in the current activity and rejects its proposals. Stopping one conversation worker retains its separate broker commands unless you explicitly stop them or the activity. The removal dialog offers either retention or stopping all work before removal.
 
 Validation included real commands inside the Linux VM, both split orientations, resize, swap/undo, maximize/restore, long Unicode input with cancellation, narrow/wide terminal resizing, light/dark themes, actions-menu access and reopening the saved layout. Four layout/Unicode unit tests also pass. Preview PNGs render the actual captured SSH terminal grid using a host monospace font.
 
@@ -110,3 +110,26 @@ references still work. `agent-os stop broker:JOB_ID` stops one broker job, and
 `agent-os stop-activity ACTIVITY_ID` stops core/broker activity work and rejects
 pending proposals. A stop reports success after job states settle; incomplete
 stops produce an error. New explicit requests can start work afterward.
+
+
+## Interactive terminals
+
+Press **R** and enter an absolute command such as `/bin/bash` to create a supervised terminal in the current activity. **I** reviews any pending approval with the exact command and its interactive root authority; after approving, press **I** again to attach. **o** can reopen an existing terminal job. These controls work without model inference. Original **r** commands remain noninteractive core jobs.
+
+While attached, keyboard input—including arrows, function keys, Unicode, Ctrl-C and Ctrl-D—goes to the application. Terminal size changes reach its controlling PTY. **Ctrl-]** detaches and returns to the dashboard; the program keeps running. Use **x**, **X** or **Y** after detaching to stop work. Ctrl-C has ordinary terminal behavior: it signals the foreground process and may leave an interactive shell running. Closing a tile or leaving the dashboard retains the session.
+
+From the ordinary guest shell:
+
+```sh
+agent-os terminal 12 -- /bin/bash
+# If approval_required, review the returned command and approve its exact ID:
+sudo agent-os-broker approve JOB_ID
+agent-os attach broker:JOB_ID
+agent-os stop broker:JOB_ID
+```
+
+Terminal sessions run with the broker’s root authority and existing resource/lifetime limits (24 hours by default). They accept human input with effects beyond their initial command; this is a direct local control, unavailable to the AI/core service identities. It is not a multi-user security boundary against admitted root programs. Attached programs emit native terminal escapes, as ordinary interactive programs do; tile/log views continue stripping process escapes.
+
+One client controls input at a time. Clean detachment releases control immediately; after a lost connection its lease expires within 15 seconds. Reattachment replays up to the most recent 256 KiB of raw output, and live output continues beyond the saved-log limit. This is bounded replay, not a durable terminal screen snapshot or unlimited scrollback; an application may need its redraw shortcut after a long absence. The broker retains live transports plus at most 32 recently finished transports; persistent job logs retain the first 256 KiB. Broker/VM restarts interrupt sessions and preserve their job records/logs without replaying commands.
+
+`tests/terminal_guest.py` checks real controlling PTYs, prompts, Unicode, resize, Ctrl-C, reconnect, output beyond the saved-log cap, cancellation and restart. `tests/interactive_terminal.py` exercises dashboard creation/approval/attachment, return to the dashboard, CLI reconnection and a full-screen curses application over real SSH.

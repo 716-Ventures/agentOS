@@ -162,10 +162,10 @@ class Installer:
         self.health()
         metadata=self.path('/etc/agent-os/release.json')
         info=json.loads(metadata.read_text())
-        info.update(version='0.5.0',milestone='Shared agent and terminal layouts',runtime_release=ident,
+        info.update(version='0.6.0',milestone='Interactive terminal sessions',runtime_release=ident,
                     agent_runtime='Gateway agent with general execution and filesystem broker; Jev typed effect advisory',voice='not implemented')
         atomic_write(metadata,(json.dumps(info,indent=2)+'\n').encode())
-        atomic_write(self.path('/etc/motd'),b'\nAgent OS 0.5 | Shared agent and terminal layouts\n\n  agent-os          Open the terminal environment\n  agent-os-status   Inspect the Linux foundation\n  sudo agent-os-configure   Set up providers\n\nOrdinary Linux shell and sudo remain available for recovery.\n\n')
+        atomic_write(self.path('/etc/motd'),b'\nAgent OS 0.6 | Interactive terminal sessions\n\n  agent-os          Open the terminal environment\n  agent-os-status   Inspect the Linux foundation\n  sudo agent-os-configure   Set up providers\n\nOrdinary Linux shell and sudo remain available for recovery.\n\n')
         transaction.update(phase='complete',completed_at=time.time());self.record(transaction)
         atomic_write(self.state/'installed.json',(json.dumps(transaction,indent=2)+'\n').encode(),0o600)
         print('Installed and healthy:',ident)
