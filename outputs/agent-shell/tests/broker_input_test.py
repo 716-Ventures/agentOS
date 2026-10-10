@@ -1,6 +1,7 @@
 import hashlib
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'services'))
@@ -12,7 +13,7 @@ class StoredInput(unittest.TestCase):
         return {'id':'a'*32,'activity':1,'status':'approval_required','stdin':text,'stdin_sha256':hashlib.sha256(text.encode()).hexdigest(),'stdin_bytes':len(text.encode())}
     def test_only_administrator_can_read_the_exact_stored_input(self):
         job=self.job()
-        with patch.dict(broker.JOBS,{job['id']:job},clear=True):
+        with tempfile.TemporaryDirectory() as directory,patch.object(broker,'STATE',Path(directory)),patch.dict(broker.JOBS,{job['id']:job},clear=True):
             for uid in (999,1000):
                 with self.assertRaisesRegex(ValueError,'administrator'):broker.handle({'op':'input','job_id':job['id']},uid)
             result=broker.handle({'op':'input','job_id':job['id']},0)

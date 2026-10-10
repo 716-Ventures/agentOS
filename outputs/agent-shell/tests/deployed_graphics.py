@@ -18,6 +18,8 @@ with tempfile.TemporaryDirectory(prefix='agentos-deployed-graphics-') as directo
     for target,upstream in [('target',ROOT/'target'),('native-shell/target',ROOT.parent/'native-shell/target'),('native-compositor/target',ROOT.parent/'native-compositor/target')]:
         (tree/target).symlink_to(upstream.resolve(),target_is_directory=True)
     for command in [
+        ['python3','native-shell/tests/direct_backend.py'],
+        ['python3','native-shell/tests/pty_broker.py'],
         ['dbus-run-session','--','python3','native-shell/tests/native_desktop.py'],
         ['dbus-run-session','--','python3','native-shell/tests/native_session.py'],
         ['python3','tests/graphical_release.py']]:

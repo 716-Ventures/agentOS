@@ -68,7 +68,7 @@ def main():
         local([sys.executable,str(SHELL/'deploy.py')],'provision',900)
         remote('cd /home/developer/agent-os-source && python3 -m unittest discover -s tests -p "*_test.py" && cargo test --locked','unit-suites')
         for test,root in [('integration',False),('activity_removal',False),('broker_integration',False),
-                          ('broker_restart_guest',False),('broker_reuse_guest',False),('file_result_guest',False),
+                          ('broker_restart_guest',False),('broker_reuse_guest',False),('file_result_guest',False),('image_preview_guest',False),
                           ('write_transport_guest',True),('layout_guest',False),('work_lifecycle_guest',True),('terminal_guest',False),('terminal_screen_guest',False),('presentation_guest',False),('broker_sources_guest',False),('voice_guest',False)]:
             remote(('sudo -n ' if root else '')+'python3 /home/developer/agent-os-source/tests/'+test+'.py',test)
         for name,command,timeout in graphical_checks():

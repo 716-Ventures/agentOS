@@ -22,6 +22,7 @@
     "cargo",
     "rustc",
     "pkg-config",
+    "git",
     "python3",
     "openssl",
     "ca-certificates",

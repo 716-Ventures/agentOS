@@ -10,7 +10,6 @@ import tarfile
 
 ROOT=Path(__file__).resolve().parent
 sys.path.insert(0,str(ROOT.parent/'vm-foundation'))
-import vm
 
 
 def source_archive(repository=ROOT.parent.parent):
@@ -32,6 +31,7 @@ def source_archive(repository=ROOT.parent.parent):
 
 
 def main():
+    import vm
     archive=source_archive()
     staged=vm.ssh('mktemp -d /home/developer/.agent-os-source.XXXXXXXX',capture_output=True,text=True,check=True).stdout.strip()
     try:

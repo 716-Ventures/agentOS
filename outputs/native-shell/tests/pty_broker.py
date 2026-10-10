@@ -48,7 +48,7 @@ while True:
     try:
         subprocess.run(argv,check=True,timeout=5,env={**os.environ,'TERM':'xterm-256color'})
         terminals.register(ident,None,tmux,24,80);worker.start()
-        subprocess.run(['cargo','+1.85.1','test','--locked','--manifest-path',str(ROOT/'Cargo.toml'),'pty_transport::tests::real_broker_terminal_round_trip_and_reattach','--','--ignored','--exact','--nocapture'],
+        subprocess.run(['cargo','test','--locked','--manifest-path',str(ROOT/'Cargo.toml'),'pty_transport::tests::real_broker_terminal_round_trip_and_reattach','--','--ignored','--exact','--nocapture'],
             env={**os.environ,'AGENT_OS_PTY_TEST_SOCKET':str(endpoint),'AGENT_OS_PTY_TEST_JOB':ident},check=True,timeout=90)
         assert terminals.SESSIONS[ident]['token'] is None
         assert terminals.SESSIONS[ident]['reader'] is None
