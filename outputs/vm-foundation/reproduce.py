@@ -13,6 +13,29 @@ ROOT=Path(__file__).resolve().parent
 SHELL=ROOT.parent/'agent-shell'
 
 
+def graphical_checks():
+    """Commands run in the deployed source root, using private headless displays."""
+    checks=[('native-build',
+        'cargo test --locked --manifest-path native-shell/Cargo.toml && '
+        'cargo build --locked --manifest-path native-shell/Cargo.toml --examples && '
+        'cargo build --locked --manifest-path native-shell/Cargo.toml && '
+        'cargo test --locked --manifest-path native-compositor/Cargo.toml && '
+        'cargo build --locked --manifest-path native-compositor/Cargo.toml',900),
+        ('native-broker-pty','python3 native-shell/tests/pty_broker.py',90),
+        ('direct-backend-cleanup','python3 native-shell/tests/direct_backend.py',30)]
+    for appearance in ('light','dark'):
+        for scale in (1,2):
+            checks.append((f'native-{appearance}-{scale}',f'dbus-run-session -- python3 native-shell/tests/native_desktop.py --appearance {appearance} --text-scale {scale}',120))
+    checks += [
+        ('native-cpu-contention','dbus-run-session -- python3 native-shell/tests/native_desktop.py --load',120),
+        ('native-compositor','dbus-run-session -- python3 native-shell/tests/native_desktop.py --compositor',120),
+        ('native-shared-workspace','dbus-run-session -- python3 native-shell/tests/native_desktop.py --compositor --shared',180)]
+    for name,option in [('logout',''),('host-loss','--host-failure'),('compositor-loss','--compositor-failure')]:
+        checks.append(('native-session-'+name,'dbus-run-session -- python3 native-shell/tests/native_session.py '+option,120))
+    checks.append(('signed-graphical-release','python3 tests/graphical_release.py',300))
+    return checks
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime',required=True,help='Separate runtime directory containing this guest disk and SSH identity')
@@ -45,8 +68,10 @@ def main():
         remote('cd /home/developer/agent-os-source && python3 -m unittest discover -s tests -p "*_test.py" && cargo test --locked','unit-suites')
         for test,root in [('integration',False),('activity_removal',False),('broker_integration',False),
                           ('broker_restart_guest',False),('broker_reuse_guest',False),('file_result_guest',False),
-                          ('write_transport_guest',True),('layout_guest',False),('work_lifecycle_guest',True),('terminal_guest',False),('terminal_screen_guest',False),('presentation_guest',False),('voice_guest',False)]:
+                          ('write_transport_guest',True),('layout_guest',False),('work_lifecycle_guest',True),('terminal_guest',False),('terminal_screen_guest',False),('presentation_guest',False),('broker_sources_guest',False),('voice_guest',False)]:
             remote(('sudo -n ' if root else '')+'python3 /home/developer/agent-os-source/tests/'+test+'.py',test)
+        for name,command,timeout in graphical_checks():
+            remote('cd /home/developer/agent-os-source && '+command,name,timeout)
         local([sys.executable,str(SHELL/'tests/work_lifecycle_terminal.py')],'terminal')
         local([sys.executable,str(SHELL/'tests/interactive_terminal.py')],'interactive-terminal')
         local([sys.executable,str(SHELL/'tests/voice_terminal.py')],'voice-terminal')

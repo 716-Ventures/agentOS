@@ -11,6 +11,7 @@ import tempfile
 import time
 
 ROOT=Path(__file__).resolve().parents[1]
+SHELL=ROOT.parent if (ROOT.parent/'install_runtime.py').is_file() else ROOT.parent/'agent-shell'
 OUTPUT=ROOT/'test-output';OUTPUT.mkdir(exist_ok=True)
 
 def wait_for(predicate,children,timeout=20):
@@ -53,14 +54,14 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
     host_failure='--host-failure' in sys.argv
     compositor_failure='--compositor-failure' in sys.argv
     with (OUTPUT/('session-compositor-failure.log' if compositor_failure else 'session-host-failure.log' if host_failure else 'session.log')).open('w') as log:
-        core=subprocess.Popen([str(ROOT.parent/'agent-shell/target/release/agent-os-core')],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+        core=subprocess.Popen([str(SHELL/'target/release/agent-os-core')],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
         session=None;owned=[]
         try:
             wait_for(endpoint.exists,[core])
             activity=call(endpoint,{'op':'create','name':'Full desktop session'})['id']
             document={'protocol':'agentos.presentation/1','catalog_revision':'native-core/1','surface_id':'session-fixture','activity_id':str(activity),'revision':0,'title':'Session lifecycle','root':'root','elements':{'root':{'type':'Text@1','props':{'text':'Authenticated session fixture'}}},'bindings':{},'actions':{}}
             call(endpoint,{'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':'session-fixture','expected_revisions':{'session-fixture':None},'operations':[{'op':'surface.create','document':document}]})
-            session=subprocess.Popen(['python3',str(ROOT.parent/'agent-shell/services/desktop_session.py'),'--backend','headless','--pixman','--bin-dir',str(bins),'--socket',str(endpoint)],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+            session=subprocess.Popen(['python3',str(SHELL/'services/desktop_session.py'),'--backend','headless','--pixman','--bin-dir',str(bins),'--socket',str(endpoint)],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
             pidfile=wait_for(lambda:next(runtime.glob('agentos-session-*/compositor.pid'),None),[core,session])
             compositor=int(wait_for(lambda:pidfile.read_text().strip(),[core,session]));owned.append(compositor)
             control=pidfile.parent/f'agentos-compositor-{compositor}.sock'

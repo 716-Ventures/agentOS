@@ -12,7 +12,8 @@ import sys
 import tempfile
 import threading
 ROOT=Path(__file__).resolve().parents[1]
-sys.path.insert(0,str(ROOT.parent/'agent-shell/services'))
+SHELL=ROOT.parent if (ROOT.parent/'install_runtime.py').is_file() else ROOT.parent/'agent-shell'
+sys.path.insert(0,str(SHELL/'services'))
 import broker
 import terminal_sessions as terminals
 

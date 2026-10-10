@@ -13,7 +13,8 @@ import time
 import sys
 
 ROOT=Path(__file__).resolve().parents[1]
-CORE=ROOT.parent/'agent-shell/target/release/agent-os-core'
+SHELL=ROOT.parent if (ROOT.parent/'install_runtime.py').is_file() else ROOT.parent/'agent-shell'
+CORE=SHELL/'target/release/agent-os-core'
 PROTOCOL='agentos.presentation/1'
 CATALOG='native-core/1'
 parser=argparse.ArgumentParser()
@@ -71,7 +72,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                 assert time.monotonic()<deadline,'Fixture job did not finish'
                 time.sleep(.02)
             image_reference='resource-'+'b'*32
-            call({'op':'resource.publish','activity_id':str(activity),'reference':image_reference,'label':'Native blue pixel','png_hex':(ROOT.parent/'agent-shell/tests/fixtures/pixel.png').read_bytes().hex()})
+            call({'op':'resource.publish','activity_id':str(activity),'reference':image_reference,'label':'Native blue pixel','png_hex':(SHELL/'tests/fixtures/pixel.png').read_bytes().hex()})
             pty_source='broker:'+'d'*32
             publication={'op':'source.publish','source':pty_source,'activity_id':str(activity),'source_revision':1,'values':{'status':'running','error':None,'exit_code':None,'created_at':1,'finished_at':None}}
             publisher='import socket,json,sys;s=socket.socket(socket.AF_UNIX);s.connect(sys.argv[1]);s.sendall(sys.argv[2].encode()+b"\\n");r=json.loads(s.makefile().readline());assert r["ok"],r'
