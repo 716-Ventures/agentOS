@@ -50,6 +50,25 @@ while True:
         terminals.register(ident,None,tmux,24,80);worker.start()
         subprocess.run(['cargo','test','--locked','--manifest-path',str(ROOT/'Cargo.toml'),'pty_transport::tests::real_broker_terminal_round_trip_and_reattach','--','--ignored','--exact','--nocapture'],
             env={**os.environ,'AGENT_OS_PTY_TEST_SOCKET':str(endpoint),'AGENT_OS_PTY_TEST_JOB':ident},check=True,timeout=90)
+        # A real GTK control journey shares this owned broker/PTY, using a private display.
+        import time,signal
+        runtime=root/'wayland';runtime.mkdir(mode=0o700)
+        env={**os.environ,'AGENT_OS_PTY_TEST_SOCKET':str(endpoint),'AGENT_OS_PTY_TEST_JOB':ident,
+             'XDG_RUNTIME_DIR':str(runtime),'WAYLAND_DISPLAY':'pty-controls','GDK_BACKEND':'wayland',
+             'GSK_RENDERER':'cairo','GTK_A11Y':'none','G_DEBUG':'fatal-criticals'}
+        with (root/'weston.log').open('w') as log:
+            host=subprocess.Popen(['weston','--backend=headless-backend.so','--use-pixman','--socket=pty-controls','--idle-time=0'],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+            try:
+                deadline=time.monotonic()+10
+                while not (runtime/'pty-controls').exists():
+                    if host.poll() is not None or time.monotonic()>deadline:raise RuntimeError('Private PTY display did not start')
+                    time.sleep(.05)
+                subprocess.run(['cargo','test','--locked','--manifest-path',str(ROOT/'Cargo.toml'),'pty_view::tests::manual_detach_restores_attach_without_a_source_refresh','--','--ignored','--exact','--nocapture'],env=env,check=True,timeout=45)
+            finally:
+                if host.poll() is None:os.killpg(host.pid,signal.SIGTERM)
+                try:host.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    os.killpg(host.pid,signal.SIGKILL);host.wait(timeout=5)
         assert terminals.SESSIONS[ident]['token'] is None
         assert terminals.SESSIONS[ident]['reader'] is None
         print('PASS: native transport / real broker / Unicode PTY input / SIGWINCH / detach / restored screen / reader cleanup')
