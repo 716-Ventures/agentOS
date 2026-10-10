@@ -1,0 +1,21 @@
+[Unit]
+Description=agentOS first-run account and runtime setup
+After=local-fs.target systemd-user-sessions.service
+ConditionPathExists=!/var/lib/agent-os-image/ready
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /usr/local/lib/agent-os-image/first-run.py
+StandardInput=tty
+StandardOutput=tty
+StandardError=tty
+TTYPath=/dev/console
+TTYReset=yes
+TTYVHangup=yes
+TimeoutStartSec=infinity
+Restart=on-failure
+RestartSec=5
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

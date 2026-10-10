@@ -1,7 +1,7 @@
 [Unit]
 Description=Agent OS Gateway tool-using assistant
-After=network-online.target agent-os-disk.service agent-os-broker.service agent-os-layout.service
-Wants=network-online.target agent-os-disk.service agent-os-broker.service agent-os-layout.service
+After=network.target agent-os-disk.service agent-os-broker.service agent-os-layout.service
+Wants=agent-os-disk.service agent-os-broker.service agent-os-layout.service
 
 [Service]
 User=agentos-ai

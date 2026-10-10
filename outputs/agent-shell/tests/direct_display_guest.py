@@ -28,7 +28,10 @@ def main():
     args = parser.parse_args()
     if os.geteuid() != 0:
         raise SystemExit('Run this dedicated-VM display qualification with sudo')
-    user = pwd.getpwnam('developer')
+    login = json.loads(Path('/etc/agent-os/login-user.json').read_text())
+    user = pwd.getpwnam(login['name'])
+    if user.pw_uid < 1000 or user.pw_uid != login['uid']:
+        raise RuntimeError('Installed ordinary login identity changed')
     runtime = Path('/run/user') / str(user.pw_uid)
     original = Path('/sys/class/tty/tty0/active').read_text().strip()
     if original == 'tty7':
@@ -58,10 +61,10 @@ def main():
         try:
             if args.input:
                 fixture=metrics/'Direct input fixture';fixture.write_text('');os.chown(fixture,user.pw_uid,user.pw_gid)
-                activity=json.loads(command('runuser','-u','developer','--','agent-os','create','Direct input verification',capture_output=True).stdout)['id']
-                surface=json.loads(command('runuser','-u','developer','--','agent-os','document','import',str(activity),str(fixture),capture_output=True).stdout)['surface_id']
+                activity=json.loads(command('runuser','-u',user.pw_name,'--','agent-os','create','Direct input verification',capture_output=True).stdout)['id']
+                surface=json.loads(command('runuser','-u',user.pw_name,'--','agent-os','document','import',str(activity),str(fixture),capture_output=True).stdout)['surface_id']
             command('chvt', '7')
-            command('systemd-run', '--quiet', '--unit=' + unit, '--uid=developer',
+            command('systemd-run', '--quiet', '--unit=' + unit, '--uid=' + user.pw_name,
                     '--property=PAMName=login', '--property=TTYPath=/dev/tty7',
                     '--property=StandardInput=tty', '--property=TTYReset=yes',
                     '--property=TTYVHangup=yes', '--property=KillMode=control-group',
@@ -115,15 +118,23 @@ def main():
                 import direct_input_probe
                 def core(op):
                     payload={'op':op,**({'document_id':surface} if op=='presentation.get' else {'surface_id':surface,'element_id':'editor'})}
-                    return json.loads(command('runuser','-u','developer','--','agent-os','presentation','-',input=json.dumps(payload),capture_output=True).stdout)
+                    return json.loads(command('runuser','-u',user.pw_name,'--','agent-os','presentation','-',input=json.dumps(payload),capture_output=True).stdout)
                 def presentation(payload):
-                    result=subprocess.run(['runuser','-u','developer','--','agent-os','presentation','-'],input=json.dumps(payload),capture_output=True,text=True)
+                    result=subprocess.run(['runuser','-u',user.pw_name,'--','agent-os','presentation','-'],input=json.dumps(payload),capture_output=True,text=True)
                     if result.returncode:raise RuntimeError('Fixture workspace request failed: '+result.stdout+result.stderr)
                     return json.loads(result.stdout)
-                deadline=time.monotonic()+5
+                deadline=time.monotonic()+8
+                def placed(value):
+                    if isinstance(value,dict):
+                        return value.get('surface_id')==surface or any(placed(child) for child in value.values())
+                    if isinstance(value,list):return any(placed(child) for child in value)
+                    return False
                 while True:
                     try:
-                        workspace=presentation({'op':'presentation.snapshot'})['documents'][f'desktop-{activity}']
+                        workspace=presentation({'op':'presentation.snapshot'})['documents'].get(f'desktop-{activity}')
+                        if not workspace or not placed(workspace.get('outputs',{})):
+                            if time.monotonic()>deadline:raise RuntimeError('Imported document did not receive a workspace placement')
+                            time.sleep(.05);continue
                         receipt=presentation({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
                             'request_id':'direct-input-focus-'+uuid.uuid4().hex,'expected_revisions':{workspace['workspace_id']:workspace['revision']},
                             'operations':[{'op':'workspace.edit','workspace_id':workspace['workspace_id'],'edit':{'kind':'maximize','surface_id':surface}},
@@ -140,7 +151,7 @@ def main():
                     if target is not None and observed.get('seat_focus')==target:break
                     if time.monotonic()>deadline:raise RuntimeError('Direct input fixture did not receive seat focus')
                     time.sleep(.05)
-                direct_input_probe.verify(metrics,snapshot['outputs'][0],core,lambda:control(endpoint,'snapshot'),target)
+                direct_input_probe.verify(metrics,snapshot['outputs'][0],core,lambda:control(endpoint,'snapshot'),target,user.pw_name)
             if args.hold_seconds:
                 print('Direct desktop ready for console inspection', flush=True)
                 time.sleep(args.hold_seconds)
@@ -176,7 +187,7 @@ def main():
                             subprocess.run(['systemctl', 'kill', '--signal=SIGKILL', '--kill-whom=all', scope], check=False)
                 command('chvt', original.removeprefix('tty'))
                 if activity is not None:
-                    command('runuser','-u','developer','--','agent-os','remove',str(activity),stdout=subprocess.DEVNULL)
+                    command('runuser','-u',user.pw_name,'--','agent-os','remove',str(activity),stdout=subprocess.DEVNULL)
                 logs = subprocess.check_output(['journalctl', '-u', unit, '--no-pager', '-o', 'cat'], text=True)
                 print(logs)
                 subprocess.run(['systemctl', 'reset-failed', unit], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

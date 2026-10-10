@@ -93,7 +93,7 @@ def main():
         report['runtime_release']=after
         report['dependency_manifest']=json.loads(vm.ssh('sudo -n cat /var/lib/agent-os-install/dependencies.json',capture_output=True,text=True,check=True).stdout)
         report['host_tools']={name:subprocess.check_output(command,text=True).strip() for name,command in
-                              [('utm',['utmctl','version']),('qemu_img',['qemu-img','--version']),('python',[sys.executable,'--version'])]}
+                              [('utm',[str(vm.controller()),'version']),('qemu_img',['qemu-img','--version']),('python',[sys.executable,'--version'])]}
         report['result']='pass'
     except Exception as exc:
         report.update(result='failed',error=str(exc));raise

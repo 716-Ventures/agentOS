@@ -88,7 +88,7 @@ def assistive():
         print(json.dumps(response),flush=True)
 
 
-def verify(metrics,output,core,scene,target):
+def verify(metrics,output,core,scene,target,login_user):
     subprocess.run(['modprobe','uinput'],check=True)
     # Join only this test session's accessibility bus; never inspect other users.
     bus=None;observer_runtime=None;deadline=time.monotonic()+10
@@ -104,9 +104,9 @@ def verify(metrics,output,core,scene,target):
     if bus is None:raise RuntimeError('Owned direct-session bus not found')
     env={**os.environ,'DBUS_SESSION_BUS_ADDRESS':bus,'XDG_RUNTIME_DIR':observer_runtime}
     # libatspi may otherwise reuse the login user's cached accessibility bus.
-    address=subprocess.check_output(['runuser','-u','developer','--','gdbus','call','--session','--dest','org.a11y.Bus','--object-path','/org/a11y/bus','--method','org.a11y.Bus.GetAddress'],env=env,text=True,timeout=5)
+    address=subprocess.check_output(['runuser','-u',login_user,'--','gdbus','call','--session','--dest','org.a11y.Bus','--object-path','/org/a11y/bus','--method','org.a11y.Bus.GetAddress'],env=env,text=True,timeout=5)
     env['AT_SPI_BUS_ADDRESS']=ast.literal_eval(address)[0]
-    helper=subprocess.Popen(['runuser','-u','developer','--','python3',str(Path(__file__).resolve()),'--accessibility'],
+    helper=subprocess.Popen(['runuser','-u',login_user,'--','python3',str(Path(__file__).resolve()),'--accessibility'],
                             env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True)
     keyboard=pointer=None
     try:
@@ -163,7 +163,12 @@ def verify(metrics,output,core,scene,target):
         wait(lambda value:value['text']=='agentos ')
         keyboard.chord(14)
         current=wait(lambda value:value['text']=='agentos')
-        assert core('draft.get')['draft']=='agentos','Kernel typing did not retain a core draft'
+        deadline=time.monotonic()+8
+        while True:
+            draft=core('draft.get')
+            if draft['draft']=='agentos':break
+            if time.monotonic()>deadline:raise RuntimeError('Kernel typing did not retain the exact core draft: '+repr(draft))
+            time.sleep(.05)
         assert core('presentation.get')['elements']['editor']['props']['value']=='','Typing committed before deliberate Save'
         click(current['save'])
         deadline=time.monotonic()+8

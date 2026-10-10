@@ -1,0 +1,58 @@
+{
+  "verified_at": "2026-10-10T15:05:34.961820+00:00",
+  "result": "pass",
+  "image": {
+    "architecture": "arm64",
+    "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
+    "bootstrap_sha256": "e60ac4a8f76a106946ad3d91a392be97b7c0671587a75f4c5111d57dfb4c4879",
+    "builder_sha256": "54b66b7f1216762730d762552de281d7948c64e59e040ccc1b8f6209ca278bfe",
+    "compression": "none",
+    "contains_personal_account": false,
+    "contains_provider_credentials": false,
+    "dependency_manifest_sha256": "7b679fd6a6827b5173475ccc889da9e157754beb2fe7219c697cfda84b8b2009",
+    "dependency_profile_sha256": "c9cfeb7ecbe8e4af734ed07ddf0f8c77e598bda490c7c2b453bca5105ebcbca3",
+    "disk_size": "20G",
+    "first_run_sha256": "8dc0c5b4a0d212667000bb009905458de85125c7fad98e1d876fb2f766471b57",
+    "first_run_unit_sha256": "c4d2376b281a0d5879ce71a15e192ede8598ebc531d58b7dff3203ca66986b09",
+    "format": 1,
+    "foundation_sources": {
+      "agent-os-foundation.service": "e5acc8fbfec78024dfd7fb27fafe615391c7b17672c1b56e235e12023e3b6bd2",
+      "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
+      "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
+    },
+    "image_sha256": "37bf19060fafdad05e3a00fa83757cf529b044c339fd21560d0b771bb5186735",
+    "name": "agentOS experimental native image",
+    "runtime_release": "6f78f2a88bd9879bb6bf6b8acdffedb34bad04588ead50945bacc81a4a4b8d44",
+    "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
+    "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
+  },
+  "signing_authority": "Development Ed25519 key; not a production release authority",
+  "checks": [
+    "new disk from checksum-pinned upstream base; no running VM export",
+    "qemu-img integrity",
+    "signed image and exact UTM configuration verification",
+    "cold boot with fresh UEFI variables and no development seed",
+    "console account creation and password-protected sudo",
+    "manifest-verified runtime activation; six healthy services",
+    "standalone DHCP and HTTPS",
+    "foundation status and boot history",
+    "direct KMS frames and VT switch/resume",
+    "kernel/libinput keyboard and pointer; clipboard; undo/redo; exact draft and deliberate Save",
+    "offline speech recognition, zero signal rejection and capture ownership/cleanup",
+    "account, activity and file persistence through reboot",
+    "cold boot with no network adapter; all six services healthy",
+    "real activation failure retains setup journal",
+    "TTY 2 rescue remains active",
+    "resume preserves account UID and password",
+    "ready only after healthy activation",
+    "all six services recover without models or network"
+  ],
+  "not_tested": [
+    "production signing/distribution authority",
+    "physical host input or real IME engine",
+    "microphone/speaker acoustic signal",
+    "physical GPU/hotplug/multi-output hardware",
+    "live Gateway or Jev inference; no configured credentials",
+    "incompatible future state-format migrations"
+  ]
+}
