@@ -278,6 +278,7 @@ pub fn catalog() -> Value {
     json!({"protocol":PROTOCOL,"catalog_revision":CATALOG,
     "limits":{"document_bytes":DOCUMENT_LIMIT,"transaction_bytes":TRANSACTION_LIMIT,"elements":2048,"depth":32,"operations":128},
     "components":seven_sixteen_ui::catalog::components(),
+    "sources":{"discovery":"source.list","job:":["/status","/exit_code","/error","/created_at","/finished_at"],"broker:":["/status","/exit_code","/error","/created_at","/finished_at"],"window:":["/title","/app_id","/availability"]},
     "action_parameters":{"kinds":[{"kind":"literal","value":"Typed host-schema value"},{"kind":"field","element_id":"TextField@1 identity"}],"schema_source":"action.metadata.parameter_schema","submission":"Authenticated native input; exact surface and source revisions; no expressions"}})
 }
 
@@ -330,7 +331,7 @@ fn walk_elements(
                 .get(name)
                 .ok_or_else(|| error("missing_reference", name))?;
             let source_type = match bound.path.as_str() {
-                "/status" | "/error" => "string",
+                "/status" | "/error" | "/title" | "/app_id" | "/availability" => "string",
                 _ => "integer",
             };
             if spec.as_str() != Some(source_type) {
@@ -420,17 +421,32 @@ fn surface_valid(db: &Connection, s: &SurfaceDocument, _principal: &Principal) -
         return Err(invalid("Unreachable elements"));
     }
     for binding in s.bindings.values() {
-        if binding.access != "read"
-            || ![
+        let paths = if binding.source.starts_with("window:") {
+            &["/title", "/app_id", "/availability"][..]
+        } else {
+            &[
                 "/status",
                 "/exit_code",
                 "/error",
                 "/created_at",
                 "/finished_at",
-            ]
-            .contains(&binding.path.as_str())
-        {
-            return Err(invalid("Only registered read-only job fields are bindable"));
+            ][..]
+        };
+        if binding.access != "read" || !paths.contains(&binding.path.as_str()) {
+            return Err(invalid(
+                "Only registered typed read-only fields are bindable",
+            ));
+        }
+        if let Some(id) = binding.source.strip_prefix("window:") {
+            if crate::presentation_hosts::activity(db, id)?.as_deref()
+                != Some(s.activity_id.as_str())
+            {
+                return Err(error(
+                    "unauthorized",
+                    "Window source is absent or belongs to another activity",
+                ));
+            }
+            continue;
         }
         if binding.source.starts_with("broker:") {
             if crate::presentation_sources::activity(db, &binding.source)?.as_deref()
@@ -1566,7 +1582,7 @@ fn bindings(db: &Connection, v: &Value) -> Result<Value> {
         })
         .map_err(db_error)?;
     for (key, b) in &s.bindings {
-        if b.source.starts_with("broker:") {
+        if b.source.starts_with("broker:") || b.source.starts_with("window:") {
             values.insert(
                 key,
                 crate::presentation_sources::binding(db, &b.source, &s.activity_id, &b.path)?,
@@ -2230,6 +2246,71 @@ mod tests {
                 .len(),
             5
         );
+    }
+    #[test]
+    fn conventional_window_metadata_is_typed_scoped_and_host_observed() {
+        let mut db = fixture();
+        let root = Principal {
+            uid: 0,
+            session: "compositor".into(),
+        };
+        let mut observed = json!({"op":"host.surface","surface_id":"window-fixture","activity_id":"1","title":"Original title","app_id":"org.example.Editor","connected":true});
+        assert!(handle(&mut db, &observed, &agent()).is_err());
+        handle(&mut db, &observed, &root).unwrap();
+        let mut doc = surface();
+        doc["elements"]["text"] =
+            json!({"type":"Status@1","props":{"value":{"binding":"window-title"}}});
+        doc["bindings"]["window-title"] =
+            json!({"source":"window:window-fixture","path":"/title","access":"read"});
+        let create = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"window-binding","expected_revisions":{"surface-a":null},"operations":[{"op":"surface.create","document":doc}]});
+        let mut foreign = create.clone();
+        foreign["operations"][0]["document"]["activity_id"] = json!("2");
+        assert!(handle(&mut db, &foreign, &agent()).is_err());
+        let mut bad = create.clone();
+        bad["operations"][0]["document"]["bindings"]["window-title"]["path"] = json!("/private");
+        assert!(handle(&mut db, &bad, &agent()).is_err());
+        handle(&mut db, &create, &agent()).unwrap();
+        let query = json!({"op":"binding.snapshot","surface_id":"surface-a"});
+        let first = handle(&mut db, &query, &human()).unwrap();
+        assert_eq!(first["bindings"]["window-title"]["value"], "Original title");
+        observed["title"] = json!("Updated λ");
+        handle(&mut db, &observed, &root).unwrap();
+        let changed = handle(&mut db, &query, &human()).unwrap();
+        assert_eq!(changed["bindings"]["window-title"]["value"], "Updated λ");
+        assert!(
+            changed["bindings"]["window-title"]["source_revision"].as_i64()
+                > first["bindings"]["window-title"]["source_revision"].as_i64()
+        );
+        handle(&mut db, &observed, &root).unwrap();
+        assert_eq!(
+            handle(&mut db, &query, &human()).unwrap()["bindings"]["window-title"]
+                ["source_revision"],
+            changed["bindings"]["window-title"]["source_revision"]
+        );
+        let source = crate::presentation_hosts::source(&db, "window-fixture")
+            .unwrap()
+            .unwrap();
+        assert_eq!(source["values"]["app_id"], "org.example.Editor");
+        assert_eq!(source["availability"], "unavailable");
+        let mut cursor = String::new();
+        let mut sources = Vec::new();
+        loop {
+            let page = handle(
+                &mut db,
+                &json!({"op":"source.list","activity_id":"1","limit":1,"after":cursor}),
+                &agent(),
+            )
+            .unwrap();
+            sources.extend(page["sources"].as_array().unwrap().iter().cloned());
+            if page["has_more"] == false {
+                break;
+            }
+            cursor = page["next"].as_str().unwrap().into();
+        }
+        assert!(sources
+            .iter()
+            .any(|row| row["source"] == "window:window-fixture" && row["paths"][0] == "/title"));
+        assert!(sources.iter().any(|row| row["source"] == "job:1"));
     }
     #[test]
     fn dead_host_connections_do_not_exhaust_capacity_or_inflate_live_snapshots() {

@@ -41,9 +41,13 @@ fn observed(db: &Connection, source: &str) -> Result<Option<Value>> {
     }).transpose()
 }
 pub fn binding(db: &Connection, source: &str, activity: &str, path: &str) -> Result<Value> {
-    let mut value = observed(db, source)?
-        .filter(|v| v["activity_id"] == activity)
-        .ok_or_else(|| error("missing_reference", "Source unavailable in this activity"))?;
+    let mut value = (if let Some(id) = source.strip_prefix("window:") {
+        crate::presentation_hosts::source(db, id)?
+    } else {
+        observed(db, source)?
+    })
+    .filter(|v| v["activity_id"] == activity)
+    .ok_or_else(|| error("missing_reference", "Source unavailable in this activity"))?;
     value["value"] = value["values"]
         .pointer(path)
         .cloned()
@@ -144,7 +148,7 @@ pub fn handle(db: &mut Connection, value: &Value, who: &Principal) -> Result<Val
                 .ok_or_else(|| error("invalid_event", "Activity required"))?;
             let after = value["after"].as_str().unwrap_or("");
             let limit = value["limit"].as_u64().unwrap_or(64).clamp(1, 128);
-            let mut query=db.prepare("SELECT source FROM presentation_external_sources WHERE activity=? AND source>? ORDER BY source LIMIT ?").map_err(storage)?;
+            let mut query=db.prepare("SELECT source FROM (SELECT source,activity FROM presentation_external_sources UNION ALL SELECT 'window:'||id AS source,activity FROM presentation_host_surfaces UNION ALL SELECT 'job:'||id AS source,CAST(activity_id AS TEXT) AS activity FROM jobs) WHERE activity=? AND source>? ORDER BY source LIMIT ?").map_err(storage)?;
             let sources = query
                 .query_map(params![activity, after, limit + 1], |r| {
                     r.get::<_, String>(0)
@@ -155,15 +159,33 @@ pub fn handle(db: &mut Connection, value: &Value, who: &Principal) -> Result<Val
             let more = sources.len() > limit as usize;
             let mut rows = Vec::new();
             for source in sources.iter().take(limit as usize) {
-                if let Some(mut row) = observed(db, source)? {
+                let value = if let Some(id) = source.strip_prefix("window:") {
+                    crate::presentation_hosts::source(db, id)?
+                } else if source.starts_with("job:") {
+                    let revision: i64 = db
+                        .query_row("SELECT value FROM meta WHERE key='revision'", [], |r| {
+                            r.get(0)
+                        })
+                        .map_err(storage)?;
+                    Some(
+                        json!({"source":source,"activity_id":activity,"source_revision":revision,"observed_at":crate::now(),"availability":"available","values":{}}),
+                    )
+                } else {
+                    observed(db, source)?
+                };
+                if let Some(mut row) = value {
                     row.as_object_mut().unwrap().remove("values");
-                    row["paths"] = json!([
-                        "/status",
-                        "/error",
-                        "/exit_code",
-                        "/created_at",
-                        "/finished_at"
-                    ]);
+                    row["paths"] = if source.starts_with("window:") {
+                        json!(["/title", "/app_id", "/availability"])
+                    } else {
+                        json!([
+                            "/status",
+                            "/error",
+                            "/exit_code",
+                            "/created_at",
+                            "/finished_at"
+                        ])
+                    };
                     rows.push(row)
                 }
             }

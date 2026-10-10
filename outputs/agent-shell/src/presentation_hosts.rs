@@ -14,7 +14,7 @@ pub fn trusted(who: &Principal) -> bool {
             .unwrap_or(false)
 }
 pub fn init(db: &Connection) -> Result<()> {
-    db.execute_batch("CREATE TABLE IF NOT EXISTS presentation_host_surfaces(id TEXT PRIMARY KEY,activity TEXT NOT NULL,uid INTEGER NOT NULL,session TEXT NOT NULL,title TEXT NOT NULL,app_id TEXT NOT NULL,connected INTEGER NOT NULL,observed_at INTEGER NOT NULL); CREATE TABLE IF NOT EXISTS presentation_renderers(surface TEXT PRIMARY KEY,uid INTEGER NOT NULL,session TEXT NOT NULL);").map_err(|e|e.to_string())
+    db.execute_batch("CREATE TABLE IF NOT EXISTS presentation_host_surfaces(id TEXT PRIMARY KEY,activity TEXT NOT NULL,uid INTEGER NOT NULL,session TEXT NOT NULL,title TEXT NOT NULL,app_id TEXT NOT NULL,connected INTEGER NOT NULL,observed_at INTEGER NOT NULL); CREATE TABLE IF NOT EXISTS presentation_host_revisions(id TEXT PRIMARY KEY,revision INTEGER NOT NULL); CREATE TABLE IF NOT EXISTS presentation_renderers(surface TEXT PRIMARY KEY,uid INTEGER NOT NULL,session TEXT NOT NULL);").map_err(|e|e.to_string())
 }
 fn ident(value: &str) -> bool {
     !value.is_empty()
@@ -103,6 +103,20 @@ pub fn register(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value
         )
         .map_err(|_| "invalid_document: Surface identity is already used")?;
     }
+    let previous: Option<(String, String, bool)> = tx
+        .query_row(
+            "SELECT title,app_id,connected FROM presentation_host_surfaces WHERE id=?",
+            [id],
+            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
+        )
+        .optional()
+        .map_err(|e| e.to_string())?;
+    let changed = previous
+        .as_ref()
+        .is_none_or(|(old_title, old_app, old_connected)| {
+            old_title != title || old_app != app_id || *old_connected != connected
+        });
+    tx.execute("INSERT INTO presentation_host_revisions VALUES(?,1) ON CONFLICT(id) DO UPDATE SET revision=revision+?",params![id,changed as i64]).map_err(|e|e.to_string())?;
     tx.execute("INSERT INTO presentation_host_surfaces(id,activity,uid,session,title,app_id,connected,observed_at) VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET title=excluded.title,app_id=excluded.app_id,connected=excluded.connected,observed_at=excluded.observed_at",params![id,activity,who.uid,who.session,title,app_id,connected,crate::now()]).map_err(|e|e.to_string())?;
     tx.commit().map_err(|e| e.to_string())?;
     Ok(json!({"surface_id":id,"connected":connected}))
@@ -115,6 +129,13 @@ pub fn activity(db: &Connection, id: &str) -> Result<Option<String>> {
     )
     .optional()
     .map_err(|e| e.to_string())
+}
+pub fn source(db: &Connection, id: &str) -> Result<Option<Value>> {
+    let row:Option<(String,String,String,bool,String,i64,i64)>=db.query_row("SELECT h.activity,h.title,h.app_id,h.connected,h.session,h.observed_at,COALESCE(r.revision,0) FROM presentation_host_surfaces h LEFT JOIN presentation_host_revisions r USING(id) WHERE h.id=?",[id],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?,r.get(5)?,r.get(6)?))).optional().map_err(|e|e.to_string())?;
+    Ok(row.map(|(activity,title,app,connected,session,observed,revision)| {
+        let availability=if connected && alive(&session) {"available"} else {"unavailable"};
+        json!({"source":format!("window:{id}"),"activity_id":activity,"source_revision":revision,"observed_at":observed,"availability":availability,"values":{"title":title,"app_id":app,"availability":availability}})
+    }))
 }
 pub fn alive(session: &str) -> bool {
     let Some((pid, start)) = session.split_once(':') else {

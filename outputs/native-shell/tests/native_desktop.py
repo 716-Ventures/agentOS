@@ -13,6 +13,8 @@ import sys
 
 ROOT=Path(__file__).resolve().parents[1]
 CORE=ROOT.parent/'agent-shell/target/release/agent-os-core'
+PROTOCOL='agentos.presentation/1'
+CATALOG='native-core/1'
 OUTPUT=ROOT/'test-output'
 OUTPUT.mkdir(exist_ok=True)
 
@@ -183,6 +185,13 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                         retained=workspace();assert retained['outputs']['removed-fixture']==off_output['outputs']['removed-fixture']
                         saved['revision']=retained['revision'];assert put(saved,'restore-from-removed-output')['ok']
                         wait_shared(lambda s:not ((s['shared'].get('overview') or {}).get('recovered_outputs')))
+                        window_view={'protocol':PROTOCOL,'catalog_revision':CATALOG,'surface_id':'window-binding-fixture','activity_id':str(activity),'revision':0,'title':'Window metadata binding','root':'title','elements':{'title':{'type':'Status@1','props':{'value':{'binding':'observed-title'}}}},'bindings':{'observed-title':{'source':'window:'+surface_id,'path':'/title','access':'read'}},'actions':{}}
+                        call({'op':'presentation.apply','protocol':PROTOCOL,'catalog_revision':CATALOG,'request_id':'create-window-binding','expected_revisions':{'window-binding-fixture':None},'operations':[{'op':'surface.create','document':window_view}]})
+                        binding=call({'op':'binding.snapshot','surface_id':'window-binding-fixture'})['bindings']['observed-title']
+                        observed_host=call({'op':'presentation.metadata'})['host_surfaces'][surface_id]
+                        assert binding['availability']=='available' and binding['value']==observed_host['title'],binding
+                        assert any(source['source']=='window:'+surface_id for source in call({'op':'source.list','activity_id':str(activity)})['sources'])
+                        print('PASS: live conventional window metadata, typed source binding and source discovery')
                         print('PASS: simulated output loss, temporary reachable projection, preserved placement and explicit recovery')
                         print('PASS: authenticated native identity, conventional registration, durable shared layout/focus, stale revision rejection, actual float/maximize rendering and journal undo')
                     else:
