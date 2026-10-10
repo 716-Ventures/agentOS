@@ -16,6 +16,8 @@ import time
 import plistlib
 import uuid
 
+from build_utmctl import controller
+
 ROOT = Path(__file__).resolve().parent
 RUN = Path(os.environ.get('AGENT_OS_VM_RUNTIME',str(ROOT / 'runtime'))).expanduser().resolve()
 LOCK = json.loads((ROOT / 'image-lock.json').read_text())
@@ -56,7 +58,7 @@ def status():
         return 'stopped'
     current = machine()
     try:
-        result = call(['utmctl', 'status', current['uuid']], capture_output=True, text=True, timeout=10)
+        result = call([controller(), 'status', current['uuid']], capture_output=True, text=True, timeout=10)
     except subprocess.TimeoutExpired as exc:
         raise RuntimeError('UTM status timed out after 10 seconds; VM state is unknown. Inspect UTM before retrying.') from exc
     except subprocess.CalledProcessError as exc:
@@ -172,11 +174,11 @@ def prepare(source=None):
     print('First-boot configuration ready. Credentials:', credentials)
 
 
-def start(hide=True):
+def start(hide=False):
     if alive():
         raise RuntimeError('VM is already running or suspended; inspect UTM before restarting.')
     try:
-        call(['utmctl', 'start'] + (['--hide'] if hide else []) + [machine()['uuid']], timeout=30)
+        call([controller(), 'start'] + (['--hide'] if hide else []) + [machine()['uuid']], timeout=30)
     except subprocess.TimeoutExpired as exc:
         raise RuntimeError('UTM start did not acknowledge within 30 seconds; do not retry automatically. Inspect the selected guest before continuing.') from exc
     observed = status()
@@ -188,7 +190,7 @@ def start(hide=True):
 def stop():
     if alive():
         try:
-            call(['utmctl', 'stop', machine()['uuid'], '--request'], timeout=15)
+            call([controller(), 'stop', machine()['uuid'], '--request'], timeout=15)
         except subprocess.TimeoutExpired as exc:
             raise RuntimeError('UTM shutdown did not acknowledge within 15 seconds; inspect the selected guest before continuing.') from exc
         print('Requested orderly guest shutdown. Check status before restarting.')
@@ -200,7 +202,7 @@ def console():
     if not sys.stdin.isatty():
         raise RuntimeError('Open console in an interactive terminal.')
     # UTM 4.7.5 attach prints the PTY path but does not relay input/output.
-    result = call(['utmctl', 'attach', machine()['uuid']], capture_output=True, text=True)
+    result = call([controller(), 'attach', machine()['uuid']], capture_output=True, text=True)
     paths = [line.split(':', 1)[1].strip() for line in result.stdout.splitlines()
              if line.startswith('PTTY:')]
     if len(paths) != 1 or not paths[0].startswith('/dev/tty'):
@@ -266,10 +268,10 @@ def main():
     b = commands.add_parser('prepare'); b.add_argument('--base')
     s = commands.add_parser('start')
     display = s.add_mutually_exclusive_group()
-    display.add_argument('--hide', dest='hide', action='store_true', default=True,
-                         help='Start without creating a console window (default)')
+    display.add_argument('--hide', dest='hide', action='store_true', default=False,
+                         help='Hide the UTM library window; the VM console is still created')
     display.add_argument('--show', dest='hide', action='store_false',
-                         help='Ask UTM to create the console during startup; requires a working foreground UTM session')
+                         help='Keep the UTM library visible during startup (default)')
     commands.add_parser('bundle')
     w = commands.add_parser('wait'); w.add_argument('--seconds', type=int, default=60)
     c = commands.add_parser('ssh'); c.add_argument('remote', nargs=argparse.REMAINDER)

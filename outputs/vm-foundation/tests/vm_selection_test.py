@@ -5,17 +5,22 @@ import plistlib
 import tempfile
 import subprocess
 import unittest
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from unittest.mock import patch
 spec=importlib.util.spec_from_file_location('selected_vm',Path(__file__).resolve().parents[1]/'vm.py')
 vm=importlib.util.module_from_spec(spec);spec.loader.exec_module(vm)
 
 class VMSelection(unittest.TestCase):
-    def test_default_start_avoids_console_creation_and_visible_start_is_explicit(self):
+    def setUp(self):
+        patcher=patch.object(vm,"controller",return_value="utmctl");patcher.start();self.addCleanup(patcher.stop)
+
+    def test_default_start_keeps_library_visible_and_hide_is_explicit(self):
         with patch.object(vm,'alive',return_value=False),patch.object(vm,'status',return_value='started'),patch.object(vm,'machine',return_value={'uuid':'fixture'}),patch.object(vm,'call') as call:
             vm.start()
-            self.assertEqual(call.call_args.args[0],['utmctl','start','--hide','fixture'])
-            vm.start(hide=False)
             self.assertEqual(call.call_args.args[0],['utmctl','start','fixture'])
+            vm.start(hide=True)
+            self.assertEqual(call.call_args.args[0],['utmctl','start','--hide','fixture'])
 
     def test_successful_cli_exit_requires_observed_running_guest(self):
         for observed in ('stopped', 'starting', 'paused', 'unknown'):

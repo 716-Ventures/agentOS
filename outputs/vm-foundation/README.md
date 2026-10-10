@@ -77,7 +77,17 @@ python3 vm.py wait --seconds 60
 python3 verify.py
 ```
 
-`start` defaults to `utmctl start --hide`; `start --show` omits that flag. UTM's flag hides its library window, **not the VM console**: [UTM 4.7.5 source](https://github.com/utmapp/UTM/blob/v4.7.5/utmctl/UTMCtl.swift) still invokes the [VM window controller](https://github.com/utmapp/UTM/blob/v4.7.5/Platform/macOS/UTMDataExtension.swift). Several hidden starts and a subsequent graphical console inspection passed, but a later cold app launch reproduced the AppKit `_changeJustMain` assertion before QEMU started. This remains an intermittent host startup failure; hidden startup is not a complete fix. The wrapper checks the observed guest state after a successful CLI exit and never retries an uncertain start automatically. Inspect the selected guest and any owned stalled UTM process before another attempt. For an existing stopped guest made by the earlier runner, `python3 vm.py bundle` moves its disk into a UTM bundle and retains its seed and SSH identity. Stop the old runner first. The current migration used a verified copy and preserved the original disk; `runtime/utm.json` selects the authoritative UTM guest.
+UTM 4.7.5's stock controller always launches the app hidden, then its VM console path calls `makeMain()`. On this macOS 27.0.1 host that intermittently asserted before QEMU started. Build the pinned controller workaround once (requires Swift/Xcode):
+
+```sh
+python3 build_utmctl.py
+```
+
+This builds the official v4.7.5 controller sources with one change: remove the unconditional `.andHide` app launch flag. Sources are hash checked, ArgumentParser is revision pinned, and third-party licenses accompany the private binary under `runtime/utmctl-control/`. The installed signed UTM app is retained. All `vm.py` control operations prefer this build and verify its binary digest; without it they use the stock controller. Three guest startup/readiness/orderly-shutdown cycles passed, including repeated cold UTM app launches, with the host locked. This is evidence for the workaround, not a fix to Apple's AppKit itself.
+
+`start` now keeps the library visible by default. `start --hide` explicitly hides only the library, not the VM console. The wrapper checks the observed guest state after a successful CLI exit and never retries an uncertain start automatically. Inspect the selected guest and any owned stalled UTM process before another attempt. The controller behavior is documented in the [official UTM source](https://github.com/utmapp/UTM/blob/v4.7.5/utmctl/UTMCtl.swift).
+
+For an existing stopped guest made by the earlier runner, `python3 vm.py bundle` moves its disk into a UTM bundle and retains its seed and SSH identity. Stop the old runner first. `runtime/utm.json` selects the authoritative UTM guest.
 
 Alternatively, reuse a downloaded base:
 

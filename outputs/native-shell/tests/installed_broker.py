@@ -37,7 +37,7 @@ def button(name, work=None):
                 if (node.name == name and node.getRole() == pyatspi.ROLE_PUSH_BUTTON
                         and node.getState().contains(pyatspi.STATE_SENSITIVE)):
                     ancestor = node
-                    matches = work is None
+                    matches = work is None or node.description == "Work broker:" + str(work)
                     for _ in range(32):
                         if ancestor is None:
                             break
@@ -52,7 +52,20 @@ def button(name, work=None):
             except (RuntimeError, LookupError):
                 pass
         return False
-    accessibility.wait(search, 'Actionable installed control missing: ' + name)
+    try:
+        accessibility.wait(search, 'Actionable installed control missing: ' + name)
+    except AssertionError:
+        from collections import deque
+        queue = deque([pyatspi.Registry.getDesktop(0)])
+        for _ in range(512):
+            if not queue:break
+            node=queue.popleft()
+            try:
+                print('Accessible:',node.getRoleName(),repr(node.name),repr(node.description),
+                      'sensitive=',node.getState().contains(pyatspi.STATE_SENSITIVE),flush=True)
+                queue.extend(node[index] for index in range(min(node.childCount,128)))
+            except (RuntimeError,LookupError):pass
+        raise
     return found[0]
 
 

@@ -58,7 +58,7 @@ def main():
     while vm.alive() and time.monotonic() < deadline:
         time.sleep(1)
     assert not vm.alive(), 'Guest failed to shut down'
-    vm.start(hide=True)
+    vm.start()
     cold = wait_new_boot(rebooted['boot_id'])
     assert remote('cat /home/developer/m0-persistence-probe') == token
     assert cold['recorded_boots'] == before['recorded_boots'] + 2

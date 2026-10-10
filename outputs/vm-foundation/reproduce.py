@@ -65,7 +65,7 @@ def main():
     def remote(command,name,timeout=180):local(vm.ssh_args()+[command],name,timeout)
     try:
         local([sys.executable,'-m','unittest','discover','-s',str(ROOT/'tests'),'-p','*_test.py'],'vm-tool-tests')
-        if not vm.alive():vm.start(hide=True)
+        if not vm.alive():vm.start()
         vm.wait_ready(60)
         remote('cloud-init status --wait','cloud-init',120)
         local([sys.executable,str(SHELL/'deploy.py')],'provision',900)

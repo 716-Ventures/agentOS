@@ -97,11 +97,21 @@ impl Row {
         }
     }
     fn update(&self, item: &Item) {
+        let identity = format!("Work {}", item.key);
         self.widget
-            .update_property(&[gtk::accessible::Property::Label(&format!(
-                "Work {}",
-                item.key
-            ))]);
+            .update_property(&[gtk::accessible::Property::Label(&identity)]);
+        // A generic Box may be transparent to AT-SPI. Actions retain their
+        // target even when the labeled ancestor is omitted from that tree.
+        for button in [
+            &self.stop,
+            &self.review,
+            &self.attach,
+            &self.embed,
+            &self.inspect,
+            &self.resume,
+        ] {
+            button.update_property(&[gtk::accessible::Property::Description(&identity)]);
+        }
         let argv = item.job["argv"]
             .as_array()
             .map(|a| {
@@ -163,6 +173,9 @@ impl Row {
             &self.inspect,
             &self.resume,
         ] {
+            button.update_property(&[gtk::accessible::Property::Description(
+                "Unavailable work row",
+            )]);
             button.set_sensitive(false);
         }
     }
