@@ -1269,7 +1269,25 @@ fn guard(
                 }) =>
             {
                 match after.get(key) {
-                    Some(Document::Workspace(new)) => w.outputs != new.outputs,
+                    Some(Document::Workspace(new)) => {
+                        // A user's compositor is a different authenticated process
+                        // from the focused editor. Explicit geometry changes may
+                        // preserve that same user's input/draft; content edits,
+                        // removal, other users and agent rearrangements stay guarded.
+                        let direct = who.human()
+                            && who.uid == uid
+                            && w.focus.as_ref().map(|f| &f.surface_id) == Some(&id)
+                            && new.focus.as_ref().map(|f| &f.surface_id) == Some(&id)
+                            && w.activity_id == new.activity_id
+                            && w.outputs.keys().eq(new.outputs.keys())
+                            && workspace::placement(new, &id).is_some()
+                            && w.constraints.iter().chain(&new.constraints).any(|c| {
+                                c.surface_id == id
+                                    && c.provenance == "direct_manipulation"
+                                    && c.strength == "required"
+                            });
+                        w.outputs != new.outputs && !direct
+                    }
                     _ => true,
                 }
             }
@@ -2671,6 +2689,78 @@ mod tests {
     }
     fn workspace() -> Value {
         json!({"protocol":PROTOCOL,"workspace_id":"workspace-a","activity_id":"1","revision":0,"outputs":{"output-a":{"tiles":{"kind":"leaf","surface_id":"surface-a"},"floating":[],"maximized":null}},"constraints":[],"focus":null})
+    }
+    #[test]
+    fn focused_user_geometry_preserves_another_process_input_and_draft() {
+        let db = fixture();
+        db.execute("INSERT INTO presentation_leases(document,element,uid,session,expires,draft) VALUES('surface-a','input',1000,'editor',?,'Unsaved λ')", [now()+30]).unwrap();
+        let mut w = workspace();
+        w["focus"] = json!({"surface_id":"surface-a","element_id":"input"});
+        let before = BTreeMap::from([
+            (
+                "surface-a".into(),
+                Document::Surface(decode(surface()).unwrap()),
+            ),
+            (
+                "workspace-a".into(),
+                Document::Workspace(decode(w.clone()).unwrap()),
+            ),
+        ]);
+        w["outputs"]["output-a"] = json!({"tiles":null,"floating":[{"surface_id":"surface-a","x":20,"y":0,"width":640,"height":480}],"maximized":null});
+        w["constraints"] = json!([{"surface_id":"surface-a","output_id":"output-a","provenance":"direct_manipulation","strength":"required"}]);
+        let mut after = before.clone();
+        after.insert(
+            "workspace-a".into(),
+            Document::Workspace(decode(w.clone()).unwrap()),
+        );
+        // The compositor and editor have the same ordinary UID, distinct sessions.
+        guard(&db, &before, &after, &human()).unwrap();
+        assert!(guard(&db, &before, &after, &agent()).is_err());
+        assert!(guard(
+            &db,
+            &before,
+            &after,
+            &Principal {
+                uid: 1001,
+                session: "other-user".into()
+            }
+        )
+        .is_err());
+        for mutation in [
+            "no-direct-constraint",
+            "other-focus",
+            "removed-placement",
+            "changed-content",
+        ] {
+            let mut rejected = after.clone();
+            let mut changed = w.clone();
+            match mutation {
+                "no-direct-constraint" => changed["constraints"] = json!([]),
+                "other-focus" => changed["focus"] = Value::Null,
+                "removed-placement" => changed["outputs"]["output-a"]["floating"] = json!([]),
+                _ => {
+                    let mut doc = surface();
+                    doc["elements"]["input"]["props"]["value"] = json!("Overwritten");
+                    rejected.insert("surface-a".into(), Document::Surface(decode(doc).unwrap()));
+                }
+            }
+            rejected.insert(
+                "workspace-a".into(),
+                Document::Workspace(decode(changed).unwrap()),
+            );
+            assert!(
+                guard(&db, &before, &rejected, &human()).is_err(),
+                "{mutation}"
+            );
+        }
+        let retained: String = db
+            .query_row(
+                "SELECT draft FROM presentation_leases WHERE document='surface-a'",
+                [],
+                |r| r.get(0),
+            )
+            .unwrap();
+        assert_eq!(retained, "Unsaved λ");
     }
     #[test]
     fn output_resize_disconnect_and_restore_preserve_preferred_work() {
