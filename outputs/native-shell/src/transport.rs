@@ -281,7 +281,7 @@ fn run(
         approvals = pending;
         match rx.recv_timeout(Duration::from_millis(50)) {
             Ok(Command::Quit) => {
-                flush(&socket, &drafts, &frame, &stop);
+                flush(&socket, &drafts, &frame, &stop, &leases);
                 break;
             }
             Ok(command) => {
@@ -345,7 +345,7 @@ fn run(
                     Command::WorkspaceUndo(cursor)=>request(&socket,&json!({"op":"presentation.undo","event_cursor":cursor,"request_id":format!("undo-{}",super::nonce())})).map(|receipt|{frame.lock().unwrap().workspace_undo=None;receipt}),
                     Command::RegisterRenderer(surface)=>request(&socket,&json!({"op":"host.renderer","surface_id":surface})),
                     Command::ReviewDraft{surface,element,reply}=>{
-                        flush(&socket,&drafts,&frame,&stop);
+                        flush(&socket,&drafts,&frame,&stop,&leases);
                         let result=review_draft(&socket,&surface,&element,&drafts);
                         let _=reply.send(result.clone());result.map(|_|json!({"status":"Latest document and retained draft ready for review"}))
                     },
@@ -365,20 +365,20 @@ fn run(
                         }
                     },
                     Command::ReviewDocumentFile{surface,revision,path,reply}=>{
-                        flush(&socket,&drafts,&frame,&stop);
+                        flush(&socket,&drafts,&frame,&stop,&leases);
                         let result=if drafts.lock().unwrap().iter().any(|((id,_),draft)|id==&surface && draft.dirty){Err("Save or discard the local draft before reviewing a file replacement".into())}else{
                             path.to_str().ok_or("File path must be UTF-8".into()).and_then(|path|super::broker_controls::run_helper("/usr/local/bin/agent-os", &["document","review",&surface,path,"--revision",&revision.to_string()],stop.clone()))
                         };
                         let _=reply.send(result.clone());result.map(|_|json!({"status":"File replacement ready for review"}))
                     },
                     Command::ReplaceDocumentFile{surface,revision,path,expected_sha256}=>{
-                        flush(&socket,&drafts,&frame,&stop);
+                        flush(&socket,&drafts,&frame,&stop,&leases);
                         if drafts.lock().unwrap().iter().any(|((id,_),draft)|id==&surface && draft.dirty){Err("Save or discard the local draft before replacing a file".into())}else{
                             path.to_str().ok_or("File path must be UTF-8".into()).and_then(|path|super::broker_controls::run_helper("/usr/local/bin/agent-os", &["document","replace",&surface,path,"--revision",&revision.to_string(),"--expected-sha256",&expected_sha256],stop.clone()))
                         }
                     },
                     Command::ExportDocument{surface,revision,path}=>{
-                        flush(&socket,&drafts,&frame,&stop);
+                        flush(&socket,&drafts,&frame,&stop,&leases);
                         if drafts.lock().unwrap().iter().any(|((id,_),draft)|id==&surface && draft.dirty){Err("Save or discard the local draft before exporting".into())}else{
                             path.to_str().ok_or("File path must be UTF-8".into()).and_then(|path|super::broker_controls::run_helper("/usr/local/bin/agent-os", &["document","export",&surface,path,"--revision",&revision.to_string()],stop.clone()))
                         }
@@ -445,7 +445,7 @@ fn run(
                         }
                         Ok(receipt)
                     }),
-                    Command::Close{surface}=>{flush(&socket,&drafts,&frame,&stop);if drafts.lock().unwrap().iter().any(|((id,_),draft)|id==&surface && draft.dirty){Err("The view remains open because its latest draft could not be saved".into())}else{close_surface(&socket,&surface).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt})}},
+                    Command::Close{surface}=>{flush(&socket,&drafts,&frame,&stop,&leases);if drafts.lock().unwrap().iter().any(|((id,_),draft)|id==&surface && draft.dirty){Err("The view remains open because its latest draft could not be saved".into())}else{close_surface(&socket,&surface).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt})}},
                     Command::Quit=>unreachable!(),
                 };
                 let mut view = frame.lock().unwrap();
@@ -517,7 +517,7 @@ fn run(
             )
             .is_err()
         });
-        flush(&socket, &drafts, &frame, &stop);
+        flush(&socket, &drafts, &frame, &stop, &leases);
         match presentation_cache.read(
             |value| request(&socket, value),
             activity.as_deref(),
@@ -778,16 +778,31 @@ fn flush(
     drafts: &Arc<Mutex<BTreeMap<(String, String), Draft>>>,
     frame: &Arc<Mutex<Frame>>,
     stop: &AtomicBool,
+    focused: &BTreeMap<(String, String), Instant>,
 ) {
     let pending = drafts.lock().unwrap().clone();
     for ((surface, element), draft) in pending.into_iter().filter(|(_, d)| d.dirty) {
         if stop.load(Ordering::Relaxed) {
             break;
         }
-        let result = request(
-            socket,
-            &json!({"op":"draft.save","surface_id":surface,"element_id":element,"expected_draft_revision":draft.expected,"draft":draft.text}),
-        );
+        let temporary = !focused.contains_key(&(surface.clone(), element.clone()));
+        let result = if temporary {
+            // Assistive clients may edit without a keyboard focus transition.
+            // Acquire only for this persistence operation; another editor still owns its lease.
+            request(socket, &json!({"op":"interaction.begin","surface_id":surface,"element_id":element}))
+                .and_then(|_| {
+                    let result = request(socket, &json!({"op":"draft.save","surface_id":surface,"element_id":element,"expected_draft_revision":draft.expected,"draft":draft.text}));
+                    if let Err(error) = request(socket, &json!({"op":"interaction.end","surface_id":surface,"element_id":element})) {
+                        frame.lock().unwrap().error = Some(format!("Draft interaction could not end: {error}"));
+                    }
+                    result
+                })
+        } else {
+            request(
+                socket,
+                &json!({"op":"draft.save","surface_id":surface,"element_id":element,"expected_draft_revision":draft.expected,"draft":draft.text}),
+            )
+        };
         match result {
             Ok(receipt) => {
                 if let Some(current) = drafts.lock().unwrap().get_mut(&(surface, element)) {
@@ -1170,6 +1185,65 @@ fn open_surface(socket: &PathBuf, frame: &Frame, document: Value) -> Result<Valu
 #[cfg(test)]
 mod draft_revision_tests {
     use super::*;
+    #[test]
+    fn unfocused_edit_uses_a_temporary_lease_and_preserves_conflicting_drafts() {
+        use std::os::unix::net::UnixListener;
+        for conflict in [false, true] {
+            let path = std::env::temp_dir().join(format!(
+                "agentos-unfocused-{}-{}.sock",
+                std::process::id(),
+                super::super::nonce()
+            ));
+            let listener = UnixListener::bind(&path).unwrap();
+            let worker = std::thread::spawn(move || {
+                let operations = if conflict {
+                    vec!["interaction.begin"]
+                } else {
+                    vec!["interaction.begin", "draft.save", "interaction.end"]
+                };
+                for op in operations {
+                    let (mut stream, _) = listener.accept().unwrap();
+                    let mut line = String::new();
+                    BufReader::new(&mut stream).read_line(&mut line).unwrap();
+                    let value: Value = serde_json::from_str(&line).unwrap();
+                    assert_eq!(value["op"], op);
+                    if op == "draft.save" {
+                        assert_eq!(value["draft"], "Assistive λ 日本語");
+                        assert_eq!(value["expected_draft_revision"], 0);
+                    }
+                    let result = if conflict {
+                        json!({"ok":false,"error":{"message":"Another editor owns this lease"}})
+                    } else {
+                        json!({"ok":true,"result":{"draft_revision":1}})
+                    };
+                    writeln!(stream, "{result}").unwrap();
+                }
+            });
+            let drafts = Arc::new(Mutex::new(BTreeMap::from([(
+                ("surface".into(), "field".into()),
+                Draft {
+                    text: "Assistive λ 日本語".into(),
+                    expected: 0,
+                    dirty: true,
+                    resolved: None,
+                },
+            )])));
+            let frame = Arc::new(Mutex::new(Frame::default()));
+            flush(
+                &path,
+                &drafts,
+                &frame,
+                &AtomicBool::new(false),
+                &BTreeMap::new(),
+            );
+            let draft = drafts.lock().unwrap().values().next().unwrap().clone();
+            assert_eq!(draft.dirty, conflict);
+            assert_eq!(draft.text, "Assistive λ 日本語");
+            assert_eq!(draft.expected, if conflict { 0 } else { 1 });
+            worker.join().unwrap();
+            std::fs::remove_file(path).unwrap();
+        }
+    }
     #[test]
     fn reviewed_save_rejects_a_changed_draft_without_committing_and_ends_its_lease() {
         use std::os::unix::net::UnixListener;

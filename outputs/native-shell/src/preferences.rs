@@ -20,19 +20,6 @@ pub fn read() -> Value {
         .filter(valid)
         .unwrap_or_else(|| json!({"appearance":"dark","text_scale":1.0,"reduced_motion":false}))
 }
-pub fn apply(display: &gtk::gdk::Display) {
-    let value = read();
-    ui::install_theme(
-        display,
-        if value["appearance"] == "light" {
-            Appearance::Light
-        } else {
-            Appearance::Dark
-        },
-        value["text_scale"].as_f64().unwrap_or(1.0),
-        value["reduced_motion"] == true,
-    );
-}
 fn valid(value: &Value) -> bool {
     value.as_object().map(|m| m.len() == 3).unwrap_or(false)
         && matches!(value["appearance"].as_str(), Some("light" | "dark"))

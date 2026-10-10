@@ -38,6 +38,19 @@ fn nonce() -> u128 {
         .unwrap_or_default()
         .as_nanos()
 }
+fn apply_preferences(display: &gtk::gdk::Display) {
+    let value = preferences::read();
+    ui::install_theme(
+        display,
+        if value["appearance"] == "light" {
+            Appearance::Light
+        } else {
+            Appearance::Dark
+        },
+        value["text_scale"].as_f64().unwrap_or(1.0),
+        value["reduced_motion"] == true,
+    );
+}
 struct Element {
     kind: String,
     widget: gtk::Widget,
@@ -1285,7 +1298,7 @@ fn main() {
     let frontend = backend.clone();
     app.connect_activate(move |app| {
         let display = gtk::gdk::Display::default().expect("A native Wayland display is required");
-        preferences::apply(&display);
+        apply_preferences(&display);
         let bar = ui::row(20);
         bar.add_css_class("seven-ui");
         bar.set_margin_top(12);
