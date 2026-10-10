@@ -100,6 +100,20 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
                     json!({"layout":state.policy.current,"windows":windows,"shared":scene.map(|s|json!({"identities":s.identities,"workspaces":s.workspaces,"error":s.error,"overview":s.overview}))}),
                 )
             }
+            Some("viewport.pan") => {
+                let id = v["id"].as_str().ok_or("View ID required")?;
+                let x = v["x"]
+                    .as_i64()
+                    .filter(|n| (-1..=1).contains(n))
+                    .ok_or("Horizontal step must be -1, 0 or 1")?;
+                let y = v["y"]
+                    .as_i64()
+                    .filter(|n| (-1..=1).contains(n))
+                    .ok_or("Vertical step must be -1, 0 or 1")?;
+                state.pan_view(id, x as i32, y as i32)?;
+                state.arrange();
+                Ok(json!({"view":id,"viewport_offset":state.viewport_offsets.get(id)}))
+            }
             Some("place") => {
                 if state.bridge.is_some() {
                     return Err("Use workspace.apply with an exact document revision".into());

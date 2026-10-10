@@ -152,9 +152,21 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                         assert put(focused,'focus-minimum-fixture')['ok']
                         state=wait_shared(lambda s:s['layout']['focus']==minimum_window['id'] and next(w for w in s['windows'] if w['id']==minimum_window['id'])['geometry']['width']>=1600)
                         assert next(w for w in state['windows'] if w['id']==minimum_window['id'])['geometry']['height']>=900
+                        before_pan=workspace()
+                        assert control_call({'op':'viewport.pan','id':minimum_window['id'],'x':1,'y':1})['ok']
+                        state=wait_shared(lambda s:next(w for w in s['windows'] if w['id']==minimum_window['id'])['geometry']['x']<0)
+                        panned=next(w for w in state['windows'] if w['id']==minimum_window['id'])['geometry']
+                        assert panned['x']+panned['width']==1280 and panned['y']+panned['height']==720,panned
+                        assert workspace()==before_pan,'Viewport panning changed preferred layout or document revision'
+                        assert control_call({'op':'workspace.activity','activity_id':str(second_activity)})['ok']
+                        state=wait_shared(lambda s:next(w for w in s['windows'] if w['id']==minimum_window['id'])['geometry']['x']<-50000)
+                        hidden=next(w for w in state['windows'] if w['id']==minimum_window['id'])['geometry']
+                        assert hidden['width']==panned['width'] and hidden['height']==panned['height'],'Hidden oversized view was shrunk'
+                        assert control_call({'op':'workspace.activity','activity_id':str(activity)})['ok']
+                        wait_shared(lambda s:next(w for w in s['windows'] if w['id']==minimum_window['id'])['geometry']['x']==panned['x'])
                         assert workspace()['outputs']==preferred['outputs'],'Pressure handling rewrote preferred placement'
                         assert minimum.poll() is None,'Pressure handling terminated a preserved view'
-                        print('PASS: measured client minimum sizes, focusable preserved overview and unchanged preferred placement')
+                        print('PASS: measured minimum sizes, viewport edges, preserved hidden geometry, activity restore and unchanged preferred placement')
                         print('PASS: authenticated native identity, conventional registration, durable shared layout/focus, stale revision rejection, actual float/maximize rendering and journal undo')
                     else:
                         revision=state['layout']['revision']

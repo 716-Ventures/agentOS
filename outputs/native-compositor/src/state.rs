@@ -28,6 +28,7 @@ pub struct Smallvil {
     pub policy: crate::policy::Policy,
     pub bridge: Option<crate::bridge::Bridge>,
     pub applied_focus: Option<String>,
+    pub viewport_offsets: std::collections::BTreeMap<String, (i32, i32)>,
     pub suppressed_keys: std::collections::BTreeSet<u32>,
     pub start_time: std::time::Instant,
     pub socket_name: OsString,
@@ -90,6 +91,7 @@ impl Smallvil {
             bridge: std::env::var_os("AGENT_OS_COMPOSITOR_CORE")
                 .map(|p| crate::bridge::Bridge::start(p.into())),
             applied_focus: None,
+            viewport_offsets: Default::default(),
             suppressed_keys: Default::default(),
             start_time,
             display_handle: dh,
@@ -161,6 +163,29 @@ impl Smallvil {
         socket_name
     }
 
+    pub fn pan_view(&mut self, id: &str, x: i32, y: i32) -> Result<(), String> {
+        let scene = self
+            .bridge
+            .as_ref()
+            .ok_or("Shared compositor required")?
+            .scene
+            .lock()
+            .unwrap()
+            .clone();
+        let rect = scene.rectangles.get(id).ok_or("Visible view required")?;
+        let area = self
+            .space
+            .outputs()
+            .next()
+            .and_then(|o| self.space.output_geometry(o))
+            .ok_or("Output unavailable")?;
+        let offset = self.viewport_offsets.entry(id.into()).or_default();
+        offset.0 = (offset.0 + x * (area.size.w * 3 / 4).max(1))
+            .clamp(0, (rect.width - area.size.w).max(0));
+        offset.1 = (offset.1 + y * (area.size.h * 3 / 4).max(1))
+            .clamp(0, (rect.height - area.size.h).max(0));
+        Ok(())
+    }
     pub fn shortcut(&mut self, action: crate::shortcuts::Shortcut) {
         use crate::shortcuts::Shortcut;
         let Some(bridge) = &self.bridge else { return };
@@ -185,6 +210,11 @@ impl Smallvil {
                 &ids[next],
                 serde_json::json!({"kind":"focus","element_id":null}),
             );
+            return;
+        }
+        if let Shortcut::Pan { x, y } = action {
+            let id = current.clone();
+            let _ = self.pan_view(&id, x, y);
             return;
         }
         if action == Shortcut::Undo {
@@ -301,8 +331,18 @@ impl Smallvil {
                     crate::policy::Rect {
                         x: -100000,
                         y: -100000,
-                        width: 320,
-                        height: 240,
+                        width: windows
+                            .iter()
+                            .zip(&ids)
+                            .find(|(_, window_id)| *window_id == id)
+                            .map(|(w, _)| w.geometry().size.w.max(80))
+                            .unwrap_or(80),
+                        height: windows
+                            .iter()
+                            .zip(&ids)
+                            .find(|(_, window_id)| *window_id == id)
+                            .map(|(w, _)| w.geometry().size.h.max(32))
+                            .unwrap_or(32),
                     },
                 );
             }
@@ -341,6 +381,12 @@ impl Smallvil {
                     }
                 }
                 self.applied_focus = scene.focus;
+            }
+        }
+        self.viewport_offsets.retain(|id, _| ids.contains(id));
+        for (id, rect) in &mut placements {
+            if let Some(offset) = self.viewport_offsets.get_mut(id) {
+                *rect = crate::pressure::viewport(*rect, area, offset);
             }
         }
         for (id, window) in ids.iter().zip(windows) {

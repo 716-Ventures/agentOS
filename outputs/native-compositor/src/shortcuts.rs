@@ -8,6 +8,7 @@ pub enum Shortcut {
     Close,
     Nudge { x: i32, y: i32, resize: bool },
     Undo,
+    Pan { x: i32, y: i32 },
 }
 pub fn decode(ctrl: bool, alt: bool, shift: bool, key: u32) -> Option<Shortcut> {
     if !ctrl || !alt {
@@ -38,6 +39,16 @@ pub fn decode(ctrl: bool, alt: bool, shift: bool, key: u32) -> Option<Shortcut> 
             x: 0,
             y: 20,
             resize: shift,
+        }),
+        0xff55 => Some(if shift {
+            Shortcut::Pan { x: -1, y: 0 }
+        } else {
+            Shortcut::Pan { x: 0, y: -1 }
+        }),
+        0xff56 => Some(if shift {
+            Shortcut::Pan { x: 1, y: 0 }
+        } else {
+            Shortcut::Pan { x: 0, y: 1 }
         }),
         0x7a | 0x5a => Some(Shortcut::Undo),
         _ => None,

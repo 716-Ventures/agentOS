@@ -63,9 +63,62 @@ pub fn project(
     }
     json!({"reason":"Client minimum sizes exceed the current arrangement. Preferred placement is retained. Switch views with Ctrl+Alt+Tab or Agent Monitor.","selected":selected,"views":ids,"constrained":pressured})
 }
+/// Viewport offsets expose oversized clients without altering their size or preferred layout.
+pub fn viewport(mut rect: Rect, area: Rect, offset: &mut (i32, i32)) -> Rect {
+    if rect.x < -50000 || rect.y < -50000 {
+        return rect;
+    }
+    offset.0 = offset.0.clamp(0, (rect.width - area.width).max(0));
+    offset.1 = offset.1.clamp(0, (rect.height - area.height).max(0));
+    if rect.width > area.width {
+        rect.x = area.x - offset.0;
+    }
+    if rect.height > area.height {
+        rect.y = area.y - offset.1;
+    }
+    rect
+}
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn viewport_exposes_every_edge_and_retains_client_dimensions() {
+        let area = Rect {
+            x: 10,
+            y: 20,
+            width: 800,
+            height: 600,
+        };
+        let client = Rect {
+            width: 1600,
+            height: 900,
+            ..area
+        };
+        let mut offset = (5000, 5000);
+        let view = viewport(client, area, &mut offset);
+        assert_eq!(offset, (800, 300));
+        assert_eq!(
+            view,
+            Rect {
+                x: -790,
+                y: -280,
+                ..client
+            }
+        );
+        assert_eq!(view.x + view.width, area.x + area.width);
+        assert_eq!(view.y + view.height, area.y + area.height);
+        let mut offset = (-20, -20);
+        assert_eq!(viewport(client, area, &mut offset), client);
+        let hidden = Rect {
+            x: -100000,
+            y: -100000,
+            ..client
+        };
+        let mut offset = (900, 900);
+        assert_eq!(viewport(hidden, area, &mut offset), hidden);
+        assert_eq!(viewport(area, area, &mut offset), area);
+        assert_eq!(offset, (0, 0));
+    }
     #[test]
     fn pressure_keeps_floating_work_and_does_not_shrink_clients() {
         let area = Rect {
