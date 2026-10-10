@@ -65,6 +65,8 @@ pub struct Frame {
     pub actions: BTreeMap<String, Value>,
     pub drafts: BTreeMap<(String, String), Value>,
     pub core: Value,
+    pub host_surfaces: Value,
+    pub workspace_undo: Option<i64>,
     pub broker: Value,
     pub usage: Value,
     pub activity: Option<String>,
@@ -76,6 +78,12 @@ pub struct Frame {
 #[derive(Debug)]
 pub enum Command {
     RegisterRenderer(String),
+    WorkspaceEdit {
+        workspace: String,
+        revision: u64,
+        edit: Value,
+    },
+    WorkspaceUndo(i64),
     ResolveDraft {
         surface: String,
         element: String,
@@ -161,6 +169,8 @@ fn run(
             }
             Ok(command) => {
                 let result=match command {
+                    Command::WorkspaceEdit{workspace,revision,edit}=>request(&socket,&json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("workspace-{}",super::nonce()),"expected_revisions":{workspace.clone():revision},"operations":[{"op":"workspace.edit","workspace_id":workspace,"edit":edit}]})).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt}),
+                    Command::WorkspaceUndo(cursor)=>request(&socket,&json!({"op":"presentation.undo","event_cursor":cursor,"request_id":format!("undo-{}",super::nonce())})).map(|receipt|{frame.lock().unwrap().workspace_undo=None;receipt}),
                     Command::RegisterRenderer(surface)=>request(&socket,&json!({"op":"host.renderer","surface_id":surface})),
                     Command::ResolveDraft{surface,element,commit}=>resolve_draft(&socket,&surface,&element,commit,&drafts),
                     Command::Preferences(value)=>super::preferences::save(&value),
@@ -195,7 +205,7 @@ fn run(
                         request(&socket,&json!({"op":if begin{"interaction.begin"}else{"interaction.end"},"surface_id":surface,"element_id":element}))
                     }
                     Command::Action{reference,key}=>request(&socket,&json!({"op":"action.metadata","reference":reference})).and_then(|info|request(&socket,&json!({"op":"action.invoke","reference":reference,"request_id":key,"expected_source_revision":info["source_revision"]}))),
-                    Command::Close{surface}=>close_surface(&socket,&surface),
+                    Command::Close{surface}=>{flush(&socket,&drafts,&frame);if drafts.lock().unwrap().iter().any(|((id,_),draft)|id==&surface && draft.dirty){Err("The view remains open because its latest draft could not be saved".into())}else{close_surface(&socket,&surface).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt})}},
                     Command::Quit=>unreachable!(),
                 };
                 let mut view = frame.lock().unwrap();
@@ -238,6 +248,7 @@ fn run(
                     connected: true,
                     ..Frame::default()
                 };
+                next.host_surfaces = state["host_surfaces"].clone();
                 next.core = request(&socket, &json!({"op":"snapshot"}))
                     .unwrap_or_else(|e| json!({"unavailable":e}));
                 next.broker = request(&broker_socket(), &json!({"op":"list"}))
@@ -302,6 +313,7 @@ fn run(
                     }
                 }
                 let mut old = frame.lock().unwrap();
+                next.workspace_undo = old.workspace_undo;
                 next.error = old.error.take();
                 next.inspection = old.inspection.take();
                 next.notice = old.notice.take();
@@ -347,27 +359,35 @@ fn close_surface(socket: &PathBuf, surface: &str) -> Result<Value, String> {
     if revision.is_null() {
         return Err("Surface is already closed".into());
     }
-    // Placement removal is explicit and atomic with closure. A compositor can perform
-    // richer tree collapse; this first client refuses to orphan a placed surface.
+    let mut expected = json!({surface:revision});
+    let mut operations = Vec::new();
+    fn contains(value: &Value, id: &str) -> bool {
+        match value {
+            Value::Object(m) => {
+                m.get("surface_id").and_then(Value::as_str) == Some(id)
+                    || m.values().any(|v| contains(v, id))
+            }
+            Value::Array(a) => a.iter().any(|v| contains(v, id)),
+            _ => false,
+        }
+    }
     for doc in state["documents"]
         .as_object()
         .into_iter()
         .flat_map(|m| m.values())
     {
-        if doc.get("workspace_id").is_some()
-            && doc["outputs"]
-                .to_string()
-                .contains(&format!("\"{surface}\""))
-        {
-            return Err(
-                "Use workspace close-view to remove a placed surface; its draft is retained".into(),
-            );
+        if doc.get("workspace_id").is_some() && contains(&doc["outputs"], surface) {
+            let id = doc["workspace_id"]
+                .as_str()
+                .ok_or("Invalid workspace identity")?;
+            expected[id] = doc["revision"].clone();
+            operations.push(json!({"op":"workspace.edit","workspace_id":id,"edit":{"kind":"remove","surface_id":surface}}));
         }
     }
-    request(
-        socket,
-        &json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("close-{}",super::nonce()),"expected_revisions":{surface:revision},"operations":[{"op":"surface.close","surface_id":surface}]}),
-    )
+    operations.push(json!({"op":"surface.close","surface_id":surface}));
+    let transaction = json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("close-{}",super::nonce()),"expected_revisions":expected,"operations":operations});
+    // An ambiguous acknowledgement retries the identical durable request, never a new action.
+    request(socket, &transaction).or_else(|_| request(socket, &transaction))
 }
 
 fn broker_socket() -> PathBuf {

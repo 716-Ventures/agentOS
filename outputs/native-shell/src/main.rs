@@ -4,6 +4,7 @@ mod preferences;
 mod transport;
 mod verification;
 mod voice;
+mod workspace_controls;
 use gtk::{glib, prelude::*};
 use serde_json::{json, Value};
 use seven_sixteen_ui::{self as ui, gtk, Appearance, ButtonVariant, InputEvent, TextField};

@@ -11,6 +11,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         let mut doc=state["documents"]["native-fixture"].clone();assert!(doc.is_object());
         transport::request(&socket,&json!({"op":"host.renderer","surface_id":"native-fixture"})).expect("Authenticated fixture renderer");
         let mut frame=Frame{connected:true,..Frame::default()};
+        frame.documents=serde_json::from_value(state["documents"].clone()).unwrap();frame.host_surfaces=state["host_surfaces"].clone();
         let bindings=transport::request(&socket,&json!({"op":"binding.snapshot","surface_id":"native-fixture"})).unwrap();frame.bindings.insert("native-fixture".into(),bindings);
         let (commands,rx)=mpsc::channel();let drafts=Arc::new(Mutex::new(BTreeMap::new()));
         frame.core=transport::request(&socket,&json!({"op":"snapshot"})).unwrap();frame.activity=doc["activity_id"].as_str().map(String::from);frame.usage=json!({"unavailable":true});frame.broker=json!([]);

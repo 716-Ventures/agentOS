@@ -1905,4 +1905,47 @@ mod tests {
             committed["outputs"]
         );
     }
+    #[test]
+    fn closing_a_placed_view_keeps_its_draft_and_undo_restores_it() {
+        let mut db = fixture();
+        create(&mut db);
+        let root = Principal {
+            uid: 0,
+            session: "host".into(),
+        };
+        handle(
+            &mut db,
+            &json!({"op":"outputs.register","output_id":"output-a","width":1280,"height":720}),
+            &root,
+        )
+        .unwrap();
+        handle(&mut db,&json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"workspace-create","expected_revisions":{"workspace-a":null},"operations":[{"op":"workspace.put","document":workspace()}]}),&human()).unwrap();
+        handle(
+            &mut db,
+            &json!({"op":"interaction.begin","surface_id":"surface-a","element_id":"input"}),
+            &human(),
+        )
+        .unwrap();
+        handle(&mut db,&json!({"op":"draft.save","surface_id":"surface-a","element_id":"input","expected_draft_revision":0,"draft":"Keep my unsaved λ text"}),&human()).unwrap();
+        let closed=handle(&mut db,&json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"close-placed","expected_revisions":{"workspace-a":0,"surface-a":0},"operations":[{"op":"workspace.edit","workspace_id":"workspace-a","edit":{"kind":"remove","surface_id":"surface-a"}},{"op":"surface.close","surface_id":"surface-a"}]}),&human()).unwrap();
+        assert!(snapshot(&db).unwrap()["documents"]
+            .get("surface-a")
+            .is_none());
+        handle(&mut db,&json!({"op":"presentation.undo","event_cursor":closed["event_cursor"],"request_id":"reopen-closed"}),&human()).unwrap();
+        let restored = snapshot(&db).unwrap();
+        assert_eq!(
+            restored["documents"]["workspace-a"]["outputs"],
+            workspace()["outputs"]
+        );
+        assert_eq!(restored["documents"]["surface-a"]["revision"], 2);
+        assert_eq!(
+            handle(
+                &mut db,
+                &json!({"op":"draft.get","surface_id":"surface-a","element_id":"input"}),
+                &human()
+            )
+            .unwrap()["draft"],
+            "Keep my unsaved λ text"
+        );
+    }
 }

@@ -26,6 +26,7 @@ pub struct Controls {
     transcript: TextField,
     review_ready: bool,
     request_field: TextField,
+    workspace: workspace_controls::WorkspaceControls,
 }
 impl Controls {
     pub fn new(app: &gtk::Application, commands: Sender<Command>) -> Self {
@@ -225,6 +226,8 @@ impl Controls {
         monitor_content.append(&ui::text("Agent Monitor", true));
         let model_text = ui::text("Model configuration and measured usage unavailable", false);
         monitor_content.append(&model_text);
+        let workspace = workspace_controls::WorkspaceControls::new(commands.clone());
+        monitor_content.append(&workspace.widget);
         let jobs = ui::column(12);
         monitor_content.append(&jobs);
         let inspection = gtk::TextView::new();
@@ -271,6 +274,7 @@ impl Controls {
             transcript,
             review_ready: false,
             request_field: request,
+            workspace,
         }
     }
     pub fn verify_controls(&mut self, frame: &Frame, commands: &Sender<Command>) {
@@ -282,6 +286,7 @@ impl Controls {
         self.request_field.entry.emit_activate();
         assert!(self.rows.values().all(|row| !row.stop.is_sensitive()));
         assert!(!self.model_text.text().is_empty());
+        self.workspace.verify(frame);
         self.present();
     }
     pub fn context(&self, context: Value) {
@@ -295,6 +300,7 @@ impl Controls {
     }
     pub fn update(&mut self, frame: &Frame, commands: &Sender<Command>) {
         *self.activity.borrow_mut() = frame.activity.clone();
+        self.workspace.update(frame);
         let voice = self.voice.state.lock().unwrap().clone();
         self.voice_button.set_label(if voice.phase == "recording" {
             "Finish recording"
