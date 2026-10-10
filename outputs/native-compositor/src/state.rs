@@ -179,19 +179,46 @@ impl Smallvil {
             height: area.size.h,
         };
         let mut placements = self.policy.arrange(area);
+        let mut maximized = std::collections::BTreeSet::new();
         if let Some(bridge) = &self.bridge {
             bridge.observe(windows.iter().map(observe).collect(), area);
             let scene = bridge.scene.lock().unwrap().clone();
+            for id in scene
+                .identities
+                .keys()
+                .filter(|id| !scene.rectangles.contains_key(*id))
+            {
+                // Preserve the live application and its placement while its activity is set aside.
+                placements.insert(
+                    id.clone(),
+                    crate::policy::Rect {
+                        x: -100000,
+                        y: -100000,
+                        width: 320,
+                        height: 240,
+                    },
+                );
+            }
+            maximized = scene.maximized;
             placements.extend(scene.rectangles);
             if scene.focus != self.applied_focus {
                 if let Some(window) = windows.iter().find(|w| {
                     Some(format!("{:?}", w.toplevel().unwrap().wl_surface().id())) == scene.focus
                 }) {
+                    self.applied_focus = scene.focus.clone();
                     self.space.raise_element(window, true);
                     if let Some(keyboard) = self.seat.get_keyboard() {
                         keyboard.set_focus(
                             self,
                             Some(window.toplevel().unwrap().wl_surface().clone()),
+                            smithay::utils::SERIAL_COUNTER.next_serial(),
+                        );
+                    }
+                } else if scene.focus.is_none() {
+                    if let Some(keyboard) = self.seat.get_keyboard() {
+                        keyboard.set_focus(
+                            self,
+                            None,
                             smithay::utils::SERIAL_COUNTER.next_serial(),
                         );
                     }
@@ -204,7 +231,22 @@ impl Smallvil {
                 let top = window.toplevel().unwrap();
                 let target = (rect.width, rect.height).into();
                 let changed = top.with_pending_state(|pending| {
-                    if pending.size != Some(target) {
+                    use smithay::reexports::wayland_protocols::xdg::shell::server::xdg_toplevel;
+                    let was_maximized = pending.states.contains(xdg_toplevel::State::Maximized);
+                    let now_maximized = if self.bridge.is_some() {
+                        maximized.contains(id)
+                    } else {
+                        matches!(
+                            self.policy.current.placements.get(id),
+                            Some(crate::policy::Placement::Maximized)
+                        )
+                    };
+                    if now_maximized {
+                        pending.states.set(xdg_toplevel::State::Maximized);
+                    } else {
+                        pending.states.unset(xdg_toplevel::State::Maximized);
+                    }
+                    if pending.size != Some(target) || was_maximized != now_maximized {
                         pending.size = Some(target);
                         true
                     } else {

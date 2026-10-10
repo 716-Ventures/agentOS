@@ -4,6 +4,9 @@ struct JobRow {
     widget: gtk::Box,
     label: gtk::Label,
     stop: gtk::Button,
+    review: gtk::Button,
+    attach: gtk::Button,
+    proposal: Rc<RefCell<Value>>,
 }
 pub struct Controls {
     pub widget: gtk::Box,
@@ -386,13 +389,37 @@ impl Controls {
                 let key = format!("{}:{}", source, job["id"]);
                 seen.push(key.clone());
                 let row = self.rows.entry(key).or_insert_with(|| {
-                    let widget = ui::row(12);
+                    let widget = ui::column(8);
                     let label = ui::text("", false);
                     widget.append(&label);
                     let inspect = ui::button("Read output", ButtonVariant::Outline, false);
                     let stop = ui::button("Stop work", ButtonVariant::Destructive, false);
-                    widget.append(&inspect);
-                    widget.append(&stop);
+                    let actions = gtk::FlowBox::new();
+                    actions.set_selection_mode(gtk::SelectionMode::None);
+                    actions.set_min_children_per_line(1);
+                    actions.set_max_children_per_line(4);
+                    actions.set_column_spacing(8);
+                    actions.set_row_spacing(8);
+                    actions.insert(&inspect, -1);
+                    actions.insert(&stop, -1);
+                    let review = ui::button("Review approval", ButtonVariant::Outline, false);
+                    let attach = ui::button("Attach terminal", ButtonVariant::Outline, false);
+                    actions.insert(&review, -1);
+                    actions.insert(&attach, -1);
+                    widget.append(&actions);
+                    let proposal = Rc::new(RefCell::new(job.clone()));
+                    let (current, sender, app) = (
+                        proposal.clone(),
+                        commands.clone(),
+                        self.monitor.application().unwrap(),
+                    );
+                    review.connect_clicked(move |_| {
+                        review_proposal(&app, current.borrow().clone(), sender.clone())
+                    });
+                    let (current, sender) = (proposal.clone(), commands.clone());
+                    attach.connect_clicked(move |_| {
+                        let _ = sender.send(Command::Attach(current.borrow().clone()));
+                    });
                     self.jobs.append(&widget);
                     let (sender, source_name, id) =
                         (commands.clone(), source.to_string(), job["id"].clone());
@@ -414,6 +441,9 @@ impl Controls {
                         widget,
                         label,
                         stop,
+                        review,
+                        attach,
+                        proposal,
                     }
                 });
                 let argv = job["argv"]
@@ -428,6 +458,12 @@ impl Controls {
                 let status = job["status"].as_str().unwrap_or("unavailable");
                 row.label
                     .set_text(&format!("{} · {}\n{}", source, status, argv));
+                *row.proposal.borrow_mut() = job.clone();
+                row.review
+                    .set_sensitive(source == "broker" && status == "approval_required");
+                row.attach.set_sensitive(
+                    source == "broker" && status == "running" && job["terminal"] == true,
+                );
                 row.stop.set_sensitive(matches!(
                     status,
                     "starting" | "running" | "cancelling" | "approval_required"
@@ -493,4 +529,64 @@ impl Controls {
             }
         }
     }
+}
+
+fn review_proposal(app: &gtk::Application, proposal: Value, commands: Sender<Command>) {
+    let content = ui::column(12);
+    content.set_margin_top(20);
+    content.set_margin_bottom(20);
+    content.set_margin_start(20);
+    content.set_margin_end(20);
+    content.append(&ui::text("Review proposed system operation", true));
+    let arguments = proposal["argv"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .enumerate()
+        .map(|(i, a)| {
+            format!(
+                "{}: {}",
+                i + 1,
+                serde_json::to_string(a.as_str().unwrap_or("")).unwrap()
+            )
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+    let explanation=format!("Purpose: {}\nDirectory: {}\nReason for review: {}\n\nExact command arguments:\n{}\n\nSupplied input: {} bytes · fingerprint {}\nInteractive terminal: {}\n\nThis operation runs with root authority in the guest.",proposal["purpose"].as_str().unwrap_or("Unspecified"),proposal["cwd"].as_str().unwrap_or("Unspecified"),proposal["policy"]["reason"].as_str().unwrap_or("Review required"),arguments,proposal["stdin_bytes"].as_u64().unwrap_or(0),proposal["stdin_sha256"].as_str().unwrap_or("none"),if proposal["terminal"]==true{"yes"}else{"no"});
+    content.append(&ui::text(&explanation, false));
+    let approve = ui::button("Approve this operation", ButtonVariant::Destructive, false);
+    let reject = ui::button("Reject this operation", ButtonVariant::Outline, false);
+    let cancel = ui::button("Keep pending", ButtonVariant::Ghost, false);
+    content.append(&approve);
+    content.append(&reject);
+    content.append(&cancel);
+    let scroll = gtk::ScrolledWindow::builder()
+        .hscrollbar_policy(gtk::PolicyType::Never)
+        .child(&content)
+        .build();
+    let window = gtk::ApplicationWindow::builder()
+        .application(app)
+        .title("Review system operation")
+        .default_width(680)
+        .default_height(560)
+        .child(&scroll)
+        .build();
+    window.add_css_class("seven-ui");
+    let (view, sender, current) = (window.clone(), commands.clone(), proposal.clone());
+    approve.connect_clicked(move |button| {
+        button.set_sensitive(false);
+        let _ = sender.send(Command::Approve(current.clone()));
+        view.close();
+    });
+    let (view, sender, id) = (window.clone(), commands, proposal["id"].clone());
+    reject.connect_clicked(move |_| {
+        let _ = sender.send(Command::Stop {
+            source: "broker".into(),
+            job: id.clone(),
+        });
+        view.close();
+    });
+    let view = window.clone();
+    cancel.connect_clicked(move |_| view.close());
+    window.present();
 }

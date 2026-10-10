@@ -113,7 +113,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                     simple2=subprocess.Popen(['weston-simple-shm'],env=childenv,stdout=nestedlog,stderr=subprocess.STDOUT,start_new_session=True);applications.append(simple2)
                     state=wait_windows(4);assert state['layout']['focus']==ident,'A conventional app stole focus'
                     if shared:
-                        state=wait_shared(lambda s:len((s.get('shared') or {}).get('identities',{}))==4)
+                        state=wait_shared(lambda s:len((s.get('shared') or {}).get('identities',{}))==4 and any(w['app_id']=='agentos.surface.native-fixture' for w in s['windows']))
                         native=next(w for w in state['windows'] if w['app_id']=='agentos.surface.native-fixture')
                         assert state['shared']['identities'][native['id']]=='native-fixture'
                         document=workspace();before=copy.deepcopy(document)
@@ -138,6 +138,12 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                         assert put(document,'manual-maximize')['ok']
                         wait_shared(lambda s:next(w for w in s['windows'] if w['id']==ident)['geometry']['width']==1280)
                         assert workspace()['focus']['surface_id']==surface_id
+                        second_activity=call({'op':'create','name':'Set-aside verification'})['id']
+                        assert control_call({'op':'workspace.activity','activity_id':str(second_activity)})['ok']
+                        wait_shared(lambda s:all(w['geometry']['x']<0 for w in s['windows']))
+                        assert simple.poll() is None and simple2.poll() is None,'Switching activity terminated work'
+                        assert control_call({'op':'workspace.activity','activity_id':str(activity)})['ok']
+                        wait_shared(lambda s:next(w for w in s['windows'] if w['id']==ident)['geometry']['width']==1280 and s['layout']['focus']==ident)
                         print('PASS: authenticated native identity, conventional registration, durable shared layout/focus, stale revision rejection, actual float/maximize rendering and journal undo')
                     else:
                         revision=state['layout']['revision']

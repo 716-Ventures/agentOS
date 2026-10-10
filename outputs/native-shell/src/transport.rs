@@ -6,6 +6,7 @@ use std::{
     os::unix::net::UnixStream,
     path::PathBuf,
     sync::{
+        atomic::{AtomicBool, Ordering},
         mpsc::{self, Receiver, Sender},
         Arc, Mutex,
     },
@@ -14,7 +15,7 @@ use std::{
 };
 const LIMIT: usize = 4 * 1024 * 1024;
 pub fn request(socket: &PathBuf, value: &Value) -> Result<Value, String> {
-    request_timeout(socket, value, Duration::from_secs(3))
+    request_timeout(socket, value, Duration::from_millis(500))
 }
 pub fn request_timeout(
     socket: &PathBuf,
@@ -78,6 +79,8 @@ pub struct Frame {
 #[derive(Debug)]
 pub enum Command {
     RegisterRenderer(String),
+    Approve(Value),
+    Attach(Value),
     WorkspaceEdit {
         workspace: String,
         revision: u64,
@@ -125,6 +128,7 @@ pub struct Backend {
     pub frame: Arc<Mutex<Frame>>,
     pub drafts: Arc<Mutex<BTreeMap<(String, String), Draft>>>,
     worker: Option<thread::JoinHandle<()>>,
+    stop: Arc<AtomicBool>,
 }
 impl Backend {
     pub fn start(socket: PathBuf, activity: Option<String>) -> Self {
@@ -132,15 +136,19 @@ impl Backend {
         let frame = Arc::new(Mutex::new(Frame::default()));
         let drafts = Arc::new(Mutex::new(BTreeMap::new()));
         let (view, edits) = (frame.clone(), drafts.clone());
-        let worker = thread::spawn(move || run(socket, activity, rx, view, edits));
+        let stop = Arc::new(AtomicBool::new(false));
+        let stopping = stop.clone();
+        let worker = thread::spawn(move || run(socket, activity, rx, view, edits, stopping));
         Self {
             commands,
             frame,
             drafts,
             worker: Some(worker),
+            stop,
         }
     }
     pub fn close(&mut self) {
+        self.stop.store(true, Ordering::Relaxed);
         let _ = self.commands.send(Command::Quit);
         if let Some(worker) = self.worker.take() {
             let _ = worker.join();
@@ -158,17 +166,59 @@ fn run(
     rx: Receiver<Command>,
     frame: Arc<Mutex<Frame>>,
     drafts: Arc<Mutex<BTreeMap<(String, String), Draft>>>,
+    stop: Arc<AtomicBool>,
 ) {
     let mut leases = BTreeMap::<(String, String), Instant>::new();
     let mut last = Instant::now() - Duration::from_secs(1);
-    loop {
+    let mut shown_activity = None::<String>;
+    let approval_pending = Arc::new(AtomicBool::new(false));
+    let mut approvals = Vec::<thread::JoinHandle<()>>::new();
+    while !stop.load(Ordering::Relaxed) {
+        let mut pending = Vec::new();
+        for task in approvals.drain(..) {
+            if task.is_finished() {
+                let _ = task.join();
+            } else {
+                pending.push(task);
+            }
+        }
+        approvals = pending;
         match rx.recv_timeout(Duration::from_millis(50)) {
             Ok(Command::Quit) => {
                 flush(&socket, &drafts, &frame);
                 break;
             }
             Ok(command) => {
+                if let Command::Approve(proposal) = command {
+                    if approval_pending
+                        .compare_exchange(false, true, Ordering::Relaxed, Ordering::Relaxed)
+                        .is_err()
+                    {
+                        frame.lock().unwrap().error = Some("An approval is already pending".into());
+                        continue;
+                    }
+                    let (pending, view, stopping) =
+                        (approval_pending.clone(), frame.clone(), stop.clone());
+                    approvals.push(thread::spawn(move || {
+                        let result =
+                            super::broker_controls::approve(broker_socket(), proposal, stopping);
+                        let mut frame = view.lock().unwrap();
+                        match result {
+                            Ok(_) => {
+                                frame.error = None;
+                                frame.notice = Some(
+                                    "Approved · inspect the existing work for its result".into(),
+                                );
+                            }
+                            Err(error) => frame.error = Some(error),
+                        }
+                        pending.store(false, Ordering::Relaxed);
+                    }));
+                    continue;
+                }
                 let result=match command {
+                    Command::Approve(_)=>unreachable!(),
+                    Command::Attach(job)=>super::broker_controls::attach(&job),
                     Command::WorkspaceEdit{workspace,revision,edit}=>request(&socket,&json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("workspace-{}",super::nonce()),"expected_revisions":{workspace.clone():revision},"operations":[{"op":"workspace.edit","workspace_id":workspace,"edit":edit}]})).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt}),
                     Command::WorkspaceUndo(cursor)=>request(&socket,&json!({"op":"presentation.undo","event_cursor":cursor,"request_id":format!("undo-{}",super::nonce())})).map(|receipt|{frame.lock().unwrap().workspace_undo=None;receipt}),
                     Command::RegisterRenderer(surface)=>request(&socket,&json!({"op":"host.renderer","surface_id":surface})),
@@ -267,9 +317,27 @@ fn run(
                         .and_then(|a| a.first())
                         .map(|a| a["id"].to_string());
                 }
+                if shown_activity != activity {
+                    if let (Some(path), Some(id)) = (
+                        std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET"),
+                        activity.as_ref(),
+                    ) {
+                        if let Err(error) = request(
+                            &PathBuf::from(path),
+                            &json!({"op":"workspace.activity","activity_id":id}),
+                        ) {
+                            next.error = Some(format!("Activity placement unavailable: {error}"));
+                        } else {
+                            shown_activity = activity.clone();
+                        }
+                    }
+                }
                 next.activity = activity.clone();
                 if let Some(documents) = state["documents"].as_object() {
                     for (id, doc) in documents {
+                        if stop.load(Ordering::Relaxed) {
+                            break;
+                        }
                         if activity
                             .as_ref()
                             .map(|a| Some(a.as_str()) != doc["activity_id"].as_str())
@@ -314,7 +382,9 @@ fn run(
                 }
                 let mut old = frame.lock().unwrap();
                 next.workspace_undo = old.workspace_undo;
-                next.error = old.error.take();
+                if next.error.is_none() {
+                    next.error = old.error.take();
+                }
                 next.inspection = old.inspection.take();
                 next.notice = old.notice.take();
                 *old = next;
@@ -325,6 +395,9 @@ fn run(
                 current.error = Some(e);
             }
         }
+    }
+    for approval in approvals {
+        let _ = approval.join();
     }
 }
 fn flush(

@@ -28,6 +28,7 @@ pub struct Scene {
     pub identities: BTreeMap<String, String>,
     pub workspaces: Value,
     pub focus: Option<String>,
+    pub maximized: BTreeSet<String>,
     pub error: Option<String>,
 }
 #[derive(Clone)]
@@ -54,6 +55,8 @@ impl Bridge {
             let mut counter = 0u64;
             let mut published = BTreeMap::new();
             let mut output_area = None;
+            let mut selected_activity = None::<String>;
+            let mut first_seen = BTreeMap::<String, std::time::Instant>::new();
             let mut nonce = [0u8; 16];
             if std::fs::File::open("/dev/urandom")
                 .and_then(|mut f| f.read_exact(&mut nonce))
@@ -66,6 +69,23 @@ impl Bridge {
                 // Bounded command queue; each operation has exact core revision checks.
                 for req in rx.try_iter().take(8) {
                     let result = match req.value["op"].as_str() {
+                        Some("workspace.transaction") => call(&socket, &req.value["transaction"]),
+                        Some("workspace.activity") => call(&socket, &json!({"op":"snapshot"}))
+                            .and_then(|s| {
+                                let activity = req.value["activity_id"]
+                                    .as_str()
+                                    .ok_or("Activity identity required")?;
+                                if !s["activities"]
+                                    .as_array()
+                                    .into_iter()
+                                    .flatten()
+                                    .any(|a| a["id"].to_string() == activity)
+                                {
+                                    return Err("Activity unavailable".into());
+                                }
+                                selected_activity = Some(activity.into());
+                                Ok(json!({"activity_id":activity}))
+                            }),
                         Some("workspace.apply") => put(
                             &socket,
                             &req.value["document"],
@@ -78,6 +98,9 @@ impl Bridge {
                         ),
                         _ => Err("Unknown shared workspace operation".into()),
                     };
+                    if let Err(e) = &result {
+                        output.lock().unwrap().error = Some(e.clone());
+                    }
                     let response = match result {
                         Ok(value) => json!({"ok":true,"result":value}),
                         Err(e) => json!({"ok":false,"error":e}),
@@ -89,10 +112,14 @@ impl Bridge {
                     let result = (|| -> Result<Scene, String> {
                         let mut state = call(&socket, &json!({"op":"presentation.snapshot"}))?;
                         let activities = call(&socket, &json!({"op":"snapshot"}))?;
-                        let activity = activities["activities"]
+                        let available = activities["activities"]
                             .as_array()
-                            .and_then(|a| a.first())
-                            .map(|a| a["id"].to_string())
+                            .ok_or("No active activity")?;
+                        let activity = selected_activity
+                            .as_ref()
+                            .filter(|id| available.iter().any(|a| a["id"].to_string() == **id))
+                            .cloned()
+                            .or_else(|| available.first().map(|a| a["id"].to_string()))
                             .ok_or("No active activity")?;
                         if output_area != Some(observed.area) {
                             call(
@@ -118,7 +145,11 @@ impl Bridge {
                             }
                         }
                         let mut added = BTreeMap::<String, Vec<String>>::new();
+                        first_seen.retain(|id, _| live.contains(id));
                         for w in &observed.windows {
+                            let seen = *first_seen
+                                .entry(w.id.clone())
+                                .or_insert_with(std::time::Instant::now);
                             if stopping.load(Ordering::Relaxed) {
                                 return Err("Compositor stopping".into());
                             }
@@ -131,6 +162,9 @@ impl Bridge {
                                 continue;
                             }
                             if !registrations.contains_key(&w.id) {
+                                if seen.elapsed() < Duration::from_millis(300) {
+                                    continue;
+                                }
                                 counter += 1;
                                 registrations.insert(
                                     w.id.clone(),
@@ -224,6 +258,11 @@ impl Bridge {
                                 continue;
                             }
                             if let Some(layout) = doc["outputs"].get("nested-primary") {
+                                if let Some(runtime) =
+                                    layout["maximized"].as_str().and_then(|id| reverse.get(id))
+                                {
+                                    next.maximized.insert(runtime.clone());
+                                }
                                 for (surface, rect) in rectangles(layout, observed.area)? {
                                     if let Some(runtime) = reverse.get(&surface) {
                                         next.rectangles.insert(runtime.clone(), rect);
@@ -251,6 +290,42 @@ impl Bridge {
             commands,
             stop,
             worker: Some(worker),
+        }
+    }
+    pub fn input(&self, runtime: &str, mut edit: Value) {
+        let scene = self.scene.lock().unwrap().clone();
+        let Some(surface) = scene.identities.get(runtime) else {
+            return;
+        };
+        let Some(document) = scene
+            .workspaces
+            .as_object()
+            .into_iter()
+            .flat_map(|d| d.values())
+            .find(|d| placed_surfaces(&json!({"documents":{"workspace":d}})).contains(surface))
+        else {
+            return;
+        };
+        edit["surface_id"] = json!(surface);
+        let Some(id) = document["workspace_id"].as_str() else {
+            return;
+        };
+        let stamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        let transaction = json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("input-{}-{stamp}",std::process::id()),"expected_revisions":{id:document["revision"]},"operations":[{"op":"workspace.edit","workspace_id":id,"edit":edit}]});
+        let (reply, _) = mpsc::sync_channel(1);
+        if self
+            .commands
+            .try_send(Request {
+                value: json!({"op":"workspace.transaction","transaction":transaction}),
+                reply,
+            })
+            .is_err()
+        {
+            self.scene.lock().unwrap().error =
+                Some("Workspace input queue busy; refresh before retrying".into());
         }
     }
     pub fn observe(&self, windows: Vec<Observed>, area: Rect) {

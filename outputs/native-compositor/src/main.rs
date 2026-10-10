@@ -43,6 +43,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     crate::winit::init_winit(&mut event_loop, &mut data)?;
 
     let control = control::Control::start()?;
+    std::env::set_var("AGENT_OS_COMPOSITOR_SOCKET", &control.path);
     println!(
         "{}",
         serde_json::json!({"wayland_display":data.state.socket_name.to_string_lossy(),"control_socket":control.path})

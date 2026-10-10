@@ -6,6 +6,7 @@ version = 4
 name = "agent-os-desktop"
 version = "0.1.0-alpha.1"
 dependencies = [
+ "libc",
  "gdk4-wayland",
  "serde_json",
  "seven-sixteen-ui",

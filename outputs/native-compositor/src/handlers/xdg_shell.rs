@@ -42,6 +42,10 @@ impl XdgShellHandler for Smallvil {
 
     fn maximize_request(&mut self, surface: ToplevelSurface) {
         let id = format!("{:?}", surface.wl_surface().id());
+        if let Some(bridge) = &self.bridge {
+            bridge.input(&id, serde_json::json!({"kind":"maximize"}));
+            return;
+        }
         let _ = self.policy.change(
             &id,
             crate::policy::Placement::Maximized,
@@ -53,6 +57,10 @@ impl XdgShellHandler for Smallvil {
     }
     fn unmaximize_request(&mut self, surface: ToplevelSurface) {
         let id = format!("{:?}", surface.wl_surface().id());
+        if let Some(bridge) = &self.bridge {
+            bridge.input(&id, serde_json::json!({"kind":"restore"}));
+            return;
+        }
         let _ = self.policy.change(
             &id,
             crate::policy::Placement::Tiled,

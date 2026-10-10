@@ -42,6 +42,14 @@ impl SeatHandler for Smallvil {
             .unwrap_or(true)
             && self.policy.current.focus != focus
         {
+            if self.applied_focus != focus {
+                if let (Some(bridge), Some(runtime)) = (&self.bridge, focus.as_ref()) {
+                    bridge.input(
+                        runtime,
+                        serde_json::json!({"kind":"focus","element_id":null}),
+                    );
+                }
+            }
             self.policy.current.focus = focus;
             self.policy.current.revision += 1;
         }

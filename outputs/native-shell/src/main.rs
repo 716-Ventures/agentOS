@@ -1,4 +1,5 @@
 //! Native shell client: stable GTK controls over the core's inert presentation API.
+mod broker_controls;
 mod controls;
 mod preferences;
 mod transport;
@@ -335,7 +336,7 @@ impl Surface {
         });
         let identity = format!("agentos.surface.{id}");
         let (registered, commands) = (id.to_string(), commands.clone());
-        window.connect_realize(move |window| {
+        window.connect_map(move |window| {
             if let Some(surface) = window
                 .surface()
                 .and_then(|s| s.downcast::<gdk4_wayland::WaylandToplevel>().ok())
