@@ -92,12 +92,13 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
             Some("snapshot") => {
                 state.arrange();
                 let windows=state.space.elements().map(|w|{let surface=w.toplevel().unwrap().wl_surface();let (title,app_id)=smithay::wayland::compositor::with_states(surface,|states|{let data=states.data_map.get::<smithay::wayland::shell::xdg::XdgToplevelSurfaceData>().unwrap().lock().unwrap();(data.title.clone(),data.app_id.clone())});let geometry=state.space.element_geometry(w);json!({"id":format!("{:?}",surface.id()),"title":title,"app_id":app_id,"geometry":geometry.map(|r|json!({"x":r.loc.x,"y":r.loc.y,"width":r.size.w,"height":r.size.h}))})}).collect::<Vec<_>>();
+                let outputs=state.space.outputs().filter_map(|output|state.space.output_geometry(output).map(|geometry|json!({"name":output.name(),"x":geometry.loc.x,"y":geometry.loc.y,"width":geometry.size.w,"height":geometry.size.h,"scale":output.current_scale().fractional_scale(),"transform":format!("{:?}",output.current_transform())}))).collect::<Vec<_>>();
                 let scene = state
                     .bridge
                     .as_ref()
                     .map(|b| b.scene.lock().unwrap().clone());
                 Ok(
-                    json!({"layout":state.policy.current,"windows":windows,"shared":scene.map(|s|json!({"identities":s.identities,"workspaces":s.workspaces,"error":s.error,"overview":s.overview}))}),
+                    json!({"layout":state.policy.current,"windows":windows,"outputs":outputs,"shared":scene.map(|s|json!({"identities":s.identities,"workspaces":s.workspaces,"error":s.error,"overview":s.overview}))}),
                 )
             }
             Some("viewport.pan") => {
