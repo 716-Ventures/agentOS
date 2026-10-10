@@ -88,9 +88,9 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                     state=wait_windows(1);ident=state['windows'][0]['id']
                     assert control_call({'op':'focus','id':ident,'expected_revision':state['layout']['revision']})['ok']
                     desktop=subprocess.Popen(command,env=childenv,stdout=None,stderr=None,start_new_session=True);applications.append(desktop)
-                    state=wait_windows(2);assert state['layout']['focus']==ident,'A new native surface stole focus'
+                    state=wait_windows(3);assert state['layout']['focus']==ident,'A new native surface stole focus'
                     simple2=subprocess.Popen(['weston-simple-shm'],env=childenv,stdout=nestedlog,stderr=subprocess.STDOUT,start_new_session=True);applications.append(simple2)
-                    state=wait_windows(3);assert state['layout']['focus']==ident,'A conventional app stole focus'
+                    state=wait_windows(4);assert state['layout']['focus']==ident,'A conventional app stole focus'
                     revision=state['layout']['revision']
                     assert not control_call({'op':'place','id':ident,'expected_revision':revision-1,'placement':{'mode':'maximized'}})['ok']
                     revision=snapshot()['layout']['revision']

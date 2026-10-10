@@ -12,6 +12,10 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         let mut frame=Frame{connected:true,..Frame::default()};
         let bindings=transport::request(&socket,&json!({"op":"binding.snapshot","surface_id":"native-fixture"})).unwrap();frame.bindings.insert("native-fixture".into(),bindings);
         let (commands,rx)=mpsc::channel();let drafts=Arc::new(Mutex::new(BTreeMap::new()));
+        frame.core=transport::request(&socket,&json!({"op":"snapshot"})).unwrap();frame.activity=doc["activity_id"].as_str().map(String::from);frame.usage=json!({"unavailable":true});frame.broker=json!([]);
+        let mut controls=controls::Controls::new(app,commands.clone());controls.verify_controls(&frame,&commands);
+        assert!(rx.try_iter().any(|c|matches!(c,Command::Ask{prompt,..} if prompt=="Explicit native request λ")));
+
         let mut surface=Surface::new(app,"native-fixture",&commands);surface.update("native-fixture",&doc,&frame,&commands,&drafts);
         let paintable=gtk::WidgetPaintable::new(Some(&surface.scroll));let quit=app.clone();let capture=capture.clone();
         glib::timeout_add_local_once(Duration::from_millis(std::env::var("AGENT_OS_NATIVE_TEST_DELAY_MS").ok().and_then(|s|s.parse::<u64>().ok()).unwrap_or(700).clamp(700,10000)),move || {

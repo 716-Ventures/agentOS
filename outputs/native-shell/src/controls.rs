@@ -25,6 +25,7 @@ pub struct Controls {
     review: gtk::ApplicationWindow,
     transcript: TextField,
     review_ready: bool,
+    request_field: TextField,
 }
 impl Controls {
     pub fn new(app: &gtk::Application, commands: Sender<Command>) -> Self {
@@ -44,10 +45,17 @@ impl Controls {
         widget.append(&setup);
         let appearance = gtk::DropDown::from_strings(&["Dark", "Light"]);
         let scale = gtk::SpinButton::with_range(1.0, 3.0, 0.25);
-        scale.set_value(1.0);
+        let preferences = super::preferences::read();
+        scale.set_value(preferences["text_scale"].as_f64().unwrap_or(1.0));
+        appearance.set_selected(if preferences["appearance"] == "light" {
+            1
+        } else {
+            0
+        });
         let reduced = gtk::CheckButton::with_label("Reduce motion");
         appearance.update_property(&[gtk::accessible::Property::Label("Appearance")]);
         scale.update_property(&[gtk::accessible::Property::Label("Text scale")]);
+        reduced.set_active(preferences["reduced_motion"] == true);
         let appearance_row = ui::row(12);
         appearance_row.append(&appearance);
         appearance_row.append(&ui::text("Text scale", false));
@@ -55,6 +63,7 @@ impl Controls {
         appearance_row.append(&reduced);
         widget.append(&appearance_row);
         let (a, s, r) = (appearance.clone(), scale.clone(), reduced.clone());
+        let sender = commands.clone();
         let theme = Rc::new(move || {
             if let Some(display) = gtk::gdk::Display::default() {
                 ui::install_theme(
@@ -67,8 +76,10 @@ impl Controls {
                     s.value(),
                     r.is_active(),
                 );
+                let _=sender.send(Command::Preferences(json!({"appearance":if a.selected()==0{"dark"}else{"light"},"text_scale":s.value(),"reduced_motion":r.is_active()})));
             }
         });
+        theme();
         let change = theme.clone();
         appearance.connect_selected_notify(move |_| change());
         let change = theme.clone();
@@ -90,12 +101,17 @@ impl Controls {
                 let _ = commands_now.send(Command::SelectActivity(id.clone()));
             }
         });
-        let activity_row = ui::row(12);
-        activity_row.append(&chooser);
+        let activity_row = gtk::FlowBox::new();
+        activity_row.set_selection_mode(gtk::SelectionMode::None);
+        activity_row.set_max_children_per_line(3);
+        activity_row.set_min_children_per_line(1);
+        activity_row.set_column_spacing(12);
+        activity_row.set_row_spacing(12);
+        activity_row.insert(&chooser, -1);
         let name = TextField::new("New activity", "Activity name", "");
-        activity_row.append(&name.widget);
+        activity_row.insert(&name.widget, -1);
         let new = ui::button("Create activity", ButtonVariant::Outline, false);
-        activity_row.append(&new);
+        activity_row.insert(&new, -1);
         let commands_now = commands.clone();
         new.connect_clicked(move |_| {
             if !name.entry.text().trim().is_empty() {
@@ -254,7 +270,19 @@ impl Controls {
             review,
             transcript,
             review_ready: false,
+            request_field: request,
         }
+    }
+    pub fn verify_controls(&mut self, frame: &Frame, commands: &Sender<Command>) {
+        self.update(frame, commands);
+        assert!(self.chooser.selected() != gtk::INVALID_LIST_POSITION);
+        self.request_field
+            .entry
+            .set_text("Explicit native request λ");
+        self.request_field.entry.emit_activate();
+        assert!(self.rows.values().all(|row| !row.stop.is_sensitive()));
+        assert!(!self.model_text.text().is_empty());
+        self.present();
     }
     pub fn context(&self, context: Value) {
         *self.voice_context.borrow_mut() = context;

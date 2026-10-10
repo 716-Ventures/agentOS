@@ -1,5 +1,6 @@
 //! Native shell client: stable GTK controls over the core's inert presentation API.
 mod controls;
+mod preferences;
 mod transport;
 mod verification;
 mod voice;
@@ -485,12 +486,13 @@ fn main() {
         let content = ui::column(12);
         content.append(&bar);
         content.append(&controls.borrow().widget);
+        let scroll=gtk::ScrolledWindow::builder().hscrollbar_policy(gtk::PolicyType::Never).child(&content).build();
         let main = gtk::ApplicationWindow::builder()
             .application(app)
             .title("agentOS")
             .default_width(800)
             .default_height(330)
-            .child(&content)
+            .child(&scroll)
             .build();
         main.add_css_class("seven-ui");
         main.present();
