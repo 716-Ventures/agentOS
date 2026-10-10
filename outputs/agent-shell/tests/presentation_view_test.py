@@ -61,6 +61,15 @@ class Projection(unittest.TestCase):
         doc['elements']['root']['slots']['children']+=['rich','chart'];lines,controls=view.project(doc);text='\n'.join(lines)
         self.assertIn('<b>日本語</b> λ',text);self.assertIn('Loss: -2.5',text);self.assertIn('Gain: 7',text)
         self.assertNotIn('rich',controls);self.assertNotIn('chart',controls)
+    def test_view_references_have_explicit_sanitized_navigation_controls(self):
+        doc=document()
+        for kind in ('DocumentReference@1','ApplicationReference@1'):
+            doc['elements']['reference']={'type':kind,'props':{'label':'Related 日本語\x1b]52;c;evil\x07','target':'view-target'}}
+            doc['elements']['root']['slots']['children'].append('reference')
+            lines,controls=view.project(doc)
+            self.assertIn('Related 日本語 → view-target','\n'.join(lines));self.assertNotIn('evil','\n'.join(lines))
+            self.assertEqual(controls['reference']['type'],kind)
+            doc['elements']['root']['slots']['children'].remove('reference')
     def test_images_have_inert_labeled_terminal_fallbacks(self):
         doc=document();doc['elements']['image']={'type':'Image@1','props':{'label':'Blue pixel 日本語','reference':'resource-'+'a'*32}}
         doc['elements']['root']['slots']['children'].append('image');lines,controls=view.project(doc)

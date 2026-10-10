@@ -53,7 +53,8 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
             image_reference='resource-'+'b'*32
             call({'op':'resource.publish','activity_id':str(activity),'reference':image_reference,'label':'Native blue pixel','png_hex':(ROOT.parent/'agent-shell/tests/fixtures/pixel.png').read_bytes().hex()})
             doc={'protocol':'agentos.presentation/1','catalog_revision':'native-core/1','surface_id':'native-fixture','activity_id':str(activity),'revision':0,'title':'Native presentation fixture','root':'root','elements':{
-                'root':{'type':'Stack@1','props':{'spacing':'relaxed'},'slots':{'children':['reading','field','status','button','link','progress','table','list','details','image']}},
+                'root':{'type':'Stack@1','props':{'spacing':'relaxed'},'slots':{'children':['reading','field','status','button','link','progress','table','list','details','image','reference']}},
+                'reference':{'type':'DocumentReference@1','props':{'label':'Open this shared document','target':'native-fixture'}},
                 'image':{'type':'Image@1','props':{'label':'Native blue pixel','reference':image_reference}},
                 'reading':{'type':'Text@1','props':{'text':'Native café · 日本語 · select this text'}},
                 'field':{'type':'TextField@1','props':{'label':'Editable local draft','value':'Original draft'}},

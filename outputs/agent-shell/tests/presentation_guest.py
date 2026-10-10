@@ -112,6 +112,16 @@ def main():
             revoked=call({**invocation,'request_id':'revoked-click','expected_source_revision':metadata['source_revision']})
             assert not revoked['ok'],revoked
             assert ok({'op':'presentation.snapshot'})['documents']['surface-fixture']['revision']==2
+            app='reference-app'
+            ok({'op':'host.surface','surface_id':app,'activity_id':str(activity),'title':'Reference application','app_id':'org.example.Reference','connected':True})
+            reference_doc={'protocol':PROTOCOL,'catalog_revision':CATALOG,'surface_id':'references','activity_id':str(activity),'revision':0,'title':'References','root':'root','elements':{'root':{'type':'Stack@1','slots':{'children':['document','application']}},'document':{'type':'DocumentReference@1','props':{'label':'Open fixture','target':'surface-fixture'}},'application':{'type':'ApplicationReference@1','props':{'label':'Open application','target':app}}},'bindings':{},'actions':{}}
+            reference_create={'op':'presentation.apply','protocol':PROTOCOL,'catalog_revision':CATALOG,'request_id':'reference-document','expected_revisions':{'references':None},'operations':[{'op':'surface.create','document':reference_doc}]}
+            ok(reference_create)
+            reference_query={'op':'presentation.reference','surface_id':'references','element_id':'application','source_revision':0}
+            assert ok(reference_query)['target']==app
+            assert not other(reference_query,agent=True)['ok']
+            ok({'op':'host.surface','surface_id':app,'activity_id':str(activity),'title':'Reference application','app_id':'org.example.Reference','connected':False})
+            missing=call(reference_query);assert not missing['ok'] and 'missing_reference' in missing['error']
             output_job=ok({'op':'run','activity_id':activity,'argv':['/bin/echo','Callback λ 日本語']})['id']
             deadline=time.monotonic()+5
             while next(j for j in ok({'op':'snapshot'})['jobs'] if j['id']==output_job)['status']!='succeeded':
@@ -154,7 +164,7 @@ def main():
             old=call({'op':'presentation.page','activity_id':str(activity),'expected_cursor':first_page['event_cursor'],'after_id':first_page['next_after_id']})
             assert not old['ok'] and 'resync_required' in old['error'],old
             paged=presentation_view.presentation_pages.read(terminal_request,activity)
-            assert len(paged['documents'])==72 and paged['documents']==ok({'op':'presentation.snapshot'})['documents']
+            assert len(paged['documents'])==73 and paged['documents']==ok({'op':'presentation.snapshot'})['documents']
             single=ok({'op':'presentation.get','document_id':'paged-069','activity_id':str(activity)})
             assert single['surface_id']=='paged-069'
             cache=presentation_view.presentation_pages.Cache()

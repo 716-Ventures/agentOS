@@ -38,6 +38,7 @@ struct Element {
     label: Option<gtk::Label>,
     rich: Option<ui::RichText>,
     image: Option<ui::ImageView>,
+    reference: Option<ui::ReferenceView>,
     image_attempted: bool,
     chart: Option<ui::BoundedChart>,
     field: Option<TextField>,
@@ -135,6 +136,7 @@ fn construct(
         label: None,
         rich: None,
         image: None,
+        reference: None,
         image_attempted: false,
         chart: None,
         field: None,
@@ -157,6 +159,24 @@ fn construct(
         children: Vec::new(),
     };
     match kind.as_str() {
+        "DocumentReference@1" | "ApplicationReference@1" => {
+            let reference = ui::ReferenceView::new(props["label"].as_str().unwrap()).unwrap();
+            let (state, sender, element) = (events.clone(), commands.clone(), id.to_string());
+            reference.on_open(move || {
+                let state = state.borrow();
+                if let (Some(surface), Some(revision)) =
+                    (state["surface"].as_str(), state["revision"].as_u64())
+                {
+                    let _ = sender.send(Command::Navigate {
+                        surface: surface.into(),
+                        element: element.clone(),
+                        revision,
+                    });
+                }
+            });
+            result.widget = reference.widget.clone().upcast();
+            result.reference = Some(reference);
+        }
         "Image@1" => {
             let reference = props["reference"].as_str().unwrap();
             let label = props["label"].as_str().unwrap();
@@ -1010,6 +1030,20 @@ impl Surface {
                     let key = node["events"]["submit"]["action"].as_str().unwrap_or("");
                     let action = doc["actions"][key]["ref"].as_str();
                     *e.events.borrow_mut() = json!({"host_reference":action,"surface":id,"revision":doc["revision"],"action":key,"parameters":doc["actions"][key]["parameters"]});
+                }
+                if let Some(reference) = &e.reference {
+                    let target = props["target"].as_str().unwrap();
+                    let available = if e.kind == "DocumentReference@1" {
+                        frame.documents.get(target).is_some_and(|target| {
+                            target.get("surface_id").is_some()
+                                && target["activity_id"] == doc["activity_id"]
+                        })
+                    } else {
+                        frame.host_surfaces[target]["availability"] == "available"
+                            && frame.host_surfaces[target]["activity_id"] == doc["activity_id"]
+                    };
+                    let _ = reference.reconcile(props["label"].as_str().unwrap(), available);
+                    *e.events.borrow_mut() = json!({"surface":id,"revision":doc["revision"]});
                 }
                 if let Some(button) = &e.button {
                     button.set_label(props["label"].as_str().unwrap_or("Action"));

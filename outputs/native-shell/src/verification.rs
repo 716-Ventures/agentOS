@@ -270,6 +270,13 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             println!("CHECK: mapped native surface");
             let image=surface.elements["image"].image.as_ref().unwrap();assert!(image.picture.paintable().is_some());assert_eq!(image.caption.text(),"Native blue pixel");
             println!("CHECK: authenticated immutable image resource and native texture");
+            let reference=surface.elements["reference"].reference.as_ref().unwrap();assert!(reference.widget.is_sensitive());reference.widget.emit_clicked();
+            assert!(rx.try_iter().any(|c|matches!(c,Command::Navigate{surface,element,revision} if surface=="native-fixture" && element=="reference" && revision==doc["revision"].as_u64().unwrap())));
+            let mut missing=frame.clone();missing.documents.remove("native-fixture");surface.update("native-fixture",&doc,&missing,&commands,&drafts);
+            assert!(!surface.elements["reference"].reference.as_ref().unwrap().widget.is_sensitive());
+            surface.update("native-fixture",&doc,&frame,&commands,&drafts);
+            assert!(surface.elements["reference"].reference.as_ref().unwrap().widget.is_sensitive());
+            println!("CHECK: reference intent, revision and target disappearance/reappearance");
             let table=surface.elements["table"].table.as_ref().unwrap();assert_eq!(table.row_count(),200);assert!(table.select_key("row-7"));assert_eq!(table.selected_key().as_deref(),Some("row-7"));
             let list=surface.elements["list"].list.as_ref().unwrap();assert_eq!(list.row_count(),200);assert!(list.select_key("item-7"));assert_eq!(list.selected_key().as_deref(),Some("item-7"));
             assert_eq!(surface.elements["details"].list.as_ref().unwrap().row_count(),2);

@@ -240,6 +240,13 @@ enum Operation {
         workspace_id: String,
         edit: workspace::Edit,
     },
+    #[serde(rename = "workspace.navigate")]
+    Navigate {
+        workspace_id: String,
+        surface_id: String,
+        element_id: String,
+        source_revision: u64,
+    },
     #[serde(rename = "workspace.put")]
     Workspace { document: WorkspaceDocument },
 }
@@ -248,7 +255,9 @@ impl Operation {
         match self {
             Self::Create { document } | Self::Replace { document } => &document.surface_id,
             Self::Workspace { document } => &document.workspace_id,
-            Self::WorkspaceEdit { workspace_id, .. } => workspace_id,
+            Self::WorkspaceEdit { workspace_id, .. } | Self::Navigate { workspace_id, .. } => {
+                workspace_id
+            }
             Self::Close { surface_id }
             | Self::Put { surface_id, .. }
             | Self::Remove { surface_id, .. }
@@ -412,6 +421,9 @@ fn walk_elements(
     }
     if node.kind == "Split@1" && node.slots.get("children").map(Vec::len) != Some(2) {
         return Err(invalid("Split requires exactly two children"));
+    }
+    if is_reference(&node.kind) && !ident(node.props["target"].as_str().unwrap()) {
+        return Err(invalid("Reference requires a local view identity"));
     }
     if node.kind == "Link@1" {
         let url = node.props["url"].as_str().unwrap();
@@ -666,7 +678,38 @@ fn validate(
             continue;
         }
         match d {
-            Document::Surface(s) => surface_valid(db, s, principal)?,
+            Document::Surface(s) => {
+                surface_valid(db, s, principal)?;
+                for (id, element) in s.elements.iter().filter(|(_, e)| is_reference(&e.kind)) {
+                    let target = element.props["target"].as_str().unwrap();
+                    if reference_target(db, docs, s, element).is_err() {
+                        // An existing reference can outlive its target. Preserve its
+                        // disabled representation without preventing user closure.
+                        let old: Option<String> = db
+                            .query_row(
+                                "SELECT body FROM presentation_documents WHERE id=?",
+                                [&s.surface_id],
+                                |r| r.get(0),
+                            )
+                            .optional()
+                            .map_err(db_error)?;
+                        let retained = old
+                            .and_then(|raw| serde_json::from_str::<SurfaceDocument>(&raw).ok())
+                            .and_then(|old| old.elements.get(id).cloned())
+                            .is_some_and(|old| {
+                                old.kind == element.kind
+                                    && old.props.get("target").and_then(Value::as_str)
+                                        == Some(target)
+                            });
+                        if !retained {
+                            return Err(error(
+                                "missing_reference",
+                                "Reference target must exist in the same activity",
+                            ));
+                        }
+                    }
+                }
+            }
             Document::Workspace(w) => {
                 if w.protocol != PROTOCOL || !ident(&w.workspace_id) {
                     return Err(invalid("Workspace protocol/identity mismatch"));
@@ -1340,6 +1383,50 @@ fn apply(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> {
                 surface_mut(&mut after, &id)?;
                 after.remove(&id);
             }
+            Operation::Navigate {
+                surface_id,
+                element_id,
+                source_revision,
+                ..
+            } => {
+                if !who.human() {
+                    return Err(error(
+                        "unauthorized",
+                        "Reference navigation requires user input",
+                    ));
+                }
+                let source = match after.get(&surface_id) {
+                    Some(Document::Surface(source)) if source.revision == source_revision => source,
+                    Some(_) => return Err(error("stale_revision", "Reference source changed")),
+                    None => return Err(error("missing_reference", "Reference source unavailable")),
+                };
+                let element = source
+                    .elements
+                    .get(&element_id)
+                    .filter(|e| is_reference(&e.kind))
+                    .ok_or_else(|| error("missing_reference", "Reference element unavailable"))?;
+                let active:bool=tx.query_row("SELECT EXISTS(SELECT 1 FROM activities WHERE CAST(id AS TEXT)=? AND id NOT IN (SELECT activity_id FROM removed_activities))",[&source.activity_id],|r|r.get(0)).map_err(db_error)?;
+                if !active {
+                    return Err(error("missing_reference", "Activity unavailable"));
+                }
+                let target = reference_target(&tx, &after, source, element)?;
+                let activity = source.activity_id.clone();
+                match after.get_mut(&id) {
+                    Some(Document::Workspace(w)) if w.activity_id == activity => workspace::apply(
+                        w,
+                        workspace::Edit::Focus {
+                            surface_id: target,
+                            element_id: None,
+                        },
+                    )?,
+                    _ => {
+                        return Err(error(
+                            "missing_reference",
+                            "Workspace unavailable in this activity",
+                        ))
+                    }
+                }
+            }
             Operation::WorkspaceEdit { edit, .. } => {
                 if !who.human() {
                     return Err(error(
@@ -1576,6 +1663,95 @@ fn commit(
     .map_err(db_error)?;
     Ok(receipt)
 }
+fn is_reference(kind: &str) -> bool {
+    matches!(kind, "DocumentReference@1" | "ApplicationReference@1")
+}
+fn reference_target(
+    db: &Connection,
+    docs: &BTreeMap<String, Document>,
+    source: &SurfaceDocument,
+    element: &Element,
+) -> Result<String> {
+    let target = element.props["target"]
+        .as_str()
+        .filter(|id| ident(id))
+        .ok_or_else(|| invalid("Invalid reference identity"))?;
+    if element.kind == "DocumentReference@1" {
+        match docs.get(target) {
+            Some(Document::Surface(s)) if s.activity_id == source.activity_id => {}
+            _ => {
+                return Err(error(
+                    "missing_reference",
+                    "Document unavailable in this activity",
+                ))
+            }
+        }
+    } else if element.kind == "ApplicationReference@1" {
+        let observed = crate::presentation_hosts::source(db, target)
+            .map_err(db_error)?
+            .ok_or_else(|| error("missing_reference", "Application unavailable"))?;
+        if observed["activity_id"].as_str() != Some(source.activity_id.as_str())
+            || observed["availability"] != "available"
+        {
+            return Err(error(
+                "missing_reference",
+                "Application unavailable in this activity",
+            ));
+        }
+    } else {
+        return Err(invalid("Element is not a view reference"));
+    }
+    Ok(target.into())
+}
+fn resolve_reference(db: &Connection, v: &Value, who: &Principal) -> Result<Value> {
+    if !who.human() {
+        return Err(error(
+            "unauthorized",
+            "Reference navigation requires user input",
+        ));
+    }
+    let id = v["surface_id"]
+        .as_str()
+        .ok_or_else(|| invalid("Source required"))?;
+    let mut docs = BTreeMap::new();
+    let raw:Option<String>=db.query_row("SELECT CASE WHEN length(CAST(body AS BLOB))<=1048576 THEN body END FROM presentation_documents WHERE id=?",[id],|r|r.get(0)).optional().map_err(db_error)?.flatten();
+    let raw = raw.ok_or_else(|| error("missing_reference", "Bounded source unavailable"))?;
+    let document: Document = serde_json::from_str(&raw).map_err(db_error)?;
+    if let Document::Surface(source) = &document {
+        if let Some(target) = v["element_id"]
+            .as_str()
+            .and_then(|id| source.elements.get(id))
+            .and_then(|e| e.props.get("target"))
+            .and_then(Value::as_str)
+        {
+            let target_body:Option<String>=db.query_row("SELECT CASE WHEN length(CAST(body AS BLOB))<=1048576 THEN body END FROM presentation_documents WHERE id=?",[target],|r|r.get(0)).optional().map_err(db_error)?.flatten();
+            if let Some(raw) = target_body {
+                docs.insert(
+                    target.to_string(),
+                    serde_json::from_str(&raw).map_err(db_error)?,
+                );
+            }
+        }
+    }
+    docs.insert(id.to_string(), document);
+    let source = match docs.get(id) {
+        Some(Document::Surface(source)) => source,
+        _ => return Err(error("missing_reference", "Source unavailable")),
+    };
+    if v["source_revision"].as_u64() != Some(source.revision) {
+        return Err(error("stale_revision", "Reference source changed"));
+    }
+    let active:bool=db.query_row("SELECT EXISTS(SELECT 1 FROM activities WHERE CAST(id AS TEXT)=? AND id NOT IN (SELECT activity_id FROM removed_activities))",[&source.activity_id],|r|r.get(0)).map_err(db_error)?;
+    if !active {
+        return Err(error("missing_reference", "Activity unavailable"));
+    }
+    let element = v["element_id"]
+        .as_str()
+        .and_then(|id| source.elements.get(id))
+        .ok_or_else(|| error("missing_reference", "Reference element unavailable"))?;
+    let target = reference_target(db, &docs, source, element)?;
+    Ok(json!({"target":target,"kind":element.kind,"activity_id":source.activity_id}))
+}
 pub fn handle(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> {
     match v["op"].as_str().unwrap_or("") {
         "catalog.get" => Ok(catalog()),
@@ -1600,6 +1776,7 @@ pub fn handle(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> 
         "presentation.get" => get_document(db, v),
         "presentation.changes" => changes(db, v),
         "presentation.apply" => apply(db, v, who),
+        "presentation.reference" => resolve_reference(db, v, who),
         "presentation.subscribe" => {
             let cursor = match v.get("after_cursor") {
                 None => 0,
@@ -1947,6 +2124,68 @@ mod tests {
     }
     fn props(request: &str, revision: u64, element: &str, text: &str) -> Value {
         json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":request,"expected_revisions":{"surface-a":revision},"operations":[{"op":"element.set_props","surface_id":"surface-a","element_id":element,"props":{"text":text}}]})
+    }
+    #[test]
+    fn references_are_scoped_guarded_and_survive_target_closure() {
+        let mut db = fixture();
+        create(&mut db);
+        let mut doc = surface();
+        doc["surface_id"] = json!("links");
+        doc["elements"]["text"] = json!({"type":"DocumentReference@1","props":{"label":"Open work","target":"surface-a"}});
+        let create_link = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"links","expected_revisions":{"links":null},"operations":[{"op":"surface.create","document":doc}]});
+        let mut foreign = create_link.clone();
+        foreign["operations"][0]["document"]["activity_id"] = json!("2");
+        assert!(handle(&mut db, &foreign, &agent())
+            .unwrap_err()
+            .contains("missing_reference"));
+        let mut path = create_link.clone();
+        path["operations"][0]["document"]["elements"]["text"]["props"]["target"] =
+            json!("/etc/passwd");
+        assert!(handle(&mut db, &path, &agent()).is_err());
+        handle(&mut db, &create_link, &agent()).unwrap();
+        let query = json!({"op":"presentation.reference","surface_id":"links","element_id":"text","source_revision":0});
+        assert!(handle(&mut db, &query, &agent())
+            .unwrap_err()
+            .contains("unauthorized"));
+        assert_eq!(
+            handle(&mut db, &query, &human()).unwrap()["target"],
+            "surface-a"
+        );
+        let mut stale = query.clone();
+        stale["source_revision"] = json!(1);
+        assert!(handle(&mut db, &stale, &human())
+            .unwrap_err()
+            .contains("stale_revision"));
+        let root = Principal {
+            uid: 0,
+            session: "compositor".into(),
+        };
+        handle(
+            &mut db,
+            &json!({"op":"outputs.register","output_id":"output-a","width":1920,"height":1080}),
+            &root,
+        )
+        .unwrap();
+        handle(&mut db,&json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"reference-workspace","expected_revisions":{"workspace-a":null},"operations":[{"op":"workspace.put","document":workspace()}]}),&human()).unwrap();
+        let navigate = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"reference-focus","expected_revisions":{"workspace-a":0},"operations":[{"op":"workspace.navigate","workspace_id":"workspace-a","surface_id":"links","element_id":"text","source_revision":0}]});
+        assert!(handle(&mut db, &navigate, &agent())
+            .unwrap_err()
+            .contains("unauthorized"));
+        let mut stale = navigate.clone();
+        stale["operations"][0]["source_revision"] = json!(1);
+        assert!(handle(&mut db, &stale, &human())
+            .unwrap_err()
+            .contains("stale_revision"));
+        handle(&mut db, &navigate, &human()).unwrap();
+        assert_eq!(
+            snapshot(&db).unwrap()["documents"]["workspace-a"]["focus"]["surface_id"],
+            "surface-a"
+        );
+        handle(&mut db,&json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"close-referenced","expected_revisions":{"workspace-a":1,"surface-a":0},"operations":[{"op":"workspace.edit","workspace_id":"workspace-a","edit":{"kind":"remove","surface_id":"surface-a"}},{"op":"surface.close","surface_id":"surface-a"}]}),&human()).unwrap();
+        assert!(handle(&mut db, &query, &human())
+            .unwrap_err()
+            .contains("missing_reference"));
+        assert!(snapshot(&db).unwrap()["documents"].get("links").is_some());
     }
     #[test]
     fn document_pages_are_bounded_scoped_and_refuse_mixed_revisions() {

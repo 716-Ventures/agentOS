@@ -58,6 +58,7 @@ def project(document,bindings=None,width=80):
         elif kind=='Button@1':
             text=f"[{key}] {props.get('label','Action')}"+(' (disabled)' if props.get('disabled') else '')
             if not props.get('disabled'):controls[key]=node
+        elif kind in ('DocumentReference@1','ApplicationReference@1'):text=f"[{key}] {props['label']} → {props['target']}";controls[key]=node
         elif kind=='Link@1':text=f"[{key}] {props.get('label','Link')} — {props.get('url','')}";controls[key]=node
         else:text=f'Unsupported control: {kind}'
         for line in clean(text).splitlines() or ['']:lines.extend(textwrap.wrap(line,max(20,width),replace_whitespace=False) or [''])
@@ -261,6 +262,10 @@ def interact(activity,request,input_fn=input,output=print):
             if choice not in controls:output('Choose a listed control ID.');continue
             node=controls[choice]
             if node['type']=='Link@1':output(clean(node.get('props',{}).get('url','')))
+            elif node['type'] in ('DocumentReference@1','ApplicationReference@1'):
+                resolved=request('presentation.reference',surface_id=selected,element_id=choice,source_revision=document['revision'])
+                if resolved['kind']=='DocumentReference@1':selected=resolved['target'];offset=0
+                else:output('Application view: '+clean(resolved['target'])+' (use the native desktop to focus it)')
             elif node['type'] in ('TextField@1','Choice@1','Toggle@1'):edit(request,document,choice,input_fn,output)
             else:
                 receipt=invoke(request,document,choice);output(clean(json.dumps(receipt,ensure_ascii=False,indent=2)))

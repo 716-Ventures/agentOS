@@ -14,9 +14,11 @@
     "format": 1
   },
   "components": [
+    "ApplicationReference@1",
     "Button@1",
     "Chart@1",
     "Choice@1",
+    "DocumentReference@1",
     "Image@1",
     "KeyValue@1",
     "Link@1",

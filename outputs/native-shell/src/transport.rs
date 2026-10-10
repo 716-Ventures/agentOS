@@ -82,6 +82,11 @@ pub struct Frame {
 #[derive(Debug)]
 pub enum Command {
     RegisterRenderer(String),
+    Navigate {
+        surface: String,
+        element: String,
+        revision: u64,
+    },
     Approve(Value),
     Resume(Value),
     ReviewInput {
@@ -285,6 +290,7 @@ fn run(
                     Command::Resume(job)=>super::broker_controls::job_id(&job).and_then(|id|request(&broker_socket(),&json!({"op":"poll","job_id":id}))).and_then(|current|super::broker_controls::continuation_request(&current).ok_or("No approved agent request is associated with this work".into())).and_then(|query|request(&socket,&query)),
                     Command::Attach(job)=>super::broker_controls::attach(&job),
                     Command::OpenTerminal=>super::broker_controls::open_terminal(),
+                    Command::Navigate{surface,element,revision}=>{let current=frame.lock().unwrap().clone();navigate(&socket,&current,&surface,&element,revision).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt})},
                     Command::WorkspaceEdit{workspace,revision,edit}=>request(&socket,&json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("workspace-{}",super::nonce()),"expected_revisions":{workspace.clone():revision},"operations":[{"op":"workspace.edit","workspace_id":workspace,"edit":edit}]})).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt}),
                     Command::WorkspaceUndo(cursor)=>request(&socket,&json!({"op":"presentation.undo","event_cursor":cursor,"request_id":format!("undo-{}",super::nonce())})).map(|receipt|{frame.lock().unwrap().workspace_undo=None;receipt}),
                     Command::RegisterRenderer(surface)=>request(&socket,&json!({"op":"host.renderer","surface_id":surface})),
@@ -832,4 +838,47 @@ fn resolve_draft(
         );
     }
     Ok(receipt)
+}
+
+fn navigate(
+    socket: &PathBuf,
+    frame: &Frame,
+    surface: &str,
+    element: &str,
+    revision: u64,
+) -> Result<Value, String> {
+    let resolved = request(
+        socket,
+        &json!({"op":"presentation.reference","surface_id":surface,"element_id":element,"source_revision":revision}),
+    )?;
+    let target = resolved["target"]
+        .as_str()
+        .ok_or("Invalid navigation target")?;
+    fn contains(value: &Value, target: &str) -> bool {
+        match value {
+            Value::Object(map) => {
+                map.get("surface_id").and_then(Value::as_str) == Some(target)
+                    || map.values().any(|value| contains(value, target))
+            }
+            Value::Array(values) => values.iter().any(|value| contains(value, target)),
+            Value::String(id) => id == target,
+            _ => false,
+        }
+    }
+    let workspace = frame
+        .documents
+        .values()
+        .find(|doc| {
+            doc.get("workspace_id").is_some()
+                && doc["activity_id"] == resolved["activity_id"]
+                && contains(&doc["outputs"], target)
+        })
+        .ok_or("Referenced view has no current workspace placement")?;
+    let id = workspace["workspace_id"]
+        .as_str()
+        .ok_or("Invalid workspace identity")?;
+    request(
+        socket,
+        &json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("navigate-{}",super::nonce()),"expected_revisions":{id:workspace["revision"]},"operations":[{"op":"workspace.navigate","workspace_id":id,"surface_id":surface,"element_id":element,"source_revision":revision}]}),
+    )
 }
