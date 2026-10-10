@@ -39,6 +39,29 @@ impl XdgShellHandler for Smallvil {
         self.space.map_element(window, (0, 0), false);
     }
 
+    fn maximize_request(&mut self, surface: ToplevelSurface) {
+        let id = format!("{:?}", surface.wl_surface().id());
+        let _ = self.policy.change(
+            &id,
+            crate::policy::Placement::Maximized,
+            self.policy.current.revision,
+        );
+        surface.with_pending_state(|state| state.states.set(xdg_toplevel::State::Maximized));
+        surface.send_pending_configure();
+        self.arrange();
+    }
+    fn unmaximize_request(&mut self, surface: ToplevelSurface) {
+        let id = format!("{:?}", surface.wl_surface().id());
+        let _ = self.policy.change(
+            &id,
+            crate::policy::Placement::Tiled,
+            self.policy.current.revision,
+        );
+        surface.with_pending_state(|state| state.states.unset(xdg_toplevel::State::Maximized));
+        surface.send_pending_configure();
+        self.arrange();
+    }
+
     fn new_popup(&mut self, surface: PopupSurface, _positioner: PositionerState) {
         self.unconstrain_popup(&surface);
         let _ = self.popups.track_popup(PopupKind::Xdg(surface));
@@ -74,6 +97,20 @@ impl XdgShellHandler for Smallvil {
                 .unwrap()
                 .clone();
             let initial_window_location = self.space.element_location(&window).unwrap();
+            let size = window.geometry().size;
+            let id = format!("{:?}", wl_surface.id());
+            let _ = self.policy.change(
+                &id,
+                crate::policy::Placement::Floating {
+                    rect: crate::policy::Rect {
+                        x: initial_window_location.x,
+                        y: initial_window_location.y,
+                        width: size.w.max(80),
+                        height: size.h.max(32),
+                    },
+                },
+                self.policy.current.revision,
+            );
 
             let grab = MoveSurfaceGrab {
                 start_data,
@@ -106,6 +143,21 @@ impl XdgShellHandler for Smallvil {
                 .unwrap()
                 .clone();
             let initial_window_location = self.space.element_location(&window).unwrap();
+            let size = window.geometry().size;
+            let id = format!("{:?}", wl_surface.id());
+            let _ = self.policy.change(
+                &id,
+                crate::policy::Placement::Floating {
+                    rect: crate::policy::Rect {
+                        x: initial_window_location.x,
+                        y: initial_window_location.y,
+                        width: size.w.max(80),
+                        height: size.h.max(32),
+                    },
+                },
+                self.policy.current.revision,
+            );
+
             let initial_window_size = window.geometry().size;
 
             surface.with_pending_state(|state| {

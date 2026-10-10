@@ -7,7 +7,7 @@ use smithay::{
         GestureSwipeEndEvent, GestureSwipeUpdateEvent, GrabStartData as PointerGrabStartData,
         MotionEvent, PointerGrab, PointerInnerHandle, RelativeMotionEvent,
     },
-    reexports::wayland_server::protocol::wl_surface::WlSurface,
+    reexports::wayland_server::{protocol::wl_surface::WlSurface, Resource},
     utils::{Logical, Point},
 };
 
@@ -32,6 +32,14 @@ impl PointerGrab<Smallvil> for MoveSurfaceGrab {
         let new_location = self.initial_window_location.to_f64() + delta;
         data.space
             .map_element(self.window.clone(), new_location.to_i32_round(), true);
+        let id = format!("{:?}", self.window.toplevel().unwrap().wl_surface().id());
+        if let Some(crate::policy::Placement::Floating { rect }) =
+            data.policy.current.placements.get_mut(&id)
+        {
+            rect.x = new_location.x.round() as i32;
+            rect.y = new_location.y.round() as i32;
+            data.policy.current.revision += 1;
+        }
     }
 
     fn relative_motion(

@@ -79,3 +79,13 @@ jobs:
         run: |
           cargo +1.85.1 test --locked --manifest-path outputs/native-compositor/Cargo.toml
           cargo +1.85.1 build --locked --manifest-path outputs/native-compositor/Cargo.toml
+      - name: Native and conventional clients in agentOS compositor
+        run: |
+          cargo +1.85.1 build --locked --manifest-path outputs/native-shell/Cargo.toml
+          cargo +1.85.1 build --release --locked --manifest-path outputs/agent-shell/Cargo.toml
+          dbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py --compositor
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: compositor-arm64
+          path: outputs/native-shell/test-output/

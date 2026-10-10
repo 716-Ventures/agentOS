@@ -230,6 +230,10 @@ impl Surface {
             .child(&scroll)
             .build();
         window.add_css_class("seven-ui");
+        scroll.set_margin_top(24);
+        scroll.set_margin_bottom(24);
+        scroll.set_margin_start(24);
+        scroll.set_margin_end(24);
         let (surface, commands) = (id.to_string(), commands.clone());
         window.connect_close_request(move |_| {
             let _ = commands.send(Command::Close {

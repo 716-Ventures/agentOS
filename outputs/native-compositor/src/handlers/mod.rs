@@ -35,6 +35,16 @@ impl SeatHandler for Smallvil {
     }
 
     fn focus_changed(&mut self, seat: &Seat<Self>, focused: Option<&WlSurface>) {
+        let focus = focused.map(|s| format!("{:?}", s.id()));
+        if focus
+            .as_ref()
+            .map(|id| self.policy.current.placements.contains_key(id))
+            .unwrap_or(true)
+            && self.policy.current.focus != focus
+        {
+            self.policy.current.focus = focus;
+            self.policy.current.revision += 1;
+        }
         let dh = &self.display_handle;
         let client = focused.and_then(|s| dh.get_client(s.id()).ok());
         set_data_device_focus(dh, seat, client);

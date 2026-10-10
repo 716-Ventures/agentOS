@@ -158,7 +158,16 @@ fn run(
                         if prompt.trim().is_empty() || prompt.len()>16000 {Err("Enter a request up to 16 KiB".into())}
                         else {
                             let mut argv=vec!["/usr/bin/python3".to_string(),"-u".into(),"/usr/local/lib/agent-os/services/worker.py".into(),"ask".into(),activity.to_string(),prompt];
-                            if let Some(context)=grounding {argv.extend(["--grounding".into(),context.to_string()]);}
+                            if let Some(context)=grounding {
+                                let surface=context["surface_id"].as_str().unwrap_or("");
+                                if surface!="native-launcher" {
+                                    let snapshot=request(&socket,&json!({"op":"presentation.snapshot"}));
+                                    if snapshot.as_ref().map(|s|s["documents"][surface]["activity_id"].as_str()!=Some(activity.to_string().as_str())).unwrap_or(true) {
+                                        frame.lock().unwrap().error=Some("The recorded view was closed or moved; record a new request".into());continue;
+                                    }
+                                }
+                                argv.extend(["--grounding".into(),context.to_string()]);
+                            }
                             request(&socket,&json!({"op":"run","activity_id":activity,"argv":argv}))
                         }
                     },
@@ -181,7 +190,15 @@ fn run(
                     Err(e) => view.error = Some(e),
                     Ok(value) => {
                         view.error = None;
-                        view.notice = Some(format!("{}", value));
+                        view.notice = Some(if let Some(id) = value.get("id") {
+                            format!(
+                                "Work {} · {}",
+                                id,
+                                value["status"].as_str().unwrap_or("accepted")
+                            )
+                        } else {
+                            value["status"].as_str().unwrap_or("Done").to_string()
+                        });
                     }
                 }
             }

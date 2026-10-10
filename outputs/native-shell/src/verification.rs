@@ -14,7 +14,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         let (commands,rx)=mpsc::channel();let drafts=Arc::new(Mutex::new(BTreeMap::new()));
         let mut surface=Surface::new(app,"native-fixture",&commands);surface.update("native-fixture",&doc,&frame,&commands,&drafts);
         let paintable=gtk::WidgetPaintable::new(Some(&surface.scroll));let quit=app.clone();let capture=capture.clone();
-        glib::timeout_add_local_once(Duration::from_millis(700),move || {
+        glib::timeout_add_local_once(Duration::from_millis(std::env::var("AGENT_OS_NATIVE_TEST_DELAY_MS").ok().and_then(|s|s.parse::<u64>().ok()).unwrap_or(700).clamp(700,10000)),move || {
             println!("CHECK: mapped native surface");
             let reading=surface.elements["reading"].label.clone().unwrap();
             let field=surface.elements["field"].field.clone().unwrap();

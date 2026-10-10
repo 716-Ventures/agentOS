@@ -9,7 +9,7 @@ use smithay::{
     },
     reexports::{
         wayland_protocols::xdg::shell::server::xdg_toplevel,
-        wayland_server::protocol::wl_surface::WlSurface,
+        wayland_server::{protocol::wl_surface::WlSurface, Resource},
     },
     utils::{Logical, Point, Rectangle, Size},
     wayland::{compositor, shell::xdg::SurfaceCachedState},
@@ -139,6 +139,20 @@ impl PointerGrab<Smallvil> for ResizeSurfaceGrab {
             state.size = Some(self.last_window_size);
         });
 
+        let id = format!("{:?}", xdg.wl_surface().id());
+        if let Some(crate::policy::Placement::Floating { rect }) =
+            data.policy.current.placements.get_mut(&id)
+        {
+            rect.width = self.last_window_size.w.max(80);
+            rect.height = self.last_window_size.h.max(32);
+            if self.edges.intersects(ResizeEdge::LEFT) {
+                rect.x = self.initial_rect.loc.x + self.initial_rect.size.w - rect.width;
+            }
+            if self.edges.intersects(ResizeEdge::TOP) {
+                rect.y = self.initial_rect.loc.y + self.initial_rect.size.h - rect.height;
+            }
+            data.policy.current.revision += 1;
+        }
         xdg.send_pending_configure();
     }
 
