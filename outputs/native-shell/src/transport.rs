@@ -67,6 +67,7 @@ pub struct Frame {
     pub drafts: BTreeMap<(String, String), Value>,
     pub core: Value,
     pub host_surfaces: Value,
+    pub compositor: Value,
     pub workspace_undo: Option<i64>,
     pub broker: Value,
     pub usage: Value,
@@ -349,6 +350,11 @@ fn run(
                     ..Frame::default()
                 };
                 next.host_surfaces = state["host_surfaces"].clone();
+                if let Some(path) = std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET") {
+                    next.compositor = request(&PathBuf::from(path), &json!({"op":"snapshot"}))
+                        .map(|v| v["shared"].clone())
+                        .unwrap_or_else(|error| json!({"unavailable":error}));
+                }
                 next.core = request(&socket, &json!({"op":"snapshot"}))
                     .unwrap_or_else(|e| json!({"unavailable":e}));
                 next.broker = request(&broker_socket(), &json!({"op":"list"}))

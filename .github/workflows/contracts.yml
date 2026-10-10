@@ -88,6 +88,7 @@ jobs:
       - name: Native and conventional clients in agentOS compositor
         run: |
           cargo +1.85.1 build --locked --manifest-path outputs/native-shell/Cargo.toml
+          cargo +1.85.1 build --locked --manifest-path outputs/native-shell/Cargo.toml --example minimum_client
           cargo +1.85.1 build --release --locked --manifest-path outputs/agent-shell/Cargo.toml
           dbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py --compositor
           dbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py --compositor --shared

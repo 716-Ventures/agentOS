@@ -165,7 +165,7 @@ impl Smallvil {
         use crate::shortcuts::Shortcut;
         let Some(bridge) = &self.bridge else { return };
         let scene = bridge.scene.lock().unwrap().clone();
-        let ids = scene.rectangles.keys().cloned().collect::<Vec<_>>();
+        let ids = scene.visible.iter().cloned().collect::<Vec<_>>();
         if ids.is_empty() {
             return;
         }
@@ -205,7 +205,17 @@ impl Smallvil {
             Shortcut::Maximize => serde_json::json!({"kind":"maximize"}),
             Shortcut::Restore => serde_json::json!({"kind":"restore"}),
             Shortcut::Float | Shortcut::Nudge { .. } => {
-                let mut rect = scene.rectangles[current];
+                let mut rect =
+                    scene
+                        .rectangles
+                        .get(current)
+                        .copied()
+                        .unwrap_or(crate::policy::Rect {
+                            x: 0,
+                            y: 0,
+                            width: 640,
+                            height: 480,
+                        });
                 if let Shortcut::Nudge { x, y, resize } = action {
                     if resize {
                         rect.width += x;
@@ -407,6 +417,13 @@ pub fn observe(window: &Window) -> crate::bridge::Observed {
             data.app_id.clone().unwrap_or_default(),
         )
     });
+    let minimum = smithay::wayland::compositor::with_states(surface, |states| {
+        states
+            .cached_state
+            .get::<smithay::wayland::shell::xdg::SurfaceCachedState>()
+            .current()
+            .min_size
+    });
     let peer = surface.client().and_then(|client| {
         client
             .get_data::<ClientState>()
@@ -419,6 +436,8 @@ pub fn observe(window: &Window) -> crate::bridge::Observed {
         app_id,
         uid,
         session,
+        min_width: minimum.w.max(80),
+        min_height: minimum.h.max(32),
     }
 }
 fn peer_identity(stream: &std::os::unix::net::UnixStream) -> Option<(u32, String)> {

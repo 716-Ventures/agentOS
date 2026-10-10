@@ -144,6 +144,17 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                         assert simple.poll() is None and simple2.poll() is None,'Switching activity terminated work'
                         assert control_call({'op':'workspace.activity','activity_id':str(activity)})['ok']
                         wait_shared(lambda s:next(w for w in s['windows'] if w['id']==ident)['geometry']['width']==1280 and s['layout']['focus']==ident)
+                        minimum=subprocess.Popen([str(ROOT/'target/debug/examples/minimum_client')],env=childenv,stdout=nestedlog,stderr=subprocess.STDOUT,start_new_session=True);applications.append(minimum)
+                        state=wait_shared(lambda s:any(w['app_id']=='com.agentos.MinimumFixture' and w['id'] in s['shared']['identities'] for w in s['windows']) and bool(s['shared'].get('overview')))
+                        minimum_window=next(w for w in state['windows'] if w['app_id']=='com.agentos.MinimumFixture')
+                        minimum_id=state['shared']['identities'][minimum_window['id']]
+                        preferred=workspace();focused=copy.deepcopy(preferred);focused['focus']={'surface_id':minimum_id,'element_id':None}
+                        assert put(focused,'focus-minimum-fixture')['ok']
+                        state=wait_shared(lambda s:s['layout']['focus']==minimum_window['id'] and next(w for w in s['windows'] if w['id']==minimum_window['id'])['geometry']['width']>=1600)
+                        assert next(w for w in state['windows'] if w['id']==minimum_window['id'])['geometry']['height']>=900
+                        assert workspace()['outputs']==preferred['outputs'],'Pressure handling rewrote preferred placement'
+                        assert minimum.poll() is None,'Pressure handling terminated a preserved view'
+                        print('PASS: measured client minimum sizes, focusable preserved overview and unchanged preferred placement')
                         print('PASS: authenticated native identity, conventional registration, durable shared layout/focus, stale revision rejection, actual float/maximize rendering and journal undo')
                     else:
                         revision=state['layout']['revision']

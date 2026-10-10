@@ -23,6 +23,8 @@ pub struct Observed {
     pub app_id: String,
     pub uid: u32,
     pub session: String,
+    pub min_width: i32,
+    pub min_height: i32,
 }
 #[derive(Clone, Default)]
 pub struct Scene {
@@ -32,6 +34,8 @@ pub struct Scene {
     pub focus: Option<String>,
     pub maximized: BTreeSet<String>,
     pub error: Option<String>,
+    pub overview: Value,
+    pub visible: BTreeSet<String>,
 }
 #[derive(Clone)]
 struct Observation {
@@ -62,6 +66,7 @@ impl Bridge {
             let mut grabs = grabs::Grabs::new(worker_previews);
             let mut registrations = BTreeMap::<String, (String, String, String, String)>::new();
             let mut counter = 0u64;
+            let mut input_error = None::<(String, std::time::Instant)>;
             let mut published = BTreeMap::new();
             let mut output_area = None;
             let mut selected_activity = None::<String>;
@@ -130,6 +135,7 @@ impl Bridge {
                         }
                     }
                     if let Err(e) = &result {
+                        input_error = Some((e.clone(), std::time::Instant::now()));
                         output.lock().unwrap().error = Some(e.clone());
                     }
                     let response = match result {
@@ -288,6 +294,7 @@ impl Bridge {
                             .iter()
                             .map(|(runtime, surface)| (surface.clone(), runtime.clone()))
                             .collect::<BTreeMap<_, _>>();
+                        let mut floating = BTreeSet::new();
                         for doc in next
                             .workspaces
                             .as_object()
@@ -303,6 +310,13 @@ impl Bridge {
                                 {
                                     next.maximized.insert(runtime.clone());
                                 }
+                                for entry in layout["floating"].as_array().into_iter().flatten() {
+                                    if let Some(runtime) =
+                                        entry["surface_id"].as_str().and_then(|id| reverse.get(id))
+                                    {
+                                        floating.insert(runtime.clone());
+                                    }
+                                }
                                 for (surface, rect) in rectangles(layout, observed.area)? {
                                     if let Some(runtime) = reverse.get(&surface) {
                                         next.rectangles.insert(runtime.clone(), rect);
@@ -313,6 +327,18 @@ impl Bridge {
                                 next.focus = reverse.get(surface).cloned();
                             }
                         }
+                        next.error = input_error
+                            .as_ref()
+                            .filter(|(_, when)| when.elapsed() < Duration::from_secs(10))
+                            .map(|(message, _)| message.clone());
+                        next.visible = next.rectangles.keys().cloned().collect();
+                        next.overview = crate::pressure::project(
+                            &mut next.rectangles,
+                            &observed.windows,
+                            &floating,
+                            next.focus.as_ref(),
+                            observed.area,
+                        );
                         Ok(next)
                     })();
                     match result {
@@ -655,6 +681,8 @@ mod tests {
             app_id: "agentos.surface.a".into(),
             uid: 1000,
             session: "8:42".into(),
+            min_width: 80,
+            min_height: 32,
         };
         assert!(native_identity(&w, &state).is_none());
         w.session = "7:42".into();

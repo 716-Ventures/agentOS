@@ -2,6 +2,7 @@
 use super::*;
 pub struct WorkspaceControls {
     pub widget: gtk::Expander,
+    notice: gtk::Label,
     surfaces: gtk::DropDown,
     targets: gtk::DropDown,
     outputs: gtk::DropDown,
@@ -32,6 +33,8 @@ impl WorkspaceControls {
             .label("Arrange workspace")
             .child(&content)
             .build();
+        let notice = ui::text("", true);
+        content.append(&notice);
         let (surfaces, surface_model) = dropdown("Surface to arrange");
         let (targets, target_model) = dropdown("Second surface for split or swap");
         let (outputs, output_model) = dropdown("Destination output");
@@ -106,6 +109,7 @@ impl WorkspaceControls {
             }
         });
         Self {
+            notice,
             widget,
             surfaces,
             targets,
@@ -130,6 +134,13 @@ impl WorkspaceControls {
         }
     }
     pub fn update(&self, frame: &Frame) {
+        let message = frame.compositor["unavailable"]
+            .as_str()
+            .or_else(|| frame.compositor["error"].as_str())
+            .or_else(|| frame.compositor["overview"]["reason"].as_str())
+            .unwrap_or("");
+        self.notice.set_text(message);
+        self.notice.set_visible(!message.is_empty());
         let doc = frame
             .documents
             .values()
