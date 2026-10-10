@@ -73,7 +73,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 {
                     if let Some(bridge) = &data.state.bridge {
                         if let Err(error) = bridge.commands.try_send(req) {
-                            let req = error.into_inner();
+                            let req = match error {
+                                std::sync::mpsc::TrySendError::Full(req)
+                                | std::sync::mpsc::TrySendError::Disconnected(req) => req,
+                            };
                             let _ = req.reply.try_send(
                                 serde_json::json!({"ok":false,"error":"Workspace worker busy"}),
                             );

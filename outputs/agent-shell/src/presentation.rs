@@ -4,6 +4,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
 
+mod workspace;
+
 type Result<T> = std::result::Result<T, String>;
 pub const PROTOCOL: &str = "agentos.presentation/1";
 pub const CATALOG: &str = "native-core/1";
@@ -225,6 +227,11 @@ enum Operation {
         surface_id: String,
         action_id: String,
     },
+    #[serde(rename = "workspace.edit")]
+    WorkspaceEdit {
+        workspace_id: String,
+        edit: workspace::Edit,
+    },
     #[serde(rename = "workspace.put")]
     Workspace { document: WorkspaceDocument },
 }
@@ -233,6 +240,7 @@ impl Operation {
         match self {
             Self::Create { document } | Self::Replace { document } => &document.surface_id,
             Self::Workspace { document } => &document.workspace_id,
+            Self::WorkspaceEdit { workspace_id, .. } => workspace_id,
             Self::Close { surface_id }
             | Self::Put { surface_id, .. }
             | Self::Remove { surface_id, .. }
@@ -903,6 +911,18 @@ fn apply(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> {
             Operation::Close { .. } => {
                 surface_mut(&mut after, &id)?;
                 after.remove(&id);
+            }
+            Operation::WorkspaceEdit { edit, .. } => {
+                if !who.human() {
+                    return Err(error(
+                        "unauthorized",
+                        "Direct workspace controls require user input",
+                    ));
+                }
+                match after.get_mut(&id) {
+                    Some(Document::Workspace(w)) => workspace::apply(w, edit)?,
+                    _ => return Err(error("missing_reference", "Workspace unavailable")),
+                }
             }
             Operation::Workspace { document } => {
                 if let Some(old) = after.get(&id) {
@@ -1788,5 +1808,101 @@ mod tests {
         reuse["surface_id"] = json!("app-fixture");
         let recycle = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"recycle-app-id","expected_revisions":{"app-fixture":null},"operations":[{"op":"surface.create","document":reuse}]});
         assert!(handle(&mut db, &recycle, &human()).is_err());
+    }
+    #[test]
+    fn direct_workspace_edits_are_atomic_revisioned_and_undoable() {
+        let mut db = fixture();
+        create(&mut db);
+        let mut second = surface();
+        second["surface_id"] = json!("surface-b");
+        handle(&mut db,&json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"create-b","expected_revisions":{"surface-b":null},"operations":[{"op":"surface.create","document":second}]}),&human()).unwrap();
+        let root = Principal {
+            uid: 0,
+            session: "host".into(),
+        };
+        handle(
+            &mut db,
+            &json!({"op":"outputs.register","output_id":"output-a","width":1280,"height":720}),
+            &root,
+        )
+        .unwrap();
+        handle(&mut db,&json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"workspace-create","expected_revisions":{"workspace-a":null},"operations":[{"op":"workspace.put","document":workspace()}]}),&human()).unwrap();
+        let request = |id: &str, revision: u64, edit: Value| json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":id,"expected_revisions":{"workspace-a":revision},"operations":[{"op":"workspace.edit","workspace_id":"workspace-a","edit":edit}]});
+        let tile = request(
+            "split",
+            0,
+            json!({"kind":"tile","surface_id":"surface-b","output_id":"output-a","target":"surface-a","axis":"horizontal","ratio":0.4}),
+        );
+        assert!(handle(&mut db, &tile, &agent())
+            .unwrap_err()
+            .contains("unauthorized"));
+        let receipt = handle(&mut db, &tile, &human()).unwrap();
+        assert_eq!(handle(&mut db, &tile, &human()).unwrap(), receipt);
+        let committed = snapshot(&db).unwrap()["documents"]["workspace-a"].clone();
+        assert_eq!(
+            committed["outputs"]["output-a"]["tiles"]["ratios"],
+            json!([0.6, 0.4])
+        );
+        let tiny = request(
+            "tiny",
+            1,
+            json!({"kind":"resize_split","surface_id":"surface-b","ratio":0.0001}),
+        );
+        assert!(handle(&mut db, &tiny, &human())
+            .unwrap_err()
+            .contains("constraint_conflict"));
+        assert_eq!(
+            snapshot(&db).unwrap()["documents"]["workspace-a"],
+            committed
+        );
+        let float = request(
+            "float",
+            1,
+            json!({"kind":"float","surface_id":"surface-b","output_id":"output-a","x":100,"y":80,"width":320,"height":240}),
+        );
+        let floated = handle(&mut db, &float, &human()).unwrap();
+        assert_eq!(
+            snapshot(&db).unwrap()["documents"]["workspace-a"]["outputs"]["output-a"]["tiles"]
+                ["surface_id"],
+            "surface-a"
+        );
+        handle(&mut db,&json!({"op":"presentation.undo","event_cursor":floated["event_cursor"],"request_id":"undo-float"}),&human()).unwrap();
+        let restored = snapshot(&db).unwrap()["documents"]["workspace-a"].clone();
+        assert_eq!(restored["outputs"], committed["outputs"]);
+        assert_eq!(restored["constraints"], committed["constraints"]);
+        assert!(handle(
+            &mut db,
+            &request(
+                "stale",
+                1,
+                json!({"kind":"maximize","surface_id":"surface-b"})
+            ),
+            &human()
+        )
+        .is_err());
+        handle(
+            &mut db,
+            &request(
+                "max",
+                3,
+                json!({"kind":"maximize","surface_id":"surface-b"}),
+            ),
+            &human(),
+        )
+        .unwrap();
+        handle(
+            &mut db,
+            &request(
+                "restore",
+                4,
+                json!({"kind":"restore","surface_id":"surface-b"}),
+            ),
+            &human(),
+        )
+        .unwrap();
+        assert_eq!(
+            snapshot(&db).unwrap()["documents"]["workspace-a"]["outputs"],
+            committed["outputs"]
+        );
     }
 }
