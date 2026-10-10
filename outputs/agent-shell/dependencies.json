@@ -52,6 +52,7 @@
     "libgles2-mesa-dev",
     "libseat-dev",
     "dbus-user-session",
-    "dbus-x11"
+    "dbus-x11",
+    "libvte-2.91-gtk4-dev"
   ]
 }

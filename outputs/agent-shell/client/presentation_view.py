@@ -42,6 +42,7 @@ def project(document,bindings=None,width=80):
                 walk(child,depth+1)
             return
         if kind in ('Text@1','Status@1'):text=text_value(props.get('text' if kind=='Text@1' else 'value'),bindings)
+        elif kind=='PtySession@1':text='[Interactive terminal] '+props['label']+' ('+props['source']+') · attach from Work or the native view'
         elif kind=='Result@1':text=props['label']+': '+text_value(props['value'],bindings)
         elif kind=='Error@1':
             text=props['label']+': '+text_value(props['message'],bindings)

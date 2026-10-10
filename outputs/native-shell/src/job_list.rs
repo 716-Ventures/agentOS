@@ -14,6 +14,7 @@ struct Row {
     stop: gtk::Button,
     review: gtk::Button,
     attach: gtk::Button,
+    embed: gtk::Button,
     inspect: gtk::Button,
     resume: gtk::Button,
     current: Rc<RefCell<Option<Item>>>,
@@ -27,13 +28,14 @@ impl Row {
         let stop = ui::button("Stop work", ButtonVariant::Destructive, false);
         let review = ui::button("Review approval", ButtonVariant::Outline, false);
         let attach = ui::button("Attach terminal", ButtonVariant::Outline, false);
+        let embed = ui::button("Open embedded terminal", ButtonVariant::Outline, false);
         let actions = gtk::FlowBox::new();
         actions.set_selection_mode(gtk::SelectionMode::None);
         actions.set_min_children_per_line(1);
         actions.set_max_children_per_line(4);
         actions.set_column_spacing(8);
         actions.set_row_spacing(8);
-        for button in [&inspect, &stop, &review, &attach] {
+        for button in [&inspect, &stop, &review, &attach, &embed] {
             actions.insert(button, -1);
         }
         widget.append(&actions);
@@ -56,6 +58,12 @@ impl Row {
         attach.connect_clicked(move |_| {
             if let Some(item) = data.borrow().as_ref() {
                 let _ = sender.send(Command::Attach(item.job.clone()));
+            }
+        });
+        let (data, sender) = (current.clone(), commands.clone());
+        embed.connect_clicked(move |_| {
+            if let Some(item) = data.borrow().as_ref() {
+                let _ = sender.send(Command::EmbedTerminal(item.job.clone()));
             }
         });
         for (button, inspect) in [(&inspect, true), (&stop, false)] {
@@ -82,6 +90,7 @@ impl Row {
             stop,
             review,
             attach,
+            embed,
             inspect,
             resume,
             current,
@@ -121,6 +130,7 @@ impl Row {
                 && status == "running"
                 && item.job["terminal"] == true,
         );
+        self.embed.set_sensitive(self.attach.is_sensitive());
         self.stop.set_sensitive(
             item.available
                 && matches!(
@@ -142,6 +152,7 @@ impl Row {
             &self.stop,
             &self.review,
             &self.attach,
+            &self.embed,
             &self.inspect,
             &self.resume,
         ] {

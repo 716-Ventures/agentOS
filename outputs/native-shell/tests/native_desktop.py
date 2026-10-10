@@ -52,8 +52,13 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                 time.sleep(.02)
             image_reference='resource-'+'b'*32
             call({'op':'resource.publish','activity_id':str(activity),'reference':image_reference,'label':'Native blue pixel','png_hex':(ROOT.parent/'agent-shell/tests/fixtures/pixel.png').read_bytes().hex()})
+            pty_source='broker:'+'d'*32
+            publication={'op':'source.publish','source':pty_source,'activity_id':str(activity),'source_revision':1,'values':{'status':'running','error':None,'exit_code':None,'created_at':1,'finished_at':None}}
+            publisher='import socket,json,sys;s=socket.socket(socket.AF_UNIX);s.connect(sys.argv[1]);s.sendall(sys.argv[2].encode()+b"\\n");r=json.loads(s.makefile().readline());assert r["ok"],r'
+            subprocess.run(['sudo','-n','python3','-c',publisher,str(endpoint),json.dumps(publication)],check=True,timeout=5)
             doc={'protocol':'agentos.presentation/1','catalog_revision':'native-core/1','surface_id':'native-fixture','activity_id':str(activity),'revision':0,'title':'Native presentation fixture','root':'root','elements':{
-                'root':{'type':'Stack@1','props':{'spacing':'relaxed'},'slots':{'children':['reading','field','status','button','link','progress','table','list','details','image','reference','result','failure']}},
+                'root':{'type':'Stack@1','props':{'spacing':'relaxed'},'slots':{'children':['reading','field','status','button','link','progress','table','list','details','image','reference','result','failure','pty']}},
+                'pty':{'type':'PtySession@1','props':{'label':'Embedded PTY fixture','source':pty_source}},
                 'result':{'type':'Result@1','props':{'label':'Completion','value':{'binding':'work'}}},
                 'failure':{'type':'Error@1','props':{'label':'Recovery needed','message':'Fixture reason 日本語','recovery_label':'Inspect work'}},
                 'reference':{'type':'DocumentReference@1','props':{'label':'Open this shared document','target':'native-fixture'}},

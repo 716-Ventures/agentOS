@@ -86,6 +86,10 @@ class Projection(unittest.TestCase):
         invoked=next(fields for op,fields in calls if op=='action.invoke')
         self.assertEqual(invoked['reference'],'inspect-callback');self.assertEqual(invoked['action_id'],'inspect')
         self.assertEqual(invoked['expected_surface_revision'],doc['revision'])
+    def test_embedded_terminal_projection_preserves_identity_without_dispatching_input(self):
+        doc=document();doc['elements']['pty']={'type':'PtySession@1','props':{'label':'Interactive work','source':'broker:'+'d'*32}}
+        doc['elements']['root']['slots']['children'].append('pty');lines,controls=view.project(doc)
+        self.assertIn('[Interactive terminal] Interactive work','\n'.join(lines));self.assertNotIn('pty',controls)
     def test_images_have_inert_labeled_terminal_fallbacks(self):
         doc=document();doc['elements']['image']={'type':'Image@1','props':{'label':'Blue pixel 日本語','reference':'resource-'+'a'*32}}
         doc['elements']['root']['slots']['children'].append('image');lines,controls=view.project(doc)

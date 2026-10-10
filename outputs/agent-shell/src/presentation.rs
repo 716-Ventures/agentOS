@@ -487,6 +487,24 @@ fn surface_valid(db: &Connection, s: &SurfaceDocument, _principal: &Principal) -
     if seen.len() != s.elements.len() {
         return Err(invalid("Unreachable elements"));
     }
+    for element in s
+        .elements
+        .values()
+        .filter(|node| node.kind == "PtySession@1")
+    {
+        let source = element.props["source"].as_str().unwrap();
+        if !source.strip_prefix("broker:").is_some_and(ident)
+            || crate::presentation_sources::activity(db, source)
+                .map_err(db_error)?
+                .as_deref()
+                != Some(s.activity_id.as_str())
+        {
+            return Err(error(
+                "missing_reference",
+                "PTY source must name registered work in this activity",
+            ));
+        }
+    }
     for element in s.elements.values().filter(|node| node.kind == "Image@1") {
         if crate::presentation_resources::activity(
             db,
@@ -2127,6 +2145,38 @@ mod tests {
     }
     fn props(request: &str, revision: u64, element: &str, text: &str) -> Value {
         json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":request,"expected_revisions":{"surface-a":revision},"operations":[{"op":"element.set_props","surface_id":"surface-a","element_id":element,"props":{"text":text}}]})
+    }
+    #[test]
+    fn embedded_terminals_only_reference_registered_same_activity_broker_work() {
+        let mut db = fixture();
+        let source = format!("broker:{}", "d".repeat(32));
+        db.execute(
+            "INSERT INTO presentation_external_sources VALUES(?, '1', 1, '{}', 'fixture', 0)",
+            [&source],
+        )
+        .unwrap();
+        let mut doc = surface();
+        doc["elements"]["text"] =
+            json!({"type":"PtySession@1","props":{"label":"Interactive work","source":source}});
+        let request = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"terminal-reference","expected_revisions":{"surface-a":null},"operations":[{"op":"surface.create","document":doc}]});
+        for value in [
+            "/bin/sh".to_string(),
+            format!("broker:{}", "e".repeat(32)),
+            format!("file:{}", "d".repeat(32)),
+        ] {
+            let mut invalid = request.clone();
+            invalid["operations"][0]["document"]["elements"]["text"]["props"]["source"] =
+                json!(value);
+            assert!(handle(&mut db, &invalid, &agent())
+                .unwrap_err()
+                .contains("missing_reference"));
+        }
+        let mut foreign = request.clone();
+        foreign["operations"][0]["document"]["activity_id"] = json!("2");
+        assert!(handle(&mut db, &foreign, &agent())
+            .unwrap_err()
+            .contains("missing_reference"));
+        handle(&mut db, &request, &agent()).unwrap();
     }
     #[test]
     fn result_and_error_content_is_bounded_typed_and_source_bindable() {

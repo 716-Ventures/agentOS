@@ -94,6 +94,7 @@ pub enum Command {
         reply: Sender<Result<Value, String>>,
     },
     Attach(Value),
+    EmbedTerminal(Value),
     OpenTerminal,
     PageOutput(i8),
     FollowOutput(bool),
@@ -289,6 +290,7 @@ fn run(
                     Command::Approve(_)|Command::ReviewInput{..}=>unreachable!(),
                     Command::Resume(job)=>super::broker_controls::job_id(&job).and_then(|id|request(&broker_socket(),&json!({"op":"poll","job_id":id}))).and_then(|current|super::broker_controls::continuation_request(&current).ok_or("No approved agent request is associated with this work".into())).and_then(|query|request(&socket,&query)),
                     Command::Attach(job)=>super::broker_controls::attach(&job),
+                    Command::EmbedTerminal(job)=>{let current=frame.lock().unwrap().clone();embed_terminal(&socket,&current,&job)},
                     Command::OpenTerminal=>super::broker_controls::open_terminal(),
                     Command::Navigate{surface,element,revision}=>{let current=frame.lock().unwrap().clone();navigate(&socket,&current,&surface,&element,revision).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt})},
                     Command::WorkspaceEdit{workspace,revision,edit}=>request(&socket,&json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("workspace-{}",super::nonce()),"expected_revisions":{workspace.clone():revision},"operations":[{"op":"workspace.edit","workspace_id":workspace,"edit":edit}]})).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt}),
@@ -880,5 +882,47 @@ fn navigate(
     request(
         socket,
         &json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("navigate-{}",super::nonce()),"expected_revisions":{id:workspace["revision"]},"operations":[{"op":"workspace.navigate","workspace_id":id,"surface_id":surface,"element_id":element,"source_revision":revision}]}),
+    )
+}
+
+fn embed_terminal(socket: &PathBuf, frame: &Frame, job: &Value) -> Result<Value, String> {
+    let id = super::broker_controls::job_id(job)?;
+    let live = request(&broker_socket(), &json!({"op":"poll","job_id":id}))?;
+    let activity = live["activity"]
+        .as_i64()
+        .filter(|id| *id > 0)
+        .ok_or("Terminal activity unavailable")?
+        .to_string();
+    if live["id"] != id
+        || live["terminal"] != true
+        || live["status"] != "running"
+        || frame.activity.as_deref() != Some(activity.as_str())
+    {
+        return Err("Running terminal is not in the selected activity".into());
+    }
+    let surface = format!("terminal-{}", super::nonce());
+    let document = json!({"protocol":"agentos.presentation/1","catalog_revision":"native-core/1","surface_id":surface,"activity_id":activity,"revision":0,"title":"Interactive terminal","root":"terminal","elements":{"terminal":{"type":"PtySession@1","props":{"label":"Interactive terminal","source":format!("broker:{id}")}}},"bindings":{},"actions":{}});
+    let mut expected = serde_json::Map::new();
+    expected.insert(surface.clone(), Value::Null);
+    let mut operations = vec![json!({"op":"surface.create","document":document})];
+    if let Some(workspace) = frame
+        .documents
+        .values()
+        .find(|doc| doc.get("workspace_id").is_some() && doc["activity_id"] == activity)
+    {
+        let workspace_id = workspace["workspace_id"]
+            .as_str()
+            .ok_or("Invalid workspace identity")?;
+        let output = workspace["outputs"]
+            .as_object()
+            .and_then(|outputs| outputs.keys().next())
+            .ok_or("Workspace has no display for the terminal")?;
+        expected.insert(workspace_id.into(), workspace["revision"].clone());
+        operations.push(json!({"op":"workspace.edit","workspace_id":workspace_id,"edit":{"kind":"tile","surface_id":surface,"output_id":output,"target":null,"axis":"vertical","ratio":0.5}}));
+        operations.push(json!({"op":"workspace.edit","workspace_id":workspace_id,"edit":{"kind":"focus","surface_id":surface,"element_id":null}}));
+    }
+    request(
+        socket,
+        &json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("open-{surface}"),"expected_revisions":expected,"operations":operations}),
     )
 }

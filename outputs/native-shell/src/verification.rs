@@ -270,6 +270,10 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             println!("CHECK: mapped native surface");
             let image=surface.elements["image"].image.as_ref().unwrap();assert!(image.picture.paintable().is_some());assert_eq!(image.caption.text(),"Native blue pixel");
             println!("CHECK: authenticated immutable image resource and native texture");
+            let pty=surface.elements["pty"].pty.as_ref().unwrap();assert!(!pty.view.input_enabled());assert!(!pty.attach.is_sensitive());
+            pty.view.feed(b"Terminal fixture\r\n",false).unwrap();
+            println!("CHECK: native PTY renderer remains detached without running authorized work");
+
             let outcome=surface.elements["result"].outcome.as_ref().unwrap();assert_eq!(outcome.widget.accessible_role(),gtk::AccessibleRole::Status);assert_eq!(outcome.message.text(),"succeeded");
             let failure=surface.elements["failure"].outcome.as_ref().unwrap();assert_eq!(failure.widget.accessible_role(),gtk::AccessibleRole::Alert);assert_eq!(failure.message.text(),"Fixture reason 日本語");assert!(!failure.recovery.is_visible());
 

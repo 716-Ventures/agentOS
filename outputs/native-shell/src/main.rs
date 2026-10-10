@@ -9,6 +9,8 @@ mod job_list;
 mod log_view;
 mod preferences;
 mod presentation_pages;
+mod pty_transport;
+mod pty_view;
 mod state_pages;
 mod transport;
 mod verification;
@@ -40,6 +42,7 @@ struct Element {
     image: Option<ui::ImageView>,
     reference: Option<ui::ReferenceView>,
     outcome: Option<ui::OutcomeView>,
+    pty: Option<pty_view::PtyView>,
     image_attempted: bool,
     chart: Option<ui::BoundedChart>,
     field: Option<TextField>,
@@ -121,6 +124,7 @@ fn lease(widget: &gtk::Widget, surface: &str, id: &str, commands: &Sender<Comman
 }
 fn construct(
     surface: &str,
+    activity: &str,
     id: &str,
     node: &Value,
     frame: &Frame,
@@ -139,6 +143,7 @@ fn construct(
         image: None,
         reference: None,
         outcome: None,
+        pty: None,
         image_attempted: false,
         chart: None,
         field: None,
@@ -161,6 +166,17 @@ fn construct(
         children: Vec::new(),
     };
     match kind.as_str() {
+        "PtySession@1" => {
+            let view = pty_view::PtyView::new(
+                props["label"].as_str().unwrap(),
+                props["source"].as_str().unwrap(),
+                activity,
+            );
+            lease(&view.view.terminal.clone().upcast(), surface, id, commands);
+            lease(&view.view.heading.clone().upcast(), surface, id, commands);
+            result.widget = view.widget.clone().upcast();
+            result.pty = Some(view);
+        }
         "Result@1" | "Error@1" => {
             let key = if kind == "Error@1" {
                 "message"
@@ -721,6 +737,7 @@ impl Surface {
                     && gtk::prelude::GtkWindowExt::focus(&self.window)
                         .map(|focus| focus == e.widget || focus.is_ancestor(&e.widget))
                         .unwrap_or(false))
+                || e.pty.as_ref().is_some_and(|view| view.view.is_protected())
                 || e.outcome.as_ref().is_some_and(|view| {
                     view.message.selection_bounds().is_some()
                         || view.heading.selection_bounds().is_some()
@@ -769,6 +786,9 @@ impl Surface {
                                         && node["props"]["reference"].as_str().is_some_and(
                                             |reference| frame.resources.contains_key(reference),
                                         ))))
+                            || (e.kind == "PtySession@1"
+                                && self.document["elements"][element]["props"]["source"]
+                                    != node["props"]["source"])
                             || (e.kind == "Table@1"
                                 && e.table
                                     .as_ref()
@@ -799,7 +819,15 @@ impl Surface {
                     }
                     self.elements.insert(
                         element.clone(),
-                        construct(id, element, node, frame, commands, drafts),
+                        construct(
+                            id,
+                            doc["activity_id"].as_str().unwrap(),
+                            element,
+                            node,
+                            frame,
+                            commands,
+                            drafts,
+                        ),
                     );
                 }
             }
@@ -1056,6 +1084,23 @@ impl Surface {
                     let key = node["events"]["submit"]["action"].as_str().unwrap_or("");
                     let action = doc["actions"][key]["ref"].as_str();
                     *e.events.borrow_mut() = json!({"host_reference":action,"surface":id,"revision":doc["revision"],"action":key,"parameters":doc["actions"][key]["parameters"]});
+                }
+                if let Some(view) = &e.pty {
+                    let job = props["source"]
+                        .as_str()
+                        .unwrap()
+                        .strip_prefix("broker:")
+                        .unwrap();
+                    let available = frame.broker.as_array().is_some_and(|rows| {
+                        rows.iter().any(|row| {
+                            row["id"] == job
+                                && row["terminal"] == true
+                                && row["status"] == "running"
+                                && row["activity"].as_i64().map(|id| id.to_string()).as_deref()
+                                    == doc["activity_id"].as_str()
+                        })
+                    });
+                    view.reconcile(props["label"].as_str().unwrap(), available);
                 }
                 if let Some(outcome) = &e.outcome {
                     let value = bound(
