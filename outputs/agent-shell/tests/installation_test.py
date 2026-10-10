@@ -14,7 +14,7 @@ class Installation(unittest.TestCase):
     def fixture(self,tmp):
         base=Path(tmp);source=base/'source';source.mkdir()
         for name in ('target/release/agent-os-core','services/common.py','services/broker-launcher.sh',
-                     'client/agent_os.py','systemd/agent-os-core.service','Cargo.toml','Cargo.lock','dependencies.json','release-contract.json','install_runtime.py'):
+                     'LICENSE','client/agent_os.py','systemd/agent-os-core.service','Cargo.toml','Cargo.lock','dependencies.json','release-contract.json','install_runtime.py'):
             path=source/name;path.parent.mkdir(parents=True,exist_ok=True)
             if name=='release-contract.json':path.write_text(json.dumps({'format':1,'state_contract':'agentos.state/1','units':['agent-os-core']}))
             elif name.endswith('.py'):path.write_text('pass\n')
@@ -107,3 +107,41 @@ class Installation(unittest.TestCase):
             instance.link(instance.root/'current',instance.root/'releases'/second)
             self.activate_fixture(instance,second)
             self.assertEqual(Path(json.loads(instance.journal.read_text())['previous']).name,first)
+
+    def desktop_fixture(self,tmp):
+        instance,source=self.fixture(tmp)
+        contract=json.loads((source/'release-contract.json').read_text());contract['desktop']={'format':1};(source/'release-contract.json').write_text(json.dumps(contract))
+        for crate,binary in [('native-shell','agent-os-desktop'),('native-compositor','agent-os-compositor')]:
+            tree=source/crate;(tree/'target/release').mkdir(parents=True);(tree/'target/release'/binary).write_bytes((source/'target/release/agent-os-core').read_bytes())
+            for name in ('Cargo.toml','Cargo.lock'):(tree/name).write_text(name)
+        (source/'services/desktop_session.py').write_text('pass\n');(source/'services/session-launcher.sh').write_text('#!/bin/sh\nexit 0\n')
+        (source/'session').mkdir();(source/'session/agent-os.desktop').write_text('[Desktop Entry]\nName=agentOS\n')
+        licenses=source/'third-party-licenses';licenses.mkdir();(licenses/'dependencies.json').write_text('{"format":1,"packages":[]}')
+        return instance,source
+
+    def test_graphical_artifacts_are_integrity_checked_and_bound_to_the_release(self):
+        from types import SimpleNamespace
+        with tempfile.TemporaryDirectory() as tmp:
+            instance,source=self.desktop_fixture(tmp);ident=instance.stage(source);release=instance.root/'releases'/ident
+            self.assertEqual(((release/'native/agent-os-desktop').resolve()).stat().st_mode & 0o777,0o755)
+            self.assertTrue(instance.contract(release)['desktop'])
+            with patch.object(install.pwd,'getpwnam',return_value=SimpleNamespace(pw_uid=1000)):self.activate_fixture(instance,ident)
+            self.assertEqual(instance.path('/usr/local/bin/agent-os-desktop').resolve(),(release/'native/agent-os-desktop').resolve())
+            self.assertIn('AGENT_OS_COMPOSITOR_UID=1000',instance.path('/etc/systemd/system/agent-os-core.service.d/30-compositor.conf').read_text())
+            ((release/'native/agent-os-desktop').resolve()).write_bytes(b'corrupt')
+            with self.assertRaisesRegex(ValueError,'integrity'):instance.verify(release)
+
+    def test_graphical_rollback_removes_only_its_desktop_bindings_and_preserves_user_state(self):
+        from types import SimpleNamespace
+        with tempfile.TemporaryDirectory() as tmp:
+            instance,source=self.fixture(tmp);terminal=instance.stage(source);self.activate_fixture(instance,terminal)
+            contract=json.loads((source/'release-contract.json').read_text());contract['desktop']={'format':1};(source/'release-contract.json').write_text(json.dumps(contract))
+            for crate,binary in [('native-shell','agent-os-desktop'),('native-compositor','agent-os-compositor')]:
+                tree=source/crate;(tree/'target/release').mkdir(parents=True);(tree/'target/release'/binary).write_bytes((source/'target/release/agent-os-core').read_bytes())
+                for name in ('Cargo.toml','Cargo.lock'):(tree/name).write_text(name)
+            (source/'services/desktop_session.py').write_text('pass\n');(source/'services/session-launcher.sh').write_text('#!/bin/sh\nexit 0\n');(source/'session').mkdir();(source/'session/agent-os.desktop').write_text('fixture');(source/'third-party-licenses').mkdir();(source/'third-party-licenses/dependencies.json').write_text('{"format":1,"packages":[]}')
+            graphical=instance.stage(source)
+            with patch.object(install.pwd,'getpwnam',return_value=SimpleNamespace(pw_uid=1000)):self.activate_fixture(instance,graphical)
+            user=instance.path('/home/developer/.local/state/agent-os/native-drafts.json');user.parent.mkdir(parents=True);user.write_text('retain my draft')
+            with patch.object(instance,'accounts'),patch.object(instance,'run'),patch.object(instance,'health'):instance.rollback(terminal)
+            self.assertFalse(instance.path('/usr/local/bin/agent-os-desktop').exists());self.assertFalse(instance.path('/usr/share/wayland-sessions/agent-os.desktop').exists());self.assertEqual(user.read_text(),'retain my draft')

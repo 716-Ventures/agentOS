@@ -15,9 +15,11 @@ import vm
 def main():
     archive=io.BytesIO()
     with tarfile.open(fileobj=archive,mode='w') as tar:
-        for path in sorted(ROOT.rglob('*')):
-            if path.is_file() and not any(p in ('target','__pycache__','.git') for p in path.parts):
-                tar.add(path,arcname=str(path.relative_to(ROOT)))
+        for folder,prefix in [(ROOT,''),(ROOT.parent/'native-shell','native-shell'),(ROOT.parent/'native-compositor','native-compositor')]:
+            for path in sorted(folder.rglob('*')):
+                relative=path.relative_to(folder)
+                if path.is_file() and not any(p in ('target','__pycache__','.git','test-output') for p in relative.parts):
+                    tar.add(path,arcname=str(Path(prefix)/relative))
     staged=vm.ssh('mktemp -d /home/developer/.agent-os-source.XXXXXXXX',capture_output=True,text=True,check=True).stdout.strip()
     try:
         subprocess.run(vm.ssh_args()+['tar xf - -C '+shlex.quote(staged)],input=archive.getvalue(),check=True)
@@ -33,7 +35,8 @@ try:staged.rename(source)
 except BaseException:
     if previous.exists():previous.rename(source)
     raise
-if (previous/'target').exists():(previous/'target').rename(source/'target')
+for name in ('target','native-shell/target','native-compositor/target'):
+    if (previous/name).exists():(previous/name).rename(source/name)
 '''.replace('STAGED',repr(staged))
         subprocess.run(vm.ssh_args()+['python3 -'],input=script.encode(),check=True)
     finally:

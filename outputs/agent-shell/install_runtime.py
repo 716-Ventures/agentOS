@@ -52,17 +52,32 @@ class Installer:
 
     def stage(self,source):
         files={'agent-os-core':source/'target/release/agent-os-core'}
-        for pattern in ('services/*.py','services/*-launcher.sh','systemd/*.service','client/*.py'):
+        for pattern in ('services/*.py','services/*-launcher.sh','systemd/*.service','client/*.py','session/*.desktop'):
             files.update({str(p.relative_to(source)):p for p in sorted(source.glob(pattern))})
-        for name in ('Cargo.lock','Cargo.toml','dependencies.json','release-contract.json','install_runtime.py'):
+        for name in ('LICENSE','Cargo.lock','Cargo.toml','dependencies.json','release-contract.json','install_runtime.py'):
             files[name]=source/name
         files['dependencies.installed.json']=self.state/'dependencies.json'
         files['voice-assets.json']=self.state/'voice.json'
+        contract=json.loads((source/'release-contract.json').read_text())
+        if contract.get('desktop'):
+            for crate,binary in (('native-shell','agent-os-desktop'),('native-compositor','agent-os-compositor')):
+                tree=source/crate if (source/crate).is_dir() else source.parent/crate
+                files['native/'+binary]=tree/'target/release'/binary
+                for name in ('Cargo.toml','Cargo.lock'):
+                    files['native/'+crate+'/'+name]=tree/name
+                for pattern in ('licenses/**/*','LICENSE-SMITHAY','THIRD_PARTY.md'):
+                    for path in sorted(tree.glob(pattern)):
+                        if path.is_file():files['native/'+crate+'/'+str(path.relative_to(tree))]=path
+            licenses=source/'third-party-licenses'
+            if not (licenses/'dependencies.json').is_file():raise ValueError('Collect dependency license notices before staging the graphical runtime')
+            files.update({'third-party-licenses/'+str(p.relative_to(licenses)):p for p in sorted(licenses.rglob('*')) if p.is_file()})
+
         for name,path in files.items():
             if name.endswith('.py'):ast.parse(path.read_bytes(),filename=name)
-        binary=files['agent-os-core'].read_bytes()
-        if binary[:4]!=b'\x7fELF' or len(binary)<20 or binary[4:6]!=b'\x02\x01' or int.from_bytes(binary[18:20],'little')!=183:
-            raise ValueError('Build the ARM64 Linux executable before installing')
+        for name in ['agent-os-core',*(['native/agent-os-desktop','native/agent-os-compositor'] if contract.get('desktop') else [])]:
+            binary=files[name].read_bytes()
+            if binary[:4]!=b'\x7fELF' or len(binary)<20 or binary[4:6]!=b'\x02\x01' or int.from_bytes(binary[18:20],'little')!=183:
+                raise ValueError('Build the ARM64 Linux executable before installing: '+name)
         hashes={name:digest(path) for name,path in files.items()}
         ident=hashlib.sha256(json.dumps(hashes,sort_keys=True).encode()).hexdigest()
         self.root.mkdir(mode=0o755,parents=True,exist_ok=True)
@@ -73,7 +88,7 @@ class Installer:
             staged=Path(tmp);staged.chmod(0o755)
             for name,path in files.items():
                 dest=staged/name;dest.parent.mkdir(mode=0o755,parents=True,exist_ok=True)
-                mode=0o755 if name=='agent-os-core' or name=='client/agent_os.py' or name.endswith('-launcher.sh') else 0o644
+                mode=0o755 if name in ('agent-os-core','native/agent-os-desktop','native/agent-os-compositor') or name=='client/agent_os.py' or name.endswith('-launcher.sh') else 0o644
                 atomic_write(dest,path.read_bytes(),mode)
             atomic_write(staged/'manifest.json',json.dumps(hashes,indent=2,sort_keys=True).encode())
             self.verify(staged)
@@ -99,9 +114,13 @@ class Installer:
         if (not isinstance(value,dict) or value.get('format')!=1
                 or not isinstance(value.get('state_contract'),str) or not value['state_contract']
                 or not isinstance(value.get('units'),list) or 'agent-os-core' not in value['units']
+                or any(not isinstance(unit,str) for unit in value['units'])
                 or len(set(value['units']))!=len(value['units'])
                 or any(unit not in UNITS or not (release/'systemd'/f'{unit}.service').is_file() for unit in value['units'])):
             raise ValueError('Invalid runtime release contract')
+        if value.get('desktop') is not None:
+            required=('native/agent-os-desktop','native/agent-os-compositor','services/desktop_session.py','services/session-launcher.sh','session/agent-os.desktop','third-party-licenses/dependencies.json')
+            if value['desktop']!={'format':1} or any(not (release/name).is_file() for name in required):raise ValueError('Invalid graphical runtime contract')
         return value
 
     def link(self,path,target):
@@ -151,6 +170,10 @@ class Installer:
         if hashlib.sha256(json.dumps(hashes,sort_keys=True).encode()).hexdigest()!=ident:
             raise ValueError('Release ID does not match its manifest')
         contract=self.contract(release)
+        desktop_uid=None
+        if contract.get('desktop'):
+            desktop_uid=pwd.getpwnam('developer').pw_uid
+            if desktop_uid<1000:raise ValueError('The graphical login must use an ordinary user account')
         current=self.root/'current'
         if current.exists() and (current/'release-contract.json').exists():
             live=self.contract(current)
@@ -177,6 +200,18 @@ class Installer:
         self.link(self.path('/usr/local/bin/agent-os'),current/'client/agent_os.py')
         for name in ('broker','configure','setup','update'):
             self.link(self.path('/usr/local/bin/agent-os-'+name),current/'services'/f'{name}-launcher.sh')
+        desktop=bool(contract.get('desktop'))
+        for name,target in [('agent-os-desktop','native/agent-os-desktop'),('agent-os-compositor','native/agent-os-compositor'),('agent-os-session','services/session-launcher.sh')]:
+            path=self.path('/usr/local/bin/'+name)
+            if desktop:self.link(path,current/target)
+            elif path.is_symlink() and str(path.readlink()).startswith(str(self.root)+'/'):path.unlink()
+        entry=self.path('/usr/share/wayland-sessions/agent-os.desktop')
+        host=self.path('/etc/systemd/system/agent-os-core.service.d/30-compositor.conf')
+        if desktop:
+            atomic_write(entry,(release/'session/agent-os.desktop').read_bytes())
+            atomic_write(host,('[Service]\nEnvironment=AGENT_OS_COMPOSITOR_UID='+str(desktop_uid)+'\n').encode())
+        else:
+            entry.unlink(missing_ok=True);host.unlink(missing_ok=True)
         for name in set(existing)-set(self.active_units):
             self.run(['systemctl','disable',name])
             self.path('/etc/systemd/system/'+name+'.service').unlink()
@@ -189,10 +224,12 @@ class Installer:
         self.health()
         metadata=self.path('/etc/agent-os/release.json')
         info=json.loads(metadata.read_text())
-        info.update(version='0.6.0',milestone='Interactive terminal sessions',runtime_release=ident,
+        info.update(version=('0.7.0-dev' if contract.get('desktop') else '0.6.0'),milestone=('Experimental native desktop' if contract.get('desktop') else 'Interactive terminal sessions'),runtime_release=ident,
                     agent_runtime='Gateway agent with general execution and filesystem broker; Jev typed effect advisory',voice='Offline English recognition and reviewed microphone input')
         atomic_write(metadata,(json.dumps(info,indent=2)+'\n').encode())
-        atomic_write(self.path('/etc/motd'),b'\nAgent OS 0.6 | Interactive terminal sessions\n\n  agent-os          Open the terminal environment\n  agent-os-status   Inspect the Linux foundation\n  sudo agent-os-configure   Set up providers\n\nOrdinary Linux shell and sudo remain available for recovery.\n\n')
+        message='\nAgent OS '+info['version']+' | '+info['milestone']+'\n\n  agent-os          Open the terminal environment\n  agent-os-status   Inspect the Linux foundation\n  sudo agent-os-configure   Set up providers\n'
+        if desktop:message+='  agent-os-session  Start the experimental native desktop from a local login\n'
+        atomic_write(self.path('/etc/motd'),(message+'\nOrdinary Linux shell and sudo remain available for recovery.\n\n').encode())
         transaction.update(phase='complete',completed_at=time.time());self.record(transaction)
         atomic_write(self.state/'installed.json',(json.dumps(transaction,indent=2)+'\n').encode(),0o600)
         print('Installed and healthy:',ident)

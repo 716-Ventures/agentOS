@@ -1,6 +1,16 @@
 {
   "format": 1,
   "state_contract": "agentos.state/1",
-  "units": ["agent-os-core", "agent-os-layout", "agent-os-disk", "agent-os-broker", "agent-os-ai", "agent-os-voice"],
-  "rollback": "Preserve live user and service state; permit only matching state contracts"
+  "units": [
+    "agent-os-core",
+    "agent-os-layout",
+    "agent-os-disk",
+    "agent-os-broker",
+    "agent-os-ai",
+    "agent-os-voice"
+  ],
+  "rollback": "Preserve live user and service state; permit only matching state contracts",
+  "desktop": {
+    "format": 1
+  }
 }

@@ -92,6 +92,9 @@ def rollbacks():
         source=Path(directory)/'source'
         shutil.copytree(SOURCE,source,ignore=shutil.ignore_patterns('target','__pycache__','.git'))
         binary=source/'target/release/agent-os-core';binary.parent.mkdir(parents=True);shutil.copyfile(SOURCE/'target/release/agent-os-core',binary)
+        for crate,name in [('native-shell','agent-os-desktop'),('native-compositor','agent-os-compositor')]:
+            tree=SOURCE/crate if (SOURCE/crate).is_dir() else SOURCE.parent/crate
+            binary=source/crate/'target/release'/name;binary.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(tree/'target/release'/name,binary)
         with (source/'services/common.py').open('a') as out:out.write('\n# Compatible runtime rollback verification fixture.\n')
         candidate=installer.stage(source);assert candidate!=original
         installer.activate(candidate);verify()

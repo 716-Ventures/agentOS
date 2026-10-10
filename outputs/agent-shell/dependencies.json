@@ -3,12 +3,54 @@
   "base": "Debian 13 arm64",
   "snapshot": "20261006T000000Z",
   "archives": [
-    {"name": "debian", "suites": ["trixie", "trixie-updates"]},
-    {"name": "debian-security", "suites": ["trixie-security"]}
+    {
+      "name": "debian",
+      "suites": [
+        "trixie",
+        "trixie-updates"
+      ]
+    },
+    {
+      "name": "debian-security",
+      "suites": [
+        "trixie-security"
+      ]
+    }
   ],
   "packages": [
-    "build-essential", "cargo", "rustc", "pkg-config", "python3", "ca-certificates",
-    "curl", "openssh-server", "sudo", "systemd", "weston", "mesa-utils",
-    "libgl1-mesa-dri", "wayland-utils", "alsa-utils", "seatd", "qemu-guest-agent", "tmux", "cmake", "libgtk-4-dev", "fonts-inter", "fonts-noto-cjk", "at-spi2-core", "python3-pyatspi"
+    "build-essential",
+    "cargo",
+    "rustc",
+    "pkg-config",
+    "python3",
+    "ca-certificates",
+    "curl",
+    "openssh-server",
+    "sudo",
+    "systemd",
+    "weston",
+    "mesa-utils",
+    "libgl1-mesa-dri",
+    "wayland-utils",
+    "alsa-utils",
+    "seatd",
+    "qemu-guest-agent",
+    "tmux",
+    "cmake",
+    "libgtk-4-dev",
+    "fonts-inter",
+    "fonts-noto-cjk",
+    "at-spi2-core",
+    "python3-pyatspi",
+    "libwayland-dev",
+    "libxkbcommon-dev",
+    "libudev-dev",
+    "libinput-dev",
+    "libgbm-dev",
+    "libegl1-mesa-dev",
+    "libgles2-mesa-dev",
+    "libseat-dev",
+    "dbus-user-session",
+    "dbus-x11"
   ]
 }

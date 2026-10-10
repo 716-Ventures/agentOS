@@ -23,3 +23,5 @@ outputs/native-shell/test-output/
 
 outputs/native-compositor/target/
 outputs/native-compositor/test-output/
+
+outputs/agent-shell/third-party-licenses/

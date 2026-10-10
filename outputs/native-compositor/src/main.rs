@@ -22,6 +22,10 @@ pub struct CalloopData {
     display_handle: DisplayHandle,
 }
 
+static TERMINATE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+extern "C" fn terminate(_: libc::c_int) {
+    TERMINATE.store(true, std::sync::atomic::Ordering::Relaxed);
+}
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     if let Ok(env_filter) = tracing_subscriber::EnvFilter::try_from_default_env() {
         tracing_subscriber::fmt().with_env_filter(env_filter).init();
@@ -29,6 +33,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         tracing_subscriber::fmt().init();
     }
 
+    unsafe {
+        libc::signal(libc::SIGTERM, terminate as libc::sighandler_t);
+        libc::signal(libc::SIGINT, terminate as libc::sighandler_t);
+    }
     let mut event_loop: EventLoop<CalloopData> = EventLoop::try_new()?;
 
     let display: Display<Smallvil> = Display::new()?;
@@ -66,6 +74,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Some(std::time::Duration::from_millis(16)),
         &mut data,
         move |data| {
+            if TERMINATE.load(std::sync::atomic::Ordering::Relaxed) {
+                data.state.loop_signal.stop();
+            }
             for req in control.requests.try_iter().take(8) {
                 if req.value["op"]
                     .as_str()

@@ -12,7 +12,7 @@ Remaining implementation/qualification:
 
 - Finish richer form/callback parameter contracts. The core and renderer now consume the same released typed catalog; multiline editing and atomic draft commit/discard are implemented.
 - Complete pointer grabs, measured minimum sizes, layout pressure/overview, stronger manual geometry constraints and restart reconciliation. Shared WorkspaceDocument projection, authenticated native/conventional identities, activity visibility, typed direct controls, native close/undo with draft retention and journal undo pass ARM64 Linux CI.
-- Complete actual output/scaling/work-area discovery, removed-output recovery, native session/display ownership and graphical guest installation.
+- Complete actual output/scaling/work-area discovery, removed-output recovery, direct display ownership and graphical guest qualification. Graphical packaging, session launcher, release bindings and rollback are implemented; full lifecycle and real ELF staging checks are added to CI.
 - Finish terminal projection, source paging/virtualized collections, bounded reconnect/shutdown and source availability handling.
 - Qualify native broker review/approval, rejection, conventional terminal attachment and offline rescue terminal controls in the guest. Implemented UI/backend paths await full system verification.
 - Exercise actual dynamic agent requests, grounded Jev candidate decisions and unresolved references; measure latency, corrections and model usage without claiming fixture decisions are live quality evidence.

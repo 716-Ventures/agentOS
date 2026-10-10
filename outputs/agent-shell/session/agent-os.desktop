@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=agentOS
+Comment=Agent desktop with direct local controls
+Exec=/usr/local/bin/agent-os-session
+TryExec=/usr/local/bin/agent-os-session
+Type=Application
+DesktopNames=agentOS

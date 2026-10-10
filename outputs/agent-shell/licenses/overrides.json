@@ -1,0 +1,62 @@
+{
+  "drm-fourcc@2.2.0": {
+    "license": "MIT",
+    "notices": [
+      {
+        "notice": "drm-fourcc-2.2.0-LICENSE",
+        "source": "https://raw.githubusercontent.com/dzfranklin/drm-fourcc-rs/bb1b81f184650e1418e1dce512e34071675206d7/LICENSE",
+        "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      }
+    ]
+  },
+  "gl_generator@0.14.0": {
+    "license": "Apache-2.0",
+    "notices": [
+      {
+        "notice": "gl_generator-0.14.0-LICENSE",
+        "source": "https://raw.githubusercontent.com/brendanzab/gl-rs/ea503e8d5fb6d73c6030e6191ce738cd3bf3433e/LICENSE",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      }
+    ]
+  },
+  "khronos_api@3.1.0": {
+    "license": "Apache-2.0",
+    "notices": [
+      {
+        "notice": "khronos_api-3.1.0-LICENSE",
+        "source": "https://raw.githubusercontent.com/brendanzab/gl-rs/f150967b1c44ae888e6676f93f639ebc82771bdc/LICENSE",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      }
+    ]
+  },
+  "profiling@1.0.18": {
+    "license": "MIT OR Apache-2.0",
+    "notices": [
+      {
+        "notice": "profiling-1.0.18-LICENSE-APACHE",
+        "source": "https://raw.githubusercontent.com/aclysma/profiling/8271551172eb6fa4cba47369aedd93790c623df9/LICENSE-APACHE",
+        "sha256": "10d30a673cd5e9349bdc02aeb48f14b3386d27d0da32df8f0a555d4aa16aa551"
+      },
+      {
+        "notice": "profiling-1.0.18-LICENSE-MIT",
+        "source": "https://raw.githubusercontent.com/aclysma/profiling/8271551172eb6fa4cba47369aedd93790c623df9/LICENSE-MIT",
+        "sha256": "c8167fdeeed46d3f244d3f85c5bf998ce889343691c32be2c61a8bc4b5c08333"
+      }
+    ]
+  },
+  "profiling-procmacros@1.0.18": {
+    "license": "MIT OR Apache-2.0",
+    "notices": [
+      {
+        "notice": "profiling-procmacros-1.0.18-LICENSE-APACHE",
+        "source": "https://raw.githubusercontent.com/aclysma/profiling/8271551172eb6fa4cba47369aedd93790c623df9/LICENSE-APACHE",
+        "sha256": "10d30a673cd5e9349bdc02aeb48f14b3386d27d0da32df8f0a555d4aa16aa551"
+      },
+      {
+        "notice": "profiling-procmacros-1.0.18-LICENSE-MIT",
+        "source": "https://raw.githubusercontent.com/aclysma/profiling/8271551172eb6fa4cba47369aedd93790c623df9/LICENSE-MIT",
+        "sha256": "c8167fdeeed46d3f244d3f85c5bf998ce889343691c32be2c61a8bc4b5c08333"
+      }
+    ]
+  }
+}
