@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Real core, validated documents, GTK/Wayland renderer; all children reaped."""
+import argparse
 import copy
 import json
 import os
@@ -15,8 +16,16 @@ ROOT=Path(__file__).resolve().parents[1]
 CORE=ROOT.parent/'agent-shell/target/release/agent-os-core'
 PROTOCOL='agentos.presentation/1'
 CATALOG='native-core/1'
-OUTPUT=ROOT/'test-output'
-OUTPUT.mkdir(exist_ok=True)
+parser=argparse.ArgumentParser()
+parser.add_argument('--compositor',action='store_true')
+parser.add_argument('--shared',action='store_true')
+parser.add_argument('--appearance',choices=['light','dark'],default='dark')
+parser.add_argument('--text-scale',type=float,choices=[1.0,2.0],default=1.0)
+parser.add_argument('--load',action='store_true',help='Two bounded CPU workers; not model inference')
+args=parser.parse_args()
+profile=f'{args.appearance}-{args.text_scale:g}'+('-load' if args.load else '')
+OUTPUT=ROOT/'test-output'/profile
+OUTPUT.mkdir(parents=True,exist_ok=True)
 
 def reap(proc):
     if proc.poll() is None:os.killpg(proc.pid,signal.SIGTERM)
@@ -27,8 +36,10 @@ METRICS=OUTPUT/'metrics';METRICS.mkdir(exist_ok=True)
 previous_metrics=set(METRICS.glob('render-*.json'))
 with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
     runtime=Path(directory);endpoint=runtime/'core.sock'
+    config=runtime/'config';(config/'agent-os').mkdir(parents=True)
+    (config/'agent-os/desktop.json').write_text(json.dumps({'appearance':args.appearance,'text_scale':args.text_scale,'reduced_motion':args.text_scale==2}))
     shared='--shared' in sys.argv
-    env={**os.environ,'AGENT_OS_METRICS_DIR':str(METRICS),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),'XDG_RUNTIME_DIR':directory,'WAYLAND_DISPLAY':'native-test','GDK_BACKEND':'wayland','GSK_RENDERER':'cairo','GTK_A11Y':'atspi','G_DEBUG':'fatal-criticals','AGENT_OS_STATE':str(runtime/'state'),'AGENT_OS_SOCKET':str(endpoint)}
+    env={**os.environ,'XDG_CONFIG_HOME':str(config),'AGENT_OS_METRICS_DIR':str(METRICS),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),'XDG_RUNTIME_DIR':directory,'WAYLAND_DISPLAY':'native-test','GDK_BACKEND':'wayland','GSK_RENDERER':'cairo','GTK_A11Y':'atspi','G_DEBUG':'fatal-criticals','AGENT_OS_STATE':str(runtime/'state'),'AGENT_OS_SOCKET':str(endpoint)}
     def call(value):
         with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as conn:
             conn.settimeout(5);conn.connect(str(endpoint));conn.sendall(json.dumps(value).encode()+b'\n')
@@ -40,7 +51,14 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
         compositor=None
         nested=None
         applications=[]
+        load_workers=[]
         try:
+            if args.load:
+                for _ in range(2):
+                    # Bound each worker even if this test is killed before cleanup.
+                    load_workers.append(subprocess.Popen([sys.executable,'-c',
+                        'import hashlib,time; end=time.monotonic()+120; data=b"x"*65536\nwhile time.monotonic()<end: hashlib.sha256(data).digest()'],
+                        stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True))
             deadline=time.monotonic()+10
             while not endpoint.exists():
                 assert core.poll() is None,'Core exited'
@@ -243,6 +261,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                     assert control_call({'op':'shutdown'})['ok'];nested.wait(timeout=10)
 
         finally:
+            for worker in load_workers:reap(worker)
             for application in applications:reap(application)
             if nested:reap(nested)
             if compositor:reap(compositor)
@@ -261,3 +280,5 @@ for report in reports:
         assert 0<values['retained']<=256 and values['samples_total']>=values['retained']
         assert 0<=values['p50_recent_ms']<=values['p95_recent_ms']<=values['max_recent_ms']
 print('PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim')
+
+(OUTPUT/'profile.json').write_text(json.dumps({'appearance':args.appearance,'text_scale':args.text_scale,'reduced_motion':args.text_scale==2,'cpu_workers':2 if args.load else 0,'qualification':'CPU/render-submit timing; not input-to-display or model inference'},indent=2)+'\n')

@@ -243,7 +243,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         .application_id("com.agentos.DesktopVerification")
         .build();
     app.connect_activate(move |app| {
-        ui::install_theme(&gtk::gdk::Display::default().unwrap(),Appearance::Dark,1.0,true);
+        preferences::apply(&gtk::gdk::Display::default().unwrap());
         let state=transport::request(&socket,&json!({"op":"presentation.snapshot"})).expect("Real core snapshot");
         let mut doc=state["documents"]["native-fixture"].clone();assert!(doc.is_object());
         transport::request(&socket,&json!({"op":"host.renderer","surface_id":"native-fixture"})).expect("Authenticated fixture renderer");

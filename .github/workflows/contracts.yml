@@ -60,7 +60,13 @@ jobs:
           sudo apt-get install -y --no-install-recommends tmux
           python3 outputs/native-shell/tests/pty_broker.py
       - name: Real native rendering and interaction
-        run: dbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py
+        run: |
+          for appearance in light dark; do
+            for scale in 1 2; do
+              dbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py --appearance "$appearance" --text-scale "$scale"
+            done
+          done
+          dbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py --load
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

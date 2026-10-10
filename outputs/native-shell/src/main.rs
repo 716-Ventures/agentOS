@@ -1280,7 +1280,7 @@ fn main() {
     let frontend = backend.clone();
     app.connect_activate(move |app| {
         let display = gtk::gdk::Display::default().expect("A native Wayland display is required");
-        ui::install_theme(&display, Appearance::Dark, 1.0, false);
+        preferences::apply(&display);
         let bar = ui::row(20);
         bar.add_css_class("seven-ui");
         bar.set_margin_top(12);
