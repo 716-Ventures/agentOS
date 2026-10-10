@@ -92,9 +92,18 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
             Some("snapshot") => {
                 state.arrange();
                 let windows=state.space.elements().map(|w|{let surface=w.toplevel().unwrap().wl_surface();let (title,app_id)=smithay::wayland::compositor::with_states(surface,|states|{let data=states.data_map.get::<smithay::wayland::shell::xdg::XdgToplevelSurfaceData>().unwrap().lock().unwrap();(data.title.clone(),data.app_id.clone())});let geometry=state.space.element_geometry(w);json!({"id":format!("{:?}",surface.id()),"title":title,"app_id":app_id,"geometry":geometry.map(|r|json!({"x":r.loc.x,"y":r.loc.y,"width":r.size.w,"height":r.size.h}))})}).collect::<Vec<_>>();
-                Ok(json!({"layout":state.policy.current,"windows":windows}))
+                let scene = state
+                    .bridge
+                    .as_ref()
+                    .map(|b| b.scene.lock().unwrap().clone());
+                Ok(
+                    json!({"layout":state.policy.current,"windows":windows,"shared":scene.map(|s|json!({"identities":s.identities,"workspaces":s.workspaces,"error":s.error}))}),
+                )
             }
             Some("place") => {
+                if state.bridge.is_some() {
+                    return Err("Use workspace.apply with an exact document revision".into());
+                }
                 let id = v["id"].as_str().ok_or("Window ID required")?;
                 let expected = v["expected_revision"].as_u64().ok_or("Revision required")?;
                 let placement = serde_json::from_value(v["placement"].clone())
@@ -104,6 +113,9 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
                 Ok(json!({"revision":state.policy.current.revision}))
             }
             Some("undo") => {
+                if state.bridge.is_some() {
+                    return Err("Use workspace.undo with a journal event cursor".into());
+                }
                 if v["expected_revision"].as_u64() != Some(state.policy.current.revision) {
                     return Err("Layout changed".into());
                 }
@@ -112,6 +124,9 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
                 Ok(json!({"revision":state.policy.current.revision}))
             }
             Some("focus") => {
+                if state.bridge.is_some() {
+                    return Err("Use workspace.apply to persist focus".into());
+                }
                 let id = v["id"].as_str().ok_or("Window ID required")?;
                 if v["expected_revision"].as_u64() != Some(state.policy.current.revision) {
                     return Err("Layout changed".into());

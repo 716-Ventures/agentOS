@@ -1,6 +1,7 @@
 //! Adapted from Smithay smallvil v0.6.0 (MIT); see LICENSE-SMITHAY.
 #![allow(irrefutable_let_patterns)]
 
+mod bridge;
 mod control;
 mod handlers;
 mod policy;
@@ -65,6 +66,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         &mut data,
         move |data| {
             for req in control.requests.try_iter().take(8) {
+                if req.value["op"]
+                    .as_str()
+                    .map(|op| op.starts_with("workspace."))
+                    .unwrap_or(false)
+                {
+                    if let Some(bridge) = &data.state.bridge {
+                        if let Err(error) = bridge.commands.try_send(req) {
+                            let req = error.into_inner();
+                            let _ = req.reply.try_send(
+                                serde_json::json!({"ok":false,"error":"Workspace worker busy"}),
+                            );
+                        }
+                        continue;
+                    }
+                }
                 let response = control::handle(&mut data.state, &req.value);
                 let _ = req.reply.try_send(response);
             }

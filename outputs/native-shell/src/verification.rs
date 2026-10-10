@@ -9,6 +9,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         ui::install_theme(&gtk::gdk::Display::default().unwrap(),Appearance::Dark,1.0,true);
         let state=transport::request(&socket,&json!({"op":"presentation.snapshot"})).expect("Real core snapshot");
         let mut doc=state["documents"]["native-fixture"].clone();assert!(doc.is_object());
+        transport::request(&socket,&json!({"op":"host.renderer","surface_id":"native-fixture"})).expect("Authenticated fixture renderer");
         let mut frame=Frame{connected:true,..Frame::default()};
         let bindings=transport::request(&socket,&json!({"op":"binding.snapshot","surface_id":"native-fixture"})).unwrap();frame.bindings.insert("native-fixture".into(),bindings);
         let (commands,rx)=mpsc::channel();let drafts=Arc::new(Mutex::new(BTreeMap::new()));

@@ -26,6 +26,8 @@ use crate::CalloopData;
 
 pub struct Smallvil {
     pub policy: crate::policy::Policy,
+    pub bridge: Option<crate::bridge::Bridge>,
+    pub applied_focus: Option<String>,
     pub start_time: std::time::Instant,
     pub socket_name: OsString,
     pub display_handle: DisplayHandle,
@@ -84,6 +86,9 @@ impl Smallvil {
 
         Self {
             policy: crate::policy::Policy::default(),
+            bridge: std::env::var_os("AGENT_OS_COMPOSITOR_CORE")
+                .map(|p| crate::bridge::Bridge::start(p.into())),
+            applied_focus: None,
             start_time,
             display_handle: dh,
 
@@ -120,9 +125,16 @@ impl Smallvil {
                 // Inside the callback, you should insert the client into the display.
                 //
                 // You may also associate some data with the client when inserting the client.
+                let peer = peer_identity(&client_stream);
                 state
                     .display_handle
-                    .insert_client(client_stream, Arc::new(ClientState::default()))
+                    .insert_client(
+                        client_stream,
+                        Arc::new(ClientState {
+                            peer,
+                            ..ClientState::default()
+                        }),
+                    )
                     .unwrap();
             })
             .expect("Failed to init the wayland event source.");
@@ -160,12 +172,33 @@ impl Smallvil {
         let Some(area) = self.space.output_geometry(output) else {
             return;
         };
-        let placements = self.policy.arrange(crate::policy::Rect {
+        let area = crate::policy::Rect {
             x: area.loc.x,
             y: area.loc.y,
             width: area.size.w,
             height: area.size.h,
-        });
+        };
+        let mut placements = self.policy.arrange(area);
+        if let Some(bridge) = &self.bridge {
+            bridge.observe(windows.iter().map(observe).collect(), area);
+            let scene = bridge.scene.lock().unwrap().clone();
+            placements.extend(scene.rectangles);
+            if scene.focus != self.applied_focus {
+                if let Some(window) = windows.iter().find(|w| {
+                    Some(format!("{:?}", w.toplevel().unwrap().wl_surface().id())) == scene.focus
+                }) {
+                    self.space.raise_element(window, true);
+                    if let Some(keyboard) = self.seat.get_keyboard() {
+                        keyboard.set_focus(
+                            self,
+                            Some(window.toplevel().unwrap().wl_surface().clone()),
+                            smithay::utils::SERIAL_COUNTER.next_serial(),
+                        );
+                    }
+                }
+                self.applied_focus = scene.focus;
+            }
+        }
         for (id, window) in ids.iter().zip(windows) {
             if let Some(rect) = placements.get(id) {
                 let top = window.toplevel().unwrap();
@@ -203,9 +236,63 @@ impl Smallvil {
 #[derive(Default)]
 pub struct ClientState {
     pub compositor_state: CompositorClientState,
+    pub peer: Option<(u32, String)>,
 }
 
 impl ClientData for ClientState {
     fn initialized(&self, _client_id: ClientId) {}
     fn disconnected(&self, _client_id: ClientId, _reason: DisconnectReason) {}
+}
+
+pub fn observe(window: &Window) -> crate::bridge::Observed {
+    let surface = window.toplevel().unwrap().wl_surface();
+    let (title, app_id) = smithay::wayland::compositor::with_states(surface, |states| {
+        let data = states
+            .data_map
+            .get::<smithay::wayland::shell::xdg::XdgToplevelSurfaceData>()
+            .unwrap()
+            .lock()
+            .unwrap();
+        (
+            data.title.clone().unwrap_or_default(),
+            data.app_id.clone().unwrap_or_default(),
+        )
+    });
+    let peer = surface.client().and_then(|client| {
+        client
+            .get_data::<ClientState>()
+            .and_then(|d| d.peer.clone())
+    });
+    let (uid, session) = peer.unwrap_or((u32::MAX, String::new()));
+    crate::bridge::Observed {
+        id: format!("{:?}", surface.id()),
+        title,
+        app_id,
+        uid,
+        session,
+    }
+}
+fn peer_identity(stream: &std::os::unix::net::UnixStream) -> Option<(u32, String)> {
+    use std::os::fd::AsRawFd;
+    let mut credential = std::mem::MaybeUninit::<libc::ucred>::uninit();
+    let mut size = std::mem::size_of::<libc::ucred>() as libc::socklen_t;
+    if unsafe {
+        libc::getsockopt(
+            stream.as_raw_fd(),
+            libc::SOL_SOCKET,
+            libc::SO_PEERCRED,
+            credential.as_mut_ptr().cast(),
+            &mut size,
+        )
+    } != 0
+    {
+        return None;
+    }
+    if size as usize != std::mem::size_of::<libc::ucred>() {
+        return None;
+    }
+    let credential = unsafe { credential.assume_init() };
+    let stat = std::fs::read_to_string(format!("/proc/{}/stat", credential.pid)).ok()?;
+    let start = stat.rsplit_once(')')?.1.split_whitespace().nth(19)?;
+    Some((credential.uid, format!("{}:{start}", credential.pid)))
 }

@@ -77,6 +77,8 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             outputs/native-compositor/target
+            outputs/native-shell/target
+            outputs/agent-shell/target
           key: compositor-arm64-rust185-${{ hashFiles('outputs/native-compositor/Cargo.lock') }}
       - name: Build and policy tests
         run: |
@@ -87,6 +89,7 @@ jobs:
           cargo +1.85.1 build --locked --manifest-path outputs/native-shell/Cargo.toml
           cargo +1.85.1 build --release --locked --manifest-path outputs/agent-shell/Cargo.toml
           dbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py --compositor
+          dbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py --compositor --shared
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
