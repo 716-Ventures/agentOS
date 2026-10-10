@@ -809,6 +809,13 @@ fn documents(db: &Connection) -> Result<BTreeMap<String, Document>> {
     .collect()
 }
 fn snapshot(db: &Connection) -> Result<Value> {
+    let bytes: i64 = db.query_row("SELECT COALESCE(SUM(length(CAST(body AS BLOB))+length(CAST(id AS BLOB))+8),0) FROM presentation_documents", [], |r| r.get(0)).map_err(db_error)?;
+    if bytes > (TRANSACTION_LIMIT - 1024) as i64 {
+        return Err(error(
+            "pagination_required",
+            "Use presentation.page and presentation.changes for this workspace",
+        ));
+    }
     let docs = documents(db)?;
     let referenced = docs
         .values()
@@ -825,9 +832,14 @@ fn snapshot(db: &Connection) -> Result<Value> {
             |r| r.get(0),
         )
         .map_err(db_error)?;
-    Ok(
-        json!({"protocol":PROTOCOL,"catalog_revision":CATALOG,"documents":docs,"host_surfaces":crate::presentation_hosts::snapshot(db,&referenced)?,"renderers":crate::presentation_hosts::renderers(db)?,"event_cursor":cursor}),
-    )
+    let state = json!({"protocol":PROTOCOL,"catalog_revision":CATALOG,"documents":docs,"host_surfaces":crate::presentation_hosts::snapshot(db,&referenced)?,"renderers":crate::presentation_hosts::renderers(db)?,"event_cursor":cursor});
+    if state.to_string().len() > TRANSACTION_LIMIT {
+        return Err(error(
+            "pagination_required",
+            "Use presentation.page and presentation.metadata for this workspace",
+        ));
+    }
+    Ok(state)
 }
 /// Pages carry a journal cursor so callers never combine different document states.
 fn page(db: &Connection, value: &Value) -> Result<Value> {
@@ -1540,7 +1552,12 @@ pub fn handle(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> 
         "presentation.changes" => changes(db, v),
         "presentation.apply" => apply(db, v, who),
         "presentation.subscribe" => {
-            let cursor = v["after_cursor"].as_i64().unwrap_or(0);
+            let cursor = match v.get("after_cursor") {
+                None => 0,
+                Some(value) => value
+                    .as_i64()
+                    .ok_or_else(|| invalid("Cursor must be a nonnegative integer"))?,
+            };
             if cursor < 0 {
                 return Err(invalid("Cursor must be nonnegative"));
             }
@@ -1557,10 +1574,35 @@ pub fn handle(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> 
             if cursor > latest {
                 return Err(error("resync_required", "Cursor is ahead of the journal"));
             }
-            let mut q=db.prepare("SELECT cursor,after_state,receipt FROM presentation_events WHERE cursor>? ORDER BY cursor LIMIT 32").map_err(db_error)?;
-            let events=q.query_map([cursor],|r|Ok((r.get::<_,i64>(0)?,r.get::<_,String>(1)?,r.get::<_,String>(2)?))).map_err(db_error)?
-                .map(|r|{let(c,d,receipt)=r.map_err(db_error)?;Ok(json!({"event_cursor":c,"documents":serde_json::from_str::<Value>(&d).map_err(db_error)?,"receipt":serde_json::from_str::<Value>(&receipt).map_err(db_error)?}))}).collect::<Result<Vec<_>>>()?;
-            Ok(json!({"protocol":PROTOCOL,"events":events,"latest_cursor":latest}))
+            let mut query = db.prepare("SELECT cursor,after_state,receipt FROM presentation_events WHERE cursor>? ORDER BY cursor LIMIT 33").map_err(db_error)?;
+            let mut rows = query.query([cursor]).map_err(db_error)?;
+            let mut events = Vec::new();
+            let mut bytes = 1024;
+            let mut next = cursor;
+            let mut more = false;
+            while let Some(row) = rows.next().map_err(db_error)? {
+                let observed: i64 = row.get(0).map_err(db_error)?;
+                let body: String = row.get(1).map_err(db_error)?;
+                let receipt: String = row.get(2).map_err(db_error)?;
+                if events.len() >= 32
+                    || bytes + body.len() + receipt.len() + 128 > TRANSACTION_LIMIT
+                {
+                    if events.is_empty() {
+                        return Err(error(
+                            "pagination_required",
+                            "Use presentation.changes and presentation.get for this journal event",
+                        ));
+                    }
+                    more = true;
+                    break;
+                }
+                bytes += body.len() + receipt.len() + 128;
+                events.push(json!({"event_cursor":observed,"documents":serde_json::from_str::<Value>(&body).map_err(db_error)?,"receipt":serde_json::from_str::<Value>(&receipt).map_err(db_error)?}));
+                next = observed;
+            }
+            Ok(
+                json!({"protocol":PROTOCOL,"events":events,"latest_cursor":latest,"next_cursor":next,"has_more":more}),
+            )
         }
         "outputs.register" | "outputs.disconnect" | "outputs.list" => {
             crate::presentation_outputs::handle(db, v, who)
@@ -2308,6 +2350,65 @@ mod tests {
         assert!(large.to_string().len() <= 512 * 1024);
         assert_eq!(large["has_more"], true);
         assert!(large["events"].as_array().unwrap().len() < 32);
+    }
+    #[test]
+    fn legacy_snapshot_and_subscription_require_bounded_reads_without_skipping_events() {
+        let mut db = fixture();
+        create(&mut db);
+        let body = json!({"payload":"日".repeat(250000)}).to_string();
+        for i in 0..12 {
+            db.execute("INSERT INTO presentation_events(uid,request,before_state,after_state,receipt) VALUES(0,?,'{}',?,'{}')", params![format!("bounded-{i}"), body]).unwrap();
+        }
+        let mut cursor = 1;
+        let mut seen = Vec::new();
+        loop {
+            let page = handle(
+                &mut db,
+                &json!({"op":"presentation.subscribe","after_cursor":cursor}),
+                &human(),
+            )
+            .unwrap();
+            assert!(page.to_string().len() < TRANSACTION_LIMIT);
+            seen.extend(
+                page["events"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|e| e["event_cursor"].as_i64().unwrap()),
+            );
+            cursor = page["next_cursor"].as_i64().unwrap();
+            if page["has_more"] == false {
+                break;
+            }
+        }
+        assert_eq!(seen, (2..=13).collect::<Vec<_>>());
+        for invalid in [json!(true), json!("1"), json!(1.5)] {
+            assert!(handle(
+                &mut db,
+                &json!({"op":"presentation.subscribe","after_cursor":invalid}),
+                &human()
+            )
+            .is_err());
+        }
+        db.execute(
+            "UPDATE presentation_events SET after_state=? WHERE cursor=2",
+            [json!({"payload":"x".repeat(TRANSACTION_LIMIT)}).to_string()],
+        )
+        .unwrap();
+        assert!(handle(
+            &mut db,
+            &json!({"op":"presentation.subscribe","after_cursor":1}),
+            &human()
+        )
+        .unwrap_err()
+        .contains("pagination_required"));
+        // Guard before decoding bodies: legacy snapshots cannot allocate an entire large workspace.
+        db.execute(
+            "UPDATE presentation_documents SET body=?",
+            ["x".repeat(TRANSACTION_LIMIT)],
+        )
+        .unwrap();
+        assert!(snapshot(&db).unwrap_err().contains("pagination_required"));
     }
     #[test]
     fn ordered_subscription_and_reopen_preserve_receipts() {

@@ -27,6 +27,8 @@ use std::{
 
 type Result<T> = std::result::Result<T, String>;
 const LOG_LIMIT: usize = 1024 * 1024;
+const RUNTIME_MODE: &str =
+    "Gateway agent with effects-based broker; Jev typed advisory; separate offline voice service";
 // Withhold an incomplete UTF-8 suffix while a live producer can finish it.
 fn log_text(bytes: &[u8], final_page: bool) -> (String, usize) {
     let mut consumed = bytes.len();
@@ -153,15 +155,26 @@ impl Core {
         let mut s = db
             .prepare("SELECT id,name,created_at FROM activities WHERE id NOT IN (SELECT activity_id FROM removed_activities) ORDER BY id DESC")
             .map_err(err)?;
-        let activities=s.query_map([], |r| { let n:i64=r.get(0)?; Ok(json!({"id":n,"name":r.get::<_,String>(1)?,"created_at":r.get::<_,i64>(2)?,"workspace":self.root.join("workspaces").join(n.to_string())})) }).map_err(err)?.collect::<std::result::Result<Vec<_>,_>>().map_err(err)?;
+        let mut bytes = 1024;
+        let mut activities = Vec::new();
+        for row in s.query_map([], |r| { let n:i64=r.get(0)?; Ok(json!({"id":n,"name":r.get::<_,String>(1)?,"created_at":r.get::<_,i64>(2)?,"workspace":self.root.join("workspaces").join(n.to_string())})) }).map_err(err)? {
+            let value = row.map_err(err)?;
+            bytes += value.to_string().len() + 1;
+            if bytes > LOG_LIMIT { return Err("Runtime snapshot exceeds byte limit; use state.page".into()); }
+            activities.push(value);
+        }
         let mut s=db.prepare("SELECT id,activity_id,argv,status,exit_code,created_at,finished_at,error FROM jobs WHERE status IN ('starting','running','cancelling') OR id IN (SELECT id FROM jobs ORDER BY id DESC LIMIT 200) ORDER BY id DESC").map_err(err)?;
-        let jobs = s
-            .query_map([], job_value)
-            .map_err(err)?
-            .collect::<std::result::Result<Vec<_>, _>>()
-            .map_err(err)?;
+        let mut jobs = Vec::new();
+        for row in s.query_map([], job_value).map_err(err)? {
+            let value = row.map_err(err)?;
+            bytes += value.to_string().len() + 1;
+            if bytes > LOG_LIMIT {
+                return Err("Runtime snapshot exceeds byte limit; use state.page".into());
+            }
+            jobs.push(value);
+        }
         Ok(
-            json!({"revision":revision(&db)?,"activities":activities,"jobs":jobs,"version":env!("CARGO_PKG_VERSION"),"mode":"Gateway agent with effects-based broker; Jev typed advisory; separate offline voice service"}),
+            json!({"revision":revision(&db)?,"activities":activities,"jobs":jobs,"version":env!("CARGO_PKG_VERSION"),"mode":RUNTIME_MODE}),
         )
     }
     fn state_page(&self, v: &Value) -> Result<Value> {
@@ -169,6 +182,11 @@ impl Core {
         if !["activities", "jobs", "events"].contains(&collection) {
             return Err("Invalid state collection".into());
         }
+        let recent = match v.get("recent_only") {
+            None => false,
+            Some(Value::Bool(recent)) if collection == "jobs" => *recent,
+            _ => return Err("Recent filter is only supported for jobs".into()),
+        };
         let before = match v.get("before_id") {
             None | Some(Value::Null) => i64::MAX,
             Some(value) => value
@@ -205,21 +223,26 @@ impl Core {
         let sql = if collection == "activities" {
             "SELECT id,name,created_at FROM activities WHERE id<?1 AND (?2 IS NULL OR id=?2) AND id NOT IN (SELECT activity_id FROM removed_activities) ORDER BY id DESC LIMIT ?3"
         } else if collection == "jobs" {
-            "SELECT id,activity_id,argv,status,exit_code,created_at,finished_at,error FROM jobs WHERE id<?1 AND (?2 IS NULL OR activity_id=?2) ORDER BY id DESC LIMIT ?3"
+            "SELECT id,activity_id,argv,status,exit_code,created_at,finished_at,error FROM jobs WHERE id<?1 AND (?2 IS NULL OR activity_id=?2) AND (?4=0 OR status IN ('starting','running','cancelling') OR id IN (SELECT id FROM jobs ORDER BY id DESC LIMIT 200)) ORDER BY id DESC LIMIT ?3"
         } else {
             "SELECT id,at,job_id,kind,detail FROM events WHERE id<?1 AND activity_id=?2 ORDER BY id DESC LIMIT ?3"
         };
         let mut query = db.prepare(sql).map_err(err)?;
-        let rows=query.query_map(params![before,activity,limit+1],|row| {
+        let mut query_rows = if collection == "jobs" {
+            query.query(params![before, activity, limit + 1, recent])
+        } else {
+            query.query(params![before, activity, limit + 1])
+        }
+        .map_err(err)?;
+        let mut values = Vec::<Value>::new();
+        let mut bytes = 512;
+        let mut more = false;
+        while let Some(row) = query_rows.next().map_err(err)? {
+            let value: Value = (|| -> rusqlite::Result<Value> {
             if collection=="jobs" {job_value(row)} else if collection=="events" {
                 Ok(json!({"id":row.get::<_,i64>(0)?,"at":row.get::<_,i64>(1)?,"job_id":row.get::<_,Option<i64>>(2)?,"kind":row.get::<_,String>(3)?,"detail":serde_json::from_str::<Value>(&row.get::<_,String>(4)?).unwrap_or(Value::Null)}))
             } else {let id:i64=row.get(0)?;Ok(json!({"id":id,"name":row.get::<_,String>(1)?,"created_at":row.get::<_,i64>(2)?,"workspace":self.root.join("workspaces").join(id.to_string())}))}
-        }).map_err(err)?;
-        let mut values = Vec::<Value>::new();
-        let mut bytes = 256;
-        let mut more = false;
-        for row in rows {
-            let value = row.map_err(err)?;
+            })().map_err(err)?;
             let size = serde_json::to_vec(&value).map_err(err)?.len() + 1;
             if values.len() >= limit as usize || bytes + size > 1024 * 1024 {
                 if values.is_empty() {
@@ -237,7 +260,7 @@ impl Core {
             None
         };
         Ok(
-            json!({"collection":collection,"revision":revision,"rows":values,"next_before_id":next,"version":env!("CARGO_PKG_VERSION")}),
+            json!({"collection":collection,"revision":revision,"rows":values,"next_before_id":next,"version":env!("CARGO_PKG_VERSION"),"mode":RUNTIME_MODE}),
         )
     }
     fn create(&self, v: &Value) -> Result<Value> {
@@ -797,6 +820,39 @@ mod tests {
             }
         }
         assert_eq!(ids.len(), 300);
+        assert!(core.snapshot().unwrap_err().contains("state.page"));
+        {
+            let db = core.db.lock().unwrap();
+            db.execute("UPDATE jobs SET status='running' WHERE id=1", [])
+                .unwrap();
+        }
+        let mut recent = Vec::new();
+        let mut before = Value::Null;
+        loop {
+            let page = core
+                .state_page(&json!({"collection":"jobs","recent_only":true,"before_id":before}))
+                .unwrap();
+            recent.extend(
+                page["rows"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|row| row["id"].as_i64().unwrap()),
+            );
+            before = page["next_before_id"].clone();
+            if before.is_null() {
+                break;
+            }
+        }
+        assert_eq!(recent.len(), 201);
+        assert!(recent.contains(&1));
+        assert!(!recent.contains(&2));
+        assert!(core
+            .state_page(&json!({"collection":"jobs","recent_only":"yes"}))
+            .is_err());
+        assert!(core
+            .state_page(&json!({"collection":"activities","recent_only":true}))
+            .is_err());
         assert!(ids.windows(2).all(|pair| pair[0] > pair[1]));
         assert_eq!(
             core.handle(&json!({"op":"job.get","job_id":1})).unwrap()["id"],

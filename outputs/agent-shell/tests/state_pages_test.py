@@ -16,6 +16,14 @@ class StatePages(unittest.TestCase):
             self.assertEqual(fields['collection'],'jobs');self.assertEqual(fields['activity_id'],3);self.assertEqual(fields['expected_revision'],2)
             return {'revision':2,'rows':[{'id':7}],'next_before_id':None}
         self.assertEqual(read(request,3)['jobs'],[{'id':7}]);self.assertEqual(calls[1]['before_id'],2)
+    def test_recent_jobs_are_explicit_and_mode_survives_paging(self):
+        calls=[]
+        def request(op,**fields):
+            calls.append(fields)
+            return {'revision':1,'version':'test','mode':'Measured mode','rows':[],'next_before_id':None}
+        state=read(request,recent=True)
+        self.assertEqual(state['mode'],'Measured mode');self.assertEqual(state['version'],'test')
+        self.assertNotIn('recent_only',calls[0]);self.assertTrue(calls[1]['recent_only'])
     def test_cancellation_bad_rows_and_nonadvancing_cursor_fail_without_spin(self):
         def unexpected(*args,**kwargs):self.fail('Cancelled request dispatched')
         with self.assertRaisesRegex(RuntimeError,'cancelled'):read(unexpected,stopped=lambda:True)

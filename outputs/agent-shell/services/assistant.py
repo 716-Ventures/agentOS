@@ -177,8 +177,8 @@ def handle(req, conn):
                 if name.startswith('knowledge_'):
                     return knowledge.operate(name.removeprefix('knowledge_'),activity=activity,**args)
                 if name in ('layout_snapshot','layout_change'):
-                    with connect('/run/agent-os/runtime.sock',{'op':'snapshot'},timeout=3) as core:
-                        with core.makefile('rb') as f: core_state=read_line(f)['result']
+                    import state_pages
+                    core_state=state_pages.read(presentation_client.request,activity,recent=True)
                     jobs=[{**j,'source':'core'} for j in core_state['jobs'] if j['activity_id']==activity]
                     jobs.extend({**j,'id':'broker:'+j['id'],'native_id':j['id'],'source':'broker'} for j in broker_request('list',activity=activity))
                     if name=='layout_snapshot':

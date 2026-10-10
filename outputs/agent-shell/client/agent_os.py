@@ -22,6 +22,7 @@ import unicodedata
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from voice_input import VoiceInput, from_file as voice_from_file
 import presentation_view
+import state_pages
 from urllib.parse import urlsplit
 
 SOCKET = os.environ.get('AGENT_OS_SOCKET', '/run/agent-os/runtime.sock')
@@ -29,6 +30,7 @@ LIVE = {'starting', 'running', 'cancelling'}
 
 
 def request(op, **fields):
+    if op=='snapshot':return state_pages.read(request,recent=True)
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as conn:
         conn.settimeout(3)
         conn.connect(SOCKET)
