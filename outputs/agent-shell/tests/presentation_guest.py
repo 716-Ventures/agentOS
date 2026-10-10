@@ -20,7 +20,7 @@ def main():
         root=Path(directory);root.chmod(0o755)
         endpoint=str(root/'api.sock')
         def start():
-            proc=subprocess.Popen([str(ROOT/'target/release/agent-os-core')],env={**os.environ,'AGENT_OS_STATE':str(root/'state'),'AGENT_OS_SOCKET':endpoint},stdout=subprocess.DEVNULL,stderr=subprocess.PIPE,start_new_session=True)
+            proc=subprocess.Popen([str(ROOT/'target/release/agent-os-core')],env={**os.environ,'AGENT_OS_STATE':str(root/'state'),'AGENT_OS_SOCKET':endpoint,'AGENT_OS_COMPOSITOR_UID':str(os.getuid())},stdout=subprocess.DEVNULL,stderr=subprocess.PIPE,start_new_session=True)
             deadline=time.monotonic()+5
             while time.monotonic()<deadline:
                 if proc.poll() is not None:raise RuntimeError(proc.stderr.read().decode())

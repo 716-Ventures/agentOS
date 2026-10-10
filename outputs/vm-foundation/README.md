@@ -2,7 +2,7 @@
 
 This is the first full-system milestone: a complete ARM64 Linux guest with UEFI boot, its own kernel, systemd, persistent storage, networking, login, and a small boot-record service. The upstream base is Debian 13, pinned to build `20260914-2601` and its published SHA-512 checksum.
 
-**The running image now also includes M0.1: the activity and job environment.** Run `agent-os` inside the guest or use the [Agent launcher](../agent-shell/Open%20Agent.command). See the [agent-shell instructions](../agent-shell/README.md). The separately deployed runtime now includes Gateway reasoning and Jev assessments; voice remains pending. `vm.py prepare` builds the M0 foundation; `reproduce.py` provisions and verifies the current runtime on it. Debian identity is retained; current guest build metadata lives in `/etc/agent-os/release.json`.
+**The running image now also includes M0.1: the activity and job environment.** Run `agent-os` inside the guest or use the [Agent launcher](../agent-shell/Open%20Agent.command). See the [agent-shell instructions](../agent-shell/README.md). The separately deployed runtime now includes Gateway reasoning and Jev assessments; offline English voice capture, deliberate review, grounding and cancellation are implemented and fixture-verified; physical speech quality remains unqualified. `vm.py prepare` builds the M0 foundation; `reproduce.py` provisions and verifies the current runtime on it. Debian identity is retained; current guest build metadata lives in `/etc/agent-os/release.json`.
 
 For a fresh build with runtime dependencies, installation recovery and automated acceptance, follow [Rebuild and verify agentOS](REPRODUCING.md).
 
@@ -105,7 +105,7 @@ Weston, Mesa, Wayland utilities, ALSA utilities, seatd, qemu-guest-agent and bui
 
 ## Next implementation milestone
 
-The environment core and terminal client are now installed: persistent activities, supervised jobs, action records, and cancellation. Gateway reasoning, general execution and Jev decisions are now implemented in agent-shell. Current work hardens those paths; voice remains required before declaring the first usable release. The system image and lifecycle tests remain the acceptance environment throughout.
+The environment core and terminal client are now installed: persistent activities, supervised jobs, action records, and cancellation. Gateway reasoning, general execution and Jev decisions are now implemented in agent-shell. Offline English voice capture, deliberate review, grounding and cancellation are implemented. Physical speech quality and the complete native desktop qualification remain required before declaring the first usable release. The system image and lifecycle tests remain the acceptance environment throughout.
 
 ## Sources
 
