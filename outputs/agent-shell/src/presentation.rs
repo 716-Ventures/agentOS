@@ -254,16 +254,7 @@ struct Apply {
 pub fn catalog() -> Value {
     json!({"protocol":PROTOCOL,"catalog_revision":CATALOG,
     "limits":{"document_bytes":DOCUMENT_LIMIT,"transaction_bytes":TRANSACTION_LIMIT,"elements":2048,"depth":32,"operations":128},
-    "components":{
-        "Stack@1":{"props":{"spacing":["compact","normal","relaxed"]},"slots":{"children":[0,2048]},"role":"group","minimum_size":[80,32]},
-        "Row@1":{"props":{"spacing":["compact","normal","relaxed"]},"slots":{"children":[0,2048]},"role":"group","minimum_size":[80,32]},
-        "Text@1":{"props":{"text":"string","role":["text","heading"]},"required":["text"],"role":"text","minimum_size":[80,32]},
-        "Status@1":{"props":{"value":"string"},"required":["value"],"bindable":["value"],"role":"status","minimum_size":[80,32]},
-        "Button@1":{"props":{"label":"string","disabled":"boolean"},"required":["label"],"events":["activate"],"role":"button","minimum_size":[80,32]},
-        "Link@1":{"props":{"label":"string","url":"string"},"required":["label","url"],"events":["activate"],"role":"link","minimum_size":[80,32]},
-        "TextField@1":{"props":{"label":"string","placeholder":"string","value":"string","multiline":"boolean"},"required":["label"],"events":["submit","change"],"role":"textbox","minimum_size":[160,40]},
-        "Progress@1":{"props":{"label":"string","value":"number"},"required":["label","value"],"bindable":["value"],"role":"progressbar","minimum_size":[80,32]}
-    }})
+    "components":seven_sixteen_ui::catalog::components()})
 }
 
 fn walk_elements(

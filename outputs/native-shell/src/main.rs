@@ -27,6 +27,7 @@ struct Element {
     widget: gtk::Widget,
     label: Option<gtk::Label>,
     field: Option<TextField>,
+    area: Option<ui::TextArea>,
     button: Option<gtk::Button>,
     progress: Option<gtk::ProgressBar>,
     container: Option<gtk::Box>,
@@ -80,6 +81,7 @@ fn construct(
         widget: gtk::Box::new(gtk::Orientation::Vertical, 0).upcast(),
         label: None,
         field: None,
+        area: None,
         button: None,
         progress: None,
         container: None,
@@ -119,6 +121,37 @@ fn construct(
                 .and_then(|d| d["draft"].as_str())
                 .or_else(|| props["value"].as_str())
                 .unwrap_or("");
+            if props["multiline"] == true {
+                let area = ui::TextArea::new(props["label"].as_str().unwrap_or("Text"), value);
+                let (s, e, edits, applying) = (
+                    surface.to_string(),
+                    id.to_string(),
+                    drafts.clone(),
+                    applying.clone(),
+                );
+                let expected = recovered
+                    .and_then(|d| d["draft_revision"].as_u64())
+                    .unwrap_or(0);
+                area.on_event(move |event| {
+                    if applying.get() {
+                        return;
+                    }
+                    if let InputEvent::Changed(text) = event {
+                        let mut drafts = edits.lock().unwrap();
+                        let draft = drafts.entry((s.clone(), e.clone())).or_insert(Draft {
+                            text: String::new(),
+                            expected,
+                            dirty: false,
+                        });
+                        draft.text = text;
+                        draft.dirty = true;
+                    }
+                });
+                result.widget = area.widget.clone().upcast();
+                lease(&area.view.clone().upcast(), surface, id, commands);
+                result.area = Some(area);
+                return result;
+            }
             let field = TextField::new(
                 props["label"].as_str().unwrap_or("Text"),
                 props["placeholder"].as_str().unwrap_or(""),
@@ -279,6 +312,14 @@ impl Surface {
                 .as_ref()
                 .map(|f| f.entry.has_focus() || f.entry.focus_child().is_some())
                 .unwrap_or(false)
+                || e.area
+                    .as_ref()
+                    .map(|a| {
+                        a.view.has_focus()
+                            || a.view.is_focus()
+                            || a.view.buffer().selection_bounds().is_some()
+                    })
+                    .unwrap_or(false)
                 || e.label
                     .as_ref()
                     .map(|l| l.selection_bounds().is_some())
@@ -301,7 +342,11 @@ impl Surface {
                 if self
                     .elements
                     .get(element)
-                    .map(|e| Some(e.kind.as_str()) != node["type"].as_str())
+                    .map(|e| {
+                        Some(e.kind.as_str()) != node["type"].as_str()
+                            || (e.kind == "TextField@1"
+                                && e.area.is_some() != (node["props"]["multiline"] == true))
+                    })
                     .unwrap_or(true)
                 {
                     self.elements.insert(
@@ -407,6 +452,20 @@ impl Surface {
                         .contains_key(&(id.into(), element.clone()))
                     {
                         field.reconcile(text);
+                    }
+                }
+                if let Some(area) = &e.area {
+                    let draft = frame
+                        .drafts
+                        .get(&(id.into(), element.clone()))
+                        .and_then(|v| v["draft"].as_str());
+                    let text = draft.or_else(|| props["value"].as_str()).unwrap_or("");
+                    let retained = drafts
+                        .lock()
+                        .unwrap()
+                        .contains_key(&(id.into(), element.clone()));
+                    if !retained {
+                        area.reconcile(text);
                     }
                 }
                 if let Some(button) = &e.button {
