@@ -34,6 +34,56 @@ fn verify_container_replacement(
     assert_eq!(a.parent().as_ref(), Some(&row));
     assert_eq!(b.parent().as_ref(), Some(&row));
     assert_eq!(surface.elements["b"].widget, b);
+    doc["revision"] = json!(4);
+    doc["elements"]["root"] = json!({"type":"Section@1","props":{"label":"Grouped details"},"slots":{"children":["region"]}});
+    doc["elements"]["region"] = json!({"type":"Scroll@1","props":{"label":"Scrollable details","spacing":"compact"},"slots":{"children":["a","b"]}});
+    surface.update(id, &doc, frame, commands, drafts);
+    let section = surface.elements["root"].section.as_ref().unwrap();
+    assert_eq!(
+        section.heading.accessible_role(),
+        gtk::AccessibleRole::Heading
+    );
+    assert_eq!(section.heading.text(), "Grouped details");
+    let region = surface.elements["region"].region.as_ref().unwrap();
+    assert_eq!(a.parent().as_ref(), Some(&region.content.clone().upcast()));
+    assert_eq!(region.content.spacing(), 6);
+    assert_eq!(
+        region.widget.parent().as_ref(),
+        Some(&section.content.clone().upcast())
+    );
+    doc["revision"] = json!(5);
+    doc["elements"]["root"]["props"]["label"] = json!("Updated details");
+    doc["elements"]["a"]["props"]["role"] = json!("heading");
+    surface.update(id, &doc, frame, commands, drafts);
+    assert_eq!(
+        surface.elements["root"]
+            .section
+            .as_ref()
+            .unwrap()
+            .heading
+            .text(),
+        "Updated details"
+    );
+    assert_eq!(
+        surface.elements["a"]
+            .label
+            .as_ref()
+            .unwrap()
+            .accessible_role(),
+        gtk::AccessibleRole::Heading
+    );
+    assert_eq!(surface.elements["b"].widget, b);
+    doc["revision"] = json!(6);
+    doc["elements"]["a"]["props"]["role"] = json!("text");
+    surface.update(id, &doc, frame, commands, drafts);
+    assert_eq!(
+        surface.elements["a"]
+            .label
+            .as_ref()
+            .unwrap()
+            .accessible_role(),
+        gtk::AccessibleRole::Label
+    );
     surface.window.destroy();
 }
 pub fn run(socket: PathBuf, capture: Option<String>) {

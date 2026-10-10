@@ -34,7 +34,9 @@ def project(document,bindings=None,width=80):
     def walk(key,depth=0):
         if depth>32:raise ValueError('View tree is too deep')
         node=elements[key];props=node.get('props',{});kind=node['type']
-        if kind in ('Stack@1','Row@1'):
+        if kind in ('Stack@1','Row@1','Section@1','Scroll@1'):
+            if kind in ('Section@1','Scroll@1'):
+                for line in clean(props.get('label','')).splitlines():lines.extend(textwrap.wrap(line,max(20,width)) or [''])
             for child in node.get('slots',{}).get('children',[]):walk(child,depth+1)
             return
         if kind in ('Text@1','Status@1'):text=text_value(props.get('text' if kind=='Text@1' else 'value'),bindings)

@@ -41,6 +41,8 @@ struct Element {
     button: Option<gtk::Button>,
     progress: Option<gtk::ProgressBar>,
     container: Option<gtk::Box>,
+    section: Option<ui::Section>,
+    region: Option<ui::ScrollRegion>,
     table: Option<ui::DataTable>,
     list: Option<ui::DataList>,
     link: Option<gtk::LinkButton>,
@@ -97,6 +99,8 @@ fn construct(
         button: None,
         progress: None,
         container: None,
+        section: None,
+        region: None,
         table: None,
         list: None,
         link: None,
@@ -124,6 +128,18 @@ fn construct(
             result.widget = list.widget.clone().upcast();
             lease(&result.widget, surface, id, commands);
             result.list = Some(list);
+        }
+        "Section@1" => {
+            let section = ui::Section::new(props["label"].as_str().unwrap()).unwrap();
+            result.widget = section.widget.clone().upcast();
+            result.container = Some(section.content.clone());
+            result.section = Some(section);
+        }
+        "Scroll@1" => {
+            let region = ui::ScrollRegion::new(props["label"].as_str().unwrap()).unwrap();
+            result.widget = region.widget.clone().upcast();
+            result.container = Some(region.content.clone());
+            result.region = Some(region);
         }
         "Stack@1" | "Row@1" => {
             let container = if kind == "Stack@1" {
@@ -474,6 +490,14 @@ impl Surface {
                                     .as_ref()
                                     .map(|table| json!(table.columns()) != node["props"]["columns"])
                                     .unwrap_or(true))
+                            || (e.kind == "Text@1"
+                                && e.label
+                                    .as_ref()
+                                    .map(|label| {
+                                        label.accessible_role() == gtk::AccessibleRole::Heading
+                                    })
+                                    .unwrap_or(false)
+                                    != (node["props"]["role"] == "heading"))
                             || (e.kind == "TextField@1"
                                 && e.area.is_some() != (node["props"]["multiline"] == true))
                     })
@@ -569,6 +593,16 @@ impl Surface {
         for (element, node) in nodes {
             if let Some(e) = self.elements.get_mut(element) {
                 let props = &node["props"];
+                if let Some(section) = &e.section {
+                    let _ = section.set_label(props["label"].as_str().unwrap());
+                }
+                if let Some(region) = &e.region {
+                    region
+                        .widget
+                        .update_property(&[gtk::accessible::Property::Label(
+                            props["label"].as_str().unwrap(),
+                        )]);
+                }
                 if e.table.is_some() || e.list.is_some() {
                     let rows = props["rows"]
                         .as_array()

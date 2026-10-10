@@ -2499,6 +2499,32 @@ mod tests {
         }
     }
     #[test]
+    fn labeled_sections_and_scroll_regions_validate_complete_nested_trees() {
+        let mut db = fixture();
+        let mut doc = surface();
+        doc["elements"]["root"] =
+            json!({"type":"Section@1","props":{"label":"Details"},"slots":{"children":["region"]}});
+        doc["elements"]["region"] = json!({"type":"Scroll@1","props":{"label":"Observed content","spacing":"compact"},"slots":{"children":["text","input"]}});
+        let create = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"section-view","expected_revisions":{"surface-a":null},"operations":[{"op":"surface.create","document":doc}]});
+        for element in ["root", "region"] {
+            let mut bad = create.clone();
+            bad["operations"][0]["document"]["elements"][element]["props"]["label"] = json!(" ");
+            assert!(handle(&mut db, &bad, &human())
+                .unwrap_err()
+                .contains("accessible label"));
+            bad["operations"][0]["document"]["elements"][element]["props"]
+                .as_object_mut()
+                .unwrap()
+                .remove("label");
+            assert!(handle(&mut db, &bad, &human()).is_err());
+        }
+        let mut bad = create.clone();
+        bad["operations"][0]["document"]["elements"]["region"]["slots"]["children"] =
+            json!(["root"]);
+        assert!(handle(&mut db, &bad, &human()).is_err());
+        handle(&mut db, &create, &human()).unwrap();
+    }
+    #[test]
     fn file_metadata_is_typed_private_scoped_and_monotonic() {
         let mut db = fixture();
         let root = Principal {

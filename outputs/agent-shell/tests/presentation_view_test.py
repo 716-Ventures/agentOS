@@ -29,6 +29,12 @@ class Projection(unittest.TestCase):
         lines,controls=view.project(doc);text='\n'.join(lines)
         self.assertIn('• 日本語',text);self.assertIn('Mode: 0644',text);self.assertNotIn('evil',text)
         self.assertNotIn('list',controls);self.assertNotIn('details',controls)
+    def test_sections_and_scroll_regions_preserve_labels_content_and_controls(self):
+        doc=document();doc['elements']['root']={'type':'Section@1','props':{'label':'Section 日本語\x1b]52;c;evil\x07'},'slots':{'children':['region']}}
+        doc['elements']['region']={'type':'Scroll@1','props':{'label':'Scrollable details'},'slots':{'children':['text','field','button']}}
+        lines,controls=view.project(doc);text='\n'.join(lines)
+        self.assertIn('Section 日本語',text);self.assertIn('Scrollable details',text);self.assertIn('Café 日本語',text);self.assertNotIn('evil',text)
+        self.assertEqual(set(controls),{'field','button'})
     def test_completed_multiline_input_survives_interruption(self):
         doc=document();doc['elements']['field']['props']['multiline']=True;calls=[]
         def request(op,**fields):calls.append(op);return {'draft_revision':0,'draft':None}
