@@ -179,6 +179,9 @@ def start(hide=True):
         call(['utmctl', 'start'] + (['--hide'] if hide else []) + [machine()['uuid']], timeout=30)
     except subprocess.TimeoutExpired as exc:
         raise RuntimeError('UTM start did not acknowledge within 30 seconds; do not retry automatically. Inspect the selected guest before continuing.') from exc
+    observed = status()
+    if observed != 'started':
+        raise RuntimeError(f'UTM start returned but guest state is {observed!r}; do not retry automatically. Inspect the selected guest before continuing.')
     print(f'UTM guest started; SSH is forwarded on localhost:{LOCK["ssh_port"]}.')
 
 
