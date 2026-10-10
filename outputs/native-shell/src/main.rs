@@ -1,6 +1,8 @@
 //! Native shell client: stable GTK controls over the core's inert presentation API.
+mod controls;
 mod transport;
 mod verification;
+mod voice;
 use gtk::{glib, prelude::*};
 use serde_json::{json, Value};
 use seven_sixteen_ui::{self as ui, gtk, Appearance, ButtonVariant, InputEvent, TextField};
@@ -463,25 +465,24 @@ fn main() {
         bar.append(&clock);
         bar.append(&user);
         bar.append(&status);
+        let controls = Rc::new(RefCell::new(controls::Controls::new(
+            app,
+            frontend.borrow().commands.clone(),
+        )));
+        let content = ui::column(12);
+        content.append(&bar);
+        content.append(&controls.borrow().widget);
         let main = gtk::ApplicationWindow::builder()
             .application(app)
             .title("agentOS")
             .default_width(800)
-            .default_height(80)
-            .child(&bar)
+            .default_height(330)
+            .child(&content)
             .build();
         main.add_css_class("seven-ui");
         main.present();
-        let monitor = gtk::ApplicationWindow::builder()
-            .application(app)
-            .title("Agent Monitor")
-            .default_width(500)
-            .default_height(300)
-            .build();
-        let monitor_text = ui::text("Native presentation connection status", false);
-        monitor.set_child(Some(&monitor_text));
-        monitor.add_css_class("seven-ui");
-        status.connect_clicked(move |_| monitor.present());
+        let opener = controls.clone();
+        status.connect_clicked(move |_| opener.borrow().present());
         let surfaces = Rc::new(RefCell::new(BTreeMap::<String, Surface>::new()));
         let frontend = frontend.clone();
         let application = app.clone();
@@ -499,6 +500,7 @@ fn main() {
                 "Connection unavailable"
             };
             status.set_label(connection);
+            controls.borrow_mut().update(&frame, &backend.commands);
             let mut surfaces = surfaces.borrow_mut();
             for (id, doc) in &frame.documents {
                 if doc.get("surface_id").is_some() {

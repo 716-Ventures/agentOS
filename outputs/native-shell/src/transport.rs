@@ -14,10 +14,17 @@ use std::{
 };
 const LIMIT: usize = 4 * 1024 * 1024;
 pub fn request(socket: &PathBuf, value: &Value) -> Result<Value, String> {
+    request_timeout(socket, value, Duration::from_secs(3))
+}
+pub fn request_timeout(
+    socket: &PathBuf,
+    value: &Value,
+    timeout: Duration,
+) -> Result<Value, String> {
     let mut conn = UnixStream::connect(socket).map_err(|e| e.to_string())?;
-    conn.set_read_timeout(Some(Duration::from_secs(3)))
+    conn.set_read_timeout(Some(timeout))
         .map_err(|e| e.to_string())?;
-    conn.set_write_timeout(Some(Duration::from_secs(3)))
+    conn.set_write_timeout(Some(timeout))
         .map_err(|e| e.to_string())?;
     let bytes = serde_json::to_vec(value).map_err(|e| e.to_string())?;
     if bytes.len() > LIMIT {
@@ -56,11 +63,32 @@ pub struct Frame {
     pub bindings: BTreeMap<String, Value>,
     pub actions: BTreeMap<String, Value>,
     pub drafts: BTreeMap<(String, String), Value>,
+    pub core: Value,
+    pub broker: Value,
+    pub usage: Value,
+    pub activity: Option<String>,
+    pub inspection: Option<String>,
+    pub notice: Option<String>,
     pub connected: bool,
     pub error: Option<String>,
 }
 #[derive(Debug)]
 pub enum Command {
+    SelectActivity(String),
+    CreateActivity(String),
+    Ask {
+        activity: i64,
+        prompt: String,
+        grounding: Option<Value>,
+    },
+    Stop {
+        source: String,
+        job: Value,
+    },
+    Inspect {
+        source: String,
+        job: Value,
+    },
     Lease {
         surface: String,
         element: String,
@@ -109,7 +137,7 @@ impl Drop for Backend {
 }
 fn run(
     socket: PathBuf,
-    activity: Option<String>,
+    mut activity: Option<String>,
     rx: Receiver<Command>,
     frame: Arc<Mutex<Frame>>,
     drafts: Arc<Mutex<BTreeMap<(String, String), Draft>>>,
@@ -124,6 +152,21 @@ fn run(
             }
             Ok(command) => {
                 let result=match command {
+                    Command::SelectActivity(id)=>{activity=Some(id);Ok(json!({"status":"Activity selected"}))},
+                    Command::CreateActivity(name)=>request(&socket,&json!({"op":"create","name":name})).map(|created|{activity=Some(created["id"].to_string());created}),
+                    Command::Ask{activity,prompt,grounding}=>{
+                        if prompt.trim().is_empty() || prompt.len()>16000 {Err("Enter a request up to 16 KiB".into())}
+                        else {
+                            let mut argv=vec!["/usr/bin/python3".to_string(),"-u".into(),"/usr/local/lib/agent-os/services/worker.py".into(),"ask".into(),activity.to_string(),prompt];
+                            if let Some(context)=grounding {argv.extend(["--grounding".into(),context.to_string()]);}
+                            request(&socket,&json!({"op":"run","activity_id":activity,"argv":argv}))
+                        }
+                    },
+                    Command::Stop{source,job}=>request(&if source=="core"{socket.clone()}else{broker_socket()},&json!({"op":"cancel","job_id":job})),
+                    Command::Inspect{source,job}=>{
+                        let result=request(&if source=="core"{socket.clone()}else{broker_socket()},&json!({"op":if source=="core"{"log"}else{"poll"},"job_id":job,"offset":0}));
+                        if let Ok(data)=&result {frame.lock().unwrap().inspection=Some(data[if source=="core"{"text"}else{"output"}].as_str().unwrap_or("No output available").into());}result
+                    },
                     Command::Lease{surface,element,begin}=>{
                         let key=(surface.clone(),element.clone());
                         if begin {leases.insert(key,Instant::now());}else{leases.remove(&key);}
@@ -133,8 +176,13 @@ fn run(
                     Command::Close{surface}=>close_surface(&socket,&surface),
                     Command::Quit=>unreachable!(),
                 };
-                if let Err(e) = result {
-                    frame.lock().unwrap().error = Some(e);
+                let mut view = frame.lock().unwrap();
+                match result {
+                    Err(e) => view.error = Some(e),
+                    Ok(value) => {
+                        view.error = None;
+                        view.notice = Some(format!("{}", value));
+                    }
                 }
             }
             Err(mpsc::RecvTimeoutError::Disconnected) => break,
@@ -160,6 +208,25 @@ fn run(
                     connected: true,
                     ..Frame::default()
                 };
+                next.core = request(&socket, &json!({"op":"snapshot"}))
+                    .unwrap_or_else(|e| json!({"unavailable":e}));
+                next.broker = request(&broker_socket(), &json!({"op":"list"}))
+                    .unwrap_or_else(|e| json!({"unavailable":e}));
+                next.usage = std::fs::read_to_string(
+                    std::env::var("AGENT_OS_MODEL_USAGE")
+                        .unwrap_or_else(|_| "/run/agent-os-ai/model-usage.json".into()),
+                )
+                .ok()
+                .filter(|s| s.len() <= 1024 * 1024)
+                .and_then(|s| serde_json::from_str(&s).ok())
+                .unwrap_or_else(|| json!({"unavailable":true}));
+                if activity.is_none() {
+                    activity = next.core["activities"]
+                        .as_array()
+                        .and_then(|a| a.first())
+                        .map(|a| a["id"].to_string());
+                }
+                next.activity = activity.clone();
                 if let Some(documents) = state["documents"].as_object() {
                     for (id, doc) in documents {
                         if activity
@@ -206,6 +273,8 @@ fn run(
                 }
                 let mut old = frame.lock().unwrap();
                 next.error = old.error.take();
+                next.inspection = old.inspection.take();
+                next.notice = old.notice.take();
                 *old = next;
             }
             Err(e) => {
@@ -268,5 +337,12 @@ fn close_surface(socket: &PathBuf, surface: &str) -> Result<Value, String> {
     request(
         socket,
         &json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("close-{}",super::nonce()),"expected_revisions":{surface:revision},"operations":[{"op":"surface.close","surface_id":surface}]}),
+    )
+}
+
+fn broker_socket() -> PathBuf {
+    PathBuf::from(
+        std::env::var("AGENT_OS_BROKER_SOCKET")
+            .unwrap_or_else(|_| "/run/agent-os-broker/api.sock".into()),
     )
 }
