@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Deploy an exact source tree to the selected Linux guest and build there."""
 from pathlib import Path
+import datetime
+import hashlib
 import io
+import json
 import os
 import shlex
 import subprocess
@@ -33,6 +36,15 @@ def source_archive(repository=ROOT.parent.parent):
 def main():
     import vm
     archive=source_archive()
+    repository=ROOT.parent.parent
+    receipt={'created_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+             'source_archive_sha256':hashlib.sha256(archive).hexdigest(),
+             'repository_revision':subprocess.check_output(['git','-C',str(repository),'rev-parse','HEAD'],text=True).strip(),
+             'source_changes':subprocess.check_output(['git','-C',str(repository),'status','--porcelain','--',
+                 'outputs/agent-shell','outputs/native-shell','outputs/native-compositor'],text=True).splitlines(),
+             'installed':False}
+    receipt_path=vm.RUN/'deployment.json'
+    receipt_path.write_text(json.dumps(receipt,indent=2)+'\n')
     staged=vm.ssh('mktemp -d /home/developer/.agent-os-source.XXXXXXXX',capture_output=True,text=True,check=True).stdout.strip()
     try:
         subprocess.run(vm.ssh_args()+['tar xf - -C '+shlex.quote(staged)],input=archive,check=True)
@@ -56,5 +68,7 @@ for name in ('target','native-shell/target','native-compositor/target'):
         script='import shutil; shutil.rmtree('+repr(staged)+',ignore_errors=True)'
         subprocess.run(vm.ssh_args()+['python3 -c '+shlex.quote(script)],check=True)
     subprocess.run(vm.ssh_args()+['cd /home/developer/agent-os-source && sh install.sh'],check=True)
+    receipt['installed']=True
+    receipt_path.write_text(json.dumps(receipt,indent=2)+'\n')
 
 if __name__=='__main__':main()

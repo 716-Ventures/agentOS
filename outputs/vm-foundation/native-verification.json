@@ -1,0 +1,132 @@
+{
+  "started_at": "2026-10-10T12:25:11.722332+00:00",
+  "finished_at": "2026-10-10T12:27:54.003918+00:00",
+  "result": "pass",
+  "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
+  "runtime_release": "f2447bc69c39068d2cadde06a2da01533a9ca6e8407a10ccb384f16bb2847753",
+  "deployment": {
+    "created_at": "2026-10-10T12:25:12.627841+00:00",
+    "source_archive_sha256": "a36069cfff766287b9611ec9860b03a2517f3bf3dda042da23a887becac029e8",
+    "repository_revision": "dbb3c448aa5a11079edc5d4d59666bf0e3899ce8",
+    "source_changes": [
+      "M  outputs/agent-shell/dependencies.json",
+      "M  outputs/agent-shell/deploy.py",
+      "M  outputs/agent-shell/install_runtime.py",
+      "A  outputs/agent-shell/tests/direct_display_guest.py",
+      "M  outputs/native-compositor/src/control.rs",
+      "M  outputs/native-compositor/src/direct.rs",
+      "M  outputs/native-compositor/src/state.rs"
+    ],
+    "installed": true
+  },
+  "host_tools": {
+    "utm": "4.7.5",
+    "qemu_img": "qemu-img version 11.1.2\nCopyright (c) 2003-2026 Fabrice Bellard and the QEMU Project developers",
+    "python": "Python 3.9.6"
+  },
+  "checks": [
+    "vm-tool-tests",
+    "cloud-init",
+    "provision",
+    "unit-suites",
+    "integration",
+    "activity_removal",
+    "broker_integration",
+    "broker_restart_guest",
+    "broker_reuse_guest",
+    "file_result_guest",
+    "image_preview_guest",
+    "write_transport_guest",
+    "layout_guest",
+    "work_lifecycle_guest",
+    "terminal_guest",
+    "terminal_screen_guest",
+    "presentation_guest",
+    "broker_sources_guest",
+    "voice_guest",
+    "native-build",
+    "native-broker-pty",
+    "direct-backend-cleanup",
+    "native-light-1",
+    "native-light-2",
+    "native-dark-1",
+    "native-dark-2",
+    "native-small-display",
+    "native-cpu-contention",
+    "native-compositor",
+    "native-shared-workspace",
+    "native-session-logout",
+    "native-session-host-loss",
+    "native-session-compositor-loss",
+    "direct-display-vt",
+    "signed-graphical-release",
+    "terminal",
+    "interactive-terminal",
+    "voice-terminal",
+    "installation-interruption",
+    "runtime-rollback-recovery",
+    "foundation-reboot-cold-start",
+    "runtime-state-after-reboots",
+    "repeat-install",
+    "state-after-repeat-install",
+    "probe-cleanup"
+  ],
+  "not_tested": [
+    "live model inference",
+    "microphone/speaker signal",
+    "physical graphical input",
+    "physical hardware",
+    "OS update rollback"
+  ],
+  "guest_stopped": true,
+  "direct_display": {
+    "result": "pass",
+    "outputs": [
+      {
+        "height": 800,
+        "name": "Virtual-1",
+        "scale": 1.0,
+        "transform": "Normal",
+        "width": 1280,
+        "x": 0,
+        "y": 0
+      }
+    ],
+    "metrics": [
+      {
+        "format": 1,
+        "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence",
+        "pid": 11119,
+        "sample_limit_per_stage": 256,
+        "stages": {
+          "compositor.direct_render_attempt": {
+            "discarded": 0,
+            "max_recent_ms": 28.22065,
+            "mean_all_ms": 0.7959691702127658,
+            "p50_recent_ms": 0.0005,
+            "p95_recent_ms": 0.228457,
+            "retained": 47,
+            "samples_total": 47
+          }
+        }
+      }
+    ],
+    "frames_before_vt": 19,
+    "frames_after_vt": 20,
+    "checks": [
+      "direct native window",
+      "KMS output discovery",
+      "shared core connection",
+      "VT switch and resume",
+      "orderly shutdown",
+      "session directory cleanup",
+      "owned login scope cleanup"
+    ],
+    "not_tested": [
+      "physical input",
+      "hotplug",
+      "physical GPU presentation"
+    ]
+  },
+  "evidence_directory": "runtime/fresh-verification (private, ignored)"
+}

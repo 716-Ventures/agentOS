@@ -36,6 +36,7 @@
     "wayland-utils",
     "alsa-utils",
     "seatd",
+    "kbd",
     "qemu-guest-agent",
     "tmux",
     "cmake",

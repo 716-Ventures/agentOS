@@ -33,6 +33,7 @@ def graphical_checks():
         ('native-shared-workspace','dbus-run-session -- python3 native-shell/tests/native_desktop.py --compositor --shared',180)]
     for name,option in [('logout',''),('host-loss','--host-failure'),('compositor-loss','--compositor-failure')]:
         checks.append(('native-session-'+name,'dbus-run-session -- python3 native-shell/tests/native_session.py '+option,120))
+    checks.append(('direct-display-vt','sudo -n python3 tests/direct_display_guest.py',90))
     checks.append(('signed-graphical-release','python3 tests/graphical_release.py',300))
     return checks
 
@@ -54,7 +55,7 @@ def main():
     machine=vm.machine()
     report={'started_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'result':'running',
             'vm_uuid':machine['uuid'],'base_sha512':vm.LOCK['sha512'],'checks':[],
-            'not_tested':['live model inference','microphone/speaker signal','graphical application behavior','physical hardware','OS update rollback']}
+            'not_tested':['live model inference','microphone/speaker signal','physical graphical input','physical hardware','OS update rollback']}
     def local(args,name,timeout=600):
         path=vm.RUN/(name+'.log')
         with path.open('w') as log:subprocess.run(args,stdout=log,stderr=subprocess.STDOUT,check=True,timeout=timeout)
@@ -66,6 +67,7 @@ def main():
         vm.wait_ready(60)
         remote('cloud-init status --wait','cloud-init',120)
         local([sys.executable,str(SHELL/'deploy.py')],'provision',900)
+        report['deployment']=json.loads((vm.RUN/'deployment.json').read_text())
         remote('cd /home/developer/agent-os-source && python3 -m unittest discover -s tests -p "*_test.py" && cargo test --locked','unit-suites')
         for test,root in [('integration',False),('activity_removal',False),('broker_integration',False),
                           ('broker_restart_guest',False),('broker_reuse_guest',False),('file_result_guest',False),('image_preview_guest',False),

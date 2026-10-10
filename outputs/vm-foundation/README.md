@@ -118,3 +118,5 @@ The environment core and terminal client are now installed: persistent activitie
 - [UTM audio configuration](https://docs.getutm.app/settings-qemu/devices/sound/)
 
 UTM status, start and shutdown acknowledgements have bounded 10/30/15-second timeouts. A timed-out status is unknown rather than stopped; an uncertain start is never retried automatically. Inspect the selected VM before another start, and retain reproduction failure logs. A responsive status command does not guarantee that UTM can start a VM while the Mac screen is locked.
+
+The October 10 native reproduction passed all 45 checks, including installed systemd PNG preview with model byte denial, the full native rendering/session matrix, direct KMS frames and VT resume, signed graphical staging, interrupted install/rollback recovery and repeat-install/cold-boot state preservation. See `native-verification.json` for the tested archive digest and qualification boundaries. The direct-display probe owns an unused VT in the dedicated development VM and cleans up its exact PAM session scope, including activated accessibility daemons.

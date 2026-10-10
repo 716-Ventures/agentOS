@@ -260,6 +260,10 @@ class Installer:
         transaction['phase']='activated';self.record(transaction)
         if interrupt=='activated':os.kill(os.getpid(),signal.SIGKILL)
         self.run(['systemctl','daemon-reload'])
+        # A deliberate activation/recovery may follow several rapid updates or
+        # failed starts. Clear only these release units' exhausted start counters;
+        # their ordinary crash-loop limits remain configured and enforced.
+        self.run(['systemctl','reset-failed',*self.active_units])
         self.run(['systemctl','enable','--now',*self.active_units])
         self.health()
         metadata=self.path('/etc/agent-os/release.json')

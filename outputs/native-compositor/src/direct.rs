@@ -371,13 +371,20 @@ pub fn init(
     let frames = device.clone();
     event_loop
         .handle()
-        .insert_source(drm_events, move |event, _, _data| {
+        .insert_source(drm_events, move |event, _, data| {
             let mut device = frames.borrow_mut();
             match event {
                 DrmEvent::VBlank(crtc) => {
                     if let Some(head) = device.heads.get_mut(&crtc) {
-                        if let Err(error) = head.scanout.frame_submitted() {
-                            eprintln!("Scanout completion failed: {error}");
+                        if !head.pending {
+                            return;
+                        }
+                        match head.scanout.frame_submitted() {
+                            Ok(_) => {
+                                data.state.direct_frames_presented =
+                                    data.state.direct_frames_presented.saturating_add(1)
+                            }
+                            Err(error) => eprintln!("Scanout completion failed: {error}"),
                         }
                         head.pending = false;
                     }

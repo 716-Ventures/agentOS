@@ -116,7 +116,7 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
                     .as_ref()
                     .map(|b| b.scene.lock().unwrap().clone());
                 Ok(
-                    json!({"layout":state.policy.current,"windows":windows,"outputs":outputs,"shared":scene.map(|s|json!({"identities":s.identities,"workspaces":s.workspaces,"error":s.error,"overview":s.overview}))}),
+                    json!({"layout":state.policy.current,"windows":windows,"outputs":outputs,"direct_frames_presented":state.direct_frames_presented,"shared":scene.map(|s|json!({"identities":s.identities,"workspaces":s.workspaces,"error":s.error,"overview":s.overview}))}),
                 )
             }
             Some("viewport.pan") => {
