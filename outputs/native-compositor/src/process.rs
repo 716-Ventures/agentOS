@@ -4,6 +4,29 @@ use std::{
     sync::{Arc, Mutex},
     time::{Duration, Instant},
 };
+/// Bound the renderer's lifetime to its compositor, including abrupt parent death.
+pub fn configure_child(command: &mut std::process::Command) {
+    use std::os::unix::process::CommandExt;
+    command.process_group(0);
+    #[cfg(target_os = "linux")]
+    {
+        let parent = unsafe { libc::getpid() };
+        unsafe {
+            command.pre_exec(move || {
+                if libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGTERM) < 0 {
+                    return Err(std::io::Error::last_os_error());
+                }
+                if libc::getppid() != parent {
+                    return Err(std::io::Error::new(
+                        std::io::ErrorKind::Interrupted,
+                        "Compositor exited before renderer startup",
+                    ));
+                }
+                Ok(())
+            });
+        }
+    }
+}
 pub struct OwnedChild(pub Arc<Mutex<Option<Child>>>);
 impl Drop for OwnedChild {
     fn drop(&mut self) {

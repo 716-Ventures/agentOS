@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Own a graphical login's Weston display host and agentOS desktop lifecycle."""
+"""Own an agentOS graphical login and its display/compositor lifecycle."""
 import argparse
 import json
 import socket
@@ -63,15 +63,41 @@ def stop_compositor(runtime,owned):
         while process_identity(ident) is not None and time.monotonic()<deadline:time.sleep(.05)
     if process_identity(ident) is not None:raise RuntimeError('Owned compositor failed to stop')
 
+def direct_session(command,env,runtime,stopped):
+    """Own the direct compositor; its renderer remains the compositor's child."""
+    proc=None;owned=None
+    try:
+        proc=subprocess.Popen(command,env={**env,'AGENT_OS_COMPOSITOR_BACKEND':'drm'},start_new_session=True)
+        identity=process_identity(proc.pid)
+        if identity and identity[1]==os.getpid() and identity[2]==os.getuid() and identity[3]==Path(command[0]).resolve():
+            owned=(proc.pid,identity)
+        while proc.poll() is None and not stopped():time.sleep(.05)
+        stop_compositor(runtime,owned)
+        try:return proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            os.killpg(proc.pid,signal.SIGTERM)
+            try:return proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);return proc.wait(timeout=5)
+    finally:
+        try:stop_compositor(runtime,owned)
+        finally:
+            if proc and proc.poll() is None:
+                os.killpg(proc.pid,signal.SIGTERM)
+                try:proc.wait(timeout=5)
+                except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait(timeout=5)
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--backend',choices=['drm','wayland','headless'],default='drm',help='Headless/Wayland modes are for explicit verification')
+    parser.add_argument('--backend',choices=['drm','wayland','headless','direct'],default='drm',help='drm uses the Weston host; direct is experimental KMS; headless/wayland are explicit verification modes')
     parser.add_argument('--bin-dir',type=Path,default=Path('/usr/local/bin'))
     parser.add_argument('--socket',type=Path,default=Path('/run/agent-os/runtime.sock'))
     parser.add_argument('--pixman',action='store_true')
-    args=parser.parse_args();runtime=runtime_directory();command=child_command(args.bin_dir,args.socket)
+    args=parser.parse_args()
+    if args.backend=='direct' and args.pixman:raise ValueError('The direct backend requires GBM/GLES; pixman is a Weston host option')
+    runtime=runtime_directory();command=child_command(args.bin_dir,args.socket)
     env={**os.environ,'XDG_SESSION_TYPE':'wayland','XDG_CURRENT_DESKTOP':'agentOS','DESKTOP_SESSION':'agent-os',
-         'AGENT_OS_COMPOSITOR_CORE':str(args.socket),'WINIT_UNIX_BACKEND':'wayland','GDK_BACKEND':'wayland'}
+         'AGENT_OS_COMPOSITOR_CORE':str(args.socket),'AGENT_OS_COMPOSITOR_BACKEND':'winit','WINIT_UNIX_BACKEND':'wayland','GDK_BACKEND':'wayland'}
     stopped=False
     def stop(_signum,_frame):
         nonlocal stopped
@@ -79,6 +105,7 @@ def main():
     previous={sig:signal.signal(sig,stop) for sig in (signal.SIGINT,signal.SIGTERM)}
     proc=None;owned=None
     try:
+        if args.backend=='direct':return direct_session(command,env,runtime,lambda:stopped)
         with tempfile.TemporaryDirectory(prefix='agentos-session-',dir=runtime) as directory:
             root=Path(directory);child=root/'desktop-child';pidfile=root/'compositor.pid'
             script = "#!/bin/sh\nprintf '%s\\n' \"$$\" > " + shlex.quote(str(pidfile)) + "\nexec " + shlex.join(command) + "\n"

@@ -13,6 +13,8 @@ mod shortcuts;
 mod direct;
 mod grabs;
 mod input;
+#[cfg(feature = "direct-display")]
+mod output_config;
 mod pointer_geometry;
 mod state;
 mod winit;
@@ -75,13 +77,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
     if matches!(args.next().as_deref(), Some("-c" | "--command")) {
         if let Some(command) = args.next() {
-            use std::os::unix::process::CommandExt;
-            *child.lock().unwrap() = Some(
-                std::process::Command::new(command)
-                    .args(args)
-                    .process_group(0)
-                    .spawn()?,
-            );
+            let mut renderer = std::process::Command::new(command);
+            renderer.args(args);
+            process::configure_child(&mut renderer);
+            *child.lock().unwrap() = Some(renderer.spawn()?);
         }
     }
     event_loop.run(

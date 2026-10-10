@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('desktop_session',ROOT/'services/desktop_session.py');session=importlib.util.module_from_spec(spec);spec.loader.exec_module(session)
 class DesktopSession(unittest.TestCase):
@@ -26,3 +26,13 @@ class DesktopSession(unittest.TestCase):
         with patch.object(session,'process_identity',return_value=('new-start',55,1000,Path('/runtime/compositor'))),patch.object(session.os,'kill') as kill:
             session.stop_compositor(Path('/tmp'),owned)
             kill.assert_not_called()
+
+    def test_direct_session_launches_no_display_host_and_reaps_the_owned_compositor(self):
+        command=['/runtime/agent-os-compositor','--command','/runtime/agent-os-desktop']
+        proc=MagicMock();proc.pid=456;proc.poll.return_value=0;proc.wait.return_value=0
+        identity=('start',os.getpid(),os.getuid(),Path(command[0]))
+        with patch.object(session.subprocess,'Popen',return_value=proc) as spawn,patch.object(session,'process_identity',return_value=identity),patch.object(session,'stop_compositor') as stop:
+            self.assertEqual(session.direct_session(command,{'AGENT_OS_COMPOSITOR_BACKEND':'winit'},Path('/runtime'),lambda:False),0)
+        spawn.assert_called_once_with(command,env={'AGENT_OS_COMPOSITOR_BACKEND':'drm'},start_new_session=True)
+        self.assertEqual(stop.call_args.args,(Path('/runtime'),(456,identity)))
+        proc.wait.assert_called_once_with(timeout=5)

@@ -32,3 +32,17 @@ class LicenseCollection(unittest.TestCase):
             with patch.object(collector.subprocess,'check_output',return_value=self.metadata(root)):
                 with self.assertRaisesRegex(ValueError,'Refusing'):collector.collect([root/'Cargo.toml'],output)
             self.assertEqual((output/'keep').read_text(),'mine')
+
+    def test_direct_display_dependencies_preserve_pinned_upstream_attribution(self):
+        for name,version in [('gbm-sys','0.4.0'),('libseat','0.2.4'),('libseat-sys','0.2.0')]:
+            with tempfile.TemporaryDirectory() as directory:
+                root=Path(directory)
+                with patch.object(collector.subprocess,'check_output',return_value=self.metadata(root,name,version)):
+                    records=collector.collect([root/'Cargo.toml'],root/'notices')
+                self.assertEqual(records[0]['license'],'MIT')
+                self.assertTrue(records[0]['supplemental_notice']['notices'])
+                payload='\n'.join((root/'notices'/notice['path']).read_text() for notice in records[0]['notices'])
+                self.assertIn('Permission is hereby granted',payload)
+                if name.startswith('libseat'):
+                    self.assertIn('Poly <marynczak.bartlomiej@gmail.com>',payload)
+                    self.assertIn('license = "MIT"',payload)

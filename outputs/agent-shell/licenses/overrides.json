@@ -4,8 +4,18 @@
     "notices": [
       {
         "notice": "drm-fourcc-2.2.0-LICENSE",
-        "source": "https://raw.githubusercontent.com/dzfranklin/drm-fourcc-rs/bb1b81f184650e1418e1dce512e34071675206d7/LICENSE",
-        "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+        "source": "https://raw.githubusercontent.com/dzfranklin/drm-fourcc-rs/bb1b81f184650e1418e1dce512e34071675206d7/LICENSE"
+      }
+    ]
+  },
+  "gbm-sys@0.4.0": {
+    "license": "MIT",
+    "notices": [
+      {
+        "notice": "gbm-sys-0.4.0-LICENSE",
+        "sha256": "56ab09c42eb251646c1c00ba32f5db0e51e297cd379eccc5a1cb7808f2de4ce7",
+        "source": "https://raw.githubusercontent.com/Drakulix/gbm.rs/2b4047f8e5ab4d050d4ed88f5ee2515069478fac/LICENSE"
       }
     ]
   },
@@ -14,8 +24,8 @@
     "notices": [
       {
         "notice": "gl_generator-0.14.0-LICENSE",
-        "source": "https://raw.githubusercontent.com/brendanzab/gl-rs/ea503e8d5fb6d73c6030e6191ce738cd3bf3433e/LICENSE",
-        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "source": "https://raw.githubusercontent.com/brendanzab/gl-rs/ea503e8d5fb6d73c6030e6191ce738cd3bf3433e/LICENSE"
       }
     ]
   },
@@ -24,23 +34,42 @@
     "notices": [
       {
         "notice": "khronos_api-3.1.0-LICENSE",
-        "source": "https://raw.githubusercontent.com/brendanzab/gl-rs/f150967b1c44ae888e6676f93f639ebc82771bdc/LICENSE",
-        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "source": "https://raw.githubusercontent.com/brendanzab/gl-rs/f150967b1c44ae888e6676f93f639ebc82771bdc/LICENSE"
       }
     ]
   },
-  "profiling@1.0.18": {
-    "license": "MIT OR Apache-2.0",
+  "libseat-sys@0.2.0": {
+    "basis": "Upstream declares MIT in its manifest but supplies no separate license/copyright notice. Preserve the exact author/license declaration and standard MIT permission terms without inventing attribution.",
+    "license": "MIT",
     "notices": [
       {
-        "notice": "profiling-1.0.18-LICENSE-APACHE",
-        "source": "https://raw.githubusercontent.com/aclysma/profiling/8271551172eb6fa4cba47369aedd93790c623df9/LICENSE-APACHE",
-        "sha256": "10d30a673cd5e9349bdc02aeb48f14b3386d27d0da32df8f0a555d4aa16aa551"
+        "notice": "libseat-sys-0.2.0-Cargo.toml",
+        "sha256": "022d95ce6df793a58658d9d536822c4f6a224d581f30d483d136038ec0a8f0ea",
+        "source": "https://raw.githubusercontent.com/PolyMeilex/libseat-rs/cfc67eeb449b5a034a192a2fa8d23ca44d59832d/libseat-sys/Cargo.toml"
       },
       {
-        "notice": "profiling-1.0.18-LICENSE-MIT",
-        "source": "https://raw.githubusercontent.com/aclysma/profiling/8271551172eb6fa4cba47369aedd93790c623df9/LICENSE-MIT",
-        "sha256": "c8167fdeeed46d3f244d3f85c5bf998ce889343691c32be2c61a8bc4b5c08333"
+        "adaptation": "Standard MIT permission terms with attribution from the separately pinned upstream manifest; no copyright attribution supplied by upstream has been changed.",
+        "notice": "libseat-rs-MIT-terms.txt",
+        "sha256": "dd9897211d18d98e488fcc70868d14e8e569f4d669d5a7f9e55365a027fbbaf9",
+        "source": "https://opensource.org/license/mit"
+      }
+    ]
+  },
+  "libseat@0.2.4": {
+    "basis": "Upstream declares MIT in its manifest but supplies no separate license/copyright notice. Preserve the exact author/license declaration and standard MIT permission terms without inventing attribution.",
+    "license": "MIT",
+    "notices": [
+      {
+        "notice": "libseat-0.2.4-Cargo.toml",
+        "sha256": "710e6c1df6deb1c3003330c74d6de14136a59ba2c73fea185874a5a3c5f8599c",
+        "source": "https://raw.githubusercontent.com/PolyMeilex/libseat-rs/00a7f14ae1cac8e475ec90bfdfb05884f53e1d0c/Cargo.toml"
+      },
+      {
+        "adaptation": "Standard MIT permission terms with attribution from the separately pinned upstream manifest; no copyright attribution supplied by upstream has been changed.",
+        "notice": "libseat-rs-MIT-terms.txt",
+        "sha256": "dd9897211d18d98e488fcc70868d14e8e569f4d669d5a7f9e55365a027fbbaf9",
+        "source": "https://opensource.org/license/mit"
       }
     ]
   },
@@ -49,13 +78,28 @@
     "notices": [
       {
         "notice": "profiling-procmacros-1.0.18-LICENSE-APACHE",
-        "source": "https://raw.githubusercontent.com/aclysma/profiling/8271551172eb6fa4cba47369aedd93790c623df9/LICENSE-APACHE",
-        "sha256": "10d30a673cd5e9349bdc02aeb48f14b3386d27d0da32df8f0a555d4aa16aa551"
+        "sha256": "10d30a673cd5e9349bdc02aeb48f14b3386d27d0da32df8f0a555d4aa16aa551",
+        "source": "https://raw.githubusercontent.com/aclysma/profiling/8271551172eb6fa4cba47369aedd93790c623df9/LICENSE-APACHE"
       },
       {
         "notice": "profiling-procmacros-1.0.18-LICENSE-MIT",
-        "source": "https://raw.githubusercontent.com/aclysma/profiling/8271551172eb6fa4cba47369aedd93790c623df9/LICENSE-MIT",
-        "sha256": "c8167fdeeed46d3f244d3f85c5bf998ce889343691c32be2c61a8bc4b5c08333"
+        "sha256": "c8167fdeeed46d3f244d3f85c5bf998ce889343691c32be2c61a8bc4b5c08333",
+        "source": "https://raw.githubusercontent.com/aclysma/profiling/8271551172eb6fa4cba47369aedd93790c623df9/LICENSE-MIT"
+      }
+    ]
+  },
+  "profiling@1.0.18": {
+    "license": "MIT OR Apache-2.0",
+    "notices": [
+      {
+        "notice": "profiling-1.0.18-LICENSE-APACHE",
+        "sha256": "10d30a673cd5e9349bdc02aeb48f14b3386d27d0da32df8f0a555d4aa16aa551",
+        "source": "https://raw.githubusercontent.com/aclysma/profiling/8271551172eb6fa4cba47369aedd93790c623df9/LICENSE-APACHE"
+      },
+      {
+        "notice": "profiling-1.0.18-LICENSE-MIT",
+        "sha256": "c8167fdeeed46d3f244d3f85c5bf998ce889343691c32be2c61a8bc4b5c08333",
+        "source": "https://raw.githubusercontent.com/aclysma/profiling/8271551172eb6fa4cba47369aedd93790c623df9/LICENSE-MIT"
       }
     ]
   }

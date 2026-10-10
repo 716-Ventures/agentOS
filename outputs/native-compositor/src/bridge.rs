@@ -31,6 +31,8 @@ pub struct Observed {
 #[derive(Clone, Default)]
 pub struct Scene {
     pub rectangles: BTreeMap<String, Rect>,
+    pub output_areas: BTreeMap<String, Rect>,
+    pub surface_outputs: BTreeMap<String, String>,
     pub identities: BTreeMap<String, String>,
     pub workspaces: Value,
     pub focus: Option<String>,
@@ -39,11 +41,65 @@ pub struct Scene {
     pub overview: Value,
     pub visible: BTreeSet<String>,
 }
+#[derive(Clone, Debug, PartialEq)]
+pub struct OutputObservation {
+    pub id: String,
+    pub area: Rect,
+    pub metadata: Value,
+}
 #[derive(Clone)]
 struct Observation {
     windows: Vec<Observed>,
-    area: Rect,
-    output: Value,
+    outputs: Vec<OutputObservation>,
+}
+fn project_outputs(
+    rectangles: &mut BTreeMap<String, Rect>,
+    assignments: &BTreeMap<String, String>,
+    windows: &[Observed],
+    floating: &BTreeSet<String>,
+    focus: Option<&String>,
+    outputs: &BTreeMap<String, Rect>,
+    primary: &str,
+    recovered: &BTreeSet<String>,
+) -> Value {
+    let mut overviews = serde_json::Map::new();
+    for (id, area) in outputs {
+        let mut subset = rectangles
+            .iter()
+            .filter(|(runtime, _)| assignments.get(*runtime).map(String::as_str) == Some(id))
+            .map(|(id, r)| (id.clone(), *r))
+            .collect::<BTreeMap<_, _>>();
+        let recovering = id == primary && !recovered.is_empty();
+        let empty = BTreeSet::new();
+        let original_ids = subset.keys().cloned().collect::<Vec<_>>();
+        let overview = crate::pressure::project_recovery(
+            &mut subset,
+            windows,
+            if recovering { &empty } else { floating },
+            focus,
+            *area,
+            recovering,
+        );
+        for id in original_ids {
+            rectangles.remove(&id);
+        }
+        rectangles.extend(subset);
+        if !overview.is_null() {
+            overviews.insert(id.clone(), overview);
+        }
+    }
+    // Preserve the existing single-output overview shape for current native hosts.
+    if outputs.len() == 1 {
+        let mut result = overviews.remove(primary).unwrap_or(Value::Null);
+        if !recovered.is_empty() {
+            result["recovered_outputs"] = json!(recovered);
+        }
+        result
+    } else if overviews.is_empty() {
+        Value::Null
+    } else {
+        json!({"outputs":overviews,"recovered_outputs":recovered})
+    }
 }
 pub struct Bridge {
     observation: Arc<Mutex<Option<Observation>>>,
@@ -71,7 +127,8 @@ impl Bridge {
             let mut counter = 0u64;
             let mut input_error = None::<(String, std::time::Instant)>;
             let mut published = BTreeMap::new();
-            let mut output_area = None;
+            let mut output_areas = BTreeMap::<String, OutputObservation>::new();
+            let mut document_cache = pages::Cache::default();
             let mut selected_activity = None::<String>;
             let mut first_seen = BTreeMap::<String, std::time::Instant>::new();
             let mut nonce = [0u8; 16];
@@ -151,11 +208,34 @@ impl Bridge {
                 let observed = input.lock().unwrap().clone();
                 if let Some(observed) = observed {
                     let result = (|| -> Result<Scene, String> {
-                        let mut state = pages::read(
+                        let mut state = document_cache.read(
                             |value| call(&socket, value),
                             None,
                             || stopping.load(Ordering::Relaxed),
                         )?;
+                        let current_outputs = observed
+                            .outputs
+                            .iter()
+                            .map(|o| (o.id.clone(), o.clone()))
+                            .collect::<BTreeMap<_, _>>();
+                        for id in output_areas
+                            .keys()
+                            .filter(|id| !current_outputs.contains_key(*id))
+                        {
+                            call(&socket, &json!({"op":"outputs.disconnect","output_id":id}))?;
+                        }
+                        for (id, head) in &current_outputs {
+                            if output_areas.get(id) != Some(head) {
+                                call(
+                                    &socket,
+                                    &json!({"op":"outputs.register","output_id":id,"width":head.area.width,"height":head.area.height,"x":head.area.x,"y":head.area.y,"scale":head.metadata["scale"],"transform":head.metadata["transform"]}),
+                                )?;
+                            }
+                        }
+                        output_areas = current_outputs;
+                        let primary = observed.outputs.first().ok_or("No connected outputs")?;
+                        let primary_id = primary.id.as_str();
+                        let primary_area = primary.area;
                         let activities = call(&socket, &json!({"op":"snapshot"}))?;
                         let available = activities["activities"]
                             .as_array()
@@ -166,13 +246,6 @@ impl Bridge {
                             .cloned()
                             .or_else(|| available.first().map(|a| a["id"].to_string()))
                             .ok_or("No active activity")?;
-                        if output_area != Some((observed.area, observed.output.clone())) {
-                            call(
-                                &socket,
-                                &json!({"op":"outputs.register","output_id":"nested-primary","width":observed.area.width,"height":observed.area.height,"x":observed.area.x,"y":observed.area.y,"scale":observed.output["scale"],"transform":observed.output["transform"]}),
-                            )?;
-                            output_area = Some((observed.area, observed.output.clone()));
-                        }
                         let mut identities = BTreeMap::new();
                         let live = observed
                             .windows
@@ -263,8 +336,8 @@ impl Bridge {
                             let expected = existing
                                 .map(|d| d["revision"].clone())
                                 .unwrap_or(Value::Null);
-                            if doc["outputs"].get("nested-primary").is_none() {
-                                doc["outputs"]["nested-primary"] =
+                            if doc["outputs"].get(primary_id).is_none() {
+                                doc["outputs"][primary_id] =
                                     json!({"tiles":null,"floating":[],"maximized":null});
                             }
                             // New background views do not reshape a manually constrained layout.
@@ -277,20 +350,25 @@ impl Bridge {
                                 continue;
                             }
                             let mut tiled = Vec::new();
-                            collect_tiles(&doc["outputs"]["nested-primary"]["tiles"], &mut tiled);
+                            collect_tiles(&doc["outputs"][primary_id]["tiles"], &mut tiled);
                             tiled.extend(surfaces);
-                            doc["outputs"]["nested-primary"]["tiles"] =
-                                automatic_tiles(&tiled, observed.area.width);
+                            doc["outputs"][primary_id]["tiles"] =
+                                automatic_tiles(&tiled, primary_area.width);
                             counter += 1;
                             put(&socket, &doc, expected, &format!("host-{prefix}-{counter}"))?;
                         }
-                        state = pages::read(
+                        state = document_cache.read(
                             |value| call(&socket, value),
                             None,
                             || stopping.load(Ordering::Relaxed),
                         )?;
                         let mut next = Scene {
                             identities,
+                            output_areas: observed
+                                .outputs
+                                .iter()
+                                .map(|o| (o.id.clone(), o.area))
+                                .collect(),
                             ..Scene::default()
                         };
                         next.workspaces = json!(state["documents"]
@@ -316,7 +394,14 @@ impl Bridge {
                             if doc["activity_id"] != activity {
                                 continue;
                             }
-                            if let Some(layout) = doc["outputs"].get("nested-primary") {
+                            for (id, layout) in doc["outputs"].as_object().into_iter().flatten() {
+                                let actual = output_areas.get(id);
+                                let area = actual.map(|o| o.area).unwrap_or(primary_area);
+                                let destination =
+                                    actual.map(|o| o.id.as_str()).unwrap_or(primary_id);
+                                if actual.is_none() {
+                                    recovered_outputs.insert(id.clone());
+                                }
                                 if let Some(runtime) =
                                     layout["maximized"].as_str().and_then(|id| reverse.get(id))
                                 {
@@ -329,33 +414,11 @@ impl Bridge {
                                         floating.insert(runtime.clone());
                                     }
                                 }
-                                for (surface, rect) in rectangles(layout, observed.area)? {
+                                for (surface, rect) in rectangles(layout, area)? {
                                     if let Some(runtime) = reverse.get(&surface) {
                                         next.rectangles.insert(runtime.clone(), rect);
-                                    }
-                                }
-                            }
-                            for (id, layout) in doc["outputs"]
-                                .as_object()
-                                .into_iter()
-                                .flatten()
-                                .filter(|(id, _)| id.as_str() != "nested-primary")
-                            {
-                                let available = state["outputs"]["outputs"]
-                                    .as_array()
-                                    .into_iter()
-                                    .flatten()
-                                    .any(|output| {
-                                        output["output_id"] == id.as_str()
-                                            && output["availability"] == "available"
-                                    });
-                                if available {
-                                    continue;
-                                }
-                                for (surface, rect) in rectangles(layout, observed.area)? {
-                                    if let Some(runtime) = reverse.get(&surface) {
-                                        next.rectangles.insert(runtime.clone(), rect);
-                                        recovered_outputs.insert(id.clone());
+                                        next.surface_outputs
+                                            .insert(runtime.clone(), destination.to_owned());
                                     }
                                 }
                             }
@@ -368,22 +431,16 @@ impl Bridge {
                             .filter(|(_, when)| when.elapsed() < Duration::from_secs(10))
                             .map(|(message, _)| message.clone());
                         next.visible = next.rectangles.keys().cloned().collect();
-                        next.overview = crate::pressure::project_recovery(
+                        next.overview = project_outputs(
                             &mut next.rectangles,
+                            &next.surface_outputs,
                             &observed.windows,
-                            if recovered_outputs.is_empty() {
-                                &floating
-                            } else {
-                                floating.clear();
-                                &floating
-                            },
+                            &floating,
                             next.focus.as_ref(),
-                            observed.area,
-                            !recovered_outputs.is_empty(),
+                            &next.output_areas,
+                            primary_id,
+                            &recovered_outputs,
                         );
-                        if !recovered_outputs.is_empty() {
-                            next.overview["recovered_outputs"] = json!(recovered_outputs);
-                        }
                         Ok(next)
                     })();
                     match result {
@@ -394,10 +451,9 @@ impl Bridge {
                 thread::sleep(Duration::from_millis(100));
             }
             grabs.stop(&socket);
-            let _ = call(
-                &socket,
-                &json!({"op":"outputs.disconnect","output_id":"nested-primary"}),
-            );
+            for id in output_areas.keys() {
+                let _ = call(&socket, &json!({"op":"outputs.disconnect","output_id":id}));
+            }
             // Core availability also checks this process's start identity, including crashes.
         });
         Self {
@@ -496,11 +552,10 @@ impl Bridge {
                 Some("Workspace input queue busy; refresh before retrying".into());
         }
     }
-    pub fn observe(&self, windows: Vec<Observed>, area: Rect, output: Value) {
+    pub fn observe(&self, windows: Vec<Observed>, outputs: Vec<OutputObservation>) {
         *self.observation.lock().unwrap() = Some(Observation {
             windows: windows.into_iter().take(1024).collect(),
-            area,
-            output,
+            outputs: outputs.into_iter().take(64).collect(),
         });
     }
 }
@@ -708,6 +763,123 @@ pub fn rectangles(layout: &Value, area: Rect) -> Result<BTreeMap<String, Rect>, 
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn multi_output_pressure_is_local_and_hidden_views_leave_the_scene() {
+        let left = Rect {
+            x: -800,
+            y: 0,
+            width: 800,
+            height: 600,
+        };
+        let right = Rect {
+            x: 0,
+            y: 0,
+            width: 800,
+            height: 600,
+        };
+        let outputs = BTreeMap::from([("left".into(), left), ("right".into(), right)]);
+        let assignments = BTreeMap::from([
+            ("a".into(), "left".into()),
+            ("b".into(), "right".into()),
+            ("c".into(), "right".into()),
+        ]);
+        let windows = [("a", 80), ("b", 900), ("c", 80)]
+            .into_iter()
+            .map(|(id, width)| Observed {
+                id: id.into(),
+                title: id.into(),
+                app_id: "fixture".into(),
+                uid: 1000,
+                session: "1:1".into(),
+                min_width: width,
+                min_height: 32,
+            })
+            .collect::<Vec<_>>();
+        let mut rectangles = BTreeMap::from([
+            ("a".into(), left),
+            (
+                "b".into(),
+                Rect {
+                    width: 400,
+                    ..right
+                },
+            ),
+            (
+                "c".into(),
+                Rect {
+                    x: 400,
+                    width: 400,
+                    ..right
+                },
+            ),
+        ]);
+        let overview = project_outputs(
+            &mut rectangles,
+            &assignments,
+            &windows,
+            &BTreeSet::new(),
+            Some(&"b".into()),
+            &outputs,
+            "left",
+            &BTreeSet::new(),
+        );
+        assert_eq!(
+            rectangles["a"], left,
+            "A healthy separate output must not be projected into the pressured output"
+        );
+        assert_eq!(rectangles["b"].x, 0);
+        assert_eq!(rectangles["b"].width, 900);
+        assert!(
+            !rectangles.contains_key("c"),
+            "Hidden overview views must be removed from visible geometry"
+        );
+        assert!(overview["outputs"].get("left").is_none());
+        assert_eq!(overview["outputs"]["right"]["selected"], "b");
+    }
+    #[test]
+    fn healthy_multiple_outputs_preserve_their_coordinates() {
+        let left = Rect {
+            x: -800,
+            y: 0,
+            width: 800,
+            height: 600,
+        };
+        let right = Rect {
+            x: 0,
+            y: 0,
+            width: 1000,
+            height: 700,
+        };
+        let outputs = BTreeMap::from([("left".into(), left), ("right".into(), right)]);
+        let assignments =
+            BTreeMap::from([("a".into(), "left".into()), ("b".into(), "right".into())]);
+        let windows = ["a", "b"]
+            .into_iter()
+            .map(|id| Observed {
+                id: id.into(),
+                title: id.into(),
+                app_id: "fixture".into(),
+                uid: 1000,
+                session: "1:1".into(),
+                min_width: 80,
+                min_height: 32,
+            })
+            .collect::<Vec<_>>();
+        let mut rectangles = BTreeMap::from([("a".into(), left), ("b".into(), right)]);
+        let saved = rectangles.clone();
+        assert!(project_outputs(
+            &mut rectangles,
+            &assignments,
+            &windows,
+            &BTreeSet::new(),
+            None,
+            &outputs,
+            "left",
+            &BTreeSet::new()
+        )
+        .is_null());
+        assert_eq!(rectangles, saved);
+    }
     #[test]
     fn automatic_views_use_balanced_rows_instead_of_repeatedly_halving_old_views() {
         let ids = (0..7).map(|i| format!("view-{i}")).collect::<Vec<_>>();

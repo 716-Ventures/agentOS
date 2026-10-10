@@ -87,6 +87,8 @@ jobs:
         run: |
           cargo +1.85.1 test --locked --manifest-path outputs/native-compositor/Cargo.toml
           cargo +1.85.1 build --locked --manifest-path outputs/native-compositor/Cargo.toml
+      - name: Direct backend startup failure and cleanup
+        run: python3 outputs/native-shell/tests/direct_backend.py
       - name: Native and conventional clients in agentOS compositor
         run: |
           cargo +1.85.1 build --locked --manifest-path outputs/native-shell/Cargo.toml

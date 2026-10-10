@@ -35,7 +35,7 @@ use smithay::{
         rustix::fs::OFlags,
         wayland_server::backend::GlobalId,
     },
-    utils::{DeviceFd, Transform},
+    utils::{DeviceFd, Scale, Transform},
     wayland::compositor::with_states,
 };
 use std::{
@@ -66,6 +66,7 @@ struct Device {
     active: bool,
     cursor: MemoryRenderBuffer,
     retry_at: std::time::Instant,
+    config: crate::output_config::Config,
 }
 impl Device {
     fn disconnect(&mut self, data: &mut CalloopData) {
@@ -84,13 +85,24 @@ impl Device {
             if connector.state() != connector::State::Connected {
                 continue;
             }
-            let Some(mode) = connector
-                .modes()
-                .iter()
-                .find(|m| m.mode_type().contains(ModeTypeFlags::PREFERRED))
-                .or_else(|| connector.modes().first())
-                .copied()
-            else {
+            let name = format!("{:?}-{}", connector.interface(), connector.interface_id());
+            let preference = self.config.outputs.get(&name).cloned().unwrap_or_default();
+            let selected = if let Some(requested) = &preference.mode {
+                connector.modes().iter().find(|m| {
+                    let mode = Mode::from(**m);
+                    mode.size.w == i32::from(requested.width)
+                        && mode.size.h == i32::from(requested.height)
+                        && mode.refresh == requested.refresh_millihz as i32
+                })
+            } else {
+                connector
+                    .modes()
+                    .iter()
+                    .find(|m| m.mode_type().contains(ModeTypeFlags::PREFERRED))
+                    .or_else(|| connector.modes().first())
+            };
+            let Some(mode) = selected.copied() else {
+                eprintln!("No matching mode for connector {name}");
                 continue;
             };
             let mut candidates = Vec::new();
@@ -125,7 +137,6 @@ impl Device {
                     continue;
                 }
             };
-            let name = format!("{:?}-{}", connector.interface(), connector.interface_id());
             let output = Output::new(
                 name,
                 PhysicalProperties {
@@ -141,15 +152,16 @@ impl Device {
             );
             let global = output.create_global::<Smallvil>(&data.display_handle);
             let wl_mode = Mode::from(mode);
+            let position = (preference.x.unwrap_or(x), preference.y.unwrap_or(0));
             output.change_current_state(
                 Some(wl_mode),
                 Some(Transform::Normal),
-                None,
-                Some((x, 0).into()),
+                Some(Scale::Fractional(preference.scale)),
+                Some(position.into()),
             );
             output.set_preferred(wl_mode);
-            data.state.space.map_output(&output, (x, 0));
-            x += i32::from(mode.size().0);
+            data.state.space.map_output(&output, position);
+            x = position.0 + (f64::from(mode.size().0) / preference.scale).ceil() as i32;
             let damage = OutputDamageTracker::from_output(&output);
             self.heads.insert(
                 crtc,
@@ -281,6 +293,7 @@ pub fn init(
     event_loop: &mut EventLoop<CalloopData>,
     data: &mut CalloopData,
 ) -> Result<(), Box<dyn std::error::Error>> {
+    let config = crate::output_config::Config::load()?;
     let (mut session, notifier) = LibSeatSession::new()?;
     let seat_name = session.seat();
     let udev = UdevBackend::new(&seat_name)?;
@@ -311,6 +324,7 @@ pub fn init(
         active: session.is_active(),
         cursor: cursor(),
         retry_at: std::time::Instant::now(),
+        config,
     }));
     device.borrow_mut().scan(data)?;
     if device.borrow().heads.is_empty() {

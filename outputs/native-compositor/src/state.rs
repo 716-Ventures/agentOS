@@ -173,6 +173,25 @@ impl Smallvil {
         socket_name
     }
 
+    fn view_area(&self, id: &str) -> Option<smithay::utils::Rectangle<i32, Logical>> {
+        if let Some(bridge) = &self.bridge {
+            let scene = bridge.scene.lock().unwrap();
+            if let Some(area) = scene
+                .surface_outputs
+                .get(id)
+                .and_then(|output| scene.output_areas.get(output))
+            {
+                return Some(smithay::utils::Rectangle::new(
+                    (area.x, area.y).into(),
+                    (area.width, area.height).into(),
+                ));
+            }
+        }
+        self.space
+            .outputs()
+            .next()
+            .and_then(|output| self.space.output_geometry(output))
+    }
     pub fn pan_view(&mut self, id: &str, x: i32, y: i32) -> Result<(), String> {
         let scene = self
             .bridge
@@ -183,12 +202,7 @@ impl Smallvil {
             .unwrap()
             .clone();
         let rect = scene.rectangles.get(id).ok_or("Visible view required")?;
-        let area = self
-            .space
-            .outputs()
-            .next()
-            .and_then(|o| self.space.output_geometry(o))
-            .ok_or("Output unavailable")?;
+        let area = self.view_area(id).ok_or("Output unavailable")?;
         let offset = self.viewport_offsets.entry(id.into()).or_default();
         offset.0 = (offset.0 + x * (area.size.w * 3 / 4).max(1))
             .clamp(0, (rect.width - area.size.w).max(0));
@@ -265,12 +279,7 @@ impl Smallvil {
                         rect.y += y;
                     }
                 }
-                if let Some(area) = self
-                    .space
-                    .outputs()
-                    .next()
-                    .and_then(|o| self.space.output_geometry(o))
-                {
+                if let Some(area) = self.view_area(current) {
                     rect.width = rect.width.max(80).min(area.size.w);
                     rect.height = rect.height.max(32).min(area.size.h);
                     rect.x = rect
@@ -280,19 +289,14 @@ impl Smallvil {
                         .y
                         .clamp(area.loc.y, area.loc.y + area.size.h - rect.height);
                 }
-                serde_json::json!({"kind":"float","output_id":"nested-primary","x":rect.x,"y":rect.y,"width":rect.width,"height":rect.height})
+                serde_json::json!({"kind":"float","output_id":scene.surface_outputs.get(current).map(String::as_str).unwrap_or("nested-primary"),"x":rect.x,"y":rect.y,"width":rect.width,"height":rect.height})
             }
             _ => return,
         };
         bridge.input(current, edit);
     }
     pub fn preview_geometry(&self, id: &str, mut rect: crate::policy::Rect) {
-        if let Some(output) = self
-            .space
-            .outputs()
-            .next()
-            .and_then(|o| self.space.output_geometry(o))
-        {
+        if let Some(output) = self.view_area(id) {
             rect.width = rect.width.max(80).min(output.size.w);
             rect.height = rect.height.max(32).min(output.size.h);
             rect.x = rect
@@ -313,6 +317,18 @@ impl Smallvil {
             .map(|w| format!("{:?}", w.toplevel().unwrap().wl_surface().id()))
             .collect::<Vec<_>>();
         self.policy.synchronize(&ids);
+        let mut observed_outputs: Vec<crate::bridge::OutputObservation> = self.space.outputs().filter_map(|output| {
+            let geometry = self.space.output_geometry(output)?;
+            Some(crate::bridge::OutputObservation {
+                id: if output.name()=="winit" {"nested-primary".into()} else {format!("drm-{}",output.name())},
+                area: crate::policy::Rect {x:geometry.loc.x,y:geometry.loc.y,width:geometry.size.w,height:geometry.size.h},
+                metadata: serde_json::json!({"scale":output.current_scale().fractional_scale(),"transform":format!("{:?}",output.current_transform())}),
+            })
+        }).collect();
+        observed_outputs.sort_by(|a, b| a.area.x.cmp(&b.area.x).then_with(|| a.id.cmp(&b.id)));
+        if let Some(bridge) = &self.bridge {
+            bridge.observe(windows.iter().map(observe).collect(), observed_outputs);
+        }
         let Some(output) = self.space.outputs().next() else {
             return;
         };
@@ -328,7 +344,6 @@ impl Smallvil {
         let mut placements = self.policy.arrange(area);
         let mut maximized = std::collections::BTreeSet::new();
         if let Some(bridge) = &self.bridge {
-            bridge.observe(windows.iter().map(observe).collect(), area,serde_json::json!({"scale":output.current_scale().fractional_scale(),"transform":format!("{:?}",output.current_transform())}));
             let scene = bridge.scene.lock().unwrap().clone();
             for id in scene
                 .identities
@@ -395,8 +410,17 @@ impl Smallvil {
         }
         self.viewport_offsets.retain(|id, _| ids.contains(id));
         for (id, rect) in &mut placements {
+            let viewport_area = self
+                .view_area(id)
+                .map(|r| crate::policy::Rect {
+                    x: r.loc.x,
+                    y: r.loc.y,
+                    width: r.size.w,
+                    height: r.size.h,
+                })
+                .unwrap_or(area);
             if let Some(offset) = self.viewport_offsets.get_mut(id) {
-                *rect = crate::pressure::viewport(*rect, area, offset);
+                *rect = crate::pressure::viewport(*rect, viewport_area, offset);
             }
         }
         for (id, window) in ids.iter().zip(windows) {
