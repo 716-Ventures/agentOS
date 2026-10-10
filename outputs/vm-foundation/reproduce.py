@@ -33,7 +33,7 @@ def graphical_checks():
         ('native-cpu-contention','dbus-run-session -- python3 native-shell/tests/native_desktop.py --load',120),
         ('native-compositor','dbus-run-session -- python3 native-shell/tests/native_desktop.py --compositor',120),
         ('native-shared-workspace','dbus-run-session -- python3 native-shell/tests/native_desktop.py --compositor --shared',180)]
-    for name,option in [('logout',''),('ime','--ime'),('host-loss','--host-failure'),('compositor-loss','--compositor-failure')]:
+    for name,option in [('logout',''),('ime','--ime'),('ime-editor','--ime-editor'),('host-loss','--host-failure'),('compositor-loss','--compositor-failure')]:
         checks.append(('native-session-'+name,'dbus-run-session -- python3 native-shell/tests/native_session.py '+option,120))
     checks.append(('direct-display-input-vt','sudo -n python3 tests/direct_display_guest.py --input',120))
     checks.append(('signed-graphical-release','python3 tests/graphical_release.py',300))

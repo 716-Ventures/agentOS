@@ -359,6 +359,27 @@ pub(super) fn focus_ime_fixture(surface: &Surface) -> bool {
     surface
         .elements
         .get("field")
-        .and_then(|e| e.field.as_ref())
-        .is_some_and(|field| field.entry.is_mapped() && field.entry.grab_focus())
+        .is_some_and(|element| {
+            element.field.as_ref().is_some_and(|field| field.entry.is_mapped() && field.entry.grab_focus())
+                || element.area.as_ref().is_some_and(|area| area.view.is_mapped() && area.view.grab_focus())
+        })
+}
+
+pub(super) fn select_ime_editor_fixture(surface: &Surface) -> bool {
+    surface.elements.get("field").and_then(|element| element.area.as_ref()).is_some_and(|area| {
+        let buffer = area.view.buffer();
+        if buffer.char_count() != 65536 { return false; }
+        if !area.view.grab_focus() { return false; }
+        if let Some(path) = std::env::var_os("AGENT_OS_NATIVE_IME_OBSERVATION") {
+            let path = std::path::PathBuf::from(path);
+            area.view.connect_preedit_changed(move |view, text| {
+                let observation = json!({"preedit_bytes":text.len(),"characters":view.buffer().char_count()});
+                let temporary = path.with_extension("pending");
+                std::fs::write(&temporary, observation.to_string()).expect("Write private IME fixture observation");
+                std::fs::rename(&temporary, &path).expect("Publish private IME fixture observation");
+            });
+        }
+        buffer.select_range(&buffer.start_iter(), &buffer.iter_at_offset(3));
+        true
+    })
 }

@@ -5,7 +5,7 @@ import pyatspi
 import accessibility
 
 
-def verify(call, endpoint):
+def verify(call, endpoint, editor=False, observation=None):
     def method(op, text=None):
         request = {'op': op}
         if text is not None:
@@ -69,4 +69,31 @@ def verify(call, endpoint):
     accessibility.activate(accessibility.find('Save draft', pyatspi.ROLE_PUSH_BUTTON))
     accessibility.wait(lambda: call({'op': 'presentation.snapshot'})['documents']['session-fixture']['elements']['field']['props']['value'] == value,
                        'Deliberate Save did not commit composed Unicode text')
+    if editor:
+        bounded='x'*65536
+        assert field.queryEditableText().setTextContents(bounded)
+        accessibility.wait(lambda:draft()==bounded,'Maximum-sized editor draft did not reach core')
+        # GTK's AT-SPI selection setters are unsupported on the tested versions.
+        # The explicit native fixture selects this range once through public
+        # GTK APIs; AT-SPI independently observes it and the later restoration.
+        accessibility.wait(lambda:field.queryText().getNSelections()==1 and field.queryText().getSelection(0)==(0,3),
+                           'Native editor fixture did not select its bounded replacement')
+        method('preedit','にほん')
+        # A protocol roundtrip does not guarantee GTK processed preedit.
+        # GTK 4.14 deletes the selection at preedit-start; 4.18 retains it.
+        accessibility.wait(lambda:observation.exists() and json.loads(observation.read_text())['preedit_bytes']==len('にほん'.encode()),
+                           'GTK did not process selected preedit before commit')
+        method('commit','日本語 λ')
+        # Observe the rejection, so unchanged text before GTK receives the
+        # commit cannot accidentally satisfy the preservation assertion.
+        try:accessibility.find('Document text is limited to 64 KiB; this insertion was not applied',pyatspi.ROLE_LABEL)
+        except AssertionError:
+            print('Overflow diagnostic:',len(accessibility.text(field).encode()),len((draft() or '').encode()),method('status'),field.queryText().getNSelections(),flush=True)
+            raise
+        accessibility.wait(lambda:draft()==bounded and accessibility.text(field)==bounded,
+                           'Rejected IME replacement deleted selected document text')
+        assert field.queryText().getSelection(0)==(0,3),'Rejected IME replacement lost its selection'
+        saved=call({'op':'presentation.get','document_id':'session-fixture'})['elements']['field']['props']['value']
+        assert saved==value,'Rejected IME replacement committed a document change'
+        print('PASS: actual GTK text-input-v3 editor overflow preserves selected text, exact durable draft and committed value')
     print('PASS: GTK text-input-v3 Unicode preedit/commit survives unrelated rendering; draft and Save remain distinct')

@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-10-10T14:42:11.083216+00:00",
+  "started_at": "2026-10-10T15:28:17.741882+00:00",
   "result": "pass",
   "vm_uuid": "27176EA2-E994-4165-9BBA-70FEED59E66B",
   "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -37,6 +37,7 @@
     "native-shared-workspace",
     "native-session-logout",
     "native-session-ime",
+    "native-session-ime-editor",
     "native-session-host-loss",
     "native-session-compositor-loss",
     "direct-display-input-vt",
@@ -60,15 +61,23 @@
     "OS update rollback"
   ],
   "deployment": {
-    "created_at": "2026-10-10T14:42:24.720485+00:00",
-    "source_archive_sha256": "2ad8816e7f1b36fabd4238acca8938c4d27eaeb1503b20cde650b660b2002973",
-    "repository_revision": "abf86ef64e0e2aa529fe182cac40461fff2cc8e0",
+    "created_at": "2026-10-10T15:28:19.920902+00:00",
+    "source_archive_sha256": "950a96d0352e0a46659219593073496f03af725fc1dedb06fc58dfd984bef536",
+    "repository_revision": "06d69ee751c01d1cab19fc26b3c0b6916658bd94",
     "source_changes": [
-      "M  outputs/agent-shell/systemd/agent-os-ai.service"
+      "M  outputs/agent-shell/tests/direct_input_probe.py",
+      "M  outputs/native-compositor/src/input.rs",
+      "M  outputs/native-compositor/src/shortcuts.rs",
+      "M  outputs/native-shell/Cargo.lock",
+      "M  outputs/native-shell/Cargo.toml",
+      "M  outputs/native-shell/src/main.rs",
+      "M  outputs/native-shell/src/verification.rs",
+      "M  outputs/native-shell/tests/ime_accessibility.py",
+      "M  outputs/native-shell/tests/native_session.py"
     ],
     "installed": true
   },
-  "runtime_release": "6f78f2a88bd9879bb6bf6b8acdffedb34bad04588ead50945bacc81a4a4b8d44",
+  "runtime_release": "f0a0269f4dd9d376671a1539f6d08073c9893e30dcd2bf268a911425fd4ea7b2",
   "dependency_manifest": {
     "packages": {
       "adduser": "3.152",
@@ -852,5 +861,5 @@
     "python": "Python 3.9.6"
   },
   "guest_stopped": true,
-  "finished_at": "2026-10-10T14:45:26.213636+00:00"
+  "finished_at": "2026-10-10T15:35:54.038494+00:00"
 }

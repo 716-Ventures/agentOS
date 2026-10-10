@@ -76,7 +76,7 @@ impl Smallvil {
                             }
                             #[cfg(feature = "direct-display")]
                             if state == KeyState::Pressed && modifiers.ctrl && modifiers.alt {
-                                let symbol = handle.modified_sym().raw();
+                                let symbol = crate::shortcuts::function_key(handle.modified_sym().raw());
                                 if (0xffbe..=0xffc3).contains(&symbol) {
                                     if let Some(session) = data.direct_session.as_mut() {
                                         use smithay::backend::session::Session;

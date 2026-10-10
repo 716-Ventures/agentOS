@@ -51,20 +51,22 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
          'AGENT_OS_SOCKET':str(endpoint),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),
          'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','G_DEBUG':'fatal-criticals','GTK_A11Y':'atspi'}
     env.pop('WAYLAND_DISPLAY',None);env.pop('DISPLAY',None)
-    ime='--ime' in sys.argv
+    ime_editor='--ime-editor' in sys.argv
+    ime='--ime' in sys.argv or ime_editor
     if ime:
         env['AGENT_OS_INPUT_METHOD_ARGV']=json.dumps([str(ROOT.parent/'native-compositor/target/debug/examples/ime_fixture'),str(runtime/'ime-test.sock')])
         env['GTK_IM_MODULE']='wayland'
-        env['AGENT_OS_NATIVE_IME_FIXTURE']='1'
+        env['AGENT_OS_NATIVE_IME_FIXTURE']='editor' if ime_editor else '1'
+        if ime_editor:env['AGENT_OS_NATIVE_IME_OBSERVATION']=str(runtime/'ime-observation.json')
     host_failure='--host-failure' in sys.argv
     compositor_failure='--compositor-failure' in sys.argv
-    with (OUTPUT/('session-compositor-failure.log' if compositor_failure else 'session-host-failure.log' if host_failure else 'session-ime.log' if ime else 'session.log')).open('w') as log:
+    with (OUTPUT/('session-compositor-failure.log' if compositor_failure else 'session-host-failure.log' if host_failure else 'session-ime-editor.log' if ime_editor else 'session-ime.log' if ime else 'session.log')).open('w') as log:
         core=subprocess.Popen([str(SHELL/'target/release/agent-os-core')],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
         session=None;owned=[]
         try:
             wait_for(endpoint.exists,[core])
             activity=call(endpoint,{'op':'create','name':'Full desktop session'})['id']
-            document={'protocol':'agentos.presentation/1','catalog_revision':'native-core/1','surface_id':'session-fixture','activity_id':str(activity),'revision':0,'title':'Session lifecycle','root':'root','elements':{'root':{'type':'Stack@1','props':{'spacing':'normal'},'slots':{'children':['reading','field']}},'reading':{'type':'Status@1','props':{'value':'Authenticated session fixture'}},'field':{'type':'TextField@1','props':{'label':'Accessible session draft','value':'Original accessible value'}}},'bindings':{},'actions':{}}
+            document={'protocol':'agentos.presentation/1','catalog_revision':'native-core/1','surface_id':'session-fixture','activity_id':str(activity),'revision':0,'title':'Session lifecycle','root':'root','elements':{'root':{'type':'Stack@1','props':{'spacing':'normal'},'slots':{'children':['reading','field']}},'reading':{'type':'Status@1','props':{'value':'Authenticated session fixture'}},'field':{'type':'DocumentEditor@1' if ime_editor else 'TextField@1','props':{'label':'Accessible session draft','value':'Original accessible value'}}},'bindings':{},'actions':{}}
             call(endpoint,{'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':'session-fixture','expected_revisions':{'session-fixture':None},'operations':[{'op':'surface.create','document':document}]})
             session=subprocess.Popen(['python3',str(SHELL/'services/desktop_session.py'),'--backend','headless','--pixman','--bin-dir',str(bins),'--socket',str(endpoint)],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
             pidfile=wait_for(lambda:next(runtime.glob('agentos-session-*/compositor.pid'),None),[core,session])
@@ -83,7 +85,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                                    'operations':[{'op':'workspace.edit','workspace_id':workspace['workspace_id'],
                                                   'edit':{'kind':'focus','surface_id':'session-fixture','element_id':'field'}}]})
                     assert focused['status']=='committed',focused
-                    try:ime_accessibility.verify(lambda value:call(endpoint,value),runtime/'ime-test.sock')
+                    try:ime_accessibility.verify(lambda value:call(endpoint,value),runtime/'ime-test.sock',editor=ime_editor,observation=runtime/'ime-observation.json')
                     except Exception:
                         print('Failed IME focus state:',call(control,{'op':'snapshot'}),flush=True)
                         raise

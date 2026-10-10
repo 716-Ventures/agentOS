@@ -83,7 +83,10 @@ def assistive():
                 value=node.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
                 return [value.x+value.width/2,value.y+value.height/2]
             text=field.queryText();value=text.getText(0,text.characterCount)
-            response={'text':value,'field':rect(field),'save':rect(save),'focused':field.getState().contains(pyatspi.STATE_FOCUSED)}
+            selection=None
+            if text.getNSelections():
+                start,end=text.getSelection(0);selection=text.getText(start,end)
+            response={'text':value,'selection':selection,'field':rect(field),'save':rect(save),'focused':field.getState().contains(pyatspi.STATE_FOCUSED)}
         except Exception as exc:response={'error':str(exc)}
         print(json.dumps(response),flush=True)
 
@@ -153,7 +156,13 @@ def verify(metrics,output,core,scene,target,login_user):
         for key in (30,34,18,49,20,24,31):keyboard.chord(key) # agentos
         wait(lambda value:value['text']=='agentos')
         # Include the separator in the copied span. GTK coalesces adjacent single-word inserts.
-        keyboard.chord(57);keyboard.chord(29,30);keyboard.chord(29,46);keyboard.chord(107);keyboard.chord(29,47)
+        keyboard.chord(57)
+        wait(lambda value:value['text']=='agentos ')
+        keyboard.chord(29,30)
+        wait(lambda value:value['selection']=='agentos ')
+        keyboard.chord(29,46);keyboard.chord(107)
+        wait(lambda value:value['selection'] is None)
+        keyboard.chord(29,47)
         wait(lambda value:value['text']=='agentos agentos ')
         keyboard.chord(29,44) # Ctrl+Z undoes the paste as one action
         wait(lambda value:value['text']=='agentos ')
@@ -177,6 +186,39 @@ def verify(metrics,output,core,scene,target,login_user):
             time.sleep(.05)
         assert core('draft.get')['draft'] is None
         print('PASS: direct kernel/libinput keyboard, absolute pointer, GTK clipboard, grouped undo/redo, retained draft and deliberate Save')
+        def geometry():
+            return next(row['geometry'] for row in scene()['windows'] if row['id']==target)
+        def await_geometry(expected):
+            deadline=time.monotonic()+8
+            while True:
+                actual=geometry()
+                if actual==expected:return
+                if time.monotonic()>deadline:raise RuntimeError('Kernel workspace shortcut did not reach geometry: '+repr((expected,actual,scene()['shared'])))
+                time.sleep(.05)
+        full={'x':0,'y':0,'width':width,'height':height}
+        await_geometry(full)
+        # The compositor handles these before delivering ordinary typing to GTK.
+        keyboard.chord(29,56,42,105) # Ctrl+Alt+Shift+Left: resize
+        smaller={**full,'width':width-20}
+        await_geometry(smaller)
+        keyboard.chord(29,56,42,103)
+        smaller['height']=height-20
+        await_geometry(smaller)
+        keyboard.chord(29,56,106) # Ctrl+Alt+Right: move
+        smaller['x']=20
+        await_geometry(smaller)
+        keyboard.chord(29,56,108)
+        smaller['y']=20
+        await_geometry(smaller)
+        keyboard.chord(29,56,68) # Ctrl+Alt+F10: maximize
+        await_geometry(full)
+        keyboard.chord(29,56,67) # Ctrl+Alt+F9: restore floating placement
+        await_geometry(smaller)
+        keyboard.chord(29,56,44) # Ctrl+Alt+Z: presentation undo
+        await_geometry(full)
+        assert core('presentation.get')['elements']['editor']['props']['value']=='agentos'
+        assert core('draft.get')['draft'] is None
+        print('PASS: direct kernel workspace resize, move, maximize, restore and presentation undo preserve saved document')
     finally:
         if pointer:pointer.close()
         if keyboard:keyboard.close()

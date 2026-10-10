@@ -601,8 +601,8 @@ dependencies = [
 
 [[package]]
 name = "seven-sixteen-ui"
-version = "0.1.0-alpha.15"
-source = "git+https://github.com/716-Ventures/716-ui?tag=v0.1.0-alpha.15#da22df156cdcf73afe67ac29fd56995c11bc776b"
+version = "0.1.0-alpha.18"
+source = "git+https://github.com/716-Ventures/716-ui?tag=v0.1.0-alpha.18#dab408d30594df48c77f8a49f5ec780c7b9aa122"
 dependencies = [
  "gtk4",
  "serde",

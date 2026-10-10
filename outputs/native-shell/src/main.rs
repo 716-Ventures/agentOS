@@ -1360,8 +1360,11 @@ fn main() {
         let surfaces = Rc::new(RefCell::new(BTreeMap::<String, Surface>::new()));
         let frontend = frontend.clone();
         let application = app.clone();
-        let ime_fixture = std::env::var("AGENT_OS_NATIVE_IME_FIXTURE").as_deref() == Ok("1");
+        let fixture_mode = std::env::var("AGENT_OS_NATIVE_IME_FIXTURE").unwrap_or_default();
+        let ime_fixture = fixture_mode == "1" || fixture_mode == "editor";
+        let ime_editor_fixture = fixture_mode == "editor";
         let mut fixture_focused = false;
+        let mut fixture_selected = false;
         glib::timeout_add_local(Duration::from_millis(50), move || {
             let backend = frontend.borrow();
             let frame = backend.frame.lock().unwrap().clone();
@@ -1394,6 +1397,9 @@ fn main() {
                     surface.update(id, doc, &frame, &backend.commands, &backend.drafts);
                     if ime_fixture && !fixture_focused && id == "session-fixture" {
                         fixture_focused = verification::focus_ime_fixture(surface);
+                    }
+                    if ime_editor_fixture && !fixture_selected && id == "session-fixture" {
+                        fixture_selected = verification::select_ime_editor_fixture(surface);
                     }
                 }
             }
