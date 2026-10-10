@@ -41,11 +41,35 @@ def atomic_write(path,data,mode=0o644):
 
 
 class Installer:
-    def __init__(self,prefix=Path('/')):
+    def __init__(self,prefix=Path('/'),login_user=None):
         self.prefix=prefix
         self.root=self.path('/usr/local/lib/agent-os')
         self.state=self.path('/var/lib/agent-os-install')
         self.journal=self.state/'transaction.json'
+        self.login_config=self.path('/etc/agent-os/login-user.json')
+        self.login_record=None
+        if self.login_config.exists() or self.login_config.is_symlink():
+            info=self.login_config.lstat()
+            if (not stat.S_ISREG(info.st_mode) or info.st_size>4096 or info.st_mode & 0o022
+                    or (self.prefix==Path('/') and info.st_uid!=0)):
+                raise ValueError('Login identity must be a bounded root-owned regular file without group/other write access')
+            self.login_record=json.loads(self.login_config.read_text())
+            if (not isinstance(self.login_record,dict) or self.login_record.get('format')!=1
+                    or type(self.login_record.get('uid')) is not int or self.login_record['uid']<1000
+                    or not isinstance(self.login_record.get('name'),str)):
+                raise ValueError('Invalid installed login identity')
+        if self.login_record is None and self.journal.exists():
+            pending=json.loads(self.journal.read_text())
+            if 'login_user' in pending or 'login_uid' in pending:
+                if (not isinstance(pending.get('login_user'),str) or type(pending.get('login_uid')) is not int
+                        or pending['login_uid']<1000):raise ValueError('Invalid journal login identity')
+                self.login_record={'format':1,'name':pending['login_user'],'uid':pending['login_uid']}
+        saved=self.login_record['name'] if self.login_record else 'developer'
+        self.login_user=login_user if login_user is not None else saved
+        if not isinstance(self.login_user,str) or not re.fullmatch(r'[a-z_][a-z0-9_-]{0,31}',self.login_user):
+            raise ValueError('Choose a valid existing Linux login account')
+        if self.login_user!=saved and (self.login_record or (self.root/'current').exists()):
+            raise ValueError('Changing an installed login requires an explicit ownership migration')
 
     def path(self,value):return self.prefix / value.lstrip('/')
     def run(self,args,**kw):return subprocess.run(args,check=True,**kw)
@@ -120,6 +144,7 @@ class Installer:
                 or len(set(value['units']))!=len(value['units'])
                 or any(unit not in UNITS or not (release/'systemd'/f'{unit}.service').is_file() for unit in value['units'])):
             raise ValueError('Invalid runtime release contract')
+        if value.get('login_identity') not in (None,1):raise ValueError('Unsupported login identity contract')
         if 'components' in value:
             components=value['components']
             if (not isinstance(components,list) or not components or len(components)>256
@@ -163,15 +188,27 @@ class Installer:
         try:os.fsync(fd)
         finally:os.close(fd)
 
+    def login_identity(self):
+        try:account=pwd.getpwnam(self.login_user)
+        except KeyError:raise ValueError('Create the selected login account before installation: '+self.login_user) from None
+        if account.pw_uid<1000 or Path(account.pw_shell).name in ('nologin','false'):
+            raise ValueError('The login must be an ordinary interactive user account')
+        if self.login_record and account.pw_uid!=self.login_record['uid']:
+            raise ValueError('Installed login UID changed; explicit ownership migration is required')
+        return account
+
     def accounts(self):
+        account=self.login_identity()
         for group in ('agentos','agentos-ai','agentos-broker'):
             self.run(['groupadd','--system','-f',group])
         for name,group,home in (('agentos','agentos','runtime'),('agentos-layout','agentos','layout'),('agentos-ai','agentos-ai','ai'),('agentos-voice','agentos','voice')):
             try:pwd.getpwnam(name)
             except KeyError:self.run(['useradd','--system','--gid',group,'--home-dir','/var/lib/agent-os-'+home,'--shell','/usr/sbin/nologin',name])
-        self.run(['usermod','-a','-G','agentos,agentos-broker','developer'])
+        self.run(['usermod','-a','-G','agentos,agentos-broker',self.login_user])
         self.run(['usermod','-a','-G','agentos-broker','agentos-ai'])
         self.path('/var/lib/agent-os-workspaces').mkdir(mode=0o755,exist_ok=True)
+        self.login_record={'format':1,'name':self.login_user,'uid':account.pw_uid}
+        atomic_write(self.login_config,(json.dumps(self.login_record)+'\n').encode())
 
     def reset_start_limits(self):
         # reset-failed rejects never-loaded units on a first install. Such units
@@ -208,9 +245,12 @@ class Installer:
         if hashlib.sha256(json.dumps(hashes,sort_keys=True).encode()).hexdigest()!=ident:
             raise ValueError('Release ID does not match its manifest')
         contract=self.contract(release)
+        if contract.get('login_identity')!=1:
+            raise ValueError('Release cannot retain the installed login identity; explicit migration is required')
+        login=self.login_identity()
         desktop_uid=None
         if contract.get('desktop'):
-            desktop_uid=pwd.getpwnam('developer').pw_uid
+            desktop_uid=login.pw_uid
             if desktop_uid<1000:raise ValueError('The graphical login must use an ordinary user account')
         current=self.root/'current'
         if current.exists() and (current/'release-contract.json').exists():
@@ -224,9 +264,11 @@ class Installer:
             prior=json.loads(self.journal.read_text())
             if prior.get('release')==ident and (prior.get('phase')!='complete' or current.resolve()==release.resolve()):
                 previous=prior.get('previous')
-        transaction={'release':ident,'previous':previous,'phase':'staged','state_contract':contract['state_contract']}
+        transaction={'release':ident,'previous':previous,'phase':'staged','state_contract':contract['state_contract'],
+                     'login_user':self.login_user,'login_uid':login.pw_uid}
         self.active_units=contract['units']
         self.record(transaction)
+        self.login_record={'format':1,'name':self.login_user,'uid':login.pw_uid}
         # Recovery remains callable even before the first release is activated.
         atomic_write(self.root/'install-recovery.py',(release/'install_runtime.py').read_bytes())
         self.accounts()
@@ -324,12 +366,13 @@ def main():
     parser.add_argument('--trusted-key',type=Path,default=Path('/etc/agent-os/update-signing-key.pem'),help='Explicitly provisioned Ed25519 public PEM key')
     parser.add_argument('--release-id',help='Release to export; defaults to the installed current release')
     parser.add_argument('--test-interrupt',choices=['stopped','activated'],help='Development-guest crash injection; terminates installer with SIGKILL')
+    parser.add_argument('--login-user',help='Existing ordinary login for first installation; retained across updates and recovery')
     args=parser.parse_args()
     if args.export_bundle and not args.signing_key:parser.error('--export-bundle requires --signing-key')
     if args.signing_key and not args.export_bundle:parser.error('--signing-key requires --export-bundle')
     if args.release_id and not args.export_bundle:parser.error('--release-id requires --export-bundle')
     if os.geteuid()!=0:parser.error('Run with sudo')
-    installer=Installer();installer.state.mkdir(mode=0o700,parents=True,exist_ok=True);installer.state.chmod(0o700)
+    installer=Installer(login_user=args.login_user);installer.state.mkdir(mode=0o700,parents=True,exist_ok=True);installer.state.chmod(0o700)
     with (installer.state/'lock').open('a+b') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX)
         if args.stage_bundle or args.export_bundle:

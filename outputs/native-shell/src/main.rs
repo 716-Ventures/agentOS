@@ -1341,6 +1341,8 @@ fn main() {
         let surfaces = Rc::new(RefCell::new(BTreeMap::<String, Surface>::new()));
         let frontend = frontend.clone();
         let application = app.clone();
+        let ime_fixture = std::env::var("AGENT_OS_NATIVE_IME_FIXTURE").as_deref() == Ok("1");
+        let mut fixture_focused = false;
         glib::timeout_add_local(Duration::from_millis(50), move || {
             let backend = frontend.borrow();
             let frame = backend.frame.lock().unwrap().clone();
@@ -1371,6 +1373,9 @@ fn main() {
                         .entry(id.clone())
                         .or_insert_with(|| Surface::new(&application, id, &backend.commands));
                     surface.update(id, doc, &frame, &backend.commands, &backend.drafts);
+                    if ime_fixture && !fixture_focused && id == "session-fixture" {
+                        fixture_focused = verification::focus_ime_fixture(surface);
+                    }
                 }
             }
             if frame.connected {

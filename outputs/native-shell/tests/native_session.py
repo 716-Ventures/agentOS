@@ -55,6 +55,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
     if ime:
         env['AGENT_OS_INPUT_METHOD_ARGV']=json.dumps([str(ROOT.parent/'native-compositor/target/debug/examples/ime_fixture'),str(runtime/'ime-test.sock')])
         env['GTK_IM_MODULE']='wayland'
+        env['AGENT_OS_NATIVE_IME_FIXTURE']='1'
     host_failure='--host-failure' in sys.argv
     compositor_failure='--compositor-failure' in sys.argv
     with (OUTPUT/('session-compositor-failure.log' if compositor_failure else 'session-host-failure.log' if host_failure else 'session-ime.log' if ime else 'session.log')).open('w') as log:
@@ -76,6 +77,11 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 if ime:
                     import ime_accessibility
                     wait_for(lambda:(runtime/'ime-test.sock').exists(),[core,session])
+                    workspace=call(endpoint,{'op':'presentation.snapshot'})['documents'][f'desktop-{activity}']
+                    call(endpoint,{'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
+                                   'request_id':'ime-fixture-focus','expected_revisions':{workspace['workspace_id']:workspace['revision']},
+                                   'operations':[{'op':'workspace.edit','workspace_id':workspace['workspace_id'],
+                                                  'edit':{'kind':'focus','surface_id':'session-fixture','element_id':'field'}}]})
                     ime_accessibility.verify(lambda value:call(endpoint,value),runtime/'ime-test.sock')
                 else:
                     import accessibility

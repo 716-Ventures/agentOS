@@ -40,5 +40,6 @@
     "Text@1",
     "TextField@1",
     "Toggle@1"
-  ]
+  ],
+  "login_identity": 1
 }

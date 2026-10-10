@@ -23,7 +23,7 @@ def verify(call, endpoint):
     def draft():
         return call({'op': 'draft.get', 'surface_id': 'session-fixture', 'element_id': 'field'}).get('draft')
     accessibility.wait(lambda: draft() == '', 'Initial local draft did not reach core')
-    assert field.queryComponent().grabFocus(), 'Editor could not acquire keyboard focus'
+    accessibility.wait(lambda: field.getState().contains(pyatspi.STATE_FOCUSED), 'Fixture editor did not acquire keyboard focus')
     accessibility.wait(lambda: method('status')['active'], 'GTK did not activate the input method')
     method('preedit', 'にほん')
     assert draft() == '', 'Uncommitted composition entered the durable draft'

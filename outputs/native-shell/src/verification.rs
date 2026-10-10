@@ -1,4 +1,4 @@
-//! Executed only by the explicit --self-test verification mode on a private display.
+//! Explicit --self-test and opt-in private IME fixture setup.
 use super::*;
 use std::sync::mpsc;
 fn verify_container_replacement(
@@ -348,4 +348,12 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         });
     });
     app.run_with_args(&["agent-os-desktop-verification"]);
+}
+
+// GTK 4.14's AT-SPI Component.GrabFocus is explicitly unsupported. Set up
+// widget focus in this opt-in fixture; AT-SPI independently checks its state,
+// edits, deliberate Save and final core value. This does not test physical input.
+pub(super) fn focus_ime_fixture(surface: &Surface) -> bool {
+    surface.elements.get("field").and_then(|e| e.field.as_ref())
+        .is_some_and(|field| field.entry.is_mapped() && field.entry.grab_focus())
 }

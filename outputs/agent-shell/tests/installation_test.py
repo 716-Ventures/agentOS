@@ -18,15 +18,67 @@ class Installation(unittest.TestCase):
         for name in ('target/release/agent-os-core','services/common.py','services/broker-launcher.sh',
                      'LICENSE','client/agent_os.py','systemd/agent-os-core.service','Cargo.toml','Cargo.lock','dependencies.json','release-contract.json','install_runtime.py'):
             path=source/name;path.parent.mkdir(parents=True,exist_ok=True)
-            if name=='release-contract.json':path.write_text(json.dumps({'format':1,'state_contract':'agentos.state/1','units':['agent-os-core']}))
+            if name=='release-contract.json':path.write_text(json.dumps({'format':1,'state_contract':'agentos.state/1','units':['agent-os-core'],'login_identity':1}))
             elif name.endswith('.py'):path.write_text('pass\n')
             elif name=='target/release/agent-os-core':path.write_bytes(b'\x7fELF\x02\x01'+b'\0'*12+(183).to_bytes(2,'little'))
             else:path.write_text('fixture '+name)
         instance=install.Installer(base/'system');instance.state.mkdir(parents=True)
         instance.reset_start_limits=Mock()
+        instance.login_identity=Mock(return_value=type('Login',(),{'pw_uid':1000,'pw_shell':'/bin/bash'})())
         (instance.state/'dependencies.json').write_text('{}')
         (instance.state/'voice.json').write_text('{}')
         return instance,source
+
+    def test_selected_login_is_retained_and_recycled_identity_is_rejected(self):
+        from types import SimpleNamespace
+        with tempfile.TemporaryDirectory() as tmp:
+            instance=install.Installer(Path(tmp),login_user='alice')
+            instance.path('/var/lib').mkdir(parents=True)
+            with patch.object(install.pwd,'getpwnam',return_value=SimpleNamespace(pw_uid=1001,pw_shell='/bin/bash')),patch.object(instance,'run') as run:
+                instance.accounts()
+                self.assertIn(['usermod','-a','-G','agentos,agentos-broker','alice'],[call.args[0] for call in run.call_args_list])
+            restored=install.Installer(Path(tmp))
+            self.assertEqual(restored.login_user,'alice')
+            with patch.object(install.pwd,'getpwnam',return_value=SimpleNamespace(pw_uid=1002,pw_shell='/bin/bash')):
+                with self.assertRaisesRegex(ValueError,'UID changed'):restored.login_identity()
+            with self.assertRaisesRegex(ValueError,'migration'):install.Installer(Path(tmp),login_user='bob')
+            instance.login_config.chmod(0o666)
+            with self.assertRaisesRegex(ValueError,'write access'):install.Installer(Path(tmp))
+
+    def test_login_configuration_rejects_service_accounts_and_invalid_names(self):
+        from types import SimpleNamespace
+        with tempfile.TemporaryDirectory() as tmp:
+            for name in ('-root','root; echo bad','a'*33):
+                with self.assertRaisesRegex(ValueError,'valid existing'):install.Installer(Path(tmp),login_user=name)
+            instance=install.Installer(Path(tmp),login_user='alice')
+            for uid,shell in [(0,'/bin/bash'),(999,'/bin/bash'),(1000,'/usr/sbin/nologin'),(1000,'/bin/false')]:
+                with patch.object(install.pwd,'getpwnam',return_value=SimpleNamespace(pw_uid=uid,pw_shell=shell)):
+                    with self.assertRaisesRegex(ValueError,'interactive'):instance.login_identity()
+            instance.login_config.parent.mkdir(parents=True)
+            instance.login_config.symlink_to(Path(tmp)/'missing')
+            with self.assertRaisesRegex(ValueError,'regular file'):install.Installer(Path(tmp))
+
+    def test_legacy_release_cannot_discard_the_selected_login_identity(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            instance,source=self.fixture(tmp);instance.login_user='alice'
+            contract=json.loads((source/'release-contract.json').read_text());contract.pop('login_identity')
+            (source/'release-contract.json').write_text(json.dumps(contract))
+            ident=instance.stage(source)
+            with patch.object(instance,'run') as run:
+                with self.assertRaisesRegex(ValueError,'retain.*login identity'):instance.activate(ident)
+                run.assert_not_called()
+                self.assertFalse(instance.journal.exists())
+
+    def test_interrupted_first_install_retains_login_before_account_setup(self):
+        from types import SimpleNamespace
+        with tempfile.TemporaryDirectory() as tmp:
+            instance=install.Installer(Path(tmp),login_user='alice');instance.state.mkdir(parents=True)
+            instance.record({'release':'fixture','phase':'staged','login_user':'alice','login_uid':1001})
+            recovered=install.Installer(Path(tmp))
+            self.assertEqual(recovered.login_user,'alice')
+            with patch.object(install.pwd,'getpwnam',return_value=SimpleNamespace(pw_uid=1002,pw_shell='/bin/bash')):
+                with self.assertRaisesRegex(ValueError,'UID changed'):recovered.login_identity()
+            with self.assertRaisesRegex(ValueError,'migration'):install.Installer(Path(tmp),login_user='bob')
 
     def test_counter_reset_skips_new_units_and_only_touches_loaded_release_units(self):
         instance=install.Installer();instance.active_units=['agent-os-core','agent-os-broker']
@@ -196,7 +248,7 @@ class Installation(unittest.TestCase):
             instance,source=self.desktop_fixture(tmp);ident=instance.stage(source);release=instance.root/'releases'/ident
             self.assertEqual(((release/'native/agent-os-desktop').resolve()).stat().st_mode & 0o777,0o755)
             self.assertTrue(instance.contract(release)['desktop'])
-            with patch.object(install.pwd,'getpwnam',return_value=SimpleNamespace(pw_uid=1000)):self.activate_fixture(instance,ident)
+            with patch.object(install.pwd,'getpwnam',return_value=SimpleNamespace(pw_uid=1000,pw_shell='/bin/bash')):self.activate_fixture(instance,ident)
             self.assertEqual(instance.path('/usr/local/bin/agent-os-desktop').resolve(),(release/'native/agent-os-desktop').resolve())
             self.assertIn('AGENT_OS_COMPOSITOR_UID=1000',instance.path('/etc/systemd/system/agent-os-core.service.d/30-compositor.conf').read_text())
             ((release/'native/agent-os-desktop').resolve()).write_bytes(b'corrupt')
@@ -212,7 +264,7 @@ class Installation(unittest.TestCase):
                 for name in ('Cargo.toml','Cargo.lock'):(tree/name).write_text(name)
             (source/'services/desktop_session.py').write_text('pass\n');(source/'services/session-launcher.sh').write_text('#!/bin/sh\nexit 0\n');(source/'session').mkdir();(source/'session/agent-os.desktop').write_text('fixture');(source/'third-party-licenses').mkdir();(source/'third-party-licenses/dependencies.json').write_text('{"format":1,"packages":[]}')
             graphical=instance.stage(source)
-            with patch.object(install.pwd,'getpwnam',return_value=SimpleNamespace(pw_uid=1000)):self.activate_fixture(instance,graphical)
+            with patch.object(install.pwd,'getpwnam',return_value=SimpleNamespace(pw_uid=1000,pw_shell='/bin/bash')):self.activate_fixture(instance,graphical)
             user=instance.path('/home/developer/.local/state/agent-os/native-drafts.json');user.parent.mkdir(parents=True);user.write_text('retain my draft')
             with patch.object(instance,'accounts'),patch.object(instance,'run'),patch.object(instance,'health'):instance.rollback(terminal)
             self.assertFalse(instance.path('/usr/local/bin/agent-os-desktop').exists());self.assertFalse(instance.path('/usr/share/wayland-sessions/agent-os.desktop').exists());self.assertEqual(user.read_text(),'retain my draft')
