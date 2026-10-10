@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-10-10T16:03:47.825838+00:00",
+  "started_at": "2026-10-10T16:36:08.258455+00:00",
   "result": "pass",
   "vm_uuid": "27176EA2-E994-4165-9BBA-70FEED59E66B",
   "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -61,13 +61,13 @@
     "OS update rollback"
   ],
   "deployment": {
-    "created_at": "2026-10-10T16:03:48.862614+00:00",
-    "source_archive_sha256": "b0990841ce64b0cce7561c3ad128e8915e580022998f0840f59f7b7ea2345df1",
-    "repository_revision": "aba9ef895c3eea5d1396e26ec738b02747b4c3fb",
+    "created_at": "2026-10-10T16:36:09.303128+00:00",
+    "source_archive_sha256": "3982126b05f7d3e8ffce7331868ef8edbbd3cbdbcea3352cd6f32f9020cb191c",
+    "repository_revision": "4c4da0e72ad89f8dddc1763f72c08026af3a55db",
     "source_changes": [],
     "installed": true
   },
-  "runtime_release": "53334a9432c46886c356f8ee4b34a8879c5a31b60ca39339f07b7bfdd031b8ee",
+  "runtime_release": "1718e4cbe02487a2d9276848b65b47a06d36a8adcc85ea4078b0a6a65b5f0f8b",
   "dependency_manifest": {
     "packages": {
       "adduser": "3.152",
@@ -851,5 +851,5 @@
     "python": "Python 3.9.6"
   },
   "guest_stopped": true,
-  "finished_at": "2026-10-10T16:07:13.266123+00:00"
+  "finished_at": "2026-10-10T16:39:51.410602+00:00"
 }
