@@ -3458,6 +3458,102 @@ mod tests {
         );
     }
     #[test]
+    fn conventional_reconnect_requires_an_unambiguous_authenticated_process_and_dead_host() {
+        let mut db = fixture();
+        let old = Principal {
+            uid: 0,
+            session: "4294967295:0".into(),
+        };
+        let new = Principal {
+            uid: 0,
+            session: "new-host".into(),
+        };
+        let observation = json!({"op":"host.surface","surface_id":"persisted-window","activity_id":"1","title":"Editor","app_id":"example.Editor","connected":true,"client_uid":1000,"client_session":"12345:67890"});
+        handle(&mut db, &observation, &old).unwrap();
+        let previous = crate::presentation_hosts::source(&db, "persisted-window")
+            .unwrap()
+            .unwrap()["source_revision"]
+            .as_i64()
+            .unwrap();
+        let mut reconnect = observation.clone();
+        reconnect["surface_id"] = json!("new-ephemeral-window");
+        reconnect["title"] = json!("Updated title");
+        assert!(handle(&mut db, &reconnect, &agent()).is_err());
+        let receipt = handle(&mut db, &reconnect, &new).unwrap();
+        assert_eq!(receipt["surface_id"], "persisted-window");
+        assert_eq!(receipt["reconciled"], true);
+        assert!(
+            crate::presentation_hosts::source(&db, "persisted-window")
+                .unwrap()
+                .unwrap()["source_revision"]
+                .as_i64()
+                .unwrap()
+                > previous
+        );
+        assert_eq!(
+            db.query_row("SELECT COUNT(*) FROM presentation_host_surfaces", [], |r| r
+                .get::<_, i64>(0))
+                .unwrap(),
+            1
+        );
+        let mut changed_peer = observation.clone();
+        changed_peer["client_session"] = json!("12345:67891");
+        assert!(handle(&mut db, &changed_peer, &new).is_err());
+        changed_peer["surface_id"] = json!("different-process-window");
+        assert_eq!(
+            handle(&mut db, &changed_peer, &new).unwrap()["surface_id"],
+            "different-process-window"
+        );
+        let mut second = observation.clone();
+        second["surface_id"] = json!("second-window");
+        handle(&mut db, &second, &new).unwrap();
+        // Multiple same-process windows are ambiguous after a compositor failure.
+        db.execute(
+            "UPDATE presentation_host_surfaces SET session='4294967295:0'",
+            [],
+        )
+        .unwrap();
+        reconnect["surface_id"] = json!("ambiguous-reconnect");
+        assert_eq!(
+            handle(&mut db, &reconnect, &new).unwrap()["surface_id"],
+            "ambiguous-reconnect"
+        );
+    }
+    #[test]
+    fn conventional_reconnect_never_adopts_another_live_compositors_window() {
+        let mut db = fixture();
+        let old = Principal {
+            uid: 0,
+            session: {
+                let Ok(stat) =
+                    std::fs::read_to_string(format!("/proc/{}/stat", std::process::id()))
+                else {
+                    return;
+                };
+                let start = stat
+                    .rsplit_once(')')
+                    .unwrap()
+                    .1
+                    .split_whitespace()
+                    .nth(19)
+                    .unwrap();
+                format!("{}:{start}", std::process::id())
+            },
+        };
+        let new = Principal {
+            uid: 0,
+            session: "new-host".into(),
+        };
+        let observation = json!({"op":"host.surface","surface_id":"live-window","activity_id":"1","title":"Editor","app_id":"example.Editor","connected":true,"client_uid":1000,"client_session":"12345:67890"});
+        handle(&mut db, &observation, &old).unwrap();
+        let mut reconnect = observation;
+        reconnect["surface_id"] = json!("second-host-window");
+        assert_eq!(
+            handle(&mut db, &reconnect, &new).unwrap()["surface_id"],
+            "second-host-window"
+        );
+    }
+    #[test]
     fn conventional_surface_registration_is_host_scoped_and_placeholders_are_durable() {
         let mut db = fixture();
         let root = Principal {

@@ -14,7 +14,7 @@ pub fn trusted(who: &Principal) -> bool {
             .unwrap_or(false)
 }
 pub fn init(db: &Connection) -> Result<()> {
-    db.execute_batch("CREATE TABLE IF NOT EXISTS presentation_host_surfaces(id TEXT PRIMARY KEY,activity TEXT NOT NULL,uid INTEGER NOT NULL,session TEXT NOT NULL,title TEXT NOT NULL,app_id TEXT NOT NULL,connected INTEGER NOT NULL,observed_at INTEGER NOT NULL); CREATE TABLE IF NOT EXISTS presentation_host_revisions(id TEXT PRIMARY KEY,revision INTEGER NOT NULL); CREATE TABLE IF NOT EXISTS presentation_renderers(surface TEXT PRIMARY KEY,uid INTEGER NOT NULL,session TEXT NOT NULL);").map_err(|e|e.to_string())
+    db.execute_batch("CREATE TABLE IF NOT EXISTS presentation_host_surfaces(id TEXT PRIMARY KEY,activity TEXT NOT NULL,uid INTEGER NOT NULL,session TEXT NOT NULL,title TEXT NOT NULL,app_id TEXT NOT NULL,connected INTEGER NOT NULL,observed_at INTEGER NOT NULL); CREATE TABLE IF NOT EXISTS presentation_host_revisions(id TEXT PRIMARY KEY,revision INTEGER NOT NULL); CREATE TABLE IF NOT EXISTS presentation_renderers(surface TEXT PRIMARY KEY,uid INTEGER NOT NULL,session TEXT NOT NULL); CREATE TABLE IF NOT EXISTS presentation_host_peers(id TEXT PRIMARY KEY,client_uid INTEGER NOT NULL,client_session TEXT NOT NULL); CREATE INDEX IF NOT EXISTS presentation_host_peer_lookup ON presentation_host_peers(client_uid,client_session);").map_err(|e|e.to_string())
 }
 fn ident(value: &str) -> bool {
     !value.is_empty()
@@ -30,7 +30,7 @@ pub fn register(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value
                 .into(),
         );
     }
-    let id = v["surface_id"]
+    let proposed_id = v["surface_id"]
         .as_str()
         .filter(|s| ident(s))
         .ok_or("invalid_document: Invalid host surface identity")?;
@@ -48,11 +48,66 @@ pub fn register(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value
         .as_str()
         .filter(|s| s.len() <= 256)
         .ok_or("resource_limit: Invalid application identity")?;
+    let peer = match (v.get("client_uid"), v.get("client_session")) {
+        (None, None) => None,
+        (Some(uid), Some(session)) => {
+            let uid = uid
+                .as_u64()
+                .filter(|uid| *uid <= u32::MAX as u64)
+                .ok_or("invalid_document: Invalid client UID")? as u32;
+            let session = session
+                .as_str()
+                .filter(|s| {
+                    s.len() <= 128
+                        && s.split_once(':').is_some_and(|(pid, start)| {
+                            pid.parse::<u32>().is_ok() && start.parse::<u64>().is_ok()
+                        })
+                })
+                .ok_or("invalid_document: Invalid authenticated client session")?;
+            Some((uid, session))
+        }
+        _ => {
+            return Err("invalid_document: Client UID and session must be supplied together".into())
+        }
+    };
     let tx = db.transaction().map_err(|e| e.to_string())?;
     let valid:bool=tx.query_row("SELECT EXISTS(SELECT 1 FROM activities WHERE CAST(id AS TEXT)=? AND id NOT IN (SELECT activity_id FROM removed_activities))",[activity],|r|r.get(0)).map_err(|e|e.to_string())?;
     if !valid {
         return Err("missing_reference: Activity unavailable".into());
     }
+    let mut recovered = None;
+    let exists: bool = tx
+        .query_row(
+            "SELECT EXISTS(SELECT 1 FROM presentation_host_surfaces WHERE id=?)",
+            [proposed_id],
+            |r| r.get(0),
+        )
+        .map_err(|e| e.to_string())?;
+    if !exists && connected {
+        if let Some((uid, session)) = peer {
+            // A live authenticated application process may reconnect after its compositor dies.
+            // Never guess from an app-id/title or pick one of several windows from the same process.
+            let mut query=tx.prepare("SELECT h.id,h.session,h.uid FROM presentation_host_surfaces h JOIN presentation_host_peers p USING(id) WHERE p.client_uid=? AND p.client_session=? AND h.activity=? AND h.app_id=? ORDER BY h.id LIMIT 2").map_err(|e|e.to_string())?;
+            let candidates = query
+                .query_map(params![uid, session, activity, app_id], |r| {
+                    Ok((
+                        r.get::<_, String>(0)?,
+                        r.get::<_, String>(1)?,
+                        r.get::<_, u32>(2)?,
+                    ))
+                })
+                .map_err(|e| e.to_string())?
+                .collect::<std::result::Result<Vec<_>, _>>()
+                .map_err(|e| e.to_string())?;
+            if candidates.len() == 1 {
+                let (identity, old_host, host_uid) = &candidates[0];
+                if *host_uid == who.uid && old_host != &who.session && !alive(old_host) {
+                    recovered = Some(identity.clone());
+                }
+            }
+        }
+    }
+    let id = recovered.as_deref().unwrap_or(proposed_id);
     let previous: Option<(u32, String, String)> = tx
         .query_row(
             "SELECT uid,session,activity FROM presentation_host_surfaces WHERE id=?",
@@ -62,7 +117,7 @@ pub fn register(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value
         .optional()
         .map_err(|e| e.to_string())?;
     if let Some((uid, session, owned)) = previous {
-        if uid != who.uid || session != who.session || owned != activity {
+        if uid != who.uid || (session != who.session && recovered.is_none()) || owned != activity {
             return Err("unauthorized: Host surface identity cannot be rebound to another session or activity".into());
         }
     } else {
@@ -103,6 +158,27 @@ pub fn register(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value
         )
         .map_err(|_| "invalid_document: Surface identity is already used")?;
     }
+    if let Some((uid, session)) = peer {
+        let previous: Option<(u32, String)> = tx
+            .query_row(
+                "SELECT client_uid,client_session FROM presentation_host_peers WHERE id=?",
+                [id],
+                |r| Ok((r.get(0)?, r.get(1)?)),
+            )
+            .optional()
+            .map_err(|e| e.to_string())?;
+        if previous
+            .as_ref()
+            .is_some_and(|(old_uid, old_session)| *old_uid != uid || old_session != session)
+        {
+            return Err("unauthorized: A conventional identity cannot change its authenticated client process".into());
+        }
+        tx.execute(
+            "INSERT INTO presentation_host_peers VALUES(?,?,?) ON CONFLICT(id) DO NOTHING",
+            params![id, uid, session],
+        )
+        .map_err(|e| e.to_string())?;
+    }
     let previous: Option<(String, String, bool)> = tx
         .query_row(
             "SELECT title,app_id,connected FROM presentation_host_surfaces WHERE id=?",
@@ -114,12 +190,15 @@ pub fn register(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value
     let changed = previous
         .as_ref()
         .is_none_or(|(old_title, old_app, old_connected)| {
-            old_title != title || old_app != app_id || *old_connected != connected
+            old_title != title
+                || old_app != app_id
+                || *old_connected != connected
+                || recovered.is_some()
         });
     tx.execute("INSERT INTO presentation_host_revisions VALUES(?,1) ON CONFLICT(id) DO UPDATE SET revision=revision+?",params![id,changed as i64]).map_err(|e|e.to_string())?;
-    tx.execute("INSERT INTO presentation_host_surfaces(id,activity,uid,session,title,app_id,connected,observed_at) VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET title=excluded.title,app_id=excluded.app_id,connected=excluded.connected,observed_at=excluded.observed_at",params![id,activity,who.uid,who.session,title,app_id,connected,crate::now()]).map_err(|e|e.to_string())?;
+    tx.execute("INSERT INTO presentation_host_surfaces(id,activity,uid,session,title,app_id,connected,observed_at) VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET session=excluded.session,title=excluded.title,app_id=excluded.app_id,connected=excluded.connected,observed_at=excluded.observed_at",params![id,activity,who.uid,who.session,title,app_id,connected,crate::now()]).map_err(|e|e.to_string())?;
     tx.commit().map_err(|e| e.to_string())?;
-    Ok(json!({"surface_id":id,"connected":connected}))
+    Ok(json!({"surface_id":id,"connected":connected,"reconciled":recovered.is_some()}))
 }
 pub fn activity(db: &Connection, id: &str) -> Result<Option<String>> {
     db.query_row(

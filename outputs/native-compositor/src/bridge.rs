@@ -300,10 +300,16 @@ impl Bridge {
                             if published.get(&w.id) != Some(entry)
                                 || state["host_surfaces"].get(&entry.0).is_none()
                             {
-                                call(
-                                    &socket,
-                                    &json!({"op":"host.surface","surface_id":entry.0,"activity_id":entry.1,"title":entry.2,"app_id":entry.3,"connected":true}),
-                                )?;
+                                let mut observation = json!({"op":"host.surface","surface_id":entry.0,"activity_id":entry.1,"title":entry.2,"app_id":entry.3,"connected":true});
+                                if !w.session.is_empty() && w.uid != u32::MAX {
+                                    observation["client_uid"] = json!(w.uid);
+                                    observation["client_session"] = json!(w.session);
+                                }
+                                let receipt = call(&socket, &observation)?;
+                                entry.0 = receipt["surface_id"]
+                                    .as_str()
+                                    .ok_or("Invalid host identity receipt")?
+                                    .to_string();
                                 published.insert(w.id.clone(), entry.clone());
                             }
                             identities.insert(w.id.clone(), entry.0.clone());

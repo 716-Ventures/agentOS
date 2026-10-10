@@ -209,6 +209,15 @@ def main():
             stop(proc);proc=None;Path(endpoint).unlink(missing_ok=True);proc=start()
             assert ok({'op':'presentation.get','document_id':opened['surface_id']})==shared
             print('PASS: strict UTF-8 document import, human edit/save, exclusive export and core restart persistence')
+            own_stat=Path(f'/proc/{os.getpid()}/stat').read_text();own_start=own_stat.rsplit(')',1)[1].split()[19]
+            observed={'op':'host.surface','surface_id':'persistent-conventional','activity_id':str(activity),'title':'Returning app','app_id':'org.example.Returning','connected':True,'client_uid':os.getuid(),'client_session':f'{os.getpid()}:{own_start}'}
+            assert other(observed)['ok']
+            returning={**observed,'surface_id':'ephemeral-after-restart'}
+            assert not other(returning,agent=True)['ok']
+            restored=ok(returning)
+            assert restored['surface_id']=='persistent-conventional' and restored['reconciled']
+            assert next(row for row in ok({'op':'source.list','activity_id':str(activity),'after':'window:','limit':64})['sources'] if row['source']=='window:persistent-conventional')['availability']=='available'
+            print('PASS: dead authenticated host reconciliation retains a unique conventional identity; model adoption denied')
             print('PASS: presentation IPC principals, atomic receipts, two clients, draft recovery, ordered changes, undo')
         finally:
             if proc:stop(proc)
