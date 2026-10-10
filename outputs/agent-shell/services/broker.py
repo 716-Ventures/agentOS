@@ -193,8 +193,8 @@ def view(job, offset=0):
         decoder = codecs.getincrementaldecoder('utf-8')(errors='replace')
         output = decoder.decode(data, final=final)
         pending = decoder.getstate()[0]
-        result.update(output=output, next_offset=offset+len(data)-len(pending))
-    else: result.update(output='', next_offset=offset)
+        result.update(output=output, next_offset=offset+len(data)-len(pending),has_more=offset+len(data)-len(pending)<p.stat().st_size)
+    else: result.update(output='', next_offset=offset,has_more=False)
     return result
 
 

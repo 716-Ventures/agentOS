@@ -10,11 +10,11 @@ New runtime work: compatible code rollback with crash recovery, release-specific
 
 Remaining implementation/qualification:
 
-- Consume one reusable typed component catalog in the core and renderer; finish multiline/form reconciliation, draft commit/discard and callback parameter contracts.
-- Connect shared WorkspaceDocument state to compositor placement and registered conventional/native identities. Complete split/resize/move/maximize/restore/close/undo, constraints, manual takeover and persistent restart reconciliation through the shared authority.
+- Finish richer form/callback parameter contracts. The core and renderer now consume the same released typed catalog; multiline editing and atomic draft commit/discard are implemented.
+- Complete pointer grabs, measured minimum sizes, layout pressure/overview, stronger manual geometry constraints and restart reconciliation. Shared WorkspaceDocument projection, authenticated native/conventional identities, activity visibility, typed direct controls, native close/undo with draft retention and journal undo pass ARM64 Linux CI.
 - Complete actual output/scaling/work-area discovery, removed-output recovery, native session/display ownership and graphical guest installation.
 - Finish terminal projection, source paging/virtualized collections, bounded reconnect/shutdown and source availability handling.
-- Finish broker approval and interactive terminal controls in the native environment; preserve direct controls during provider/network failure.
+- Qualify native broker review/approval, rejection, conventional terminal attachment and offline rescue terminal controls in the guest. Implemented UI/backend paths await full system verification.
 - Exercise actual dynamic agent requests, grounded Jev candidate decisions and unresolved references; measure latency, corrections and model usage without claiming fixture decisions are live quality evidence.
 - Validate keyboard, pointer, voice and screen-reader workflows, selection/IME/clipboard/undo/context menus, long text, small displays, light/dark/text scale and reduced motion.
 - Verify 716 UI reference appearance, state transitions and motion against its pinned shadcn profile; early releases remain experimental.

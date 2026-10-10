@@ -71,7 +71,7 @@ pub struct Frame {
     pub broker: Value,
     pub usage: Value,
     pub activity: Option<String>,
-    pub inspection: Option<String>,
+    pub inspection: Option<super::log_view::Page>,
     pub notice: Option<String>,
     pub connected: bool,
     pub error: Option<String>,
@@ -81,6 +81,8 @@ pub enum Command {
     RegisterRenderer(String),
     Approve(Value),
     Attach(Value),
+    OpenTerminal,
+    PageOutput(i8),
     WorkspaceEdit {
         workspace: String,
         revision: u64,
@@ -134,7 +136,9 @@ impl Backend {
     pub fn start(socket: PathBuf, activity: Option<String>) -> Self {
         let (commands, rx) = mpsc::channel();
         let frame = Arc::new(Mutex::new(Frame::default()));
-        let drafts = Arc::new(Mutex::new(BTreeMap::new()));
+        let drafts = Arc::new(Mutex::new(super::draft_cache::load(
+            &super::draft_cache::path(),
+        )));
         let (view, edits) = (frame.clone(), drafts.clone());
         let stop = Arc::new(AtomicBool::new(false));
         let stopping = stop.clone();
@@ -152,6 +156,11 @@ impl Backend {
         let _ = self.commands.send(Command::Quit);
         if let Some(worker) = self.worker.take() {
             let _ = worker.join();
+            if let Err(error) = super::draft_cache::encode(&self.drafts.lock().unwrap())
+                .and_then(|bytes| super::draft_cache::save(&super::draft_cache::path(), &bytes))
+            {
+                eprintln!("Draft recovery: {error}");
+            }
         }
     }
 }
@@ -168,12 +177,28 @@ fn run(
     drafts: Arc<Mutex<BTreeMap<(String, String), Draft>>>,
     stop: Arc<AtomicBool>,
 ) {
+    let mut output_view = None::<super::log_view::LogView>;
     let mut leases = BTreeMap::<(String, String), Instant>::new();
     let mut last = Instant::now() - Duration::from_secs(1);
     let mut shown_activity = None::<String>;
+    let mut recovered = drafts.lock().unwrap().keys().cloned().collect::<Vec<_>>();
+    let mut saved_cache = Vec::new();
     let approval_pending = Arc::new(AtomicBool::new(false));
     let mut approvals = Vec::<thread::JoinHandle<()>>::new();
     while !stop.load(Ordering::Relaxed) {
+        match super::draft_cache::encode(&drafts.lock().unwrap()) {
+            Ok(bytes) if bytes != saved_cache => {
+                match super::draft_cache::save(&super::draft_cache::path(), &bytes) {
+                    Ok(()) => saved_cache = bytes,
+                    Err(error) => {
+                        frame.lock().unwrap().error =
+                            Some(format!("Local draft recovery unavailable: {error}"))
+                    }
+                }
+            }
+            Err(error) => frame.lock().unwrap().error = Some(error),
+            _ => {}
+        }
         let mut pending = Vec::new();
         for task in approvals.drain(..) {
             if task.is_finished() {
@@ -185,7 +210,7 @@ fn run(
         approvals = pending;
         match rx.recv_timeout(Duration::from_millis(50)) {
             Ok(Command::Quit) => {
-                flush(&socket, &drafts, &frame);
+                flush(&socket, &drafts, &frame, &stop);
                 break;
             }
             Ok(command) => {
@@ -219,6 +244,7 @@ fn run(
                 let result=match command {
                     Command::Approve(_)=>unreachable!(),
                     Command::Attach(job)=>super::broker_controls::attach(&job),
+                    Command::OpenTerminal=>super::broker_controls::open_terminal(),
                     Command::WorkspaceEdit{workspace,revision,edit}=>request(&socket,&json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("workspace-{}",super::nonce()),"expected_revisions":{workspace.clone():revision},"operations":[{"op":"workspace.edit","workspace_id":workspace,"edit":edit}]})).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt}),
                     Command::WorkspaceUndo(cursor)=>request(&socket,&json!({"op":"presentation.undo","event_cursor":cursor,"request_id":format!("undo-{}",super::nonce())})).map(|receipt|{frame.lock().unwrap().workspace_undo=None;receipt}),
                     Command::RegisterRenderer(surface)=>request(&socket,&json!({"op":"host.renderer","surface_id":surface})),
@@ -233,7 +259,15 @@ fn run(
                             let mut argv=vec!["/usr/bin/python3".to_string(),"-u".into(),"/usr/local/lib/agent-os/services/worker.py".into(),"ask".into(),activity.to_string(),prompt];
                             if let Some(context)=grounding {
                                 let surface=context["surface_id"].as_str().unwrap_or("");
-                                if surface!="native-launcher" {
+                                if surface=="native-monitor" {
+                                    let reference=&context["job_ref"];
+                                    let valid=if let Some(id)=reference.as_i64() {
+                                        request(&socket,&json!({"op":"snapshot"})).ok().and_then(|s|s["jobs"].as_array().map(|rows|rows.iter().any(|j|j["id"]==id && j["activity_id"]==activity))).unwrap_or(false)
+                                    }else if let Some(id)=reference.as_str().and_then(|r|r.strip_prefix("broker:")) {
+                                        request(&broker_socket(),&json!({"op":"poll","job_id":id})).map(|job|job["activity"]==activity).unwrap_or(false)
+                                    }else{false};
+                                    if !valid {frame.lock().unwrap().error=Some("The recorded work is unavailable or belongs to another activity; record a new request".into());continue;}
+                                }else if surface!="native-launcher" {
                                     let snapshot=request(&socket,&json!({"op":"presentation.snapshot"}));
                                     if snapshot.as_ref().map(|s|s["documents"][surface]["activity_id"].as_str()!=Some(activity.to_string().as_str())).unwrap_or(true) {
                                         frame.lock().unwrap().error=Some("The recorded view was closed or moved; record a new request".into());continue;
@@ -246,16 +280,22 @@ fn run(
                     },
                     Command::Stop{source,job}=>request(&if source=="core"{socket.clone()}else{broker_socket()},&json!({"op":"cancel","job_id":job})),
                     Command::Inspect{source,job}=>{
-                        let result=request(&if source=="core"{socket.clone()}else{broker_socket()},&json!({"op":if source=="core"{"log"}else{"poll"},"job_id":job,"offset":0}));
-                        if let Ok(data)=&result {frame.lock().unwrap().inspection=Some(data[if source=="core"{"text"}else{"output"}].as_str().unwrap_or("No output available").into());}result
+                        let current=frame.lock().unwrap().clone();
+                        let rows=if source=="core"{current.core["jobs"].as_array()}else{current.broker.as_array()};
+                        let metadata=rows.and_then(|rows|rows.iter().find(|row|row["id"]==job));
+                        match metadata.and_then(|row|row[if source=="core"{"activity_id"}else{"activity"}].as_i64().map(|activity|(activity,row["argv"].to_string()))) {
+                            Some((activity,title))=>super::log_view::LogView::new(source,job,activity,title).and_then(|mut view|{let page=view.read(&socket,0)?;frame.lock().unwrap().inspection=Some(page);output_view=Some(view);Ok(json!({"status":"Output page loaded"}))}),
+                            None=>Err("This work is no longer available in the current snapshot".into()),
+                        }
                     },
+                    Command::PageOutput(direction)=>match output_view.as_mut(){Some(view)=>view.read(&socket,direction).map(|page|{frame.lock().unwrap().inspection=Some(page);json!({"status":"Output page loaded"})}),None=>Err("Select work to inspect first".into())},
                     Command::Lease{surface,element,begin}=>{
                         let key=(surface.clone(),element.clone());
                         if begin {leases.insert(key,Instant::now());}else{leases.remove(&key);}
                         request(&socket,&json!({"op":if begin{"interaction.begin"}else{"interaction.end"},"surface_id":surface,"element_id":element}))
                     }
                     Command::Action{reference,key}=>request(&socket,&json!({"op":"action.metadata","reference":reference})).and_then(|info|request(&socket,&json!({"op":"action.invoke","reference":reference,"request_id":key,"expected_source_revision":info["source_revision"]}))),
-                    Command::Close{surface}=>{flush(&socket,&drafts,&frame);if drafts.lock().unwrap().iter().any(|((id,_),draft)|id==&surface && draft.dirty){Err("The view remains open because its latest draft could not be saved".into())}else{close_surface(&socket,&surface).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt})}},
+                    Command::Close{surface}=>{flush(&socket,&drafts,&frame,&stop);if drafts.lock().unwrap().iter().any(|((id,_),draft)|id==&surface && draft.dirty){Err("The view remains open because its latest draft could not be saved".into())}else{close_surface(&socket,&surface).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt})}},
                     Command::Quit=>unreachable!(),
                 };
                 let mut view = frame.lock().unwrap();
@@ -291,7 +331,17 @@ fn run(
             continue;
         }
         last = Instant::now();
-        flush(&socket, &drafts, &frame);
+        recovered.retain(|(surface, element)| {
+            if stop.load(Ordering::Relaxed) {
+                return true;
+            }
+            request(
+                &socket,
+                &json!({"op":"interaction.begin","surface_id":surface,"element_id":element}),
+            )
+            .is_err()
+        });
+        flush(&socket, &drafts, &frame, &stop);
         match request(&socket, &json!({"op":"presentation.snapshot"})) {
             Ok(state) => {
                 let mut next = Frame {
@@ -356,6 +406,9 @@ fn run(
                         }
                         if let Some(actions) = doc["actions"].as_object() {
                             for action in actions.values() {
+                                if stop.load(Ordering::Relaxed) {
+                                    break;
+                                }
                                 if let Some(reference) = action["ref"].as_str() {
                                     if let Ok(info) = request(
                                         &socket,
@@ -368,6 +421,9 @@ fn run(
                         }
                         if let Some(elements) = doc["elements"].as_object() {
                             for (element, node) in elements {
+                                if stop.load(Ordering::Relaxed) {
+                                    break;
+                                }
                                 if node["type"] == "TextField@1" {
                                     if let Ok(draft) = request(
                                         &socket,
@@ -385,7 +441,7 @@ fn run(
                 if next.error.is_none() {
                     next.error = old.error.take();
                 }
-                next.inspection = old.inspection.take();
+                next.inspection = old.inspection.clone();
                 next.notice = old.notice.take();
                 *old = next;
             }
@@ -404,9 +460,13 @@ fn flush(
     socket: &PathBuf,
     drafts: &Arc<Mutex<BTreeMap<(String, String), Draft>>>,
     frame: &Arc<Mutex<Frame>>,
+    stop: &AtomicBool,
 ) {
     let pending = drafts.lock().unwrap().clone();
     for ((surface, element), draft) in pending.into_iter().filter(|(_, d)| d.dirty) {
+        if stop.load(Ordering::Relaxed) {
+            break;
+        }
         let result = request(
             socket,
             &json!({"op":"draft.save","surface_id":surface,"element_id":element,"expected_draft_revision":draft.expected,"draft":draft.text}),
@@ -463,7 +523,7 @@ fn close_surface(socket: &PathBuf, surface: &str) -> Result<Value, String> {
     request(socket, &transaction).or_else(|_| request(socket, &transaction))
 }
 
-fn broker_socket() -> PathBuf {
+pub(crate) fn broker_socket() -> PathBuf {
     PathBuf::from(
         std::env::var("AGENT_OS_BROKER_SOCKET")
             .unwrap_or_else(|_| "/run/agent-os-broker/api.sock".into()),
@@ -491,13 +551,13 @@ fn resolve_draft(
         &json!({"op":"draft.get","surface_id":surface,"element_id":element}),
     )?;
     if let Some(local) = &local {
-        if local.dirty {
+        if local.dirty && commit {
             let receipt = request(
                 socket,
                 &json!({"op":"draft.save","surface_id":surface,"element_id":element,"expected_draft_revision":local.expected,"draft":local.text}),
             )?;
             saved = json!({"draft_revision":receipt["draft_revision"],"draft":local.text});
-        } else if saved["draft_revision"].as_u64() != Some(local.expected) {
+        } else if commit && saved["draft_revision"].as_u64() != Some(local.expected) {
             return Err("Draft changed in another editor; recover before resolving it".into());
         }
     }

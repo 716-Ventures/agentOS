@@ -21,6 +21,11 @@ pub struct Controls {
     message: gtk::Label,
     model_text: gtk::Label,
     inspection: gtk::TextView,
+    output_page: Option<log_view::Page>,
+    output_label: gtk::Label,
+    output_previous: gtk::Button,
+    output_next: gtk::Button,
+    output_refresh: gtk::Button,
     voice: voice::Voice,
     voice_button: gtk::Button,
     voice_status: gtk::Label,
@@ -47,6 +52,12 @@ impl Controls {
             let _ = sender.send(Command::Setup);
         });
         widget.append(&setup);
+        let terminal = ui::button("Open terminal", ButtonVariant::Outline, false);
+        let sender = commands.clone();
+        terminal.connect_clicked(move |_| {
+            let _ = sender.send(Command::OpenTerminal);
+        });
+        widget.append(&terminal);
         let appearance = gtk::DropDown::from_strings(&["Dark", "Light"]);
         let scale = gtk::SpinButton::with_range(1.0, 3.0, 0.25);
         let preferences = super::preferences::read();
@@ -240,6 +251,30 @@ impl Controls {
         inspection.set_wrap_mode(gtk::WrapMode::WordChar);
         inspection.update_property(&[gtk::accessible::Property::Label("Selected work output")]);
         monitor_content.append(&inspection);
+        let output_label = ui::text("Select work to inspect its output", false);
+        monitor_content.append(&output_label);
+        let output_previous = ui::button("Previous output page", ButtonVariant::Outline, false);
+        let output_next = ui::button("Next output page", ButtonVariant::Outline, false);
+        let output_refresh = ui::button("Refresh output page", ButtonVariant::Outline, false);
+        let pages = gtk::FlowBox::new();
+        pages.set_selection_mode(gtk::SelectionMode::None);
+        pages.set_min_children_per_line(1);
+        pages.set_max_children_per_line(3);
+        pages.set_column_spacing(8);
+        pages.set_row_spacing(8);
+        for (button, direction) in [
+            (&output_previous, -1),
+            (&output_next, 1),
+            (&output_refresh, 0),
+        ] {
+            pages.insert(button, -1);
+            button.set_sensitive(false);
+            let sender = commands.clone();
+            button.connect_clicked(move |_| {
+                let _ = sender.send(Command::PageOutput(direction));
+            });
+        }
+        monitor_content.append(&pages);
         let scroll = gtk::ScrolledWindow::builder()
             .hscrollbar_policy(gtk::PolicyType::Never)
             .child(&monitor_content)
@@ -269,6 +304,11 @@ impl Controls {
             message,
             model_text,
             inspection,
+            output_page: None,
+            output_label,
+            output_previous,
+            output_next,
+            output_refresh,
             voice,
             voice_button,
             voice_status,
@@ -292,7 +332,29 @@ impl Controls {
         self.workspace.verify(frame);
         self.present();
     }
-    pub fn context(&self, context: Value) {
+    pub fn context(&self, mut context: Value) {
+        let buffer = self.inspection.buffer();
+        if self.monitor.is_active() || buffer.has_selection() {
+            if let Some(page) = &self.output_page {
+                let mut selection = buffer
+                    .selection_bounds()
+                    .map(|(start, end)| buffer.text(&start, &end, false).to_string())
+                    .unwrap_or_default();
+                while selection.len() > 8000 {
+                    selection.pop();
+                }
+                context["activity_id"] = json!(page.activity);
+                context["surface_id"] = json!("native-monitor");
+                context["layout_revision"] = json!(page.start);
+                context["job_ref"] = if page.source == "core" {
+                    page.job.clone()
+                } else {
+                    json!(format!("broker:{}", page.job.as_str().unwrap_or("")))
+                };
+                context["selection"] = json!(selection);
+                context["surface_title"] = json!(page.title.chars().take(200).collect::<String>());
+            }
+        }
         *self.voice_context.borrow_mut() = context;
     }
     pub fn close(&self) {
@@ -524,8 +586,18 @@ impl Controls {
         }
         if let Some(output) = &frame.inspection {
             let buffer = self.inspection.buffer();
-            if buffer.text(&buffer.start_iter(), &buffer.end_iter(), false) != output.as_str() {
-                buffer.set_text(output);
+            self.output_previous.set_sensitive(output.has_previous);
+            self.output_next.set_sensitive(output.has_more);
+            self.output_refresh.set_sensitive(frame.connected);
+            if !buffer.has_selection() {
+                if buffer.text(&buffer.start_iter(), &buffer.end_iter(), false) != output.text {
+                    buffer.set_text(&output.text);
+                }
+                self.output_label.set_text(&format!(
+                    "{} work {} · output bytes {}–{}",
+                    output.source, output.job, output.start, output.end
+                ));
+                self.output_page = Some(output.clone());
             }
         }
     }
@@ -572,21 +644,29 @@ fn review_proposal(app: &gtk::Application, proposal: Value, commands: Sender<Com
         .child(&scroll)
         .build();
     window.add_css_class("seven-ui");
-    let (view, sender, current) = (window.clone(), commands.clone(), proposal.clone());
+    let (view, sender, current) = (window.downgrade(), commands.clone(), proposal.clone());
     approve.connect_clicked(move |button| {
         button.set_sensitive(false);
         let _ = sender.send(Command::Approve(current.clone()));
-        view.close();
+        if let Some(view) = view.upgrade() {
+            view.close();
+        }
     });
-    let (view, sender, id) = (window.clone(), commands, proposal["id"].clone());
+    let (view, sender, id) = (window.downgrade(), commands, proposal["id"].clone());
     reject.connect_clicked(move |_| {
         let _ = sender.send(Command::Stop {
             source: "broker".into(),
             job: id.clone(),
         });
-        view.close();
+        if let Some(view) = view.upgrade() {
+            view.close();
+        }
     });
-    let view = window.clone();
-    cancel.connect_clicked(move |_| view.close());
+    let view = window.downgrade();
+    cancel.connect_clicked(move |_| {
+        if let Some(view) = view.upgrade() {
+            view.close();
+        }
+    });
     window.present();
 }

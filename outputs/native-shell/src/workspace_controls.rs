@@ -173,6 +173,36 @@ impl WorkspaceControls {
         if let Some(doc) = doc {
             walk(&doc["outputs"], &mut entries, frame);
         }
+        for (id, document) in &frame.documents {
+            if document.get("surface_id").is_some() {
+                entries.entry(id.clone()).or_insert_with(|| {
+                    format!(
+                        "{} · available view",
+                        document["title"].as_str().unwrap_or("Native view")
+                    )
+                });
+            }
+        }
+        for (id, host) in frame
+            .host_surfaces
+            .as_object()
+            .into_iter()
+            .flat_map(|h| h.iter())
+        {
+            if host["activity_id"].as_str() == frame.activity.as_deref() {
+                entries.entry(id.clone()).or_insert_with(|| {
+                    format!(
+                        "{} · {}",
+                        host["title"].as_str().unwrap_or("Application"),
+                        if host["availability"] == "available" {
+                            "available view"
+                        } else {
+                            "disconnected"
+                        }
+                    )
+                });
+            }
+        }
         let ids = entries.keys().cloned().collect::<Vec<_>>();
         let names = entries.values().map(String::as_str).collect::<Vec<_>>();
         let outputs = doc

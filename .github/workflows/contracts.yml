@@ -49,6 +49,7 @@ jobs:
           key: desktop-arm64-rust185-${{ hashFiles('outputs/native-shell/Cargo.lock') }}
       - name: Build native desktop
         run: |
+          cargo +1.85.1 test --locked --manifest-path outputs/native-shell/Cargo.toml
           cargo +1.85.1 build --locked --manifest-path outputs/native-shell/Cargo.toml
           cargo +1.85.1 build --release --locked --manifest-path outputs/agent-shell/Cargo.toml
       - name: Real native rendering and interaction

@@ -222,12 +222,20 @@ impl Bridge {
                                 doc["outputs"]["nested-primary"] =
                                     json!({"tiles":null,"floating":[],"maximized":null});
                             }
-                            for surface in surfaces {
-                                append_tile(
-                                    &mut doc["outputs"]["nested-primary"]["tiles"],
-                                    &surface,
-                                );
+                            // New background views do not reshape a manually constrained layout.
+                            if doc["constraints"]
+                                .as_array()
+                                .into_iter()
+                                .flatten()
+                                .any(|c| c["provenance"] != "inferred_preference")
+                            {
+                                continue;
                             }
+                            let mut tiled = Vec::new();
+                            collect_tiles(&doc["outputs"]["nested-primary"]["tiles"], &mut tiled);
+                            tiled.extend(surfaces);
+                            doc["outputs"]["nested-primary"]["tiles"] =
+                                automatic_tiles(&tiled, observed.area.width);
                             counter += 1;
                             put(&socket, &doc, expected, &format!("host-{prefix}-{counter}"))?;
                         }
@@ -425,14 +433,40 @@ fn placed_surfaces(state: &Value) -> BTreeSet<String> {
     }
     result
 }
-fn append_tile(tile: &mut Value, id: &str) {
-    let leaf = json!({"kind":"leaf","surface_id":id});
-    if tile.is_null() {
-        *tile = leaf;
-        return;
+fn collect_tiles(tile: &Value, ids: &mut Vec<String>) {
+    if tile["kind"] == "leaf" {
+        if let Some(id) = tile["surface_id"].as_str() {
+            ids.push(id.into());
+        }
+    } else {
+        for child in tile["children"].as_array().into_iter().flatten() {
+            collect_tiles(child, ids);
+        }
     }
-    // Keep existing split geometry intact; append a sibling instead of flattening user layout.
-    *tile = json!({"kind":"split","axis":"horizontal","ratios":[0.5,0.5],"children":[tile.clone(),leaf]});
+}
+fn automatic_tiles(ids: &[String], width: i32) -> Value {
+    fn split(axis: &str, children: Vec<Value>) -> Value {
+        if children.is_empty() {
+            Value::Null
+        } else if children.len() == 1 {
+            children.into_iter().next().unwrap()
+        } else {
+            json!({"kind":"split","axis":axis,"ratios":vec![1.0/children.len() as f64;children.len()],"children":children})
+        }
+    }
+    let columns = ids.len().min((width / 320).max(1) as usize).max(1);
+    let rows = ids
+        .chunks(columns)
+        .map(|row| {
+            split(
+                "horizontal",
+                row.iter()
+                    .map(|id| json!({"kind":"leaf","surface_id":id}))
+                    .collect(),
+            )
+        })
+        .collect();
+    split("vertical", rows)
 }
 pub fn rectangles(layout: &Value, area: Rect) -> Result<BTreeMap<String, Rect>, String> {
     fn tiles(
@@ -513,6 +547,20 @@ pub fn rectangles(layout: &Value, area: Rect) -> Result<BTreeMap<String, Rect>, 
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn automatic_views_use_balanced_rows_instead_of_repeatedly_halving_old_views() {
+        let ids = (0..7).map(|i| format!("view-{i}")).collect::<Vec<_>>();
+        let layout = json!({"tiles":automatic_tiles(&ids,1280),"floating":[],"maximized":null});
+        let area = Rect {
+            x: 0,
+            y: 0,
+            width: 1280,
+            height: 800,
+        };
+        let rects = rectangles(&layout, area).unwrap();
+        assert_eq!(rects.len(), 7);
+        assert!(rects.values().all(|r| r.width >= 320 && r.height >= 400));
+    }
     #[test]
     fn app_id_alone_cannot_impersonate_native_surface() {
         let mut state = json!({"documents":{"a":{"surface_id":"a"}},"renderers":{"a":{"uid":1000,"session":"7:42"}}});

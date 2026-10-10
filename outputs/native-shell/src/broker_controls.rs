@@ -121,6 +121,17 @@ pub fn attach(job: &Value) -> Result<Value, String> {
     Ok(json!({"status":"Terminal opened · Ctrl-] detaches without stopping work"}))
 }
 
+pub fn open_terminal() -> Result<Value, String> {
+    let mut child = Command::new("weston-terminal")
+        .args(["--shell", "/bin/bash"])
+        .spawn()
+        .map_err(|e| e.to_string())?;
+    thread::spawn(move || {
+        let _ = child.wait();
+    });
+    Ok(json!({"status":"Local terminal opened"}))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

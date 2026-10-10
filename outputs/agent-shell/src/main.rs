@@ -24,6 +24,31 @@ use std::{
 
 type Result<T> = std::result::Result<T, String>;
 const LOG_LIMIT: usize = 1024 * 1024;
+// Withhold an incomplete UTF-8 suffix while a live producer can finish it.
+fn log_text(bytes: &[u8], final_page: bool) -> (String, usize) {
+    let mut consumed = bytes.len();
+    if !final_page {
+        let mut cursor = 0;
+        while cursor < bytes.len() {
+            match std::str::from_utf8(&bytes[cursor..]) {
+                Ok(_) => break,
+                Err(error) => {
+                    cursor += error.valid_up_to();
+                    if let Some(length) = error.error_len() {
+                        cursor += length;
+                    } else {
+                        consumed = cursor;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    (
+        String::from_utf8_lossy(&bytes[..consumed]).into_owned(),
+        consumed,
+    )
+}
 struct Core {
     db: Mutex<Connection>,
     root: PathBuf,
@@ -445,7 +470,12 @@ impl Core {
                 f.seek(SeekFrom::Start(offset)).map_err(err)?;
                 let mut buf = vec![0; 32768];
                 let n = f.read(&mut buf).map_err(err)?;
-                Ok(json!({"text":String::from_utf8_lossy(&buf[..n]),"offset":offset+n as u64}))
+                let length = f.metadata().map_err(err)?.len();
+                let live:bool=self.db.lock().unwrap().query_row("SELECT EXISTS(SELECT 1 FROM jobs WHERE id=? AND status IN ('starting','running','cancelling'))",[job],|r|r.get(0)).map_err(err)?;
+                let (text, consumed) = log_text(&buf[..n], !live && offset + n as u64 >= length);
+                Ok(
+                    json!({"text":text,"offset":offset+consumed as u64,"has_more":offset+(consumed as u64)<length}),
+                )
             }
             "history" => {
                 let activity = id(v, "activity_id")?;
@@ -631,6 +661,19 @@ mod tests {
         }
     }
 
+    #[test]
+    fn log_pages_preserve_unicode_across_every_byte_boundary() {
+        let text = "café λ 日本語";
+        let bytes = text.as_bytes();
+        for boundary in 0..=bytes.len() {
+            let (first, consumed) = log_text(&bytes[..boundary], false);
+            let (second, end) = log_text(&bytes[consumed..], true);
+            assert_eq!(format!("{first}{second}"), text);
+            assert_eq!(consumed + end, bytes.len());
+        }
+        assert_eq!(log_text(&[0xff, 0xe6, 0x97], false), ("�".into(), 1));
+        assert_eq!(log_text(&[0xe6, 0x97], true), ("�".into(), 2));
+    }
     #[test]
     fn activities_and_history_survive_reopen() {
         let fixture = Fixture::new();

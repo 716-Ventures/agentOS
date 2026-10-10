@@ -51,9 +51,12 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             surface.elements["button"].button.as_ref().unwrap().emit_clicked();
             assert!(rx.try_iter().any(|c|matches!(c,Command::Action{reference,..} if reference=="fixture-action")));
             frame.connected=false;surface.update("native-fixture",&doc,&frame,&commands,&drafts);assert_eq!(field.entry.text(),"Unsaved λ 日本語");
+            // Capture after GTK has rendered the verified final state.
+            glib::timeout_add_local_once(Duration::from_millis(180),move || {
             if let Some(path)=capture {let snapshot=gtk::Snapshot::new();paintable.snapshot(&snapshot,surface.scroll.width() as f64,surface.scroll.height() as f64);let node=snapshot.to_node().unwrap();surface.window.renderer().unwrap().render_texture(&node,None).save_to_png(path).unwrap();}
             println!("PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view");
             surface.window.destroy();quit.quit();
+            });
         });
     });
     app.run_with_args(&["agent-os-desktop-verification"]);

@@ -1234,7 +1234,16 @@ fn interaction(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value>
             json!({"draft_revision":existing.as_ref().map(|r|r.3).unwrap_or(0),"draft":existing.and_then(|r|r.4)}),
         );
     }
-    if !owned && existing.as_ref().map(|r| r.2 >= now()).unwrap_or(false) {
+    let previous_dead = existing
+        .as_ref()
+        .map(|r| {
+            r.1.split_once(':')
+                .map(|(pid, start)| pid.parse::<u32>().is_ok() && start.parse::<u64>().is_ok())
+                .unwrap_or(false)
+                && !crate::presentation_hosts::alive(&r.1)
+        })
+        .unwrap_or(false);
+    if !owned && !previous_dead && existing.as_ref().map(|r| r.2 >= now()).unwrap_or(false) {
         return Err(error(
             "interaction_conflict",
             "Another native input session owns this element",
@@ -1947,5 +1956,35 @@ mod tests {
             .unwrap()["draft"],
             "Keep my unsaved λ text"
         );
+    }
+    #[test]
+    fn renderer_restart_can_recover_a_dead_process_draft_without_waiting_for_timeout() {
+        let mut db = fixture();
+        create(&mut db);
+        let old = Principal {
+            uid: human().uid,
+            session: "4294967295:0".into(),
+        };
+        handle(
+            &mut db,
+            &json!({"op":"interaction.begin","surface_id":"surface-a","element_id":"input"}),
+            &old,
+        )
+        .unwrap();
+        handle(&mut db,&json!({"op":"draft.save","surface_id":"surface-a","element_id":"input","expected_draft_revision":0,"draft":"Recover after crash"}),&old).unwrap();
+        handle(
+            &mut db,
+            &json!({"op":"interaction.begin","surface_id":"surface-a","element_id":"input"}),
+            &human(),
+        )
+        .unwrap();
+        let recovered = handle(
+            &mut db,
+            &json!({"op":"draft.get","surface_id":"surface-a","element_id":"input"}),
+            &human(),
+        )
+        .unwrap();
+        assert_eq!(recovered["draft"], "Recover after crash");
+        assert_eq!(recovered["draft_revision"], 1);
     }
 }
