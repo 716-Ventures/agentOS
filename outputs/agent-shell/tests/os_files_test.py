@@ -45,4 +45,18 @@ class DurableEdits(unittest.TestCase):
     with self.assertRaisesRegex(ValueError,'File changed while'):files.run(dict(op='write',path=str(target),content='new',expected_sha256=hashlib.sha256(b'original').hexdigest()))
    self.assertEqual(target.read_text(),'external change');self.assertFalse(list(root.glob('.agent-edit-*')))
 
+ def test_identical_replacement_inode_or_changed_permissions_during_backup_are_not_overwritten(self):
+  import hashlib
+  for replace_inode in (True,False):
+   with self.subTest(replace_inode=replace_inode),tempfile.TemporaryDirectory() as tmp:
+    root=Path(tmp);target=root/'note';target.write_text('original');target.chmod(0o600)
+    def changed(_):
+     if replace_inode:
+      replacement=root/'external';replacement.write_text('original');replacement.replace(target)
+     else:target.chmod(0o640)
+    with patch.object(files,'BACKUPS',root/'backups'),patch.object(files,'sync_directory',side_effect=changed):
+     with self.assertRaisesRegex(ValueError,'File changed while'):
+      files.run(dict(op='write',path=str(target),content='new',expected_sha256=hashlib.sha256(b'original').hexdigest()))
+    self.assertEqual(target.read_text(),'original');self.assertFalse(list(root.glob('.agent-edit-*')))
+
 if __name__=='__main__':unittest.main()

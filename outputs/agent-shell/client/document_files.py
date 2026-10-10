@@ -97,7 +97,7 @@ def replace(request,surface,path,revision,expected_sha256):
     previous=files.BACKUPS
     try:
         files.BACKUPS=backups
-        result=files.run({'op':'write','path':current['path'],'content':content,'expected_sha256':expected_sha256})
+        result=files.run({'op':'write','path':current['path'],'content':content,'expected_sha256':expected_sha256,'preserve_path':True})
     finally:files.BACKUPS=previous
     result['status']='File saved; original retained at '+str(result['backup'])
     result['revision']=revision

@@ -14,13 +14,17 @@ import time
 BACKUPS=Path('/var/lib/agent-os-file-backups')
 
 
-def read_regular(path):
+def read_version(path, nofollow=False):
     # Opening a FIFO must not hang the service before its type can be checked.
-    fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK)
-    with os.fdopen(fd, 'rb') as f:
-        if not stat.S_ISREG(os.fstat(f.fileno()).st_mode):
-            raise ValueError('Use execute for non-regular files')
-        return f.read(65537)
+    flags=os.O_RDONLY|os.O_NONBLOCK|(os.O_NOFOLLOW if nofollow else 0)
+    fd=os.open(path,flags)
+    with os.fdopen(fd,'rb') as stream:
+        info=os.fstat(stream.fileno())
+        if not stat.S_ISREG(info.st_mode):raise ValueError('Use execute for non-regular files')
+        return stream.read(65537),info
+
+
+def read_regular(path):return read_version(path)[0]
 
 
 def operate(req):
@@ -49,7 +53,7 @@ def operate(req):
         return {'path':str(path),'content':data[:65536].decode('utf-8','replace'), 'truncated':len(data)>65536,
                 'sha256':hashlib.sha256(data).hexdigest() if len(data)<=65536 else None}
     if op=='write':
-        target=path.resolve()
+        target=(path.parent.resolve(strict=True)/path.name) if req.get('preserve_path') is True else path.resolve()
         locks=BACKUPS/'.locks';locks.mkdir(mode=0o700,parents=True,exist_ok=True)
         lock_path=locks/hashlib.sha256(os.fsencode(target)).hexdigest()
         with lock_path.open('a+b') as lock:
@@ -81,9 +85,9 @@ def sync_directory(path):
 
 def write_guarded(target, req):
     if target.exists():
-        old=read_regular(target)
+        old,original=read_version(target,nofollow=True)
         if len(old)>65536:raise ValueError('File too large for recoverable edit')
-        digest=hashlib.sha256(old).hexdigest();original=target.stat()
+        digest=hashlib.sha256(old).hexdigest()
     else:old=None;digest='missing';original=None
     if req.get('expected_sha256')!=digest:
         raise ValueError('This file does not exist. To create it, pass expected_sha256 as the literal string missing; do not hash the new content.' if old is None else 'File changed; read it again and use the returned current-file sha256, not the hash of your new content.')
@@ -112,8 +116,10 @@ def write_guarded(target, req):
         else:
             # Recheck after backup/preparation as well as under our per-path writer lock.
             # External writers do not share that lock; an OS rename cannot provide a content CAS.
-            current=read_regular(target)
-            if hashlib.sha256(current).hexdigest()!=digest:raise ValueError('File changed while preparing the edit; the existing file was preserved')
+            current,observed=read_version(target,nofollow=True)
+            identity=lambda info:(info.st_dev,info.st_ino,info.st_uid,info.st_gid,stat.S_IMODE(info.st_mode))
+            if hashlib.sha256(current).hexdigest()!=digest or identity(observed)!=identity(original):
+                raise ValueError('File changed while preparing the edit; the existing file was preserved')
             temporary.replace(target)
         sync_directory(target.parent)
     finally:

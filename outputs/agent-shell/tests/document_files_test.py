@@ -91,3 +91,17 @@ class Documents(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'View changed'):
                 files.replace(changed,self.doc['surface_id'],path,3,review['expected_sha256'])
         self.assertEqual(path.read_text(),'original')
+
+    def test_path_swapped_to_identical_symlink_after_review_cannot_redirect_replacement(self):
+        path=self.root/'selected';other=self.root/'other';path.write_text('same');other.write_text('same')
+        review=files.review(self.request,self.doc['surface_id'],path,3);reads=0
+        def swap(op,**fields):
+            nonlocal reads
+            result=self.request(op,**fields)
+            if op=='presentation.get':
+                reads+=1
+                if reads==2:path.unlink();path.symlink_to(other)
+            return result
+        with patch.dict(os.environ,{'XDG_STATE_HOME':str(self.root/'state')}):
+            with self.assertRaises(OSError):files.replace(swap,self.doc['surface_id'],path,3,review['expected_sha256'])
+        self.assertTrue(path.is_symlink());self.assertEqual(other.read_text(),'same')
