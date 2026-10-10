@@ -257,7 +257,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         frame.core=transport::request(&socket,&json!({"op":"snapshot"})).unwrap();frame.activity=doc["activity_id"].as_str().map(String::from);frame.usage=json!({"unavailable":true});frame.broker=json!([]);
         verify_container_replacement(app,&frame,&commands,&drafts);
         let mut controls=controls::Controls::new(app,commands.clone());controls.verify_controls(&frame,&commands);
-        assert!(rx.try_iter().any(|c|matches!(c,Command::Ask{prompt,..} if prompt=="Explicit native request λ")));
+        let gestures=rx.try_iter().collect::<Vec<_>>();assert!(gestures.iter().any(|c|matches!(c,Command::Ask{prompt,..} if prompt=="Explicit native request λ")));assert!(gestures.iter().any(|c|matches!(c,Command::CreateDocument)));
 
         controls.verify_output(&frame,&commands);
         let output_commands=rx.try_iter().collect::<Vec<_>>();
@@ -270,6 +270,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             println!("CHECK: mapped native surface");
             let image=surface.elements["image"].image.as_ref().unwrap();assert!(image.picture.paintable().is_some());assert_eq!(image.caption.text(),"Native blue pixel");
             println!("CHECK: authenticated immutable image resource and native texture");
+            assert_eq!(surface.elements["editor"].area.as_ref().unwrap().value(),"Document body λ\n日本語");
             let pty=surface.elements["pty"].pty.as_ref().unwrap();assert!(!pty.view.input_enabled());assert!(!pty.attach.is_sensitive());
             pty.view.feed(b"Terminal fixture\r\n",false).unwrap();
             println!("CHECK: native PTY renderer remains detached without running authorized work");
@@ -328,6 +329,9 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             assert!(rx.try_iter().any(|c|matches!(c,Command::Action{reference,..} if reference=="fixture-action")));
             field.entry.emit_activate();
             assert_eq!(rx.try_iter().filter(|c|matches!(c,Command::Action{reference,..} if reference=="fixture-action")).count(),1,"Text field submit must dispatch exactly once");
+            let editor=surface.elements["editor"].area.as_ref().unwrap();editor.view.buffer().set_text("Human edited document 日本語");
+            let toolbar=surface.elements["editor"].widget.last_child().unwrap();let save=toolbar.first_child().unwrap().downcast::<gtk::Button>().unwrap();save.emit_clicked();
+            assert!(rx.try_iter().any(|c|matches!(c,Command::ResolveDraft{surface,element,commit:true,revision:2} if surface=="native-fixture" && element=="editor")));
             frame.connected=false;surface.update("native-fixture",&doc,&frame,&commands,&drafts);assert_eq!(field.entry.text(),"Unsaved λ 日本語");
             // Capture after GTK has rendered the verified final state.
             glib::timeout_add_local_once(Duration::from_millis(180),move || {

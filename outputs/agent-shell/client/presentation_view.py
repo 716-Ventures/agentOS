@@ -59,7 +59,7 @@ def project(document,bindings=None,width=80):
             text='\n'.join([props.get('label','Table'),' | '.join(props.get('columns',[])),*(' | '.join(row['cells']) for row in props.get('rows',[]))])
         elif kind=='List@1':text='\n'.join([props.get('label','List'),*('• '+row['cells'][0] for row in props.get('rows',[]))])
         elif kind=='KeyValue@1':text='\n'.join([props.get('label','Details'),*(': '.join(row['cells']) for row in props.get('rows',[]))])
-        elif kind in ('TextField@1','Choice@1','Toggle@1'):text=f"[{key}] {props.get('label','Text')}: {props.get('value','')}";controls[key]=node
+        elif kind in ('TextField@1','Choice@1','Toggle@1','DocumentEditor@1'):text=f"[{key}] {props.get('label','Text')}: {props.get('value','')}";controls[key]=node
         elif kind=='Button@1':
             text=f"[{key}] {props.get('label','Action')}"+(' (disabled)' if props.get('disabled') else '')
             if not props.get('disabled'):controls[key]=node
@@ -87,7 +87,7 @@ def parameters(action,metadata,fields):
 
 
 def invoke(request,document,element,key=None):
-    node=document['elements'][element];event='submit' if node['type']=='TextField@1' else 'recover' if node['type']=='Error@1' else 'activate'
+    node=document['elements'][element];event='submit' if node['type'] in ('TextField@1','DocumentEditor@1') else 'recover' if node['type']=='Error@1' else 'activate'
     action_id=node.get('events',{}).get(event,{}).get('action')
     if not action_id:raise ValueError('This control has no registered action')
     action=document['actions'][action_id];metadata=request('action.metadata',reference=action['ref'])
@@ -158,7 +158,7 @@ def recover(request,document,input_fn=input,output=print):
                 if not stat.S_ISREG(info.st_mode) or info.st_uid!=os.getuid() or info.st_size>128*1024:continue
                 value=json.load(stream)
             if (value.get('format')==1 and value.get('surface_id')==surface and isinstance(value.get('text'),str)
-                    and len(value['text'].encode())<=65536 and document['elements'].get(value.get('element_id'),{}).get('type') in ('TextField@1','Choice@1','Toggle@1')):
+                    and len(value['text'].encode())<=65536 and document['elements'].get(value.get('element_id'),{}).get('type') in ('TextField@1','Choice@1','Toggle@1','DocumentEditor@1')):
                 records.append((path,value))
         except (OSError,ValueError,TypeError,AttributeError):continue
     if not records:output('No local recovery drafts match this view.');return
@@ -187,7 +187,7 @@ def edit(request,document,element,input_fn=input,output=print):
         if node['type']=='Toggle@1':output('Enter true or false.')
         output('Enter :draft to use the current text; ::draft enters that literal text.')
         local=None
-        if node.get('props',{}).get('multiline'):
+        if node.get('props',{}).get('multiline') or node['type']=='DocumentEditor@1':
             output('Enter lines. A single period finishes; two periods enter a literal period.');rows=[]
             while True:
                 line=input_fn('> ')
@@ -216,7 +216,8 @@ def edit(request,document,element,input_fn=input,output=print):
         choice=input_fn('[s] Save to view  [k] Keep draft  [d] Discard: ').strip().lower()
         if choice=='s':
             current=request('presentation.get',document_id=surface,activity_id=document['activity_id'])
-            result=request('presentation.apply',protocol='agentos.presentation/1',catalog_revision='native-core/1',request_id=f'terminal-save-{time.time_ns()}',expected_revisions={surface:current['revision']},operations=[{'op':'draft.commit','surface_id':surface,'element_id':element,'expected_draft_revision':saved['draft_revision']}])
+            if current['revision']!=document['revision']:raise ValueError('View changed; your draft is retained. Refresh and review the current revision before saving.')
+            result=request('presentation.apply',protocol='agentos.presentation/1',catalog_revision='native-core/1',request_id=f'terminal-save-{time.time_ns()}',expected_revisions={surface:document['revision']},operations=[{'op':'draft.commit','surface_id':surface,'element_id':element,'expected_draft_revision':saved['draft_revision']}])
             output('Saved. Revision '+str(result['revisions'][surface]))
         elif choice=='d':request('draft.save',surface_id=surface,element_id=element,expected_draft_revision=saved['draft_revision'],draft=None);output('Draft discarded.')
         else:output('Draft retained; it is separate from the view document.')
@@ -271,7 +272,7 @@ def interact(activity,request,input_fn=input,output=print):
                 resolved=request('presentation.reference',surface_id=selected,element_id=choice,source_revision=document['revision'])
                 if resolved['kind']=='DocumentReference@1':selected=resolved['target'];offset=0
                 else:output('Application view: '+clean(resolved['target'])+' (use the native desktop to focus it)')
-            elif node['type'] in ('TextField@1','Choice@1','Toggle@1'):edit(request,document,choice,input_fn,output)
+            elif node['type'] in ('TextField@1','Choice@1','Toggle@1','DocumentEditor@1'):edit(request,document,choice,input_fn,output)
             else:
                 receipt=invoke(request,document,choice);output(clean(json.dumps(receipt,ensure_ascii=False,indent=2)))
         except (OSError,RuntimeError,ValueError,KeyError) as exc:output('View unavailable: '+clean(str(exc)))

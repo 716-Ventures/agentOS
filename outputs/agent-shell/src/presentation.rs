@@ -1572,7 +1572,7 @@ fn apply(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> {
                             .get_mut(&element_id)
                             .ok_or_else(|| error("missing_reference", &element_id))?;
                         let value = match element.kind.as_str() {
-                            "TextField@1" => json!(draft),
+                            "TextField@1" | "DocumentEditor@1" => json!(draft),
                             "Choice@1"
                                 if element.props["options"]
                                     .as_array()
@@ -2240,6 +2240,36 @@ mod tests {
             .unwrap_err()
             .contains("missing_reference"));
         handle(&mut db, &request, &agent()).unwrap();
+    }
+    #[test]
+    fn shared_document_edits_persist_only_through_guarded_human_draft_commit() {
+        let mut db = fixture();
+        let mut doc = surface();
+        doc["elements"]["input"] =
+            json!({"type":"DocumentEditor@1","props":{"label":"Document","value":"Original λ"}});
+        handle(&mut db,&json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"editor-create","expected_revisions":{"surface-a":null},"operations":[{"op":"surface.create","document":doc}]}),&agent()).unwrap();
+        handle(
+            &mut db,
+            &json!({"op":"interaction.begin","surface_id":"surface-a","element_id":"input"}),
+            &human(),
+        )
+        .unwrap();
+        handle(&mut db,&json!({"op":"draft.save","surface_id":"surface-a","element_id":"input","expected_draft_revision":0,"draft":"Human document 日本語\nSecond line"}),&human()).unwrap();
+        let mut commit = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"editor-save","expected_revisions":{"surface-a":1},"operations":[{"op":"draft.commit","surface_id":"surface-a","element_id":"input","expected_draft_revision":1}]});
+        assert!(handle(&mut db, &commit, &human())
+            .unwrap_err()
+            .contains("stale_revision"));
+        assert_eq!(
+            snapshot(&db).unwrap()["documents"]["surface-a"]["elements"]["input"]["props"]["value"],
+            "Original λ"
+        );
+        commit["expected_revisions"]["surface-a"] = json!(0);
+        assert!(handle(&mut db, &commit, &agent()).is_err());
+        handle(&mut db, &commit, &human()).unwrap();
+        assert_eq!(
+            snapshot(&db).unwrap()["documents"]["surface-a"]["elements"]["input"]["props"]["value"],
+            "Human document 日本語\nSecond line"
+        );
     }
     #[test]
     fn result_and_error_content_is_bounded_typed_and_source_bindable() {

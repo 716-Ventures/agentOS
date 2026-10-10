@@ -109,11 +109,13 @@ pub enum Command {
         surface: String,
         element: String,
         commit: bool,
+        revision: u64,
     },
     Preferences(Value),
     Setup,
     SelectActivity(String),
     CreateActivity(String),
+    CreateDocument,
     Ask {
         activity: i64,
         prompt: String,
@@ -296,10 +298,11 @@ fn run(
                     Command::WorkspaceEdit{workspace,revision,edit}=>request(&socket,&json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("workspace-{}",super::nonce()),"expected_revisions":{workspace.clone():revision},"operations":[{"op":"workspace.edit","workspace_id":workspace,"edit":edit}]})).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt}),
                     Command::WorkspaceUndo(cursor)=>request(&socket,&json!({"op":"presentation.undo","event_cursor":cursor,"request_id":format!("undo-{}",super::nonce())})).map(|receipt|{frame.lock().unwrap().workspace_undo=None;receipt}),
                     Command::RegisterRenderer(surface)=>request(&socket,&json!({"op":"host.renderer","surface_id":surface})),
-                    Command::ResolveDraft{surface,element,commit}=>resolve_draft(&socket,&surface,&element,commit,&drafts),
+                    Command::ResolveDraft{surface,element,commit,revision}=>resolve_draft(&socket,&surface,&element,commit,revision,&drafts),
                     Command::Preferences(value)=>super::preferences::save(&value),
                     Command::Setup=>std::process::Command::new("weston-terminal").args(["--shell","/usr/local/bin/agent-os-setup"]).spawn().map(|mut child|{std::thread::spawn(move||{let _=child.wait();});json!({"status":"Setup opened"})}).map_err(|e|e.to_string()),
                     Command::SelectActivity(id)=>{activity=Some(id);Ok(json!({"status":"Activity selected"}))},
+                    Command::CreateDocument=>{let current=frame.lock().unwrap().clone();create_document(&socket,&current)},
                     Command::CreateActivity(name)=>request(&socket,&json!({"op":"create","name":name})).map(|created|{activity=Some(created["id"].to_string());created}),
                     Command::Ask{activity,prompt,grounding}=>{
                         if prompt.trim().is_empty() || prompt.len()>16000 {Err("Enter a request up to 16 KiB".into())}
@@ -641,7 +644,7 @@ fn run(
                                 if stop.load(Ordering::Relaxed) {
                                     break;
                                 }
-                                if ["TextField@1", "Choice@1", "Toggle@1"]
+                                if ["TextField@1", "Choice@1", "Toggle@1", "DocumentEditor@1"]
                                     .iter()
                                     .any(|kind| node["type"] == *kind)
                                 {
@@ -759,87 +762,111 @@ fn resolve_draft(
     surface: &str,
     element: &str,
     commit: bool,
+    viewed_revision: u64,
     drafts: &Arc<Mutex<BTreeMap<(String, String), Draft>>>,
 ) -> Result<Value, String> {
     request(
         socket,
         &json!({"op":"interaction.begin","surface_id":surface,"element_id":element}),
     )?;
-    let local = drafts
-        .lock()
-        .unwrap()
-        .get(&(surface.into(), element.into()))
-        .cloned();
-    let mut saved = request(
-        socket,
-        &json!({"op":"draft.get","surface_id":surface,"element_id":element}),
-    )?;
-    if let Some(local) = &local {
-        if local.dirty && commit {
+    let result = (|| {
+        let local = drafts
+            .lock()
+            .unwrap()
+            .get(&(surface.into(), element.into()))
+            .cloned();
+        let mut saved = request(
+            socket,
+            &json!({"op":"draft.get","surface_id":surface,"element_id":element}),
+        )?;
+        if let Some(local) = &local {
+            if local.dirty && commit {
+                let receipt = request(
+                    socket,
+                    &json!({"op":"draft.save","surface_id":surface,"element_id":element,"expected_draft_revision":local.expected,"draft":local.text}),
+                )?;
+                let next = receipt["draft_revision"]
+                    .as_u64()
+                    .ok_or("Missing draft revision")?;
+                if let Some(edit) = drafts
+                    .lock()
+                    .unwrap()
+                    .get_mut(&(surface.into(), element.into()))
+                {
+                    edit.expected = next;
+                    edit.dirty = edit.text != local.text;
+                }
+                saved = json!({"draft_revision":next,"draft":local.text});
+            } else if commit && saved["draft_revision"].as_u64() != Some(local.expected) {
+                return Err("Draft changed in another editor; recover before resolving it".into());
+            }
+        }
+        let doc = request(
+            socket,
+            &json!({"op":"presentation.get","document_id":surface}),
+        )?;
+        let revision = doc["revision"].as_u64().ok_or("View unavailable")?;
+        if commit && revision != viewed_revision {
+            return Err("View changed since this editor was displayed; keep the draft and review the current revision before saving".into());
+        }
+        let expected = saved["draft_revision"]
+            .as_u64()
+            .ok_or("Draft unavailable")?;
+        let (text, resolved, receipt) = if commit {
+            let text = saved["draft"]
+                .as_str()
+                .ok_or("No draft to save")?
+                .to_string();
+            let payload = json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("save-draft-{}",super::nonce()),"expected_revisions":{surface:revision},"operations":[{"op":"draft.commit","surface_id":surface,"element_id":element,"expected_draft_revision":expected}]});
+            let receipt = request(socket, &payload).or_else(|_| request(socket, &payload))?;
+            let resolved = receipt["revisions"][surface]
+                .as_u64()
+                .ok_or("Missing commit revision")?;
+            (text, resolved, receipt)
+        } else {
+            let value = &doc["elements"][element]["props"]["value"];
+            let text = value.as_str().map(String::from).unwrap_or_else(|| {
+                value
+                    .as_bool()
+                    .map(|value| value.to_string())
+                    .unwrap_or_default()
+            });
             let receipt = request(
                 socket,
-                &json!({"op":"draft.save","surface_id":surface,"element_id":element,"expected_draft_revision":local.expected,"draft":local.text}),
+                &json!({"op":"draft.save","surface_id":surface,"element_id":element,"expected_draft_revision":expected,"draft":null}),
             )?;
-            saved = json!({"draft_revision":receipt["draft_revision"],"draft":local.text});
-        } else if commit && saved["draft_revision"].as_u64() != Some(local.expected) {
-            return Err("Draft changed in another editor; recover before resolving it".into());
+            (text, revision, receipt)
+        };
+        let mut edits = drafts.lock().unwrap();
+        if edits
+            .get(&(surface.into(), element.into()))
+            .map(|d| local.as_ref().map(|l| d.text != l.text).unwrap_or(true))
+            .unwrap_or(false)
+        {
+            // Input typed while the worker committed belongs to the next draft revision.
+            if let Some(draft) = edits.get_mut(&(surface.into(), element.into())) {
+                draft.expected = expected + 1;
+                draft.dirty = true;
+                draft.resolved = None;
+            }
+        } else {
+            edits.insert(
+                (surface.into(), element.into()),
+                Draft {
+                    text,
+                    expected: expected + 1,
+                    dirty: false,
+                    resolved: Some(resolved),
+                },
+            );
         }
-    }
-    let snapshot = super::presentation_pages::read(|value| request(socket, value), None, || false)?;
-    let doc = &snapshot["documents"][surface];
-    let revision = doc["revision"].as_u64().ok_or("View unavailable")?;
-    let expected = saved["draft_revision"]
-        .as_u64()
-        .ok_or("Draft unavailable")?;
-    let (text, resolved, receipt) = if commit {
-        let text = saved["draft"]
-            .as_str()
-            .ok_or("No draft to save")?
-            .to_string();
-        let payload = json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("save-draft-{}",super::nonce()),"expected_revisions":{surface:revision},"operations":[{"op":"draft.commit","surface_id":surface,"element_id":element,"expected_draft_revision":expected}]});
-        let receipt = request(socket, &payload).or_else(|_| request(socket, &payload))?;
-        let resolved = receipt["revisions"][surface]
-            .as_u64()
-            .ok_or("Missing commit revision")?;
-        (text, resolved, receipt)
-    } else {
-        let value = &doc["elements"][element]["props"]["value"];
-        let text = value.as_str().map(String::from).unwrap_or_else(|| {
-            value
-                .as_bool()
-                .map(|value| value.to_string())
-                .unwrap_or_default()
-        });
-        let receipt = request(
-            socket,
-            &json!({"op":"draft.save","surface_id":surface,"element_id":element,"expected_draft_revision":expected,"draft":null}),
-        )?;
-        (text, revision, receipt)
-    };
-    let mut edits = drafts.lock().unwrap();
-    if edits
-        .get(&(surface.into(), element.into()))
-        .map(|d| local.as_ref().map(|l| d.text != l.text).unwrap_or(true))
-        .unwrap_or(false)
-    {
-        // Input typed while the worker committed belongs to the next draft revision.
-        if let Some(draft) = edits.get_mut(&(surface.into(), element.into())) {
-            draft.expected = expected + 1;
-            draft.dirty = true;
-            draft.resolved = None;
-        }
-    } else {
-        edits.insert(
-            (surface.into(), element.into()),
-            Draft {
-                text,
-                expected: expected + 1,
-                dirty: false,
-                resolved: Some(resolved),
-            },
-        );
-    }
-    Ok(receipt)
+        Ok(receipt)
+    })();
+    let ended = request(
+        socket,
+        &json!({"op":"interaction.end","surface_id":surface,"element_id":element}),
+    );
+    result.and_then(|receipt| ended.map(|_| receipt))
 }
 
 fn navigate(
@@ -902,6 +929,26 @@ fn embed_terminal(socket: &PathBuf, frame: &Frame, job: &Value) -> Result<Value,
     }
     let surface = format!("terminal-{}", super::nonce());
     let document = json!({"protocol":"agentos.presentation/1","catalog_revision":"native-core/1","surface_id":surface,"activity_id":activity,"revision":0,"title":"Interactive terminal","root":"terminal","elements":{"terminal":{"type":"PtySession@1","props":{"label":"Interactive terminal","source":format!("broker:{id}")}}},"bindings":{},"actions":{}});
+    open_surface(socket, frame, document)
+}
+fn create_document(socket: &PathBuf, frame: &Frame) -> Result<Value, String> {
+    let activity = frame
+        .activity
+        .as_deref()
+        .ok_or("Select an activity before creating a document")?;
+    let surface = format!("document-{}", super::nonce());
+    let document = json!({"protocol":"agentos.presentation/1","catalog_revision":"native-core/1","surface_id":surface,"activity_id":activity,"revision":0,"title":"Untitled document","root":"editor","elements":{"editor":{"type":"DocumentEditor@1","props":{"label":"Document","value":""}}},"bindings":{},"actions":{}});
+    open_surface(socket, frame, document)
+}
+fn open_surface(socket: &PathBuf, frame: &Frame, document: Value) -> Result<Value, String> {
+    let surface = document["surface_id"]
+        .as_str()
+        .ok_or("View identity unavailable")?
+        .to_string();
+    let activity = document["activity_id"]
+        .as_str()
+        .ok_or("Activity identity unavailable")?
+        .to_string();
     let mut expected = serde_json::Map::new();
     expected.insert(surface.clone(), Value::Null);
     let mut operations = vec![json!({"op":"surface.create","document":document})];
@@ -916,7 +963,7 @@ fn embed_terminal(socket: &PathBuf, frame: &Frame, job: &Value) -> Result<Value,
         let output = workspace["outputs"]
             .as_object()
             .and_then(|outputs| outputs.keys().next())
-            .ok_or("Workspace has no display for the terminal")?;
+            .ok_or("Workspace has no display for the new view")?;
         expected.insert(workspace_id.into(), workspace["revision"].clone());
         operations.push(json!({"op":"workspace.edit","workspace_id":workspace_id,"edit":{"kind":"tile","surface_id":surface,"output_id":output,"target":null,"axis":"vertical","ratio":0.5}}));
         operations.push(json!({"op":"workspace.edit","workspace_id":workspace_id,"edit":{"kind":"focus","surface_id":surface,"element_id":null}}));
@@ -925,4 +972,63 @@ fn embed_terminal(socket: &PathBuf, frame: &Frame, job: &Value) -> Result<Value,
         socket,
         &json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("open-{surface}"),"expected_revisions":expected,"operations":operations}),
     )
+}
+
+#[cfg(test)]
+mod draft_revision_tests {
+    use super::*;
+    #[test]
+    fn save_refuses_a_revision_the_user_has_not_seen_and_retains_the_local_draft() {
+        use std::{
+            io::{BufRead, BufReader, Write},
+            os::unix::net::UnixListener,
+        };
+        let path = std::env::temp_dir().join(format!(
+            "agentos-draft-{}-{}.sock",
+            std::process::id(),
+            super::super::nonce()
+        ));
+        let listener = UnixListener::bind(&path).unwrap();
+        let server = std::thread::spawn(move || {
+            for expected in [
+                "interaction.begin",
+                "draft.get",
+                "presentation.get",
+                "interaction.end",
+            ] {
+                let (mut conn, _) = listener.accept().unwrap();
+                let mut raw = String::new();
+                BufReader::new(conn.try_clone().unwrap())
+                    .read_line(&mut raw)
+                    .unwrap();
+                let query: Value = serde_json::from_str(&raw).unwrap();
+                assert_eq!(query["op"], expected);
+                let result = match expected {
+                    "interaction.begin" => json!({"status":"accepted"}),
+                    "draft.get" => json!({"draft_revision":1,"draft":"Local user document"}),
+                    "presentation.get" => json!({"surface_id":"surface","revision":2}),
+                    _ => json!({"event_cursor":2}),
+                };
+                writeln!(conn, "{}", json!({"ok":true,"result":result})).unwrap();
+            }
+        });
+        let drafts = Arc::new(Mutex::new(BTreeMap::from([(
+            ("surface".into(), "editor".into()),
+            Draft {
+                text: "Local user document".into(),
+                expected: 1,
+                dirty: false,
+                resolved: None,
+            },
+        )])));
+        assert!(resolve_draft(&path, "surface", "editor", true, 1, &drafts)
+            .unwrap_err()
+            .contains("View changed"));
+        assert_eq!(
+            drafts.lock().unwrap()[&("surface".into(), "editor".into())].text,
+            "Local user document"
+        );
+        server.join().unwrap();
+        std::fs::remove_file(path).unwrap();
+    }
 }

@@ -380,7 +380,7 @@ fn construct(
                 });
                 result.selection_notice = Some(notice);
                 lease(&choice.control.clone().upcast(), surface, id, commands);
-                draft_controls(&choice.widget, surface, id, commands);
+                draft_controls(&choice.widget, surface, id, commands, &events);
                 result.widget = choice.widget.clone().upcast();
                 result.choice = Some(choice);
             } else {
@@ -402,19 +402,27 @@ fn construct(
                 });
                 result.selection_notice = Some(notice);
                 lease(&toggle.control.clone().upcast(), surface, id, commands);
-                draft_controls(&toggle.widget, surface, id, commands);
+                draft_controls(&toggle.widget, surface, id, commands, &events);
                 result.widget = toggle.widget.clone().upcast();
                 result.toggle = Some(toggle);
             }
         }
-        "TextField@1" => {
+        "TextField@1" | "DocumentEditor@1" => {
             let recovered = frame.drafts.get(&(surface.into(), id.into()));
             let value = recovered
                 .and_then(|d| d["draft"].as_str())
                 .or_else(|| props["value"].as_str())
                 .unwrap_or("");
-            if props["multiline"] == true {
-                let area = ui::TextArea::new(props["label"].as_str().unwrap_or("Text"), value);
+            if props["multiline"] == true || kind == "DocumentEditor@1" {
+                let (area, widget) = if kind == "DocumentEditor@1" {
+                    let editor =
+                        ui::DocumentEditor::new(props["label"].as_str().unwrap(), value).unwrap();
+                    (editor.area, editor.widget)
+                } else {
+                    let area = ui::TextArea::new(props["label"].as_str().unwrap_or("Text"), value);
+                    let widget = area.widget.clone();
+                    (area, widget)
+                };
                 let (s, e, edits, applying) = (
                     surface.to_string(),
                     id.to_string(),
@@ -446,9 +454,13 @@ fn construct(
                         draft.resolved = None;
                     }
                 });
-                draft_controls(&area.widget, surface, id, commands);
-                result.widget = area.widget.clone().upcast();
-                lease(&area.view.clone().upcast(), surface, id, commands);
+                draft_controls(&widget, surface, id, commands, &events);
+                result.widget = widget.clone().upcast();
+                if kind == "DocumentEditor@1" {
+                    lease(&widget.upcast(), surface, id, commands);
+                } else {
+                    lease(&area.view.clone().upcast(), surface, id, commands);
+                }
                 result.area = Some(area);
                 return result;
             }
@@ -488,7 +500,7 @@ fn construct(
                     draft.resolved = None;
                 }
             });
-            draft_controls(&field.widget, surface, id, commands);
+            draft_controls(&field.widget, surface, id, commands, &events);
             result.widget = field.widget.clone().upcast();
             lease(&field.entry.clone().upcast(), surface, id, commands);
             result.field = Some(field);
@@ -552,16 +564,24 @@ fn dispatch_action(events: &Rc<RefCell<Value>>, commands: &Sender<Command>) {
         });
     }
 }
-fn draft_controls(widget: &gtk::Box, surface: &str, element: &str, commands: &Sender<Command>) {
+fn draft_controls(
+    widget: &gtk::Box,
+    surface: &str,
+    element: &str,
+    commands: &Sender<Command>,
+    events: &Rc<RefCell<Value>>,
+) {
     let row = ui::row(8);
     for (label, commit) in [("Save draft", true), ("Discard draft", false)] {
         let button = ui::button(label, ButtonVariant::Outline, false);
         let (sender, s, e) = (commands.clone(), surface.to_string(), element.to_string());
+        let state = events.clone();
         button.connect_clicked(move |_| {
             let _ = sender.send(Command::ResolveDraft {
                 surface: s.clone(),
                 element: e.clone(),
                 commit,
+                revision: state.borrow()["revision"].as_u64().unwrap_or(0),
             });
         });
         row.append(&button);
@@ -733,7 +753,7 @@ impl Surface {
                     .as_ref()
                     .map(|list| list.view.has_focus() || list.view.focus_child().is_some())
                     .unwrap_or(false)
-                || ((e.tabs.is_some() || e.split.is_some())
+                || ((e.tabs.is_some() || e.split.is_some() || e.kind == "DocumentEditor@1")
                     && gtk::prelude::GtkWindowExt::focus(&self.window)
                         .map(|focus| focus == e.widget || focus.is_ancestor(&e.widget))
                         .unwrap_or(false))
@@ -1080,6 +1100,7 @@ impl Surface {
                         .control
                         .update_property(&[gtk::accessible::Property::Label(label)]);
                 }
+                e.events.borrow_mut()["revision"] = doc["revision"].clone();
                 if e.field.is_some() || e.area.is_some() {
                     let key = node["events"]["submit"]["action"].as_str().unwrap_or("");
                     let action = doc["actions"][key]["ref"].as_str();

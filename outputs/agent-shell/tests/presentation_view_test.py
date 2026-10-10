@@ -90,6 +90,31 @@ class Projection(unittest.TestCase):
         doc=document();doc['elements']['pty']={'type':'PtySession@1','props':{'label':'Interactive work','source':'broker:'+'d'*32}}
         doc['elements']['root']['slots']['children'].append('pty');lines,controls=view.project(doc)
         self.assertIn('[Interactive terminal] Interactive work','\n'.join(lines));self.assertNotIn('pty',controls)
+    def test_shared_documents_edit_multiline_and_save_the_displayed_revision(self):
+        doc=document();doc['elements']['field']={'type':'DocumentEditor@1','props':{'label':'Document','value':'Original'}};calls=[]
+        def request(op,**fields):
+            calls.append((op,fields))
+            if op=='draft.get':return {'draft_revision':0,'draft':None}
+            if op=='draft.save':return {'draft_revision':1}
+            if op=='presentation.get':return doc
+            if op=='presentation.apply':return {'revisions':{'view':5}}
+            return {}
+        answers=iter(['Human λ','日本語','.','s']);view.edit(request,doc,'field',lambda _:next(answers),lambda _:None)
+        self.assertEqual(next(fields['draft'] for op,fields in calls if op=='draft.save'),'Human λ\n日本語')
+        self.assertEqual(next(fields['expected_revisions'] for op,fields in calls if op=='presentation.apply'),{'view':doc['revision']})
+    def test_document_save_preserves_draft_when_displayed_revision_is_stale(self):
+        doc=document();doc['elements']['field']['type']='DocumentEditor@1';calls=[]
+        def request(op,**fields):
+            calls.append((op,fields))
+            if op=='draft.get':return {'draft_revision':0,'draft':None}
+            if op=='draft.save':return {'draft_revision':1}
+            if op=='presentation.get':return {'revision':doc['revision']+1}
+            return {}
+        answers=iter(['Human edit','.','s'])
+        with self.assertRaisesRegex(ValueError,'View changed'):
+            view.edit(request,doc,'field',lambda _:next(answers),lambda _:None)
+        self.assertIn('draft.save',[op for op,_ in calls]);self.assertNotIn('presentation.apply',[op for op,_ in calls])
+        self.assertEqual(calls[-1][0],'interaction.end')
     def test_images_have_inert_labeled_terminal_fallbacks(self):
         doc=document();doc['elements']['image']={'type':'Image@1','props':{'label':'Blue pixel 日本語','reference':'resource-'+'a'*32}}
         doc['elements']['root']['slots']['children'].append('image');lines,controls=view.project(doc)
@@ -135,10 +160,10 @@ class Projection(unittest.TestCase):
         calls=[]
         def request(op,**fields):
             calls.append((op,fields))
-            return {'interaction.begin':{},'draft.get':{'draft_revision':3,'draft':None},'draft.save':{'draft_revision':4},'presentation.get':{'revision':5},'presentation.apply':{'revisions':{'view':6}},'interaction.end':{}}[op]
+            return {'interaction.begin':{},'draft.get':{'draft_revision':3,'draft':None},'draft.save':{'draft_revision':4},'presentation.get':{'revision':4},'presentation.apply':{'revisions':{'view':6}},'interaction.end':{}}[op]
         inputs=iter(['42','s']);view.edit(request,document(),'field',lambda _:next(inputs),lambda _:None)
         self.assertEqual(calls[0][0],'interaction.begin');self.assertEqual(calls[-1][0],'interaction.end')
-        apply=next(fields for op,fields in calls if op=='presentation.apply');self.assertEqual(apply['expected_revisions'],{'view':5});self.assertEqual(apply['operations'][0]['expected_draft_revision'],4)
+        apply=next(fields for op,fields in calls if op=='presentation.apply');self.assertEqual(apply['expected_revisions'],{'view':4});self.assertEqual(apply['operations'][0]['expected_draft_revision'],4)
     def test_callback_uses_edited_data_and_reconciles_a_lost_response_without_replay(self):
         calls=[]
         def request(op,**fields):

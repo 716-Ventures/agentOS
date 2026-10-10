@@ -28,6 +28,7 @@ pub struct Controls {
     transcript: TextField,
     review_ready: bool,
     request_field: TextField,
+    new_document: gtk::Button,
     workspace: workspace_controls::WorkspaceControls,
 }
 impl Controls {
@@ -52,6 +53,12 @@ impl Controls {
             let _ = sender.send(Command::OpenTerminal);
         });
         widget.append(&terminal);
+        let new_document = ui::button("New document", ButtonVariant::Outline, false);
+        let sender = commands.clone();
+        new_document.connect_clicked(move |_| {
+            let _ = sender.send(Command::CreateDocument);
+        });
+        widget.append(&new_document);
         let shortcuts=gtk::Expander::builder().label("Desktop keyboard shortcuts").child(&ui::text("Ctrl+Alt+Tab: next view (Shift: previous)\nCtrl+Alt+F10: maximize · F9: restore · F8: float\nCtrl+Alt+Arrow: move · Shift+Arrow: resize\nCtrl+Alt+PageUp/PageDown: pan oversized view (Shift: horizontal)\nCtrl+Alt+Delete: close view · Ctrl+Alt+Z: undo arrangement\nSplit, swap and pin controls are available under Arrange workspace in Agent Monitor.",true)).build();
         widget.append(&shortcuts);
         let appearance = gtk::DropDown::from_strings(&["Dark", "Light"]);
@@ -352,11 +359,14 @@ impl Controls {
             transcript,
             review_ready: false,
             request_field: request,
+            new_document,
             workspace,
         }
     }
     pub fn verify_controls(&mut self, frame: &Frame, commands: &Sender<Command>) {
         self.update(frame, commands);
+        assert!(self.new_document.is_sensitive());
+        self.new_document.emit_clicked();
         assert!(self.chooser.selected() != gtk::INVALID_LIST_POSITION);
         self.request_field
             .entry
@@ -433,6 +443,8 @@ impl Controls {
         self.monitor.present();
     }
     pub fn update(&mut self, frame: &Frame, _commands: &Sender<Command>) {
+        self.new_document
+            .set_sensitive(frame.connected && frame.activity.is_some());
         *self.activity.borrow_mut() = frame.activity.clone();
         self.workspace.update(frame);
         let voice = self.voice.state.lock().unwrap().clone();
