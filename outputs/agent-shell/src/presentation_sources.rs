@@ -160,7 +160,7 @@ pub fn handle(db: &mut Connection, value: &Value, who: &Principal) -> Result<Val
                     return Err(error("unauthorized", "Source ownership cannot be rebound"));
                 }
                 if revision < old || (revision == old && raw != body) {
-                    return Err(error("stale_revision", "Observed source revision changed"));
+                    return Err(json!({"code":"stale_revision","detail":"Observed source revision changed","source":source,"current_revision":old}).to_string());
                 }
             }
             tx.execute("INSERT INTO presentation_external_sources VALUES(?,?,?,?,?,?) ON CONFLICT(source) DO UPDATE SET revision=excluded.revision,body=excluded.body,session=excluded.session,observed=excluded.observed",params![source,activity,revision,body,who.session,crate::now()]).map_err(storage)?;

@@ -53,3 +53,19 @@ class Sources(unittest.TestCase):
             rows=list(broker.source_backfill())
             self.assertEqual(len(rows),2);self.assertEqual({r['source'].split(':')[0] for r in rows},{'broker','file'})
             self.assertNotIn('private input',json.dumps(rows))
+
+    def test_replay_drops_only_proven_older_observations(self):
+        import io
+        import json
+        from unittest.mock import MagicMock
+        payload=BrokerSources.job_payload(self.job(2))
+        for revision,source,ignored in [(3,payload['source'],True),(2,payload['source'],False),
+                                        (1,payload['source'],False),(True,payload['source'],False),
+                                        (3,'broker:'+'b'*32,False),(None,payload['source'],False)]:
+            error={'code':'stale_revision','source':source,'current_revision':revision}
+            conn=MagicMock();conn.__enter__.return_value=conn
+            conn.makefile.return_value=io.BytesIO(json.dumps({'ok':False,'error':json.dumps(error)}).encode()+b'\n')
+            with patch('source_publisher.socket.socket',return_value=conn):
+                if ignored:BrokerSources('/unused').request(payload)
+                else:
+                    with self.assertRaises(RuntimeError):BrokerSources('/unused').request(payload)

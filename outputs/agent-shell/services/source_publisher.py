@@ -44,7 +44,12 @@ class BrokerSources:
             if not response.get('ok'):
                 error=response.get('error','Source publication failed')
                 # A replay can encounter a newer observation already delivered by the live queue.
-                try:obsolete=json.loads(error).get('code')=='stale_revision'
+                try:
+                    conflict=json.loads(error)
+                    current=conflict.get('current_revision')
+                    offered=value.get('source_revision')
+                    obsolete=(conflict.get('code')=='stale_revision' and conflict.get('source')==value.get('source')
+                              and type(current) is int and type(offered) is int and current>offered)
                 except (TypeError,ValueError,AttributeError):obsolete=False
                 if not obsolete:raise RuntimeError(error)
     def start(self):

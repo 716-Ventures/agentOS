@@ -2272,9 +2272,15 @@ mod tests {
             "failed"
         );
         publication["values"]["status"] = json!("succeeded");
-        assert!(handle(&mut db, &publication, &root)
-            .unwrap_err()
-            .contains("stale_revision"));
+        let conflict: Value =
+            serde_json::from_str(&handle(&mut db, &publication, &root).unwrap_err()).unwrap();
+        assert_eq!(conflict["code"], "stale_revision");
+        assert_eq!(conflict["source"], source);
+        assert_eq!(conflict["current_revision"], 1);
+        publication["source_revision"] = json!(0);
+        let older: Value =
+            serde_json::from_str(&handle(&mut db, &publication, &root).unwrap_err()).unwrap();
+        assert_eq!(older["current_revision"], 1);
         let binding = handle(&mut db, &read, &human()).unwrap();
         assert_eq!(
             binding["bindings"]["broker-state"]["availability"], "unavailable",
