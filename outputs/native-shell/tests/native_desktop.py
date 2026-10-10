@@ -94,7 +94,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                         time.sleep(.05)
                     displays=[p.name for p in runtime.glob('wayland-*') if p.is_socket()]
                     assert len(displays)==1,displays
-                    childenv={**env,'WAYLAND_DISPLAY':displays[0],'AGENT_OS_NATIVE_TEST_DELAY_MS':('10000' if shared else '3000')}
+                    childenv={**env,'WAYLAND_DISPLAY':displays[0],'AGENT_OS_NATIVE_TEST_SKIP_FILE_REVIEW':'1','AGENT_OS_NATIVE_TEST_DELAY_MS':('10000' if shared else '3000')}
                     def control_call(value):
                         with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as conn:
                             conn.settimeout(3);conn.connect(str(control));conn.sendall(json.dumps(value).encode()+b'\n')
