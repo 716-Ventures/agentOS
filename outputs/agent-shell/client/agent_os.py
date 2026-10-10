@@ -1114,7 +1114,7 @@ def main():
     c=sub.add_parser('jobs');c.add_argument('activity',type=int,nargs='?');c.add_argument('--all',action='store_true',help='Read complete core history through revision-consistent pages')
     c=sub.add_parser('stop');c.add_argument('job')
     c=sub.add_parser('stop-activity');c.add_argument('activity',type=int)
-    c=sub.add_parser('history');c.add_argument('activity',type=int)
+    c=sub.add_parser('history');c.add_argument('activity',type=int);c.add_argument('--all',action='store_true',help='Read complete activity event history through bounded pages')
     c=sub.add_parser('logs');c.add_argument('job');c.add_argument('--follow',action='store_true')
     args=p.parse_args()
     if not args.cmd:
@@ -1176,7 +1176,9 @@ def main():
         result=[j for j in work_projection(state,broker_jobs) if args.activity is None or j['activity_id']==args.activity]
     elif args.cmd=='stop': result=stop_work(args.job)
     elif args.cmd=='stop-activity': result=stop_activity_work(args.activity)
-    elif args.cmd=='history': result=request('history',activity_id=args.activity)
+    elif args.cmd=='history':
+        from state_pages import history
+        result=history(request,args.activity) if args.all else request('history',activity_id=args.activity)
     elif args.cmd=='logs':
         offset=0
         while True:

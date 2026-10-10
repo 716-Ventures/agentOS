@@ -1,14 +1,14 @@
 """Read complete runtime history through byte-bounded, revision-consistent pages."""
-def read(request,activity=None,stopped=lambda:False):
+def _read(request,activity,stopped,collections):
     for attempt in range(3):
         try:
             state={};revision=None
-            for collection in ('activities','jobs'):
+            for collection in collections:
                 rows=[];before=None
                 while True:
                     if stopped():raise RuntimeError('Runtime read cancelled')
                     fields={'collection':collection,'limit':64,'before_id':before}
-                    if collection=='jobs' and activity is not None:fields['activity_id']=int(activity)
+                    if collection!='activities' and activity is not None:fields['activity_id']=int(activity)
                     if revision is not None:fields['expected_revision']=revision
                     page=request('state.page',**fields)
                     observed=page.get('revision')
@@ -31,3 +31,11 @@ def read(request,activity=None,stopped=lambda:False):
             return state
         except RuntimeError as exc:
             if 'resync_required' not in str(exc) or attempt==2:raise
+
+
+def read(request,activity=None,stopped=lambda:False):
+    return _read(request,activity,stopped,('activities','jobs'))
+
+
+def history(request,activity,stopped=lambda:False):
+    return _read(request,activity,stopped,('events',))['events']

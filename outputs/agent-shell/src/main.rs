@@ -166,7 +166,7 @@ impl Core {
     }
     fn state_page(&self, v: &Value) -> Result<Value> {
         let collection = field(v, "collection")?;
-        if !["activities", "jobs"].contains(&collection) {
+        if !["activities", "jobs", "events"].contains(&collection) {
             return Err("Invalid state collection".into());
         }
         let before = match v.get("before_id") {
@@ -185,6 +185,9 @@ impl Core {
                     .ok_or("Invalid activity filter")?,
             ),
         };
+        if collection == "events" && activity.is_none() {
+            return Err("Activity required for event history".into());
+        }
         let limit = match v.get("limit") {
             None => 64,
             Some(value) => value
@@ -201,12 +204,16 @@ impl Core {
         }
         let sql = if collection == "activities" {
             "SELECT id,name,created_at FROM activities WHERE id<?1 AND (?2 IS NULL OR id=?2) AND id NOT IN (SELECT activity_id FROM removed_activities) ORDER BY id DESC LIMIT ?3"
-        } else {
+        } else if collection == "jobs" {
             "SELECT id,activity_id,argv,status,exit_code,created_at,finished_at,error FROM jobs WHERE id<?1 AND (?2 IS NULL OR activity_id=?2) ORDER BY id DESC LIMIT ?3"
+        } else {
+            "SELECT id,at,job_id,kind,detail FROM events WHERE id<?1 AND activity_id=?2 ORDER BY id DESC LIMIT ?3"
         };
         let mut query = db.prepare(sql).map_err(err)?;
         let rows=query.query_map(params![before,activity,limit+1],|row| {
-            if collection=="jobs" {job_value(row)} else {let id:i64=row.get(0)?;Ok(json!({"id":id,"name":row.get::<_,String>(1)?,"created_at":row.get::<_,i64>(2)?,"workspace":self.root.join("workspaces").join(id.to_string())}))}
+            if collection=="jobs" {job_value(row)} else if collection=="events" {
+                Ok(json!({"id":row.get::<_,i64>(0)?,"at":row.get::<_,i64>(1)?,"job_id":row.get::<_,Option<i64>>(2)?,"kind":row.get::<_,String>(3)?,"detail":serde_json::from_str::<Value>(&row.get::<_,String>(4)?).unwrap_or(Value::Null)}))
+            } else {let id:i64=row.get(0)?;Ok(json!({"id":id,"name":row.get::<_,String>(1)?,"created_at":row.get::<_,i64>(2)?,"workspace":self.root.join("workspaces").join(id.to_string())}))}
         }).map_err(err)?;
         let mut values = Vec::<Value>::new();
         let mut bytes = 256;
@@ -552,11 +559,8 @@ impl Core {
                 )
             }
             "history" => {
-                let activity = id(v, "activity_id")?;
-                let db = self.db.lock().unwrap();
-                let mut s=db.prepare("SELECT id,at,job_id,kind,detail FROM events WHERE activity_id=? ORDER BY id DESC LIMIT 100").map_err(err)?;
-                let events=s.query_map([activity],|r|Ok(json!({"id":r.get::<_,i64>(0)?,"at":r.get::<_,i64>(1)?,"job_id":r.get::<_,Option<i64>>(2)?,"kind":r.get::<_,String>(3)?,"detail":serde_json::from_str::<Value>(&r.get::<_,String>(4)?).unwrap_or(Value::Null)}))).map_err(err)?.collect::<std::result::Result<Vec<_>,_>>().map_err(err)?;
-                Ok(json!(events))
+                let page = self.state_page(&json!({"collection":"events","activity_id":id(v,"activity_id")?,"limit":100}))?;
+                Ok(page["rows"].clone())
             }
             _ => Err("Unknown operation".into()),
         }
@@ -817,6 +821,52 @@ mod tests {
         ] {
             assert!(core.state_page(&invalid).is_err());
         }
+    }
+    #[test]
+    fn event_history_pages_are_complete_scoped_and_byte_bounded() {
+        let fixture = Fixture::new();
+        let core = fixture.open();
+        let activity = core.create(&json!({"name":"Full history"})).unwrap()["id"]
+            .as_i64()
+            .unwrap();
+        {
+            let db = core.db.lock().unwrap();
+            for _ in 0..140 {
+                event(
+                    &db,
+                    Some(activity),
+                    None,
+                    "fixture.observed",
+                    &json!({"detail":"λ".repeat(30000)}),
+                )
+                .unwrap();
+            }
+            event(&db, Some(activity + 1), None, "foreign", &json!({})).unwrap();
+        }
+        let mut before = Value::Null;
+        let mut ids = Vec::new();
+        loop {
+            let page = core.state_page(&json!({"collection":"events","activity_id":activity,"before_id":before,"limit":128})).unwrap();
+            assert!(page.to_string().len() <= 1024 * 1024);
+            for row in page["rows"].as_array().unwrap() {
+                assert_ne!(row["kind"], "foreign");
+                ids.push(row["id"].as_i64().unwrap());
+            }
+            before = page["next_before_id"].clone();
+            if before.is_null() {
+                break;
+            }
+        }
+        assert_eq!(ids.len(), 141);
+        assert!(ids.windows(2).all(|pair| pair[0] > pair[1]));
+        assert!(
+            core.handle(&json!({"op":"history","activity_id":activity}))
+                .unwrap()
+                .to_string()
+                .len()
+                <= 1024 * 1024
+        );
+        assert!(core.state_page(&json!({"collection":"events"})).is_err());
     }
     #[test]
     fn activities_and_history_survive_reopen() {
