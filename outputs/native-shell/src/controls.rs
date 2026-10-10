@@ -628,6 +628,62 @@ fn review_proposal(app: &gtk::Application, proposal: Value, commands: Sender<Com
         .join("\n");
     let explanation=format!("Purpose: {}\nDirectory: {}\nReason for review: {}\n\nExact command arguments:\n{}\n\nSupplied input: {} bytes · fingerprint {}\nInteractive terminal: {}\n\nThis operation runs with root authority in the guest.",proposal["purpose"].as_str().unwrap_or("Unspecified"),proposal["cwd"].as_str().unwrap_or("Unspecified"),proposal["policy"]["reason"].as_str().unwrap_or("Review required"),arguments,proposal["stdin_bytes"].as_u64().unwrap_or(0),proposal["stdin_sha256"].as_str().unwrap_or("none"),if proposal["terminal"]==true{"yes"}else{"no"});
     content.append(&ui::text(&explanation, false));
+    if proposal["stdin_bytes"].as_u64().unwrap_or(0) > 0 {
+        let inspect = ui::button("Inspect stored input", ButtonVariant::Outline, false);
+        let preview = gtk::TextView::builder()
+            .editable(false)
+            .cursor_visible(true)
+            .monospace(true)
+            .wrap_mode(gtk::WrapMode::WordChar)
+            .build();
+        preview.update_property(&[gtk::accessible::Property::Label("Stored operation input")]);
+        let scroll = gtk::ScrolledWindow::builder()
+            .min_content_height(160)
+            .max_content_height(300)
+            .child(&preview)
+            .build();
+        content.append(&inspect);
+        content.append(&scroll);
+        let (sender, current, weak) = (commands.clone(), proposal.clone(), preview.downgrade());
+        inspect.connect_clicked(move |button| {
+            button.set_sensitive(false);
+            let (reply, receiver) = std::sync::mpsc::channel();
+            if sender
+                .send(Command::ReviewInput {
+                    proposal: current.clone(),
+                    reply,
+                })
+                .is_err()
+            {
+                return;
+            }
+            let weak = weak.clone();
+            glib::timeout_add_local(Duration::from_millis(100), move || {
+                let Some(preview) = weak.upgrade() else {
+                    return glib::ControlFlow::Break;
+                };
+                match receiver.try_recv() {
+                    Ok(Ok(value)) => {
+                        preview
+                            .buffer()
+                            .set_text(value["stdin"].as_str().unwrap_or("No stored input"));
+                        glib::ControlFlow::Break
+                    }
+                    Ok(Err(error)) => {
+                        preview
+                            .buffer()
+                            .set_text(&format!("Input inspection unavailable: {error}"));
+                        glib::ControlFlow::Break
+                    }
+                    Err(std::sync::mpsc::TryRecvError::Empty) => glib::ControlFlow::Continue,
+                    Err(_) => {
+                        preview.buffer().set_text("Input inspection unavailable");
+                        glib::ControlFlow::Break
+                    }
+                }
+            });
+        });
+    }
     let approve = ui::button("Approve this operation", ButtonVariant::Destructive, false);
     let reject = ui::button("Reject this operation", ButtonVariant::Outline, false);
     let cancel = ui::button("Keep pending", ButtonVariant::Ghost, false);

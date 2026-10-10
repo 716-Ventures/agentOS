@@ -182,7 +182,20 @@ def launch(job):
             job['finished_at'] = time.time(); persist(job)
 
 
+def checked_input(job):
+    content=job.get('stdin')
+    if content is None:
+        if job.get('stdin_sha256') is not None or job.get('stdin_bytes',0)!=0:raise ValueError('Stored operation input is inconsistent; reassess this operation')
+        return None
+    if not isinstance(content,str):raise ValueError('Stored operation input is invalid')
+    raw=content.encode('utf-8')
+    if len(raw)>BROKER_INPUT_LIMIT or job.get('stdin_bytes')!=len(raw) or job.get('stdin_sha256')!=hashlib.sha256(raw).hexdigest():
+        raise ValueError('Stored operation input changed; reassess this operation')
+    return content
+
+
 def start(job):
+    checked_input(job)
     if sum(j['status'] in ('starting','running','cancelling') for j in JOBS.values()) >= 4:
         raise ValueError('Four broker jobs are active; wait or stop one')
     job['status'] = 'starting'; persist(job)
@@ -362,7 +375,7 @@ def handle(req, uid):
             return terminal_sessions.control(ident,req)
         if op == 'input':
             if uid != 0:raise ValueError('Only a local administrator may inspect stored input')
-            return {'stdin':job.get('stdin'),'stdin_sha256':job.get('stdin_sha256'),'stdin_bytes':job.get('stdin_bytes',0)}
+            return {'stdin':checked_input(job),'stdin_sha256':job.get('stdin_sha256'),'stdin_bytes':job.get('stdin_bytes',0)}
         if op == 'poll':
             offset=req.get('offset',0)
             if type(offset) is not int or not 0 <= offset <= LIMIT: raise ValueError('Invalid offset')

@@ -32,6 +32,7 @@ pub fn unchanged(proposal: &Value, current: &Value) -> bool {
             "scope",
             "cwd",
             "stdin_sha256",
+            "stdin_bytes",
             "terminal",
         ]
         .iter()
@@ -46,8 +47,40 @@ pub fn approve(socket: PathBuf, proposal: Value, stop: Arc<AtomicBool>) -> Resul
     if stop.load(Ordering::Relaxed) {
         return Err("Approval cancelled before dispatch".into());
     }
+    privileged("approve", id, stop)
+}
+pub fn input(socket: PathBuf, proposal: Value, stop: Arc<AtomicBool>) -> Result<Value, String> {
+    let id = job_id(&proposal)?;
+    let current = super::transport::request(&socket, &json!({"op":"poll","job_id":id}))?;
+    if !unchanged(&proposal, &current) {
+        return Err("The proposal changed; review it again".into());
+    }
+    let value = privileged("input", id, stop)?;
+    validate_input(&proposal, &value)?;
+    Ok(value)
+}
+fn validate_input(proposal: &Value, value: &Value) -> Result<(), String> {
+    if value["stdin_sha256"] != proposal["stdin_sha256"]
+        || value["stdin_bytes"].as_u64().unwrap_or(0)
+            != proposal["stdin_bytes"].as_u64().unwrap_or(0)
+    {
+        return Err("Stored input no longer matches the reviewed proposal".into());
+    }
+    let text = value["stdin"].as_str().ok_or("Stored input must be text")?;
+    if text.len() > 65536 || Some(text.len() as u64) != value["stdin_bytes"].as_u64() {
+        return Err("Stored input size mismatch".into());
+    }
+    Ok(())
+}
+fn privileged(operation: &str, id: &str, stop: Arc<AtomicBool>) -> Result<Value, String> {
+    if !matches!(operation, "approve" | "input") {
+        return Err("Unsupported broker review operation".into());
+    }
+    if stop.load(Ordering::Relaxed) {
+        return Err("Broker review cancelled before dispatch".into());
+    }
     let mut child = Command::new("/usr/bin/sudo")
-        .args(["-n", "/usr/local/bin/agent-os-broker", "approve", id])
+        .args(["-n", "/usr/local/bin/agent-os-broker", operation, id])
         .stdin(Stdio::null())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
@@ -80,17 +113,17 @@ pub fn approve(socket: PathBuf, proposal: Value, stop: Arc<AtomicBool>) -> Resul
             let _ = child.kill();
             let _ = child.wait();
             break Err(
-                "Approval acknowledgement unavailable; inspect this existing job before retrying"
+                "Broker review acknowledgement unavailable; inspect the existing job before retrying"
                     .into(),
             );
         }
         thread::sleep(Duration::from_millis(20));
     };
-    let (read, bytes) = out.join().map_err(|_| "Approval output unavailable")?;
-    let (_, errors) = err.join().map_err(|_| "Approval error unavailable")?;
+    let (read, bytes) = out.join().map_err(|_| "Broker review output unavailable")?;
+    let (_, errors) = err.join().map_err(|_| "Broker review error unavailable")?;
     if !status?.success() {
         return Err(format!(
-            "Approval failed: {}",
+            "Broker review failed: {}",
             String::from_utf8_lossy(&errors)
                 .chars()
                 .take(2000)
@@ -99,7 +132,7 @@ pub fn approve(socket: PathBuf, proposal: Value, stop: Arc<AtomicBool>) -> Resul
     }
     read.map_err(|e| e.to_string())?;
     if bytes.len() > 1024 * 1024 {
-        return Err("Approval response exceeded its limit".into());
+        return Err("Broker review response exceeded its limit".into());
     }
     serde_json::from_slice(&bytes).map_err(|e| e.to_string())
 }
@@ -136,6 +169,17 @@ pub fn open_terminal() -> Result<Value, String> {
 mod tests {
     use super::*;
     #[test]
+    fn stored_input_preview_matches_the_frozen_proposal_and_byte_count() {
+        let proposal = json!({"stdin_sha256":"abc","stdin_bytes":3});
+        let value = json!({"stdin_sha256":"abc","stdin_bytes":3,"stdin":"λ!"});
+        assert!(validate_input(&proposal, &value).is_ok());
+        for key in ["stdin_sha256", "stdin_bytes", "stdin"] {
+            let mut changed = value.clone();
+            changed[key] = json!("changed");
+            assert!(validate_input(&proposal, &changed).is_err());
+        }
+    }
+    #[test]
     fn stale_review_cannot_authorize_changed_command_or_input() {
         let proposal = json!({"id":"0123456789abcdef0123456789abcdef","status":"approval_required","argv":["/bin/rm","/tmp/example"],"activity":1,"scope":"system","cwd":"/tmp","stdin_sha256":"abc","terminal":false});
         assert!(unchanged(&proposal, &proposal));
@@ -145,6 +189,7 @@ mod tests {
             "scope",
             "cwd",
             "stdin_sha256",
+            "stdin_bytes",
             "terminal",
             "status",
         ] {

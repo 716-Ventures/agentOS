@@ -81,6 +81,10 @@ pub struct Frame {
 pub enum Command {
     RegisterRenderer(String),
     Approve(Value),
+    ReviewInput {
+        proposal: Value,
+        reply: Sender<Result<Value, String>>,
+    },
     Attach(Value),
     OpenTerminal,
     PageOutput(i8),
@@ -219,6 +223,21 @@ fn run(
                 break;
             }
             Ok(command) => {
+                if let Command::ReviewInput { proposal, reply } = command {
+                    if approvals.len() >= 4 {
+                        let _ = reply.send(Err("Four broker review requests are pending".into()));
+                        continue;
+                    }
+                    let stopping = stop.clone();
+                    approvals.push(thread::spawn(move || {
+                        let _ = reply.send(super::broker_controls::input(
+                            broker_socket(),
+                            proposal,
+                            stopping,
+                        ));
+                    }));
+                    continue;
+                }
                 if let Command::Approve(proposal) = command {
                     if approval_pending
                         .compare_exchange(false, true, Ordering::Relaxed, Ordering::Relaxed)
@@ -247,7 +266,7 @@ fn run(
                     continue;
                 }
                 let result=match command {
-                    Command::Approve(_)=>unreachable!(),
+                    Command::Approve(_)|Command::ReviewInput{..}=>unreachable!(),
                     Command::Attach(job)=>super::broker_controls::attach(&job),
                     Command::OpenTerminal=>super::broker_controls::open_terminal(),
                     Command::WorkspaceEdit{workspace,revision,edit}=>request(&socket,&json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("workspace-{}",super::nonce()),"expected_revisions":{workspace.clone():revision},"operations":[{"op":"workspace.edit","workspace_id":workspace,"edit":edit}]})).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt}),
