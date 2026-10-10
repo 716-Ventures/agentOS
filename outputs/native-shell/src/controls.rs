@@ -18,6 +18,13 @@ pub struct Controls {
     message: gtk::Label,
     model_text: gtk::Label,
     inspection: gtk::TextView,
+    voice: voice::Voice,
+    voice_button: gtk::Button,
+    voice_status: gtk::Label,
+    voice_context: Rc<RefCell<Value>>,
+    review: gtk::ApplicationWindow,
+    transcript: TextField,
+    review_ready: bool,
 }
 impl Controls {
     pub fn new(app: &gtk::Application, commands: Sender<Command>) -> Self {
@@ -76,6 +83,76 @@ impl Controls {
         let click = submit.clone();
         send.connect_clicked(move |_| click());
         request.entry.connect_activate(move |_| submit());
+        let voice = voice::Voice::new();
+        let voice_context = Rc::new(RefCell::new(Value::Null));
+        let voice_button = ui::button("Record voice", ButtonVariant::Outline, false);
+        let voice_status = ui::status("Microphone idle");
+        let voice_row = ui::row(12);
+        voice_row.append(&voice_button);
+        voice_row.append(&voice_status);
+        widget.append(&voice_row);
+        let review_content = ui::column(12);
+        review_content.append(&ui::text("Review voice request", true));
+        let transcript = TextField::new("Edit the transcript before sending", "Transcript", "");
+        review_content.append(&transcript.widget);
+        let review_actions = ui::row(12);
+        let send_voice = ui::button("Send reviewed request", ButtonVariant::Primary, false);
+        let discard = ui::button("Discard recording", ButtonVariant::Outline, false);
+        review_actions.append(&send_voice);
+        review_actions.append(&discard);
+        review_content.append(&review_actions);
+        let review = gtk::ApplicationWindow::builder()
+            .application(app)
+            .title("Review voice request")
+            .default_width(700)
+            .default_height(220)
+            .child(&review_content)
+            .build();
+        review.add_css_class("seven-ui");
+        let recorder = voice.clone();
+        let context = voice_context.clone();
+        voice_button.connect_clicked(move |_| {
+            let phase = recorder.state.lock().unwrap().phase.clone();
+            if phase == "recording" {
+                recorder.finish();
+            } else if phase == "idle" {
+                let context = context.borrow().clone();
+                if !context.is_null() {
+                    recorder.start(context);
+                }
+            }
+        });
+        let recorder = voice.clone();
+        let window = review.clone();
+        discard.connect_clicked(move |_| {
+            recorder.cancel();
+            window.set_visible(false);
+        });
+        let recorder = voice.clone();
+        review.connect_close_request(move |window| {
+            recorder.cancel();
+            window.set_visible(false);
+            glib::Propagation::Stop
+        });
+        let recorder = voice.clone();
+        let window = review.clone();
+        let entry = transcript.entry.clone();
+        let sender = commands.clone();
+        send_voice.connect_clicked(move |_| {
+            if entry.text().trim().is_empty() {
+                return;
+            }
+            if let Some(context) = recorder.consume() {
+                if let Some(activity) = context["activity_id"].as_i64() {
+                    let _ = sender.send(Command::Ask {
+                        activity,
+                        prompt: entry.text().into(),
+                        grounding: Some(context),
+                    });
+                    window.set_visible(false);
+                }
+            }
+        });
         let message = ui::status("Select or create an activity to start work.");
         widget.append(&message);
         let monitor_content = ui::column(16);
@@ -128,13 +205,61 @@ impl Controls {
             message,
             model_text,
             inspection,
+            voice,
+            voice_button,
+            voice_status,
+            voice_context,
+            review,
+            transcript,
+            review_ready: false,
         }
+    }
+    pub fn context(&self, context: Value) {
+        *self.voice_context.borrow_mut() = context;
+    }
+    pub fn close(&self) {
+        self.voice.cancel();
     }
     pub fn present(&self) {
         self.monitor.present();
     }
     pub fn update(&mut self, frame: &Frame, commands: &Sender<Command>) {
         *self.activity.borrow_mut() = frame.activity.clone();
+        let voice = self.voice.state.lock().unwrap().clone();
+        self.voice_button.set_label(if voice.phase == "recording" {
+            "Finish recording"
+        } else {
+            "Record voice"
+        });
+        self.voice_button
+            .set_sensitive(matches!(voice.phase.as_str(), "idle" | "recording"));
+        self.voice_status.set_text(
+            voice
+                .error
+                .as_deref()
+                .unwrap_or(match voice.phase.as_str() {
+                    "idle" => "Microphone idle",
+                    "starting" => "Starting microphone…",
+                    "recording" => "Recording · finish or discard",
+                    "transcribing" => "Recognizing speech locally…",
+                    "review" => "Review the transcript before sending",
+                    _ => "Voice unavailable · discard and retry",
+                }),
+        );
+        if voice.phase == "review" && !self.review_ready {
+            self.transcript
+                .entry
+                .set_text(voice.text.as_deref().unwrap_or(""));
+            self.review.present();
+            self.review_ready = true;
+        }
+        if voice.phase != "review" {
+            self.review_ready = false;
+        }
+        if voice.phase == "error" {
+            self.review.present();
+        }
+
         let activities = frame.core["activities"]
             .as_array()
             .cloned()
@@ -244,10 +369,43 @@ impl Controls {
         let usage = if frame.usage["unavailable"] == true {
             "Model configuration and measured usage unavailable".into()
         } else {
-            format!(
-                "Model configuration and measured usage\n{}",
-                serde_json::to_string_pretty(&frame.usage).unwrap_or_default()
-            )
+            let mut lines = vec!["Model configuration and measured usage".to_string()];
+            for config in frame.usage["configuration"]
+                .as_array()
+                .into_iter()
+                .flatten()
+            {
+                lines.push(format!(
+                    "{} · {} · {}",
+                    config["model"].as_str().unwrap_or("Unknown model"),
+                    config["role"].as_str().unwrap_or(""),
+                    if config["configured"] == true {
+                        "Configured"
+                    } else {
+                        "Setup required"
+                    }
+                ));
+            }
+            for row in frame.usage["models"]
+                .as_object()
+                .into_iter()
+                .flat_map(|m| m.values())
+            {
+                let tokens = if row["total_reports"].as_u64().unwrap_or(0) > 0 {
+                    format!("{} reported tokens", row["total_tokens"])
+                } else {
+                    "Token usage not reported".into()
+                };
+                lines.push(format!(
+                    "{} · {} responses · {} active · {} errors · {}",
+                    row["model"].as_str().unwrap_or("Model"),
+                    row["responses"],
+                    row["active"],
+                    row["errors"],
+                    tokens
+                ));
+            }
+            lines.join("\n")
         };
         if self.model_text.text() != usage {
             self.model_text.set_text(&usage);

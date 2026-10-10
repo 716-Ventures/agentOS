@@ -481,6 +481,7 @@ fn main() {
             .build();
         main.add_css_class("seven-ui");
         main.present();
+        let voice_cleanup=controls.clone();app.connect_shutdown(move |_|voice_cleanup.borrow().close());
         let opener = controls.clone();
         status.connect_clicked(move |_| opener.borrow().present());
         let surfaces = Rc::new(RefCell::new(BTreeMap::<String, Surface>::new()));
@@ -501,6 +502,14 @@ fn main() {
             };
             status.set_label(connection);
             controls.borrow_mut().update(&frame, &backend.commands);
+            if let Some(activity)=frame.activity.as_ref().and_then(|a|a.parse::<i64>().ok()) {
+                let mut context=json!({"activity_id":activity,"surface_id":"native-launcher","layout_revision":0,"job_ref":null,"selection":"","selection_kind":"focused_output","surface_title":"Agent request"});
+                for (id,surface) in surfaces.borrow().iter(){
+                    let selection=surface.elements.values().filter_map(|e|e.label.as_ref()).find_map(|label|label.selection_bounds().map(|(a,b)|label.text().chars().skip(a.min(b) as usize).take((b-a).unsigned_abs() as usize).collect::<String>()));
+                    if surface.window.is_active() || selection.is_some(){let mut selected=selection.unwrap_or_default();while selected.len()>8000{selected.pop();}context["surface_id"]=json!(id);context["layout_revision"]=json!(surface.revision.unwrap_or(0));context["selection"]=json!(selected);context["surface_title"]=surface.document["title"].clone();break;}
+                }
+                controls.borrow().context(context);
+            }
             let mut surfaces = surfaces.borrow_mut();
             for (id, doc) in &frame.documents {
                 if doc.get("surface_id").is_some() {
