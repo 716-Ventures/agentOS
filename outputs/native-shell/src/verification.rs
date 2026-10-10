@@ -32,7 +32,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             println!("CHECK: local edit preserved");
             // Simulate a durable flush; the retained local editor must still own its value.
             drafts.lock().unwrap().values_mut().for_each(|d|d.dirty=false);
-            surface.elements["button"].button.as_ref().unwrap().grab_focus();
+            surface.elements["link"].link.as_ref().unwrap().grab_focus();
             doc["elements"]["root"]["slots"]["children"]=json!(["field","reading","status","button","link","progress"]);
             surface.update("native-fixture",&doc,&frame,&commands,&drafts);
             println!("CHECK: reordered retained widgets");
