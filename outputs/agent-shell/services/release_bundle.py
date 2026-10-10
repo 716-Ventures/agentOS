@@ -10,11 +10,56 @@ import re
 import subprocess
 import tarfile
 import tempfile
+import time
+import urllib.parse
+import urllib.request
 
 OPENSSL='/usr/bin/openssl'
 MAX_FILE=128*1024*1024
 MAX_TOTAL=512*1024*1024
 MAX_FILES=10000
+MAX_DOWNLOAD=MAX_TOTAL+16*1024*1024
+
+
+def download_url(value):
+    if not isinstance(value,str) or len(value)>4096 or any(ord(char)<33 for char in value):
+        raise ValueError('Use an HTTPS runtime bundle URL')
+    parsed=urllib.parse.urlsplit(value)
+    if parsed.scheme!='https' or not parsed.hostname or parsed.username is not None or parsed.password is not None or parsed.fragment:
+        raise ValueError('Runtime downloads require HTTPS without URL credentials or fragments')
+    return value
+
+
+class SecureRedirect(urllib.request.HTTPRedirectHandler):
+    max_redirections=5
+    def redirect_request(self,req,fp,code,msg,headers,newurl):
+        download_url(newurl)
+        return super().redirect_request(req,fp,code,msg,headers,newurl)
+
+
+def fetch_bundle(installer,url,trusted_key):
+    """Download into private temporary storage, verify, and stage; never activate."""
+    download_url(url);key_type(Path(trusted_key),True)
+    installer.state.mkdir(mode=0o700,parents=True,exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='.download-',dir=installer.state) as directory:
+        path=Path(directory)/'runtime.tar.gz';deadline=time.monotonic()+120
+        opener=urllib.request.build_opener(SecureRedirect())
+        request=urllib.request.Request(url,headers={'User-Agent':'agentOS-runtime-update/1','Accept-Encoding':'identity'})
+        with opener.open(request,timeout=15) as response,path.open('xb') as stream:
+            path.chmod(0o600)
+            length=response.headers.get('Content-Length')
+            if length is not None and (not length.isdecimal() or int(length)>MAX_DOWNLOAD):
+                raise ValueError('Runtime download exceeds its size limit')
+            total=0
+            while True:
+                if time.monotonic()>deadline:raise ValueError('Runtime download exceeded its time limit')
+                data=response.read(min(1024*1024,MAX_DOWNLOAD-total+1))
+                if not data:break
+                total+=len(data)
+                if total>MAX_DOWNLOAD:raise ValueError('Runtime download exceeds its size limit')
+                stream.write(data)
+            stream.flush();os.fsync(stream.fileno())
+        return import_bundle(installer,path,trusted_key)
 
 
 def sha(data):return hashlib.sha256(data).hexdigest()

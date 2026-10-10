@@ -2,6 +2,10 @@
 """Stage real ARM64 graphical ELFs and pinned dependency notices without activation."""
 import importlib.util
 import json
+import os
+import ssl
+import threading
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 import shutil
 import subprocess
@@ -57,3 +61,31 @@ with tempfile.TemporaryDirectory(prefix='agentos-graphical-release-') as directo
     assert destination.verify(destination.root/'releases'/ident)==hashes
     assert not (destination.root/'current').exists() and not destination.journal.exists()
     print('PASS: signed real ARM64 graphical bundle verifies and stages without activation or user state')
+
+    # Real TLS transfer through the production bounded downloader. The fixture
+    # CA is trusted only for this test process, never installed in the guest.
+    tls_key=root/'tls-key.pem';tls_cert=root/'tls-cert.pem'
+    subprocess.run(['/usr/bin/openssl','req','-x509','-newkey','rsa:2048','-nodes','-days','1',
+                    '-subj','/CN=localhost','-addext','subjectAltName=IP:127.0.0.1',
+                    '-keyout',str(tls_key),'-out',str(tls_cert)],check=True,capture_output=True)
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            if self.path!='/runtime.tar.gz':self.send_error(404);return
+            self.send_response(200);self.send_header('Content-Length',str(archive.stat().st_size));self.end_headers()
+            with archive.open('rb') as stream:shutil.copyfileobj(stream,self.wfile)
+        def log_message(self,*args):pass
+    server=ThreadingHTTPServer(('127.0.0.1',0),Handler)
+    context=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER);context.load_cert_chain(tls_cert,tls_key)
+    server.socket=context.wrap_socket(server.socket,server_side=True)
+    thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
+    previous=os.environ.get('SSL_CERT_FILE');os.environ['SSL_CERT_FILE']=str(tls_cert)
+    try:
+        assert bundles.fetch_bundle(destination,'https://127.0.0.1:'+str(server.server_port)+'/runtime.tar.gz',public)==ident
+        assert not (destination.root/'current').exists() and not destination.journal.exists()
+        assert not list(destination.state.glob('.download-*'))
+        print('PASS: HTTPS runtime download verifies and stages real signed ELFs without activation; temporary download removed')
+    finally:
+        if previous is None:os.environ.pop('SSL_CERT_FILE',None)
+        else:os.environ['SSL_CERT_FILE']=previous
+        server.shutdown();server.server_close();thread.join(timeout=3)
+        assert not thread.is_alive(),'TLS fixture server leaked'

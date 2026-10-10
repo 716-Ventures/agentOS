@@ -362,6 +362,7 @@ def main():
     operation.add_argument('--activate',metavar='RELEASE_ID')
     operation.add_argument('--list-releases',action='store_true')
     operation.add_argument('--stage-bundle',type=Path,metavar='BUNDLE',help='Verify a signed bundle and stage it without activating')
+    operation.add_argument('--fetch-bundle',metavar='HTTPS_URL',help='Download a signed bundle over HTTPS, verify and stage without activating')
     operation.add_argument('--export-bundle',type=Path,metavar='OUTPUT',help='Sign and export an immutable runtime release')
     parser.add_argument('--signing-key',type=Path,help='Ed25519 private PEM key used only for export')
     parser.add_argument('--trusted-key',type=Path,default=Path('/etc/agent-os/update-signing-key.pem'),help='Explicitly provisioned Ed25519 public PEM key')
@@ -376,13 +377,14 @@ def main():
     installer=Installer(login_user=args.login_user);installer.state.mkdir(mode=0o700,parents=True,exist_ok=True);installer.state.chmod(0o700)
     with (installer.state/'lock').open('a+b') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX)
-        if args.stage_bundle or args.export_bundle:
+        if args.stage_bundle or args.fetch_bundle or args.export_bundle:
             module=SOURCE/'services/release_bundle.py'
             if not module.is_file():module=installer.root/'current/services/release_bundle.py'
             spec=importlib.util.spec_from_file_location('agentos_release_bundle',module)
             bundles=importlib.util.module_from_spec(spec);spec.loader.exec_module(bundles)
-            if args.stage_bundle:
-                ident=bundles.import_bundle(installer,args.stage_bundle,args.trusted_key)
+            if args.stage_bundle or args.fetch_bundle:
+                ident=(bundles.fetch_bundle(installer,args.fetch_bundle,args.trusted_key) if args.fetch_bundle
+                       else bundles.import_bundle(installer,args.stage_bundle,args.trusted_key))
                 print('Verified and staged:',ident)
                 print('Activate with: sudo agent-os-update --activate '+ident)
             else:

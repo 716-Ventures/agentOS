@@ -49,6 +49,30 @@ class SignedBundles(unittest.TestCase):
         self.assertFalse(self.destination.journal.exists())
         self.assertEqual(list((self.destination.root/'releases').glob('*')),[])
 
+    def test_https_fetch_verifies_and_stages_without_activation(self):
+        response=io.BytesIO(self.archive.read_bytes());response.headers={}
+        with patch.object(bundle.urllib.request,'build_opener') as opener, \
+                patch.object(bundle.platform,'system',return_value='Linux'), \
+                patch.object(bundle.platform,'machine',return_value='aarch64'), \
+                patch.object(bundle,'installed_packages',return_value={'python3':'3.13'}):
+            opener.return_value.open.return_value=response
+            self.assertEqual(bundle.fetch_bundle(self.destination,'https://releases.example/runtime.tar.gz',self.public),self.ident)
+        self.assertFalse((self.destination.root/'current').exists())
+        self.assertFalse(self.destination.journal.exists())
+        self.assertEqual(list(self.destination.state.glob('.download-*')),[])
+
+    def test_fetch_rejects_transport_downgrade_url_credentials_and_oversized_body(self):
+        for url in ('http://example.com/a','file:///tmp/a','https://user:secret@example.com/a','https://example.com/a#fragment','https://example.com/\n'):
+            with self.subTest(url=url),self.assertRaises(ValueError):bundle.download_url(url)
+        request=bundle.urllib.request.Request('https://example.com/a')
+        with self.assertRaises(ValueError):bundle.SecureRedirect().redirect_request(request,None,302,'redirect',{},'http://example.com/a')
+        response=io.BytesIO(b'123456789');response.headers={}
+        with patch.object(bundle,'MAX_DOWNLOAD',8),patch.object(bundle.urllib.request,'build_opener') as opener:
+            opener.return_value.open.return_value=response
+            with self.assertRaisesRegex(ValueError,'size limit'):bundle.fetch_bundle(self.destination,'https://example.com/a',self.public)
+        self.assertEqual(list(self.destination.state.glob('.download-*')),[])
+        self.assertFalse((self.destination.root/'current').exists())
+
     def test_roundtrip_deterministic_only_manifest_payload_and_no_activation(self):
         release=self.installer.root/'releases'/self.ident
         (release/'unlisted-private-key').write_text('never export')
