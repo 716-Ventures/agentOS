@@ -350,3 +350,46 @@ pub fn apply(w: &mut WorkspaceDocument, edit: Edit) -> Result<()> {
     }
     Ok(())
 }
+
+/// Compare effective placement without coupling protection to a particular tree shape.
+pub fn placement(w: &WorkspaceDocument, id: &str) -> Option<Value> {
+    fn find(tile: &Tile, id: &str, rect: [f64; 4]) -> Option<[f64; 4]> {
+        match tile {
+            Tile::Leaf { surface_id } => (surface_id == id).then_some(rect),
+            Tile::Split {
+                axis,
+                children,
+                ratios,
+            } => {
+                let mut offset = 0.0;
+                for (child, ratio) in children.iter().zip(ratios) {
+                    let mut next = rect;
+                    let (position, extent) = if axis == "horizontal" { (0, 2) } else { (1, 3) };
+                    next[position] += offset * rect[extent];
+                    next[extent] *= ratio;
+                    if let Some(found) = find(child, id, next) {
+                        return Some(found);
+                    }
+                    offset += ratio;
+                }
+                None
+            }
+        }
+    }
+    for (output, layout) in &w.outputs {
+        let maximized = layout.maximized.as_deref() == Some(id);
+        if let Some(f) = layout.floating.iter().find(|f| f.surface_id == id) {
+            return Some(
+                json!({"output":output,"mode":"floating","rect":[f.x,f.y,f.width,f.height],"maximized":maximized}),
+            );
+        }
+        if let Some(rect) = layout
+            .tiles
+            .as_ref()
+            .and_then(|t| find(t, id, [0.0, 0.0, 1.0, 1.0]))
+        {
+            return Some(json!({"output":output,"mode":"tiled","rect":rect,"maximized":maximized}));
+        }
+    }
+    None
+}

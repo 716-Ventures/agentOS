@@ -70,15 +70,24 @@ impl Smallvil {
                         .element_under(pointer.current_location())
                         .map(|(w, l)| (w.clone(), l))
                     {
-                        self.space.raise_element(&window, true);
-                        keyboard.set_focus(
-                            self,
-                            Some(window.toplevel().unwrap().wl_surface().clone()),
-                            serial,
-                        );
-                        self.space.elements().for_each(|window| {
-                            window.toplevel().unwrap().send_pending_configure();
-                        });
+                        if let Some(bridge) = &self.bridge {
+                            use smithay::reexports::wayland_server::Resource;
+                            let id = format!("{:?}", window.toplevel().unwrap().wl_surface().id());
+                            bridge
+                                .input(&id, serde_json::json!({"kind":"focus","element_id":null}));
+                            // The committed scene applies focus. A stale command must not
+                            // leave the seat focused on a different surface than the core.
+                        } else {
+                            self.space.raise_element(&window, true);
+                            keyboard.set_focus(
+                                self,
+                                Some(window.toplevel().unwrap().wl_surface().clone()),
+                                serial,
+                            );
+                            self.space.elements().for_each(|window| {
+                                window.toplevel().unwrap().send_pending_configure();
+                            });
+                        }
                     } else {
                         self.space.elements().for_each(|window| {
                             window.set_activated(false);

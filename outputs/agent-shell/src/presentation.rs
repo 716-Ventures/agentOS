@@ -778,6 +778,15 @@ fn guard(
                         .iter()
                         .filter(|c| c.provenance != "inferred_preference")
                     {
+                        if c.strength == "required"
+                            && workspace::placement(old, &c.surface_id)
+                                != workspace::placement(new, &c.surface_id)
+                        {
+                            return Err(error(
+                                "constraint_conflict",
+                                "Agent cannot change manually constrained geometry",
+                            ));
+                        }
                         if !new.constraints.contains(c) {
                             return Err(error(
                                 "constraint_conflict",
@@ -1213,12 +1222,17 @@ fn interaction(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value>
         .ok_or_else(|| invalid("Missing surface ID"))?;
     let element = v["element_id"].as_str().unwrap_or("");
     let docs = documents(db)?;
-    let s = match docs.get(id) {
-        Some(Document::Surface(s)) => s,
-        _ => return Err(error("missing_reference", id)),
-    };
-    if !element.is_empty() && !s.elements.contains_key(element) {
-        return Err(error("missing_reference", element));
+    let document = docs.get(id).ok_or_else(|| error("missing_reference", id))?;
+    if !element.is_empty() {
+        match document {
+            Document::Surface(s) if s.elements.contains_key(element) => {}
+            _ => return Err(error("missing_reference", element)),
+        }
+    }
+    if matches!(document, Document::Workspace(_))
+        && v["op"].as_str().unwrap_or("").starts_with("draft.")
+    {
+        return Err(invalid("Workspace leases do not contain text drafts"));
     }
     let existing:Option<(u32,String,i64,i64,Option<String>)>=db.query_row("SELECT uid,session,expires,draft_revision,draft FROM presentation_leases WHERE document=? AND element=?",params![id,element],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?))).optional().map_err(db_error)?;
     let owned = existing
@@ -1253,7 +1267,7 @@ fn interaction(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value>
         let rev = existing.as_ref().map(|r| r.3).unwrap_or(0);
         db.execute("INSERT INTO presentation_leases(document,element,uid,session,expires) VALUES(?,?,?,?,?) ON CONFLICT(document,element) DO UPDATE SET uid=excluded.uid,session=excluded.session,expires=excluded.expires",params![id,element,who.uid,who.session,now()+30]).map_err(db_error)?;
         return Ok(
-            json!({"expires_at":now()+30,"draft_revision":rev,"surface_revision":s.revision}),
+            json!({"expires_at":now()+30,"draft_revision":rev,"surface_revision":document.revision()}),
         );
     }
     if !owned {
@@ -1837,6 +1851,30 @@ mod tests {
         .unwrap();
         handle(&mut db,&json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"workspace-create","expected_revisions":{"workspace-a":null},"operations":[{"op":"workspace.put","document":workspace()}]}),&human()).unwrap();
         let request = |id: &str, revision: u64, edit: Value| json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":id,"expected_revisions":{"workspace-a":revision},"operations":[{"op":"workspace.edit","workspace_id":"workspace-a","edit":edit}]});
+        handle(
+            &mut db,
+            &json!({"op":"interaction.begin","surface_id":"workspace-a"}),
+            &human(),
+        )
+        .unwrap();
+        let competing = Principal {
+            uid: 1000,
+            session: "other-input".into(),
+        };
+        assert!(handle(
+            &mut db,
+            &json!({"op":"interaction.begin","surface_id":"workspace-a"}),
+            &competing
+        )
+        .unwrap_err()
+        .contains("interaction_conflict"));
+        assert!(handle(&mut db,&json!({"op":"draft.save","surface_id":"workspace-a","draft":"text","expected_draft_revision":0}),&human()).unwrap_err().contains("Workspace leases"));
+        handle(
+            &mut db,
+            &json!({"op":"interaction.end","surface_id":"workspace-a"}),
+            &human(),
+        )
+        .unwrap();
         let tile = request(
             "split",
             0,
@@ -1851,6 +1889,16 @@ mod tests {
         assert_eq!(
             committed["outputs"]["output-a"]["tiles"]["ratios"],
             json!([0.6, 0.4])
+        );
+        let mut indirect = committed.clone();
+        indirect["outputs"]["output-a"]["tiles"]["ratios"] = json!([0.5, 0.5]);
+        let agent_resize = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"indirect-resize","expected_revisions":{"workspace-a":1},"operations":[{"op":"workspace.put","document":indirect}]});
+        assert!(handle(&mut db, &agent_resize, &agent())
+            .unwrap_err()
+            .contains("manually constrained geometry"));
+        assert_eq!(
+            snapshot(&db).unwrap()["documents"]["workspace-a"],
+            committed
         );
         let tiny = request(
             "tiny",

@@ -14,6 +14,8 @@ use std::{
     thread,
     time::Duration,
 };
+#[path = "bridge_grabs.rs"]
+mod grabs;
 #[derive(Clone, Debug, PartialEq)]
 pub struct Observed {
     pub id: String,
@@ -42,6 +44,7 @@ pub struct Bridge {
     pub commands: SyncSender<Request>,
     stop: Arc<AtomicBool>,
     worker: Option<thread::JoinHandle<()>>,
+    pub previews: Arc<Mutex<BTreeMap<String, grabs::Preview>>>,
 }
 impl Bridge {
     pub fn start(socket: PathBuf) -> Self {
@@ -50,7 +53,10 @@ impl Bridge {
         let stop = Arc::new(AtomicBool::new(false));
         let (commands, rx) = mpsc::sync_channel::<Request>(32);
         let (input, output, stopping) = (observation.clone(), scene.clone(), stop.clone());
+        let previews = Arc::new(Mutex::new(BTreeMap::new()));
+        let worker_previews = previews.clone();
         let worker = thread::spawn(move || {
+            let mut grabs = grabs::Grabs::new(worker_previews);
             let mut registrations = BTreeMap::<String, (String, String, String, String)>::new();
             let mut counter = 0u64;
             let mut published = BTreeMap::new();
@@ -68,35 +74,42 @@ impl Bridge {
             while !stopping.load(Ordering::Relaxed) {
                 // Bounded command queue; each operation has exact core revision checks.
                 for req in rx.try_iter().take(8) {
-                    let result = match req.value["op"].as_str() {
-                        Some("workspace.transaction") => call(&socket, &req.value["transaction"]),
-                        Some("workspace.activity") => call(&socket, &json!({"op":"snapshot"}))
-                            .and_then(|s| {
-                                let activity = req.value["activity_id"]
-                                    .as_str()
-                                    .ok_or("Activity identity required")?;
-                                if !s["activities"]
-                                    .as_array()
-                                    .into_iter()
-                                    .flatten()
-                                    .any(|a| a["id"].to_string() == activity)
-                                {
-                                    return Err("Activity unavailable".into());
-                                }
-                                selected_activity = Some(activity.into());
-                                Ok(json!({"activity_id":activity}))
-                            }),
-                        Some("workspace.apply") => put(
-                            &socket,
-                            &req.value["document"],
-                            req.value["expected_revision"].clone(),
-                            req.value["request_id"].as_str().unwrap_or(""),
-                        ),
-                        Some("workspace.undo") => call(
-                            &socket,
-                            &json!({"op":"presentation.undo","event_cursor":req.value["event_cursor"],"request_id":req.value["request_id"]}),
-                        ),
-                        _ => Err("Unknown shared workspace operation".into()),
+                    let scene = output.lock().unwrap().clone();
+                    let result = if let Some(result) = grabs.handle(&socket, &scene, &req.value) {
+                        result
+                    } else {
+                        match req.value["op"].as_str() {
+                            Some("workspace.transaction") => {
+                                call(&socket, &req.value["transaction"])
+                            }
+                            Some("workspace.activity") => call(&socket, &json!({"op":"snapshot"}))
+                                .and_then(|s| {
+                                    let activity = req.value["activity_id"]
+                                        .as_str()
+                                        .ok_or("Activity identity required")?;
+                                    if !s["activities"]
+                                        .as_array()
+                                        .into_iter()
+                                        .flatten()
+                                        .any(|a| a["id"].to_string() == activity)
+                                    {
+                                        return Err("Activity unavailable".into());
+                                    }
+                                    selected_activity = Some(activity.into());
+                                    Ok(json!({"activity_id":activity}))
+                                }),
+                            Some("workspace.apply") => put(
+                                &socket,
+                                &req.value["document"],
+                                req.value["expected_revision"].clone(),
+                                req.value["request_id"].as_str().unwrap_or(""),
+                            ),
+                            Some("workspace.undo") => call(
+                                &socket,
+                                &json!({"op":"presentation.undo","event_cursor":req.value["event_cursor"],"request_id":req.value["request_id"]}),
+                            ),
+                            _ => Err("Unknown shared workspace operation".into()),
+                        }
                     };
                     if let Err(e) = &result {
                         output.lock().unwrap().error = Some(e.clone());
@@ -107,6 +120,7 @@ impl Bridge {
                     };
                     let _ = req.reply.try_send(response);
                 }
+                grabs.renew(&socket);
                 let observed = input.lock().unwrap().clone();
                 if let Some(observed) = observed {
                     let result = (|| -> Result<Scene, String> {
@@ -290,6 +304,7 @@ impl Bridge {
                 }
                 thread::sleep(Duration::from_millis(100));
             }
+            grabs.stop(&socket);
             // Core availability also checks this process's start identity, including crashes.
         });
         Self {
@@ -298,6 +313,42 @@ impl Bridge {
             commands,
             stop,
             worker: Some(worker),
+            previews,
+        }
+    }
+    pub fn begin_grab(&self, runtime: &str, rect: Rect) {
+        self.previews.lock().unwrap().insert(
+            runtime.into(),
+            grabs::Preview {
+                rect,
+                active: false,
+            },
+        );
+        self.grab_command(runtime, "begin");
+    }
+    pub fn preview_grab(&self, runtime: &str, rect: Rect) {
+        if let Some(preview) = self.previews.lock().unwrap().get_mut(runtime) {
+            preview.rect = rect;
+        }
+    }
+    pub fn finish_grab(&self, runtime: &str) {
+        self.grab_command(runtime, "finish")
+    }
+    pub fn cancel_grab(&self, runtime: &str) {
+        self.grab_command(runtime, "cancel")
+    }
+    fn grab_command(&self, runtime: &str, operation: &str) {
+        let (reply, _) = mpsc::sync_channel(1);
+        if self
+            .commands
+            .try_send(Request {
+                value: json!({"op":format!("workspace.grab.{operation}"),"runtime":runtime}),
+                reply,
+            })
+            .is_err()
+        {
+            self.previews.lock().unwrap().remove(runtime);
+            self.scene.lock().unwrap().error = Some("Pointer interaction queue busy".into());
         }
     }
     pub fn input(&self, runtime: &str, mut edit: Value) {

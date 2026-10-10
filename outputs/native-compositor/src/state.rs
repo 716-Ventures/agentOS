@@ -159,6 +159,26 @@ impl Smallvil {
         socket_name
     }
 
+    pub fn preview_geometry(&self, id: &str, mut rect: crate::policy::Rect) {
+        if let Some(output) = self
+            .space
+            .outputs()
+            .next()
+            .and_then(|o| self.space.output_geometry(o))
+        {
+            rect.width = rect.width.max(80).min(output.size.w);
+            rect.height = rect.height.max(32).min(output.size.h);
+            rect.x = rect
+                .x
+                .clamp(output.loc.x, output.loc.x + output.size.w - rect.width);
+            rect.y = rect
+                .y
+                .clamp(output.loc.y, output.loc.y + output.size.h - rect.height);
+        }
+        if let Some(bridge) = &self.bridge {
+            bridge.preview_grab(id, rect)
+        }
+    }
     pub fn arrange(&mut self) {
         let windows = self.space.elements().cloned().collect::<Vec<_>>();
         let ids = windows
@@ -201,6 +221,16 @@ impl Smallvil {
             }
             maximized = scene.maximized;
             placements.extend(scene.rectangles);
+            for (id, preview) in bridge
+                .previews
+                .lock()
+                .unwrap()
+                .iter()
+                .filter(|(_, p)| p.active)
+            {
+                placements.insert(id.clone(), preview.rect);
+                maximized.remove(id);
+            }
             if scene.focus != self.applied_focus {
                 if let Some(window) = windows.iter().find(|w| {
                     Some(format!("{:?}", w.toplevel().unwrap().wl_surface().id())) == scene.focus

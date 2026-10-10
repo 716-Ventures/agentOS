@@ -54,13 +54,15 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
         session=None;owned=[]
         try:
             wait_for(endpoint.exists,[core])
-            call(endpoint,{'op':'create','name':'Full desktop session'})
+            activity=call(endpoint,{'op':'create','name':'Full desktop session'})['id']
+            document={'protocol':'agentos.presentation/1','catalog_revision':'native-core/1','surface_id':'session-fixture','activity_id':str(activity),'revision':0,'title':'Session lifecycle','root':'root','elements':{'root':{'type':'Text@1','props':{'text':'Authenticated session fixture'}}},'bindings':{},'actions':{}}
+            call(endpoint,{'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':'session-fixture','expected_revisions':{'session-fixture':None},'operations':[{'op':'surface.create','document':document}]})
             session=subprocess.Popen(['python3',str(ROOT.parent/'agent-shell/services/desktop_session.py'),'--backend','headless','--pixman','--bin-dir',str(bins),'--socket',str(endpoint)],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
             pidfile=wait_for(lambda:next(runtime.glob('agentos-session-*/compositor.pid'),None),[core,session])
             compositor=int(wait_for(lambda:pidfile.read_text().strip(),[core,session]));owned.append(compositor)
             control=runtime/f'agentos-compositor-{compositor}.sock'
             wait_for(control.exists,[core,session])
-            state=wait_for(lambda:(lambda s:s if s.get('shared') and s['shared']['identities'] else None)(call(control,{'op':'snapshot'})),[core,session])
+            state=wait_for(lambda:(lambda s:s if s.get('shared') and 'session-fixture' in s['shared']['identities'].values() else None)(call(control,{'op':'snapshot'})),[core,session])
             assert any(w['app_id'].startswith('agentos.surface.') for w in state['windows']),state
             # Every process in this private runtime is ours. Record identities before teardown.
             for proc in Path('/proc').iterdir():

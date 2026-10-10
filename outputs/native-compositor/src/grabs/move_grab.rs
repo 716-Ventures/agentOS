@@ -40,6 +40,11 @@ impl PointerGrab<Smallvil> for MoveSurfaceGrab {
             rect.y = new_location.y.round() as i32;
             data.policy.current.revision += 1;
         }
+        if let Some(crate::policy::Placement::Floating { rect }) =
+            data.policy.current.placements.get(&id)
+        {
+            data.preview_geometry(&id, *rect);
+        }
     }
 
     fn relative_motion(
@@ -66,6 +71,10 @@ impl PointerGrab<Smallvil> for MoveSurfaceGrab {
 
         if !handle.current_pressed().contains(&BTN_LEFT) {
             // No more buttons are pressed, release the grab.
+            let id = format!("{:?}", self.window.toplevel().unwrap().wl_surface().id());
+            if let Some(bridge) = &data.bridge {
+                bridge.finish_grab(&id)
+            }
             handle.unset_grab(self, data, event.serial, event.time, true);
         }
     }
@@ -159,5 +168,10 @@ impl PointerGrab<Smallvil> for MoveSurfaceGrab {
         &self.start_data
     }
 
-    fn unset(&mut self, _data: &mut Smallvil) {}
+    fn unset(&mut self, data: &mut Smallvil) {
+        let id = format!("{:?}", self.window.toplevel().unwrap().wl_surface().id());
+        if let Some(bridge) = &data.bridge {
+            bridge.cancel_grab(&id)
+        }
+    }
 }

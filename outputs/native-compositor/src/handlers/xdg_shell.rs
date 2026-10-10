@@ -108,6 +108,17 @@ impl XdgShellHandler for Smallvil {
             let initial_window_location = self.space.element_location(&window).unwrap();
             let size = window.geometry().size;
             let id = format!("{:?}", wl_surface.id());
+            if let Some(bridge) = &self.bridge {
+                bridge.begin_grab(
+                    &id,
+                    crate::policy::Rect {
+                        x: initial_window_location.x,
+                        y: initial_window_location.y,
+                        width: size.w.max(80),
+                        height: size.h.max(32),
+                    },
+                );
+            }
             let _ = self.policy.change(
                 &id,
                 crate::policy::Placement::Floating {
@@ -154,6 +165,17 @@ impl XdgShellHandler for Smallvil {
             let initial_window_location = self.space.element_location(&window).unwrap();
             let size = window.geometry().size;
             let id = format!("{:?}", wl_surface.id());
+            if let Some(bridge) = &self.bridge {
+                bridge.begin_grab(
+                    &id,
+                    crate::policy::Rect {
+                        x: initial_window_location.x,
+                        y: initial_window_location.y,
+                        width: size.w.max(80),
+                        height: size.h.max(32),
+                    },
+                );
+            }
             let _ = self.policy.change(
                 &id,
                 crate::policy::Placement::Floating {
