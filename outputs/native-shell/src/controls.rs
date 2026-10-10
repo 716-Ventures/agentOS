@@ -284,13 +284,13 @@ impl Controls {
         output_follow.set_sensitive(false);
         let output_changing = Rc::new(Cell::new(false));
         let output_displayed = Rc::new(RefCell::new(None::<log_view::Page>));
-        let (sender, changing, buffer) = (
+        let (sender, output_guard, buffer) = (
             commands.clone(),
-            output_changing.clone(),
+            output_output_guard.clone(),
             inspection.buffer(),
         );
         output_follow.connect_toggled(move |control| {
-            if changing.get() {
+            if output_guard.get() {
                 return;
             }
             if control.is_active() && buffer.has_selection() {
@@ -298,11 +298,11 @@ impl Controls {
             }
             let _ = sender.send(Command::FollowOutput(control.is_active()));
         });
-        let (sender, displayed, control, changing) = (
+        let (sender, displayed, control, output_guard) = (
             commands.clone(),
             output_displayed.clone(),
             output_follow.clone(),
-            output_changing.clone(),
+            output_output_guard.clone(),
         );
         inspection
             .buffer()
@@ -311,9 +311,9 @@ impl Controls {
                     if let Some(page) = displayed.borrow().as_ref() {
                         let _ = sender.send(Command::FreezeOutput(page.start));
                     }
-                    changing.set(true);
+                    output_guard.set(true);
                     control.set_active(false);
-                    changing.set(false);
+                    output_guard.set(false);
                 }
             });
         monitor_content.append(&output_follow);
