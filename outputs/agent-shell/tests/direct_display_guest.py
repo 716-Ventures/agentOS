@@ -51,7 +51,9 @@ def main():
         os.chown(metrics, user.pw_uid, user.pw_gid)
         def control(path, op):
             with socket.socket(socket.AF_UNIX) as conn:
-                conn.settimeout(2)
+                # The server bounds queued control work at five seconds. This
+                # read-only observer must allow that bound during a VT transition.
+                conn.settimeout(6)
                 conn.connect(str(path))
                 conn.sendall(json.dumps({'op': op}).encode() + b'\n')
                 result = json.loads(conn.makefile('rb').readline(65537))
