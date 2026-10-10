@@ -175,7 +175,7 @@ class Installer:
         self.link(self.root/'services',current/'services')
         self.link(self.root/'agent-os-core',current/'agent-os-core')
         self.link(self.path('/usr/local/bin/agent-os'),current/'client/agent_os.py')
-        for name in ('broker','configure'):
+        for name in ('broker','configure','setup','update'):
             self.link(self.path('/usr/local/bin/agent-os-'+name),current/'services'/f'{name}-launcher.sh')
         for name in set(existing)-set(self.active_units):
             self.run(['systemctl','disable',name])

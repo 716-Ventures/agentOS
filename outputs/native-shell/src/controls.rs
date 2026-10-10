@@ -32,6 +32,48 @@ impl Controls {
         widget.set_margin_start(20);
         widget.set_margin_end(20);
         widget.set_margin_bottom(16);
+        let setup = ui::button(
+            "Setup network, audio and providers",
+            ButtonVariant::Outline,
+            false,
+        );
+        let sender = commands.clone();
+        setup.connect_clicked(move |_| {
+            let _ = sender.send(Command::Setup);
+        });
+        widget.append(&setup);
+        let appearance = gtk::DropDown::from_strings(&["Dark", "Light"]);
+        let scale = gtk::SpinButton::with_range(1.0, 3.0, 0.25);
+        scale.set_value(1.0);
+        let reduced = gtk::CheckButton::with_label("Reduce motion");
+        appearance.update_property(&[gtk::accessible::Property::Label("Appearance")]);
+        scale.update_property(&[gtk::accessible::Property::Label("Text scale")]);
+        let appearance_row = ui::row(12);
+        appearance_row.append(&appearance);
+        appearance_row.append(&ui::text("Text scale", false));
+        appearance_row.append(&scale);
+        appearance_row.append(&reduced);
+        widget.append(&appearance_row);
+        let (a, s, r) = (appearance.clone(), scale.clone(), reduced.clone());
+        let theme = Rc::new(move || {
+            if let Some(display) = gtk::gdk::Display::default() {
+                ui::install_theme(
+                    &display,
+                    if a.selected() == 0 {
+                        Appearance::Dark
+                    } else {
+                        Appearance::Light
+                    },
+                    s.value(),
+                    r.is_active(),
+                );
+            }
+        });
+        let change = theme.clone();
+        appearance.connect_selected_notify(move |_| change());
+        let change = theme.clone();
+        scale.connect_value_changed(move |_| change());
+        reduced.connect_toggled(move |_| theme());
         let activity = Rc::new(RefCell::new(None));
         let choices = Rc::new(RefCell::new(Vec::<String>::new()));
         let changing = Rc::new(Cell::new(false));

@@ -74,6 +74,7 @@ pub struct Frame {
 }
 #[derive(Debug)]
 pub enum Command {
+    Setup,
     SelectActivity(String),
     CreateActivity(String),
     Ask {
@@ -152,6 +153,7 @@ fn run(
             }
             Ok(command) => {
                 let result=match command {
+                    Command::Setup=>std::process::Command::new("weston-terminal").args(["--shell","/usr/local/bin/agent-os-setup"]).spawn().map(|mut child|{std::thread::spawn(move||{let _=child.wait();});json!({"status":"Setup opened"})}).map_err(|e|e.to_string()),
                     Command::SelectActivity(id)=>{activity=Some(id);Ok(json!({"status":"Activity selected"}))},
                     Command::CreateActivity(name)=>request(&socket,&json!({"op":"create","name":name})).map(|created|{activity=Some(created["id"].to_string());created}),
                     Command::Ask{activity,prompt,grounding}=>{

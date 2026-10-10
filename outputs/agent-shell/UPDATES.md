@@ -5,11 +5,11 @@
 From the ordinary Linux rescue shell:
 
 ```sh
-sudo python3 /usr/local/lib/agent-os/install-recovery.py --list-releases
-sudo python3 /usr/local/lib/agent-os/install-recovery.py --recover
-sudo python3 /usr/local/lib/agent-os/install-recovery.py --rollback
-sudo python3 /usr/local/lib/agent-os/install-recovery.py --rollback RELEASE_ID
-sudo python3 /usr/local/lib/agent-os/install-recovery.py --activate RELEASE_ID
+sudo agent-os-update --list-releases
+sudo agent-os-update --recover
+sudo agent-os-update --rollback
+sudo agent-os-update --rollback RELEASE_ID
+sudo agent-os-update --activate RELEASE_ID
 ```
 
 Rollback selects verified installed code, preserves live activities, drafts, credentials, files and external effects, and uses the same recoverable activation journal. Reinstalling the current release or recovering after the switch preserves the original previous-release pointer. Releases must declare the same state contract; incompatible formats are rejected before stopping services. Legacy releases without a contract cannot be rollback targets. A future incompatible schema requires an explicit forward/backward migration implementation and its own tests.
