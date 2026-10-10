@@ -432,6 +432,17 @@ fn surface_valid(db: &Connection, s: &SurfaceDocument, _principal: &Principal) -
         {
             return Err(invalid("Only registered read-only job fields are bindable"));
         }
+        if binding.source.starts_with("broker:") {
+            if crate::presentation_sources::activity(db, &binding.source)?.as_deref()
+                != Some(s.activity_id.as_str())
+            {
+                return Err(error(
+                    "unauthorized",
+                    "Broker source is absent or belongs to another activity",
+                ));
+            }
+            continue;
+        }
         let id = binding
             .source
             .strip_prefix("job:")
@@ -671,6 +682,7 @@ pub fn init(db: &Connection) -> Result<()> {
         CREATE TABLE IF NOT EXISTS presentation_outputs(id TEXT PRIMARY KEY,width REAL NOT NULL,height REAL NOT NULL,connected INTEGER NOT NULL);
         CREATE TABLE IF NOT EXISTS presentation_actions(reference TEXT PRIMARY KEY,uid INTEGER NOT NULL,activity TEXT NOT NULL,revoked INTEGER NOT NULL DEFAULT 0);").map_err(db_error)?;
     crate::presentation_hosts::init(db)?;
+    crate::presentation_sources::init(db)?;
     crate::presentation_actions::init(db)
 }
 fn documents(db: &Connection) -> Result<BTreeMap<String, Document>> {
@@ -1183,6 +1195,9 @@ fn commit(
 pub fn handle(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> {
     match v["op"].as_str().unwrap_or("") {
         "catalog.get" => Ok(catalog()),
+        "source.publish" | "source.heartbeat" | "source.list" => {
+            crate::presentation_sources::handle(db, v, who)
+        }
         "host.renderer" => crate::presentation_hosts::renderer(db, v, who),
         "host.surface" => crate::presentation_hosts::register(db, v, who),
         "action.issue" | "action.revoke" | "action.metadata" | "action.status" => {
@@ -1375,6 +1390,13 @@ fn bindings(db: &Connection, v: &Value) -> Result<Value> {
         })
         .map_err(db_error)?;
     for (key, b) in &s.bindings {
+        if b.source.starts_with("broker:") {
+            values.insert(
+                key,
+                crate::presentation_sources::binding(db, &b.source, &s.activity_id, &b.path)?,
+            );
+            continue;
+        }
         let job = b
             .source
             .strip_prefix("job:")
@@ -1816,6 +1838,73 @@ mod tests {
         .unwrap();
         assert!(draft["draft"].is_null());
         assert_eq!(draft["draft_revision"], 2);
+    }
+    #[test]
+    fn broker_observations_are_scoped_monotonic_and_unwritable_by_presentation_clients() {
+        let mut db = fixture();
+        let root = Principal {
+            uid: 0,
+            session: "broker-fixture".into(),
+        };
+        let source = format!("broker:{}", "a".repeat(32));
+        let mut publication = json!({"op":"source.publish","source":source,"activity_id":"1","source_revision":0,"values":{"status":"running","exit_code":null,"error":null,"created_at":1,"finished_at":null}});
+        assert!(handle(&mut db, &publication, &agent())
+            .unwrap_err()
+            .contains("unauthorized"));
+        assert!(handle(&mut db, &publication, &human())
+            .unwrap_err()
+            .contains("unauthorized"));
+        handle(&mut db, &publication, &root).unwrap();
+        let mut doc = surface();
+        doc["bindings"] =
+            json!({"broker-state":{"source":source,"path":"/status","access":"read"}});
+        doc["elements"]["status"] =
+            json!({"type":"Status@1","props":{"value":{"binding":"broker-state"}}});
+        doc["elements"]["root"]["slots"]["children"]
+            .as_array_mut()
+            .unwrap()
+            .push(json!("status"));
+        let create = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"broker-source-view","expected_revisions":{"surface-a":null},"operations":[{"op":"surface.create","document":doc}]});
+        let mut foreign = create.clone();
+        foreign["operations"][0]["document"]["activity_id"] = json!("2");
+        assert!(handle(&mut db, &foreign, &human())
+            .unwrap_err()
+            .contains("unauthorized"));
+        handle(&mut db, &create, &human()).unwrap();
+        let read = json!({"op":"binding.snapshot","surface_id":"surface-a"});
+        assert_eq!(
+            handle(&mut db, &read, &human()).unwrap()["bindings"]["broker-state"]["value"],
+            "running"
+        );
+        publication["source_revision"] = json!(1);
+        publication["values"]["status"] = json!("failed");
+        handle(&mut db, &publication, &root).unwrap();
+        assert_eq!(
+            handle(&mut db, &read, &human()).unwrap()["bindings"]["broker-state"]["value"],
+            "failed"
+        );
+        publication["values"]["status"] = json!("succeeded");
+        assert!(handle(&mut db, &publication, &root)
+            .unwrap_err()
+            .contains("stale_revision"));
+        let binding = handle(&mut db, &read, &human()).unwrap();
+        assert_eq!(
+            binding["bindings"]["broker-state"]["availability"], "unavailable",
+            "A dead fixture publisher must not claim a live source"
+        );
+        // The source's metadata exposes only registered paths; stdin is never published.
+        assert_eq!(
+            handle(
+                &mut db,
+                &json!({"op":"source.list","activity_id":"1"}),
+                &agent()
+            )
+            .unwrap()["sources"][0]["paths"]
+                .as_array()
+                .unwrap()
+                .len(),
+            5
+        );
     }
     #[test]
     fn dead_host_connections_do_not_exhaust_capacity_or_inflate_live_snapshots() {

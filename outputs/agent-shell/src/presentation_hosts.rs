@@ -126,9 +126,14 @@ pub fn alive(session: &str) -> bool {
     std::fs::read_to_string(format!("/proc/{pid}/stat"))
         .ok()
         .and_then(|s| {
-            s.rsplit_once(')')
-                .and_then(|(_, tail)| tail.split_whitespace().nth(19))
-                .map(String::from)
+            s.rsplit_once(')').and_then(|(_, tail)| {
+                let fields = tail.split_whitespace().collect::<Vec<_>>();
+                if matches!(fields.first(), Some(&"Z") | Some(&"X")) {
+                    None
+                } else {
+                    fields.get(19).map(|s| s.to_string())
+                }
+            })
         })
         .map(|observed| observed == start)
         .unwrap_or(false)

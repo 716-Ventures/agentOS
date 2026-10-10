@@ -334,12 +334,19 @@ impl Surface {
         let scroll = gtk::ScrolledWindow::builder()
             .hscrollbar_policy(gtk::PolicyType::Never)
             .build();
+        let content = ui::column(0);
+        let provenance = ui::text("Agent view", false);
+        provenance.set_margin_start(24);
+        provenance.set_margin_top(8);
+        content.append(&provenance);
+        content.append(&scroll);
+        scroll.set_vexpand(true);
         let window = gtk::ApplicationWindow::builder()
             .application(app)
-            .title("agentOS surface")
+            .title("Agent view")
             .default_width(700)
             .default_height(500)
-            .child(&scroll)
+            .child(&content)
             .build();
         window.add_css_class("seven-ui");
         scroll.set_margin_top(24);
@@ -416,8 +423,10 @@ impl Surface {
             return;
         }
         if changed {
-            self.window
-                .set_title(Some(doc["title"].as_str().unwrap_or("Work")));
+            self.window.set_title(Some(&format!(
+                "Agent view · {}",
+                doc["title"].as_str().unwrap_or("Work")
+            )));
             for (element, node) in nodes {
                 if self
                     .elements

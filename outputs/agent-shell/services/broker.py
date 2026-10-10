@@ -3,6 +3,7 @@
 import json
 import select
 import terminal_sessions
+from source_publisher import BrokerSources
 import codecs
 import math
 import hashlib
@@ -25,6 +26,7 @@ WORK = Path('/var/lib/agent-os-workspaces')
 LOCK = threading.RLock()
 LIMIT = BROKER_OUTPUT_LIMIT
 JOBS = {}
+SOURCES = BrokerSources()
 
 
 def confident(value, threshold):
@@ -32,10 +34,16 @@ def confident(value, threshold):
 
 
 def persist(job):
+    job['source_revision']=job.get('source_revision',0)+1
     p = STATE / (job['id']+'.json')
     tmp = p.with_suffix('.tmp')
-    tmp.write_text(json.dumps(job, indent=2)+'\n')
+    with tmp.open('w') as stream:
+        os.fchmod(stream.fileno(),0o600);stream.write(json.dumps(job,indent=2)+'\n');stream.flush();os.fsync(stream.fileno())
     tmp.replace(p)
+    fd=os.open(STATE,os.O_RDONLY|os.O_DIRECTORY)
+    try:os.fsync(fd)
+    finally:os.close(fd)
+    SOURCES.mark(job)
 
 
 def workspace(activity):
@@ -420,10 +428,12 @@ def recover_jobs():
         recovered[job['id']] = job
     JOBS.clear()
     JOBS.update(recovered)
+    for job in recovered.values():SOURCES.mark(job)
 
 
 def main():
     recover_jobs()
+    SOURCES.start()
     def reap_terminals():
         while True:
             time.sleep(.5)

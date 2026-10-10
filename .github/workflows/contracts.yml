@@ -26,7 +26,9 @@ jobs:
           cargo +1.85.1 test --locked
           cargo +1.85.1 build --release --locked
       - name: Authenticated presentation and callback IPC
-        run: python3 tests/presentation_guest.py
+        run: |
+          python3 tests/presentation_guest.py
+          python3 tests/broker_sources_guest.py
 
   native:
     runs-on: ubuntu-24.04-arm

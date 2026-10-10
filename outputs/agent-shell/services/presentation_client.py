@@ -27,6 +27,7 @@ def for_activity(activity):
     state['documents']={key:doc for key,doc in state['documents'].items() if doc['activity_id']==str(activity)}
     state['host_surfaces']={key:host for key,host in state.get('host_surfaces',{}).items() if host.get('activity_id')==str(activity)}
     state['renderers']={key:owner for key,owner in state.get('renderers',{}).items() if key in state['documents']}
+    state['sources']=request('source.list',activity_id=str(activity))
     return state
 
 
