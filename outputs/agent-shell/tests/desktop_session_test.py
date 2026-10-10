@@ -36,3 +36,12 @@ class DesktopSession(unittest.TestCase):
         spawn.assert_called_once_with(command,env={'AGENT_OS_COMPOSITOR_BACKEND':'drm'},start_new_session=True)
         self.assertEqual(stop.call_args.args,(Path('/runtime'),(456,identity)))
         proc.wait.assert_called_once_with(timeout=5)
+
+    def test_reaping_never_signals_a_child_that_was_already_reaped(self):
+        def wait(pid,options):return (pid,0) if pid==123 or options==0 else (0,0)
+        identity=('start',os.getpid(),os.getuid(),Path('/runtime/renderer'))
+        with patch.object(session.Path,'read_text',return_value='123 456'),patch.object(session.os,'waitpid',side_effect=wait),patch.object(session,'process_identity',return_value=identity),patch.object(session.os,'getpgid',return_value=456),patch.object(session.os,'killpg') as kill,patch.object(session.time,'monotonic',side_effect=[0,4]):
+            session.reap_session_children()
+        self.assertEqual(kill.call_args_list[0].args,(456,session.signal.SIGTERM))
+        self.assertEqual(kill.call_args_list[1].args,(456,session.signal.SIGKILL))
+        self.assertTrue(all(call.args[0]!=123 for call in kill.call_args_list))

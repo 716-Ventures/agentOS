@@ -51,7 +51,8 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
          'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','G_DEBUG':'fatal-criticals'}
     env.pop('WAYLAND_DISPLAY',None);env.pop('DISPLAY',None)
     host_failure='--host-failure' in sys.argv
-    with (OUTPUT/('session-host-failure.log' if host_failure else 'session.log')).open('w') as log:
+    compositor_failure='--compositor-failure' in sys.argv
+    with (OUTPUT/('session-compositor-failure.log' if compositor_failure else 'session-host-failure.log' if host_failure else 'session.log')).open('w') as log:
         core=subprocess.Popen([str(ROOT.parent/'agent-shell/target/release/agent-os-core')],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
         session=None;owned=[]
         try:
@@ -62,7 +63,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
             session=subprocess.Popen(['python3',str(ROOT.parent/'agent-shell/services/desktop_session.py'),'--backend','headless','--pixman','--bin-dir',str(bins),'--socket',str(endpoint)],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
             pidfile=wait_for(lambda:next(runtime.glob('agentos-session-*/compositor.pid'),None),[core,session])
             compositor=int(wait_for(lambda:pidfile.read_text().strip(),[core,session]));owned.append(compositor)
-            control=runtime/f'agentos-compositor-{compositor}.sock'
+            control=pidfile.parent/f'agentos-compositor-{compositor}.sock'
             wait_for(control.exists,[core,session])
             state=wait_for(lambda:(lambda s:s if s.get('shared') and 'session-fixture' in s['shared']['identities'].values() else None)(call(control,{'op':'snapshot'})),[core,session])
             assert any(w['app_id'].startswith('agentos.surface.') for w in state['windows']),state
@@ -71,25 +72,28 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 if not proc.name.isdigit() or int(proc.name)==core.pid:continue
                 try:values=(proc/'environ').read_bytes().split(b'\0')
                 except (PermissionError,FileNotFoundError,ProcessLookupError):continue
-                if ('XDG_RUNTIME_DIR='+str(runtime)).encode() in values:owned.append(int(proc.name))
-            if host_failure:
+                if any(value==('XDG_RUNTIME_DIR='+str(runtime)).encode() or value.startswith(('XDG_RUNTIME_DIR='+str(runtime)+'/agentos-session-').encode()) for value in values):owned.append(int(proc.name))
+            if compositor_failure:
+                os.kill(compositor,signal.SIGKILL)
+            elif host_failure:
                 # Simulate display-host loss, rather than the ordinary logout path.
                 host=int(Path(f'/proc/{session.pid}/task/{session.pid}/children').read_text().split()[0])
                 os.kill(host,signal.SIGTERM)
             else:session.terminate()
-            assert session.wait(timeout=20)==0
+            exit_code=session.wait(timeout=20)
+            assert exit_code>=0 if compositor_failure else exit_code==0
             remaining=lambda:[pid for pid in owned if alive(pid)]
             try:wait_for(lambda:not remaining(),[core],timeout=5)
             except AssertionError:raise AssertionError('Session processes survived shutdown: '+str({pid:Path(f'/proc/{pid}/cmdline').read_bytes().replace(bytes([0]),b' ') for pid in remaining()}))
             assert not control.exists(),'Compositor socket leaked'
             assert not list(runtime.glob('agentos-session-*')),'Session directory leaked'
-            print('PASS: '+('display-host loss' if host_failure else 'normal session')+' maps authenticated surfaces and reaps display host, compositor and renderer')
+            print('PASS: '+('abrupt compositor loss' if compositor_failure else 'display-host loss' if host_failure else 'normal session')+' maps authenticated surfaces and reaps display host, compositor and renderer')
         finally:
             if session:reap(session)
             for pid in owned:
                 try:
                     values=Path(f'/proc/{pid}/environ').read_bytes().split(b'\0')
-                    if ('XDG_RUNTIME_DIR='+str(runtime)).encode() in values and alive(pid):
+                    if any(value==('XDG_RUNTIME_DIR='+str(runtime)).encode() or value.startswith(('XDG_RUNTIME_DIR='+str(runtime)+'/agentos-session-').encode()) for value in values) and alive(pid):
                         if os.getpgid(pid)==pid:os.killpg(pid,signal.SIGKILL)
                         else:os.kill(pid,signal.SIGKILL)
                 except (FileNotFoundError,ProcessLookupError,PermissionError):pass

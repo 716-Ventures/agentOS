@@ -100,6 +100,7 @@ jobs:
         run: |
           dbus-run-session -- python3 outputs/native-shell/tests/native_session.py
           dbus-run-session -- python3 outputs/native-shell/tests/native_session.py --host-failure
+          dbus-run-session -- python3 outputs/native-shell/tests/native_session.py --compositor-failure
           python3 outputs/agent-shell/tests/graphical_release.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

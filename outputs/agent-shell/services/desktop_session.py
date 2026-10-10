@@ -63,6 +63,47 @@ def stop_compositor(runtime,owned):
         while process_identity(ident) is not None and time.monotonic()<deadline:time.sleep(.05)
     if process_identity(ident) is not None:raise RuntimeError('Owned compositor failed to stop')
 
+def enable_subreaper():
+    # Adopt renderer grandchildren after compositor/display-host failure so this
+    # login can reap them instead of leaving cleanup to the system init process.
+    import ctypes
+    libc=ctypes.CDLL(None,use_errno=True)
+    if libc.prctl(36,1,0,0,0)!=0:raise OSError(ctypes.get_errno(),'Cannot establish session child ownership')
+
+
+def reap_session_children():
+    children=Path(f'/proc/{os.getpid()}/task/{os.getpid()}/children')
+    try:pids=[int(p) for p in children.read_text().split()]
+    except FileNotFoundError:return
+    pending=[]
+    for pid in pids:
+        try:
+            waited,_=os.waitpid(pid,os.WNOHANG)
+            if waited:continue
+            identity=process_identity(pid)
+            if identity and identity[1]==os.getpid() and identity[2]==os.getuid():
+                group=os.getpgid(pid)==pid
+                (os.killpg if group else os.kill)(pid,signal.SIGTERM)
+                pending.append((pid,group))
+        except (ChildProcessError,ProcessLookupError):pass
+    deadline=time.monotonic()+3
+    while pending and time.monotonic()<deadline:
+        remaining=[]
+        for pid,group in pending:
+            try:
+                waited,_=os.waitpid(pid,os.WNOHANG)
+                if not waited:remaining.append((pid,group))
+            except ChildProcessError:pass
+        pending=remaining
+        if pending:time.sleep(.05)
+    for pid,group in pending:
+        try:
+            # An unreaped child keeps its PID reserved, including after exit.
+            (os.killpg if group else os.kill)(pid,signal.SIGKILL)
+            os.waitpid(pid,0)
+        except (ChildProcessError,ProcessLookupError):pass
+
+
 def direct_session(command,env,runtime,stopped):
     """Own the direct compositor; its renderer remains the compositor's child."""
     proc=None;owned=None
@@ -96,6 +137,7 @@ def main():
     args=parser.parse_args()
     if args.backend=='direct' and args.pixman:raise ValueError('The direct backend requires GBM/GLES; pixman is a Weston host option')
     runtime=runtime_directory();command=child_command(args.bin_dir,args.socket)
+    enable_subreaper()
     env={**os.environ,'XDG_SESSION_TYPE':'wayland','XDG_CURRENT_DESKTOP':'agentOS','DESKTOP_SESSION':'agent-os',
          'AGENT_OS_COMPOSITOR_CORE':str(args.socket),'AGENT_OS_COMPOSITOR_BACKEND':'winit','WINIT_UNIX_BACKEND':'wayland','GDK_BACKEND':'wayland'}
     stopped=False
@@ -103,11 +145,12 @@ def main():
         nonlocal stopped
         stopped=True
     previous={sig:signal.signal(sig,stop) for sig in (signal.SIGINT,signal.SIGTERM)}
-    proc=None;owned=None
+    proc=None;owned=None;display_runtime=runtime
     try:
-        if args.backend=='direct':return direct_session(command,env,runtime,lambda:stopped)
         with tempfile.TemporaryDirectory(prefix='agentos-session-',dir=runtime) as directory:
-            root=Path(directory);child=root/'desktop-child';pidfile=root/'compositor.pid'
+            root=Path(directory);display_runtime=root;env['XDG_RUNTIME_DIR']=str(root)
+            if args.backend=='direct':return direct_session(command,env,root,lambda:stopped)
+            child=root/'desktop-child';pidfile=root/'compositor.pid'
             script = "#!/bin/sh\nprintf '%s\\n' \"$$\" > " + shlex.quote(str(pidfile)) + "\nexec " + shlex.join(command) + "\n"
             child.write_text(script);child.chmod(0o700)
             config=root/'weston.ini';config.write_text(configuration(child,args.backend))
@@ -124,19 +167,20 @@ def main():
                 time.sleep(.05)
             # Weston starts autolaunched clients in separate process groups. Bind
             # ownership to its direct child and Linux start identity, not its pgid.
-            stop_compositor(runtime,owned)
+            stop_compositor(display_runtime,owned)
             if proc.poll() is None:
                 try:proc.wait(timeout=5)
                 except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGTERM)
             try:return proc.wait(timeout=5)
             except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);return proc.wait(timeout=5)
     finally:
-        try:stop_compositor(runtime,owned)
+        try:stop_compositor(display_runtime,owned)
         finally:
             if proc and proc.poll() is None:
                 os.killpg(proc.pid,signal.SIGTERM)
                 try:proc.wait(timeout=5)
                 except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait(timeout=5)
+            reap_session_children()
             for sig,handler in previous.items():signal.signal(sig,handler)
 
 
