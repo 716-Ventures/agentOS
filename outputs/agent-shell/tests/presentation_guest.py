@@ -195,6 +195,20 @@ def main():
             print('PASS: terminal shared projection, lease-owned edit/commit and actual opaque output callback')
             print('PASS: typed edited callback parameters, actual bounded Unicode output, idempotency and stale-form rejection')
             print('PASS: host-issued stop action, actual process cancellation, idempotent callback receipt, forged actor rejection, revocation')
+            import document_files
+            import_path=root/'document-input.txt';import_path.write_bytes('Original λ\n日本語\r\n'.encode())
+            opened=document_files.publish(terminal_request,activity,import_path)
+            shared=ok({'op':'presentation.get','document_id':opened['surface_id']})
+            answers=iter(['Edited λ','日本語','.','s'])
+            presentation_view.edit(terminal_request,shared,'editor',lambda _:next(answers),lambda _:None)
+            shared=ok({'op':'presentation.get','document_id':opened['surface_id']})
+            exported=root/'document-export.txt'
+            document_files.export(terminal_request,opened['surface_id'],exported,shared['revision'])
+            assert exported.read_bytes()=='Edited λ\n日本語'.encode()
+            assert import_path.read_bytes()=='Original λ\n日本語\r\n'.encode()
+            stop(proc);proc=None;Path(endpoint).unlink(missing_ok=True);proc=start()
+            assert ok({'op':'presentation.get','document_id':opened['surface_id']})==shared
+            print('PASS: strict UTF-8 document import, human edit/save, exclusive export and core restart persistence')
             print('PASS: presentation IPC principals, atomic receipts, two clients, draft recovery, ordered changes, undo')
         finally:
             if proc:stop(proc)

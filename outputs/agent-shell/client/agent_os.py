@@ -1103,6 +1103,11 @@ def main():
     c=sub.add_parser('voice',help='Transcribe a 16 kHz mono PCM WAV locally; output is for review, never submitted')
     c.add_argument('--file',required=True)
     sub.add_parser('models', help='Read model configuration and measured usage as JSON')
+    c=sub.add_parser('document',help='Import a UTF-8 shared document or export a saved revision to a new file')
+    dc=c.add_subparsers(dest='document_command',required=True)
+    c=dc.add_parser('read');c.add_argument('path')
+    c=dc.add_parser('import');c.add_argument('activity',type=int);c.add_argument('path')
+    c=dc.add_parser('export');c.add_argument('surface');c.add_argument('path');c.add_argument('--revision',type=int,required=True)
     c=sub.add_parser('image',help='Import a bounded PNG as a private native image view');c.add_argument('activity',type=int);c.add_argument('path');c.add_argument('--label')
     c=sub.add_parser('views',help='Inspect and control shared presentation views from the terminal');c.add_argument('activity',type=int);c.add_argument('--text',action='store_true')
     c=sub.add_parser('disk');c.add_argument('activity',type=int)
@@ -1134,6 +1139,11 @@ def main():
         sys.path.insert(0,'/usr/local/lib/agent-os/services')
         from presentation_client import request as presentation_request
         result=presentation_request(op,**payload)
+    elif args.cmd=='document':
+        import document_files
+        if args.document_command=='read':result=document_files.read(args.path)
+        elif args.document_command=='import':result=document_files.publish(request,args.activity,args.path)
+        else:result=document_files.export(request,args.surface,args.path,args.revision)
     elif args.cmd=='image':
         import image_resources
         result=image_resources.publish(request,args.activity,args.path,args.label)

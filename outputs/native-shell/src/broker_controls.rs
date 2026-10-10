@@ -100,11 +100,22 @@ fn privileged(operation: &str, id: &str, stop: Arc<AtomicBool>) -> Result<Value,
     if !matches!(operation, "approve" | "input") {
         return Err("Unsupported broker review operation".into());
     }
+    run_helper(
+        "/usr/bin/sudo",
+        &["-n", "/usr/local/bin/agent-os-broker", operation, id],
+        stop,
+    )
+}
+pub(crate) fn run_helper(
+    program: &str,
+    args: &[&str],
+    stop: Arc<AtomicBool>,
+) -> Result<Value, String> {
     if stop.load(Ordering::Relaxed) {
-        return Err("Broker review cancelled before dispatch".into());
+        return Err("Local action cancelled before dispatch".into());
     }
-    let mut child = Command::new("/usr/bin/sudo")
-        .args(["-n", "/usr/local/bin/agent-os-broker", operation, id])
+    let mut child = Command::new(program)
+        .args(args)
         .stdin(Stdio::null())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
@@ -137,17 +148,17 @@ fn privileged(operation: &str, id: &str, stop: Arc<AtomicBool>) -> Result<Value,
             let _ = child.kill();
             let _ = child.wait();
             break Err(
-                "Broker review acknowledgement unavailable; inspect the existing job before retrying"
+                "Local action acknowledgement unavailable; inspect the existing job before retrying"
                     .into(),
             );
         }
         thread::sleep(Duration::from_millis(20));
     };
-    let (read, bytes) = out.join().map_err(|_| "Broker review output unavailable")?;
-    let (_, errors) = err.join().map_err(|_| "Broker review error unavailable")?;
+    let (read, bytes) = out.join().map_err(|_| "Local action output unavailable")?;
+    let (_, errors) = err.join().map_err(|_| "Local action error unavailable")?;
     if !status?.success() {
         return Err(format!(
-            "Broker review failed: {}",
+            "Local action failed: {}",
             String::from_utf8_lossy(&errors)
                 .chars()
                 .take(2000)
@@ -156,7 +167,7 @@ fn privileged(operation: &str, id: &str, stop: Arc<AtomicBool>) -> Result<Value,
     }
     read.map_err(|e| e.to_string())?;
     if bytes.len() > 1024 * 1024 {
-        return Err("Broker review response exceeded its limit".into());
+        return Err("Local action response exceeded its limit".into());
     }
     serde_json::from_slice(&bytes).map_err(|e| e.to_string())
 }

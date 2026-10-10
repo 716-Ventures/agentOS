@@ -96,6 +96,15 @@ pub enum Command {
     Attach(Value),
     EmbedTerminal(Value),
     OpenTerminal,
+    ImportDocument {
+        activity: String,
+        path: PathBuf,
+    },
+    ExportDocument {
+        surface: String,
+        revision: u64,
+        path: PathBuf,
+    },
     PageOutput(i8),
     FollowOutput(bool),
     FreezeOutput(u64),
@@ -302,6 +311,22 @@ fn run(
                     Command::Preferences(value)=>super::preferences::save(&value),
                     Command::Setup=>std::process::Command::new("weston-terminal").args(["--shell","/usr/local/bin/agent-os-setup"]).spawn().map(|mut child|{std::thread::spawn(move||{let _=child.wait();});json!({"status":"Setup opened"})}).map_err(|e|e.to_string()),
                     Command::SelectActivity(id)=>{activity=Some(id);Ok(json!({"status":"Activity selected"}))},
+                    Command::ImportDocument{activity:id,path}=>{
+                        let current=frame.lock().unwrap().clone();
+                        if current.activity.as_deref()!=Some(id.as_str()){Err("Activity changed; choose the file again".into())}else{
+                            path.to_str().ok_or("File path must be UTF-8".into()).and_then(|path|super::broker_controls::run_helper("/usr/local/bin/agent-os", &["document","read",path],stop.clone())).and_then(|loaded|{
+                                let surface=format!("document-{}",super::nonce());
+                                let doc=json!({"protocol":"agentos.presentation/1","catalog_revision":"native-core/1","surface_id":surface,"activity_id":id,"revision":0,"title":loaded["title"],"root":"editor","elements":{"editor":{"type":"DocumentEditor@1","props":{"label":loaded["title"],"value":loaded["content"]}}},"bindings":{},"actions":{}});
+                                open_surface(&socket,&current,doc)
+                            })
+                        }
+                    },
+                    Command::ExportDocument{surface,revision,path}=>{
+                        flush(&socket,&drafts,&frame,&stop);
+                        if drafts.lock().unwrap().iter().any(|((id,_),draft)|id==&surface && draft.dirty){Err("Save or discard the local draft before exporting".into())}else{
+                            path.to_str().ok_or("File path must be UTF-8".into()).and_then(|path|super::broker_controls::run_helper("/usr/local/bin/agent-os", &["document","export",&surface,path,"--revision",&revision.to_string()],stop.clone()))
+                        }
+                    },
                     Command::CreateDocument=>{let current=frame.lock().unwrap().clone();create_document(&socket,&current)},
                     Command::CreateActivity(name)=>request(&socket,&json!({"op":"create","name":name})).map(|created|{activity=Some(created["id"].to_string());created}),
                     Command::Ask{activity,prompt,grounding}=>{

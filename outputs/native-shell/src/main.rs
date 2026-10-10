@@ -3,6 +3,7 @@ mod action_parameters;
 mod broker_controls;
 mod broker_pages;
 mod controls;
+mod document_dialog;
 mod draft_cache;
 mod first_run;
 mod job_list;
@@ -455,6 +456,25 @@ fn construct(
                     }
                 });
                 draft_controls(&widget, surface, id, commands, &events);
+                if kind == "DocumentEditor@1" {
+                    let button =
+                        ui::button("Export saved document…", ButtonVariant::Outline, false);
+                    let (sender, s, state) =
+                        (commands.clone(), surface.to_string(), events.clone());
+                    button.connect_clicked(move |button| {
+                        let parent = button
+                            .root()
+                            .and_then(|root| root.downcast::<gtk::Window>().ok());
+                        document_dialog::choose(
+                            parent.as_ref(),
+                            Some((s.clone(), state.borrow()["revision"].as_u64().unwrap_or(0))),
+                            None,
+                            sender.clone(),
+                        );
+                    });
+                    // Keep Save/Discard as the last toolbar for keyboard traversal and verification.
+                    widget.insert_child_after(&button, None::<&gtk::Widget>);
+                }
                 result.widget = widget.clone().upcast();
                 if kind == "DocumentEditor@1" {
                     lease(&widget.upcast(), surface, id, commands);

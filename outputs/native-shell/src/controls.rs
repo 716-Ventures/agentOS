@@ -29,6 +29,7 @@ pub struct Controls {
     review_ready: bool,
     request_field: TextField,
     new_document: gtk::Button,
+    import_document: gtk::Button,
     workspace: workspace_controls::WorkspaceControls,
 }
 impl Controls {
@@ -59,6 +60,8 @@ impl Controls {
             let _ = sender.send(Command::CreateDocument);
         });
         widget.append(&new_document);
+        let import_document = ui::button("Import text file…", ButtonVariant::Outline, false);
+        widget.append(&import_document);
         let shortcuts=gtk::Expander::builder().label("Desktop keyboard shortcuts").child(&ui::text("Ctrl+Alt+Tab: next view (Shift: previous)\nCtrl+Alt+F10: maximize · F9: restore · F8: float\nCtrl+Alt+Arrow: move · Shift+Arrow: resize\nCtrl+Alt+PageUp/PageDown: pan oversized view (Shift: horizontal)\nCtrl+Alt+Delete: close view · Ctrl+Alt+Z: undo arrangement\nSplit, swap and pin controls are available under Arrange workspace in Agent Monitor.",true)).build();
         widget.append(&shortcuts);
         let appearance = gtk::DropDown::from_strings(&["Dark", "Light"]);
@@ -331,6 +334,19 @@ impl Controls {
             window.set_visible(false);
             glib::Propagation::Stop
         });
+        let import_activity = activity.clone();
+        let import_sender = commands.clone();
+        import_document.connect_clicked(move |button| {
+            let parent = button
+                .root()
+                .and_then(|root| root.downcast::<gtk::Window>().ok());
+            document_dialog::choose(
+                parent.as_ref(),
+                None,
+                import_activity.borrow().clone(),
+                import_sender.clone(),
+            );
+        });
         Self {
             widget,
             activity,
@@ -360,6 +376,7 @@ impl Controls {
             review_ready: false,
             request_field: request,
             new_document,
+            import_document,
             workspace,
         }
     }
@@ -443,6 +460,8 @@ impl Controls {
         self.monitor.present();
     }
     pub fn update(&mut self, frame: &Frame, _commands: &Sender<Command>) {
+        self.import_document
+            .set_sensitive(frame.connected && frame.activity.is_some());
         self.new_document
             .set_sensitive(frame.connected && frame.activity.is_some());
         *self.activity.borrow_mut() = frame.activity.clone();
