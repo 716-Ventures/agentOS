@@ -22,6 +22,7 @@ def graphical_checks():
         'cargo test --locked --manifest-path native-compositor/Cargo.toml && '
         'cargo build --locked --manifest-path native-compositor/Cargo.toml',900),
         ('native-broker-pty','python3 native-shell/tests/pty_broker.py',90),
+        ('native-installed-broker','dbus-run-session -- python3 native-shell/tests/installed_broker.py',120),
         ('direct-backend-cleanup','python3 native-shell/tests/direct_backend.py',30)]
     for appearance in ('light','dark'):
         for scale in (1,2):

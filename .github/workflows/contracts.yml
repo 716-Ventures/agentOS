@@ -118,6 +118,8 @@ jobs:
           dbus-run-session -- python3 outputs/native-shell/tests/native_session.py --compositor-failure
           python3 outputs/agent-shell/tests/graphical_release.py
           python3 outputs/agent-shell/tests/deployed_graphics.py
+      - name: Installed native approval journey against systemd broker
+        run: sudo env "PATH=$PATH" "CARGO_HOME=$HOME/.cargo" "RUSTUP_HOME=$HOME/.rustup" GITHUB_ACTIONS=true RUSTUP_TOOLCHAIN=1.85.1 python3 outputs/agent-shell/tests/installed_native_ci.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
