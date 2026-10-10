@@ -1,5 +1,5 @@
 {
-  "verified_at": "2026-10-10T15:05:34.961820+00:00",
+  "verified_at": "2026-10-10T17:11:53.596535+00:00",
   "result": "pass",
   "image": {
     "architecture": "arm64",
@@ -20,33 +20,42 @@
       "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
       "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
     },
-    "image_sha256": "37bf19060fafdad05e3a00fa83757cf529b044c339fd21560d0b771bb5186735",
+    "image_sha256": "20628f0fac94fa4bbb39de58de2c41c9d31aa6db2650f53513212f9c5921afb6",
     "name": "agentOS experimental native image",
-    "runtime_release": "6f78f2a88bd9879bb6bf6b8acdffedb34bad04588ead50945bacc81a4a4b8d44",
+    "runtime_release": "1718e4cbe02487a2d9276848b65b47a06d36a8adcc85ea4078b0a6a65b5f0f8b",
     "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
     "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
   },
   "signing_authority": "Development Ed25519 key; not a production release authority",
   "checks": [
-    "new disk from checksum-pinned upstream base; no running VM export",
+    "new checksum-pinned base disk; no running development disk export",
     "qemu-img integrity",
     "signed image and exact UTM configuration verification",
-    "cold boot with fresh UEFI variables and no development seed",
-    "console account creation and password-protected sudo",
-    "manifest-verified runtime activation; six healthy services",
+    "fresh EFI; actual guest block inventory confirms one disk and no development seed",
+    "local console account creation and password-protected sudo",
+    "baseline runtime activation and six healthy services",
     "standalone DHCP and HTTPS",
-    "foundation status and boot history",
-    "direct KMS frames and VT switch/resume",
-    "kernel/libinput keyboard and pointer; clipboard; undo/redo; exact draft and deliberate Save",
-    "offline speech recognition, zero signal rejection and capture ownership/cleanup",
-    "account, activity and file persistence through reboot",
-    "cold boot with no network adapter; all six services healthy",
+    "signed update staging leaves current release unchanged",
+    "signed update activation and rollback preserve activity and file",
+    "updated runtime direct KMS, keyboard/pointer, VT, move/resize/undo, close/restore, primary paste and Unicode COPY/oversized DND",
+    "updated runtime real CPU speech recognition, zero-signal rejection, owner-bound capture and recorder cleanup",
+    "updated runtime account/activity/file/service persistence through reboot",
+    "actual no-network cold boot: only lo, six healthy services",
     "real activation failure retains setup journal",
     "TTY 2 rescue remains active",
     "resume preserves account UID and password",
     "ready only after healthy activation",
-    "all six services recover without models or network"
+    "all six services recover without models or network",
+    "latest signed runtime can reactivate offline after setup recovery",
+    "qualification-only SSH key and sudo authority removed; development disk/config/EFI restored; VM stopped and owned UTM app closed",
+    "original signed distribution remains unbooted"
   ],
+  "updated_runtime": {
+    "release": "3ebc478291575d588f89c5349397c930093233a51eb45c8892611cb38bebdc1f",
+    "signed_bundle_sha256": "ede34e9cebebf6f393383ef7933c134aa37e215afb2155717abb8a06d91b25ad",
+    "source_revision": "bae63caf11cced8ccfa7a5ed9f70dd5d107f0b79",
+    "probe_revision": "8076e475341e3a38e5809681c26d974cb8584010"
+  },
   "not_tested": [
     "production signing/distribution authority",
     "physical host input or real IME engine",
