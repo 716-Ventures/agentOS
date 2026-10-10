@@ -55,3 +55,27 @@ jobs:
         with:
           name: native-desktop-arm64
           path: outputs/native-shell/test-output/
+
+  compositor:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Wayland dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libwayland-dev libxkbcommon-dev libudev-dev libinput-dev libgbm-dev libegl1-mesa-dev libgles2-mesa-dev libseat-dev weston dbus-x11 libgtk-4-dev fonts-inter fonts-noto-cjk at-spi2-core mesa-utils
+          rustup toolchain install 1.85.1 --profile minimal
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            outputs/native-compositor/target
+          key: compositor-arm64-rust185-${{ hashFiles('outputs/native-compositor/Cargo.lock') }}
+      - name: Build and policy tests
+        run: |
+          cargo +1.85.1 test --locked --manifest-path outputs/native-compositor/Cargo.toml
+          cargo +1.85.1 build --locked --manifest-path outputs/native-compositor/Cargo.toml

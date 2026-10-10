@@ -1,0 +1,26 @@
+[package]
+name = "agent-os-compositor"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+license = "Apache-2.0 AND MIT"
+
+[dependencies]
+tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
+bitflags = "2.2.1"
+serde = {version="1",features=["derive"]}
+serde_json = "1"
+libc = "0.2"
+
+[dependencies.smithay]
+git = "https://github.com/Smithay/smithay"
+rev = "f85d06a4629795f5008b573f6b48606db9ff6d71"
+default-features = false
+features = [
+    "backend_winit",
+    "wayland_frontend",
+    "desktop",
+]
+
+[profile.dev]
+debug = 0

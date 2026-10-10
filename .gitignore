@@ -20,3 +20,6 @@ node_modules/
 
 outputs/native-shell/target/
 outputs/native-shell/test-output/
+
+outputs/native-compositor/target/
+outputs/native-compositor/test-output/
