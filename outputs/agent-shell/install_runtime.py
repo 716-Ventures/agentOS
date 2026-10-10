@@ -18,7 +18,7 @@ import tempfile
 import time
 
 SOURCE=Path(__file__).resolve().parent
-UNITS=['agent-os-core','agent-os-layout','agent-os-disk','agent-os-broker','agent-os-ai']
+UNITS=['agent-os-core','agent-os-layout','agent-os-disk','agent-os-broker','agent-os-ai','agent-os-voice']
 
 
 def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -52,11 +52,12 @@ class Installer:
 
     def stage(self,source):
         files={'agent-os-core':source/'target/release/agent-os-core'}
-        for pattern in ('services/*.py','services/*-launcher.sh','systemd/*.service','client/agent_os.py'):
+        for pattern in ('services/*.py','services/*-launcher.sh','systemd/*.service','client/*.py'):
             files.update({str(p.relative_to(source)):p for p in sorted(source.glob(pattern))})
         for name in ('Cargo.lock','Cargo.toml','dependencies.json','install_runtime.py'):
             files[name]=source/name
         files['dependencies.installed.json']=self.state/'dependencies.json'
+        files['voice-assets.json']=self.state/'voice.json'
         for name,path in files.items():
             if name.endswith('.py'):ast.parse(path.read_bytes(),filename=name)
         binary=files['agent-os-core'].read_bytes()
@@ -107,7 +108,7 @@ class Installer:
     def accounts(self):
         for group in ('agentos','agentos-ai','agentos-broker'):
             self.run(['groupadd','--system','-f',group])
-        for name,group,home in (('agentos','agentos','runtime'),('agentos-layout','agentos','layout'),('agentos-ai','agentos-ai','ai')):
+        for name,group,home in (('agentos','agentos','runtime'),('agentos-layout','agentos','layout'),('agentos-ai','agentos-ai','ai'),('agentos-voice','agentos','voice')):
             try:pwd.getpwnam(name)
             except KeyError:self.run(['useradd','--system','--gid',group,'--home-dir','/var/lib/agent-os-'+home,'--shell','/usr/sbin/nologin',name])
         self.run(['usermod','-a','-G','agentos,agentos-broker','developer'])
@@ -117,7 +118,7 @@ class Installer:
     def health(self):
         deadline=time.monotonic()+30
         sockets=['/run/agent-os/runtime.sock','/run/agent-os-layout/api.sock','/run/agent-os-broker/api.sock',
-                 '/run/agent-os-ai/api.sock','/run/agent-os-disk/api.sock']
+                 '/run/agent-os-ai/api.sock','/run/agent-os-disk/api.sock','/run/agent-os-voice/api.sock']
         while time.monotonic()<deadline:
             states=subprocess.run(['systemctl','is-active',*UNITS],capture_output=True,text=True).stdout.splitlines()
             active=states==['active']*len(UNITS)
@@ -163,7 +164,7 @@ class Installer:
         metadata=self.path('/etc/agent-os/release.json')
         info=json.loads(metadata.read_text())
         info.update(version='0.6.0',milestone='Interactive terminal sessions',runtime_release=ident,
-                    agent_runtime='Gateway agent with general execution and filesystem broker; Jev typed effect advisory',voice='not implemented')
+                    agent_runtime='Gateway agent with general execution and filesystem broker; Jev typed effect advisory',voice='Offline English recognition and reviewed microphone input')
         atomic_write(metadata,(json.dumps(info,indent=2)+'\n').encode())
         atomic_write(self.path('/etc/motd'),b'\nAgent OS 0.6 | Interactive terminal sessions\n\n  agent-os          Open the terminal environment\n  agent-os-status   Inspect the Linux foundation\n  sudo agent-os-configure   Set up providers\n\nOrdinary Linux shell and sudo remain available for recovery.\n\n')
         transaction.update(phase='complete',completed_at=time.time());self.record(transaction)

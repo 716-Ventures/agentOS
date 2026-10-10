@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """Terminal client and scriptable interface for the Agent OS environment core."""
 import argparse
+import atexit
 import base64
 import select
 import termios
@@ -18,6 +19,8 @@ import textwrap
 import sys
 import time
 import unicodedata
+sys.path.insert(0,str(Path(__file__).resolve().parent))
+from voice_input import VoiceInput, from_file as voice_from_file
 from urllib.parse import urlsplit
 
 SOCKET = os.environ.get('AGENT_OS_SOCKET', '/run/agent-os/runtime.sock')
@@ -493,6 +496,8 @@ def dashboard(screen):
     broker_jobs=[];broker_error='';attention=[]
     rail_focus=False
     models_open=False;models_scroll=0;models_focus=False
+    voice=VoiceInput()
+    atexit.register(voice.cancel)
 
     def save():
         nonlocal dirty,last_save
@@ -584,7 +589,7 @@ def dashboard(screen):
         nonlocal menu,menu_index
         menu={'kind':kind,'items':items};menu_index=0
 
-    actions=[('models','Models and usage','p'),('ask','Reply to Agent','Enter / a'),('run','Run a command','r'),('terminal','New interactive terminal','R'),('attach','Attach selected terminal / review approval','I'),('split_x','Split side by side','v'),
+    actions=[('voice','Record / finish / review voice input','V'),('models','Models and usage','p'),('ask','Reply to Agent','Enter / a'),('run','Run a command','r'),('terminal','New interactive terminal','R'),('attach','Attach selected terminal / review approval','I'),('split_x','Split side by side','v'),
              ('split_y','Split top / bottom','s'),('jobs','Choose work for this tile','o'),
              ('view','Change tile view','t'),('zoom','Maximize / restore tile','z'),('grow','Grow tile','+'),
              ('shrink','Shrink tile','−'),('swap','Swap with next tile','m'),('close','Close tile; keep work running','w'),
@@ -592,10 +597,31 @@ def dashboard(screen):
              ('mouse','Toggle mouse controls / text selection','M'),('theme','Switch light / dark theme','T'),('new','New activity','n'),('disk','Inspect disk usage','i'),('stop','Stop selected job','x'),('broker_stop','Stop or reject any active work','X'),('activity_stop','Stop all work in this activity','Y')]
 
     def action(name):
-        nonlocal focus,zoom,sidebar,dirty,menu,theme,rail_focus,mouse_enabled,models_open,models_scroll,models_focus
+        nonlocal focus,zoom,sidebar,dirty,menu,theme,rail_focus,mouse_enabled,models_open,models_scroll,models_focus,editor,cursor
         if name=='models':
             models_open=not models_open;models_focus=models_open;models_scroll=0;return
         pane=selected();layout=current()
+        if name=='voice':
+            status=voice.snapshot()
+            if status['state']=='recording':voice.finish();return
+            if status['state']=='review':
+                frozen=status['context']
+                if activity!=frozen['activity_id']:switch(frozen['activity_id'])
+                if current() is None or frozen['surface_id'] not in [p['id'] for p in leaves(current()['tree'])]:
+                    voice.cancel();raise ValueError('The referenced tile was closed; record a new request with the intended context')
+                mutate('focus',surface_id=frozen['surface_id'])
+                result=voice.consume();transcript=result['result'].get('text','')
+                if not transcript:notify('No speech signal detected. Check the microphone and try again.');return
+                ask_input('ask');editor['text']=transcript;editor['grounding']=frozen
+                cursor=len(transcript);return
+            if status['state']!='idle':return
+            if not activity:switch(request('create',name='Conversation')['id'])
+            pane=selected();title,body,job=pane_text(pane)
+            generation=broker_request('activity_state',activity=activity)['generation']
+            voice.start({'activity_id':activity,'surface_id':pane['id'],'layout_revision':current()['revision'],
+                         'job_ref':pane.get('job'),'selection':body.encode('utf-8')[-8000:].decode('utf-8','ignore'),
+                         'selection_kind':'focused_output','surface_title':str(title)[:200],'expected_generation':generation})
+            return
         if name=='mouse':
             mouse_enabled=not mouse_enabled
             curses.mousemask(curses.ALL_MOUSE_EVENTS if mouse_enabled else 0)
@@ -714,18 +740,26 @@ def dashboard(screen):
         if recent and recent[0]['status'] in ('failed','interrupted'):return 'The approved action didn’t finish successfully. I’ll need to check what happened.'
         return ''
 
-    def reply(text,proposals):
+    def reply(text,proposals,grounding=None):
         if not activity:switch(request('create',name='Conversation')['id'])
-        target=approval_target(text,proposals)
+        if grounding is not None:
+            if grounding['activity_id']!=activity:raise ValueError('Voice context belongs to another activity')
+            # Transcription is a request for review, never an approval token.
+            if broker_request('activity_state',activity=activity)['generation']!=grounding['expected_generation']:
+                raise ValueError('Activity work was stopped after recording. Record or type a fresh request.')
+        target=approval_target(text,proposals) if grounding is None else None
         if target:
             result=approve_operation(target)
             text='I approved operation '+target['id']+' ('+shlex.join(target['argv'])+'). It is '+result['status']+'. Poll this existing operation, report the result, and continue our conversation. Do not create another proposal for the same command.'
-        submit(workflow_argv('ask',activity,text),'answer')
+        submit(workflow_argv('ask',activity,text,grounding=grounding),'answer')
         selected()['at_end']=True;selected()['scroll']=0
 
     while True:
         now=time.monotonic();h,w=screen.getmaxyx()
         try:
+            voice_state=voice.snapshot()
+            if voice_state['state']=='recording' and now-voice_state['started']>=10:voice.finish()
+            if voice_state['state']=='error':notify('Voice: '+voice.consume()['error'])
             if now-last_fetch>=.6:
                 state=request('snapshot');connected=True;last_fetch=now
                 if activity not in [a['id'] for a in state['activities']]:
@@ -829,10 +863,16 @@ def dashboard(screen):
                 put(h-3,xx,label,kind='bar');buttons.append((xx,xx+len(label),act));xx+=len(label)+3
             hints=('↑↓ Activity  Enter Open  d Remove  n New  F6 Work' if rail_focus else 'F6 Activities  Tab Focus  d Remove  o Work  t View  p Models  ? Help  q Leave') if w>=85 else ('↑↓ Move · d Remove · Enter Open' if rail_focus else 'F6 Activities · Space Actions · q Leave')
             put(h-2,2,note if now<note_until else hints,w-4,'muted')
+            voice_state=voice.snapshot()
+            if voice_state['state']!='idle':
+                mic={'starting':'Microphone starting','recording':'Microphone recording · V finishes · Esc cancels',
+                     'transcribing':'Microphone off · transcribing locally · Esc cancels',
+                     'review':'Microphone off · transcript ready · V reviews original context · Esc discards'}.get(voice_state['state'],'Voice unavailable')
+                put(h-4,left,mic,work_right-left-2,'accent')
             if editor:
                 fill(h-3,0,w,'selected');fill(h-2,0,w,'base')
                 label={'ask':'Reply to Agent','run':'Run command','terminal':'Terminal command · root authority · I attaches · Ctrl-] detaches','new':'Name activity · this is a label, not a message'}[editor['kind']]
-                put(h-3,2,label+'  ·  Enter submit / Esc cancel',w-4,'selected')
+                put(h-3,2,('Review voice transcript · '+editor['grounding']['surface_title'] if editor.get('grounding') else label)+'  ·  Enter submit / Esc cancel',w-4,'selected')
                 available=w-6;prefix=editor['text'][:cursor];start=max(0,cursor-available+2)
                 while cells(prefix[start:])>available-1:start+=1
                 put(h-2,2,'›',kind='accent');put(h-2,4,editor['text'][start:],available)
@@ -900,13 +940,14 @@ def dashboard(screen):
                     if key==curses.KEY_HOME:models_scroll=0;continue
                     if key==curses.KEY_END:models_scroll=100000;continue
                     models_focus=False
+            if key=='\x1b' and voice.snapshot()['state']!='idle':voice.cancel();notify('Voice input discarded.');continue
             if editor:
-                if key=='\x1b':editor=None;editing(False);continue
+                if key=='\x1b' :editor=None;editing(False);continue
                 if key in ('\n','\r',curses.KEY_ENTER):
-                    text=editor['text'].strip();kind=editor['kind'];proposals=editor['proposals'];editor=None;editing(False)
+                    text=editor['text'].strip();kind=editor['kind'];proposals=editor['proposals'];grounding=editor.get('grounding');editor=None;editing(False)
                     if text:
                         if kind=='new':switch(request('create',name=text)['id'])
-                        elif kind=='ask':reply(text,proposals)
+                        elif kind=='ask':reply(text,proposals,grounding=grounding)
                         elif kind=='terminal':
                             task=broker_request('execute',activity=activity,argv=shlex.split(text),purpose='Human interactive terminal session',
                                 terminal=True,background=True,lifetime_seconds=86400,request_confirmation=True)
@@ -974,7 +1015,7 @@ def dashboard(screen):
                     if key=='\t' and current():mutate('focus',surface_id=leaves(current()['tree'])[0]['id'])
                     continue
             if key in ('\n','\r',curses.KEY_ENTER):action('ask');continue
-            if key=='q':save();return
+            if key=='q':voice.cancel();save();return
             if key in (' ','?',':'):
                 choose('actions',[(name,label+'    '+shortcut) for name,label,shortcut in actions]);continue
             if key=='\t' and current():
@@ -1016,14 +1057,15 @@ def dashboard(screen):
                             if act=='menu':choose('actions',[(n,l+'    '+s) for n,l,s in actions])
                             else:action(act)
                 continue
-            mapping={'M':'mouse','D':'remove','a':'ask','r':'run','R':'terminal','I':'attach','n':'new','v':'split_x','s':'split_y','z':'zoom','w':'close','+':'grow','=':'grow','-':'shrink','m':'swap','b':'sidebar','u':'undo','o':'jobs','t':'view','d':'remove','i':'disk','x':'stop','X':'broker_stop','Y':'activity_stop','T':'theme'}
+            mapping={'V':'voice','M':'mouse','D':'remove','a':'ask','r':'run','R':'terminal','I':'attach','n':'new','v':'split_x','s':'split_y','z':'zoom','w':'close','+':'grow','=':'grow','-':'shrink','m':'swap','b':'sidebar','u':'undo','o':'jobs','t':'view','d':'remove','i':'disk','x':'stop','X':'broker_stop','Y':'activity_stop','T':'theme'}
             if key in mapping:action(mapping[key])
             elif key=='h' and selected():mutate('view',view='history');last_fetch=0
         except (OSError,RuntimeError,ValueError,subprocess.SubprocessError,curses.error) as exc:notify(str(exc))
 
-def workflow_argv(op, activity, question=None):
+def workflow_argv(op, activity, question=None, grounding=None):
     argv=['/usr/bin/python3', '-u', '/usr/local/lib/agent-os/services/worker.py', op, str(activity)]
     if question is not None: argv.append(question)
+    if grounding is not None:argv.extend(['--grounding',json.dumps(grounding,ensure_ascii=False)])
     return argv
 
 
@@ -1041,6 +1083,8 @@ def main():
     c=sub.add_parser('knowledge',help='Inspect and restore versioned memory and skills')
     c.add_argument('action',choices=['list','read','history','restore','archive'],nargs='?',default='list')
     c.add_argument('key',nargs='?');c.add_argument('--revision',type=int);c.add_argument('--expected-revision',type=int)
+    c=sub.add_parser('voice',help='Transcribe a 16 kHz mono PCM WAV locally; output is for review, never submitted')
+    c.add_argument('--file',required=True)
     sub.add_parser('models', help='Read model configuration and measured usage as JSON')
     c=sub.add_parser('disk');c.add_argument('activity',type=int)
     c=sub.add_parser('ask');c.add_argument('activity',type=int);c.add_argument('question')
@@ -1073,6 +1117,7 @@ def main():
         result=presentation_request(op,**payload)
     elif args.cmd=='status': result=request('snapshot')
     elif args.cmd=='knowledge':result=knowledge_request(args.action,**{k:v for k,v in {'key':args.key,'revision':args.revision,'expected_revision':args.expected_revision}.items() if v is not None})
+    elif args.cmd=='voice':result=voice_from_file(args.file)
     elif args.cmd=='models': result=model_snapshot()
     elif args.cmd=='providers':
         sys.exit(subprocess.call(workflow_argv('status', 1)))

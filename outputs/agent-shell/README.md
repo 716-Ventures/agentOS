@@ -2,7 +2,7 @@
 
 **Windowing design:** The [native windowing specification](../agent-os-windowing-specification.md) defines the adopted graphical architecture: native component catalog, surface documents, source bindings, broker action references and revisioned tiled/floating workspaces. It is planned implementation, not a graphical feature of this release.
 
-A full Debian-based Linux VM with persistent activities, a terminal interface, and a Gateway agent that can use general Linux execution and filesystem tools. Jev assesses actions, selects relevant context, advises on recovery, checks completion and reviews learning; Ling plans and reasons. See [the decision layer](JEV.md). Versioned memory and reusable skills persist across activities. Voice and the graphical desktop are future work.
+A full Debian-based Linux VM with persistent activities, a terminal interface, and a Gateway agent that can use general Linux execution and filesystem tools. Jev assesses actions, selects relevant context, advises on recovery, checks completion and reviews learning; Ling plans and reasons. See [the decision layer](JEV.md). Versioned memory and reusable skills persist across activities. Offline English voice input and transcript review are implemented; see [VOICE.md](VOICE.md). The graphical desktop remains under development.
 
 ## Open and use
 
@@ -112,7 +112,7 @@ Guest acceptance requires a provisioned VM: deploy, run `cargo test --locked` in
 `/home/developer/agent-os-source`, then the core, broker and layout integration
 scripts. These tests create activities/files and the core integration script
 restarts its service. Historical verification reports do not substitute for a
-fresh run of the current source. Voice, native graphics, release updates and
+fresh run of the current source. Acoustic voice qualification, native graphics, release updates and
 formal accessibility validation remain outside this runtime hardening scope.
 
 The initial Rust native presentation contract is implemented and tested headlessly. See [PRESENTATION.md](PRESENTATION.md) for operations, guarantees and remaining graphical integration work.

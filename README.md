@@ -2,7 +2,7 @@
 
 An agent-first operating system built on Linux. The operating system is the agent's workspace: it can inspect the machine, plan and execute requested work, and retain useful knowledge. Explicit user authorization is required for harmful effects that the request does not already cover.
 
-The current prototype is a complete Debian ARM64 virtual machine with a tiling terminal interface, persistent activities, a Rust runtime, and Python services. Ling through Vercel AI Gateway handles reasoning; Jev supplies typed action assessments that the execution broker validates and applies. Voice and a custom native graphical desktop are planned. The adopted windowing model uses typed declarative surfaces, live state bindings and revisioned workspace composition, with native rendering and immediate direct controls.
+The current prototype is a complete Debian ARM64 virtual machine with a tiling terminal interface, persistent activities, a Rust runtime, and Python services. Ling through Vercel AI Gateway handles reasoning; Jev supplies typed action assessments that the execution broker validates and applies. Offline English voice input with transcript review is implemented; actual microphone speech remains to be qualified. A custom native graphical desktop is being built. The adopted windowing model uses typed declarative surfaces, live state bindings and revisioned workspace composition, with native rendering and immediate direct controls.
 
 ## Source map
 

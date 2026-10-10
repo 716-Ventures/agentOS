@@ -131,7 +131,7 @@ impl Core {
             .collect::<std::result::Result<Vec<_>, _>>()
             .map_err(err)?;
         Ok(
-            json!({"revision":revision(&db)?,"activities":activities,"jobs":jobs,"version":env!("CARGO_PKG_VERSION"),"mode":"Gateway agent with effects-based broker; Jev typed advisory; voice pending"}),
+            json!({"revision":revision(&db)?,"activities":activities,"jobs":jobs,"version":env!("CARGO_PKG_VERSION"),"mode":"Gateway agent with effects-based broker; Jev typed advisory; separate offline voice service"}),
         )
     }
     fn create(&self, v: &Value) -> Result<Value> {

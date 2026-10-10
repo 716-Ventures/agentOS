@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "engine": {
+    "name": "whisper.cpp",
+    "version": "1.9.5",
+    "revision": "d1be6fde11ac6e0407606b4e42fe72d34add8037",
+    "url": "https://codeload.github.com/ggml-org/whisper.cpp/tar.gz/d1be6fde11ac6e0407606b4e42fe72d34add8037",
+    "sha256": "645445da884df6dbd52b30f82d7be7c01d1767c938714e477e786b88d529e9f4",
+    "bytes": 9631456,
+    "license": "MIT"
+  },
+  "model": {
+    "name": "ggml-tiny.en.bin",
+    "revision": "5359861c739e955e79d9a303bcbc70fb988958b1",
+    "url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-tiny.en.bin",
+    "sha256": "921e4cf8686fdd993dcd081a5da5b6c365bfde1162e72b08d75ac75289920b1f",
+    "bytes": 77704715,
+    "license": "MIT"
+  }
+}

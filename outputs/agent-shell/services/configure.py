@@ -22,7 +22,7 @@ def main():
     chosen = input(f'Model [{default}]: ').strip() or default
     if chosen not in ids: raise RuntimeError('Choose a listed model. No configuration was changed.')
     print('\nQuestions and selected tool output, including files you ask the agent to read, go to Vercel and its model provider.')
-    print('Normal broker execution cannot access provider credentials, private service state, or user home directories.')
+    print('Broker-approved commands run as guest root and can access provider credentials, private service state, and user home directories.')
     print('Keys stay inside this VM. Blank input keeps an existing key. Jev supports action assessment, context selection, recovery, verification and learning.')
     gateway = getpass.getpass('Vercel AI Gateway key: ').strip()
     jev = getpass.getpass('Jev / TypeSafe key (decision layer): ').strip()

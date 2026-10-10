@@ -21,6 +21,7 @@ class Installation(unittest.TestCase):
             else:path.write_text('fixture '+name)
         instance=install.Installer(base/'system');instance.state.mkdir(parents=True)
         (instance.state/'dependencies.json').write_text('{}')
+        (instance.state/'voice.json').write_text('{}')
         return instance,source
 
     def test_staging_is_content_addressed_and_does_not_touch_live_files(self):

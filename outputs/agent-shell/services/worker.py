@@ -17,12 +17,17 @@ def main():
     p.add_argument('op', choices=['status', 'disk', 'ask', 'report'])
     p.add_argument('activity', type=int, nargs='?', default=1)
     p.add_argument('prompt', nargs='?')
+    p.add_argument('--grounding')
     args = p.parse_args()
     req = {'op': args.op, 'activity': args.activity}
     if args.prompt is not None: req['prompt'] = args.prompt
     if args.op=='ask':
         from broker_client import request
-        req['expected_generation']=request('activity_state',activity=args.activity)['generation']
+        if args.grounding is not None:
+            import grounding
+            req['input_context']=grounding.validate(json.loads(args.grounding),args.activity)
+            req['expected_generation']=req['input_context']['expected_generation']
+        else:req['expected_generation']=request('activity_state',activity=args.activity)['generation']
         parent=os.environ.get('AGENT_OS_JOB_ID')
         if parent:req['core_job_id']=int(parent)
     with connect(AI_SOCKET, req, timeout=240) as conn:
