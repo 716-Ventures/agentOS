@@ -576,8 +576,8 @@ fn serve(core: Arc<Core>, mut stream: UnixStream) {
                     let prepared=presentation_actions::prepare(&mut core.db.lock().unwrap(),&v,&principal)?;
                     match prepared {
                         presentation_actions::Prepared::Cached(receipt)=>Ok(receipt),
-                        presentation_actions::Prepared::Run{request_id,job,operation}=>{
-                            let result=if operation=="job.cancel" {core.cancel(&json!({"job_id":job}))} else {
+                        presentation_actions::Prepared::Run{request_id,job,operation,parameters}=>{
+                            let result=if operation=="job.cancel" {core.cancel(&json!({"job_id":job}))} else if operation=="job.read_output" {core.handle(&json!({"op":"log","job_id":job,"offset":parameters["offset"].as_u64().unwrap_or(0)}))} else {
                                 let db=core.db.lock().unwrap();
                                 db.query_row("SELECT id,activity_id,argv,status,exit_code,created_at,finished_at,error FROM jobs WHERE id=?",[job],job_value).map_err(err)
                             };

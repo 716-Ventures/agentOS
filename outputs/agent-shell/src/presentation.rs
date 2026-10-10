@@ -72,6 +72,14 @@ pub struct Binding {
 pub struct Action {
     #[serde(rename = "ref")]
     pub reference: String,
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub parameters: BTreeMap<String, Parameter>,
+}
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+#[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
+pub enum Parameter {
+    Literal { value: Value },
+    Field { element_id: String },
 }
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
@@ -269,7 +277,8 @@ struct Apply {
 pub fn catalog() -> Value {
     json!({"protocol":PROTOCOL,"catalog_revision":CATALOG,
     "limits":{"document_bytes":DOCUMENT_LIMIT,"transaction_bytes":TRANSACTION_LIMIT,"elements":2048,"depth":32,"operations":128},
-    "components":seven_sixteen_ui::catalog::components()})
+    "components":seven_sixteen_ui::catalog::components(),
+    "action_parameters":{"kinds":[{"kind":"literal","value":"Typed host-schema value"},{"kind":"field","element_id":"TextField@1 identity"}],"schema_source":"action.metadata.parameter_schema","submission":"Authenticated native input; exact surface and source revisions; no expressions"}})
 }
 
 fn walk_elements(
@@ -449,6 +458,28 @@ fn surface_valid(db: &Connection, s: &SurfaceDocument, _principal: &Principal) -
         }
     }
     for action in s.actions.values() {
+        let metadata = crate::presentation_actions::metadata(db, &action.reference)?;
+        let schema = &metadata["parameter_schema"];
+        for (key, parameter) in &action.parameters {
+            if schema[key].is_null() {
+                return Err(invalid("Callback parameter is not in the host schema"));
+            }
+            match parameter {
+                Parameter::Field { element_id } => {
+                    if s.elements.get(element_id).map(|e| e.kind.as_str()) != Some("TextField@1") {
+                        return Err(invalid(
+                            "Callback parameters must reference an editable field",
+                        ));
+                    }
+                }
+                Parameter::Literal { value } => {
+                    crate::presentation_actions::validate_parameters(
+                        metadata["operation"].as_str().unwrap_or(""),
+                        &serde_json::Map::from_iter([(key.clone(), value.clone())]),
+                    )?;
+                }
+            }
+        }
         let allowed:bool=db.query_row("SELECT EXISTS(SELECT 1 FROM presentation_actions WHERE reference=? AND activity=?)",params![action.reference,s.activity_id],|r|r.get(0)).map_err(db_error)?;
         if !allowed {
             return Err(error(

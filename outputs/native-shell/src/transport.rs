@@ -120,6 +120,10 @@ pub enum Command {
     Action {
         reference: String,
         key: String,
+        surface: String,
+        revision: u64,
+        action: String,
+        parameters: Value,
     },
     Close {
         surface: String,
@@ -295,7 +299,20 @@ fn run(
                         if begin {leases.insert(key,Instant::now());}else{leases.remove(&key);}
                         request(&socket,&json!({"op":if begin{"interaction.begin"}else{"interaction.end"},"surface_id":surface,"element_id":element}))
                     }
-                    Command::Action{reference,key}=>request(&socket,&json!({"op":"action.metadata","reference":reference})).and_then(|info|request(&socket,&json!({"op":"action.invoke","reference":reference,"request_id":key,"expected_source_revision":info["source_revision"]}))),
+                    Command::Action{reference,key,surface,revision,action,parameters}=>request(&socket,&json!({"op":"action.metadata","reference":reference})).and_then(|info|{
+                        let current=frame.lock().unwrap().clone();
+                        let edits=drafts.lock().unwrap();
+                        let values=super::action_parameters::resolve(&parameters,&info["parameter_schema"],|element|edits.get(&(surface.clone(),element.into())).map(|d|d.text.clone()).or_else(||current.documents.get(&surface).and_then(|doc|doc["elements"][element]["props"]["value"].as_str().map(String::from))))?;
+                        drop(edits);
+                        let receipt=request(&socket,&json!({"op":"action.invoke","reference":reference,"request_id":key,"expected_source_revision":info["source_revision"],"surface_id":surface,"expected_surface_revision":revision,"action_id":action,"parameters":values}))?;
+                        if info["operation"]=="job.read_output" && receipt["status"]=="succeeded" {
+                            let job=info["target"]["job_id"].clone();let activity=info["activity_id"].as_str().and_then(|a|a.parse::<i64>().ok()).ok_or("Action activity unavailable")?;
+                            let mut view=super::log_view::LogView::new("core".into(),job,activity,"Callback output".into())?;
+                            view.start_at(values["offset"].as_u64().unwrap_or(0));
+                            frame.lock().unwrap().inspection=Some(view.read(&socket,0)?);output_view=Some(view);
+                        }
+                        Ok(receipt)
+                    }),
                     Command::Close{surface}=>{flush(&socket,&drafts,&frame,&stop);if drafts.lock().unwrap().iter().any(|((id,_),draft)|id==&surface && draft.dirty){Err("The view remains open because its latest draft could not be saved".into())}else{close_surface(&socket,&surface).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt})}},
                     Command::Quit=>unreachable!(),
                 };

@@ -25,6 +25,8 @@ def request(op, **fields):
 def for_activity(activity):
     state=request('presentation.snapshot')
     state['documents']={key:doc for key,doc in state['documents'].items() if doc['activity_id']==str(activity)}
+    state['host_surfaces']={key:host for key,host in state.get('host_surfaces',{}).items() if host.get('activity_id')==str(activity)}
+    state['renderers']={key:owner for key,owner in state.get('renderers',{}).items() if key in state['documents']}
     return state
 
 

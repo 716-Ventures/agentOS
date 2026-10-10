@@ -42,6 +42,11 @@ struct Invoke {
     reference: String,
     request_id: String,
     expected_source_revision: u64,
+    #[serde(default)]
+    parameters: serde_json::Map<String, Value>,
+    surface_id: Option<String>,
+    expected_surface_revision: Option<u64>,
+    action_id: Option<String>,
 }
 #[derive(Debug)]
 pub enum Prepared {
@@ -50,6 +55,7 @@ pub enum Prepared {
         request_id: String,
         job: i64,
         operation: String,
+        parameters: Value,
     },
 }
 
@@ -104,8 +110,39 @@ pub fn metadata(db: &Connection, reference: &str) -> Result<Value> {
     Ok(
         json!({"reference":reference,"activity_id":activity,"issuer_uid":uid,"operation":operation,
         "target":{"source":"core","job_id":id},"revoked":revoked,"available":!revoked && source.is_some(),
-        "source_revision":revision,"observed_target":source}),
+        "source_revision":revision,"parameter_schema":parameter_schema(&operation),"observed_target":source}),
     )
+}
+pub fn parameter_schema(operation: &str) -> Value {
+    if operation == "job.read_output" {
+        json!({"offset":{"type":"integer","minimum":0,"maximum":1048676}})
+    } else {
+        json!({})
+    }
+}
+pub fn validate_parameters(
+    operation: &str,
+    parameters: &serde_json::Map<String, Value>,
+) -> Result<()> {
+    let schema = parameter_schema(operation);
+    for (key, value) in parameters {
+        let rule = &schema[key];
+        let valid = rule["type"] == "integer"
+            && value
+                .as_u64()
+                .map(|n| {
+                    n >= rule["minimum"].as_u64().unwrap_or(0)
+                        && n <= rule["maximum"].as_u64().unwrap_or(0)
+                })
+                .unwrap_or(false);
+        if !valid {
+            return Err(error(
+                "invalid_event",
+                format!("Unsupported or invalid callback parameter: {key}"),
+            ));
+        }
+    }
+    Ok(())
 }
 pub fn handle(db: &mut Connection, value: &Value, who: &Principal) -> Result<Value> {
     match value["op"].as_str().unwrap_or("") {
@@ -114,11 +151,12 @@ pub fn handle(db: &mut Connection, value: &Value, who: &Principal) -> Result<Val
             let req: Issue =
                 serde_json::from_value(value.clone()).map_err(|e| error("invalid_event", e))?;
             if req.op != "action.issue"
-                || !["job.inspect", "job.cancel"].contains(&req.operation.as_str())
+                || !["job.inspect", "job.cancel", "job.read_output"]
+                    .contains(&req.operation.as_str())
             {
                 return Err(error(
                     "unsupported_operation",
-                    "Only registered core-job inspection and stop callbacks exist",
+                    "Only registered core-job inspection, output and stop callbacks exist",
                 ));
             }
             let source = job(db, req.job_id)?;
@@ -248,6 +286,43 @@ pub fn prepare(db: &mut Connection, value: &Value, who: &Principal) -> Result<Pr
             "Refresh the action's source state before invoking",
         ));
     }
+    validate_parameters(info["operation"].as_str().unwrap_or(""), &req.parameters)?;
+    if req.surface_id.is_some()
+        || req.expected_surface_revision.is_some()
+        || req.action_id.is_some()
+    {
+        let surface = req
+            .surface_id
+            .as_deref()
+            .ok_or_else(|| error("invalid_event", "Surface identity required"))?;
+        let action = req
+            .action_id
+            .as_deref()
+            .ok_or_else(|| error("invalid_event", "Action identity required"))?;
+        let body: Option<String> = tx
+            .query_row(
+                "SELECT body FROM presentation_documents WHERE id=?",
+                [surface],
+                |r| r.get(0),
+            )
+            .optional()
+            .map_err(storage)?;
+        let document: Value = serde_json::from_str(
+            &body.ok_or_else(|| error("missing_reference", "Surface unavailable"))?,
+        )
+        .map_err(storage)?;
+        if document["revision"].as_u64() != req.expected_surface_revision
+            || document["actions"][action]["ref"] != req.reference
+        {
+            return Err(error(
+                "stale_revision",
+                "The presented action changed before submission",
+            ));
+        }
+        if document["activity_id"] != info["activity_id"] {
+            return Err(error("unauthorized", "Action belongs to another activity"));
+        }
+    }
     let target = info["target"]["job_id"].as_i64().unwrap();
     let operation = info["operation"].as_str().unwrap().to_string();
     let receipt = json!({"request_id":req.request_id,"reference":req.reference,"status":"accepted","observed_target":info["observed_target"]});
@@ -269,6 +344,7 @@ pub fn prepare(db: &mut Connection, value: &Value, who: &Principal) -> Result<Pr
         request_id: req.request_id,
         job: target,
         operation,
+        parameters: json!(req.parameters),
     })
 }
 pub fn finish(
@@ -376,6 +452,64 @@ mod tests {
         let mut forged = invoke(&action, "forged");
         forged["actor"] = json!("human");
         assert!(prepare(&mut db, &forged, &human()).is_err());
+    }
+    #[test]
+    fn output_parameters_are_typed_bounded_and_cannot_change_the_target() {
+        let mut db = fixture();
+        let action = handle(
+            &mut db,
+            &json!({"op":"action.issue","activity_id":1,"job_id":1,"operation":"job.read_output"}),
+            &human(),
+        )
+        .unwrap();
+        let mut request = invoke(&action, "output-click");
+        request["parameters"] = json!({"offset":42});
+        match prepare(&mut db, &request, &human()).unwrap() {
+            Prepared::Run {
+                job, parameters, ..
+            } => {
+                assert_eq!(job, 1);
+                assert_eq!(parameters["offset"], 42)
+            }
+            _ => panic!("Expected output callback"),
+        }
+        assert!(matches!(
+            prepare(&mut db, &request, &human()).unwrap(),
+            Prepared::Cached(_)
+        ));
+        for (index, params) in [
+            json!({"offset":-1}),
+            json!({"offset":"42"}),
+            json!({"offset":1048677}),
+            json!({"job_id":2}),
+            json!({"argv":["/bin/sh"]}),
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            let mut invalid = invoke(&action, &format!("bad-{index}"));
+            invalid["parameters"] = params;
+            assert!(prepare(&mut db, &invalid, &human())
+                .unwrap_err()
+                .contains("invalid_event"));
+        }
+        let mut stale = request.clone();
+        stale["request_id"] = json!("stale-form");
+        stale["surface_id"] = json!("missing");
+        stale["action_id"] = json!("read");
+        stale["expected_surface_revision"] = json!(0);
+        assert!(prepare(&mut db, &stale, &human())
+            .unwrap_err()
+            .contains("missing_reference"));
+        assert_eq!(
+            db.query_row(
+                "SELECT COUNT(*) FROM presentation_action_invocations",
+                [],
+                |r| r.get::<_, i64>(0)
+            )
+            .unwrap(),
+            1
+        );
     }
     #[test]
     fn stale_or_revoked_callbacks_do_not_allocate_execution_receipts() {

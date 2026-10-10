@@ -17,9 +17,12 @@ class PresentationClientTests(unittest.TestCase):
                 with self.assertRaises(ValueError):client.apply_for_activity(1,{'op':'presentation.apply','operations':[operation]})
             self.assertTrue(all(c.args==('presentation.snapshot',) for c in request.call_args_list))
     def test_scoped_snapshot_and_valid_forwarding(self):
-        state={'documents':{'allowed':{'activity_id':'1'},'foreign':{'activity_id':'2'}},'event_cursor':4}
+        state={'documents':{'allowed':{'activity_id':'1'},'foreign':{'activity_id':'2'}},'event_cursor':4,'host_surfaces':{'local':{'activity_id':'1'},'foreign':{'activity_id':'2'}},'renderers':{'allowed':{'uid':1000},'foreign':{'uid':1000}}}
         with patch.object(client,'request',return_value=state):
-            self.assertEqual(set(client.for_activity(1)['documents']),{'allowed'})
+            snapshot=client.for_activity(1)
+            self.assertEqual(set(snapshot['documents']),{'allowed'})
+            self.assertEqual(set(snapshot['host_surfaces']),{'local'})
+            self.assertEqual(set(snapshot['renderers']),{'allowed'})
         tx={'op':'presentation.apply','operations':[{'op':'element.set_props','surface_id':'allowed','element_id':'text','props':{'text':'changed'}}]}
         with patch.object(client,'for_activity',return_value={'documents':{'allowed':{}}}),patch.object(client,'request',return_value={'status':'committed'}) as request:
             self.assertEqual(client.apply_for_activity(1,tx)['status'],'committed');request.assert_called_once_with(**tx)

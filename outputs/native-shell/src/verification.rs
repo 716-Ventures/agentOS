@@ -46,10 +46,12 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             assert_eq!(surface.elements["reading"].widget,widget);assert_eq!(field.entry.text(),"Unsaved λ 日本語");
             assert_eq!(surface.elements["root"].container.as_ref().unwrap().first_child().unwrap(),field.widget.clone().upcast::<gtk::Widget>());
             assert!(!surface.elements["button"].button.as_ref().unwrap().is_sensitive());
-            doc["actions"]["click"]=json!({"ref":"fixture-action"});doc["elements"]["button"]["events"]=json!({"activate":{"action":"click"}});doc["revision"]=json!(2);
+            doc["actions"]["click"]=json!({"ref":"fixture-action"});doc["elements"]["button"]["events"]=json!({"activate":{"action":"click"}});doc["elements"]["field"]["events"]=json!({"submit":{"action":"click"}});doc["revision"]=json!(2);
             frame.actions.insert("fixture-action".into(),json!({"available":true}));surface.update("native-fixture",&doc,&frame,&commands,&drafts);
             surface.elements["button"].button.as_ref().unwrap().emit_clicked();
             assert!(rx.try_iter().any(|c|matches!(c,Command::Action{reference,..} if reference=="fixture-action")));
+            field.entry.emit_activate();
+            assert_eq!(rx.try_iter().filter(|c|matches!(c,Command::Action{reference,..} if reference=="fixture-action")).count(),1,"Text field submit must dispatch exactly once");
             frame.connected=false;surface.update("native-fixture",&doc,&frame,&commands,&drafts);assert_eq!(field.entry.text(),"Unsaved λ 日本語");
             // Capture after GTK has rendered the verified final state.
             glib::timeout_add_local_once(Duration::from_millis(180),move || {

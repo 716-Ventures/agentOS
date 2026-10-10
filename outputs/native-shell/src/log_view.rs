@@ -42,6 +42,16 @@ impl LogView {
             more: false,
         })
     }
+    pub fn start_at(&mut self, offset: u64) {
+        self.offsets = if offset == 0 {
+            vec![0]
+        } else {
+            vec![0, offset]
+        };
+        self.position = self.offsets.len() - 1;
+        self.next = offset;
+        self.more = false;
+    }
     pub fn read(&mut self, core: &PathBuf, direction: i8) -> Result<Page, String> {
         let previous_position = self.position;
         if direction < 0 {

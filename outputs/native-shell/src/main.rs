@@ -1,4 +1,5 @@
 //! Native shell client: stable GTK controls over the core's inert presentation API.
+mod action_parameters;
 mod broker_controls;
 mod controls;
 mod draft_cache;
@@ -137,9 +138,14 @@ fn construct(
                 let expected = recovered
                     .and_then(|d| d["draft_revision"].as_u64())
                     .unwrap_or(0);
+                let submit_events = events.clone();
+                let submit_commands = commands.clone();
                 area.on_event(move |event| {
                     if applying.get() {
                         return;
+                    }
+                    if matches!(&event, InputEvent::Submitted(_)) {
+                        dispatch_action(&submit_events, &submit_commands);
                     }
                     if let InputEvent::Changed(text) = event {
                         let mut drafts = edits.lock().unwrap();
@@ -174,9 +180,14 @@ fn construct(
             let expected = recovered
                 .and_then(|d| d["draft_revision"].as_u64())
                 .unwrap_or(0);
+            let submit_events = events.clone();
+            let submit_commands = commands.clone();
             field.on_event(move |event| {
                 if applying.get() {
                     return;
+                }
+                if matches!(&event, InputEvent::Submitted(_)) {
+                    dispatch_action(&submit_events, &submit_commands);
                 }
                 if let InputEvent::Changed(text) = event {
                     let mut drafts = edits.lock().unwrap();
@@ -203,15 +214,7 @@ fn construct(
                 props["disabled"] == true,
             );
             let (events, commands) = (events.clone(), commands.clone());
-            button.connect_clicked(move |_| {
-                let event = events.borrow();
-                if let Some(reference) = event["host_reference"].as_str() {
-                    let _ = commands.send(Command::Action {
-                        reference: reference.into(),
-                        key: format!("native-{}", nonce()),
-                    });
-                }
-            });
+            button.connect_clicked(move |_| dispatch_action(&events, &commands));
             result.widget = button.clone().upcast();
             result.button = Some(button);
         }
@@ -249,6 +252,19 @@ fn construct(
         }
     }
     result
+}
+fn dispatch_action(events: &Rc<RefCell<Value>>, commands: &Sender<Command>) {
+    let event = events.borrow();
+    if let Some(reference) = event["host_reference"].as_str() {
+        let _ = commands.send(Command::Action {
+            reference: reference.into(),
+            key: format!("native-{}", nonce()),
+            surface: event["surface"].as_str().unwrap_or("").into(),
+            revision: event["revision"].as_u64().unwrap_or(0),
+            action: event["action"].as_str().unwrap_or("").into(),
+            parameters: event["parameters"].clone(),
+        });
+    }
 }
 fn draft_controls(widget: &gtk::Box, surface: &str, element: &str, commands: &Sender<Command>) {
     let row = ui::row(8);
@@ -521,6 +537,11 @@ impl Surface {
                         }
                     }
                 }
+                if e.field.is_some() || e.area.is_some() {
+                    let key = node["events"]["submit"]["action"].as_str().unwrap_or("");
+                    let action = doc["actions"][key]["ref"].as_str();
+                    *e.events.borrow_mut() = json!({"host_reference":action,"surface":id,"revision":doc["revision"],"action":key,"parameters":doc["actions"][key]["parameters"]});
+                }
                 if let Some(button) = &e.button {
                     button.set_label(props["label"].as_str().unwrap_or("Action"));
                     let action = node["events"]["activate"]["action"]
@@ -531,7 +552,8 @@ impl Surface {
                         .map(|a| a["available"] == true)
                         .unwrap_or(false);
                     button.set_sensitive(props["disabled"] != true && available);
-                    *e.events.borrow_mut() = json!({"host_reference":action});
+                    let key = node["events"]["activate"]["action"].as_str().unwrap_or("");
+                    *e.events.borrow_mut() = json!({"host_reference":action,"surface":id,"revision":doc["revision"],"action":key,"parameters":doc["actions"][key]["parameters"]});
                 }
                 if let Some(progress) = &e.progress {
                     let value = bound(id, &props["value"], frame);
