@@ -77,7 +77,7 @@ python3 vm.py wait --seconds 60
 python3 verify.py
 ```
 
-`start --hide` runs without showing the display window. For an existing stopped guest made by the earlier runner, `python3 vm.py bundle` moves its disk into a UTM bundle and retains its seed and SSH identity. Stop the old runner first. The current migration used a verified copy and preserved the original disk; `runtime/utm.json` selects the authoritative UTM guest.
+`start` (also `start --hide`) runs without creating a display window. After boot, double-click the running guest in UTM to open its graphical console; this sequence was verified on macOS 27.0.1. `start --show` requests the visible startup path explicitly. Automated reproduction and cold-start verification use this path: UTM 4.7.5 (118) on macOS 27.0.1 can throw an AppKit `_changeJustMain` exception while creating the visible console, before QEMU starts. Hidden startup was verified to launch the selected guest and expose SSH; it retains the configured graphical devices. A timed-out visible start must be inspected and its stalled UTM instance closed before another start is attempted. For an existing stopped guest made by the earlier runner, `python3 vm.py bundle` moves its disk into a UTM bundle and retains its seed and SSH identity. Stop the old runner first. The current migration used a verified copy and preserved the original disk; `runtime/utm.json` selects the authoritative UTM guest.
 
 Alternatively, reuse a downloaded base:
 

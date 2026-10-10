@@ -172,7 +172,7 @@ def prepare(source=None):
     print('First-boot configuration ready. Credentials:', credentials)
 
 
-def start(hide=False):
+def start(hide=True):
     if alive():
         raise RuntimeError('VM is already running or suspended; inspect UTM before restarting.')
     try:
@@ -261,7 +261,12 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     commands = p.add_subparsers(dest='command', required=True)
     b = commands.add_parser('prepare'); b.add_argument('--base')
-    s = commands.add_parser('start'); s.add_argument('--hide', action='store_true')
+    s = commands.add_parser('start')
+    display = s.add_mutually_exclusive_group()
+    display.add_argument('--hide', dest='hide', action='store_true', default=True,
+                         help='Start without creating a console window (default)')
+    display.add_argument('--show', dest='hide', action='store_false',
+                         help='Ask UTM to create the console during startup; requires a working foreground UTM session')
     commands.add_parser('bundle')
     w = commands.add_parser('wait'); w.add_argument('--seconds', type=int, default=60)
     c = commands.add_parser('ssh'); c.add_argument('remote', nargs=argparse.REMAINDER)

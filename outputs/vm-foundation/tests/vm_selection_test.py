@@ -10,6 +10,13 @@ spec=importlib.util.spec_from_file_location('selected_vm',Path(__file__).resolve
 vm=importlib.util.module_from_spec(spec);spec.loader.exec_module(vm)
 
 class VMSelection(unittest.TestCase):
+    def test_default_start_avoids_console_creation_and_visible_start_is_explicit(self):
+        with patch.object(vm,'alive',return_value=False),patch.object(vm,'machine',return_value={'uuid':'fixture'}),patch.object(vm,'call') as call:
+            vm.start()
+            self.assertEqual(call.call_args.args[0],['utmctl','start','--hide','fixture'])
+            vm.start(hide=False)
+            self.assertEqual(call.call_args.args[0],['utmctl','start','fixture'])
+
     def test_port_and_uuid_must_match_the_selected_bundle_before_operations(self):
         with tempfile.TemporaryDirectory() as tmp:
             run=Path(tmp);bundle=run/'test.utm';bundle.mkdir()
