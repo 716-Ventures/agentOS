@@ -1,5 +1,6 @@
 mod presentation;
 mod presentation_actions;
+mod presentation_external_actions;
 mod presentation_hosts;
 mod presentation_outputs;
 mod presentation_sources;
@@ -650,6 +651,14 @@ fn serve(core: Arc<Core>, mut stream: UnixStream) {
                     let prepared=presentation_actions::prepare(&mut core.db.lock().unwrap(),&v,&principal)?;
                     match prepared {
                         presentation_actions::Prepared::Cached(receipt)=>Ok(receipt),
+                        presentation_actions::Prepared::ExternalRun{request_id,source,operation,activity,revision,parameters}=>{
+                            let result=if operation=="file.inspect" {presentation_external_actions::run(Some(&core.db.lock().unwrap()),&source,&operation,&activity,revision,&parameters)}else{
+                                // Broker I/O must not hold the environment database lock.
+                                presentation_external_actions::run(None,&source,&operation,&activity,revision,&parameters)
+                            };
+                            presentation_actions::finish(&core.db.lock().unwrap(),&principal,&request_id,result,&operation)
+                        }
+
                         presentation_actions::Prepared::Run{request_id,job,operation,parameters}=>{
                             let result=if operation=="job.cancel" {core.cancel(&json!({"job_id":job}))} else if operation=="job.read_output" {core.handle(&json!({"op":"log","job_id":job,"offset":parameters["offset"].as_u64().unwrap_or(0)}))} else {
                                 let db=core.db.lock().unwrap();

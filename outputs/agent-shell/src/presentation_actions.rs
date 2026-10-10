@@ -58,6 +58,14 @@ struct Invoke {
 #[derive(Debug)]
 pub enum Prepared {
     Cached(Value),
+    ExternalRun {
+        request_id: String,
+        source: String,
+        operation: String,
+        activity: String,
+        revision: u64,
+        parameters: Value,
+    },
     Run {
         request_id: String,
         job: i64,
@@ -67,6 +75,7 @@ pub enum Prepared {
 }
 
 pub fn init(db: &Connection) -> Result<()> {
+    crate::presentation_external_actions::init(db)?;
     db.execute_batch("CREATE TABLE IF NOT EXISTS presentation_action_targets(reference TEXT PRIMARY KEY,operation TEXT NOT NULL,job INTEGER NOT NULL);
         CREATE TABLE IF NOT EXISTS presentation_action_defaults(uid INTEGER NOT NULL,job INTEGER NOT NULL,operation TEXT NOT NULL,reference TEXT NOT NULL,PRIMARY KEY(uid,job,operation));
         CREATE TABLE IF NOT EXISTS presentation_action_invocations(uid INTEGER NOT NULL,request TEXT NOT NULL,payload TEXT NOT NULL,reference TEXT NOT NULL,job INTEGER NOT NULL,operation TEXT NOT NULL,receipt TEXT NOT NULL,PRIMARY KEY(uid,request));").map_err(storage)?;
@@ -106,6 +115,9 @@ fn job(db: &Connection, id: i64) -> Result<Value> {
     db.query_row("SELECT id,activity_id,argv,status,exit_code,created_at,finished_at,error FROM jobs WHERE id=?",[id],super::job_value).map_err(|_|error("missing_reference","Job is unavailable"))
 }
 pub fn metadata(db: &Connection, reference: &str) -> Result<Value> {
+    if let Some(info) = crate::presentation_external_actions::metadata(db, reference)? {
+        return Ok(info);
+    }
     let row:Option<(String,u32,bool,String,i64)>=db.query_row("SELECT a.activity,a.uid,a.revoked,t.operation,t.job FROM presentation_actions a JOIN presentation_action_targets t USING(reference) WHERE reference=?",[reference],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?))).optional().map_err(storage)?;
     let (activity, uid, revoked, operation, id) =
         row.ok_or_else(|| error("missing_reference", "Action is unavailable"))?;
@@ -127,8 +139,8 @@ fn discovery(db: &Connection, reference: &str) -> Result<Value> {
     Ok(value)
 }
 pub fn parameter_schema(operation: &str) -> Value {
-    if operation == "job.read_output" {
-        json!({"offset":{"type":"integer","minimum":0,"maximum":1048676}})
+    if operation == "job.read_output" || operation == "broker.read_output" {
+        json!({"offset":{"type":"integer","minimum":0,"maximum":if operation=="broker.read_output" {262144}else{1048576}}})
     } else {
         json!({})
     }
@@ -159,6 +171,7 @@ pub fn validate_parameters(
 }
 pub fn handle(db: &mut Connection, value: &Value, who: &Principal) -> Result<Value> {
     match value["op"].as_str().unwrap_or("") {
+        "action.ensure_sources" => crate::presentation_external_actions::ensure(db, value, who),
         "action.ensure" => {
             human(who)?;
             let req: Ensure =
@@ -333,10 +346,18 @@ pub fn handle(db: &mut Connection, value: &Value, who: &Principal) -> Result<Val
                 )
             })?;
             let mut receipt: Value = serde_json::from_str(&raw).map_err(storage)?;
-            if operation == "job.cancel"
+            if ["job.cancel", "broker.cancel"].contains(&operation.as_str())
                 && ["running", "unknown"].contains(&receipt["status"].as_str().unwrap_or(""))
             {
-                if let Ok(observed) = job(db, target) {
+                let observed = if operation == "broker.cancel" {
+                    metadata(db, receipt["reference"].as_str().unwrap_or(""))
+                        .ok()
+                        .filter(|info| info["observed_target"]["availability"] == "available")
+                        .map(|info| info["observed_target"]["values"].clone())
+                } else {
+                    job(db, target).ok()
+                };
+                if let Some(observed) = observed {
                     if !["starting", "running", "cancelling"]
                         .contains(&observed["status"].as_str().unwrap_or(""))
                     {
@@ -430,7 +451,7 @@ pub fn prepare(db: &mut Connection, value: &Value, who: &Principal) -> Result<Pr
             return Err(error("unauthorized", "Action belongs to another activity"));
         }
     }
-    let target = info["target"]["job_id"].as_i64().unwrap();
+    let target = info["target"]["job_id"].as_i64().unwrap_or(0);
     let operation = info["operation"].as_str().unwrap().to_string();
     let receipt = json!({"request_id":req.request_id,"reference":req.reference,"status":"accepted","observed_target":info["observed_target"]});
     tx.execute(
@@ -447,6 +468,16 @@ pub fn prepare(db: &mut Connection, value: &Value, who: &Principal) -> Result<Pr
     )
     .map_err(storage)?;
     tx.commit().map_err(storage)?;
+    if target == 0 {
+        return Ok(Prepared::ExternalRun {
+            request_id: req.request_id,
+            source: info["target"]["source"].as_str().unwrap().into(),
+            operation,
+            activity: info["activity_id"].as_str().unwrap().into(),
+            revision: req.expected_source_revision,
+            parameters: json!(req.parameters),
+        });
+    }
     Ok(Prepared::Run {
         request_id: req.request_id,
         job: target,
@@ -471,7 +502,7 @@ pub fn finish(
     let mut receipt: Value = serde_json::from_str(&raw).map_err(storage)?;
     match result {
         Ok(observed) => {
-            receipt["status"] = json!(if operation == "job.cancel"
+            receipt["status"] = json!(if ["job.cancel", "broker.cancel"].contains(&operation)
                 && ["starting", "running", "cancelling"]
                     .contains(&observed["status"].as_str().unwrap_or(""))
             {

@@ -1421,7 +1421,12 @@ pub fn handle(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> 
         }
         "host.renderer" => crate::presentation_hosts::renderer(db, v, who),
         "host.surface" => crate::presentation_hosts::register(db, v, who),
-        "action.issue" | "action.ensure" | "action.list" | "action.revoke" | "action.metadata"
+        "action.issue"
+        | "action.ensure"
+        | "action.ensure_sources"
+        | "action.list"
+        | "action.revoke"
+        | "action.metadata"
         | "action.status" => crate::presentation_actions::handle(db, v, who),
         "presentation.snapshot" => snapshot(db),
         "presentation.page" => page(db, v),

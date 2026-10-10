@@ -33,7 +33,7 @@ pub fn activity(db: &Connection, source: &str) -> Result<Option<String>> {
     .optional()
     .map_err(storage)
 }
-fn observed(db: &Connection, source: &str) -> Result<Option<Value>> {
+pub fn observation(db: &Connection, source: &str) -> Result<Option<Value>> {
     let row:Option<(String,i64,String,String,i64,i64)>=db.query_row("SELECT s.activity,s.revision,s.body,s.session,s.observed,COALESCE(o.observed,s.observed) FROM presentation_external_sources s LEFT JOIN presentation_source_owners o USING(session) WHERE source=?",[source],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?,r.get(5)?))).optional().map_err(storage)?;
     row.map(|(activity,revision,body,session,at,heartbeat)| {
         let mut body:Value=serde_json::from_str(&body).map_err(storage)?;
@@ -51,7 +51,7 @@ pub fn binding(db: &Connection, source: &str, activity: &str, path: &str) -> Res
     let mut value = (if let Some(id) = source.strip_prefix("window:") {
         crate::presentation_hosts::source(db, id)?
     } else {
-        observed(db, source)?
+        observation(db, source)?
     })
     .filter(|v| v["activity_id"] == activity)
     .ok_or_else(|| error("missing_reference", "Source unavailable in this activity"))?;
@@ -207,7 +207,7 @@ pub fn handle(db: &mut Connection, value: &Value, who: &Principal) -> Result<Val
                         json!({"source":source,"activity_id":activity,"source_revision":revision,"observed_at":crate::now(),"availability":"available","values":{}}),
                     )
                 } else {
-                    observed(db, source)?
+                    observation(db, source)?
                 };
                 if let Some(mut row) = value {
                     row.as_object_mut().unwrap().remove("values");

@@ -373,6 +373,8 @@ def handle(req, uid):
         if not isinstance(ident,str) or not re.fullmatch('[a-f0-9]{32}',ident) or ident not in JOBS:
             raise ValueError('Unknown broker job')
         job = JOBS[ident]
+        if 'expected_activity' in req and (type(req['expected_activity']) is not int or req['expected_activity']!=job['activity']):raise ValueError('Callback target changed activity')
+        if 'expected_source_revision' in req and (type(req['expected_source_revision']) is not int or req['expected_source_revision']!=job.get('source_revision',0)):raise ValueError('Callback source changed; refresh before submitting')
         if isinstance(op,str) and op.startswith('terminal_'):
             human_terminal_user(uid)
             if not job.get('terminal'):raise ValueError('This job has no interactive terminal')

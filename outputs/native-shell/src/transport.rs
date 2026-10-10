@@ -194,6 +194,8 @@ fn run(
     let mut last = Instant::now() - Duration::from_secs(1);
     let mut shown_activity = None::<String>;
     let mut ensured = std::collections::BTreeSet::<i64>::new();
+    let mut ensured_sources = std::collections::BTreeSet::<String>::new();
+    let mut source_scan = (None::<String>, String::new());
     let mut recovered = drafts.lock().unwrap().keys().cloned().collect::<Vec<_>>();
     let mut saved_cache = Vec::new();
     let approval_pending = Arc::new(AtomicBool::new(false));
@@ -333,9 +335,9 @@ fn run(
                             Ok(receipt)=>receipt,
                             Err(original)=>request(&socket,&json!({"op":"action.status","request_id":key})).map_err(|_|original)?,
                         };
-                        if info["operation"]=="job.read_output" && receipt["status"]=="succeeded" {
-                            let job=info["target"]["job_id"].clone();let activity=info["activity_id"].as_str().and_then(|a|a.parse::<i64>().ok()).ok_or("Action activity unavailable")?;
-                            let mut view=super::log_view::LogView::new("core".into(),job,activity,"Callback output".into())?;
+                        if ["job.read_output","broker.read_output"].contains(&info["operation"].as_str().unwrap_or("")) && receipt["status"]=="succeeded" {
+                            let (source,job)=if let Some(id)=info["target"]["source"].as_str().and_then(|source|source.strip_prefix("broker:")){("broker",json!(id))}else{("core",info["target"]["job_id"].clone())};let activity=info["activity_id"].as_str().and_then(|a|a.parse::<i64>().ok()).ok_or("Action activity unavailable")?;
+                            let mut view=super::log_view::LogView::new(source.into(),job,activity,"Callback output".into())?;
                             view.start_at(values["offset"].as_u64().unwrap_or(0));
                             frame.lock().unwrap().inspection=Some(view.read(&socket,0)?);output_view=Some(view);
                         }
@@ -349,15 +351,31 @@ fn run(
                     Err(e) => view.error = Some(e),
                     Ok(value) => {
                         view.error = None;
-                        view.notice = Some(if let Some(id) = value.get("id") {
-                            format!(
-                                "Work {} · {}",
-                                id,
-                                value["status"].as_str().unwrap_or("accepted")
-                            )
-                        } else {
-                            value["status"].as_str().unwrap_or("Done").to_string()
-                        });
+                        view.notice = Some(
+                            if value["observed_target"]["source"]
+                                .as_str()
+                                .is_some_and(|source| source.starts_with("file:"))
+                            {
+                                let observed = &value["observed_target"];
+                                let values = &observed["values"];
+                                format!(
+                                    "Last observed {} · {} · {} · permissions {} · measured {}",
+                                    values["path"].as_str().unwrap_or("File"),
+                                    values["kind"].as_str().unwrap_or("unavailable"),
+                                    values["size_text"].as_str().unwrap_or("Unavailable"),
+                                    values["mode_text"].as_str().unwrap_or("Unavailable"),
+                                    observed["observed_at"]
+                                )
+                            } else if let Some(id) = value.get("id") {
+                                format!(
+                                    "Work {} · {}",
+                                    id,
+                                    value["status"].as_str().unwrap_or("accepted")
+                                )
+                            } else {
+                                value["status"].as_str().unwrap_or("Done").to_string()
+                            },
+                        );
                     }
                 }
             }
@@ -474,6 +492,41 @@ fn run(
                                 ensured.clear();
                             }
                             ensured.extend(jobs);
+                        }
+                    }
+                }
+                if let Some(id) = activity.as_ref().and_then(|id| id.parse::<i64>().ok()) {
+                    if source_scan.0 != activity {
+                        source_scan = (activity.clone(), String::new());
+                    }
+                    if !stop.load(Ordering::Relaxed) {
+                        if let Ok(page) = request(
+                            &socket,
+                            &json!({"op":"source.list","activity_id":id.to_string(),"after":source_scan.1,"limit":64}),
+                        ) {
+                            let sources = page["sources"]
+                                .as_array()
+                                .into_iter()
+                                .flatten()
+                                .filter_map(|row| row["source"].as_str())
+                                .filter(|source| {
+                                    source.starts_with("broker:") || source.starts_with("file:")
+                                })
+                                .filter(|source| !ensured_sources.contains(*source))
+                                .map(String::from)
+                                .collect::<Vec<_>>();
+                            let registered=sources.is_empty() || request(&socket,&json!({"op":"action.ensure_sources","activity_id":id,"sources":sources})).is_ok();
+                            if registered {
+                                if ensured_sources.len() > 4096 {
+                                    ensured_sources.clear();
+                                }
+                                ensured_sources.extend(sources);
+                                source_scan.1 = if page["has_more"] == true {
+                                    page["next"].as_str().unwrap_or("").into()
+                                } else {
+                                    String::new()
+                                };
+                            }
                         }
                     }
                 }
