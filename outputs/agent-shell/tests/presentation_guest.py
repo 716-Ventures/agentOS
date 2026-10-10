@@ -120,6 +120,19 @@ def main():
             read_back=presentation_view.invoke(terminal_request,current_form,'read',key='terminal-output-read')
             assert read_back['observed_target']['text']=='back λ 日本語\n',read_back
             assert ok({'op':'draft.get','surface_id':'output-form','element_id':'offset'})['draft'] is None
+            first_page=ok({'op':'presentation.page','activity_id':str(activity),'limit':1})
+            batch=[];expected={}
+            for index in range(70):
+                extra=json.loads(json.dumps(form));extra['surface_id']=f'paged-{index:03d}';extra['revision']=0
+                batch.append({'op':'surface.create','document':extra});expected[extra['surface_id']]=None
+            ok({'op':'presentation.apply','protocol':PROTOCOL,'catalog_revision':CATALOG,'request_id':'page-collection','expected_revisions':expected,'operations':batch})
+            old=call({'op':'presentation.page','activity_id':str(activity),'expected_cursor':first_page['event_cursor'],'after_id':first_page['next_after_id']})
+            assert not old['ok'] and 'resync_required' in old['error'],old
+            paged=presentation_view.presentation_pages.read(terminal_request,activity)
+            assert len(paged['documents'])==72 and paged['documents']==ok({'op':'presentation.snapshot'})['documents']
+            single=ok({'op':'presentation.get','document_id':'paged-069','activity_id':str(activity)})
+            assert single['surface_id']=='paged-069'
+            print('PASS: real IPC collection paging, journal consistency, single-document reads and 70-view assembly')
             print('PASS: terminal shared projection, lease-owned edit/commit and actual opaque output callback')
             print('PASS: typed edited callback parameters, actual bounded Unicode output, idempotency and stale-form rejection')
             print('PASS: host-issued stop action, actual process cancellation, idempotent callback receipt, forged actor rejection, revocation')

@@ -2,6 +2,10 @@
 import json
 import os
 import socket
+import sys
+from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'client'))
+import presentation_pages
 
 PROTOCOL='agentos.presentation/1'
 CATALOG='native-core/1'
@@ -23,7 +27,7 @@ def request(op, **fields):
 
 
 def for_activity(activity):
-    state=request('presentation.snapshot')
+    state=presentation_pages.read(request,activity)
     state['documents']={key:doc for key,doc in state['documents'].items() if doc['activity_id']==str(activity)}
     state['host_surfaces']={key:host for key,host in state.get('host_surfaces',{}).items() if host.get('activity_id')==str(activity)}
     state['renderers']={key:owner for key,owner in state.get('renderers',{}).items() if key in state['documents']}

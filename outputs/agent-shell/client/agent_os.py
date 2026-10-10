@@ -1125,7 +1125,7 @@ def main():
         result=presentation_request(op,**payload)
     elif args.cmd=='views':
         if args.text:
-            state=request('presentation.snapshot')
+            state=presentation_view.presentation_pages.read(request,args.activity,metadata=False)
             for ident,doc in state['documents'].items():
                 if not doc.get('surface_id') or doc['activity_id']!=str(args.activity):continue
                 print(clean(doc['title'])+' ['+ident+']')

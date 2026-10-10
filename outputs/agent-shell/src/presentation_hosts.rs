@@ -139,6 +139,13 @@ pub fn alive(session: &str) -> bool {
         .unwrap_or(false)
 }
 pub fn snapshot(db: &Connection, referenced: &BTreeSet<String>) -> Result<Value> {
+    snapshot_for(db, referenced, None)
+}
+pub fn snapshot_for(
+    db: &Connection,
+    referenced: &BTreeSet<String>,
+    filter: Option<&str>,
+) -> Result<Value> {
     let mut query=db.prepare("SELECT id,activity,session,title,app_id,connected,observed_at FROM presentation_host_surfaces ORDER BY id").map_err(|e|e.to_string())?;
     let rows = query
         .query_map([], |r| {
@@ -157,6 +164,9 @@ pub fn snapshot(db: &Connection, referenced: &BTreeSet<String>) -> Result<Value>
     for row in rows {
         let (id, activity, session, title, app_id, connected, observed_at) =
             row.map_err(|e| e.to_string())?;
+        if filter.is_some_and(|wanted| wanted != activity) {
+            continue;
+        }
         let available = connected && alive(&session);
         if !available && !referenced.contains(&id) {
             continue;
@@ -205,9 +215,12 @@ pub fn renderer(db: &Connection, v: &Value, who: &Principal) -> Result<Value> {
     Ok(json!({"surface_id":id}))
 }
 pub fn renderers(db: &Connection) -> Result<Value> {
-    let mut q = db.prepare("SELECT surface,uid,session FROM presentation_renderers WHERE surface IN (SELECT id FROM presentation_documents)").map_err(|e|e.to_string())?;
+    renderers_for(db, None)
+}
+pub fn renderers_for(db: &Connection, activity: Option<&str>) -> Result<Value> {
+    let mut q = db.prepare("SELECT surface,uid,session FROM presentation_renderers WHERE surface IN (SELECT id FROM presentation_documents WHERE ?1 IS NULL OR json_extract(body,'$.activity_id')=?1)").map_err(|e|e.to_string())?;
     let rows = q
-        .query_map([], |r| {
+        .query_map([activity], |r| {
             Ok((
                 r.get::<_, String>(0)?,
                 r.get::<_, u32>(1)?,

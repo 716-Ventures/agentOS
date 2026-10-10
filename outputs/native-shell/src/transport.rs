@@ -273,7 +273,7 @@ fn run(
                                     }else{false};
                                     if !valid {frame.lock().unwrap().error=Some("The recorded work is unavailable or belongs to another activity; record a new request".into());continue;}
                                 }else if surface!="native-launcher" {
-                                    let snapshot=request(&socket,&json!({"op":"presentation.snapshot"}));
+                                    let snapshot=super::presentation_pages::read(|value|request(&socket,value),None,||stop.load(Ordering::Relaxed));
                                     if snapshot.as_ref().map(|s|s["documents"][surface]["activity_id"].as_str()!=Some(activity.to_string().as_str())).unwrap_or(true) {
                                         frame.lock().unwrap().error=Some("The recorded view was closed or moved; record a new request".into());continue;
                                     }
@@ -363,7 +363,11 @@ fn run(
             .is_err()
         });
         flush(&socket, &drafts, &frame, &stop);
-        match request(&socket, &json!({"op":"presentation.snapshot"})) {
+        match super::presentation_pages::read(
+            |value| request(&socket, value),
+            activity.as_deref(),
+            || stop.load(Ordering::Relaxed),
+        ) {
             Ok(state) => {
                 let mut next = Frame {
                     connected: true,
@@ -513,7 +517,7 @@ fn flush(
     }
 }
 fn close_surface(socket: &PathBuf, surface: &str) -> Result<Value, String> {
-    let state = request(socket, &json!({"op":"presentation.snapshot"}))?;
+    let state = super::presentation_pages::read(|value| request(socket, value), None, || false)?;
     let revision = state["documents"][surface]["revision"].clone();
     if revision.is_null() {
         return Err("Surface is already closed".into());
@@ -587,7 +591,7 @@ fn resolve_draft(
             return Err("Draft changed in another editor; recover before resolving it".into());
         }
     }
-    let snapshot = request(socket, &json!({"op":"presentation.snapshot"}))?;
+    let snapshot = super::presentation_pages::read(|value| request(socket, value), None, || false)?;
     let doc = &snapshot["documents"][surface];
     let revision = doc["revision"].as_u64().ok_or("View unavailable")?;
     let expected = saved["draft_revision"]

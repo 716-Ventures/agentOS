@@ -1,4 +1,5 @@
 import copy
+import sys
 import importlib.util
 from pathlib import Path
 import unittest
@@ -6,6 +7,7 @@ import tempfile
 import json
 from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'client'))
 spec=importlib.util.spec_from_file_location('presentation_view',ROOT/'client/presentation_view.py');view=importlib.util.module_from_spec(spec);spec.loader.exec_module(view)
 
 def document():
@@ -56,7 +58,7 @@ class Projection(unittest.TestCase):
         calls=[]
         def request(op,**fields):
             calls.append((op,fields))
-            return {'interaction.begin':{},'draft.get':{'draft_revision':3,'draft':None},'draft.save':{'draft_revision':4},'presentation.snapshot':{'documents':{'view':{'revision':5}}},'presentation.apply':{'revisions':{'view':6}},'interaction.end':{}}[op]
+            return {'interaction.begin':{},'draft.get':{'draft_revision':3,'draft':None},'draft.save':{'draft_revision':4},'presentation.get':{'revision':5},'presentation.apply':{'revisions':{'view':6}},'interaction.end':{}}[op]
         inputs=iter(['42','s']);view.edit(request,document(),'field',lambda _:next(inputs),lambda _:None)
         self.assertEqual(calls[0][0],'interaction.begin');self.assertEqual(calls[-1][0],'interaction.end')
         apply=next(fields for op,fields in calls if op=='presentation.apply');self.assertEqual(apply['expected_revisions'],{'view':5});self.assertEqual(apply['operations'][0]['expected_draft_revision'],4)

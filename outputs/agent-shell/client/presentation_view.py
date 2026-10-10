@@ -10,6 +10,7 @@ import textwrap
 import threading
 import time
 import unicodedata
+import presentation_pages
 
 
 def clean(value):
@@ -192,7 +193,7 @@ def edit(request,document,element,input_fn=input,output=print):
         Path(local).unlink(missing_ok=True)
         choice=input_fn('[s] Save to view  [k] Keep draft  [d] Discard: ').strip().lower()
         if choice=='s':
-            current=request('presentation.snapshot')['documents'][surface]
+            current=request('presentation.get',document_id=surface,activity_id=document['activity_id'])
             result=request('presentation.apply',protocol='agentos.presentation/1',catalog_revision='native-core/1',request_id=f'terminal-save-{time.time_ns()}',expected_revisions={surface:current['revision']},operations=[{'op':'draft.commit','surface_id':surface,'element_id':element,'expected_draft_revision':saved['draft_revision']}])
             output('Saved. Revision '+str(result['revisions'][surface]))
         elif choice=='d':request('draft.save',surface_id=surface,element_id=element,expected_draft_revision=saved['draft_revision'],draft=None);output('Draft discarded.')
@@ -204,7 +205,7 @@ def interact(activity,request,input_fn=input,output=print):
     selected=None;offset=0
     while True:
         try:
-            documents={key:doc for key,doc in request('presentation.snapshot')['documents'].items() if doc.get('surface_id') and doc['activity_id']==str(activity)}
+            documents={key:doc for key,doc in presentation_pages.read(request,activity,metadata=False)['documents'].items() if doc.get('surface_id') and doc['activity_id']==str(activity)}
             output('\nShared views — activity '+str(activity))
             if selected not in documents:
                 selected=None

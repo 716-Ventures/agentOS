@@ -6,6 +6,7 @@ mod draft_cache;
 mod first_run;
 mod log_view;
 mod preferences;
+mod presentation_pages;
 mod transport;
 mod verification;
 mod voice;

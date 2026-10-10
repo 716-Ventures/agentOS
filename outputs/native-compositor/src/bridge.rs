@@ -16,6 +16,8 @@ use std::{
 };
 #[path = "bridge_grabs.rs"]
 mod grabs;
+#[path = "../../native-shell/src/presentation_pages.rs"]
+mod pages;
 #[derive(Clone, Debug, PartialEq)]
 pub struct Observed {
     pub id: String,
@@ -148,7 +150,11 @@ impl Bridge {
                 let observed = input.lock().unwrap().clone();
                 if let Some(observed) = observed {
                     let result = (|| -> Result<Scene, String> {
-                        let mut state = call(&socket, &json!({"op":"presentation.snapshot"}))?;
+                        let mut state = pages::read(
+                            |value| call(&socket, value),
+                            None,
+                            || stopping.load(Ordering::Relaxed),
+                        )?;
                         let activities = call(&socket, &json!({"op":"snapshot"}))?;
                         let available = activities["activities"]
                             .as_array()
@@ -277,7 +283,11 @@ impl Bridge {
                             counter += 1;
                             put(&socket, &doc, expected, &format!("host-{prefix}-{counter}"))?;
                         }
-                        state = call(&socket, &json!({"op":"presentation.snapshot"}))?;
+                        state = pages::read(
+                            |value| call(&socket, value),
+                            None,
+                            || stopping.load(Ordering::Relaxed),
+                        )?;
                         let mut next = Scene {
                             identities,
                             ..Scene::default()

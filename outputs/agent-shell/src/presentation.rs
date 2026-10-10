@@ -719,6 +719,139 @@ fn snapshot(db: &Connection) -> Result<Value> {
         json!({"protocol":PROTOCOL,"catalog_revision":CATALOG,"documents":docs,"host_surfaces":crate::presentation_hosts::snapshot(db,&referenced)?,"renderers":crate::presentation_hosts::renderers(db)?,"event_cursor":cursor}),
     )
 }
+/// Pages carry a journal cursor so callers never combine different document states.
+fn page(db: &Connection, value: &Value) -> Result<Value> {
+    let activity = match value.get("activity_id") {
+        None | Some(Value::Null) => None,
+        Some(Value::String(id)) if ident(id) => Some(id.as_str()),
+        _ => return Err(invalid("Invalid activity filter")),
+    };
+    let after = match value.get("after_id") {
+        None | Some(Value::Null) => "",
+        Some(Value::String(id)) if id.is_empty() || ident(id) => id.as_str(),
+        _ => return Err(invalid("Invalid document cursor")),
+    };
+    let limit = match value.get("limit") {
+        None => 16,
+        Some(v) => v
+            .as_u64()
+            .filter(|n| (1..=64).contains(n))
+            .ok_or_else(|| invalid("Page size must be between 1 and 64"))?,
+    };
+    let cursor: i64 = db
+        .query_row(
+            "SELECT COALESCE(MAX(cursor),0) FROM presentation_events",
+            [],
+            |r| r.get(0),
+        )
+        .map_err(db_error)?;
+    if let Some(expected) = value.get("expected_cursor") {
+        if expected.as_i64() != Some(cursor) {
+            return Err(error(
+                "resync_required",
+                "Presentation changed while reading pages",
+            ));
+        }
+    }
+    let mut q=db.prepare("SELECT id,body FROM presentation_documents WHERE id>?1 AND (?2 IS NULL OR json_extract(body,'$.activity_id')=?2) ORDER BY id LIMIT ?3").map_err(db_error)?;
+    let rows = q
+        .query_map(params![after, activity, limit + 1], |r| {
+            Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?))
+        })
+        .map_err(db_error)?;
+    let mut documents = BTreeMap::new();
+    let mut bytes = 0;
+    let mut more = false;
+    for row in rows {
+        let (id, body) = row.map_err(db_error)?;
+        if documents.len() >= limit as usize
+            || (!documents.is_empty() && bytes + body.len() > 2 * DOCUMENT_LIMIT)
+        {
+            more = true;
+            break;
+        }
+        bytes += body.len();
+        documents.insert(id, serde_json::from_str::<Value>(&body).map_err(db_error)?);
+    }
+    let next = if more {
+        documents.keys().next_back().cloned()
+    } else {
+        None
+    };
+    Ok(
+        json!({"protocol":PROTOCOL,"catalog_revision":CATALOG,"documents":documents,"event_cursor":cursor,"next_after_id":next}),
+    )
+}
+fn metadata(db: &Connection, value: &Value) -> Result<Value> {
+    let activity = match value.get("activity_id") {
+        None | Some(Value::Null) => None,
+        Some(Value::String(id)) if ident(id) => Some(id.as_str()),
+        _ => return Err(invalid("Invalid activity filter")),
+    };
+    let cursor: i64 = db
+        .query_row(
+            "SELECT COALESCE(MAX(cursor),0) FROM presentation_events",
+            [],
+            |r| r.get(0),
+        )
+        .map_err(db_error)?;
+    if value
+        .get("expected_cursor")
+        .is_some_and(|v| v.as_i64() != Some(cursor))
+    {
+        return Err(error(
+            "resync_required",
+            "Presentation changed while reading pages",
+        ));
+    }
+    let mut referenced = BTreeSet::new();
+    let mut q=db.prepare("SELECT body FROM presentation_documents WHERE json_type(body,'$.workspace_id')='text' AND (?1 IS NULL OR json_extract(body,'$.activity_id')=?1)").map_err(db_error)?;
+    let rows = q
+        .query_map([activity], |r| r.get::<_, String>(0))
+        .map_err(db_error)?;
+    for row in rows {
+        if let Document::Workspace(workspace) =
+            serde_json::from_str::<Document>(&row.map_err(db_error)?).map_err(db_error)?
+        {
+            referenced.extend(workspace::surfaces(&workspace));
+        }
+    }
+    let state = json!({"protocol":PROTOCOL,"catalog_revision":CATALOG,"event_cursor":cursor,"host_surfaces":crate::presentation_hosts::snapshot_for(db,&referenced,activity)?,"renderers":crate::presentation_hosts::renderers_for(db,activity)?});
+    if state.to_string().len() > TRANSACTION_LIMIT {
+        return Err(error(
+            "resource_limit",
+            "Presentation metadata exceeds its transport budget",
+        ));
+    }
+    Ok(state)
+}
+fn get_document(db: &Connection, value: &Value) -> Result<Value> {
+    let id = value["document_id"]
+        .as_str()
+        .filter(|id| ident(id))
+        .ok_or_else(|| invalid("Document identity required"))?;
+    let body: Option<String> = db
+        .query_row(
+            "SELECT body FROM presentation_documents WHERE id=?",
+            [id],
+            |r| r.get(0),
+        )
+        .optional()
+        .map_err(db_error)?;
+    let doc: Value = serde_json::from_str(
+        &body.ok_or_else(|| error("missing_reference", "Document unavailable"))?,
+    )
+    .map_err(db_error)?;
+    if let Some(activity) = value.get("activity_id") {
+        if activity != &doc["activity_id"] {
+            return Err(error(
+                "missing_reference",
+                "Document unavailable in this activity",
+            ));
+        }
+    }
+    Ok(doc)
+}
 fn element_path(surface: &SurfaceDocument, target: &str) -> Vec<(String, String, usize)> {
     fn walk(
         s: &SurfaceDocument,
@@ -1204,6 +1337,9 @@ pub fn handle(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> 
             crate::presentation_actions::handle(db, v, who)
         }
         "presentation.snapshot" => snapshot(db),
+        "presentation.page" => page(db, v),
+        "presentation.metadata" => metadata(db, v),
+        "presentation.get" => get_document(db, v),
         "presentation.apply" => apply(db, v, who),
         "presentation.subscribe" => {
             let cursor = v["after_cursor"].as_i64().unwrap_or(0);
@@ -1523,6 +1659,80 @@ mod tests {
     }
     fn props(request: &str, revision: u64, element: &str, text: &str) -> Value {
         json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":request,"expected_revisions":{"surface-a":revision},"operations":[{"op":"element.set_props","surface_id":"surface-a","element_id":element,"props":{"text":text}}]})
+    }
+    #[test]
+    fn document_pages_are_bounded_scoped_and_refuse_mixed_revisions() {
+        let mut db = fixture();
+        for i in 0..5 {
+            let mut doc = surface();
+            doc["surface_id"] = json!(format!("surface-{i}"));
+            doc["activity_id"] = json!(if i == 4 { "2" } else { "1" });
+            db.execute(
+                "INSERT INTO presentation_documents VALUES(?,?)",
+                params![format!("surface-{i}"), doc.to_string()],
+            )
+            .unwrap();
+        }
+        let first = handle(
+            &mut db,
+            &json!({"op":"presentation.page","activity_id":"1","limit":2}),
+            &human(),
+        )
+        .unwrap();
+        assert_eq!(first["documents"].as_object().unwrap().len(), 2);
+        assert_eq!(first["next_after_id"], "surface-1");
+        let second=handle(&mut db,&json!({"op":"presentation.page","activity_id":"1","limit":2,"after_id":first["next_after_id"],"expected_cursor":first["event_cursor"]}),&human()).unwrap();
+        assert_eq!(second["documents"].as_object().unwrap().len(), 2);
+        assert!(second["next_after_id"].is_null());
+        assert!(handle(
+            &mut db,
+            &json!({"op":"presentation.get","document_id":"surface-4","activity_id":"1"}),
+            &human()
+        )
+        .is_err());
+        assert_eq!(
+            handle(
+                &mut db,
+                &json!({"op":"presentation.get","document_id":"surface-4","activity_id":"2"}),
+                &human()
+            )
+            .unwrap()["activity_id"],
+            "2"
+        );
+        for limit in [0, 65] {
+            assert!(handle(
+                &mut db,
+                &json!({"op":"presentation.page","limit":limit}),
+                &human()
+            )
+            .is_err());
+        }
+        create(&mut db);
+        assert!(handle(
+            &mut db,
+            &json!({"op":"presentation.page","expected_cursor":first["event_cursor"]}),
+            &human()
+        )
+        .unwrap_err()
+        .contains("resync_required"));
+    }
+    #[test]
+    fn document_page_byte_budget_keeps_large_collections_bounded() {
+        let db = fixture();
+        for i in 0..8 {
+            let mut doc = surface();
+            doc["surface_id"] = json!(format!("large-{i}"));
+            doc["elements"]["text"]["props"]["text"] = json!("a".repeat(700_000));
+            db.execute(
+                "INSERT INTO presentation_documents VALUES(?,?)",
+                params![format!("large-{i}"), doc.to_string()],
+            )
+            .unwrap();
+        }
+        let first = page(&db, &json!({"limit":64})).unwrap();
+        assert_eq!(first["documents"].as_object().unwrap().len(), 2);
+        assert!(first.to_string().len() < 2 * DOCUMENT_LIMIT);
+        assert_eq!(first["next_after_id"], "large-1");
     }
     #[test]
     fn atomic_rejection_stale_and_deduplicated_receipts() {
