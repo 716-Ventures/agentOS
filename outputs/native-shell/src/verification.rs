@@ -266,7 +266,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         assert!(output_commands.iter().any(|command|matches!(command,Command::FollowOutput(true))));
         assert!(output_commands.iter().any(|command|matches!(command,Command::PageOutput(-1))));
         let mut surface=Surface::new(app,"native-fixture",&commands);surface.update("native-fixture",&doc,&frame,&commands,&drafts);
-        if std::env::var("AGENT_OS_NATIVE_TEST_SKIP_FILE_REVIEW").as_deref()!=Ok("1"){document_dialog::verify_review(surface.window.upcast_ref());}
+        if std::env::var("AGENT_OS_NATIVE_TEST_SKIP_FILE_REVIEW").as_deref()!=Ok("1"){document_dialog::verify_review(surface.window.upcast_ref());draft_dialog::verify(surface.window.upcast_ref());}
         let paintable=gtk::WidgetPaintable::new(Some(&surface.scroll));let quit=app.clone();let capture=capture.clone();
         glib::timeout_add_local_once(Duration::from_millis(std::env::var("AGENT_OS_NATIVE_TEST_DELAY_MS").ok().and_then(|s|s.parse::<u64>().ok()).unwrap_or(700).clamp(700,10000)),move || {
             println!("CHECK: mapped native surface");

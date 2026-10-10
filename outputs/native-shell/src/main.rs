@@ -5,6 +5,7 @@ mod broker_pages;
 mod controls;
 mod document_dialog;
 mod draft_cache;
+mod draft_dialog;
 mod first_run;
 mod image_controls;
 mod job_list;
@@ -627,6 +628,15 @@ fn draft_controls(
         });
         row.append(&button);
     }
+    let review = ui::button("Review latest version…", ButtonVariant::Outline, false);
+    let (sender, s, e) = (commands.clone(), surface.to_string(), element.to_string());
+    review.connect_clicked(move |button| {
+        let parent = button
+            .root()
+            .and_then(|root| root.downcast::<gtk::Window>().ok());
+        draft_dialog::review(parent.as_ref(), s.clone(), e.clone(), sender.clone());
+    });
+    row.append(&review);
     widget.append(&row);
 }
 fn literal_editor_value(props: &Value) -> String {

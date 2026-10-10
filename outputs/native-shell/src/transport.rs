@@ -137,6 +137,18 @@ pub enum Command {
         edit: Value,
     },
     WorkspaceUndo(i64),
+    ReviewDraft {
+        surface: String,
+        element: String,
+        reply: Sender<Result<Value, String>>,
+    },
+    ResolveReviewedDraft {
+        surface: String,
+        element: String,
+        revision: u64,
+        draft_revision: u64,
+        text: String,
+    },
     ResolveDraft {
         surface: String,
         element: String,
@@ -332,7 +344,13 @@ fn run(
                     Command::WorkspaceEdit{workspace,revision,edit}=>request(&socket,&json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("workspace-{}",super::nonce()),"expected_revisions":{workspace.clone():revision},"operations":[{"op":"workspace.edit","workspace_id":workspace,"edit":edit}]})).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt}),
                     Command::WorkspaceUndo(cursor)=>request(&socket,&json!({"op":"presentation.undo","event_cursor":cursor,"request_id":format!("undo-{}",super::nonce())})).map(|receipt|{frame.lock().unwrap().workspace_undo=None;receipt}),
                     Command::RegisterRenderer(surface)=>request(&socket,&json!({"op":"host.renderer","surface_id":surface})),
-                    Command::ResolveDraft{surface,element,commit,revision}=>resolve_draft(&socket,&surface,&element,commit,revision,&drafts),
+                    Command::ReviewDraft{surface,element,reply}=>{
+                        flush(&socket,&drafts,&frame,&stop);
+                        let result=review_draft(&socket,&surface,&element,&drafts);
+                        let _=reply.send(result.clone());result.map(|_|json!({"status":"Latest document and retained draft ready for review"}))
+                    },
+                    Command::ResolveReviewedDraft{surface,element,revision,draft_revision,text}=>resolve_draft(&socket,&surface,&element,true,revision,Some((draft_revision,text)),&drafts),
+                    Command::ResolveDraft{surface,element,commit,revision}=>resolve_draft(&socket,&surface,&element,commit,revision,None,&drafts),
                     Command::Preferences(value)=>super::preferences::save(&value),
                     Command::Setup=>std::process::Command::new("weston-terminal").args(["--shell","/usr/local/bin/agent-os-setup"]).spawn().map(|mut child|{std::thread::spawn(move||{let _=child.wait();});json!({"status":"Setup opened"})}).map_err(|e|e.to_string()),
                     Command::SelectActivity(id)=>{activity=Some(id);Ok(json!({"status":"Activity selected"}))},
@@ -829,12 +847,58 @@ pub(crate) fn broker_socket() -> PathBuf {
     )
 }
 
+fn review_draft(
+    socket: &PathBuf,
+    surface: &str,
+    element: &str,
+    drafts: &Arc<Mutex<BTreeMap<(String, String), Draft>>>,
+) -> Result<Value, String> {
+    if drafts
+        .lock()
+        .unwrap()
+        .get(&(surface.into(), element.into()))
+        .is_some_and(|draft| draft.dirty)
+    {
+        return Err(
+            "The local draft could not be synchronized; it remains retained for recovery".into(),
+        );
+    }
+    let doc = request(
+        socket,
+        &json!({"op":"presentation.get","document_id":surface}),
+    )?;
+    let node = &doc["elements"][element];
+    if !["TextField@1", "DocumentEditor@1", "Choice@1", "Toggle@1"]
+        .iter()
+        .any(|kind| node["type"] == *kind)
+    {
+        return Err("This editor changed or is unavailable; recover its retained draft".into());
+    }
+    let saved = request(
+        socket,
+        &json!({"op":"draft.get","surface_id":surface,"element_id":element}),
+    )?;
+    let text = saved["draft"]
+        .as_str()
+        .ok_or("No retained draft to review; edit the field first")?;
+    let value = &node["props"]["value"];
+    let before = value
+        .as_str()
+        .map(String::from)
+        .or_else(|| value.as_bool().map(|v| v.to_string()))
+        .unwrap_or_default();
+    Ok(
+        json!({"title":doc["title"],"before":before,"after":text,"revision":doc["revision"],"draft_revision":saved["draft_revision"]}),
+    )
+}
+
 fn resolve_draft(
     socket: &PathBuf,
     surface: &str,
     element: &str,
     commit: bool,
     viewed_revision: u64,
+    reviewed: Option<(u64, String)>,
     drafts: &Arc<Mutex<BTreeMap<(String, String), Draft>>>,
 ) -> Result<Value, String> {
     request(
@@ -851,6 +915,19 @@ fn resolve_draft(
             socket,
             &json!({"op":"draft.get","surface_id":surface,"element_id":element}),
         )?;
+        if let Some((revision, text)) = &reviewed {
+            if saved["draft_revision"].as_u64() != Some(*revision)
+                || saved["draft"].as_str() != Some(text.as_str())
+                || local.as_ref().is_some_and(|local| {
+                    local.dirty || local.expected != *revision || local.text != *text
+                })
+            {
+                return Err(
+                    "Draft changed after review; keep it and review the latest versions again"
+                        .into(),
+                );
+            }
+        }
         if let Some(local) = &local {
             if local.dirty && commit {
                 let receipt = request(
@@ -1094,6 +1171,49 @@ fn open_surface(socket: &PathBuf, frame: &Frame, document: Value) -> Result<Valu
 mod draft_revision_tests {
     use super::*;
     #[test]
+    fn reviewed_save_rejects_a_changed_draft_without_committing_and_ends_its_lease() {
+        use std::os::unix::net::UnixListener;
+        for (revision, text) in [(2, "Reviewed edit"), (1, "Another editor's text")] {
+            let path = std::env::temp_dir().join(format!(
+                "agentos-reviewed-{}-{}.sock",
+                std::process::id(),
+                super::super::nonce()
+            ));
+            let listener = UnixListener::bind(&path).unwrap();
+            let server = std::thread::spawn(move || {
+                for expected in ["interaction.begin", "draft.get", "interaction.end"] {
+                    let (mut conn, _) = listener.accept().unwrap();
+                    let mut raw = String::new();
+                    BufReader::new(conn.try_clone().unwrap())
+                        .read_line(&mut raw)
+                        .unwrap();
+                    let query: Value = serde_json::from_str(&raw).unwrap();
+                    assert_eq!(query["op"], expected);
+                    let result = if expected == "draft.get" {
+                        json!({"draft_revision":revision,"draft":text})
+                    } else {
+                        json!({})
+                    };
+                    writeln!(conn, "{}", json!({"ok":true,"result":result})).unwrap();
+                }
+            });
+            let drafts = Arc::new(Mutex::new(BTreeMap::new()));
+            let error = resolve_draft(
+                &path,
+                "surface",
+                "editor",
+                true,
+                7,
+                Some((1, "Reviewed edit".into())),
+                &drafts,
+            )
+            .unwrap_err();
+            assert!(error.contains("Draft changed after review"));
+            server.join().unwrap();
+            std::fs::remove_file(path).unwrap();
+        }
+    }
+    #[test]
     fn save_refuses_a_revision_the_user_has_not_seen_and_retains_the_local_draft() {
         use std::{
             io::{BufRead, BufReader, Write},
@@ -1137,9 +1257,11 @@ mod draft_revision_tests {
                 resolved: None,
             },
         )])));
-        assert!(resolve_draft(&path, "surface", "editor", true, 1, &drafts)
-            .unwrap_err()
-            .contains("View changed"));
+        assert!(
+            resolve_draft(&path, "surface", "editor", true, 1, None, &drafts)
+                .unwrap_err()
+                .contains("View changed")
+        );
         assert_eq!(
             drafts.lock().unwrap()[&("surface".into(), "editor".into())].text,
             "Local user document"

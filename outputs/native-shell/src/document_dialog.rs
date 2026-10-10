@@ -90,57 +90,18 @@ fn review_replacement(
     path: PathBuf,
     commands: Sender<Command>,
 ) -> gtk::Window {
-    let window = gtk::Window::builder()
-        .title("Review file replacement")
-        .default_width(900)
-        .default_height(600)
-        .modal(true)
-        .build();
-    window.set_transient_for(parent);
-    window.set_application(parent.and_then(|p| p.application()).as_ref());
-    let content = ui::column(12);
-    content.set_margin_top(20);
-    content.set_margin_bottom(20);
-    content.set_margin_start(20);
-    content.set_margin_end(20);
-    let notice = ui::text("Loading saved document and current file…", false);
-    content.append(&notice);
-    let panes = ui::row(12);
-    panes.set_vexpand(true);
-    let mut previews = Vec::new();
-    for label in ["Current file", "Saved document replacement"] {
-        let column = ui::column(8);
-        column.set_hexpand(true);
-        column.append(&ui::text(label, true));
-        let text = gtk::TextView::builder()
-            .editable(false)
-            .monospace(true)
-            .wrap_mode(gtk::WrapMode::WordChar)
-            .build();
-        text.update_property(&[gtk::accessible::Property::Label(label)]);
-        let scroll = gtk::ScrolledWindow::builder()
-            .min_content_height(240)
-            .child(&text)
-            .vexpand(true)
-            .hexpand(true)
-            .build();
-        column.append(&scroll);
-        panes.append(&column);
-        previews.push(text);
-    }
-    content.append(&panes);
-    let save = ui::button(
+    let ReviewPanel {
+        window,
+        notice,
+        previews,
+        save,
+        cancel,
+    } = panel(
+        parent,
+        "Review file replacement",
+        ["Current file", "Saved document replacement"],
         "Replace file and retain original",
-        ButtonVariant::Primary,
-        false,
     );
-    save.set_sensitive(false);
-    let cancel = ui::button("Cancel", ButtonVariant::Outline, false);
-    let row = ui::row(8);
-    row.append(&save);
-    row.append(&cancel);
-    content.append(&row);
-    window.set_child(Some(&content));
     let fingerprint = Rc::new(RefCell::new(None::<String>));
     let (sender, digest, weak) = (commands.clone(), fingerprint.clone(), window.downgrade());
     let selected = path.clone();
@@ -256,4 +217,73 @@ pub fn verify_review(parent: &gtk::Window) {
     assert!(!window.is_visible());
     window.destroy();
     println!("CHECK: file replacement requires completed review and deliberate human action with exact revision/hash");
+}
+
+pub(super) struct ReviewPanel {
+    pub window: gtk::Window,
+    pub notice: gtk::Label,
+    pub previews: Vec<gtk::TextView>,
+    pub save: gtk::Button,
+    pub cancel: gtk::Button,
+}
+pub(super) fn panel(
+    parent: Option<&gtk::Window>,
+    title: &str,
+    labels: [&str; 2],
+    save_label: &str,
+) -> ReviewPanel {
+    let window = gtk::Window::builder()
+        .title(title)
+        .default_width(900)
+        .default_height(600)
+        .modal(true)
+        .build();
+    window.set_transient_for(parent);
+    window.set_application(parent.and_then(|p| p.application()).as_ref());
+    let content = ui::column(12);
+    content.set_margin_top(20);
+    content.set_margin_bottom(20);
+    content.set_margin_start(20);
+    content.set_margin_end(20);
+    let notice = ui::text("Loading current and proposed versions…", false);
+    content.append(&notice);
+    let panes = ui::row(12);
+    panes.set_vexpand(true);
+    let mut previews = Vec::new();
+    for label in labels {
+        let column = ui::column(8);
+        column.set_hexpand(true);
+        column.append(&ui::text(label, true));
+        let text = gtk::TextView::builder()
+            .editable(false)
+            .monospace(true)
+            .wrap_mode(gtk::WrapMode::WordChar)
+            .build();
+        text.update_property(&[gtk::accessible::Property::Label(label)]);
+        let scroll = gtk::ScrolledWindow::builder()
+            .min_content_height(240)
+            .child(&text)
+            .vexpand(true)
+            .hexpand(true)
+            .build();
+        column.append(&scroll);
+        panes.append(&column);
+        previews.push(text);
+    }
+    content.append(&panes);
+    let save = ui::button(save_label, ButtonVariant::Primary, false);
+    save.set_sensitive(false);
+    let cancel = ui::button("Cancel", ButtonVariant::Outline, false);
+    let row = ui::row(8);
+    row.append(&save);
+    row.append(&cancel);
+    content.append(&row);
+    window.set_child(Some(&content));
+    ReviewPanel {
+        window,
+        notice,
+        previews,
+        save,
+        cancel,
+    }
 }
