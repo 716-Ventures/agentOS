@@ -86,8 +86,15 @@ except KeyboardInterrupt:print('INTERRUPTED',flush=True)
     cursor=0;output=b'';until(b'RESTART_READY')
     subprocess.run(['sudo','-n','systemctl','restart','agent-os-broker'],check=True)
     deadline=time.monotonic()+10
-    while not Path('/run/agent-os-broker/api.sock').exists() and time.monotonic()<deadline:time.sleep(.1)
-    state=request('poll',job_id=ident)
+    while True:
+        try:
+            state=request('poll',job_id=ident)
+            break
+        except (FileNotFoundError,ConnectionRefusedError,PermissionError):
+            # RuntimeDirectory is recreated during restart. Wait for the actual
+            # read-only API, including its final directory ownership/socket mode.
+            if time.monotonic()>=deadline:raise
+            time.sleep(.1)
     assert state['status']=='interrupted',state
     assert b'RESTART_READY' in state['output'].encode(),state
     assert subprocess.call(['sudo','-n','systemctl','is-active','--quiet','agent-os-exec-'+ident+'.service'])!=0

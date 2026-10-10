@@ -23,11 +23,15 @@ def runtime_directory():
     return runtime
 
 
-def child_command(bin_dir,core):
+def child_command(bin_dir,core,activity=None):
     compositor=bin_dir/'agent-os-compositor';desktop=bin_dir/'agent-os-desktop'
     if any(not path.is_absolute() or not path.is_file() or not os.access(path,os.X_OK) for path in (compositor,desktop)):
         raise ValueError('The graphical runtime is not installed')
-    return [str(compositor),'--command',str(desktop),'--socket',str(core)]
+    command=[str(compositor),'--command',str(desktop),'--socket',str(core)]
+    if activity is not None:
+        if type(activity) is not int or activity<1:raise ValueError('Choose a positive activity ID')
+        command.extend(['--activity',str(activity)])
+    return command
 
 
 def configuration(child,backend):
@@ -133,10 +137,11 @@ def main():
     parser.add_argument('--backend',choices=['drm','wayland','headless','direct'],default='drm',help='drm uses the Weston host; direct is experimental KMS; headless/wayland are explicit verification modes')
     parser.add_argument('--bin-dir',type=Path,default=Path('/usr/local/bin'))
     parser.add_argument('--socket',type=Path,default=Path('/run/agent-os/runtime.sock'))
+    parser.add_argument('--activity',type=int,help='Open this existing activity in the graphical session')
     parser.add_argument('--pixman',action='store_true')
     args=parser.parse_args()
     if args.backend=='direct' and args.pixman:raise ValueError('The direct backend requires GBM/GLES; pixman is a Weston host option')
-    runtime=runtime_directory();command=child_command(args.bin_dir,args.socket)
+    runtime=runtime_directory();command=child_command(args.bin_dir,args.socket,args.activity)
     enable_subreaper()
     env={**os.environ,'XDG_SESSION_TYPE':'wayland','XDG_CURRENT_DESKTOP':'agentOS','DESKTOP_SESSION':'agent-os',
          'AGENT_OS_COMPOSITOR_CORE':str(args.socket),'AGENT_OS_COMPOSITOR_BACKEND':'winit','WINIT_UNIX_BACKEND':'wayland','GDK_BACKEND':'wayland'}
