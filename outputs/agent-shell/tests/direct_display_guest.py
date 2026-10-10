@@ -2,7 +2,7 @@
 """Bounded direct KMS/seat/VT qualification in the dedicated development VM.
 
 Run as root. Owns one transient local login on unused VT 7, restores the original
-VT and stops the session even after failure. Does not synthesize physical input.
+VT and stops the session even after failure. Optional uinput devices exercise the kernel stack, not physical host input.
 """
 import argparse
 import json
@@ -24,6 +24,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--hold-seconds', type=int, default=0, choices=range(31),
                         help='Keep the verified desktop visible briefly for console inspection (0–30 seconds)')
+    parser.add_argument('--input',action='store_true',help='Exercise temporary kernel input devices in this dedicated VM')
     args = parser.parse_args()
     if os.geteuid() != 0:
         raise SystemExit('Run this dedicated-VM display qualification with sudo')
@@ -40,6 +41,8 @@ def main():
     owned = set()
     leader = None
     snapshot = None
+    verified = False
+    activity = surface = None
     with tempfile.TemporaryDirectory(prefix='agentos-display-metrics-') as directory:
         metrics = Path(directory)
         os.chown(metrics, user.pw_uid, user.pw_gid)
@@ -53,6 +56,10 @@ def main():
                     raise RuntimeError(result.get('error', 'Display control unavailable'))
                 return result.get('result')
         try:
+            if args.input:
+                fixture=metrics/'Direct input fixture';fixture.write_text('');os.chown(fixture,user.pw_uid,user.pw_gid)
+                activity=json.loads(command('runuser','-u','developer','--','agent-os','create','Direct input verification',capture_output=True).stdout)['id']
+                surface=json.loads(command('runuser','-u','developer','--','agent-os','document','import',str(activity),str(fixture),capture_output=True).stdout)['surface_id']
             command('chvt', '7')
             command('systemd-run', '--quiet', '--unit=' + unit, '--uid=developer',
                     '--property=PAMName=login', '--property=TTYPath=/dev/tty7',
@@ -64,7 +71,9 @@ def main():
                     '--setenv=XDG_SESSION_TYPE=wayland', '--setenv=XDG_SESSION_CLASS=user',
                     '--setenv=XDG_SEAT=seat0', '--setenv=XDG_VTNR=7',
                     '--setenv=LIBSEAT_BACKEND=logind', '--setenv=AGENT_OS_METRICS_DIR=' + directory,
-                    '/usr/bin/dbus-run-session', '--', '/usr/local/bin/agent-os-session', '--backend', 'direct')
+                    *(['--setenv=GTK_A11Y=atspi'] if args.input else []),
+                    '/usr/bin/dbus-run-session', '--', '/usr/local/bin/agent-os-session', '--backend', 'direct',
+                    *(['--activity',str(activity)] if activity else []))
             leader = int(subprocess.check_output(['systemctl', 'show', unit, '--property=MainPID', '--value'], text=True))
             assert leader > 0, 'Local login wrapper did not start'
             deadline = time.monotonic() + 30
@@ -102,6 +111,36 @@ def main():
                     if time.monotonic() >= deadline:
                         raise
                     time.sleep(.1)
+            if args.input:
+                import direct_input_probe
+                def core(op):
+                    payload={'op':op,**({'document_id':surface} if op=='presentation.get' else {'surface_id':surface,'element_id':'editor'})}
+                    return json.loads(command('runuser','-u','developer','--','agent-os','presentation','-',input=json.dumps(payload),capture_output=True).stdout)
+                def presentation(payload):
+                    result=subprocess.run(['runuser','-u','developer','--','agent-os','presentation','-'],input=json.dumps(payload),capture_output=True,text=True)
+                    if result.returncode:raise RuntimeError('Fixture workspace request failed: '+result.stdout+result.stderr)
+                    return json.loads(result.stdout)
+                deadline=time.monotonic()+5
+                while True:
+                    try:
+                        workspace=presentation({'op':'presentation.snapshot'})['documents'][f'desktop-{activity}']
+                        receipt=presentation({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
+                            'request_id':'direct-input-focus-'+uuid.uuid4().hex,'expected_revisions':{workspace['workspace_id']:workspace['revision']},
+                            'operations':[{'op':'workspace.edit','workspace_id':workspace['workspace_id'],'edit':{'kind':'maximize','surface_id':surface}},
+                                          {'op':'workspace.edit','workspace_id':workspace['workspace_id'],'edit':{'kind':'focus','surface_id':surface,'element_id':'editor'}}]})
+                        break
+                    except RuntimeError as exc:
+                        if '"code":"stale_revision"' not in str(exc) or time.monotonic()>deadline:raise
+                        time.sleep(.05)
+                assert receipt['status']=='committed',receipt
+                deadline=time.monotonic()+8
+                while True:
+                    observed=control(endpoint,'snapshot')
+                    target=next((ident for ident,logical in observed['shared']['identities'].items() if logical==surface),None)
+                    if target is not None and observed.get('seat_focus')==target:break
+                    if time.monotonic()>deadline:raise RuntimeError('Direct input fixture did not receive seat focus')
+                    time.sleep(.05)
+                direct_input_probe.verify(metrics,snapshot['outputs'][0],core,lambda:control(endpoint,'snapshot'),target)
             if args.hold_seconds:
                 print('Direct desktop ready for console inspection', flush=True)
                 time.sleep(args.hold_seconds)
@@ -112,6 +151,7 @@ def main():
                 if running.returncode != 0:
                     break
                 time.sleep(.1)
+            verified = True
         finally:
             try:
                 if subprocess.run(['systemctl', 'is-active', '--quiet', unit], check=False).returncode == 0:
@@ -124,6 +164,7 @@ def main():
                     if row.get('tty') == 'tty7' and row.get('uid') == user.pw_uid and row.get('leader') == leader:
                         command('loginctl', 'terminate-session', row['session'])
                         scope = 'session-' + row['session'] + '.scope'
+                        if not verified:print(subprocess.check_output(['journalctl','-u',scope,'--no-pager','-o','cat','-n','80'],text=True))
                         deadline = time.monotonic() + 3
                         while time.monotonic() < deadline:
                             if subprocess.run(['systemctl', 'is-active', '--quiet', scope], check=False).returncode != 0:
@@ -134,6 +175,8 @@ def main():
                             # SIGTERM. The exact owned scope is the cleanup bound.
                             subprocess.run(['systemctl', 'kill', '--signal=SIGKILL', '--kill-whom=all', scope], check=False)
                 command('chvt', original.removeprefix('tty'))
+                if activity is not None:
+                    command('runuser','-u','developer','--','agent-os','remove',str(activity),stdout=subprocess.DEVNULL)
                 logs = subprocess.check_output(['journalctl', '-u', unit, '--no-pager', '-o', 'cat'], text=True)
                 print(logs)
                 subprocess.run(['systemctl', 'reset-failed', unit], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -155,7 +198,7 @@ def main():
                           'frames_before_vt': snapshot['direct_frames_presented'],
                           'frames_after_vt': resumed['direct_frames_presented'],
                           'checks': ['direct native window', 'KMS output discovery', 'shared core connection',
-                                     'VT switch and resume', 'orderly shutdown', 'session directory cleanup', 'owned login scope cleanup'],
+                                     'VT switch and resume', 'orderly shutdown', 'session directory cleanup', 'owned login scope cleanup'] + (['kernel keyboard and absolute pointer','clipboard copy/paste','undo/redo','retained draft','deliberate pointer Save'] if args.input else []),
                           'not_tested': ['physical input', 'hotplug', 'physical GPU presentation']}))
 
 
