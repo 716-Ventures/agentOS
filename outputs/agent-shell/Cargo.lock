@@ -201,8 +201,8 @@ dependencies = [
 
 [[package]]
 name = "seven-sixteen-ui"
-version = "0.1.0-alpha.21"
-source = "git+https://github.com/716-Ventures/716-ui?tag=v0.1.0-alpha.21#de7b8b590153b02669977da1e94c4c407f485a54"
+version = "0.1.0-alpha.22"
+source = "git+https://github.com/716-Ventures/716-ui?tag=v0.1.0-alpha.22#7f66e63374c0907ec9ba99249aeb0ac768902cb1"
 dependencies = [
  "serde",
  "serde_json",

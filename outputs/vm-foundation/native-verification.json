@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-10-10T17:30:31.388850+00:00",
+  "started_at": "2026-10-10T18:05:38.805128+00:00",
   "result": "pass",
   "vm_uuid": "27176EA2-E994-4165-9BBA-70FEED59E66B",
   "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -61,9 +61,9 @@
     "OS update rollback"
   ],
   "deployment": {
-    "created_at": "2026-10-10T17:30:32.357420+00:00",
-    "source_archive_sha256": "153d317d8c5fa6f0b75ce29f2242147582ba0ec4fa7f952d76b6e9e134ca10b6",
-    "repository_revision": "167f556c1314abaa46a640e61db56a01de529411",
+    "created_at": "2026-10-10T18:05:52.385508+00:00",
+    "source_archive_sha256": "2648b0967d6a8f64cdef38bb8ac27a090a7a9eaeb4e8e18ad6489038471fb258",
+    "repository_revision": "b9ad423a4e6212148bc2c4b5e9ad3395ded02773",
     "source_changes": [
       " M outputs/agent-shell/Cargo.lock",
       " M outputs/agent-shell/Cargo.toml",
@@ -73,7 +73,7 @@
     ],
     "installed": true
   },
-  "runtime_release": "9aa030eca916f7b1bd3363711288723f7c4b7ad42f65f4101dc6944c3688e843",
+  "runtime_release": "36cd7ddfac5cf9739c61dbfa5186facd0456fdc61bc6f1f3b2d38cc79e86f6bb",
   "dependency_manifest": {
     "packages": {
       "adduser": "3.152",
@@ -857,5 +857,5 @@
     "python": "Python 3.9.6"
   },
   "guest_stopped": true,
-  "finished_at": "2026-10-10T17:34:34.668042+00:00"
+  "finished_at": "2026-10-10T18:09:58.745441+00:00"
 }
