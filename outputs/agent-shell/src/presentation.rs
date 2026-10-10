@@ -190,6 +190,12 @@ enum Operation {
         element_id: String,
         props: BTreeMap<String, Value>,
     },
+    #[serde(rename = "draft.commit")]
+    CommitDraft {
+        surface_id: String,
+        element_id: String,
+        expected_draft_revision: i64,
+    },
     #[serde(rename = "element.set_children")]
     Children {
         surface_id: String,
@@ -231,6 +237,7 @@ impl Operation {
             | Self::Put { surface_id, .. }
             | Self::Remove { surface_id, .. }
             | Self::Props { surface_id, .. }
+            | Self::CommitDraft { surface_id, .. }
             | Self::Children { surface_id, .. }
             | Self::Bind { surface_id, .. }
             | Self::Unbind { surface_id, .. }
@@ -940,6 +947,41 @@ fn apply(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> {
                             .ok_or_else(|| error("missing_reference", element_id))?
                             .props = props;
                     }
+                    Operation::CommitDraft {
+                        element_id,
+                        expected_draft_revision,
+                        ..
+                    } => {
+                        if !who.human() {
+                            return Err(error(
+                                "unauthorized",
+                                "Draft commit requires direct native input",
+                            ));
+                        }
+                        let saved:Option<(u32,String,i64,Option<String>)>=tx.query_row("SELECT uid,session,draft_revision,draft FROM presentation_leases WHERE document=? AND element=?",params![id,element_id],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?))).optional().map_err(db_error)?;
+                        let (uid, session, revision, draft) = saved
+                            .ok_or_else(|| error("missing_reference", "No draft to commit"))?;
+                        if uid != who.uid || session != who.session {
+                            return Err(error(
+                                "interaction_conflict",
+                                "Acquire the native editor before committing",
+                            ));
+                        }
+                        if revision != expected_draft_revision {
+                            return Err(error("stale_revision", "Draft changed before commit"));
+                        }
+                        let draft = draft
+                            .ok_or_else(|| error("missing_reference", "No draft text to commit"))?;
+                        let element = s
+                            .elements
+                            .get_mut(&element_id)
+                            .ok_or_else(|| error("missing_reference", &element_id))?;
+                        if element.kind != "TextField@1" {
+                            return Err(invalid("Only editable text fields can commit a draft"));
+                        }
+                        element.props.insert("value".into(), json!(draft));
+                        tx.execute("UPDATE presentation_leases SET draft=NULL,draft_revision=draft_revision+1 WHERE document=? AND element=?",params![id,element_id]).map_err(db_error)?;
+                    }
                     Operation::Children {
                         element_id,
                         slot,
@@ -1643,5 +1685,49 @@ mod tests {
         .contains("resync_required"));
         drop(db);
         std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn committing_a_native_draft_is_atomic_scoped_and_idempotent() {
+        let mut db = fixture();
+        create(&mut db);
+        handle(
+            &mut db,
+            &json!({"op":"interaction.begin","surface_id":"surface-a","element_id":"input"}),
+            &human(),
+        )
+        .unwrap();
+        handle(&mut db,&json!({"op":"draft.save","surface_id":"surface-a","element_id":"input","expected_draft_revision":0,"draft":"Reviewed λ"}),&human()).unwrap();
+        let commit = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"commit-draft","expected_revisions":{"surface-a":0},"operations":[{"op":"draft.commit","surface_id":"surface-a","element_id":"input","expected_draft_revision":1}]});
+        assert!(handle(&mut db, &commit, &agent()).is_err());
+        let mut broken = commit.clone();
+        broken["request_id"] = json!("atomic-bad");
+        broken["operations"]
+            .as_array_mut()
+            .unwrap()
+            .push(json!({"op":"element.remove","surface_id":"surface-a","element_id":"root"}));
+        assert!(handle(&mut db, &broken, &human()).is_err());
+        assert_eq!(
+            handle(
+                &mut db,
+                &json!({"op":"draft.get","surface_id":"surface-a","element_id":"input"}),
+                &human()
+            )
+            .unwrap()["draft"],
+            "Reviewed λ"
+        );
+        let first = handle(&mut db, &commit, &human()).unwrap();
+        assert_eq!(handle(&mut db, &commit, &human()).unwrap(), first);
+        assert_eq!(
+            snapshot(&db).unwrap()["documents"]["surface-a"]["elements"]["input"]["props"]["value"],
+            "Reviewed λ"
+        );
+        let draft = handle(
+            &mut db,
+            &json!({"op":"draft.get","surface_id":"surface-a","element_id":"input"}),
+            &human(),
+        )
+        .unwrap();
+        assert!(draft["draft"].is_null());
+        assert_eq!(draft["draft_revision"], 2);
     }
 }

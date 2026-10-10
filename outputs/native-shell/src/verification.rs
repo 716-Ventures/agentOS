@@ -35,7 +35,8 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             surface.update("native-fixture",&doc,&frame,&commands,&drafts);assert_eq!(field.entry.text(),"Unsaved λ 日本語");
             println!("CHECK: local edit preserved");
             // Simulate a durable flush; the retained local editor must still own its value.
-            drafts.lock().unwrap().values_mut().for_each(|d|d.dirty=false);
+            drafts.lock().unwrap().values_mut().for_each(|d|{d.dirty=false;d.resolved=Some(1);d.expected=1;});
+            frame.drafts.insert(("native-fixture".into(),"field".into()),json!({"draft_revision":1,"draft":null}));doc["elements"]["field"]["props"]["value"]=json!("Unsaved λ 日本語");
             surface.elements["link"].link.as_ref().unwrap().grab_focus();
             doc["elements"]["root"]["slots"]["children"]=json!(["field","reading","status","button","link","progress"]);
             surface.update("native-fixture",&doc,&frame,&commands,&drafts);

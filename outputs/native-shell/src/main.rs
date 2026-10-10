@@ -142,11 +142,14 @@ fn construct(
                             text: String::new(),
                             expected,
                             dirty: false,
+                            resolved: None,
                         });
                         draft.text = text;
                         draft.dirty = true;
+                        draft.resolved = None;
                     }
                 });
+                draft_controls(&area.widget, surface, id, commands);
                 result.widget = area.widget.clone().upcast();
                 lease(&area.view.clone().upcast(), surface, id, commands);
                 result.area = Some(area);
@@ -176,11 +179,14 @@ fn construct(
                         text: String::new(),
                         expected,
                         dirty: false,
+                        resolved: None,
                     });
                     draft.text = text;
                     draft.dirty = true;
+                    draft.resolved = None;
                 }
             });
+            draft_controls(&field.widget, surface, id, commands);
             result.widget = field.widget.clone().upcast();
             lease(&field.entry.clone().upcast(), surface, id, commands);
             result.field = Some(field);
@@ -238,6 +244,57 @@ fn construct(
         }
     }
     result
+}
+fn draft_controls(widget: &gtk::Box, surface: &str, element: &str, commands: &Sender<Command>) {
+    let row = ui::row(8);
+    for (label, commit) in [("Save draft", true), ("Discard draft", false)] {
+        let button = ui::button(label, ButtonVariant::Outline, false);
+        let (sender, s, e) = (commands.clone(), surface.to_string(), element.to_string());
+        button.connect_clicked(move |_| {
+            let _ = sender.send(Command::ResolveDraft {
+                surface: s.clone(),
+                element: e.clone(),
+                commit,
+            });
+        });
+        row.append(&button);
+    }
+    widget.append(&row);
+}
+fn editor_value(
+    surface: &str,
+    element: &str,
+    revision: u64,
+    props: &Value,
+    frame: &Frame,
+    drafts: &Arc<Mutex<BTreeMap<(String, String), Draft>>>,
+) -> Option<String> {
+    let key = (surface.to_string(), element.to_string());
+    let mut edits = drafts.lock().unwrap();
+    if let Some(local) = edits.get(&key) {
+        if let Some(resolved) = local.resolved {
+            let text = local.text.clone();
+            let observed = frame
+                .drafts
+                .get(&key)
+                .and_then(|d| d["draft_revision"].as_u64());
+            if revision >= resolved && observed.map(|v| v >= local.expected).unwrap_or(false) {
+                edits.remove(&key);
+            }
+            return Some(text);
+        } else {
+            return None;
+        }
+    }
+    Some(
+        frame
+            .drafts
+            .get(&key)
+            .and_then(|v| v["draft"].as_str())
+            .or_else(|| props["value"].as_str())
+            .unwrap_or("")
+            .into(),
+    )
 }
 fn bound(surface: &str, value: &Value, frame: &Frame) -> Value {
     if let Some(binding) = value["binding"].as_str() {
@@ -328,7 +385,7 @@ impl Surface {
             .lock()
             .unwrap()
             .iter()
-            .any(|((s, _), d)| s == id && d.dirty);
+            .any(|((s, _), d)| s == id && (d.dirty || d.resolved.is_none()));
         let changed = doc["revision"].as_u64() != self.revision;
         if changed && protected && self.revision.is_some() {
             let retained = self.document.clone();
@@ -440,32 +497,21 @@ impl Surface {
                         }
                     }
                 }
-                if let Some(field) = &e.field {
-                    let draft = frame
-                        .drafts
-                        .get(&(id.into(), element.clone()))
-                        .and_then(|v| v["draft"].as_str());
-                    let text = draft.or_else(|| props["value"].as_str()).unwrap_or("");
-                    if !drafts
-                        .lock()
-                        .unwrap()
-                        .contains_key(&(id.into(), element.clone()))
-                    {
-                        field.reconcile(text);
-                    }
-                }
-                if let Some(area) = &e.area {
-                    let draft = frame
-                        .drafts
-                        .get(&(id.into(), element.clone()))
-                        .and_then(|v| v["draft"].as_str());
-                    let text = draft.or_else(|| props["value"].as_str()).unwrap_or("");
-                    let retained = drafts
-                        .lock()
-                        .unwrap()
-                        .contains_key(&(id.into(), element.clone()));
-                    if !retained {
-                        area.reconcile(text);
+                if e.field.is_some() || e.area.is_some() {
+                    if let Some(text) = editor_value(
+                        id,
+                        element,
+                        doc["revision"].as_u64().unwrap_or(0),
+                        props,
+                        frame,
+                        drafts,
+                    ) {
+                        if let Some(field) = &e.field {
+                            field.reconcile(&text);
+                        }
+                        if let Some(area) = &e.area {
+                            area.reconcile(&text);
+                        }
                     }
                 }
                 if let Some(button) = &e.button {
