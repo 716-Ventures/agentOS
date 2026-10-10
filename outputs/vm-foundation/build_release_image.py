@@ -38,6 +38,22 @@ def regular(path):
         raise ValueError('A regular input file is required: ' + str(path))
 
 
+def publish_image(source, output):
+    """Publish the completed inode exclusively, without another disk-sized copy."""
+    regular(source)
+    source.chmod(0o644)
+    with source.open('rb') as stream:
+        os.fsync(stream.fileno())
+    # The private build directory is on the output filesystem. Hard linking is
+    # atomic and refuses existing files/symlinks, unlike a replacing rename.
+    os.link(source, output)
+    directory = os.open(output.parent, os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        os.fsync(directory)
+    finally:
+        os.close(directory)
+
+
 def payload(release):
     release = release.resolve(strict=True)
     regular(release / 'manifest.json')
@@ -225,11 +241,11 @@ def main():
     if sha(args.base, 'sha512') != lock['sha512']: raise ValueError('Pinned upstream base checksum mismatch')
     release = args.release.resolve(strict=True); ident, hashes = payload(release)
     output = args.output.absolute()
-    if output.exists() or output.is_symlink() or output.with_suffix('.json').exists():
+    if output.exists() or output.is_symlink() or output.with_suffix('.json').exists() or output.with_suffix('.json').is_symlink():
         raise ValueError('Choose new output and metadata paths')
     output.parent.mkdir(parents=True, exist_ok=True)
     loop = None; mounted = False
-    with tempfile.TemporaryDirectory(prefix='agentos-image-', dir='/var/tmp') as directory:
+    with tempfile.TemporaryDirectory(prefix='agentos-image-', dir=output.parent) as directory:
         work = Path(directory); raw = work / 'disk.raw'; root = work / 'root'; root.mkdir()
         command('qemu-img', 'convert', '-f', 'qcow2', '-O', 'raw', args.base, raw)
         command('qemu-img', 'resize', '-f', 'raw', raw, '20G')
@@ -259,11 +275,7 @@ def main():
         info['compression'] = 'zlib' if args.compress else 'none'
         command('qemu-img', 'check', completed)
         info['image_sha256'] = sha(completed)
-        # Exclusive publication, including across filesystems. Never overwrite a
-        # VM disk or follow an output symlink even if it appears during the build.
-        with output.open('xb') as stream, completed.open('rb') as source:
-            shutil.copyfileobj(source, stream, 1024 * 1024); stream.flush(); os.fsync(stream.fileno())
-        output.chmod(0o644)
+        publish_image(completed, output)
         with output.with_suffix('.json').open('x') as stream:
             json.dump(info, stream, sort_keys=True, indent=2); stream.write('\n'); stream.flush(); os.fsync(stream.fileno())
         print('Built new release image:', output)

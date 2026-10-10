@@ -4,6 +4,8 @@
 
 The initial image includes the complete development dependency profile. It is an experimental VM release, not a minimal production distribution or a physical-hardware qualification. A repeat build identifies the exact base, dependency profile, runtime release, image-building sources and resulting disk hash; package installation and filesystem creation do not promise bit-for-bit identical disk bytes.
 
+The private build directory lives beside the requested output so final publication can hard-link the completed, fsynced image exclusively. This avoids a third disk-sized copy while refusing existing files and symlinks, including ones created during the build. The build still needs space for its sparse raw filesystem and converted qcow2 at the same time. A failed build cannot be packaged without complete metadata and signature verification.
+
 ## Build
 
 Use a dedicated Debian 13 ARM64 Linux VM with the verified runtime installed. The builder needs `qemu-img`, `growpart`, `losetup`, `e2fsck`, `resize2fs`, `mount`, `lsblk`, `udevadm`, `fstrim`, OpenSSL and systemd tools. Do not run it against a physical disk. It accepts only a new output path and a checksum-matching regular upstream base image, creates its own private sparse disk and loop device, and detaches that device after unmounting its private filesystems.

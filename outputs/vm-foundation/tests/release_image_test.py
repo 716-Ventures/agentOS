@@ -23,6 +23,30 @@ package = module('image_package', ROOT / 'package_release_image.py')
 
 
 class ReleaseImageTest(unittest.TestCase):
+    def test_completed_image_publication_reuses_inode_and_survives_build_cleanup(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / 'completed.qcow2'; output = root / 'image.qcow2'
+            source.write_bytes(b'completed-image')
+            image.publish_image(source, output)
+            self.assertEqual(source.stat().st_ino, output.stat().st_ino)
+            self.assertEqual(output.stat().st_mode & 0o777, 0o644)
+            source.unlink()
+            self.assertEqual(output.read_bytes(), b'completed-image')
+
+    def test_publication_cannot_replace_existing_disk_or_follow_output_symlink(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / 'completed'; disk = root / 'existing'
+            source.write_bytes(b'new'); disk.write_bytes(b'keep-existing')
+            for target in (disk, root / 'symlink', root / 'dangling'):
+                if target.name == 'symlink': target.symlink_to(disk)
+                if target.name == 'dangling': target.symlink_to(root / 'absent')
+                with self.subTest(target=target.name), self.assertRaises(FileExistsError):
+                    image.publish_image(source, target)
+            self.assertEqual(disk.read_bytes(), b'keep-existing')
+            self.assertFalse((root / 'absent').exists())
+
     def test_personal_login_names_cannot_be_options_system_accounts_or_paths(self):
         self.assertEqual(first.username('chris'), 'chris')
         for value in ('root', 'debian', '-f', '../chris', 'Chris', '', 'a' * 32, 'a\nb', None):
