@@ -65,29 +65,49 @@ def run(req):
     result=operate(req);result['metadata']=metadata(result['path']);return result
 
 
+def sync_directory(path):
+    fd=os.open(path,os.O_RDONLY|os.O_DIRECTORY)
+    try:os.fsync(fd)
+    finally:os.close(fd)
+
+
 def write_guarded(target, req):
     if target.exists():
         old=read_regular(target)
         if len(old)>65536:raise ValueError('File too large for recoverable edit')
-        digest=hashlib.sha256(old).hexdigest()
-    else:old=None;digest='missing'
+        digest=hashlib.sha256(old).hexdigest();original=target.stat()
+    else:old=None;digest='missing';original=None
     if req.get('expected_sha256')!=digest:
         raise ValueError('This file does not exist. To create it, pass expected_sha256 as the literal string missing; do not hash the new content.' if old is None else 'File changed; read it again and use the returned current-file sha256, not the hash of your new content.')
     content=req['content'].encode()
     if len(content)>65536:raise ValueError('Content too large')
     backup=None
     if old is not None:
-        directory=BACKUPS;directory.mkdir(mode=0o700,exist_ok=True)
+        directory=BACKUPS;directory.mkdir(mode=0o700,parents=True,exist_ok=True)
         backup=directory/uuid.uuid4().hex
-        with backup.open('xb') as f:f.write(old)
+        fd=os.open(backup,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+        with os.fdopen(fd,'wb') as stream:stream.write(old);stream.flush();os.fsync(stream.fileno())
+        sync_directory(directory)
     temporary=target.with_name('.agent-edit-'+uuid.uuid4().hex)
     try:
-        with temporary.open('xb') as f:f.write(content);f.flush();os.fsync(f.fileno())
-        if target.exists():
-            original=target.stat()
-            os.chmod(temporary,original.st_mode & 0o777)
-            os.chown(temporary,original.st_uid,original.st_gid)
-        temporary.replace(target)
+        fd=os.open(temporary,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+        with os.fdopen(fd,'wb') as stream:
+            stream.write(content);stream.flush()
+            if original is not None:
+                os.fchown(stream.fileno(),original.st_uid,original.st_gid)
+                os.fchmod(stream.fileno(),original.st_mode&0o777)
+            os.fsync(stream.fileno())
+        if old is None:
+            # A concurrently created target must not be overwritten by a new-file request.
+            os.link(temporary,target,follow_symlinks=False)
+            temporary.unlink()
+        else:
+            # Recheck after backup/preparation as well as under our per-path writer lock.
+            # External writers do not share that lock; an OS rename cannot provide a content CAS.
+            current=read_regular(target)
+            if hashlib.sha256(current).hexdigest()!=digest:raise ValueError('File changed while preparing the edit; the existing file was preserved')
+            temporary.replace(target)
+        sync_directory(target.parent)
     finally:
         temporary.unlink(missing_ok=True)
     return {'path':str(target),'sha256':hashlib.sha256(content).hexdigest(),'backup':str(backup) if backup else None}

@@ -100,6 +100,18 @@ pub enum Command {
         activity: String,
         path: PathBuf,
     },
+    ReviewDocumentFile {
+        surface: String,
+        revision: u64,
+        path: PathBuf,
+        reply: Sender<Result<Value, String>>,
+    },
+    ReplaceDocumentFile {
+        surface: String,
+        revision: u64,
+        path: PathBuf,
+        expected_sha256: String,
+    },
     ExportDocument {
         surface: String,
         revision: u64,
@@ -319,6 +331,19 @@ fn run(
                                 let doc=json!({"protocol":"agentos.presentation/1","catalog_revision":"native-core/1","surface_id":surface,"activity_id":id,"revision":0,"title":loaded["title"],"root":"editor","elements":{"editor":{"type":"DocumentEditor@1","props":{"label":loaded["title"],"value":loaded["content"]}}},"bindings":{},"actions":{}});
                                 open_surface(&socket,&current,doc)
                             })
+                        }
+                    },
+                    Command::ReviewDocumentFile{surface,revision,path,reply}=>{
+                        flush(&socket,&drafts,&frame,&stop);
+                        let result=if drafts.lock().unwrap().iter().any(|((id,_),draft)|id==&surface && draft.dirty){Err("Save or discard the local draft before reviewing a file replacement".into())}else{
+                            path.to_str().ok_or("File path must be UTF-8".into()).and_then(|path|super::broker_controls::run_helper("/usr/local/bin/agent-os", &["document","review",&surface,path,"--revision",&revision.to_string()],stop.clone()))
+                        };
+                        let _=reply.send(result.clone());result.map(|_|json!({"status":"File replacement ready for review"}))
+                    },
+                    Command::ReplaceDocumentFile{surface,revision,path,expected_sha256}=>{
+                        flush(&socket,&drafts,&frame,&stop);
+                        if drafts.lock().unwrap().iter().any(|((id,_),draft)|id==&surface && draft.dirty){Err("Save or discard the local draft before replacing a file".into())}else{
+                            path.to_str().ok_or("File path must be UTF-8".into()).and_then(|path|super::broker_controls::run_helper("/usr/local/bin/agent-os", &["document","replace",&surface,path,"--revision",&revision.to_string(),"--expected-sha256",&expected_sha256],stop.clone()))
                         }
                     },
                     Command::ExportDocument{surface,revision,path}=>{

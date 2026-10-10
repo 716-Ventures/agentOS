@@ -4,6 +4,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'client'))
 import document_files as files
 
@@ -62,3 +63,31 @@ class Documents(unittest.TestCase):
         result=files.publish(request,2,path);self.assertEqual(calls[0],calls[1])
         doc=calls[0][1]['operations'][0]['document'];self.assertEqual(doc['surface_id'],result['surface_id']);self.assertEqual(doc['activity_id'],'2')
         self.assertEqual(doc['elements']['editor']['props']['value'],'λ')
+
+    def test_reviewed_replace_retains_private_exact_original_and_rejects_stale_file(self):
+        path=self.root/'existing';path.write_bytes(b'original\r\n');path.chmod(0o640)
+        review=files.review(self.request,self.doc['surface_id'],path,3)
+        self.assertEqual(review['before'],'original\r\n')
+        self.assertEqual(review['after'],self.doc['elements']['editor']['props']['value'])
+        with patch.dict(os.environ,{'XDG_STATE_HOME':str(self.root/'state')}):
+            result=files.replace(self.request,self.doc['surface_id'],path,3,review['expected_sha256'])
+            with self.assertRaisesRegex(ValueError,'File changed'):
+                files.replace(self.request,self.doc['surface_id'],path,3,review['expected_sha256'])
+        self.assertEqual(Path(result['backup']).read_bytes(),b'original\r\n')
+        self.assertEqual(Path(result['backup']).stat().st_mode&0o777,0o600)
+        self.assertEqual(path.stat().st_mode&0o777,0o640)
+        self.assertEqual(path.read_bytes(),review['after'].encode())
+    def test_replacement_rechecks_saved_document_after_review(self):
+        path=self.root/'existing';path.write_text('original');review=files.review(self.request,self.doc['surface_id'],path,3)
+        reads=0
+        def changed(op,**fields):
+            nonlocal reads
+            result=self.request(op,**fields)
+            if op=='presentation.get':
+                reads+=1
+                if reads==2:result['revision']=4
+            return result
+        with patch.dict(os.environ,{'XDG_STATE_HOME':str(self.root/'state')}):
+            with self.assertRaisesRegex(ValueError,'View changed'):
+                files.replace(changed,self.doc['surface_id'],path,3,review['expected_sha256'])
+        self.assertEqual(path.read_text(),'original')

@@ -206,6 +206,12 @@ def main():
             document_files.export(terminal_request,opened['surface_id'],exported,shared['revision'])
             assert exported.read_bytes()=='Edited λ\n日本語'.encode()
             assert import_path.read_bytes()=='Original λ\n日本語\r\n'.encode()
+            reviewed=document_files.review(terminal_request,opened['surface_id'],import_path,shared['revision'])
+            os.environ['XDG_STATE_HOME']=str(root/'human-state')
+            replaced=document_files.replace(terminal_request,opened['surface_id'],import_path,shared['revision'],reviewed['expected_sha256'])
+            assert import_path.read_bytes()==exported.read_bytes()
+            assert Path(replaced['backup']).read_bytes()=='Original λ\n日本語\r\n'.encode()
+
             stop(proc);proc=None;Path(endpoint).unlink(missing_ok=True);proc=start()
             assert ok({'op':'presentation.get','document_id':opened['surface_id']})==shared
             print('PASS: strict UTF-8 document import, human edit/save, exclusive export and core restart persistence')

@@ -474,6 +474,25 @@ fn construct(
                     });
                     // Keep Save/Discard as the last toolbar for keyboard traversal and verification.
                     widget.insert_child_after(&button, None::<&gtk::Widget>);
+                    let replace = ui::button(
+                        "Review replacement of existing file…",
+                        ButtonVariant::Outline,
+                        false,
+                    );
+                    let (sender, s, state) =
+                        (commands.clone(), surface.to_string(), events.clone());
+                    replace.connect_clicked(move |button| {
+                        let parent = button
+                            .root()
+                            .and_then(|root| root.downcast::<gtk::Window>().ok());
+                        document_dialog::choose_replacement(
+                            parent.as_ref(),
+                            s.clone(),
+                            state.borrow()["revision"].as_u64().unwrap_or(0),
+                            sender.clone(),
+                        );
+                    });
+                    widget.insert_child_after(&replace, Some(&button));
                 }
                 result.widget = widget.clone().upcast();
                 if kind == "DocumentEditor@1" {
