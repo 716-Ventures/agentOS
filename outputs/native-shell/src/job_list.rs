@@ -15,6 +15,7 @@ struct Row {
     review: gtk::Button,
     attach: gtk::Button,
     inspect: gtk::Button,
+    resume: gtk::Button,
     current: Rc<RefCell<Option<Item>>>,
 }
 impl Row {
@@ -36,7 +37,15 @@ impl Row {
             actions.insert(button, -1);
         }
         widget.append(&actions);
+        let resume = ui::button("Continue request", ButtonVariant::Outline, false);
+        actions.insert(&resume, -1);
         let current = Rc::new(RefCell::new(None::<Item>));
+        let (data, sender) = (current.clone(), commands.clone());
+        resume.connect_clicked(move |_| {
+            if let Some(item) = data.borrow().as_ref() {
+                let _ = sender.send(Command::Resume(item.job.clone()));
+            }
+        });
         let (data, sender, app) = (current.clone(), commands.clone(), app.clone());
         review.connect_clicked(move |_| {
             if let Some(item) = data.borrow().as_ref() {
@@ -74,6 +83,7 @@ impl Row {
             review,
             attach,
             inspect,
+            resume,
             current,
         }
     }
@@ -119,11 +129,22 @@ impl Row {
                 ),
         );
         self.inspect.set_sensitive(item.available);
+        self.resume.set_sensitive(
+            item.available
+                && item.source == "broker"
+                && super::broker_controls::continuation_request(&item.job).is_some(),
+        );
         *self.current.borrow_mut() = Some(item.clone());
     }
     fn clear(&self) {
         *self.current.borrow_mut() = None;
-        for button in [&self.stop, &self.review, &self.attach, &self.inspect] {
+        for button in [
+            &self.stop,
+            &self.review,
+            &self.attach,
+            &self.inspect,
+            &self.resume,
+        ] {
             button.set_sensitive(false);
         }
     }

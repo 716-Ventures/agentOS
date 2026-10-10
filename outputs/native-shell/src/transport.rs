@@ -82,6 +82,7 @@ pub struct Frame {
 pub enum Command {
     RegisterRenderer(String),
     Approve(Value),
+    Resume(Value),
     ReviewInput {
         proposal: Value,
         reply: Sender<Result<Value, String>>,
@@ -254,16 +255,21 @@ fn run(
                     }
                     let (pending, view, stopping) =
                         (approval_pending.clone(), frame.clone(), stop.clone());
+                    let core_socket = socket.clone();
                     approvals.push(thread::spawn(move || {
                         let result =
-                            super::broker_controls::approve(broker_socket(), proposal, stopping);
+                            super::broker_controls::approve(broker_socket(), proposal, stopping.clone()).and_then(|job|{
+                                if stopping.load(Ordering::Relaxed){return Ok(json!({"notice":"Approved"}));}
+                                match super::broker_controls::continuation_request(&job){
+                                    Some(query)=>request(&core_socket,&query).map(|work|json!({"notice":format!("Approved · continuing the original request in work {}",work["id"])})).map_err(|error|format!("Approved, but continuation could not start: {error}. Use Continue request to retry.")),
+                                    None=>Ok(json!({"notice":"Approved · inspect the existing work for its result"})),
+                                }
+                            });
                         let mut frame = view.lock().unwrap();
                         match result {
-                            Ok(_) => {
+                            Ok(result) => {
                                 frame.error = None;
-                                frame.notice = Some(
-                                    "Approved · inspect the existing work for its result".into(),
-                                );
+                                frame.notice = result["notice"].as_str().map(String::from);
                             }
                             Err(error) => frame.error = Some(error),
                         }
@@ -273,6 +279,7 @@ fn run(
                 }
                 let result=match command {
                     Command::Approve(_)|Command::ReviewInput{..}=>unreachable!(),
+                    Command::Resume(job)=>super::broker_controls::job_id(&job).and_then(|id|request(&broker_socket(),&json!({"op":"poll","job_id":id}))).and_then(|current|super::broker_controls::continuation_request(&current).ok_or("No approved agent request is associated with this work".into())).and_then(|query|request(&socket,&query)),
                     Command::Attach(job)=>super::broker_controls::attach(&job),
                     Command::OpenTerminal=>super::broker_controls::open_terminal(),
                     Command::WorkspaceEdit{workspace,revision,edit}=>request(&socket,&json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("workspace-{}",super::nonce()),"expected_revisions":{workspace.clone():revision},"operations":[{"op":"workspace.edit","workspace_id":workspace,"edit":edit}]})).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt}),

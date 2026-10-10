@@ -14,14 +14,15 @@ def clean(s):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument('op', choices=['status', 'disk', 'ask', 'report'])
+    p.add_argument('op', choices=['status', 'disk', 'ask', 'report', 'resume'])
     p.add_argument('activity', type=int, nargs='?', default=1)
     p.add_argument('prompt', nargs='?')
     p.add_argument('--grounding')
     args = p.parse_args()
     req = {'op': args.op, 'activity': args.activity}
-    if args.prompt is not None: req['prompt'] = args.prompt
-    if args.op=='ask':
+    if args.op=='resume':req['job_id']=args.prompt
+    elif args.prompt is not None:req['prompt']=args.prompt
+    if args.op in ('ask','resume'):
         from broker_client import request
         if args.grounding is not None:
             import grounding

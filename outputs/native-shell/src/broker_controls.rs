@@ -38,6 +38,30 @@ pub fn unchanged(proposal: &Value, current: &Value) -> bool {
         .iter()
         .all(|key| proposal[key] == current[key])
 }
+pub fn continuation_request(job: &Value) -> Option<Value> {
+    let id = job_id(job).ok()?;
+    let activity = job["activity"].as_i64().filter(|id| *id > 0)?;
+    let origin = job["origin"]["conversation_id"].as_str()?;
+    if !["starting", "running", "succeeded", "failed", "interrupted"]
+        .contains(&job["status"].as_str().unwrap_or(""))
+    {
+        return None;
+    }
+    if origin.len() != 32
+        || !origin
+            .bytes()
+            .all(|b| b.is_ascii_hexdigit() && !b.is_ascii_uppercase())
+        || job["approved_by_uid"] != 0
+        || !job["approved_at"]
+            .as_f64()
+            .is_some_and(|n| n.is_finite() && n >= 0.)
+    {
+        return None;
+    }
+    Some(
+        json!({"op":"run","activity_id":activity,"argv":["/usr/bin/python3","-u","/usr/local/lib/agent-os/services/worker.py","resume",activity.to_string(),id]}),
+    )
+}
 pub fn approve(socket: PathBuf, proposal: Value, stop: Arc<AtomicBool>) -> Result<Value, String> {
     let id = job_id(&proposal)?;
     let current = super::transport::request(&socket, &json!({"op":"poll","job_id":id}))?;
@@ -167,6 +191,28 @@ pub fn open_terminal() -> Result<Value, String> {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn continuation_is_a_typed_existing_job_reference_without_command_text() {
+        let job = json!({"id":"a".repeat(32),"activity":1,"origin":{"conversation_id":"b".repeat(32)},"status":"succeeded","approved_by_uid":0,"approved_at":1,"argv":["/bin/echo","Untrusted command text"]});
+        let request = continuation_request(&job).unwrap();
+        assert_eq!(request["op"], "run");
+        assert_eq!(request["argv"][3], "resume");
+        assert_eq!(request["argv"][5], "a".repeat(32));
+        assert!(!request.to_string().contains("Untrusted command text"));
+        for change in [
+            json!({"status":"cancelled"}),
+            json!({"status":"cancelling"}),
+            json!({"approved_by_uid":false}),
+            json!({"activity":-1}),
+            json!({"origin":{"conversation_id":"../escape"}}),
+        ] {
+            let mut invalid = job.clone();
+            for (key, value) in change.as_object().unwrap() {
+                invalid[key] = value.clone();
+            }
+            assert!(continuation_request(&invalid).is_none());
+        }
+    }
     use super::*;
     #[test]
     fn stored_input_preview_matches_the_frozen_proposal_and_byte_count() {

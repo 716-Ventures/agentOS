@@ -192,7 +192,7 @@ def approval_target(text, proposals):
 def approve_operation(proposal):
     # Only the local human client crosses this boundary. Never a model tool.
     current=broker_request('poll',job_id=proposal['id'])
-    if current['status']!='approval_required' or any(current.get(k)!=proposal.get(k) for k in ('argv','activity','scope','stdin_sha256','terminal')):
+    if current['status']!='approval_required' or any(current.get(k)!=proposal.get(k) for k in ('argv','activity','scope','cwd','stdin_sha256','stdin_bytes','terminal')):
         raise RuntimeError('This proposal changed or was already handled. Nothing was approved.')
     result=subprocess.run(['/usr/bin/sudo','-n','/usr/local/bin/agent-os-broker','approve',proposal['id']],
                           capture_output=True,text=True,timeout=15)
@@ -258,6 +258,7 @@ def job_label(argv):
     if len(argv) >= 5 and argv[2] == '/usr/local/lib/agent-os/services/worker.py':
         if argv[3] == 'disk': return 'Inspect disk usage'
         if argv[3] == 'ask': return 'Ask: ' + (argv[5] if len(argv) > 5 else '')
+        if argv[3] == 'resume':return 'Ask: Approved operation continuation'
     return shlex.join(argv)
 
 
@@ -760,6 +761,10 @@ def dashboard(screen):
         target=approval_target(text,proposals) if grounding is None else None
         if target:
             result=approve_operation(target)
+            origin=(result.get('origin') or {}).get('conversation_id')
+            if isinstance(origin,str) and re.fullmatch('[0-9a-f]{32}',origin):
+                submit(workflow_argv('resume',activity,target['id']),'answer')
+                selected()['at_end']=True;selected()['scroll']=0;return
             text='I approved operation '+target['id']+' ('+shlex.join(target['argv'])+'). It is '+result['status']+'. Poll this existing operation, report the result, and continue our conversation. Do not create another proposal for the same command.'
         submit(workflow_argv('ask',activity,text,grounding=grounding),'answer')
         selected()['at_end']=True;selected()['scroll']=0

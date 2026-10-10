@@ -13,7 +13,7 @@ class ConversationTests(unittest.TestCase):
   with self.assertRaises(ValueError):ui.approval_target('approve '+'b'*32,[self.proposal])
   self.assertEqual(ui.approval_target('approve '+'a'*32,[self.proposal]),self.proposal)
  def test_approval_rechecks_before_sudo(self):
-  for change in ({'status':'succeeded'},{'argv':['/bin/false']},{'activity':2},{'stdin_sha256':'changed'}):
+  for change in ({'status':'succeeded'},{'argv':['/bin/false']},{'activity':2},{'stdin_sha256':'changed'},{'stdin_bytes':1},{'cwd':'changed'}):
    with patch.object(ui,'broker_request',return_value={**self.proposal,**change}),patch.object(ui.subprocess,'run') as run:
     with self.assertRaises(RuntimeError):ui.approve_operation(self.proposal)
     run.assert_not_called()
