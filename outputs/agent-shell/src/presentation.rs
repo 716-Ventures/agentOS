@@ -1768,6 +1768,13 @@ fn commit(
         } else {
             db.execute("DELETE FROM presentation_documents WHERE id=?", [id])
                 .map_err(db_error)?;
+            // Widget teardown happens after deletion, when interaction.end can
+            // no longer resolve the document. Retain drafts but end live input.
+            db.execute(
+                "UPDATE presentation_leases SET expires=0 WHERE document=?",
+                [id],
+            )
+            .map_err(db_error)?;
         }
     }
     let revisions: BTreeMap<_, _> = affected
@@ -4062,6 +4069,45 @@ mod tests {
         let before = snapshot(&db).unwrap();
         assert!(handle(&mut db,&json!({"op":"presentation.undo","event_cursor":second["event_cursor"],"request_id":"undo-diverged-placement"}),&human()).unwrap_err().contains("stale_revision"));
         assert_eq!(snapshot(&db).unwrap(), before);
+    }
+    #[test]
+    fn closed_view_undo_does_not_resurrect_input_but_preserves_draft_protection() {
+        for draft in [false, true] {
+            let mut db = fixture();
+            create(&mut db);
+            handle(
+                &mut db,
+                &json!({"op":"interaction.begin","surface_id":"surface-a","element_id":"input"}),
+                &human(),
+            )
+            .unwrap();
+            if draft {
+                handle(&mut db,&json!({"op":"draft.save","surface_id":"surface-a","element_id":"input","expected_draft_revision":0,"draft":"Retain λ"}),&human()).unwrap();
+            }
+            let closed=handle(&mut db,&json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"close-live-input","expected_revisions":{"surface-a":0},"operations":[{"op":"surface.close","surface_id":"surface-a"}]}),&human()).unwrap();
+            let expires:i64=db.query_row("SELECT expires FROM presentation_leases WHERE document='surface-a' AND element='input'",[],|row|row.get(0)).unwrap();
+            assert_eq!(expires, 0);
+            handle(&mut db,&json!({"op":"presentation.undo","event_cursor":closed["event_cursor"],"request_id":"restore-inactive"}),&human()).unwrap();
+            let changed = handle(
+                &mut db,
+                &json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"new-input-props","expected_revisions":{"surface-a":2},"operations":[{"op":"element.set_props","surface_id":"surface-a","element_id":"input","props":{"label":"Updated request"}}]}),
+                &agent(),
+            );
+            if draft {
+                assert!(changed.unwrap_err().contains("interaction_conflict"));
+                assert_eq!(
+                    handle(
+                        &mut db,
+                        &json!({"op":"draft.get","surface_id":"surface-a","element_id":"input"}),
+                        &human()
+                    )
+                    .unwrap()["draft"],
+                    "Retain λ"
+                );
+            } else {
+                changed.unwrap();
+            }
+        }
     }
     #[test]
     fn closing_a_placed_view_keeps_its_draft_and_undo_restores_it() {

@@ -16,7 +16,7 @@ use smithay::{
         compositor::{CompositorClientState, CompositorState},
         output::OutputManagerState,
         relative_pointer::RelativePointerManagerState,
-        selection::data_device::DataDeviceState,
+        selection::{data_device::DataDeviceState, primary_selection::PrimarySelectionState},
         shell::xdg::XdgShellState,
         shm::ShmState,
         socket::ListeningSocketSource,
@@ -46,8 +46,11 @@ pub struct Smallvil {
     pub _relative_pointer_manager: RelativePointerManagerState,
     pub seat_state: SeatState<Smallvil>,
     pub data_device_state: DataDeviceState,
+    pub primary_selection_state: PrimarySelectionState,
     pub popups: PopupManager,
 
+    pub drag_icon: Option<WlSurface>,
+    pub drag_icon_render_submissions: u64,
     pub cursor_image: smithay::input::pointer::CursorImageStatus,
     pub direct_frames_presented: u64,
     pub direct_active: Option<bool>,
@@ -70,6 +73,7 @@ impl Smallvil {
         let relative_pointer_manager = RelativePointerManagerState::new::<Self>(&dh);
         let mut seat_state = SeatState::new();
         let data_device_state = DataDeviceState::new::<Self>(&dh);
+        let primary_selection_state = PrimarySelectionState::new::<Self>(&dh);
         let popups = PopupManager::default();
 
         // A seat is a group of keyboards, pointer and touch devices.
@@ -116,7 +120,10 @@ impl Smallvil {
             _relative_pointer_manager: relative_pointer_manager,
             seat_state,
             data_device_state,
+            primary_selection_state,
             popups,
+            drag_icon: None,
+            drag_icon_render_submissions: 0,
             cursor_image: smithay::input::pointer::CursorImageStatus::default_named(),
             direct_frames_presented: 0,
             direct_active: None,

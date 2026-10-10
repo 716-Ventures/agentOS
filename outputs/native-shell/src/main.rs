@@ -122,24 +122,68 @@ struct Surface {
 }
 fn lease(widget: &gtk::Widget, surface: &str, id: &str, commands: &Sender<Command>) {
     let focus = gtk::EventControllerFocus::new();
+    let active = Rc::new(Cell::new(false));
     let (s, e, c) = (surface.to_string(), id.to_string(), commands.clone());
-    focus.connect_enter(move |_| {
-        let _ = c.send(Command::Lease {
-            surface: s.clone(),
-            element: e.clone(),
-            begin: true,
-        });
+    let publish: Rc<dyn Fn(bool)> = Rc::new(move |begin| {
+        if active.replace(begin) != begin {
+            let _ = c.send(Command::Lease {
+                surface: s.clone(),
+                element: e.clone(),
+                begin,
+            });
+        }
     });
-    let (s, e, c) = (surface.to_string(), id.to_string(), commands.clone());
-    focus.connect_leave(move |_| {
-        let _ = c.send(Command::Lease {
-            surface: s.clone(),
-            element: e.clone(),
-            begin: false,
-        });
+    let entered = publish.clone();
+    focus.connect_enter(move |focus| {
+        let active = focus
+            .widget()
+            .and_then(|widget| widget.root())
+            .and_then(|root| root.downcast::<gtk::Window>().ok())
+            .is_some_and(|window| window.is_active());
+        entered(active);
+    });
+    let left = publish.clone();
+    focus.connect_leave(move |_| left(false));
+    // A mapped/restored window can retain its internal focus widget without
+    // owning the keyboard. Only renew input while that window is active.
+    let connection: Rc<RefCell<Option<(glib::WeakRef<gtk::Window>, glib::SignalHandlerId)>>> =
+        Rc::new(RefCell::new(None));
+    let weak_focus = focus.downgrade();
+    widget.connect_root_notify(move |widget| {
+        let window = widget
+            .root()
+            .and_then(|root| root.downcast::<gtk::Window>().ok());
+        if let (Some(window), Some((previous, _))) = (&window, connection.borrow().as_ref()) {
+            if previous.upgrade().as_ref() == Some(window) {
+                return;
+            }
+        }
+        if let Some((window, handler)) = connection.borrow_mut().take() {
+            if let Some(window) = window.upgrade() {
+                window.disconnect(handler);
+            }
+        }
+        publish(false);
+        if let Some(window) = window {
+            let changed = publish.clone();
+            let controller = weak_focus.clone();
+            let handler = window.connect_is_active_notify(move |window| {
+                if let Some(focus) = controller.upgrade() {
+                    changed(window.is_active() && focus.contains_focus());
+                }
+            });
+            publish(
+                window.is_active()
+                    && weak_focus
+                        .upgrade()
+                        .is_some_and(|focus| focus.contains_focus()),
+            );
+            *connection.borrow_mut() = Some((window.downgrade(), handler));
+        }
     });
     widget.add_controller(focus);
 }
+
 fn construct(
     surface: &str,
     activity: &str,
@@ -722,6 +766,9 @@ impl Surface {
             .build();
         let content = ui::column(0);
         let provenance = ui::text("Agent view", false);
+        // Window chrome must not become the initial selectable focus target:
+        // GTK would select this label and replace PRIMARY on every restore.
+        provenance.set_selectable(false);
         provenance.set_margin_start(24);
         provenance.set_margin_top(8);
         content.append(&provenance);

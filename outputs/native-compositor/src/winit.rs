@@ -3,7 +3,11 @@ use std::time::Duration;
 use smithay::{
     backend::{
         renderer::{
-            damage::OutputDamageTracker, element::surface::WaylandSurfaceRenderElement,
+            damage::OutputDamageTracker,
+            element::{
+                surface::{render_elements_from_surface_tree, WaylandSurfaceRenderElement},
+                Kind,
+            },
             gles::GlesRenderer,
         },
         winit::{self, WinitEvent},
@@ -79,6 +83,27 @@ pub fn init_winit(
 
                     {
                         let (renderer, mut framebuffer) = backend.bind().unwrap();
+                        let location = state
+                            .seat
+                            .get_pointer()
+                            .unwrap()
+                            .current_location()
+                            .to_physical(output.current_scale().fractional_scale())
+                            .to_i32_round();
+                        let icon: Vec<WaylandSurfaceRenderElement<GlesRenderer>> = state
+                            .drag_icon
+                            .as_ref()
+                            .map(|surface| {
+                                render_elements_from_surface_tree(
+                                    renderer,
+                                    surface,
+                                    location,
+                                    output.current_scale().fractional_scale(),
+                                    1.0,
+                                    Kind::Cursor,
+                                )
+                            })
+                            .unwrap_or_default();
                         smithay::desktop::space::render_output::<
                             _,
                             WaylandSurfaceRenderElement<GlesRenderer>,
@@ -91,11 +116,24 @@ pub fn init_winit(
                             1.0,
                             0,
                             [&state.space],
-                            &[],
+                            &icon,
                             &mut damage_tracker,
                             [0.1, 0.1, 0.1, 1.0],
                         )
                         .unwrap();
+                        if !icon.is_empty() {
+                            state.drag_icon_render_submissions =
+                                state.drag_icon_render_submissions.saturating_add(1);
+                            if let Some(icon) = &state.drag_icon {
+                                smithay::desktop::utils::send_frames_surface_tree(
+                                    icon,
+                                    &output,
+                                    state.start_time.elapsed(),
+                                    Some(Duration::ZERO),
+                                    |_, _| Some(output.clone()),
+                                );
+                            }
+                        }
                     }
                     backend.submit(Some(&[damage])).unwrap();
 

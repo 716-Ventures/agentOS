@@ -196,7 +196,7 @@ impl Device {
                     - geometry.loc.to_f64();
                 let scale = head.output.current_scale().fractional_scale();
                 let location = pointer.to_physical(scale);
-                let cursor: Vec<Cursor<GlesRenderer>> = match &data.state.cursor_image {
+                let mut cursor: Vec<Cursor<GlesRenderer>> = match &data.state.cursor_image {
                     CursorImageStatus::Hidden => Vec::new(),
                     CursorImageStatus::Named(_) => {
                         vec![MemoryRenderBufferRenderElement::from_buffer(
@@ -230,6 +230,23 @@ impl Device {
                         )
                     }
                 };
+                let icon: Vec<Cursor<GlesRenderer>> = data
+                    .state
+                    .drag_icon
+                    .as_ref()
+                    .map(|surface| {
+                        render_elements_from_surface_tree(
+                            renderer,
+                            surface,
+                            location.to_i32_round(),
+                            scale,
+                            1.0,
+                            Kind::Cursor,
+                        )
+                    })
+                    .unwrap_or_default();
+                let icon_rendered = !icon.is_empty();
+                cursor.extend(icon);
                 let (mut buffer, age) = head.scanout.next_buffer()?;
                 let mut target = renderer.bind(&mut buffer)?;
                 let result = smithay::desktop::space::render_output(
@@ -247,6 +264,19 @@ impl Device {
                 drop(target);
                 head.scanout.queue_buffer(Some(sync), None, ())?;
                 head.pending = true;
+                if icon_rendered {
+                    data.state.drag_icon_render_submissions =
+                        data.state.drag_icon_render_submissions.saturating_add(1);
+                    if let Some(icon) = &data.state.drag_icon {
+                        smithay::desktop::utils::send_frames_surface_tree(
+                            icon,
+                            &head.output,
+                            data.state.start_time.elapsed(),
+                            Some(Duration::ZERO),
+                            |_, _| Some(head.output.clone()),
+                        );
+                    }
+                }
                 for window in data.state.space.elements() {
                     window.send_frame(
                         &head.output,

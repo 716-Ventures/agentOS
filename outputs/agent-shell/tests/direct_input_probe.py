@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import select
+import signal
 import struct
 import subprocess
 import sys
@@ -40,11 +41,11 @@ class Device:
     def chord(self,*keys):
         for key in keys:self.event(1,key,1);self.sync()
         for key in reversed(keys):self.event(1,key,0);self.sync()
-    def click(self,x,y,width,height):
+    def click(self,x,y,width,height,button=272):
         self.event(3,0,round(x*65535/width));self.event(3,1,round(y*65535/height));self.sync()
         time.sleep(.1)
-        self.chord(272)
-    def drag(self,start,end,width,height):
+        self.chord(button)
+    def drag(self,start,end,width,height,observe=None):
         def move(x,y):
             self.event(3,0,round(x*65535/width));self.event(3,1,round(y*65535/height));self.sync()
         move(*start);time.sleep(.1)
@@ -53,10 +54,42 @@ class Device:
             for step in range(1,11):
                 move(*(start[axis]+(end[axis]-start[axis])*step/10 for axis in (0,1)))
                 time.sleep(.04)
+                if step==5 and observe:observe()
         finally:self.event(1,272,0);self.sync()
     def close(self):
         try:fcntl.ioctl(self.fd,0x5502)
         finally:os.close(self.fd)
+
+
+def transfer_source():
+    """Owned conventional GTK source for real Wayland primary/DND handoffs."""
+    import gi
+    gi.require_version('Gtk','4.0');gi.require_version('Gdk','4.0')
+    from gi.repository import Gtk,Gdk,GLib
+    receipts=Path(sys.argv[sys.argv.index('--transfer-source')+1])
+    state={'begun':0,'ended':0,'primary':0}
+    def record():
+        temporary=receipts.with_suffix('.tmp');temporary.write_text(json.dumps(state));temporary.replace(receipts)
+    app=Gtk.Application(application_id='com.agentos.TransferFixture')
+    def activate(app):
+        box=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=8)
+        for label,value in [('Copy transfer text',' DROP λ'),('Oversized transfer','x'*65537)]:
+            button=Gtk.Button(label=label);button.set_size_request(280,42)
+            source=Gtk.DragSource();source.set_actions(Gdk.DragAction.COPY)
+            source.set_icon(Gtk.WidgetPaintable.new(button),0,0)
+            source.set_content(Gdk.ContentProvider.new_for_bytes('text/plain;charset=utf-8',GLib.Bytes.new(value.encode())))
+            def begun(*_):state['begun']+=1;record()
+            def ended(*_):state['ended']+=1;record()
+            source.connect('drag-begin',begun);source.connect('drag-end',ended);button.add_controller(source);box.append(button)
+        primary=Gtk.Button(label='Publish primary text')
+        def publish(*_):
+            Gdk.Display.get_default().get_primary_clipboard().set_content(Gdk.ContentProvider.new_for_bytes('text/plain;charset=utf-8',GLib.Bytes.new(b' PRIMARY')))
+            state['primary']+=1;record()
+        primary.connect('clicked',publish)
+        box.append(primary)
+        window=Gtk.ApplicationWindow(application=app,title='Direct transfer source',default_width=300,default_height=180,child=box)
+        record();window.present()
+    app.connect('activate',activate);app.run([])
 
 
 def assistive():
@@ -82,6 +115,10 @@ def assistive():
                 response={'expanded':control.getState().contains(pyatspi.STATE_EXPANDED)}
                 if request!='arrange-status':response['requested']=control.queryAction().doAction(0)
                 print(json.dumps(response),flush=True);continue
+            if request.startswith('transfer:'):
+                button=find(request.split(':',1)[1],pyatspi.ROLE_PUSH_BUTTON)
+                rect=button.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
+                print(json.dumps({'point':[rect.x+rect.width/2,rect.y+rect.height/2]}),flush=True);continue
             if request in ('undo-status','undo-close'):
                 undo=find('Undo last arrangement',pyatspi.ROLE_PUSH_BUTTON)
                 sensitive=undo.getState().contains(pyatspi.STATE_SENSITIVE)
@@ -116,27 +153,27 @@ def assistive():
         print(json.dumps(response),flush=True)
 
 
-def verify(metrics,output,core,scene,target,login_user):
+def verify(metrics,output,core,scene,target,login_user,presentation):
     subprocess.run(['modprobe','uinput'],check=True)
     # Join only this test session's accessibility bus; never inspect other users.
-    bus=None;observer_runtime=None;deadline=time.monotonic()+10
+    bus=None;observer_runtime=None;wayland=None;deadline=time.monotonic()+10
     while bus is None and time.monotonic()<deadline:
         for proc in Path('/proc').iterdir():
             if not proc.name.isdigit():continue
             try:
                 values=dict(value.split(b'=',1) for value in (proc/'environ').read_bytes().split(b'\0') if b'=' in value)
                 if ((proc/'exe').resolve().name=='agent-os-desktop' and values.get(b'AGENT_OS_METRICS_DIR')==str(metrics).encode() and values.get(b'DBUS_SESSION_BUS_ADDRESS')):
-                    bus=values[b'DBUS_SESSION_BUS_ADDRESS'].decode();observer_runtime=values[b'XDG_RUNTIME_DIR'].decode();break
+                    bus=values[b'DBUS_SESSION_BUS_ADDRESS'].decode();observer_runtime=values[b'XDG_RUNTIME_DIR'].decode();wayland=values[b'WAYLAND_DISPLAY'].decode();break
             except (OSError,ValueError):pass
         if bus is None:time.sleep(.05)
     if bus is None:raise RuntimeError('Owned direct-session bus not found')
-    env={**os.environ,'DBUS_SESSION_BUS_ADDRESS':bus,'XDG_RUNTIME_DIR':observer_runtime}
+    env={**os.environ,'DBUS_SESSION_BUS_ADDRESS':bus,'XDG_RUNTIME_DIR':observer_runtime,'WAYLAND_DISPLAY':wayland,'GDK_BACKEND':'wayland'}
     # libatspi may otherwise reuse the login user's cached accessibility bus.
     address=subprocess.check_output(['runuser','-u',login_user,'--','gdbus','call','--session','--dest','org.a11y.Bus','--object-path','/org/a11y/bus','--method','org.a11y.Bus.GetAddress'],env=env,text=True,timeout=5)
     env['AT_SPI_BUS_ADDRESS']=ast.literal_eval(address)[0]
     helper=subprocess.Popen(['runuser','-u',login_user,'--','python3',str(Path(__file__).resolve()),'--accessibility'],
                             env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True)
-    keyboard=pointer=None
+    keyboard=pointer=source_client=None
     try:
         def snapshot(command='snapshot'):
             helper.stdin.write(command+'\n');helper.stdin.flush()
@@ -330,7 +367,87 @@ def verify(metrics,output,core,scene,target,login_user):
         assert core('presentation.get')['elements']['editor']['props']['value']=='agentos'
         assert core('draft.get')['draft'] is None
         print('PASS: direct kernel titlebar drag, focus cycling, VT shortcut/resume and close-view; native assistive undo restores exact saved document')
+        # Transfer from a distinct conventional client, through the compositor.
+        logical=core('presentation.get')['surface_id']
+        restored_target=next(ident for ident,surface in scene()['shared']['identities'].items() if surface==logical)
+        if scene()['seat_focus']==restored_target:
+            keyboard.chord(29,56,15);await_focus(lambda focus:focus is not None and focus!=restored_target)
+        receipts=metrics/'transfer-receipts.json'
+        with (metrics/'transfer-source.log').open('w') as log:
+            source_client=subprocess.Popen(['runuser','-u',login_user,'--','python3',str(Path(__file__).resolve()),'--transfer-source',str(receipts)],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+        deadline=time.monotonic()+10
+        while True:
+            observed=scene();source_window=next((row for row in observed['windows'] if row['title']=='Direct transfer source'),None)
+            source_id=observed['shared']['identities'].get(source_window['id']) if source_window else None
+            if source_id:break
+            if source_client.poll() is not None:raise RuntimeError('Transfer source failed: '+(metrics/'transfer-source.log').read_text())
+            if time.monotonic()>deadline:raise RuntimeError('Transfer source did not register')
+            time.sleep(.05)
+        while True:
+            workspace=next(doc for doc in scene()['shared']['workspaces'].values() if any(row['surface_id']==logical for layout in doc['outputs'].values() for row in layout['floating']))
+            try:
+                result=presentation({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
+                    'request_id':'transfer-placement-'+str(time.time_ns()),'expected_revisions':{workspace['workspace_id']:workspace['revision']},
+                    'operations':[{'op':'workspace.edit','workspace_id':workspace['workspace_id'],'edit':{'kind':'float','surface_id':source_id,'output_id':next(iter(workspace['outputs'])),'x':980,'y':0,'width':300,'height':180}}]})
+            except RuntimeError as exc:
+                if '\"code\":\"stale_revision\"' not in str(exc) or time.monotonic()>deadline:raise
+                time.sleep(.05);continue
+            if result['status']=='committed':break
+            if time.monotonic()>deadline:raise RuntimeError('Transfer fixture placement rejected: '+repr(result))
+            time.sleep(.05)
+        while True:
+            source_window=next(row for row in scene()['windows'] if row['id']==source_window['id'])
+            if source_window['geometry']=={'x':980,'y':0,'width':300,'height':180}:break
+            if time.monotonic()>deadline:raise RuntimeError('Transfer source geometry was not applied')
+            time.sleep(.05)
+        destination=next(row['geometry'] for row in scene()['windows'] if row['id']==restored_target)
+        def transfer_point(label):
+            point=snapshot('transfer:'+label)['point'];return (980+point[0],point[1])
+        field=snapshot()['field'];end=(destination['x']+field[0],destination['y']+field[1])
+        # Establish source keyboard ownership before publishing a selection,
+        # then navigate to the destination before middle-paste.
+        pointer.click(*transfer_point('Publish primary text'),width,height)
+        await_focus(lambda focus:focus==source_window['id'])
+        count=json.loads(receipts.read_text())['primary']
+        pointer.click(*transfer_point('Publish primary text'),width,height)
+        deadline=time.monotonic()+5
+        while json.loads(receipts.read_text())['primary']<=count:
+            if time.monotonic()>deadline:raise RuntimeError('Kernel pointer did not publish the primary selection')
+            time.sleep(.05)
+        pointer.click(*end,width,height)
+        await_focus(lambda focus:focus==restored_target)
+        wait(lambda value:value['focused'])
+        pointer.click(*end,width,height,button=274)
+        wait(lambda value:value['text']=='agentos PRIMARY')
+        keyboard.chord(29,44);wait(lambda value:value['text']=='agentos')
+        for label,expected in [('Copy transfer text','agentos DROP λ'),('Oversized transfer','agentos')]:
+            count=json.loads(receipts.read_text())['ended']
+            before_icon=scene()['drag_icon_render_submissions'];before_frame=scene()['direct_frames_presented']
+            def observe_drag():
+                deadline=time.monotonic()+3
+                while True:
+                    current=scene()
+                    if current['drag_icon'] and current['drag_icon_render_submissions']>before_icon and current['direct_frames_presented']>before_frame:return
+                    if time.monotonic()>deadline:raise RuntimeError('Drag icon did not reach direct rendering: '+repr(current['drag_icon']))
+                    time.sleep(.05)
+            pointer.drag(transfer_point(label),end,width,height,observe=observe_drag)
+            deadline=time.monotonic()+8
+            while json.loads(receipts.read_text())['ended']<=count:
+                if time.monotonic()>deadline:raise RuntimeError('Wayland drag handoff did not finish')
+                time.sleep(.05)
+            wait(lambda value:value['text']==expected)
+            assert not scene()['drag_icon'],'Released drag retained its icon'
+            if label=='Copy transfer text':
+                pointer.click(*end,width,height);await_focus(lambda focus:focus==restored_target)
+                keyboard.chord(29,44);wait(lambda value:value['text']=='agentos')
+        assert core('presentation.get')['elements']['editor']['props']['value']=='agentos'
+        print('PASS: real Wayland primary middle-paste and COPY drag/drop; Unicode handoff, grouped undo and oversized rejection preserve saved document')
+
     finally:
+        if source_client:
+            if source_client.poll() is None:os.killpg(source_client.pid,signal.SIGTERM)
+            try:source_client.wait(timeout=3)
+            except subprocess.TimeoutExpired:os.killpg(source_client.pid,signal.SIGKILL);source_client.wait(timeout=3)
         if pointer:pointer.close()
         if keyboard:keyboard.close()
         helper.terminate()
@@ -338,4 +455,6 @@ def verify(metrics,output,core,scene,target,login_user):
         except subprocess.TimeoutExpired:helper.kill();helper.wait(timeout=3)
 
 
-if __name__=='__main__' and '--accessibility' in sys.argv:assistive()
+if __name__=='__main__':
+    if '--accessibility' in sys.argv:assistive()
+    elif '--transfer-source' in sys.argv:transfer_source()

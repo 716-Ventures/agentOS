@@ -16,6 +16,9 @@ use smithay::wayland::selection::data_device::{
     set_data_device_focus, ClientDndGrabHandler, DataDeviceHandler, DataDeviceState,
     ServerDndGrabHandler,
 };
+use smithay::wayland::selection::primary_selection::{
+    set_primary_focus, PrimarySelectionHandler, PrimarySelectionState,
+};
 use smithay::wayland::selection::SelectionHandler;
 use smithay::{delegate_data_device, delegate_output, delegate_seat};
 
@@ -57,7 +60,8 @@ impl SeatHandler for Smallvil {
         }
         let dh = &self.display_handle;
         let client = focused.and_then(|s| dh.get_client(s.id()).ok());
-        set_data_device_focus(dh, seat, client);
+        set_data_device_focus(dh, seat, client.clone());
+        set_primary_focus(dh, seat, client);
     }
 }
 
@@ -78,10 +82,29 @@ impl DataDeviceHandler for Smallvil {
     }
 }
 
-impl ClientDndGrabHandler for Smallvil {}
+impl ClientDndGrabHandler for Smallvil {
+    fn started(
+        &mut self,
+        _source: Option<smithay::reexports::wayland_server::protocol::wl_data_source::WlDataSource>,
+        icon: Option<WlSurface>,
+        _seat: Seat<Self>,
+    ) {
+        self.drag_icon = icon;
+    }
+    fn dropped(&mut self, _target: Option<WlSurface>, _validated: bool, _seat: Seat<Self>) {
+        self.drag_icon = None;
+    }
+}
 impl ServerDndGrabHandler for Smallvil {}
 
 delegate_data_device!(Smallvil);
+
+impl PrimarySelectionHandler for Smallvil {
+    fn primary_selection_state(&self) -> &PrimarySelectionState {
+        &self.primary_selection_state
+    }
+}
+smithay::delegate_primary_selection!(Smallvil);
 
 //
 // Wl Output & Xdg Output

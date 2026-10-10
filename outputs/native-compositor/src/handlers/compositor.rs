@@ -27,6 +27,12 @@ impl CompositorHandler for Smallvil {
         &client.get_data::<ClientState>().unwrap().compositor_state
     }
 
+    fn destroyed(&mut self, surface: &WlSurface) {
+        if self.drag_icon.as_ref() == Some(surface) {
+            self.drag_icon = None;
+        }
+    }
+
     fn commit(&mut self, surface: &WlSurface) {
         on_commit_buffer_handler::<Self>(surface);
         if !is_sync_subsurface(surface) {
