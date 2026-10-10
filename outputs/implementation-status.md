@@ -11,7 +11,7 @@ New runtime work: compatible code rollback with crash recovery, release-specific
 Remaining implementation/qualification:
 
 - Finish richer form/callback parameter contracts. The core and renderer now consume the same released typed catalog; multiline editing and atomic draft commit/discard are implemented.
-- Complete pointer grabs, measured minimum sizes, layout pressure/overview, stronger manual geometry constraints and restart reconciliation. Shared WorkspaceDocument projection, authenticated native/conventional identities, activity visibility, typed direct controls, native close/undo with draft retention and journal undo pass ARM64 Linux CI.
+- Complete measured minimum sizes, layout pressure/overview and restart reconciliation. Pointer grabs now use leases/local previews/final commits, manual geometry is protected, and compositor keyboard controls are implemented; physical input journeys still await UTM qualification. Shared WorkspaceDocument projection, authenticated native/conventional identities, activity visibility, typed direct controls, native close/undo with draft retention and journal undo pass ARM64 Linux CI.
 - Complete actual output/scaling/work-area discovery, removed-output recovery, direct display ownership and graphical guest qualification. Graphical packaging, session launcher, release bindings and rollback are implemented; full lifecycle and real ELF staging checks are added to CI.
 - Finish terminal projection, source paging/virtualized collections, bounded reconnect/shutdown and source availability handling.
 - Qualify native broker review/approval, rejection, conventional terminal attachment and offline rescue terminal controls in the guest. Implemented UI/backend paths await full system verification.

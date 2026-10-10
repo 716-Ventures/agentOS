@@ -1,7 +1,7 @@
 use smithay::{
     backend::input::{
         AbsolutePositionEvent, Axis, AxisSource, ButtonState, Event, InputBackend, InputEvent,
-        KeyboardKeyEvent, PointerAxisEvent, PointerButtonEvent,
+        KeyState, KeyboardKeyEvent, PointerAxisEvent, PointerButtonEvent,
     },
     input::{
         keyboard::FilterResult,
@@ -20,14 +20,40 @@ impl Smallvil {
                 let serial = SERIAL_COUNTER.next_serial();
                 let time = Event::time_msec(&event);
 
-                self.seat.get_keyboard().unwrap().input::<(), _>(
-                    self,
-                    event.key_code(),
-                    event.state(),
-                    serial,
-                    time,
-                    |_, _, _| FilterResult::Forward,
-                );
+                let key = event.key_code().raw();
+                let state = event.state();
+                let action = self
+                    .seat
+                    .get_keyboard()
+                    .unwrap()
+                    .input(
+                        self,
+                        event.key_code(),
+                        state,
+                        serial,
+                        time,
+                        |data, modifiers, handle| {
+                            if state == KeyState::Released && data.suppressed_keys.remove(&key) {
+                                return FilterResult::Intercept(None);
+                            }
+                            if state == KeyState::Pressed && data.bridge.is_some() {
+                                if let Some(action) = crate::shortcuts::decode(
+                                    modifiers.ctrl,
+                                    modifiers.alt,
+                                    modifiers.shift,
+                                    handle.modified_sym().raw(),
+                                ) {
+                                    data.suppressed_keys.insert(key);
+                                    return FilterResult::Intercept(Some(action));
+                                }
+                            }
+                            FilterResult::Forward
+                        },
+                    )
+                    .flatten();
+                if let Some(action) = action {
+                    self.shortcut(action)
+                }
             }
             InputEvent::PointerMotion { .. } => {}
             InputEvent::PointerMotionAbsolute { event, .. } => {

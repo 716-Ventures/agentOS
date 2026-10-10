@@ -58,6 +58,8 @@ impl Controls {
             let _ = sender.send(Command::OpenTerminal);
         });
         widget.append(&terminal);
+        let shortcuts=gtk::Expander::builder().label("Desktop keyboard shortcuts").child(&ui::text("Ctrl+Alt+Tab: next view (Shift: previous)\nCtrl+Alt+F10: maximize · F9: restore · F8: float\nCtrl+Alt+Arrow: move · Shift+Arrow: resize\nCtrl+Alt+Delete: close view · Ctrl+Alt+Z: undo arrangement\nSplit, swap and pin controls are available under Arrange workspace in Agent Monitor.",true)).build();
+        widget.append(&shortcuts);
         let appearance = gtk::DropDown::from_strings(&["Dark", "Light"]);
         let scale = gtk::SpinButton::with_range(1.0, 3.0, 0.25);
         let preferences = super::preferences::read();

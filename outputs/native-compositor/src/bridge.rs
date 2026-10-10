@@ -7,7 +7,7 @@ use std::{
     os::unix::net::UnixStream,
     path::PathBuf,
     sync::{
-        atomic::{AtomicBool, Ordering},
+        atomic::{AtomicBool, AtomicI64, Ordering},
         mpsc::{self, SyncSender},
         Arc, Mutex,
     },
@@ -43,6 +43,7 @@ pub struct Bridge {
     pub scene: Arc<Mutex<Scene>>,
     pub commands: SyncSender<Request>,
     stop: Arc<AtomicBool>,
+    last_input: Arc<AtomicI64>,
     worker: Option<thread::JoinHandle<()>>,
     pub previews: Arc<Mutex<BTreeMap<String, grabs::Preview>>>,
 }
@@ -55,6 +56,8 @@ impl Bridge {
         let (input, output, stopping) = (observation.clone(), scene.clone(), stop.clone());
         let previews = Arc::new(Mutex::new(BTreeMap::new()));
         let worker_previews = previews.clone();
+        let last_input = Arc::new(AtomicI64::new(0));
+        let input_cursor = last_input.clone();
         let worker = thread::spawn(move || {
             let mut grabs = grabs::Grabs::new(worker_previews);
             let mut registrations = BTreeMap::<String, (String, String, String, String)>::new();
@@ -111,6 +114,21 @@ impl Bridge {
                             _ => Err("Unknown shared workspace operation".into()),
                         }
                     };
+                    if let Ok(value) = &result {
+                        let op = req.value["op"].as_str().unwrap_or("");
+                        if op == "workspace.undo" {
+                            input_cursor.store(0, Ordering::Relaxed);
+                        } else if op == "workspace.grab.finish"
+                            || op == "workspace.apply"
+                            || (op == "workspace.transaction"
+                                && req.value["transaction"]["operations"][0]["edit"]["kind"]
+                                    != "focus")
+                        {
+                            if let Some(cursor) = value["event_cursor"].as_i64() {
+                                input_cursor.store(cursor, Ordering::Relaxed);
+                            }
+                        }
+                    }
                     if let Err(e) = &result {
                         output.lock().unwrap().error = Some(e.clone());
                     }
@@ -314,6 +332,22 @@ impl Bridge {
             stop,
             worker: Some(worker),
             previews,
+            last_input,
+        }
+    }
+    pub fn undo_input(&self) {
+        let cursor = self.last_input.load(Ordering::Relaxed);
+        if cursor <= 0 {
+            self.scene.lock().unwrap().error = Some("No desktop arrangement to undo".into());
+            return;
+        }
+        let stamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        let (reply, _) = mpsc::sync_channel(1);
+        if self.commands.try_send(Request {value:json!({"op":"workspace.undo","event_cursor":cursor,"request_id":format!("keyboard-undo-{}-{stamp}",std::process::id())}),reply}).is_err() {
+            self.scene.lock().unwrap().error=Some("Workspace input queue busy".into());
         }
     }
     pub fn begin_grab(&self, runtime: &str, rect: Rect) {

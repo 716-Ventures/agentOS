@@ -6,6 +6,7 @@ mod control;
 mod handlers;
 mod policy;
 mod process;
+mod shortcuts;
 
 mod grabs;
 mod input;

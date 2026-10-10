@@ -28,6 +28,7 @@ pub struct Smallvil {
     pub policy: crate::policy::Policy,
     pub bridge: Option<crate::bridge::Bridge>,
     pub applied_focus: Option<String>,
+    pub suppressed_keys: std::collections::BTreeSet<u32>,
     pub start_time: std::time::Instant,
     pub socket_name: OsString,
     pub display_handle: DisplayHandle,
@@ -89,6 +90,7 @@ impl Smallvil {
             bridge: std::env::var_os("AGENT_OS_COMPOSITOR_CORE")
                 .map(|p| crate::bridge::Bridge::start(p.into())),
             applied_focus: None,
+            suppressed_keys: Default::default(),
             start_time,
             display_handle: dh,
 
@@ -159,6 +161,81 @@ impl Smallvil {
         socket_name
     }
 
+    pub fn shortcut(&mut self, action: crate::shortcuts::Shortcut) {
+        use crate::shortcuts::Shortcut;
+        let Some(bridge) = &self.bridge else { return };
+        let scene = bridge.scene.lock().unwrap().clone();
+        let ids = scene.rectangles.keys().cloned().collect::<Vec<_>>();
+        if ids.is_empty() {
+            return;
+        }
+        let current = scene
+            .focus
+            .as_ref()
+            .filter(|id| ids.contains(id))
+            .unwrap_or(&ids[0]);
+        if let Shortcut::Cycle(reverse) = action {
+            let index = ids.iter().position(|id| id == current).unwrap_or(0);
+            let next = if reverse {
+                (index + ids.len() - 1) % ids.len()
+            } else {
+                (index + 1) % ids.len()
+            };
+            bridge.input(
+                &ids[next],
+                serde_json::json!({"kind":"focus","element_id":null}),
+            );
+            return;
+        }
+        if action == Shortcut::Undo {
+            bridge.undo_input();
+            return;
+        }
+        if action == Shortcut::Close {
+            if let Some(window) = self
+                .space
+                .elements()
+                .find(|w| format!("{:?}", w.toplevel().unwrap().wl_surface().id()) == *current)
+            {
+                window.toplevel().unwrap().send_close();
+            }
+            return;
+        }
+        let edit = match action {
+            Shortcut::Maximize => serde_json::json!({"kind":"maximize"}),
+            Shortcut::Restore => serde_json::json!({"kind":"restore"}),
+            Shortcut::Float | Shortcut::Nudge { .. } => {
+                let mut rect = scene.rectangles[current];
+                if let Shortcut::Nudge { x, y, resize } = action {
+                    if resize {
+                        rect.width += x;
+                        rect.height += y;
+                    } else {
+                        rect.x += x;
+                        rect.y += y;
+                    }
+                }
+                if let Some(area) = self
+                    .space
+                    .outputs()
+                    .next()
+                    .and_then(|o| self.space.output_geometry(o))
+                {
+                    rect.width = rect.width.max(80).min(area.size.w);
+                    rect.height = rect.height.max(32).min(area.size.h);
+                    rect.x = rect
+                        .x
+                        .clamp(area.loc.x, area.loc.x + area.size.w - rect.width);
+                    rect.y = rect
+                        .y
+                        .clamp(area.loc.y, area.loc.y + area.size.h - rect.height);
+                }
+                serde_json::json!({"kind":"float","output_id":"nested-primary","x":rect.x,"y":rect.y,"width":rect.width,"height":rect.height})
+            }
+            _ => return,
+        };
+        bridge.input(current, edit);
+    }
     pub fn preview_geometry(&self, id: &str, mut rect: crate::policy::Rect) {
         if let Some(output) = self
             .space
