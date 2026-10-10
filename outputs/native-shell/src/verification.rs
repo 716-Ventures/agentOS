@@ -32,7 +32,6 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             assert_eq!(reading.text(),"Native café · 日本語 · select this text");
             assert_eq!(surface.elements["status"].label.as_ref().unwrap().text(),"running");
             println!("CHECK: selection and live binding preserved");
-            doc["elements"]["progress"]["props"]["value"]=json!({"binding":"numeric"});
             frame.bindings.get_mut("native-fixture").unwrap()["bindings"]["numeric"]=json!({"availability":"available","value":2});
             surface.update("native-fixture",&doc,&frame,&commands,&drafts);
             let progress=surface.elements["progress"].progress.as_ref().unwrap();assert_eq!(progress.fraction(),0.0);assert_eq!(progress.text().as_deref(),Some("Source unavailable"));

@@ -57,8 +57,8 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                 'status':{'type':'Status@1','props':{'value':{'binding':'work'}}},
                 'button':{'type':'Button@1','props':{'label':'Host action'}},
                 'link':{'type':'Link@1','props':{'label':'716 UI','url':'https://github.com/716-Ventures/716-ui'}},
-                'progress':{'type':'Progress@1','props':{'label':'Observed work','value':.5}},
-            },'bindings':{'work':{'source':f'job:{job}','path':'/status','access':'read'}},'actions':{}}
+                'progress':{'type':'Progress@1','props':{'label':'Observed work','value':{'binding':'numeric'}}},
+            },'bindings':{'work':{'source':f'job:{job}','path':'/status','access':'read'},'numeric':{'source':f'job:{job}','path':'/exit_code','access':'read'}},'actions':{}}
             call({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':'fixture','expected_revisions':{'native-fixture':None},'operations':[{'op':'surface.create','document':doc}]})
             compositor=subprocess.Popen(['weston','--backend=headless-backend.so','--use-pixman','--socket=native-test','--idle-time=0','--width=1280','--height=800'],env=env,stdout=displaylog,stderr=subprocess.STDOUT,start_new_session=True)
             deadline=time.monotonic()+10
