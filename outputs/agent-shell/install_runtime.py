@@ -54,7 +54,7 @@ class Installer:
         files={'agent-os-core':source/'target/release/agent-os-core'}
         for pattern in ('services/*.py','services/*-launcher.sh','systemd/*.service','client/*.py'):
             files.update({str(p.relative_to(source)):p for p in sorted(source.glob(pattern))})
-        for name in ('Cargo.lock','Cargo.toml','dependencies.json','install_runtime.py'):
+        for name in ('Cargo.lock','Cargo.toml','dependencies.json','release-contract.json','install_runtime.py'):
             files[name]=source/name
         files['dependencies.installed.json']=self.state/'dependencies.json'
         files['voice-assets.json']=self.state/'voice.json'
@@ -94,6 +94,16 @@ class Installer:
                 raise ValueError('Staged release integrity check failed: '+name)
         return hashes
 
+    def contract(self,release):
+        value=json.loads((release/'release-contract.json').read_text())
+        if (not isinstance(value,dict) or value.get('format')!=1
+                or not isinstance(value.get('state_contract'),str) or not value['state_contract']
+                or not isinstance(value.get('units'),list) or 'agent-os-core' not in value['units']
+                or len(set(value['units']))!=len(value['units'])
+                or any(unit not in UNITS or not (release/'systemd'/f'{unit}.service').is_file() for unit in value['units'])):
+            raise ValueError('Invalid runtime release contract')
+        return value
+
     def link(self,path,target):
         path.parent.mkdir(parents=True,exist_ok=True)
         if path.is_dir() and not path.is_symlink():
@@ -117,16 +127,18 @@ class Installer:
 
     def health(self):
         deadline=time.monotonic()+30
-        sockets=['/run/agent-os/runtime.sock','/run/agent-os-layout/api.sock','/run/agent-os-broker/api.sock',
-                 '/run/agent-os-ai/api.sock','/run/agent-os-disk/api.sock','/run/agent-os-voice/api.sock']
+        units=getattr(self,'active_units',UNITS)
+        socket_map=dict(zip(UNITS,['/run/agent-os/runtime.sock','/run/agent-os-layout/api.sock','/run/agent-os-disk/api.sock',
+                 '/run/agent-os-broker/api.sock','/run/agent-os-ai/api.sock','/run/agent-os-voice/api.sock']))
+        sockets=[socket_map[unit] for unit in units]
         while time.monotonic()<deadline:
-            states=subprocess.run(['systemctl','is-active',*UNITS],capture_output=True,text=True).stdout.splitlines()
-            active=states==['active']*len(UNITS)
+            states=subprocess.run(['systemctl','is-active',*units],capture_output=True,text=True).stdout.splitlines()
+            active=states==['active']*len(units)
             ready=all(p.exists() and stat.S_ISSOCK(p.stat().st_mode) for p in map(self.path,sockets))
             if active and ready:
                 # An active PID/socket alone cannot establish core startup/recovery readiness.
                 with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as conn:
-                    conn.settimeout(3);conn.connect(str(self.path(sockets[0])))
+                    conn.settimeout(3);conn.connect(str(self.path('/run/agent-os/runtime.sock')))
                     conn.sendall(b'{"op":"snapshot"}\n')
                     with conn.makefile('rb') as stream:result=json.loads(stream.readline(2*1024*1024))
                 if result.get('ok'):return
@@ -138,8 +150,19 @@ class Installer:
         release=self.root/'releases'/ident;hashes=self.verify(release)
         if hashlib.sha256(json.dumps(hashes,sort_keys=True).encode()).hexdigest()!=ident:
             raise ValueError('Release ID does not match its manifest')
+        contract=self.contract(release)
         current=self.root/'current'
-        transaction={'release':ident,'previous':str(current.resolve()) if current.exists() else None,'phase':'staged'}
+        if current.exists() and (current/'release-contract.json').exists():
+            live=self.contract(current)
+            if live['state_contract']!=contract['state_contract']:
+                raise ValueError('Incompatible state contract; an explicit migration is required before activation')
+        previous=str(current.resolve()) if current.exists() else None
+        if self.journal.exists():
+            prior=json.loads(self.journal.read_text())
+            if prior.get('release')==ident and (prior.get('phase')!='complete' or current.resolve()==release.resolve()):
+                previous=prior.get('previous')
+        transaction={'release':ident,'previous':previous,'phase':'staged','state_contract':contract['state_contract']}
+        self.active_units=contract['units']
         self.record(transaction)
         # Recovery remains callable even before the first release is activated.
         atomic_write(self.root/'install-recovery.py',(release/'install_runtime.py').read_bytes())
@@ -154,12 +177,15 @@ class Installer:
         self.link(self.path('/usr/local/bin/agent-os'),current/'client/agent_os.py')
         for name in ('broker','configure'):
             self.link(self.path('/usr/local/bin/agent-os-'+name),current/'services'/f'{name}-launcher.sh')
-        for name in UNITS:
+        for name in set(existing)-set(self.active_units):
+            self.run(['systemctl','disable',name])
+            self.path('/etc/systemd/system/'+name+'.service').unlink()
+        for name in self.active_units:
             atomic_write(self.path('/etc/systemd/system/'+name+'.service'),(release/'systemd'/f'{name}.service').read_bytes())
         transaction['phase']='activated';self.record(transaction)
         if interrupt=='activated':os.kill(os.getpid(),signal.SIGKILL)
         self.run(['systemctl','daemon-reload'])
-        self.run(['systemctl','enable','--now',*UNITS])
+        self.run(['systemctl','enable','--now',*self.active_units])
         self.health()
         metadata=self.path('/etc/agent-os/release.json')
         info=json.loads(metadata.read_text())
@@ -171,6 +197,24 @@ class Installer:
         atomic_write(self.state/'installed.json',(json.dumps(transaction,indent=2)+'\n').encode(),0o600)
         print('Installed and healthy:',ident)
 
+    def rollback(self,ident=None,interrupt=None):
+        current=self.root/'current'
+        if not current.exists():raise ValueError('No installed runtime to roll back')
+        live=self.contract(current)
+        if ident is None:
+            installed=json.loads((self.state/'installed.json').read_text())
+            previous=installed.get('previous')
+            if not previous:raise ValueError('No previous compatible release recorded')
+            target=Path(previous)
+            if target.parent.resolve()!=(self.root/'releases').resolve():raise ValueError('Invalid previous release path')
+            ident=target.name
+        if not re.fullmatch('[a-f0-9]{64}',ident):raise ValueError('Invalid rollback release ID')
+        release=self.root/'releases'/ident
+        self.verify(release)
+        if self.contract(release)['state_contract']!=live['state_contract']:
+            raise ValueError('Rollback would cross an incompatible state contract; live state was preserved')
+        self.activate(ident,interrupt)
+
     def recover(self):
         if not self.journal.exists():raise ValueError('No installation transaction to recover')
         transaction=json.loads(self.journal.read_text())
@@ -179,14 +223,30 @@ class Installer:
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--recover',action='store_true')
+    operation=parser.add_mutually_exclusive_group()
+    operation.add_argument('--recover',action='store_true')
+    operation.add_argument('--rollback',nargs='?',const='previous',metavar='RELEASE_ID')
+    operation.add_argument('--activate',metavar='RELEASE_ID')
+    operation.add_argument('--list-releases',action='store_true')
     parser.add_argument('--test-interrupt',choices=['stopped','activated'],help='Development-guest crash injection; terminates installer with SIGKILL')
     args=parser.parse_args()
     if os.geteuid()!=0:parser.error('Run with sudo')
     installer=Installer();installer.state.mkdir(mode=0o700,parents=True,exist_ok=True);installer.state.chmod(0o700)
     with (installer.state/'lock').open('a+b') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX)
-        if args.recover:installer.recover()
+        if args.list_releases:
+            current=(installer.root/'current').resolve()
+            releases=[]
+            for release in sorted((installer.root/'releases').glob('*')):
+                if re.fullmatch('[a-f0-9]{64}',release.name):
+                    try:
+                        installer.verify(release);contract=installer.contract(release)
+                        releases.append(dict(release=release.name,current=release==current,state_contract=contract['state_contract']))
+                    except (OSError,ValueError):releases.append(dict(release=release.name,unavailable=True))
+            print(json.dumps(releases,indent=2))
+        elif args.recover:installer.recover()
+        elif args.rollback:installer.rollback(None if args.rollback=='previous' else args.rollback,args.test_interrupt)
+        elif args.activate:installer.activate(args.activate,args.test_interrupt)
         else:
             if installer.journal.exists() and json.loads(installer.journal.read_text())['phase']!='complete':
                 installer.recover()

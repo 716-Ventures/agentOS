@@ -51,6 +51,7 @@ def main():
         local([sys.executable,str(SHELL/'tests/interactive_terminal.py')],'interactive-terminal')
         local([sys.executable,str(SHELL/'tests/voice_terminal.py')],'voice-terminal')
         remote('sudo -n python3 /home/developer/agent-os-source/tests/installation_guest.py interrupts','installation-interruption')
+        remote('sudo -n python3 /home/developer/agent-os-source/tests/installation_guest.py rollbacks','runtime-rollback-recovery',300)
         local([sys.executable,str(ROOT/'verify.py')],'foundation-reboot-cold-start',240)
         remote('sudo -n python3 /home/developer/agent-os-source/tests/installation_guest.py verify','runtime-state-after-reboots')
         before=json.loads(vm.ssh('cat /etc/agent-os/release.json',capture_output=True,text=True,check=True).stdout)['runtime_release']

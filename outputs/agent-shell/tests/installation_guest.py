@@ -10,6 +10,8 @@ from pathlib import Path
 import subprocess
 import sys
 import time
+import tempfile
+import shutil
 sys.path.insert(0,'/usr/local/lib/agent-os/services')
 from broker_client import request as broker
 from layout_client import request as layout
@@ -81,6 +83,28 @@ def interrupts():
         verify();checks.append('SIGKILL at '+phase+' recovered from staged release; state and config preserved')
     return checks
 
+def rollbacks():
+    setup()
+    spec=importlib.util.spec_from_file_location('installed_installer',SOURCE/'install_runtime.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    installer=module.Installer();original=Path('/usr/local/lib/agent-os/current').resolve().name
+    assert installer.contract(Path('/usr/local/lib/agent-os/current'))['state_contract']=='agentos.state/1'
+    with tempfile.TemporaryDirectory(prefix='agentos-update-probe-') as directory:
+        source=Path(directory)/'source'
+        shutil.copytree(SOURCE,source,ignore=shutil.ignore_patterns('target','__pycache__','.git'))
+        binary=source/'target/release/agent-os-core';binary.parent.mkdir(parents=True);shutil.copyfile(SOURCE/'target/release/agent-os-core',binary)
+        with (source/'services/common.py').open('a') as out:out.write('\n# Compatible runtime rollback verification fixture.\n')
+        candidate=installer.stage(source);assert candidate!=original
+        installer.activate(candidate);verify()
+        installer.rollback();verify();assert Path('/usr/local/lib/agent-os/current').resolve().name==original
+        for phase in ('stopped','activated'):
+            installer.activate(candidate)
+            result=subprocess.run([sys.executable,str(SOURCE/'install_runtime.py'),'--rollback',original,'--test-interrupt',phase])
+            assert result.returncode==-9,result.returncode
+            subprocess.run([sys.executable,'/usr/local/lib/agent-os/install-recovery.py','--recover'],check=True)
+            verify();assert Path('/usr/local/lib/agent-os/current').resolve().name==original
+    return ['Compatible update and rollback preserve activities, outputs, layouts, pending approvals, user files and provider configuration',
+            'SIGKILL during rollback at stopped and activated phases recovers to the selected release without rewinding live state']
+
 def cleanup():
     probe=verify()
     broker('cancel',job_id=probe['proposal']);Path(probe['file']).unlink()
@@ -89,9 +113,9 @@ def cleanup():
 
 if __name__=='__main__':
     if os.geteuid()!=0:raise SystemExit('Run this development-guest test with sudo')
-    parser=argparse.ArgumentParser();parser.add_argument('operation',choices=['interrupts','verify','cleanup'])
+    parser=argparse.ArgumentParser();parser.add_argument('operation',choices=['interrupts','rollbacks','verify','cleanup'])
     operation=parser.parse_args().operation
-    checks=interrupts() if operation=='interrupts' else [operation]
+    checks=interrupts() if operation=='interrupts' else rollbacks() if operation=='rollbacks' else [operation]
     if operation=='verify':verify()
     if operation=='cleanup':cleanup()
     print(json.dumps({'result':'pass','checks':checks,'provider_calls':'none'}))
