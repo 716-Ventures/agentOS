@@ -92,7 +92,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     event_loop.run(
         Some(std::time::Duration::from_millis(16)),
         &mut data,
-        move |data| {
+        |data| {
             if let Some(service) = &input_method {
                 if let Err(error) = service.check() {
                     eprintln!("Input method unavailable: {error}");

@@ -51,9 +51,13 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
          'AGENT_OS_SOCKET':str(endpoint),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),
          'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','G_DEBUG':'fatal-criticals','GTK_A11Y':'atspi'}
     env.pop('WAYLAND_DISPLAY',None);env.pop('DISPLAY',None)
+    ime='--ime' in sys.argv
+    if ime:
+        env['AGENT_OS_INPUT_METHOD_ARGV']=json.dumps([str(ROOT.parent/'native-compositor/target/debug/examples/ime_fixture'),str(runtime/'ime-test.sock')])
+        env['GTK_IM_MODULE']='wayland'
     host_failure='--host-failure' in sys.argv
     compositor_failure='--compositor-failure' in sys.argv
-    with (OUTPUT/('session-compositor-failure.log' if compositor_failure else 'session-host-failure.log' if host_failure else 'session.log')).open('w') as log:
+    with (OUTPUT/('session-compositor-failure.log' if compositor_failure else 'session-host-failure.log' if host_failure else 'session-ime.log' if ime else 'session.log')).open('w') as log:
         core=subprocess.Popen([str(SHELL/'target/release/agent-os-core')],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
         session=None;owned=[]
         try:
@@ -69,8 +73,13 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
             state=wait_for(lambda:(lambda s:s if s.get('shared') and 'session-fixture' in s['shared']['identities'].values() else None)(call(control,{'op':'snapshot'})),[core,session])
             assert any(w['app_id'].startswith('agentos.surface.') for w in state['windows']),state
             if not host_failure and not compositor_failure:
-                import accessibility
-                accessibility.verify(lambda value:call(endpoint,value))
+                if ime:
+                    import ime_accessibility
+                    wait_for(lambda:(runtime/'ime-test.sock').exists(),[core,session])
+                    ime_accessibility.verify(lambda value:call(endpoint,value),runtime/'ime-test.sock')
+                else:
+                    import accessibility
+                    accessibility.verify(lambda value:call(endpoint,value))
             # Every process in this private runtime is ours. Record identities before teardown.
             for proc in Path('/proc').iterdir():
                 if not proc.name.isdigit() or int(proc.name)==core.pid:continue

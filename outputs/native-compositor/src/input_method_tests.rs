@@ -122,7 +122,7 @@ fn private_input_method_delivers_unicode_and_cannot_be_bound_by_an_application()
         std::env::set_var("XDG_RUNTIME_DIR", &runtime);
         let mut event_loop = EventLoop::<CalloopData>::try_new().unwrap();
         let display = Display::<Smallvil>::new().unwrap();
-        let dh = display.handle();
+        let mut dh = display.handle();
         let app = dh
             .insert_client(app_server, Arc::new(ClientState::default()))
             .unwrap();

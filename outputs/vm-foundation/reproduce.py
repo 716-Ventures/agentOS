@@ -20,6 +20,7 @@ def graphical_checks():
         'cargo build --locked --manifest-path native-shell/Cargo.toml --examples && '
         'cargo build --locked --manifest-path native-shell/Cargo.toml && '
         'cargo test --locked --manifest-path native-compositor/Cargo.toml && '
+        'cargo build --locked --manifest-path native-compositor/Cargo.toml --examples && '
         'cargo build --locked --manifest-path native-compositor/Cargo.toml',900),
         ('native-broker-pty','python3 native-shell/tests/pty_broker.py',90),
         ('native-installed-broker','dbus-run-session -- python3 native-shell/tests/installed_broker.py',120),
@@ -32,7 +33,7 @@ def graphical_checks():
         ('native-cpu-contention','dbus-run-session -- python3 native-shell/tests/native_desktop.py --load',120),
         ('native-compositor','dbus-run-session -- python3 native-shell/tests/native_desktop.py --compositor',120),
         ('native-shared-workspace','dbus-run-session -- python3 native-shell/tests/native_desktop.py --compositor --shared',180)]
-    for name,option in [('logout',''),('host-loss','--host-failure'),('compositor-loss','--compositor-failure')]:
+    for name,option in [('logout',''),('ime','--ime'),('host-loss','--host-failure'),('compositor-loss','--compositor-failure')]:
         checks.append(('native-session-'+name,'dbus-run-session -- python3 native-shell/tests/native_session.py '+option,120))
     checks.append(('direct-display-vt','sudo -n python3 tests/direct_display_guest.py',90))
     checks.append(('signed-graphical-release','python3 tests/graphical_release.py',300))
