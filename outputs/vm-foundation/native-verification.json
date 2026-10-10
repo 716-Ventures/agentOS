@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-10-10T15:28:17.741882+00:00",
+  "started_at": "2026-10-10T16:03:47.825838+00:00",
   "result": "pass",
   "vm_uuid": "27176EA2-E994-4165-9BBA-70FEED59E66B",
   "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -61,23 +61,13 @@
     "OS update rollback"
   ],
   "deployment": {
-    "created_at": "2026-10-10T15:28:19.920902+00:00",
-    "source_archive_sha256": "950a96d0352e0a46659219593073496f03af725fc1dedb06fc58dfd984bef536",
-    "repository_revision": "06d69ee751c01d1cab19fc26b3c0b6916658bd94",
-    "source_changes": [
-      "M  outputs/agent-shell/tests/direct_input_probe.py",
-      "M  outputs/native-compositor/src/input.rs",
-      "M  outputs/native-compositor/src/shortcuts.rs",
-      "M  outputs/native-shell/Cargo.lock",
-      "M  outputs/native-shell/Cargo.toml",
-      "M  outputs/native-shell/src/main.rs",
-      "M  outputs/native-shell/src/verification.rs",
-      "M  outputs/native-shell/tests/ime_accessibility.py",
-      "M  outputs/native-shell/tests/native_session.py"
-    ],
+    "created_at": "2026-10-10T16:03:48.862614+00:00",
+    "source_archive_sha256": "b0990841ce64b0cce7561c3ad128e8915e580022998f0840f59f7b7ea2345df1",
+    "repository_revision": "aba9ef895c3eea5d1396e26ec738b02747b4c3fb",
+    "source_changes": [],
     "installed": true
   },
-  "runtime_release": "f0a0269f4dd9d376671a1539f6d08073c9893e30dcd2bf268a911425fd4ea7b2",
+  "runtime_release": "53334a9432c46886c356f8ee4b34a8879c5a31b60ca39339f07b7bfdd031b8ee",
   "dependency_manifest": {
     "packages": {
       "adduser": "3.152",
@@ -861,5 +851,5 @@
     "python": "Python 3.9.6"
   },
   "guest_stopped": true,
-  "finished_at": "2026-10-10T15:35:54.038494+00:00"
+  "finished_at": "2026-10-10T16:07:13.266123+00:00"
 }
