@@ -74,6 +74,22 @@ impl Smallvil {
                             if state == KeyState::Released && data.suppressed_keys.remove(&key) {
                                 return FilterResult::Intercept(None);
                             }
+                            #[cfg(feature = "direct-display")]
+                            if state == KeyState::Pressed && modifiers.ctrl && modifiers.alt {
+                                let symbol = handle.modified_sym().raw();
+                                if (0xffbe..=0xffc3).contains(&symbol) {
+                                    if let Some(session) = data.direct_session.as_mut() {
+                                        use smithay::backend::session::Session;
+                                        if let Err(error) =
+                                            session.change_vt((symbol - 0xffbe + 1) as i32)
+                                        {
+                                            eprintln!("VT switch failed: {error}");
+                                        }
+                                        data.suppressed_keys.insert(key);
+                                        return FilterResult::Intercept(None);
+                                    }
+                                }
+                            }
                             if state == KeyState::Pressed && data.bridge.is_some() {
                                 if let Some(action) = crate::shortcuts::decode(
                                     modifiers.ctrl,

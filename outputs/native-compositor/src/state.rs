@@ -48,6 +48,9 @@ pub struct Smallvil {
     pub data_device_state: DataDeviceState,
     pub popups: PopupManager,
 
+    pub cursor_image: smithay::input::pointer::CursorImageStatus,
+    #[cfg(feature = "direct-display")]
+    pub direct_session: Option<smithay::backend::session::libseat::LibSeatSession>,
     pub seat: Seat<Self>,
 }
 
@@ -111,6 +114,9 @@ impl Smallvil {
             seat_state,
             data_device_state,
             popups,
+            cursor_image: smithay::input::pointer::CursorImageStatus::default_named(),
+            #[cfg(feature = "direct-display")]
+            direct_session: None,
             seat,
         }
     }

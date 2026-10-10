@@ -5,6 +5,10 @@ edition = "2021"
 rust-version = "1.85"
 license = "Apache-2.0 AND MIT"
 
+[features]
+default = ["direct-display"]
+direct-display = ["smithay/backend_drm", "smithay/backend_gbm", "smithay/backend_udev", "smithay/backend_libinput", "smithay/backend_session_libseat"]
+
 [dependencies]
 tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
 bitflags = "2.2.1"

@@ -9,6 +9,8 @@ mod pressure;
 mod process;
 mod shortcuts;
 
+#[cfg(feature = "direct-display")]
+mod direct;
 mod grabs;
 mod input;
 mod pointer_geometry;
@@ -52,7 +54,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         display_handle,
     };
 
-    crate::winit::init_winit(&mut event_loop, &mut data)?;
+    match std::env::var("AGENT_OS_COMPOSITOR_BACKEND")
+        .as_deref()
+        .unwrap_or("winit")
+    {
+        "winit" => crate::winit::init_winit(&mut event_loop, &mut data)?,
+        #[cfg(feature = "direct-display")]
+        "drm" => crate::direct::init(&mut event_loop, &mut data)?,
+        _ => return Err("Unsupported compositor backend".into()),
+    }
 
     let control = control::Control::start()?;
     std::env::set_var("AGENT_OS_COMPOSITOR_SOCKET", &control.path);
