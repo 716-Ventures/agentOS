@@ -23,6 +23,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parent))
 from voice_input import VoiceInput, from_file as voice_from_file
 import presentation_view
 import state_pages
+import text_input
 from urllib.parse import urlsplit
 
 SOCKET = os.environ.get('AGENT_OS_SOCKET', '/run/agent-os/runtime.sock')
@@ -498,7 +499,7 @@ def dashboard(screen):
     set_theme()
     sidebar=bool(preferences.get('sidebar',True));activity=previous();focus=''
     zoom=False;note='';note_until=0;cache={};state={'activities':[],'jobs':[]};last_fetch=0;connected=True
-    menu=None;menu_index=0;editor=None;cursor=0;history_cache={};dirty=False;last_save=0
+    menu=None;menu_index=0;editor=None;cursor=0;history_cache={};dirty=False;last_save=0;deferred_key=None
     active_rects=[];rail_hits=[];menu_hits=[];buttons=[]
     broker_jobs=[];broker_error='';attention=[]
     rail_focus=False
@@ -942,7 +943,9 @@ def dashboard(screen):
                 link_color=24 if theme=='light' else 117
                 output+=f'\x1b[{row+1};{column+1}H\x1b[4;38;5;{link_color}m'+hyperlink_escape(target,label)
             sys.stdout.write(output+'\x1b[0m\x1b8');sys.stdout.flush()
-        try:key=screen.get_wch()
+        try:
+            if deferred_key is None:key=screen.get_wch()
+            else:key,deferred_key=deferred_key,None
         except curses.error:continue
         try:
             if not editor and not menu:
@@ -980,8 +983,11 @@ def dashboard(screen):
                 elif key in (curses.KEY_HOME,'\x01'):cursor=0
                 elif key in (curses.KEY_END,'\x05'):cursor=len(editor['text'])
                 elif key=='\x15':editor['text']=editor['text'][cursor:];cursor=0
-                elif isinstance(key,str) and key.isprintable() and len(editor['text'])<4000:
-                    editor['text']=editor['text'][:cursor]+key+editor['text'][cursor:];cursor+=len(key)
+                elif isinstance(key,str) and key.isprintable():
+                    # A pasted command is one bounded text burst, not hundreds
+                    # of complete dashboard redraws. Submit/navigation stay queued.
+                    inserted,deferred_key=text_input.burst(screen,key,4000-len(editor['text']))
+                    editor['text']=editor['text'][:cursor]+inserted+editor['text'][cursor:];cursor+=len(inserted)
                 continue
             if menu:
                 if key in ('\x1b','q'):menu=None;continue
