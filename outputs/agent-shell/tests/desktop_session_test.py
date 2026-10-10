@@ -20,3 +20,9 @@ class DesktopSession(unittest.TestCase):
             self.assertEqual(argv,[str(root/'agent-os-compositor'),'--command',str(root/'agent-os-desktop'),'--socket',str(root/'core with spaces.sock')])
             self.assertIn('watch=true',session.configuration(root/'child','headless'))
             with self.assertRaises(ValueError):session.configuration(Path('/tmp/child\npath=other'),'drm')
+
+    def test_shutdown_does_not_signal_a_reused_process_identity(self):
+        owned=(123,('old-start',55,1000,Path('/runtime/compositor')))
+        with patch.object(session,'process_identity',return_value=('new-start',55,1000,Path('/runtime/compositor'))),patch.object(session.os,'kill') as kill:
+            session.stop_compositor(Path('/tmp'),owned)
+            kill.assert_not_called()

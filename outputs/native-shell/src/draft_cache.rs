@@ -24,47 +24,66 @@ fn identifier(s: &str) -> bool {
         && s.bytes()
             .all(|c| c.is_ascii_alphanumeric() || b"_-:.".contains(&c))
 }
+fn decode(bytes: &[u8]) -> Option<Drafts> {
+    if bytes.len() as u64 > LIMIT {
+        return None;
+    }
+    let value: Value = serde_json::from_slice(&bytes).ok()?;
+    if value["format"] != 1 {
+        return None;
+    }
+    let rows = value["drafts"].as_array()?;
+    let mut drafts = Drafts::new();
+    for row in rows {
+        let surface = row["surface"].as_str()?;
+        let element = row["element"].as_str()?;
+        let text = row["text"].as_str()?;
+        if !identifier(surface) || !identifier(element) || text.len() > 65536 {
+            return None;
+        }
+        let draft = Draft {
+            text: text.into(),
+            expected: row["expected"].as_u64()?,
+            dirty: row["dirty"].as_bool()?,
+            resolved: if row["resolved"].is_null() {
+                None
+            } else {
+                Some(row["resolved"].as_u64()?)
+            },
+        };
+        if drafts
+            .insert((surface.into(), element.into()), draft)
+            .is_some()
+        {
+            return None;
+        }
+    }
+    Some(drafts)
+}
+fn read(path: &Path) -> std::io::Result<Option<Drafts>> {
+    let file = fs::File::open(path)?;
+    let mut bytes = Vec::new();
+    file.take(LIMIT + 1).read_to_end(&mut bytes)?;
+    Ok(decode(&bytes))
+}
+fn preserve_invalid(path: &Path) -> std::io::Result<()> {
+    let backup = path.with_file_name(format!(
+        "native-drafts.corrupt-{}-{}.json",
+        std::process::id(),
+        super::nonce()
+    ));
+    fs::rename(path, backup)?;
+    fs::File::open(path.parent().unwrap())?.sync_all()
+}
 pub fn load(path: &Path) -> Drafts {
-    let read = (|| -> Option<Drafts> {
-        let file = fs::File::open(path).ok()?;
-        let mut bytes = Vec::new();
-        file.take(LIMIT + 1).read_to_end(&mut bytes).ok()?;
-        if bytes.len() as u64 > LIMIT {
-            return None;
+    match read(path) {
+        Ok(Some(drafts)) => drafts,
+        Ok(None) => {
+            let _ = preserve_invalid(path);
+            Drafts::new()
         }
-        let value: Value = serde_json::from_slice(&bytes).ok()?;
-        if value["format"] != 1 {
-            return None;
-        }
-        let rows = value["drafts"].as_array()?;
-        let mut drafts = Drafts::new();
-        for row in rows {
-            let surface = row["surface"].as_str()?;
-            let element = row["element"].as_str()?;
-            let text = row["text"].as_str()?;
-            if !identifier(surface) || !identifier(element) || text.len() > 65536 {
-                return None;
-            }
-            let draft = Draft {
-                text: text.into(),
-                expected: row["expected"].as_u64()?,
-                dirty: row["dirty"].as_bool()?,
-                resolved: if row["resolved"].is_null() {
-                    None
-                } else {
-                    Some(row["resolved"].as_u64()?)
-                },
-            };
-            if drafts
-                .insert((surface.into(), element.into()), draft)
-                .is_some()
-            {
-                return None;
-            }
-        }
-        Some(drafts)
-    })();
-    read.unwrap_or_default()
+        Err(_) => Drafts::new(),
+    }
 }
 pub fn encode(drafts: &Drafts) -> Result<Vec<u8>, String> {
     let rows=drafts.iter().map(|((surface,element),d)|json!({"surface":surface,"element":element,"text":d.text,"expected":d.expected,"dirty":d.dirty,"resolved":d.resolved})).collect::<Vec<_>>();
@@ -79,6 +98,15 @@ pub fn encode(drafts: &Drafts) -> Result<Vec<u8>, String> {
     Ok(bytes)
 }
 pub fn save(path: &Path, bytes: &[u8]) -> Result<(), String> {
+    if decode(bytes).is_none() {
+        return Err("Invalid local draft recovery payload".into());
+    }
+    if path.exists() {
+        // An unreadable or invalid previous recovery file must survive replacement.
+        if read(path).map_err(|e| e.to_string())?.is_none() {
+            preserve_invalid(path).map_err(|e| e.to_string())?;
+        }
+    }
     let parent = path.parent().ok_or("Invalid local draft path")?;
     fs::DirBuilder::new()
         .recursive(true)
@@ -150,6 +178,14 @@ mod tests {
         assert!(load(&file).is_empty());
         fs::write(&file, b"truncated").unwrap();
         assert!(load(&file).is_empty());
+        let backups = fs::read_dir(&root)
+            .unwrap()
+            .map(|e| e.unwrap().path())
+            .collect::<Vec<_>>();
+        assert_eq!(backups.len(), 2);
+        assert!(backups.iter().any(|p| fs::read(p).unwrap() == b"truncated"));
+        save(&file, &encode(&Drafts::new()).unwrap()).unwrap();
+        assert_eq!(fs::read_dir(&root).unwrap().count(), 3);
         fs::remove_dir_all(root).unwrap();
     }
 }

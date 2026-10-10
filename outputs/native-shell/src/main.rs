@@ -2,6 +2,7 @@
 mod broker_controls;
 mod controls;
 mod draft_cache;
+mod first_run;
 mod log_view;
 mod preferences;
 mod transport;
@@ -590,6 +591,9 @@ fn main() {
         bar.append(&clock);
         bar.append(&user);
         bar.append(&status);
+        let logout=ui::button("End desktop session",ButtonVariant::Outline,false);
+        let desktop=app.clone();logout.connect_clicked(move |_|desktop.quit());
+        bar.append(&logout);
         let controls = Rc::new(RefCell::new(controls::Controls::new(
             app,
             frontend.borrow().commands.clone(),
@@ -607,6 +611,7 @@ fn main() {
             .build();
         main.add_css_class("seven-ui");
         main.present();
+        first_run::present(app,frontend.borrow().commands.clone());
         let voice_cleanup=controls.clone();app.connect_shutdown(move |_|voice_cleanup.borrow().close());
         let opener = controls.clone();
         status.connect_clicked(move |_| opener.borrow().present());

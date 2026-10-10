@@ -71,7 +71,9 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 except (PermissionError,FileNotFoundError,ProcessLookupError):continue
                 if ('XDG_RUNTIME_DIR='+str(runtime)).encode() in values:owned.append(int(proc.name))
             session.terminate();assert session.wait(timeout=15)==0
-            wait_for(lambda:all(not alive(pid) for pid in owned),[core],timeout=5)
+            remaining=lambda:[pid for pid in owned if alive(pid)]
+            try:wait_for(lambda:not remaining(),[core],timeout=5)
+            except AssertionError:raise AssertionError('Session processes survived shutdown: '+str({pid:Path(f'/proc/{pid}/cmdline').read_bytes().replace(bytes([0]),b' ') for pid in remaining()}))
             assert not control.exists(),'Compositor socket leaked'
             assert not list(runtime.glob('agentos-session-*')),'Session directory leaked'
             print('PASS: normal native session maps authenticated surfaces and reaps display host, compositor and renderer')

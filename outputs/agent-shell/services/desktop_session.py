@@ -36,6 +36,33 @@ def configuration(child,backend):
             '[autolaunch]\npath='+str(child)+'\nwatch=true\n')
 
 
+def process_identity(pid):
+    try:
+        root=Path('/proc')/str(pid);fields=(root/'stat').read_text().rsplit(')',1)[1].split()
+        return (fields[19],int(fields[1]),root.stat().st_uid,(root/'exe').resolve()) if fields[0]!='Z' else None
+    except (OSError,ValueError,IndexError):return None
+
+
+def stop_compositor(runtime,owned):
+    if not owned:return
+    ident,identity=owned
+    current=process_identity(ident)
+    if current is None or current[0]!=identity[0]:return
+    path=runtime/f'agentos-compositor-{ident}.sock'
+    try:
+        with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as conn:
+            conn.settimeout(.3);conn.connect(str(path));conn.sendall(json.dumps({'op':'shutdown'}).encode()+b'\n');conn.recv(4096)
+    except OSError:
+        try:os.kill(ident,signal.SIGTERM)
+        except ProcessLookupError:return
+    deadline=time.monotonic()+5
+    while process_identity(ident) is not None and time.monotonic()<deadline:time.sleep(.05)
+    if process_identity(ident) is not None:
+        os.kill(ident,signal.SIGTERM)
+        deadline=time.monotonic()+5
+        while process_identity(ident) is not None and time.monotonic()<deadline:time.sleep(.05)
+    if process_identity(ident) is not None:raise RuntimeError('Owned compositor failed to stop')
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--backend',choices=['drm','wayland','headless'],default='drm',help='Headless/Wayland modes are for explicit verification')
@@ -50,7 +77,7 @@ def main():
         nonlocal stopped
         stopped=True
     previous={sig:signal.signal(sig,stop) for sig in (signal.SIGINT,signal.SIGTERM)}
-    proc=None
+    proc=None;owned=None
     try:
         with tempfile.TemporaryDirectory(prefix='agentos-session-',dir=runtime) as directory:
             root=Path(directory);child=root/'desktop-child';pidfile=root/'compositor.pid'
@@ -61,29 +88,32 @@ def main():
             if args.pixman:argv.append('--use-pixman')
             if args.backend=='headless':argv.extend(['--width=1280','--height=800'])
             proc=subprocess.Popen(argv,env=env,start_new_session=True)
-            while proc.poll() is None and not stopped:time.sleep(.05)
-            # Weston may also exit unexpectedly. Stop the recorded compositor first;
-            # its renderer has a separate process group and must be reaped by it.
-            try:
-                ident=int(pidfile.read_text().strip())
-                if os.getpgid(ident)!=proc.pid:raise ValueError('Compositor ownership changed')
-                path=runtime/f'agentos-compositor-{ident}.sock'
-                with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as conn:
-                    conn.settimeout(.3);conn.connect(str(path));conn.sendall(json.dumps({'op':'shutdown'}).encode()+b'\n');conn.recv(4096)
-            except (OSError,ValueError):pass
+            while proc.poll() is None and not stopped:
+                if owned is None and pidfile.exists():
+                    try:
+                        ident=int(pidfile.read_text().strip());identity=process_identity(ident)
+                        if identity and identity[1]==proc.pid and identity[2]==os.getuid() and identity[3]==Path(command[0]).resolve():owned=(ident,identity)
+                    except (OSError,ValueError):pass
+                time.sleep(.05)
+            # Weston starts autolaunched clients in separate process groups. Bind
+            # ownership to its direct child and Linux start identity, not its pgid.
+            stop_compositor(runtime,owned)
             if proc.poll() is None:
                 try:proc.wait(timeout=5)
                 except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGTERM)
             try:return proc.wait(timeout=5)
             except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);return proc.wait(timeout=5)
     finally:
-        if proc and proc.poll() is None:
-            os.killpg(proc.pid,signal.SIGTERM)
-            try:proc.wait(timeout=5)
-            except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait(timeout=5)
-        for sig,handler in previous.items():signal.signal(sig,handler)
+        try:stop_compositor(runtime,owned)
+        finally:
+            if proc and proc.poll() is None:
+                os.killpg(proc.pid,signal.SIGTERM)
+                try:proc.wait(timeout=5)
+                except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait(timeout=5)
+            for sig,handler in previous.items():signal.signal(sig,handler)
+
 
 
 if __name__=='__main__':
     try:raise SystemExit(main())
-    except (OSError,ValueError) as exc:raise SystemExit('Desktop session: '+str(exc))
+    except (OSError,ValueError,RuntimeError) as exc:raise SystemExit('Desktop session: '+str(exc))
