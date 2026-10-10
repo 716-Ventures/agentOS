@@ -97,6 +97,9 @@ impl Row {
         }
     }
     fn update(&self, item: &Item) {
+        self.widget.update_property(&[gtk::accessible::Property::Label(
+            &format!("Work {}", item.key),
+        )]);
         let argv = item.job["argv"]
             .as_array()
             .map(|a| {
@@ -147,6 +150,7 @@ impl Row {
         *self.current.borrow_mut() = Some(item.clone());
     }
     fn clear(&self) {
+        self.widget.update_property(&[gtk::accessible::Property::Label("Unavailable work row")]);
         *self.current.borrow_mut() = None;
         for button in [
             &self.stop,

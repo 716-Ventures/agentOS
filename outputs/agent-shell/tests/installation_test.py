@@ -80,6 +80,14 @@ class Installation(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError,'UID changed'):recovered.login_identity()
             with self.assertRaisesRegex(ValueError,'migration'):install.Installer(Path(tmp),login_user='bob')
 
+    def test_login_contract_versions_are_integers(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            instance,source=self.fixture(tmp)
+            for invalid in (True,False,0,2,'1'):
+                value=json.loads((source/'release-contract.json').read_text());value['login_identity']=invalid
+                (source/'release-contract.json').write_text(json.dumps(value));ident=instance.stage(source)
+                with self.assertRaisesRegex(ValueError,'login identity contract'):instance.contract(instance.root/'releases'/ident)
+
     def test_counter_reset_skips_new_units_and_only_touches_loaded_release_units(self):
         instance=install.Installer();instance.active_units=['agent-os-core','agent-os-broker']
         for rows,expected in [([],None),([{'unit':'agent-os-core.service'},{'unit':'unrelated.service'}],['systemctl','reset-failed','agent-os-core'])]:

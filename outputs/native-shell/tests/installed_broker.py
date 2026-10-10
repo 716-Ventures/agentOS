@@ -23,19 +23,31 @@ OUTPUT = ROOT / 'test-output'
 OUTPUT.mkdir(exist_ok=True)
 
 
-def button(name):
+def button(name, work=None):
     # Completed work retains disabled controls. Select only the actionable row.
     found = []
     def search():
         from collections import deque
         queue = deque([pyatspi.Registry.getDesktop(0)])
-        while queue:
+        visited = 0
+        while queue and visited < 4096:
             node = queue.popleft()
+            visited += 1
             try:
                 if (node.name == name and node.getRole() == pyatspi.ROLE_PUSH_BUTTON
                         and node.getState().contains(pyatspi.STATE_SENSITIVE)):
-                    found.append(node)
-                    return True
+                    ancestor = node
+                    matches = work is None
+                    for _ in range(32):
+                        if ancestor is None:
+                            break
+                        if ancestor.name == 'Work broker:' + str(work):
+                            matches = True
+                            break
+                        ancestor = ancestor.parent
+                    if matches:
+                        found.append(node)
+                        return True
                 queue.extend(node[index] for index in range(min(node.childCount, 128)))
             except (RuntimeError, LookupError):
                 pass
@@ -70,8 +82,8 @@ def main():
         return job['id']
     def poll(ident):
         return request('poll', job_id=ident)
-    def click(name):
-        accessibility.activate(button(name))
+    def click(name, work=None):
+        accessibility.activate(button(name, work))
     text = 'Native reviewed stdin λ 日本語\n$(literal input, never a command)'
     echo = ['/usr/bin/python3', '-c', 'import sys; print(sys.stdin.read(),end="")']
     try:
@@ -95,7 +107,7 @@ def main():
                     desktop = subprocess.Popen(['/usr/local/bin/agent-os-desktop', '--activity', str(activity)],
                                                env=env, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
                     click('Agent Monitor')
-                    click('Review approval')
+                    click('Review approval', approved)
                     click('Inspect stored input')
                     preview = accessibility.find('Stored operation input', pyatspi.ROLE_TEXT)
                     accessibility.wait(lambda: accessibility.text(preview) == text, 'Privileged input inspection did not show exact Unicode text')
@@ -104,15 +116,15 @@ def main():
                     accessibility.wait(lambda: poll(approved)['status'] == 'succeeded', 'Native approval did not execute the harmless fixture')
                     assert poll(approved)['output'] == text
                     rejected = propose(echo, 'Rejected input must not run')
-                    click('Review approval')
+                    click('Review approval', rejected)
                     click('Reject this operation')
                     accessibility.wait(lambda: poll(rejected)['status'] == 'rejected', 'Native rejection did not cancel the proposal')
                     assert poll(rejected)['output'] == ''
                     sleeping = propose(['/usr/bin/sleep', '30'])
-                    click('Review approval')
+                    click('Review approval', sleeping)
                     click('Approve this operation')
                     accessibility.wait(lambda: poll(sleeping)['status'] == 'running', 'Bounded sleep fixture did not start')
-                    click('Stop work')
+                    click('Stop work', sleeping)
                     accessibility.wait(lambda: poll(sleeping)['status'] == 'cancelled', 'Native stop did not cancel installed systemd work')
                     print('PASS: installed native AT-SPI review, exact root input preview, deliberate approval, rejection and direct systemd stop without models')
                 finally:

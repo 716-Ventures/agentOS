@@ -54,7 +54,7 @@ class Installer:
                     or (self.prefix==Path('/') and info.st_uid!=0)):
                 raise ValueError('Login identity must be a bounded root-owned regular file without group/other write access')
             self.login_record=json.loads(self.login_config.read_text())
-            if (not isinstance(self.login_record,dict) or self.login_record.get('format')!=1
+            if (not isinstance(self.login_record,dict) or type(self.login_record.get('format')) is not int or self.login_record.get('format')!=1
                     or type(self.login_record.get('uid')) is not int or self.login_record['uid']<1000
                     or not isinstance(self.login_record.get('name'),str)):
                 raise ValueError('Invalid installed login identity')
@@ -144,7 +144,8 @@ class Installer:
                 or len(set(value['units']))!=len(value['units'])
                 or any(unit not in UNITS or not (release/'systemd'/f'{unit}.service').is_file() for unit in value['units'])):
             raise ValueError('Invalid runtime release contract')
-        if value.get('login_identity') not in (None,1):raise ValueError('Unsupported login identity contract')
+        identity=value.get('login_identity')
+        if identity is not None and (type(identity) is not int or identity!=1):raise ValueError('Unsupported login identity contract')
         if 'components' in value:
             components=value['components']
             if (not isinstance(components,list) or not components or len(components)>256
