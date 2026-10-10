@@ -1,6 +1,6 @@
 # Agent OS 0.6 — interactive terminal sessions
 
-**Windowing design:** The [native windowing specification](../agent-os-windowing-specification.md) defines the adopted graphical architecture: native component catalog, surface documents, source bindings, broker action references and revisioned tiled/floating workspaces. It is planned implementation, not a graphical feature of this release.
+**Windowing design:** The [native windowing specification](../agent-os-windowing-specification.md) defines the adopted graphical architecture: native component catalog, surface documents, source bindings, broker action references and revisioned tiled/floating workspaces. The experimental desktop is packaged with this runtime; graphical guest qualification remains in progress.
 
 A full Debian-based Linux VM with persistent activities, a terminal interface, and a Gateway agent that can use general Linux execution and filesystem tools. Jev assesses actions, selects relevant context, advises on recovery, checks completion and reviews learning; Ling plans and reasons. See [the decision layer](JEV.md). Versioned memory and reusable skills persist across activities. Offline English voice input and transcript review are implemented; see [VOICE.md](VOICE.md). The graphical desktop remains under development.
 
@@ -116,3 +116,8 @@ fresh run of the current source. Acoustic voice qualification, native graphics, 
 formal accessibility validation remain outside this runtime hardening scope.
 
 The initial Rust native presentation contract is implemented and tested headlessly. See [PRESENTATION.md](PRESENTATION.md) for operations, guarantees and remaining graphical integration work.
+
+
+Signed runtime updates use Ed25519 and OpenSSL 3. Provision a public PEM trust key explicitly at `/etc/agent-os/update-signing-key.pem`; the installer never generates or trusts a distribution key automatically. Keep the private key outside the runtime and VM image. On a build guest, `sudo agent-os-update --export-bundle /path/runtime.tar.gz --signing-key /secure/private.pem` exports the current immutable release; `--release-id ID` selects another staged release. The bundle includes only integrity-manifested runtime files and license notices, with deterministic archive metadata. User data, provider credentials, voice model binaries and private keys are excluded.
+
+On the receiving ARM64 Linux guest, `sudo agent-os-update --stage-bundle /path/runtime.tar.gz` checks the configured signature, payload hashes, architecture, installed dependency versions, voice asset identity and current state contract. `--trusted-key /path/public.pem` explicitly selects another provisioned trust anchor. Staging does not stop services or activate code. Activate the printed release ID with `sudo agent-os-update --activate ID`; existing recovery and compatible rollback remain available. Dependency/voice changes must be installed separately, and incompatible state formats require a migration. Key distribution, rotation, revocation and downloadable release publication remain deployment work.

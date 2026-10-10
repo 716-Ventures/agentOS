@@ -23,6 +23,7 @@
     "rustc",
     "pkg-config",
     "python3",
+    "openssl",
     "ca-certificates",
     "curl",
     "openssh-server",

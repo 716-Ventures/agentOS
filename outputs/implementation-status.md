@@ -18,6 +18,6 @@ Remaining implementation/qualification:
 - Exercise actual dynamic agent requests, grounded Jev candidate decisions and unresolved references; measure latency, corrections and model usage without claiming fixture decisions are live quality evidence.
 - Validate keyboard, pointer, voice and screen-reader workflows, selection/IME/clipboard/undo/context menus, long text, small displays, light/dark/text scale and reduced motion.
 - Verify 716 UI reference appearance, state transitions and motion against its pinned shadcn profile; early releases remain experimental.
-- Complete first-run session wiring, integrated VM image/export, secret-free release preparation, update distribution and migration qualification, guest audio and full repeated cold-boot/recovery checks.
+- Complete integrated VM image/export, secret-free release preparation, update distribution and migration qualification, guest audio and full repeated cold-boot/recovery checks. Native first-run guidance and bounded Ed25519 runtime export/verification/staging are implemented; key provisioning/distribution and migration across state formats remain deployment work.
 
 All authorized changes are committed/pushed as development proceeds. Test apps, private displays and VMs must be closed after verification. Public 716 UI source remains separate from private agentOS source, VM state and credentials.

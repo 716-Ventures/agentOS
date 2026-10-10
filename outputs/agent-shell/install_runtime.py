@@ -4,6 +4,7 @@ import argparse
 import ast
 import fcntl
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -265,13 +266,34 @@ def main():
     operation.add_argument('--rollback',nargs='?',const='previous',metavar='RELEASE_ID')
     operation.add_argument('--activate',metavar='RELEASE_ID')
     operation.add_argument('--list-releases',action='store_true')
+    operation.add_argument('--stage-bundle',type=Path,metavar='BUNDLE',help='Verify a signed bundle and stage it without activating')
+    operation.add_argument('--export-bundle',type=Path,metavar='OUTPUT',help='Sign and export an immutable runtime release')
+    parser.add_argument('--signing-key',type=Path,help='Ed25519 private PEM key used only for export')
+    parser.add_argument('--trusted-key',type=Path,default=Path('/etc/agent-os/update-signing-key.pem'),help='Explicitly provisioned Ed25519 public PEM key')
+    parser.add_argument('--release-id',help='Release to export; defaults to the installed current release')
     parser.add_argument('--test-interrupt',choices=['stopped','activated'],help='Development-guest crash injection; terminates installer with SIGKILL')
     args=parser.parse_args()
+    if args.export_bundle and not args.signing_key:parser.error('--export-bundle requires --signing-key')
+    if args.signing_key and not args.export_bundle:parser.error('--signing-key requires --export-bundle')
+    if args.release_id and not args.export_bundle:parser.error('--release-id requires --export-bundle')
     if os.geteuid()!=0:parser.error('Run with sudo')
     installer=Installer();installer.state.mkdir(mode=0o700,parents=True,exist_ok=True);installer.state.chmod(0o700)
     with (installer.state/'lock').open('a+b') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX)
-        if args.list_releases:
+        if args.stage_bundle or args.export_bundle:
+            module=SOURCE/'services/release_bundle.py'
+            if not module.is_file():module=installer.root/'current/services/release_bundle.py'
+            spec=importlib.util.spec_from_file_location('agentos_release_bundle',module)
+            bundles=importlib.util.module_from_spec(spec);spec.loader.exec_module(bundles)
+            if args.stage_bundle:
+                ident=bundles.import_bundle(installer,args.stage_bundle,args.trusted_key)
+                print('Verified and staged:',ident)
+                print('Activate with: sudo agent-os-update --activate '+ident)
+            else:
+                ident=args.release_id or (installer.root/'current').resolve().name
+                bundles.export(installer,ident,args.signing_key,args.export_bundle)
+                print('Signed runtime bundle:',args.export_bundle)
+        elif args.list_releases:
             current=(installer.root/'current').resolve()
             releases=[]
             for release in sorted((installer.root/'releases').glob('*')):
