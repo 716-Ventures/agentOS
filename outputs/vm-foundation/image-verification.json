@@ -1,5 +1,5 @@
 {
-  "verified_at": "2026-10-10T17:11:53.596535+00:00",
+  "verified_at": "2026-10-10T17:44:11.160393+00:00",
   "result": "pass",
   "image": {
     "architecture": "arm64",
@@ -20,9 +20,9 @@
       "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
       "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
     },
-    "image_sha256": "20628f0fac94fa4bbb39de58de2c41c9d31aa6db2650f53513212f9c5921afb6",
+    "image_sha256": "3e216330b8a08684adb4c3037c6ae0f72031dc8e7bc6b44902418422713a8260",
     "name": "agentOS experimental native image",
-    "runtime_release": "1718e4cbe02487a2d9276848b65b47a06d36a8adcc85ea4078b0a6a65b5f0f8b",
+    "runtime_release": "9aa030eca916f7b1bd3363711288723f7c4b7ad42f65f4101dc6944c3688e843",
     "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
     "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
   },
@@ -36,10 +36,10 @@
     "baseline runtime activation and six healthy services",
     "standalone DHCP and HTTPS",
     "signed update staging leaves current release unchanged",
-    "signed update activation and rollback preserve activity and file",
-    "updated runtime direct KMS, keyboard/pointer, VT, move/resize/undo, close/restore, primary paste and Unicode COPY/oversized DND",
-    "updated runtime real CPU speech recognition, zero-signal rejection, owner-bound capture and recorder cleanup",
-    "updated runtime account/activity/file/service persistence through reboot",
+    "signed compatible older-runtime activation and rollback restore image runtime and preserve activity and file",
+    "image runtime direct KMS, keyboard/pointer, VT, move/resize/undo, close/restore, primary paste and Unicode COPY/oversized DND",
+    "image runtime real CPU speech recognition, zero-signal rejection, owner-bound capture and recorder cleanup",
+    "image runtime account/activity/file/service persistence through reboot",
     "actual no-network cold boot: only lo, six healthy services",
     "real activation failure retains setup journal",
     "TTY 2 rescue remains active",
@@ -50,12 +50,6 @@
     "qualification-only SSH key and sudo authority removed; development disk/config/EFI restored; VM stopped and owned UTM app closed",
     "original signed distribution remains unbooted"
   ],
-  "updated_runtime": {
-    "release": "3ebc478291575d588f89c5349397c930093233a51eb45c8892611cb38bebdc1f",
-    "signed_bundle_sha256": "ede34e9cebebf6f393383ef7933c134aa37e215afb2155717abb8a06d91b25ad",
-    "source_revision": "bae63caf11cced8ccfa7a5ed9f70dd5d107f0b79",
-    "probe_revision": "8076e475341e3a38e5809681c26d974cb8584010"
-  },
   "not_tested": [
     "production signing/distribution authority",
     "physical host input or real IME engine",
@@ -63,5 +57,86 @@
     "physical GPU/hotplug/multi-output hardware",
     "live Gateway or Jev inference; no configured credentials",
     "incompatible future state-format migrations"
-  ]
+  ],
+  "runtime_source_revision": "26ab95cfbb573463bd1dedb181f95c1e7d8a5327",
+  "runtime_716_ui": "v0.1.0-alpha.21",
+  "compatible_rollback_probe": {
+    "release": "3ebc478291575d588f89c5349397c930093233a51eb45c8892611cb38bebdc1f",
+    "signed_bundle_sha256": "ede34e9cebebf6f393383ef7933c134aa37e215afb2155717abb8a06d91b25ad"
+  },
+  "lifecycle": {
+    "result": "pass",
+    "before": {
+      "result": "pass",
+      "boot_id": "d206315d-196d-43ca-93eb-bf6e8521ba14",
+      "runtime": "9aa030eca916f7b1bd3363711288723f7c4b7ad42f65f4101dc6944c3688e843",
+      "uid": 1000,
+      "activity": 1,
+      "file_persisted": true,
+      "healthy_services": [
+        "active",
+        "active",
+        "active",
+        "active",
+        "active",
+        "active"
+      ],
+      "network_interfaces": [
+        "lo",
+        "enp0s1"
+      ]
+    },
+    "reboot": {
+      "result": "pass",
+      "boot_id": "ea34a4ca-179a-487a-8e65-61e209e87b67",
+      "runtime": "9aa030eca916f7b1bd3363711288723f7c4b7ad42f65f4101dc6944c3688e843",
+      "uid": 1000,
+      "activity": 1,
+      "file_persisted": true,
+      "healthy_services": [
+        "active",
+        "active",
+        "active",
+        "active",
+        "active",
+        "active"
+      ],
+      "network_interfaces": [
+        "lo",
+        "enp0s1"
+      ]
+    },
+    "offline": {
+      "result": "pass",
+      "boot_id": "b3983fd3-336c-4036-9e97-2efc6b8c7c41",
+      "runtime": "9aa030eca916f7b1bd3363711288723f7c4b7ad42f65f4101dc6944c3688e843",
+      "uid": 1000,
+      "activity": 1,
+      "file_persisted": true,
+      "healthy_services": [
+        "active",
+        "active",
+        "active",
+        "active",
+        "active",
+        "active"
+      ],
+      "network_interfaces": [
+        "lo"
+      ]
+    },
+    "activation_resume": {
+      "result": "pass",
+      "checks": [
+        "real activation failure retains setup journal",
+        "TTY 2 rescue remains active",
+        "resume preserves account UID and password",
+        "ready only after healthy activation",
+        "all six services recover without models or network"
+      ]
+    },
+    "final_offline_runtime": "9aa030eca916f7b1bd3363711288723f7c4b7ad42f65f4101dc6944c3688e843",
+    "development_disk_restored": true,
+    "guest_stopped": true
+  }
 }
