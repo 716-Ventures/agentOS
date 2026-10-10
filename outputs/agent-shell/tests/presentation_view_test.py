@@ -41,6 +41,20 @@ class Projection(unittest.TestCase):
         lines,controls=view.project(doc);text='\n'.join(lines)
         self.assertIn('Read',text);self.assertIn('Edit',text);self.assertIn('Inputs',text);self.assertIn('Café 日本語',text)
         self.assertEqual(set(controls),{'field','button'})
+    def test_choice_and_toggle_edits_save_typed_drafts_deliberately(self):
+        for kind,props,value in [('Choice@1',{'label':'Density','options':['Compact','Comfortable'],'value':'Comfortable'},'Compact'),('Toggle@1',{'label':'Wrap','value':True},'false')]:
+            doc=document();doc['elements']['field']={'type':kind,'props':props};calls=[]
+            def request(op,**fields):
+                calls.append((op,fields))
+                if op=='draft.get':return {'draft_revision':0,'draft':None}
+                if op=='draft.save':return {'draft_revision':1}
+                if op=='presentation.get':return doc
+                if op=='presentation.apply':return {'revisions':{'view':5}}
+                return {}
+            answers=iter([value,'s']);view.edit(request,doc,'field',lambda _:next(answers),lambda _:None)
+            self.assertEqual(next(fields['draft'] for op,fields in calls if op=='draft.save'),value)
+            self.assertEqual(sum(op=='presentation.apply' for op,_ in calls),1)
+            with self.assertRaises(ValueError):view.edit(request,doc,'field',lambda _:'unknown',lambda _:None)
     def test_completed_multiline_input_survives_interruption(self):
         doc=document();doc['elements']['field']['props']['multiline']=True;calls=[]
         def request(op,**fields):calls.append(op);return {'draft_revision':0,'draft':None}

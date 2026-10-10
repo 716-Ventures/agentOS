@@ -138,6 +138,78 @@ fn verify_container_replacement(
             .as_deref(),
         Some("a")
     );
+    doc["revision"] = json!(12);
+    doc["elements"]["root"] =
+        json!({"type":"Stack@1","props":{},"slots":{"children":["a","choice","toggle"]}});
+    doc["elements"]["choice"] = json!({"type":"Choice@1","props":{"label":"Density","options":["Compact","Comfortable"],"value":"Comfortable"}});
+    doc["elements"]["toggle"] = json!({"type":"Toggle@1","props":{"label":"Wrap","value":true}});
+    surface.update(id, &doc, frame, commands, drafts);
+    surface.elements["choice"]
+        .choice
+        .as_ref()
+        .unwrap()
+        .control
+        .set_selected(0);
+    surface.elements["toggle"]
+        .toggle
+        .as_ref()
+        .unwrap()
+        .control
+        .set_active(false);
+    assert_eq!(
+        drafts.lock().unwrap()[&(id.into(), "choice".into())].text,
+        "Compact"
+    );
+    assert_eq!(
+        drafts.lock().unwrap()[&(id.into(), "toggle".into())].text,
+        "false"
+    );
+    doc["revision"] = json!(13);
+    surface.update(id, &doc, frame, commands, drafts);
+    assert_eq!(
+        surface.elements["choice"]
+            .choice
+            .as_ref()
+            .unwrap()
+            .value()
+            .as_deref(),
+        Some("Compact")
+    );
+    assert!(!surface.elements["toggle"]
+        .toggle
+        .as_ref()
+        .unwrap()
+        .control
+        .is_active());
+    assert_eq!(surface.revision, Some(12));
+    drafts
+        .lock()
+        .unwrap()
+        .retain(|(surface, _), _| surface != id);
+    surface.update(id, &doc, frame, commands, drafts);
+    assert_eq!(
+        surface.elements["choice"]
+            .choice
+            .as_ref()
+            .unwrap()
+            .value()
+            .as_deref(),
+        Some("Comfortable")
+    );
+    assert!(surface.elements["toggle"]
+        .toggle
+        .as_ref()
+        .unwrap()
+        .control
+        .is_active());
+    assert!(
+        !drafts
+            .lock()
+            .unwrap()
+            .keys()
+            .any(|(surface, _)| surface == id),
+        "Programmatic reconciliation must not create edits"
+    );
     surface.window.destroy();
 }
 pub fn run(socket: PathBuf, capture: Option<String>) {

@@ -583,7 +583,10 @@ fn run(
                                 if stop.load(Ordering::Relaxed) {
                                     break;
                                 }
-                                if node["type"] == "TextField@1" {
+                                if ["TextField@1", "Choice@1", "Toggle@1"]
+                                    .iter()
+                                    .any(|kind| node["type"] == *kind)
+                                {
                                     if let Ok(draft) = request(
                                         &socket,
                                         &json!({"op":"draft.get","surface_id":id,"element_id":element}),
@@ -738,10 +741,13 @@ fn resolve_draft(
             .ok_or("Missing commit revision")?;
         (text, resolved, receipt)
     } else {
-        let text = doc["elements"][element]["props"]["value"]
-            .as_str()
-            .unwrap_or("")
-            .to_string();
+        let value = &doc["elements"][element]["props"]["value"];
+        let text = value.as_str().map(String::from).unwrap_or_else(|| {
+            value
+                .as_bool()
+                .map(|value| value.to_string())
+                .unwrap_or_default()
+        });
         let receipt = request(
             socket,
             &json!({"op":"draft.save","surface_id":surface,"element_id":element,"expected_draft_revision":expected,"draft":null}),

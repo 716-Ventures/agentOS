@@ -37,6 +37,9 @@ struct Element {
     widget: gtk::Widget,
     label: Option<gtk::Label>,
     field: Option<TextField>,
+    choice: Option<ui::Choice>,
+    selection_notice: Option<gtk::Label>,
+    toggle: Option<ui::Toggle>,
     area: Option<ui::TextArea>,
     button: Option<gtk::Button>,
     progress: Option<gtk::ProgressBar>,
@@ -127,6 +130,9 @@ fn construct(
         widget: gtk::Box::new(gtk::Orientation::Vertical, 0).upcast(),
         label: None,
         field: None,
+        choice: None,
+        selection_notice: None,
+        toggle: None,
         area: None,
         button: None,
         progress: None,
@@ -212,6 +218,92 @@ fn construct(
                 lease(&result.widget, surface, id, commands);
             } else if let Some(label) = &result.label {
                 label.set_selectable(false);
+            }
+        }
+        "Choice@1" | "Toggle@1" => {
+            let recovered = frame.drafts.get(&(surface.into(), id.into()));
+            let expected = recovered
+                .and_then(|d| d["draft_revision"].as_u64())
+                .unwrap_or(0);
+            let value = recovered
+                .and_then(|d| d["draft"].as_str())
+                .map(String::from)
+                .unwrap_or_else(|| literal_editor_value(props));
+            let (s, e, edits, flag) = (
+                surface.to_string(),
+                id.to_string(),
+                drafts.clone(),
+                applying.clone(),
+            );
+            let changed = move |text: String| {
+                if flag.get() {
+                    return;
+                }
+                let mut drafts = edits.lock().unwrap();
+                let draft = drafts.entry((s.clone(), e.clone())).or_insert(Draft {
+                    text: String::new(),
+                    expected,
+                    dirty: false,
+                    resolved: None,
+                });
+                draft.text = text;
+                draft.dirty = true;
+                draft.resolved = None;
+            };
+            if kind == "Choice@1" {
+                let options = props["options"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|v| v.as_str().unwrap().to_string())
+                    .collect::<Vec<_>>();
+                let selected = if options.contains(&value) {
+                    value.as_str()
+                } else {
+                    props["value"].as_str().unwrap()
+                };
+                let choice =
+                    ui::Choice::new(props["label"].as_str().unwrap(), &options, selected).unwrap();
+                let notice = ui::status(
+                    "Saved choice is unavailable. Choose an available option before saving.",
+                );
+                notice.set_visible(!options.contains(&value));
+                choice.widget.append(&notice);
+                if !options.contains(&value) {
+                    choice.control.set_selected(gtk::INVALID_LIST_POSITION);
+                }
+                let warning = notice.clone();
+                choice.on_changed(move |value| {
+                    warning.set_visible(false);
+                    changed(value);
+                });
+                result.selection_notice = Some(notice);
+                lease(&choice.control.clone().upcast(), surface, id, commands);
+                draft_controls(&choice.widget, surface, id, commands);
+                result.widget = choice.widget.clone().upcast();
+                result.choice = Some(choice);
+            } else {
+                let toggle =
+                    ui::Toggle::new(props["label"].as_str().unwrap(), value == "true").unwrap();
+                let notice =
+                    ui::status("Saved toggle is unavailable. Choose true or false before saving.");
+                notice.set_visible(value != "true" && value != "false");
+                toggle
+                    .control
+                    .set_inconsistent(value != "true" && value != "false");
+                toggle.widget.append(&notice);
+                let warning = notice.clone();
+                let control = toggle.control.clone();
+                toggle.on_changed(move |value| {
+                    warning.set_visible(false);
+                    control.set_inconsistent(false);
+                    changed(value.to_string());
+                });
+                result.selection_notice = Some(notice);
+                lease(&toggle.control.clone().upcast(), surface, id, commands);
+                draft_controls(&toggle.widget, surface, id, commands);
+                result.widget = toggle.widget.clone().upcast();
+                result.toggle = Some(toggle);
             }
         }
         "TextField@1" => {
@@ -375,6 +467,17 @@ fn draft_controls(widget: &gtk::Box, surface: &str, element: &str, commands: &Se
     }
     widget.append(&row);
 }
+fn literal_editor_value(props: &Value) -> String {
+    props["value"]
+        .as_str()
+        .map(String::from)
+        .unwrap_or_else(|| {
+            props["value"]
+                .as_bool()
+                .map(|value| value.to_string())
+                .unwrap_or_default()
+        })
+}
 fn editor_value(
     surface: &str,
     element: &str,
@@ -405,9 +508,8 @@ fn editor_value(
             .drafts
             .get(&key)
             .and_then(|v| v["draft"].as_str())
-            .or_else(|| props["value"].as_str())
-            .unwrap_or("")
-            .into(),
+            .map(String::from)
+            .unwrap_or_else(|| literal_editor_value(props)),
     )
 }
 fn bound(surface: &str, value: &Value, frame: &Frame) -> Value {
@@ -492,6 +594,20 @@ impl Surface {
                 .as_ref()
                 .map(|f| f.entry.has_focus() || f.entry.focus_child().is_some())
                 .unwrap_or(false)
+                || e.choice
+                    .as_ref()
+                    .map(|choice| {
+                        choice.control.has_focus() || choice.control.focus_child().is_some()
+                    })
+                    .unwrap_or(false)
+                || e.toggle
+                    .as_ref()
+                    .map(|toggle| {
+                        toggle.control.has_focus()
+                            || toggle.control.is_focus()
+                            || toggle.control.focus_child().is_some()
+                    })
+                    .unwrap_or(false)
                 || e.area
                     .as_ref()
                     .map(|a| {
@@ -542,6 +658,13 @@ impl Surface {
                                 && e.table
                                     .as_ref()
                                     .map(|table| json!(table.columns()) != node["props"]["columns"])
+                                    .unwrap_or(true))
+                            || (e.kind == "Choice@1"
+                                && e.choice
+                                    .as_ref()
+                                    .map(|choice| {
+                                        json!(choice.options()) != node["props"]["options"]
+                                    })
                                     .unwrap_or(true))
                             || (e.kind == "Text@1"
                                 && e.label
@@ -731,7 +854,8 @@ impl Surface {
                         }
                     }
                 }
-                if e.field.is_some() || e.area.is_some() {
+                if e.field.is_some() || e.area.is_some() || e.choice.is_some() || e.toggle.is_some()
+                {
                     if let Some(text) = editor_value(
                         id,
                         element,
@@ -740,6 +864,27 @@ impl Surface {
                         frame,
                         drafts,
                     ) {
+                        if let Some(choice) = &e.choice {
+                            let valid = choice.options().contains(&text);
+                            if let Some(notice) = &e.selection_notice {
+                                notice.set_visible(!valid);
+                            }
+                            if valid {
+                                choice.reconcile(&text);
+                            } else {
+                                choice.control.set_selected(gtk::INVALID_LIST_POSITION);
+                            }
+                        }
+                        if let Some(toggle) = &e.toggle {
+                            let valid = text == "true" || text == "false";
+                            if let Some(notice) = &e.selection_notice {
+                                notice.set_visible(!valid);
+                            }
+                            if valid {
+                                toggle.reconcile(text == "true");
+                            }
+                            toggle.control.set_inconsistent(!valid);
+                        }
                         if let Some(field) = &e.field {
                             field.reconcile(&text);
                         }
@@ -747,6 +892,26 @@ impl Surface {
                             area.reconcile(&text);
                         }
                     }
+                }
+                if let Some(choice) = &e.choice {
+                    let label = props["label"].as_str().unwrap();
+                    if let Some(heading) = choice
+                        .widget
+                        .first_child()
+                        .and_then(|child| child.downcast::<gtk::Label>().ok())
+                    {
+                        heading.set_text(label);
+                    }
+                    choice
+                        .control
+                        .update_property(&[gtk::accessible::Property::Label(label)]);
+                }
+                if let Some(toggle) = &e.toggle {
+                    let label = props["label"].as_str().unwrap();
+                    toggle.control.set_label(Some(label));
+                    toggle
+                        .control
+                        .update_property(&[gtk::accessible::Property::Label(label)]);
                 }
                 if e.field.is_some() || e.area.is_some() {
                     let key = node["events"]["submit"]["action"].as_str().unwrap_or("");

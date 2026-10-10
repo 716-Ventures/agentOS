@@ -385,6 +385,18 @@ fn walk_elements(
             return Err(invalid("Collection cell count must match its schema"));
         }
     }
+    if node.kind == "Choice@1" {
+        let options = node.props["options"].as_array().unwrap();
+        let mut unique = BTreeSet::new();
+        if options.iter().any(|value| {
+            value.as_str().unwrap().trim().is_empty() || !unique.insert(value.as_str().unwrap())
+        }) || !options.contains(&node.props["value"])
+        {
+            return Err(invalid(
+                "Choice requires distinct meaningful options and an exact selected value",
+            ));
+        }
+    }
     if node.kind == "Tabs@1" {
         let labels = node.props["labels"].as_array().unwrap();
         if node.slots.get("children").map(Vec::len) != Some(labels.len())
@@ -1397,10 +1409,26 @@ fn apply(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> {
                             .elements
                             .get_mut(&element_id)
                             .ok_or_else(|| error("missing_reference", &element_id))?;
-                        if element.kind != "TextField@1" {
-                            return Err(invalid("Only editable text fields can commit a draft"));
-                        }
-                        element.props.insert("value".into(), json!(draft));
+                        let value = match element.kind.as_str() {
+                            "TextField@1" => json!(draft),
+                            "Choice@1"
+                                if element.props["options"]
+                                    .as_array()
+                                    .unwrap()
+                                    .contains(&json!(draft)) =>
+                            {
+                                json!(draft)
+                            }
+                            "Toggle@1" if draft == "true" || draft == "false" => {
+                                json!(draft == "true")
+                            }
+                            _ => {
+                                return Err(invalid(
+                                    "Draft is incompatible with this editable control",
+                                ))
+                            }
+                        };
+                        element.props.insert("value".into(), value);
                         tx.execute("UPDATE presentation_leases SET draft=NULL,draft_revision=draft_revision+1 WHERE document=? AND element=?",params![id,element_id]).map_err(db_error)?;
                     }
                     Operation::Children {
@@ -2663,6 +2691,65 @@ mod tests {
                 }
             }
             handle(&mut db, &create, &human()).unwrap();
+        }
+    }
+    #[test]
+    fn choice_and_toggle_drafts_are_typed_atomic_and_user_owned() {
+        for (kind, props, valid, invalid, result) in [
+            (
+                "Choice@1",
+                json!({"label":"Density","options":["Compact","Comfortable"],"value":"Comfortable"}),
+                "Compact",
+                "Unknown",
+                json!("Compact"),
+            ),
+            (
+                "Toggle@1",
+                json!({"label":"Wrap","value":true}),
+                "false",
+                "yes",
+                json!(false),
+            ),
+        ] {
+            let mut db = fixture();
+            let mut doc = surface();
+            doc["elements"]["input"] = json!({"type":kind,"props":props});
+            let create = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"selection-view","expected_revisions":{"surface-a":null},"operations":[{"op":"surface.create","document":doc}]});
+            if kind == "Choice@1" {
+                for options in [
+                    json!(["Compact", "Compact"]),
+                    json!([" ", "Comfortable"]),
+                    json!(["Compact"]),
+                ] {
+                    let mut bad = create.clone();
+                    bad["operations"][0]["document"]["elements"]["input"]["props"]["options"] =
+                        options;
+                    assert!(handle(&mut db, &bad, &human()).is_err());
+                }
+            }
+            handle(&mut db, &create, &human()).unwrap();
+            handle(
+                &mut db,
+                &json!({"op":"interaction.begin","surface_id":"surface-a","element_id":"input"}),
+                &human(),
+            )
+            .unwrap();
+            handle(&mut db, &json!({"op":"draft.save","surface_id":"surface-a","element_id":"input","expected_draft_revision":0,"draft":invalid}), &human()).unwrap();
+            let mut commit = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"selection-commit","expected_revisions":{"surface-a":0},"operations":[{"op":"draft.commit","surface_id":"surface-a","element_id":"input","expected_draft_revision":1}]});
+            assert!(handle(&mut db, &commit, &human()).is_err());
+            assert_eq!(
+                snapshot(&db).unwrap()["documents"]["surface-a"]["elements"]["input"]["props"],
+                props
+            );
+            handle(&mut db, &json!({"op":"draft.save","surface_id":"surface-a","element_id":"input","expected_draft_revision":1,"draft":valid}), &human()).unwrap();
+            commit["operations"][0]["expected_draft_revision"] = json!(2);
+            assert!(handle(&mut db, &commit, &agent()).is_err());
+            handle(&mut db, &commit, &human()).unwrap();
+            assert_eq!(
+                snapshot(&db).unwrap()["documents"]["surface-a"]["elements"]["input"]["props"]
+                    ["value"],
+                result
+            );
         }
     }
     #[test]

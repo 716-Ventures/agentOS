@@ -51,7 +51,7 @@ def project(document,bindings=None,width=80):
             text='\n'.join([props.get('label','Table'),' | '.join(props.get('columns',[])),*(' | '.join(row['cells']) for row in props.get('rows',[]))])
         elif kind=='List@1':text='\n'.join([props.get('label','List'),*('• '+row['cells'][0] for row in props.get('rows',[]))])
         elif kind=='KeyValue@1':text='\n'.join([props.get('label','Details'),*(': '.join(row['cells']) for row in props.get('rows',[]))])
-        elif kind=='TextField@1':text=f"[{key}] {props.get('label','Text')}: {props.get('value','')}";controls[key]=node
+        elif kind in ('TextField@1','Choice@1','Toggle@1'):text=f"[{key}] {props.get('label','Text')}: {props.get('value','')}";controls[key]=node
         elif kind=='Button@1':
             text=f"[{key}] {props.get('label','Action')}"+(' (disabled)' if props.get('disabled') else '')
             if not props.get('disabled'):controls[key]=node
@@ -149,7 +149,7 @@ def recover(request,document,input_fn=input,output=print):
                 if not stat.S_ISREG(info.st_mode) or info.st_uid!=os.getuid() or info.st_size>128*1024:continue
                 value=json.load(stream)
             if (value.get('format')==1 and value.get('surface_id')==surface and isinstance(value.get('text'),str)
-                    and len(value['text'].encode())<=65536 and document['elements'].get(value.get('element_id'),{}).get('type')=='TextField@1'):
+                    and len(value['text'].encode())<=65536 and document['elements'].get(value.get('element_id'),{}).get('type') in ('TextField@1','Choice@1','Toggle@1')):
                 records.append((path,value))
         except (OSError,ValueError,TypeError,AttributeError):continue
     if not records:output('No local recovery drafts match this view.');return
@@ -172,7 +172,10 @@ def edit(request,document,element,input_fn=input,output=print):
     with Lease(request,surface,element) as lease:
         recovered=request('draft.get',surface_id=surface,element_id=element)
         existing=recovered.get('draft') if recovered.get('draft') is not None else node.get('props',{}).get('value','')
-        output('Current text: '+clean(existing))
+        if type(existing) is bool:existing=str(existing).lower()
+        output('Current value: '+clean(existing))
+        if node['type']=='Choice@1':output('Available choices: '+', '.join(clean(value) for value in node['props']['options']))
+        if node['type']=='Toggle@1':output('Enter true or false.')
         output('Enter :draft to use the current text; ::draft enters that literal text.')
         local=None
         if node.get('props',{}).get('multiline'):
@@ -191,6 +194,8 @@ def edit(request,document,element,input_fn=input,output=print):
             text=input_fn('New text: ')
             if text==':draft':text=existing
             elif text=='::draft':text=':draft'
+        if node['type']=='Choice@1' and text not in node['props']['options']:raise ValueError('Choose an available option exactly as shown')
+        if node['type']=='Toggle@1' and text not in ('true','false'):raise ValueError('Toggle value must be true or false')
         if len(text.encode())>65536:raise ValueError('Draft exceeds 64 KiB')
         local=preserve(text,surface,element,local)
         try:
@@ -253,7 +258,7 @@ def interact(activity,request,input_fn=input,output=print):
             if choice not in controls:output('Choose a listed control ID.');continue
             node=controls[choice]
             if node['type']=='Link@1':output(clean(node.get('props',{}).get('url','')))
-            elif node['type']=='TextField@1':edit(request,document,choice,input_fn,output)
+            elif node['type'] in ('TextField@1','Choice@1','Toggle@1'):edit(request,document,choice,input_fn,output)
             else:
                 receipt=invoke(request,document,choice);output(clean(json.dumps(receipt,ensure_ascii=False,indent=2)))
         except (OSError,RuntimeError,ValueError,KeyError) as exc:output('View unavailable: '+clean(str(exc)))
