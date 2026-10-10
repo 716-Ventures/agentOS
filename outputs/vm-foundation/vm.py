@@ -57,13 +57,31 @@ def status():
     if not (RUN / 'utm.json').exists():
         return 'stopped'
     current = machine()
-    try:
-        result = call([controller(), 'status', current['uuid']], capture_output=True, text=True, timeout=10)
-    except subprocess.TimeoutExpired as exc:
-        raise RuntimeError('UTM status timed out after 10 seconds; VM state is unknown. Inspect UTM before retrying.') from exc
-    except subprocess.CalledProcessError as exc:
-        raise RuntimeError(f'UTM cannot find/control this guest. Open {current["bundle"]} in UTM to register it.\n{exc.stderr.strip()}') from exc
-    return result.stdout.strip()
+    control = controller()
+    deadline = time.monotonic() + 10
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise RuntimeError('UTM status timed out after 10 seconds; VM state is unknown. Inspect UTM before retrying.')
+        try:
+            result = call([control, 'status', current['uuid']], capture_output=True,
+                          text=True, timeout=remaining)
+        except subprocess.TimeoutExpired as exc:
+            raise RuntimeError('UTM status timed out after 10 seconds; VM state is unknown. Inspect UTM before retrying.') from exc
+        except subprocess.CalledProcessError as exc:
+            detail = (exc.stderr or '').strip()
+            remaining = deadline - time.monotonic()
+            # A freshly launched app can answer before loading its saved VM list.
+            # Only repeat this read-only lookup, never a lifecycle mutation.
+            if detail == 'Error: Virtual machine not found.' and remaining > 0:
+                time.sleep(min(.25, remaining))
+                if time.monotonic() < deadline:
+                    continue
+            raise RuntimeError(f'UTM cannot find/control this guest. Open {current["bundle"]} in UTM to register it.\n{detail}') from exc
+        observed = result.stdout.strip()
+        if observed not in {'stopped', 'starting', 'started', 'pausing', 'paused', 'resuming', 'stopping'}:
+            raise RuntimeError(f'UTM returned an unrecognized status {observed!r}; VM state is unknown.')
+        return observed
 
 
 def alive():

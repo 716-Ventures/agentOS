@@ -1,0 +1,44 @@
+{
+  "verified_at": "2026-10-10T17:54:19.772330+00:00",
+  "result": "pass",
+  "cycles": [
+    {
+      "cycle": 1,
+      "cold_app": true,
+      "guest_ready_seconds": 12.923639792,
+      "healthy_services": 6,
+      "guest_stopped": true,
+      "owned_app_closed": true
+    },
+    {
+      "cycle": 2,
+      "cold_app": true,
+      "guest_ready_seconds": 12.956116250000001,
+      "healthy_services": 6,
+      "guest_stopped": true,
+      "owned_app_closed": true
+    }
+  ],
+  "regression": "cold app temporarily omits saved guest; only status lookups retry within total deadline",
+  "host_macos": "27.0.1",
+  "utm_version": "4.7.5",
+  "controller": {
+    "argument_parser_revision": "8f4d2753f0e4778c76d5f05ad16c74f707390531",
+    "binary_sha256": "e0359b6c5a4020ad77a4496cf035664fc8157462abf0573dc4f9e0b2cf532641",
+    "launch_policy": "foreground-launch/1",
+    "source_revision": "048ca7498ea3a374439149d51739d94c5300bcda",
+    "source_sha256": {
+      "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "Scripting/UTMScripting.swift": "40b64b2e8997d310c8f2ee55a05c38440c0374fec60e57fff81b43507d68a0cd",
+      "utmctl/UTMCtl.swift": "007a1ef14182d73fda4d24e52511112fa9801a10ff56d3d067ec096ce759ffe6"
+    }
+  },
+  "wrapper_sha256": "11eb3fc8218268aa6f8555616883c4529a65f22dc879926eadb5a60141978e13",
+  "unit_checks": [
+    "temporary missing registration recovers through status only",
+    "permanent missing registration bounded to ten seconds",
+    "unrelated failures not retried",
+    "unknown status rejected",
+    "uncertain start/shutdown never replayed"
+  ]
+}

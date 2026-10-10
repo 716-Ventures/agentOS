@@ -50,7 +50,8 @@ class VMSelection(unittest.TestCase):
             with patch.object(vm,'machine',return_value={'uuid':'fixture'}),patch.object(vm,'call',side_effect=subprocess.TimeoutExpired('utmctl',10)) as call:
                 with self.assertRaisesRegex(RuntimeError,'state is unknown'):vm.status()
                 self.assertEqual(call.call_count,1)
-                self.assertEqual(call.call_args.kwargs['timeout'],10)
+                self.assertGreater(call.call_args.kwargs['timeout'],0)
+                self.assertLessEqual(call.call_args.kwargs['timeout'],10)
         with patch.object(vm,'alive',return_value=False),patch.object(vm,'machine',return_value={'uuid':'fixture'}),patch.object(vm,'call',side_effect=subprocess.TimeoutExpired('utmctl',30)) as call:
             with self.assertRaisesRegex(RuntimeError,'do not retry automatically'):vm.start(hide=True)
             self.assertEqual(call.call_count,1)
@@ -60,3 +61,37 @@ class VMSelection(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError,'shutdown did not acknowledge'):vm.stop()
             self.assertEqual(call.call_count,1)
             self.assertEqual(call.call_args.kwargs['timeout'],15)
+
+    def test_cold_app_registration_race_retries_only_read_only_lookup(self):
+        with tempfile.TemporaryDirectory() as directory,patch.object(vm,'RUN',Path(directory)):
+            (Path(directory)/'utm.json').write_text('{}')
+            missing=subprocess.CalledProcessError(1,'utmctl',stderr='Error: Virtual machine not found.\n')
+            now=[0.0]
+            def sleep(seconds):now[0]+=seconds
+            with patch.object(vm,'machine',return_value={'uuid':'fixture','bundle':'fixture.utm'}),patch.object(vm.time,'monotonic',side_effect=lambda:now[0]),patch.object(vm.time,'sleep',side_effect=sleep),patch.object(vm,'call',side_effect=[missing,missing,subprocess.CompletedProcess([],0,stdout='stopped\n')]) as call:
+                self.assertEqual(vm.status(),'stopped')
+                self.assertEqual(now[0],.5)
+                self.assertEqual(call.call_count,3)
+                for attempt in call.call_args_list:
+                    self.assertEqual(attempt.args[0],['utmctl','status','fixture'])
+                    self.assertGreater(attempt.kwargs['timeout'],0)
+                    self.assertLessEqual(attempt.kwargs['timeout'],10)
+
+    def test_missing_registration_is_bounded_and_other_failures_are_not_retried(self):
+        with tempfile.TemporaryDirectory() as directory,patch.object(vm,'RUN',Path(directory)):
+            (Path(directory)/'utm.json').write_text('{}')
+            now=[0.0]
+            def sleep(seconds):now[0]+=seconds
+            with patch.object(vm,'machine',return_value={'uuid':'fixture','bundle':'fixture.utm'}),patch.object(vm.time,'monotonic',side_effect=lambda:now[0]),patch.object(vm.time,'sleep',side_effect=sleep):
+                missing=subprocess.CalledProcessError(1,'utmctl',stderr='Error: Virtual machine not found.')
+                with patch.object(vm,'call',side_effect=missing) as call:
+                    with self.assertRaisesRegex(RuntimeError,'register it'):vm.status()
+                    self.assertEqual(now[0],10)
+                    self.assertEqual(call.call_count,40)
+                for detail in ('Automation denied','Error: Virtual machine not found. Additional failure'):
+                    with patch.object(vm,'call',side_effect=subprocess.CalledProcessError(1,'utmctl',stderr=detail)) as call:
+                        with self.assertRaisesRegex(RuntimeError,'cannot find/control'):vm.status()
+                        self.assertEqual(call.call_count,1)
+                with patch.object(vm,'call',return_value=subprocess.CompletedProcess([],0,stdout='')) as call:
+                    with self.assertRaisesRegex(RuntimeError,'state is unknown'):vm.status()
+                    self.assertEqual(call.call_count,1)
