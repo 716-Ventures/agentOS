@@ -8,6 +8,8 @@ mod policy;
 mod pressure;
 mod process;
 mod shortcuts;
+#[path = "../../native-shell/src/timings.rs"]
+mod timings;
 
 #[cfg(feature = "direct-display")]
 mod direct;

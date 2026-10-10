@@ -23,10 +23,12 @@ def reap(proc):
     try:proc.wait(timeout=5)
     except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait(timeout=5)
 
+METRICS=OUTPUT/'metrics';METRICS.mkdir(exist_ok=True)
+previous_metrics=set(METRICS.glob('render-*.json'))
 with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
     runtime=Path(directory);endpoint=runtime/'core.sock'
     shared='--shared' in sys.argv
-    env={**os.environ,'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),'XDG_RUNTIME_DIR':directory,'WAYLAND_DISPLAY':'native-test','GDK_BACKEND':'wayland','GSK_RENDERER':'cairo','GTK_A11Y':'atspi','G_DEBUG':'fatal-criticals','AGENT_OS_STATE':str(runtime/'state'),'AGENT_OS_SOCKET':str(endpoint)}
+    env={**os.environ,'AGENT_OS_METRICS_DIR':str(METRICS),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),'XDG_RUNTIME_DIR':directory,'WAYLAND_DISPLAY':'native-test','GDK_BACKEND':'wayland','GSK_RENDERER':'cairo','GTK_A11Y':'atspi','G_DEBUG':'fatal-criticals','AGENT_OS_STATE':str(runtime/'state'),'AGENT_OS_SOCKET':str(endpoint)}
     def call(value):
         with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as conn:
             conn.settimeout(5);conn.connect(str(endpoint));conn.sendall(json.dumps(value).encode()+b'\n')
@@ -246,3 +248,16 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
             if compositor:reap(compositor)
             reap(core)
 print('PASS: native test core and private display cleaned up')
+
+reports=[json.loads(path.read_text()) for path in set(METRICS.glob('render-*.json'))-previous_metrics]
+assert reports,'Rendering diagnostics were not written on clean shutdown'
+stages={name for report in reports for name in report['stages']}
+assert 'native.surface_update' in stages and 'native.revision_reconcile_attempt' in stages
+if '--compositor' in sys.argv:assert 'compositor.nested_render_submit' in stages
+for report in reports:
+    assert report['format']==1 and report['sample_limit_per_stage']==256
+    assert len(report['stages'])<=8
+    for values in report['stages'].values():
+        assert 0<values['retained']<=256 and values['samples_total']>=values['retained']
+        assert 0<=values['p50_recent_ms']<=values['p95_recent_ms']<=values['max_recent_ms']
+print('PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim')

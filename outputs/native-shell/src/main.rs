@@ -13,6 +13,7 @@ mod presentation_pages;
 mod pty_transport;
 mod pty_view;
 mod state_pages;
+mod timings;
 mod transport;
 mod verification;
 mod voice;
@@ -745,6 +746,9 @@ impl Surface {
         commands: &Sender<Command>,
         drafts: &Arc<Mutex<BTreeMap<(String, String), Draft>>>,
     ) {
+        let _timing = timings::Span::new("native.surface_update");
+        let _revision_timing = (self.revision != doc["revision"].as_u64())
+            .then(|| timings::Span::new("native.revision_reconcile_attempt"));
         let nodes = match doc["elements"].as_object() {
             Some(nodes) => nodes,
             None => return,

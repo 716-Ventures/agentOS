@@ -178,6 +178,7 @@ impl Device {
         Ok(())
     }
     fn render(&mut self, data: &mut CalloopData) {
+        let _timing = crate::timings::Span::new("compositor.direct_render_attempt");
         if !self.active || std::time::Instant::now() < self.retry_at {
             return;
         }
