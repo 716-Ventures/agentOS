@@ -26,10 +26,12 @@ class VMSelection(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError,'UUID'):vm.machine()
 
     def test_control_timeouts_leave_state_unknown_and_never_retry_start(self):
-        with patch.object(vm,'machine',return_value={'uuid':'fixture'}),patch.object(vm,'call',side_effect=subprocess.TimeoutExpired('utmctl',10)) as call:
-            with self.assertRaisesRegex(RuntimeError,'state is unknown'):vm.status()
-            self.assertEqual(call.call_count,1)
-            self.assertEqual(call.call_args.kwargs['timeout'],10)
+        with tempfile.TemporaryDirectory() as directory,patch.object(vm,'RUN',Path(directory)):
+            (Path(directory)/'utm.json').write_text('{}')
+            with patch.object(vm,'machine',return_value={'uuid':'fixture'}),patch.object(vm,'call',side_effect=subprocess.TimeoutExpired('utmctl',10)) as call:
+                with self.assertRaisesRegex(RuntimeError,'state is unknown'):vm.status()
+                self.assertEqual(call.call_count,1)
+                self.assertEqual(call.call_args.kwargs['timeout'],10)
         with patch.object(vm,'alive',return_value=False),patch.object(vm,'machine',return_value={'uuid':'fixture'}),patch.object(vm,'call',side_effect=subprocess.TimeoutExpired('utmctl',30)) as call:
             with self.assertRaisesRegex(RuntimeError,'do not retry automatically'):vm.start(hide=True)
             self.assertEqual(call.call_count,1)
