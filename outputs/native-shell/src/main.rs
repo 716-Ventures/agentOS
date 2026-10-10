@@ -613,7 +613,12 @@ fn draft_controls(
     commands: &Sender<Command>,
     events: &Rc<RefCell<Value>>,
 ) {
-    let row = ui::row(8);
+    let row = gtk::FlowBox::new();
+    row.set_selection_mode(gtk::SelectionMode::None);
+    row.set_min_children_per_line(1);
+    row.set_max_children_per_line(3);
+    row.set_column_spacing(8);
+    row.set_row_spacing(8);
     for (label, commit) in [("Save draft", true), ("Discard draft", false)] {
         let button = ui::button(label, ButtonVariant::Outline, false);
         let (sender, s, e) = (commands.clone(), surface.to_string(), element.to_string());
@@ -626,7 +631,7 @@ fn draft_controls(
                 revision: state.borrow()["revision"].as_u64().unwrap_or(0),
             });
         });
-        row.append(&button);
+        row.insert(&button, -1);
     }
     let review = ui::button("Review latest version…", ButtonVariant::Outline, false);
     let (sender, s, e) = (commands.clone(), surface.to_string(), element.to_string());
@@ -636,7 +641,7 @@ fn draft_controls(
             .and_then(|root| root.downcast::<gtk::Window>().ok());
         draft_dialog::review(parent.as_ref(), s.clone(), e.clone(), sender.clone());
     });
-    row.append(&review);
+    row.insert(&review, -1);
     widget.append(&row);
 }
 fn literal_editor_value(props: &Value) -> String {

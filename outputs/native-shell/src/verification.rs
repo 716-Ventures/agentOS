@@ -267,9 +267,13 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         assert!(output_commands.iter().any(|command|matches!(command,Command::PageOutput(-1))));
         let mut surface=Surface::new(app,"native-fixture",&commands);surface.update("native-fixture",&doc,&frame,&commands,&drafts);
         if std::env::var("AGENT_OS_NATIVE_TEST_SKIP_FILE_REVIEW").as_deref()!=Ok("1"){document_dialog::verify_review(surface.window.upcast_ref());draft_dialog::verify(surface.window.upcast_ref());}
-        let paintable=gtk::WidgetPaintable::new(Some(&surface.scroll));let quit=app.clone();let capture=capture.clone();
+        let paintable=gtk::WidgetPaintable::new(Some(&surface.window));let quit=app.clone();let capture=capture.clone();
         glib::timeout_add_local_once(Duration::from_millis(std::env::var("AGENT_OS_NATIVE_TEST_DELAY_MS").ok().and_then(|s|s.parse::<u64>().ok()).unwrap_or(700).clamp(700,10000)),move || {
             println!("CHECK: mapped native surface");
+            if let Ok(maximum)=std::env::var("AGENT_OS_NATIVE_TEST_MAX_WIDTH") {
+                let maximum=maximum.parse::<i32>().unwrap();
+                assert!(surface.window.width()<=maximum,"Native view {} exceeds logical output {}",surface.window.width(),maximum);
+            }
             let image=surface.elements["image"].image.as_ref().unwrap();assert!(image.picture.paintable().is_some());assert_eq!(image.caption.text(),"Native blue pixel");
             println!("CHECK: authenticated immutable image resource and native texture");
             assert_eq!(surface.elements["editor"].area.as_ref().unwrap().value(),"Document body λ\n日本語");
@@ -332,12 +336,12 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             field.entry.emit_activate();
             assert_eq!(rx.try_iter().filter(|c|matches!(c,Command::Action{reference,..} if reference=="fixture-action")).count(),1,"Text field submit must dispatch exactly once");
             let editor=surface.elements["editor"].area.as_ref().unwrap();editor.view.buffer().set_text("Human edited document 日本語");
-            let toolbar=surface.elements["editor"].widget.last_child().unwrap();let save=toolbar.first_child().unwrap().downcast::<gtk::Button>().unwrap();save.emit_clicked();
+            let toolbar=surface.elements["editor"].widget.last_child().unwrap();let save=toolbar.first_child().unwrap().first_child().unwrap().downcast::<gtk::Button>().unwrap();save.emit_clicked();
             assert!(rx.try_iter().any(|c|matches!(c,Command::ResolveDraft{surface,element,commit:true,revision:2} if surface=="native-fixture" && element=="editor")));
             frame.connected=false;surface.update("native-fixture",&doc,&frame,&commands,&drafts);assert_eq!(field.entry.text(),"Unsaved λ 日本語");
             // Capture after GTK has rendered the verified final state.
             glib::timeout_add_local_once(Duration::from_millis(180),move || {
-            if let Some(path)=capture {let snapshot=gtk::Snapshot::new();paintable.snapshot(&snapshot,surface.scroll.width() as f64,surface.scroll.height() as f64);let node=snapshot.to_node().unwrap();surface.window.renderer().unwrap().render_texture(&node,None).save_to_png(path).unwrap();}
+            if let Some(path)=capture {let snapshot=gtk::Snapshot::new();paintable.snapshot(&snapshot,surface.window.width() as f64,surface.window.height() as f64);let node=snapshot.to_node().unwrap();surface.window.renderer().unwrap().render_texture(&node,None).save_to_png(path).unwrap();}
             println!("PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view");
             surface.window.destroy();quit.quit();
             });

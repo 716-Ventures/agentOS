@@ -27,6 +27,7 @@ def graphical_checks():
         for scale in (1,2):
             checks.append((f'native-{appearance}-{scale}',f'dbus-run-session -- python3 native-shell/tests/native_desktop.py --appearance {appearance} --text-scale {scale}',120))
     checks += [
+        ('native-small-display','dbus-run-session -- python3 native-shell/tests/native_desktop.py --small --text-scale 2',120),
         ('native-cpu-contention','dbus-run-session -- python3 native-shell/tests/native_desktop.py --load',120),
         ('native-compositor','dbus-run-session -- python3 native-shell/tests/native_desktop.py --compositor',120),
         ('native-shared-workspace','dbus-run-session -- python3 native-shell/tests/native_desktop.py --compositor --shared',180)]

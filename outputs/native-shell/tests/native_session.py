@@ -49,7 +49,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
     env={**os.environ,'HOME':str(root),'XDG_RUNTIME_DIR':str(runtime),'XDG_CONFIG_HOME':str(root/'config'),
          'XDG_STATE_HOME':str(root/'user-state'),'AGENT_OS_STATE':str(root/'core-state'),
          'AGENT_OS_SOCKET':str(endpoint),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),
-         'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','G_DEBUG':'fatal-criticals'}
+         'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','G_DEBUG':'fatal-criticals','GTK_A11Y':'atspi'}
     env.pop('WAYLAND_DISPLAY',None);env.pop('DISPLAY',None)
     host_failure='--host-failure' in sys.argv
     compositor_failure='--compositor-failure' in sys.argv
@@ -59,7 +59,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
         try:
             wait_for(endpoint.exists,[core])
             activity=call(endpoint,{'op':'create','name':'Full desktop session'})['id']
-            document={'protocol':'agentos.presentation/1','catalog_revision':'native-core/1','surface_id':'session-fixture','activity_id':str(activity),'revision':0,'title':'Session lifecycle','root':'root','elements':{'root':{'type':'Text@1','props':{'text':'Authenticated session fixture'}}},'bindings':{},'actions':{}}
+            document={'protocol':'agentos.presentation/1','catalog_revision':'native-core/1','surface_id':'session-fixture','activity_id':str(activity),'revision':0,'title':'Session lifecycle','root':'root','elements':{'root':{'type':'Stack@1','props':{'gap':12},'slots':{'children':['reading','field']}},'reading':{'type':'Text@1','props':{'text':'Authenticated session fixture'}},'field':{'type':'TextField@1','props':{'label':'Accessible session draft','value':'Original accessible value'}}},'bindings':{},'actions':{}}
             call(endpoint,{'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':'session-fixture','expected_revisions':{'session-fixture':None},'operations':[{'op':'surface.create','document':document}]})
             session=subprocess.Popen(['python3',str(SHELL/'services/desktop_session.py'),'--backend','headless','--pixman','--bin-dir',str(bins),'--socket',str(endpoint)],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
             pidfile=wait_for(lambda:next(runtime.glob('agentos-session-*/compositor.pid'),None),[core,session])
@@ -68,6 +68,9 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
             wait_for(control.exists,[core,session])
             state=wait_for(lambda:(lambda s:s if s.get('shared') and 'session-fixture' in s['shared']['identities'].values() else None)(call(control,{'op':'snapshot'})),[core,session])
             assert any(w['app_id'].startswith('agentos.surface.') for w in state['windows']),state
+            if not host_failure and not compositor_failure:
+                import accessibility
+                accessibility.verify(lambda value:call(endpoint,value))
             # Every process in this private runtime is ours. Record identities before teardown.
             for proc in Path('/proc').iterdir():
                 if not proc.name.isdigit() or int(proc.name)==core.pid:continue

@@ -41,7 +41,7 @@ jobs:
       - name: Native dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libgtk-4-dev libvte-2.91-gtk4-dev weston dbus-x11 fonts-inter fonts-noto-cjk at-spi2-core
+          sudo apt-get install -y --no-install-recommends libgtk-4-dev libvte-2.91-gtk4-dev weston dbus-x11 fonts-inter fonts-noto-cjk at-spi2-core python3-pyatspi
           rustup toolchain install 1.85.1 --profile minimal
       - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
@@ -67,6 +67,7 @@ jobs:
             done
           done
           dbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py --load
+          dbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py --small --text-scale 2
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -83,7 +84,7 @@ jobs:
       - name: Wayland dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libwayland-dev libxkbcommon-dev libudev-dev libinput-dev libgbm-dev libegl1-mesa-dev libgles2-mesa-dev libseat-dev weston dbus-x11 libgtk-4-dev libvte-2.91-gtk4-dev fonts-inter fonts-noto-cjk at-spi2-core mesa-utils
+          sudo apt-get install -y --no-install-recommends libwayland-dev libxkbcommon-dev libudev-dev libinput-dev libgbm-dev libegl1-mesa-dev libgles2-mesa-dev libseat-dev weston dbus-x11 libgtk-4-dev libvte-2.91-gtk4-dev fonts-inter fonts-noto-cjk at-spi2-core python3-pyatspi mesa-utils
           rustup toolchain install 1.85.1 --profile minimal
       - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         with:

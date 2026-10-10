@@ -22,9 +22,10 @@ parser.add_argument('--compositor',action='store_true')
 parser.add_argument('--shared',action='store_true')
 parser.add_argument('--appearance',choices=['light','dark'],default='dark')
 parser.add_argument('--text-scale',type=float,choices=[1.0,2.0],default=1.0)
+parser.add_argument('--small',action='store_true',help='800 by 600 logical output')
 parser.add_argument('--load',action='store_true',help='Two bounded CPU workers; not model inference')
 args=parser.parse_args()
-profile=f'{args.appearance}-{args.text_scale:g}'+('-load' if args.load else '')
+profile=f'{args.appearance}-{args.text_scale:g}'+('-load' if args.load else '')+('-small' if args.small else '')
 OUTPUT=ROOT/'test-output'/profile
 OUTPUT.mkdir(parents=True,exist_ok=True)
 
@@ -41,6 +42,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
     (config/'agent-os/desktop.json').write_text(json.dumps({'appearance':args.appearance,'text_scale':args.text_scale,'reduced_motion':args.text_scale==2}))
     shared='--shared' in sys.argv
     env={**os.environ,'XDG_CONFIG_HOME':str(config),'AGENT_OS_METRICS_DIR':str(METRICS),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),'XDG_RUNTIME_DIR':directory,'WAYLAND_DISPLAY':'native-test','GDK_BACKEND':'wayland','GSK_RENDERER':'cairo','GTK_A11Y':'atspi','G_DEBUG':'fatal-criticals','AGENT_OS_STATE':str(runtime/'state'),'AGENT_OS_SOCKET':str(endpoint)}
+    if args.small:env['AGENT_OS_NATIVE_TEST_MAX_WIDTH']='800'
     def call(value):
         with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as conn:
             conn.settimeout(5);conn.connect(str(endpoint));conn.sendall(json.dumps(value).encode()+b'\n')
@@ -96,7 +98,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                 'progress':{'type':'Progress@1','props':{'label':'Observed work','value':{'binding':'numeric'}}},
             },'bindings':{'work':{'source':f'job:{job}','path':'/status','access':'read'},'numeric':{'source':f'job:{job}','path':'/exit_code','access':'read'}},'actions':{}}
             call({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':'fixture','expected_revisions':{'native-fixture':None},'operations':[{'op':'surface.create','document':doc}]})
-            compositor=subprocess.Popen(['weston','--backend=headless-backend.so','--use-pixman','--socket=native-test','--idle-time=0','--width=1280','--height=800'],env=env,stdout=displaylog,stderr=subprocess.STDOUT,start_new_session=True)
+            compositor=subprocess.Popen(['weston','--backend=headless-backend.so','--use-pixman','--socket=native-test','--idle-time=0','--width='+('800' if args.small else '1280'),'--height='+('600' if args.small else '800')],env=env,stdout=displaylog,stderr=subprocess.STDOUT,start_new_session=True)
             deadline=time.monotonic()+10
             while not (runtime/'native-test').exists():
                 assert compositor.poll() is None,'Display exited'
@@ -282,4 +284,4 @@ for report in reports:
         assert 0<=values['p50_recent_ms']<=values['p95_recent_ms']<=values['max_recent_ms']
 print('PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim')
 
-(OUTPUT/'profile.json').write_text(json.dumps({'appearance':args.appearance,'text_scale':args.text_scale,'reduced_motion':args.text_scale==2,'cpu_workers':2 if args.load else 0,'qualification':'CPU/render-submit timing; not input-to-display or model inference'},indent=2)+'\n')
+(OUTPUT/'profile.json').write_text(json.dumps({'appearance':args.appearance,'text_scale':args.text_scale,'reduced_motion':args.text_scale==2,'output_size':[800,600] if args.small else [1280,800],'cpu_workers':2 if args.load else 0,'qualification':'CPU/render-submit timing; not input-to-display or model inference'},indent=2)+'\n')
