@@ -51,6 +51,9 @@ def layout_request(op, **fields):
 
 
 def broker_request(op, **fields):
+    if op=='list':
+        from broker_pages import read
+        return read(broker_request,fields.get('activity'),recent=True)
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as conn:
         conn.settimeout(3);conn.connect('/run/agent-os-broker/api.sock')
         conn.sendall(json.dumps({'op':op,**fields}).encode()+b'\n')
@@ -1162,8 +1165,10 @@ def main():
         if args.all:
             from state_pages import read as read_state
             state=read_state(request,args.activity)
-        else:state=request('snapshot')
-        result=[j for j in work_projection(state,broker_request('list')) if args.activity is None or j['activity_id']==args.activity]
+            from broker_pages import read as read_broker
+            broker_jobs=read_broker(broker_request,args.activity)
+        else:state=request('snapshot');broker_jobs=broker_request('list')
+        result=[j for j in work_projection(state,broker_jobs) if args.activity is None or j['activity_id']==args.activity]
     elif args.cmd=='stop': result=stop_work(args.job)
     elif args.cmd=='stop-activity': result=stop_activity_work(args.activity)
     elif args.cmd=='history': result=request('history',activity_id=args.activity)

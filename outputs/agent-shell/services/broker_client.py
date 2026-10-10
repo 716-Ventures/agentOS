@@ -2,12 +2,17 @@
 import argparse
 import json
 import sys
+from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'client'))
 from common import connect, read_line
 
 SOCKET='/run/agent-os-broker/api.sock'
 
 
 def request(op,**fields):
+    if op=='list':
+        from broker_pages import read
+        return read(request,fields.get('activity'),recent=True)
     with connect(SOCKET,{'op':op,**fields},timeout=25) as conn:
         with conn.makefile('rb') as f:r=read_line(f)
     if not r['ok']:raise RuntimeError(r['error'])

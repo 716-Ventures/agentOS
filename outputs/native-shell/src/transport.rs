@@ -439,8 +439,12 @@ fn run(
                     || stop.load(Ordering::Relaxed),
                 )
                 .unwrap_or_else(|e| json!({"unavailable":e}));
-                next.broker = request(&broker_socket(), &json!({"op":"list"}))
-                    .unwrap_or_else(|e| json!({"unavailable":e}));
+                next.broker = super::broker_pages::read(
+                    |query| request(&broker_socket(), query),
+                    activity.as_ref().and_then(|id| id.parse().ok()),
+                    || stop.load(Ordering::Relaxed),
+                )
+                .unwrap_or_else(|e| json!({"unavailable":e}));
                 next.usage = std::fs::read_to_string(
                     std::env::var("AGENT_OS_MODEL_USAGE")
                         .unwrap_or_else(|_| "/run/agent-os-ai/model-usage.json".into()),

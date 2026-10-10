@@ -178,7 +178,14 @@ def handle(req, conn):
                         raise ValueError('Job does not belong to this activity')
                     return layout_request('apply',activity=activity,expected_revision=args['expected_revision'],action=action)
                 if name=='preview_execution': return execute_broker('preview',current_request=prompt,conversation_context=conversation_context,**args)
-                if name=='list_jobs': return broker_request('list',activity=activity)
+                if name=='list_jobs':
+                    cursor=args.get('cursor');fields={'activity':activity,'limit':args.get('limit',8)}
+                    if cursor:
+                        if not args.get('expected_revision'):raise ValueError('Pass the previous page revision with its cursor')
+                        fields['before']=json.loads(cursor)
+                    if 'expected_revision' in args:fields['expected_revision']=args['expected_revision']
+                    page=broker_request('list.page',**fields)
+                    return {'jobs':page['jobs'],'revision':page['revision'],'next_cursor':json.dumps(page['next_before']) if page['next_before'] is not None else None}
                 if name=='stop_job': return broker_request('cancel',**args)
                 if name=='job_output': return broker_request('poll',**args)
                 if name=='execute':

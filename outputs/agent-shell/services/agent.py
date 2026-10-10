@@ -29,7 +29,7 @@ TOOLS = [
          {'job_id':{'type':'string'},'offset':{'type':'integer','minimum':0}}, ['job_id']),
     tool('stop_job', 'Stop a supervised broker job and its process group, or reject a pending proposal.',
          {'job_id':{'type':'string'}}, ['job_id']),
-    tool('list_jobs', 'List recent broker operations in this activity, including background jobs and pending administrator proposals.', {}, []),
+    tool('list_jobs', 'Read a bounded page of broker work in this activity, including complete history. Pass next_cursor as cursor and the same revision as expected_revision for subsequent pages.', {'cursor':{'type':'string'},'expected_revision':{'type':'string'},'limit':{'type':'integer','minimum':1,'maximum':32}}, []),
     tool('read_file', 'Read a UTF-8 file, up to 64 KiB, with hash for guarded updates. Paths may be absolute or relative to the activity workspace. Uses OS-level authority; sensitive reads and changes are assessed by the broker.',
          {'path':{'type':'string'}}, ['path']),
     tool('list_directory', 'Inspect up to 200 directory entries. Normal Unix permissions apply.',

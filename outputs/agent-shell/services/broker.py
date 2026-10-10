@@ -27,6 +27,8 @@ WORK = Path('/var/lib/agent-os-workspaces')
 LOCK = threading.RLock()
 LIMIT = BROKER_OUTPUT_LIMIT
 JOBS = {}
+EPOCH=uuid.uuid4().hex
+REVISION=0
 SOURCES = BrokerSources()
 
 
@@ -35,6 +37,7 @@ def confident(value, threshold):
 
 
 def persist(job):
+    global REVISION
     job['source_revision']=job.get('source_revision',0)+1
     p = STATE / (job['id']+'.json')
     tmp = p.with_suffix('.tmp')
@@ -44,6 +47,7 @@ def persist(job):
     fd=os.open(STATE,os.O_RDONLY|os.O_DIRECTORY)
     try:os.fsync(fd)
     finally:os.close(fd)
+    REVISION+=1
     SOURCES.mark(job)
 
 
@@ -225,6 +229,37 @@ def view(job, offset=0):
     return result
 
 
+def list_page(req):
+    activity=req.get('activity')
+    if activity is not None and (type(activity) is not int or activity<=0):raise ValueError('Invalid activity filter')
+    limit=req.get('limit',32)
+    if type(limit) is not int or not 1<=limit<=64:raise ValueError('Page size must be between 1 and 64')
+    before=req.get('before')
+    if before is not None:
+        if (not isinstance(before,list) or len(before)!=2 or type(before[0]) not in (float,int) or not 0<=before[0]<=2**53
+                or not isinstance(before[1],str) or not re.fullmatch('[0-9a-f]{32}',before[1])):raise ValueError('Invalid broker page cursor')
+        before=tuple(before)
+    revision=EPOCH+':'+str(REVISION)
+    if 'expected_revision' in req and req['expected_revision']!=revision:raise ValueError('resync_required: Broker metadata changed while reading pages')
+    selected=sorted((job for job in JOBS.values() if (activity is None or job['activity']==activity) and (before is None or (job['created_at'],job['id'])<before)),key=lambda job:(job['created_at'],job['id']),reverse=True)
+    recent_only=req.get('recent_only',False)
+    if type(recent_only) is not bool:raise ValueError('Invalid recent-work filter')
+    if recent_only:
+        recent={job['id'] for job in sorted((job for job in JOBS.values() if activity is None or job['activity']==activity),key=lambda job:(job['created_at'],job['id']),reverse=True)[:100]}
+        selected=[job for job in selected if job['id'] in recent or job['status'] in ('starting','running','cancelling','approval_required')]
+    fields=('id','activity','argv','cwd','scope','purpose','timeout_seconds','background','terminal','rows','cols','status','exit_code','created_at','finished_at','error','stdin_sha256','stdin_bytes','source_revision','origin','file_source','metadata_observation_unavailable')
+    rows=[];size=256;more=False
+    for job in selected:
+        row={key:job[key] for key in fields if key in job}
+        row['policy']={key:job.get('policy',{}).get(key) for key in ('decision','reason')}
+        encoded=len(json.dumps(row,ensure_ascii=True,allow_nan=False).encode())+2
+        if len(rows)>=limit or size+encoded>448*1024:
+            if not rows:raise ValueError('Broker metadata record exceeds page limit; inspect this job separately')
+            more=True;break
+        rows.append(row);size+=encoded
+    return {'revision':revision,'jobs':rows,'next_before':[rows[-1]['created_at'],rows[-1]['id']] if more else None}
+
+
 def same_operation(job, activity, argv, cwd, background, timeout, scope, stdin_sha256=None, terminal=False):
     """Deduplication must preserve the requested execution contract."""
     return (job['activity'] == activity and job['argv'] == argv
@@ -256,6 +291,7 @@ def handle(req, uid):
             affected=[cancel_job(j) for j in JOBS.values() if j['activity']==activity
                       and j['status'] in ('starting','running','cancelling','approval_required')]
             return {'activity':activity,'generation':generation,'jobs':affected}
+        if op == 'list.page':return list_page(req)
         if op == 'list':
             activity = req.get('activity')
             selected=sorted((j for j in JOBS.values() if activity is None or j['activity']==activity),

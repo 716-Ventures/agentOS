@@ -27,7 +27,7 @@ def valid(values):
             if value is None and key=='modified_at':continue
             if type(value) not in (float,int) or not math.isfinite(value):return False
         return values['measured_at']>=0
-    except (UnicodeError,TypeError,ValueError):return False
+    except (UnicodeError,TypeError,ValueError,OverflowError):return False
 
 
 def record_valid(record):

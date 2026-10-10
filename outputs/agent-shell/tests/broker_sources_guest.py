@@ -8,6 +8,7 @@ import socket
 import subprocess
 import tempfile
 import time
+import sys
 ROOT=Path(__file__).resolve().parents[1]
 
 def wait(predicate,timeout=10):
@@ -69,7 +70,7 @@ threading.Thread(target=serve,daemon=True).start()
 publisher.mark(job);publisher.start();print(source,flush=True)
 try:
     for line in sys.stdin:
-        command=json.loads(line);job['status']=command['status'];job['source_revision']+=1;publisher.mark(job)
+        command=json.loads(line);job['status']=command['status'];job['source_revision']+=1;broker.REVISION+=1;publisher.mark(job)
         job_path.write_text(json.dumps(job))
         note.write_text('new');store.save(int(sys.argv[3]),metadata(note))
 finally:publisher.close();server.close()
@@ -93,6 +94,17 @@ finally:publisher.close();server.close()
         output_action=next(row for row in callbacks if row['operation']=='broker.read_output')
         file_action=next(row for row in callbacks if row['operation']=='file.inspect')
         output_invocation=dict(reference=output_action['reference'],request_id='broker-output-callback',expected_source_revision=output_action['source_revision'],parameters={'offset':0})
+        def broker_call(op,**fields):
+            with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as conn:
+                conn.settimeout(3);conn.connect(str(root/'broker.sock'));conn.sendall(json.dumps({'op':op,**fields}).encode()+b'\n')
+                with conn.makefile('rb') as stream:response=json.loads(stream.readline())
+                assert response['ok'],response
+                return response['result']
+        initial_broker=broker_call('list.page',activity=activity)
+        assert initial_broker['jobs'][0]['id']=='c'*32
+        sys.path.insert(0,str(ROOT/'client'))
+        from broker_pages import read as read_broker
+        assert read_broker(broker_call,activity)[0]['status']=='running'
         output_receipt=call('action.invoke',**output_invocation)
         assert output_receipt['status']=='succeeded' and output_receipt['observed_target']['output']=='Observed 日本語'
         file_invocation=dict(reference=file_action['reference'],request_id='file-metadata-callback',expected_source_revision=file_action['source_revision'])
@@ -103,6 +115,11 @@ finally:publisher.close();server.close()
         producer.stdin.write(json.dumps({'status':'succeeded'})+'\n');producer.stdin.flush()
         wait(lambda:binding()['value']=='succeeded')
         wait(lambda:file_binding()['value']=='3 bytes')
+        try:broker_call('list.page',activity=activity,expected_revision=initial_broker['revision'])
+        except AssertionError as exc:assert 'resync_required' in str(exc)
+        else:raise AssertionError('Broker pages accepted a mixed metadata revision')
+        assert read_broker(broker_call,activity)[0]['status']=='succeeded'
+
         try:call('source.heartbeat')
         except AssertionError as exc:assert 'unauthorized' in str(exc)
         else:raise AssertionError('An unprivileged UI claimed authoritative source availability')

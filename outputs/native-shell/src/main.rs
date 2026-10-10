@@ -1,6 +1,7 @@
 //! Native shell client: stable GTK controls over the core's inert presentation API.
 mod action_parameters;
 mod broker_controls;
+mod broker_pages;
 mod controls;
 mod draft_cache;
 mod first_run;
