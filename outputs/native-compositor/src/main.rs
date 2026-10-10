@@ -11,6 +11,7 @@ mod shortcuts;
 
 mod grabs;
 mod input;
+mod pointer_geometry;
 mod state;
 mod winit;
 

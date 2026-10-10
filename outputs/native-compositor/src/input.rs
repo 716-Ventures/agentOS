@@ -1,11 +1,11 @@
 use smithay::{
     backend::input::{
         AbsolutePositionEvent, Axis, AxisSource, ButtonState, Event, InputBackend, InputEvent,
-        KeyState, KeyboardKeyEvent, PointerAxisEvent, PointerButtonEvent,
+        KeyState, KeyboardKeyEvent, PointerAxisEvent, PointerButtonEvent, PointerMotionEvent,
     },
     input::{
         keyboard::FilterResult,
-        pointer::{AxisFrame, ButtonEvent, MotionEvent},
+        pointer::{AxisFrame, ButtonEvent, MotionEvent, RelativeMotionEvent},
     },
     reexports::wayland_server::protocol::wl_surface::WlSurface,
     utils::SERIAL_COUNTER,
@@ -14,6 +14,44 @@ use smithay::{
 use crate::state::Smallvil;
 
 impl Smallvil {
+    fn clamp_pointer(
+        &self,
+        position: smithay::utils::Point<f64, smithay::utils::Logical>,
+    ) -> Option<smithay::utils::Point<f64, smithay::utils::Logical>> {
+        let outputs = self
+            .space
+            .outputs()
+            .filter_map(|output| self.space.output_geometry(output))
+            .map(|r| crate::pointer_geometry::OutputRect {
+                x: r.loc.x,
+                y: r.loc.y,
+                width: r.size.w,
+                height: r.size.h,
+            });
+        crate::pointer_geometry::clamp((position.x, position.y), outputs).map(Into::into)
+    }
+
+    fn move_pointer(
+        &mut self,
+        pos: smithay::utils::Point<f64, smithay::utils::Logical>,
+        time: u32,
+    ) {
+        let Some(pointer) = self.seat.get_pointer() else {
+            return;
+        };
+        let under = self.surface_under(pos);
+        pointer.motion(
+            self,
+            under,
+            &MotionEvent {
+                location: pos,
+                serial: SERIAL_COUNTER.next_serial(),
+                time,
+            },
+        );
+        pointer.frame(self);
+    }
+
     pub fn process_input_event<I: InputBackend>(&mut self, event: InputEvent<I>) {
         match event {
             InputEvent::Keyboard { event, .. } => {
@@ -55,30 +93,46 @@ impl Smallvil {
                     self.shortcut(action)
                 }
             }
-            InputEvent::PointerMotion { .. } => {}
-            InputEvent::PointerMotionAbsolute { event, .. } => {
-                let output = self.space.outputs().next().unwrap();
-
-                let output_geo = self.space.output_geometry(output).unwrap();
-
-                let pos = event.position_transformed(output_geo.size) + output_geo.loc.to_f64();
-
-                let serial = SERIAL_COUNTER.next_serial();
-
-                let pointer = self.seat.get_pointer().unwrap();
-
-                let under = self.surface_under(pos);
-
-                pointer.motion(
+            InputEvent::PointerMotion { event, .. } => {
+                let Some(pointer) = self.seat.get_pointer() else {
+                    return;
+                };
+                let delta = event.delta();
+                let unaccelerated = event.delta_unaccel();
+                if ![delta.x, delta.y, unaccelerated.x, unaccelerated.y]
+                    .iter()
+                    .all(|v| v.is_finite())
+                {
+                    return;
+                }
+                let current = pointer.current_location();
+                let Some(pos) = self.clamp_pointer(current + delta) else {
+                    return;
+                };
+                let under = self.surface_under(current);
+                pointer.relative_motion(
                     self,
                     under,
-                    &MotionEvent {
-                        location: pos,
-                        serial,
-                        time: event.time_msec(),
+                    &RelativeMotionEvent {
+                        delta,
+                        delta_unaccel: unaccelerated,
+                        utime: event.time(),
                     },
                 );
-                pointer.frame(self);
+                self.move_pointer(pos, event.time_msec());
+            }
+            InputEvent::PointerMotionAbsolute { event, .. } => {
+                let Some(geometry) = self
+                    .space
+                    .outputs()
+                    .find_map(|output| self.space.output_geometry(output))
+                else {
+                    return;
+                };
+                let pos = event.position_transformed(geometry.size) + geometry.loc.to_f64();
+                if let Some(pos) = self.clamp_pointer(pos) {
+                    self.move_pointer(pos, event.time_msec());
+                }
             }
             InputEvent::PointerButton { event, .. } => {
                 let pointer = self.seat.get_pointer().unwrap();

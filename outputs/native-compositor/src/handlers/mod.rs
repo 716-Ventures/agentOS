@@ -60,6 +60,7 @@ impl SeatHandler for Smallvil {
 }
 
 delegate_seat!(Smallvil);
+smithay::delegate_relative_pointer!(Smallvil);
 
 //
 // Wl Data Device

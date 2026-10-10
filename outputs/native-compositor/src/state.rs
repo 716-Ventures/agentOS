@@ -15,6 +15,7 @@ use smithay::{
     wayland::{
         compositor::{CompositorClientState, CompositorState},
         output::OutputManagerState,
+        relative_pointer::RelativePointerManagerState,
         selection::data_device::DataDeviceState,
         shell::xdg::XdgShellState,
         shm::ShmState,
@@ -42,6 +43,7 @@ pub struct Smallvil {
     pub xdg_shell_state: XdgShellState,
     pub shm_state: ShmState,
     pub output_manager_state: OutputManagerState,
+    pub _relative_pointer_manager: RelativePointerManagerState,
     pub seat_state: SeatState<Smallvil>,
     pub data_device_state: DataDeviceState,
     pub popups: PopupManager,
@@ -59,6 +61,7 @@ impl Smallvil {
         let xdg_shell_state = XdgShellState::new::<Self>(&dh);
         let shm_state = ShmState::new::<Self>(&dh, vec![]);
         let output_manager_state = OutputManagerState::new_with_xdg_output::<Self>(&dh);
+        let relative_pointer_manager = RelativePointerManagerState::new::<Self>(&dh);
         let mut seat_state = SeatState::new();
         let data_device_state = DataDeviceState::new::<Self>(&dh);
         let popups = PopupManager::default();
@@ -104,6 +107,7 @@ impl Smallvil {
             xdg_shell_state,
             shm_state,
             output_manager_state,
+            _relative_pointer_manager: relative_pointer_manager,
             seat_state,
             data_device_state,
             popups,
