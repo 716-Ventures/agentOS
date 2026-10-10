@@ -21,6 +21,7 @@ import time
 import unicodedata
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from voice_input import VoiceInput, from_file as voice_from_file
+import presentation_view
 from urllib.parse import urlsplit
 
 SOCKET = os.environ.get('AGENT_OS_SOCKET', '/run/agent-os/runtime.sock')
@@ -589,7 +590,7 @@ def dashboard(screen):
         nonlocal menu,menu_index
         menu={'kind':kind,'items':items};menu_index=0
 
-    actions=[('voice','Record / finish / review voice input','V'),('models','Models and usage','p'),('ask','Reply to Agent','Enter / a'),('run','Run a command','r'),('terminal','New interactive terminal','R'),('attach','Attach selected terminal / review approval','I'),('split_x','Split side by side','v'),
+    actions=[('shared_views','Shared views','g'),('voice','Record / finish / review voice input','V'),('models','Models and usage','p'),('ask','Reply to Agent','Enter / a'),('run','Run a command','r'),('terminal','New interactive terminal','R'),('attach','Attach selected terminal / review approval','I'),('split_x','Split side by side','v'),
              ('split_y','Split top / bottom','s'),('jobs','Choose work for this tile','o'),
              ('view','Change tile view','t'),('zoom','Maximize / restore tile','z'),('grow','Grow tile','+'),
              ('shrink','Shrink tile','−'),('swap','Swap with next tile','m'),('close','Close tile; keep work running','w'),
@@ -598,6 +599,12 @@ def dashboard(screen):
 
     def action(name):
         nonlocal focus,zoom,sidebar,dirty,menu,theme,rail_focus,mouse_enabled,models_open,models_scroll,models_focus,editor,cursor
+        if name=='shared_views':
+            if activity is None:raise ValueError('Create an activity first')
+            curses.def_prog_mode();curses.endwin()
+            try:presentation_view.interact(activity,request)
+            finally:curses.reset_prog_mode();screen.clear();screen.refresh()
+            return
         if name=='models':
             models_open=not models_open;models_focus=models_open;models_scroll=0;return
         pane=selected();layout=current()
@@ -1057,7 +1064,7 @@ def dashboard(screen):
                             if act=='menu':choose('actions',[(n,l+'    '+s) for n,l,s in actions])
                             else:action(act)
                 continue
-            mapping={'V':'voice','M':'mouse','D':'remove','a':'ask','r':'run','R':'terminal','I':'attach','n':'new','v':'split_x','s':'split_y','z':'zoom','w':'close','+':'grow','=':'grow','-':'shrink','m':'swap','b':'sidebar','u':'undo','o':'jobs','t':'view','d':'remove','i':'disk','x':'stop','X':'broker_stop','Y':'activity_stop','T':'theme'}
+            mapping={'g':'shared_views','V':'voice','M':'mouse','D':'remove','a':'ask','r':'run','R':'terminal','I':'attach','n':'new','v':'split_x','s':'split_y','z':'zoom','w':'close','+':'grow','=':'grow','-':'shrink','m':'swap','b':'sidebar','u':'undo','o':'jobs','t':'view','d':'remove','i':'disk','x':'stop','X':'broker_stop','Y':'activity_stop','T':'theme'}
             if key in mapping:action(mapping[key])
             elif key=='h' and selected():mutate('view',view='history');last_fetch=0
         except (OSError,RuntimeError,ValueError,subprocess.SubprocessError,curses.error) as exc:notify(str(exc))
@@ -1086,6 +1093,7 @@ def main():
     c=sub.add_parser('voice',help='Transcribe a 16 kHz mono PCM WAV locally; output is for review, never submitted')
     c.add_argument('--file',required=True)
     sub.add_parser('models', help='Read model configuration and measured usage as JSON')
+    c=sub.add_parser('views',help='Inspect and control shared presentation views from the terminal');c.add_argument('activity',type=int);c.add_argument('--text',action='store_true')
     c=sub.add_parser('disk');c.add_argument('activity',type=int)
     c=sub.add_parser('ask');c.add_argument('activity',type=int);c.add_argument('question')
     c=sub.add_parser('report');c.add_argument('activity',type=int)
@@ -1115,6 +1123,17 @@ def main():
         sys.path.insert(0,'/usr/local/lib/agent-os/services')
         from presentation_client import request as presentation_request
         result=presentation_request(op,**payload)
+    elif args.cmd=='views':
+        if args.text:
+            state=request('presentation.snapshot')
+            for ident,doc in state['documents'].items():
+                if not doc.get('surface_id') or doc['activity_id']!=str(args.activity):continue
+                print(clean(doc['title'])+' ['+ident+']')
+                bindings=request('binding.snapshot',surface_id=ident)['bindings']
+                for line in presentation_view.project(doc,bindings)[0]:print(line)
+            return
+        if not sys.stdin.isatty():p.error('Interactive shared views requires a terminal; use --text for readable output')
+        presentation_view.interact(args.activity,request);return
     elif args.cmd=='status': result=request('snapshot')
     elif args.cmd=='knowledge':result=knowledge_request(args.action,**{k:v for k,v in {'key':args.key,'revision':args.revision,'expected_revision':args.expected_revision}.items() if v is not None})
     elif args.cmd=='voice':result=voice_from_file(args.file)

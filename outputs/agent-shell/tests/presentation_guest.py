@@ -6,6 +6,7 @@ from pathlib import Path
 import signal
 import socket
 import subprocess
+import sys
 import tempfile
 import time
 
@@ -106,6 +107,20 @@ def main():
             invalid=call({**read,'request_id':'invalid-output-form','parameters':{'offset':-1}});assert not invalid['ok'],invalid
             ok({'op':'presentation.apply','protocol':PROTOCOL,'catalog_revision':CATALOG,'request_id':'change-output-form','expected_revisions':{'output-form':0},'operations':[{'op':'element.set_props','surface_id':'output-form','element_id':'offset','props':{'label':'Byte offset','value':'1'}}]})
             stale=call({**read,'request_id':'stale-output-form'});assert not stale['ok'] and 'stale_revision' in stale['error'],stale
+            sys.path.insert(0,str(ROOT/'client'))
+            import presentation_view
+            def terminal_request(op,**fields):return ok({'op':op,**fields})
+            current_form=ok({'op':'presentation.snapshot'})['documents']['output-form']
+            lines,controls=presentation_view.project(current_form)
+            assert 'offset' in controls and 'read' in controls and any('Read output' in line for line in lines)
+            answers=iter(['4','s'])
+            presentation_view.edit(terminal_request,current_form,'offset',lambda _:next(answers),lambda _:None)
+            current_form=ok({'op':'presentation.snapshot'})['documents']['output-form']
+            assert current_form['elements']['offset']['props']['value']=='4'
+            read_back=presentation_view.invoke(terminal_request,current_form,'read',key='terminal-output-read')
+            assert read_back['observed_target']['text']=='back λ 日本語\n',read_back
+            assert ok({'op':'draft.get','surface_id':'output-form','element_id':'offset'})['draft'] is None
+            print('PASS: terminal shared projection, lease-owned edit/commit and actual opaque output callback')
             print('PASS: typed edited callback parameters, actual bounded Unicode output, idempotency and stale-form rejection')
             print('PASS: host-issued stop action, actual process cancellation, idempotent callback receipt, forged actor rejection, revocation')
             print('PASS: presentation IPC principals, atomic receipts, two clients, draft recovery, ordered changes, undo')

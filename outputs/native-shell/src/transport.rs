@@ -304,7 +304,10 @@ fn run(
                         let edits=drafts.lock().unwrap();
                         let values=super::action_parameters::resolve(&parameters,&info["parameter_schema"],|element|edits.get(&(surface.clone(),element.into())).map(|d|d.text.clone()).or_else(||current.documents.get(&surface).and_then(|doc|doc["elements"][element]["props"]["value"].as_str().map(String::from))))?;
                         drop(edits);
-                        let receipt=request(&socket,&json!({"op":"action.invoke","reference":reference,"request_id":key,"expected_source_revision":info["source_revision"],"surface_id":surface,"expected_surface_revision":revision,"action_id":action,"parameters":values}))?;
+                        let receipt=match request(&socket,&json!({"op":"action.invoke","reference":reference,"request_id":key,"expected_source_revision":info["source_revision"],"surface_id":surface,"expected_surface_revision":revision,"action_id":action,"parameters":values})) {
+                            Ok(receipt)=>receipt,
+                            Err(original)=>request(&socket,&json!({"op":"action.status","request_id":key})).map_err(|_|original)?,
+                        };
                         if info["operation"]=="job.read_output" && receipt["status"]=="succeeded" {
                             let job=info["target"]["job_id"].clone();let activity=info["activity_id"].as_str().and_then(|a|a.parse::<i64>().ok()).ok_or("Action activity unavailable")?;
                             let mut view=super::log_view::LogView::new("core".into(),job,activity,"Callback output".into())?;
