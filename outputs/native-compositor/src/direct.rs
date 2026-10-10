@@ -328,6 +328,7 @@ pub fn init(
         config,
     }));
     device.borrow_mut().scan(data)?;
+    data.state.direct_active = Some(device.borrow().active);
     if device.borrow().heads.is_empty() {
         return Err("No usable connected DRM output".into());
     }
@@ -348,22 +349,37 @@ pub fn init(
     let session_device = device.clone();
     event_loop
         .handle()
-        .insert_source(notifier, move |event, _, _data| {
+        .insert_source(notifier, move |event, _, data| {
             let mut device = session_device.borrow_mut();
             match event {
                 SessionEvent::PauseSession => {
                     device.active = false;
+                    data.state.direct_active = Some(false);
                     input.suspend();
                     device.drm.pause();
                 }
                 SessionEvent::ActivateSession => {
-                    if input.resume().is_ok() && device.drm.activate(false).is_ok() {
+                    let resumed = input
+                        .resume()
+                        .map_err(|error| format!("Input resume failed: {error:?}"))
+                        .and_then(|_| {
+                            device
+                                .drm
+                                .activate(false)
+                                .map_err(|error| format!("DRM resume failed: {error}"))
+                        });
+                    if let Err(error) = resumed {
+                        data.state.direct_resume_error = Some(error);
+                        data.state.direct_active = Some(false);
+                    } else {
                         for head in device.heads.values_mut() {
                             head.scanout.reset_buffers();
                             head.pending = false;
                             head.damage = OutputDamageTracker::from_output(&head.output);
                         }
                         device.active = true;
+                        data.state.direct_active = Some(true);
+                        data.state.direct_resume_error = None;
                     }
                 }
             }

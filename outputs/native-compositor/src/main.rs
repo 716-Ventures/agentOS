@@ -15,6 +15,7 @@ mod timings;
 mod direct;
 mod grabs;
 mod input;
+mod input_revision;
 mod input_method;
 #[cfg(test)]
 mod input_method_tests;

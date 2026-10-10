@@ -121,7 +121,7 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
                     .and_then(|keyboard| keyboard.current_focus())
                     .map(|surface| format!("{:?}", surface.id()));
                 Ok(
-                    json!({"seat_focus":seat_focus,"pointer_location":state.seat.get_pointer().map(|pointer|{let point=pointer.current_location();json!([point.x,point.y])}),"layout":state.policy.current,"windows":windows,"outputs":outputs,"direct_frames_presented":state.direct_frames_presented,"shared":scene.map(|s|json!({"identities":s.identities,"workspaces":s.workspaces,"error":s.error,"overview":s.overview}))}),
+                    json!({"seat_focus":seat_focus,"pointer_location":state.seat.get_pointer().map(|pointer|{let point=pointer.current_location();json!([point.x,point.y])}),"layout":state.policy.current,"windows":windows,"outputs":outputs,"direct_frames_presented":state.direct_frames_presented,"direct_active":state.direct_active,"direct_resume_error":state.direct_resume_error,"shared":scene.map(|s|json!({"identities":s.identities,"workspaces":s.workspaces,"error":s.error,"overview":s.overview}))}),
                 )
             }
             Some("viewport.pan") => {

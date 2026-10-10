@@ -2183,7 +2183,20 @@ fn undo(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> {
         .cloned()
         .collect();
     for id in &affected {
-        if before.get(id) != new.get(id) {
+        let focus_only = match (before.get(id), new.get(id)) {
+            (Some(Document::Workspace(current)), Some(Document::Workspace(expected)))
+                if current.revision >= expected.revision =>
+            {
+                let mut normalized = current.clone();
+                normalized.revision = expected.revision;
+                normalized.focus = expected.focus.clone();
+                normalized == *expected
+                    && matches!(old.get(id), Some(Document::Workspace(original))
+                        if original.outputs != expected.outputs || original.constraints != expected.constraints)
+            }
+            _ => false,
+        };
+        if before.get(id) != new.get(id) && !focus_only {
             return Err(error(
                 "stale_revision",
                 "Undo target diverged; current views were preserved",
@@ -2191,6 +2204,19 @@ fn undo(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> {
         }
         if let Some(doc) = old.get(id) {
             let mut doc = doc.clone();
+            if before.get(id) != new.get(id) {
+                if let (Document::Workspace(restored), Some(Document::Workspace(current))) =
+                    (&mut doc, before.get(id))
+                {
+                    // Opening/using Undo may change focus. Keep that current
+                    // focus when it survives the restored placement; never
+                    // treat unrelated placement/content changes as focus.
+                    restored.focus = current
+                        .focus
+                        .clone()
+                        .filter(|focus| workspace::surfaces(restored).contains(&focus.surface_id));
+                }
+            }
             let latest: u64 = tx
                 .query_row(
                     "SELECT revision FROM presentation_identities WHERE id=?",
@@ -3964,6 +3990,78 @@ mod tests {
             snapshot(&db).unwrap()["documents"]["workspace-a"]["outputs"],
             committed["outputs"]
         );
+    }
+    #[test]
+    fn workspace_undo_preserves_new_focus_but_refuses_new_placement() {
+        let mut db = fixture();
+        create(&mut db);
+        let mut second = surface();
+        second["surface_id"] = json!("surface-b");
+        handle(&mut db,&json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"undo-create-b","expected_revisions":{"surface-b":null},"operations":[{"op":"surface.create","document":second}]}),&human()).unwrap();
+        handle(
+            &mut db,
+            &json!({"op":"outputs.register","output_id":"output-a","width":1280,"height":720}),
+            &Principal {
+                uid: 0,
+                session: "host".into(),
+            },
+        )
+        .unwrap();
+        let mut initial = workspace();
+        initial["outputs"]["output-a"]["tiles"] = json!({"kind":"split","axis":"horizontal","ratios":[0.5,0.5],"children":[{"kind":"leaf","surface_id":"surface-a"},{"kind":"leaf","surface_id":"surface-b"}]});
+        handle(&mut db,&json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"undo-workspace","expected_revisions":{"workspace-a":null},"operations":[{"op":"workspace.put","document":initial}]}),&human()).unwrap();
+        let edit = |id: &str, revision: u64, edit: Value| json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":id,"expected_revisions":{"workspace-a":revision},"operations":[{"op":"workspace.edit","workspace_id":"workspace-a","edit":edit}]});
+        let float = json!({"kind":"float","surface_id":"surface-a","output_id":"output-a","x":80,"y":80,"width":320,"height":240});
+        let first = handle(&mut db, &edit("undo-float", 0, float.clone()), &human()).unwrap();
+        handle(
+            &mut db,
+            &edit(
+                "undo-control-focus",
+                1,
+                json!({"kind":"focus","surface_id":"surface-b","element_id":null}),
+            ),
+            &human(),
+        )
+        .unwrap();
+        handle(&mut db,&json!({"op":"presentation.undo","event_cursor":first["event_cursor"],"request_id":"undo-after-focus"}),&human()).unwrap();
+        let restored = snapshot(&db).unwrap();
+        assert_eq!(
+            restored["documents"]["workspace-a"]["outputs"],
+            initial["outputs"]
+        );
+        assert_eq!(
+            restored["documents"]["workspace-a"]["focus"]["surface_id"],
+            "surface-b"
+        );
+        assert_eq!(restored["documents"]["workspace-a"]["revision"], 3);
+        let focus = handle(
+            &mut db,
+            &edit(
+                "undo-focus-a",
+                3,
+                json!({"kind":"focus","surface_id":"surface-a","element_id":null}),
+            ),
+            &human(),
+        )
+        .unwrap();
+        handle(
+            &mut db,
+            &edit(
+                "undo-focus-b",
+                4,
+                json!({"kind":"focus","surface_id":"surface-b","element_id":null}),
+            ),
+            &human(),
+        )
+        .unwrap();
+        let focused = snapshot(&db).unwrap();
+        assert!(handle(&mut db,&json!({"op":"presentation.undo","event_cursor":focus["event_cursor"],"request_id":"undo-diverged-focus"}),&human()).unwrap_err().contains("stale_revision"));
+        assert_eq!(snapshot(&db).unwrap(), focused);
+        let second = handle(&mut db, &edit("undo-float-again", 5, float), &human()).unwrap();
+        handle(&mut db,&edit("undo-competing-placement",6,json!({"kind":"float","surface_id":"surface-b","output_id":"output-a","x":400,"y":80,"width":320,"height":240})),&human()).unwrap();
+        let before = snapshot(&db).unwrap();
+        assert!(handle(&mut db,&json!({"op":"presentation.undo","event_cursor":second["event_cursor"],"request_id":"undo-diverged-placement"}),&human()).unwrap_err().contains("stale_revision"));
+        assert_eq!(snapshot(&db).unwrap(), before);
     }
     #[test]
     fn closing_a_placed_view_keeps_its_draft_and_undo_restores_it() {

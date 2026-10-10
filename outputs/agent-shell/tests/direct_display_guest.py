@@ -209,7 +209,7 @@ def main():
                           'frames_before_vt': snapshot['direct_frames_presented'],
                           'frames_after_vt': resumed['direct_frames_presented'],
                           'checks': ['direct native window', 'KMS output discovery', 'shared core connection',
-                                     'VT switch and resume', 'orderly shutdown', 'session directory cleanup', 'owned login scope cleanup'] + (['kernel keyboard and absolute pointer','clipboard copy/paste','undo/redo','retained draft','deliberate pointer Save'] if args.input else []),
+                                     'VT switch and resume', 'orderly shutdown', 'session directory cleanup', 'owned login scope cleanup'] + (['kernel keyboard and absolute pointer','clipboard copy/paste','undo/redo','retained draft','deliberate pointer Save','kernel workspace move/resize/maximize/restore/undo','native titlebar drag with durable placement','kernel focus cycling','kernel VT shortcut and acknowledged resume','kernel close and native assistive undo'] if args.input else []),
                           'not_tested': ['physical input', 'hotplug', 'physical GPU presentation']}))
 
 

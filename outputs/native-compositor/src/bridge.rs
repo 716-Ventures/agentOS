@@ -151,7 +151,12 @@ impl Bridge {
                     } else {
                         match req.value["op"].as_str() {
                             Some("workspace.transaction") => {
-                                call(&socket, &req.value["transaction"])
+                                if let Some(baseline) = req.value.get("input_baseline") {
+                                    call(&socket, &json!({"op":"presentation.get","document_id":baseline["workspace_id"]}))
+                                        .and_then(|current| call(&socket, &crate::input_revision::refresh(req.value["transaction"].clone(), baseline, &current)))
+                                } else {
+                                    call(&socket, &req.value["transaction"])
+                                }
                             }
                             Some("workspace.activity") => call(&socket, &json!({"op":"snapshot"}))
                                 .and_then(|s| {
@@ -350,20 +355,7 @@ impl Bridge {
                                 doc["outputs"][primary_id] =
                                     json!({"tiles":null,"floating":[],"maximized":null});
                             }
-                            // New background views do not reshape a manually constrained layout.
-                            if doc["constraints"]
-                                .as_array()
-                                .into_iter()
-                                .flatten()
-                                .any(|c| c["provenance"] != "inferred_preference")
-                            {
-                                continue;
-                            }
-                            let mut tiled = Vec::new();
-                            collect_tiles(&doc["outputs"][primary_id]["tiles"], &mut tiled);
-                            tiled.extend(surfaces);
-                            doc["outputs"][primary_id]["tiles"] =
-                                automatic_tiles(&tiled, primary_area.width);
+                            place_new_views(&mut doc, primary_id, primary_area, surfaces);
                             counter += 1;
                             if let Err(error) =
                                 put(&socket, &doc, expected, &format!("host-{prefix}-{counter}"))
@@ -562,7 +554,7 @@ impl Bridge {
         if self
             .commands
             .try_send(Request {
-                value: json!({"op":"workspace.transaction","transaction":transaction}),
+                value: json!({"op":"workspace.transaction","transaction":transaction,"input_baseline":document}),
                 reply,
                 deadline: None,
             })
@@ -668,6 +660,33 @@ fn placed_surfaces(state: &Value) -> BTreeSet<String> {
         walk(&d["outputs"], &mut result);
     }
     result
+}
+// Preserve every existing placement when a human has constrained the workspace.
+// New windows still need durable geometry so they can be focused and managed.
+fn place_new_views(doc: &mut Value, output: &str, area: Rect, surfaces: Vec<String>) {
+    let constrained = doc["constraints"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .any(|c| c["provenance"] != "inferred_preference");
+    if constrained {
+        let width = area.width.min(720).max(1);
+        let height = area.height.min(600).max(1);
+        for surface in surfaces {
+            doc["outputs"][output]["floating"]
+                .as_array_mut()
+                .unwrap()
+                .push(json!({
+                    "surface_id":surface,"x":(area.width-width)/2,
+                    "y":(area.height-height)/2,"width":width,"height":height
+                }));
+        }
+    } else {
+        let mut tiled = Vec::new();
+        collect_tiles(&doc["outputs"][output]["tiles"], &mut tiled);
+        tiled.extend(surfaces);
+        doc["outputs"][output]["tiles"] = automatic_tiles(&tiled, area.width);
+    }
 }
 fn collect_tiles(tile: &Value, ids: &mut Vec<String>) {
     if tile["kind"] == "leaf" {
@@ -913,6 +932,35 @@ mod tests {
         let rects = rectangles(&layout, area).unwrap();
         assert_eq!(rects.len(), 7);
         assert!(rects.values().all(|r| r.width >= 320 && r.height >= 400));
+    }
+    #[test]
+    fn new_windows_remain_manageable_in_manually_constrained_workspaces() {
+        let original =
+            json!({"tiles":{"kind":"leaf","surface_id":"old"},"floating":[],"maximized":null});
+        let mut doc = json!({"outputs":{"left":original},"constraints":[{"provenance":"direct_manipulation"}],"focus":{"surface_id":"old"}});
+        let constraints = doc["constraints"].clone();
+        let focus = doc["focus"].clone();
+        let area = Rect {
+            x: -800,
+            y: 40,
+            width: 800,
+            height: 700,
+        };
+        place_new_views(&mut doc, "left", area, vec!["monitor".into()]);
+        assert_eq!(doc["outputs"]["left"]["tiles"], original["tiles"]);
+        assert_eq!(doc["constraints"], constraints);
+        assert_eq!(doc["focus"], focus);
+        let views = rectangles(&doc["outputs"]["left"], area).unwrap();
+        assert_eq!(views["old"], area);
+        assert_eq!(
+            views["monitor"],
+            Rect {
+                x: -760,
+                y: 90,
+                width: 720,
+                height: 600
+            }
+        );
     }
     #[test]
     fn app_id_alone_cannot_impersonate_native_surface() {

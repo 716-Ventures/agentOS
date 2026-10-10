@@ -44,6 +44,16 @@ class Device:
         self.event(3,0,round(x*65535/width));self.event(3,1,round(y*65535/height));self.sync()
         time.sleep(.1)
         self.chord(272)
+    def drag(self,start,end,width,height):
+        def move(x,y):
+            self.event(3,0,round(x*65535/width));self.event(3,1,round(y*65535/height));self.sync()
+        move(*start);time.sleep(.1)
+        self.event(1,272,1);self.sync()
+        try:
+            for step in range(1,11):
+                move(*(start[axis]+(end[axis]-start[axis])*step/10 for axis in (0,1)))
+                time.sleep(.04)
+        finally:self.event(1,272,0);self.sync()
     def close(self):
         try:fcntl.ioctl(self.fd,0x5502)
         finally:os.close(self.fd)
@@ -59,13 +69,28 @@ def assistive():
             node=queue.popleft()
             try:
                 observed.append((node.name,node.getRoleName()))
-                if node.name==name and node.getRole()==role:return node
+                if node.name==name and (node.getRole()==role or role is None and node.queryAction().nActions):return node
                 queue.extend(node[index] for index in range(min(node.childCount,128)))
-            except (RuntimeError,LookupError):pass
-        raise ValueError('Input fixture accessible control unavailable: '+name+'; tree='+repr(observed[:80]))
+            except (RuntimeError,LookupError,NotImplementedError):pass
+        errors=[row for row in observed if any(word in row[0].lower() for word in ('stale','diverg','conflict','undo','lease'))]
+        raise ValueError('Input fixture accessible control unavailable: '+name+'; tree='+repr(observed[:80])+'; notices='+repr(errors))
     for line in sys.stdin:
         try:
-            assert line.strip()=='snapshot'
+            request=line.strip()
+            if request in ('open-monitor','arrange-status','expand-workspace'):
+                control=find('Agent Monitor' if request=='open-monitor' else 'Arrange workspace',pyatspi.ROLE_PUSH_BUTTON if request=='open-monitor' else None)
+                response={'expanded':control.getState().contains(pyatspi.STATE_EXPANDED)}
+                if request!='arrange-status':response['requested']=control.queryAction().doAction(0)
+                print(json.dumps(response),flush=True);continue
+            if request in ('undo-status','undo-close'):
+                undo=find('Undo last arrangement',pyatspi.ROLE_PUSH_BUTTON)
+                sensitive=undo.getState().contains(pyatspi.STATE_SENSITIVE)
+                response={'sensitive':sensitive}
+                if request=='undo-close':
+                    assert sensitive
+                    response['requested']=undo.queryAction().doAction(0)
+                print(json.dumps(response),flush=True);continue
+            assert request=='snapshot'
             field=find('Direct input fixture',pyatspi.ROLE_TEXT)
             ancestor=field
             while ancestor.parent is not None and ancestor.getRole()!=pyatspi.ROLE_FRAME:ancestor=ancestor.parent
@@ -86,7 +111,7 @@ def assistive():
             selection=None
             if text.getNSelections():
                 start,end=text.getSelection(0);selection=text.getText(start,end)
-            response={'text':value,'selection':selection,'field':rect(field),'save':rect(save),'focused':field.getState().contains(pyatspi.STATE_FOCUSED)}
+            response={'text':value,'caret':text.caretOffset,'selection':selection,'field':rect(field),'save':rect(save),'focused':field.getState().contains(pyatspi.STATE_FOCUSED)}
         except Exception as exc:response={'error':str(exc)}
         print(json.dumps(response),flush=True)
 
@@ -113,8 +138,8 @@ def verify(metrics,output,core,scene,target,login_user):
                             env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True)
     keyboard=pointer=None
     try:
-        def snapshot():
-            helper.stdin.write('snapshot\n');helper.stdin.flush()
+        def snapshot(command='snapshot'):
+            helper.stdin.write(command+'\n');helper.stdin.flush()
             if not select.select([helper.stdout],[],[],3)[0]:raise RuntimeError('Assistive input observation timed out')
             line=helper.stdout.readline(65537)
             if not line or len(line)>65536:raise RuntimeError('Assistive observer disconnected')
@@ -219,6 +244,92 @@ def verify(metrics,output,core,scene,target,login_user):
         assert core('presentation.get')['elements']['editor']['props']['value']=='agentos'
         assert core('draft.get')['draft'] is None
         print('PASS: direct kernel workspace resize, move, maximize, restore and presentation undo preserve saved document')
+        keyboard.chord(29,56,67)
+        await_geometry(smaller)
+        # The native titlebar issues an ordinary xdg_toplevel move request.
+        pointer.drag((smaller['x']+100,smaller['y']+16),(100,smaller['y']+16),width,height)
+        dragged={**smaller,'x':0}
+        await_geometry(dragged)
+        deadline=time.monotonic()+8
+        while True:
+            shared=scene()['shared'];logical=shared['identities'][target]
+            placements=[entry for workspace in shared['workspaces'].values() for layout in workspace['outputs'].values()
+                        for entry in layout['floating'] if entry['surface_id']==logical]
+            if any(all(entry[key]==value for key,value in dragged.items()) for entry in placements):break
+            if time.monotonic()>deadline:raise RuntimeError('Pointer preview was not committed to the durable workspace')
+            time.sleep(.05)
+        def await_focus(predicate):
+            deadline=time.monotonic()+8
+            while not predicate(scene()['seat_focus']):
+                if time.monotonic()>deadline:raise RuntimeError('Kernel focus shortcut did not reach its target: '+repr({'focus':scene()['seat_focus'],'overview':scene()['shared']['overview'],'windows':scene()['windows']}))
+                time.sleep(.05)
+        keyboard.chord(29,56,15)
+        await_focus(lambda focus:focus is not None and focus!=target)
+        keyboard.chord(29,56,42,15)
+        await_focus(lambda focus:focus==target)
+        before_resume=scene()['direct_frames_presented']
+        keyboard.chord(29,56,60) # Ctrl+Alt+F2 uses XKB's VT-switch level.
+        try:
+            deadline=time.monotonic()+5
+            while Path('/sys/class/tty/tty0/active').read_text().strip()!='tty2':
+                if time.monotonic()>deadline:raise RuntimeError('Kernel VT shortcut did not activate tty2')
+                time.sleep(.05)
+            while scene()['direct_active'] is not False:
+                if time.monotonic()>deadline:raise RuntimeError('Direct seat did not acknowledge VT pause')
+                time.sleep(.05)
+        finally:subprocess.run(['chvt','7'],check=True)
+        deadline=time.monotonic()+8
+        while scene()['direct_frames_presented']<=before_resume:
+            if time.monotonic()>deadline:raise RuntimeError('Direct output did not present a frame after kernel VT shortcut: '+repr({key:scene()[key] for key in ('direct_active','direct_resume_error','direct_frames_presented')}))
+            time.sleep(.05)
+        await_focus(lambda focus:focus==target)
+        click(snapshot()['field']);wait(lambda value:value['focused'])
+        keyboard.chord(102);wait(lambda value:value['caret']==0)
+        keyboard.chord(106);wait(lambda value:value['caret']==1)
+        await_geometry(dragged)
+        # Open the existing undo controls before close records its placement.
+        # Merely opening another window is a distinct layout mutation.
+        keyboard.chord(29,56,15)
+        await_focus(lambda focus:focus is not None and focus!=target)
+        assert snapshot('open-monitor')['requested']
+        deadline=time.monotonic()+8
+        while True:
+            try:
+                status=snapshot('arrange-status');break
+            except RuntimeError:
+                if time.monotonic()>deadline:raise
+                time.sleep(.05)
+        if not status['expanded']:assert snapshot('expand-workspace')['requested']
+        while True:
+            observed=scene();monitor=next((row for row in observed['windows'] if row['title']=='Agent Monitor'),None)
+            if monitor and monitor['id'] in observed['shared']['identities']:
+                logical=observed['shared']['identities'][monitor['id']]
+                def placed(value):
+                    if isinstance(value,dict):return value.get('surface_id')==logical or any(placed(child) for child in value.values())
+                    if isinstance(value,list):return any(placed(child) for child in value)
+                    return False
+                if any(placed(workspace['outputs']) for workspace in observed['shared']['workspaces'].values()):break
+            if time.monotonic()>deadline:raise RuntimeError('Agent Monitor was not placed: '+repr({'windows':observed['windows'],'error':observed['shared']['error'],'identities':observed['shared']['identities']}))
+            time.sleep(.05)
+        for _ in range(5):
+            old_focus=scene()['seat_focus']
+            if old_focus==target:break
+            keyboard.chord(29,56,15);await_focus(lambda focus:focus is not None and focus!=old_focus)
+        assert scene()['seat_focus']==target
+        keyboard.chord(29,56,111)
+        deadline=time.monotonic()+8
+        while any(row['id']==target for row in scene()['windows']):
+            if time.monotonic()>deadline:raise RuntimeError('Kernel close-view shortcut left the native window mapped')
+            time.sleep(.05)
+        deadline=time.monotonic()+8
+        while not snapshot('undo-status')['sensitive']:
+            if time.monotonic()>deadline:raise RuntimeError('Native close did not expose an undo control')
+            time.sleep(.05)
+        assert snapshot('undo-close')['requested'],'Native assistive close undo was not accepted'
+        wait(lambda value:value['text']=='agentos')
+        assert core('presentation.get')['elements']['editor']['props']['value']=='agentos'
+        assert core('draft.get')['draft'] is None
+        print('PASS: direct kernel titlebar drag, focus cycling, VT shortcut/resume and close-view; native assistive undo restores exact saved document')
     finally:
         if pointer:pointer.close()
         if keyboard:keyboard.close()
