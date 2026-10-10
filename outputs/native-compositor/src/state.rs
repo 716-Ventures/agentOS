@@ -406,8 +406,11 @@ impl Smallvil {
                             smithay::utils::SERIAL_COUNTER.next_serial(),
                         );
                     }
+                    self.applied_focus = None;
                 }
-                self.applied_focus = scene.focus;
+                // A shared surface can be selected before its Wayland window
+                // maps. Retain the pending focus until the seat actually gets
+                // that window; otherwise later mapping never sends keyboard enter.
             }
         }
         self.viewport_offsets.retain(|id, _| ids.contains(id));

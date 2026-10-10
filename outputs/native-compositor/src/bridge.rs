@@ -335,6 +335,7 @@ impl Bridge {
                                 added.entry(owned).or_default().push(surface.clone());
                             }
                         }
+                        let mut placement_error = None;
                         for (owned, surfaces) in added {
                             let existing = state["documents"].as_object().and_then(|d| {
                                 d.values().find(|d| {
@@ -364,7 +365,14 @@ impl Bridge {
                             doc["outputs"][primary_id]["tiles"] =
                                 automatic_tiles(&tiled, primary_area.width);
                             counter += 1;
-                            put(&socket, &doc, expected, &format!("host-{prefix}-{counter}"))?;
+                            if let Err(error) =
+                                put(&socket, &doc, expected, &format!("host-{prefix}-{counter}"))
+                            {
+                                // Automatic placement may conflict with an active draft.
+                                // Keep projecting fresh committed state (including human
+                                // focus) instead of freezing the whole prior scene.
+                                placement_error = Some(error);
+                            }
                         }
                         state = document_cache.read(
                             |value| call(&socket, value),
@@ -438,7 +446,8 @@ impl Bridge {
                         next.error = input_error
                             .as_ref()
                             .filter(|(_, when)| when.elapsed() < Duration::from_secs(10))
-                            .map(|(message, _)| message.clone());
+                            .map(|(message, _)| message.clone())
+                            .or(placement_error);
                         next.visible = next.rectangles.keys().cloned().collect();
                         next.overview = project_outputs(
                             &mut next.rectangles,

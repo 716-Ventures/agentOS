@@ -61,10 +61,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         display_handle,
     };
 
-    match std::env::var("AGENT_OS_COMPOSITOR_BACKEND")
-        .as_deref()
-        .unwrap_or("winit")
-    {
+    let backend = std::env::var("AGENT_OS_COMPOSITOR_BACKEND").unwrap_or_else(|_| "winit".into());
+    match backend.as_str() {
         "winit" => crate::winit::init_winit(&mut event_loop, &mut data)?,
         #[cfg(feature = "direct-display")]
         "drm" => crate::direct::init(&mut event_loop, &mut data)?,
@@ -93,6 +91,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Some(std::time::Duration::from_millis(16)),
         &mut data,
         |data| {
+            // Core/seat reconciliation must progress when the outer compositor
+            // throttles frame callbacks (for example an occluded nested window).
+            if backend == "winit" {
+                data.state.arrange();
+            }
             if let Some(service) = &input_method {
                 if let Err(error) = service.check() {
                     eprintln!("Input method unavailable: {error}");
@@ -132,6 +135,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     data.state.loop_signal.stop();
                 }
             }
+            // Protocol responses (seat focus, text input, configure and control)
+            // must leave the server even when no frame can be presented.
+            let _ = data.display_handle.flush_clients();
         },
     )?;
 

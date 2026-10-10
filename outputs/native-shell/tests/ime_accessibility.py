@@ -27,12 +27,37 @@ def verify(call, endpoint):
     method('preedit', 'にほん')
     assert draft() == '', 'Uncommitted composition entered the durable draft'
     document = call({'op': 'presentation.snapshot'})['documents']['session-fixture']
-    call({'op': 'presentation.apply', 'protocol': 'agentos.presentation/1', 'catalog_revision': 'native-core/1',
+    updated=call({'op': 'presentation.apply', 'protocol': 'agentos.presentation/1', 'catalog_revision': 'native-core/1',
           'request_id': 'ime-concurrent-status', 'expected_revisions': {'session-fixture': document['revision']},
           'operations': [{'op': 'element.set_props', 'surface_id': 'session-fixture', 'element_id': 'reading',
-                          'props': {'text': 'Unrelated update during composition'}}]})
+                          'props': {'value': 'Unrelated update during composition'}}]})
+    assert updated['status']=='committed',updated
     # Wait for the actual renderer to consume the update, not just core acceptance.
-    accessibility.find('Unrelated update during composition', pyatspi.ROLE_LABEL)
+    def rendered_status():
+        from collections import deque
+        queue=deque([pyatspi.Registry.getDesktop(0)])
+        for _ in range(2048):
+            if not queue:break
+            node=queue.popleft()
+            try:
+                if accessibility.text(node)=='Unrelated update during composition':return True
+            except (NotImplementedError,RuntimeError,LookupError):pass
+            try:queue.extend(node[index] for index in range(min(node.childCount,128)))
+            except (RuntimeError,LookupError):pass
+        return False
+    try:accessibility.wait(rendered_status,'Unrelated status was not rendered during composition')
+    except AssertionError:
+        print('Current composition document:',call({'op':'presentation.get','document_id':'session-fixture'}),flush=True)
+        from collections import deque
+        queue=deque([pyatspi.Registry.getDesktop(0)])
+        for _ in range(256):
+            if not queue:break
+            node=queue.popleft()
+            try:
+                print('IME accessible:',node.getRoleName(),repr(node.name),flush=True)
+                queue.extend(node[index] for index in range(min(node.childCount,128)))
+            except (RuntimeError,LookupError):pass
+        raise
     assert method('status')['active'], 'Unrelated update ended editor composition/focus'
     assert draft() == '', 'Unrelated update committed or erased composition'
     value = '日本語 λ'

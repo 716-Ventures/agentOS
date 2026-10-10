@@ -64,7 +64,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
         try:
             wait_for(endpoint.exists,[core])
             activity=call(endpoint,{'op':'create','name':'Full desktop session'})['id']
-            document={'protocol':'agentos.presentation/1','catalog_revision':'native-core/1','surface_id':'session-fixture','activity_id':str(activity),'revision':0,'title':'Session lifecycle','root':'root','elements':{'root':{'type':'Stack@1','props':{'spacing':'normal'},'slots':{'children':['reading','field']}},'reading':{'type':'Text@1','props':{'text':'Authenticated session fixture'}},'field':{'type':'TextField@1','props':{'label':'Accessible session draft','value':'Original accessible value'}}},'bindings':{},'actions':{}}
+            document={'protocol':'agentos.presentation/1','catalog_revision':'native-core/1','surface_id':'session-fixture','activity_id':str(activity),'revision':0,'title':'Session lifecycle','root':'root','elements':{'root':{'type':'Stack@1','props':{'spacing':'normal'},'slots':{'children':['reading','field']}},'reading':{'type':'Status@1','props':{'value':'Authenticated session fixture'}},'field':{'type':'TextField@1','props':{'label':'Accessible session draft','value':'Original accessible value'}}},'bindings':{},'actions':{}}
             call(endpoint,{'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':'session-fixture','expected_revisions':{'session-fixture':None},'operations':[{'op':'surface.create','document':document}]})
             session=subprocess.Popen(['python3',str(SHELL/'services/desktop_session.py'),'--backend','headless','--pixman','--bin-dir',str(bins),'--socket',str(endpoint)],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
             pidfile=wait_for(lambda:next(runtime.glob('agentos-session-*/compositor.pid'),None),[core,session])
@@ -78,11 +78,15 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                     import ime_accessibility
                     wait_for(lambda:(runtime/'ime-test.sock').exists(),[core,session])
                     workspace=call(endpoint,{'op':'presentation.snapshot'})['documents'][f'desktop-{activity}']
-                    call(endpoint,{'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
+                    focused=call(endpoint,{'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
                                    'request_id':'ime-fixture-focus','expected_revisions':{workspace['workspace_id']:workspace['revision']},
                                    'operations':[{'op':'workspace.edit','workspace_id':workspace['workspace_id'],
                                                   'edit':{'kind':'focus','surface_id':'session-fixture','element_id':'field'}}]})
-                    ime_accessibility.verify(lambda value:call(endpoint,value),runtime/'ime-test.sock')
+                    assert focused['status']=='committed',focused
+                    try:ime_accessibility.verify(lambda value:call(endpoint,value),runtime/'ime-test.sock')
+                    except Exception:
+                        print('Failed IME focus state:',call(control,{'op':'snapshot'}),flush=True)
+                        raise
                 else:
                     import accessibility
                     accessibility.verify(lambda value:call(endpoint,value))

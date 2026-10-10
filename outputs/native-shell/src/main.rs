@@ -14,6 +14,7 @@ mod preferences;
 mod presentation_pages;
 mod pty_transport;
 mod pty_view;
+mod reconcile;
 mod state_pages;
 mod timings;
 mod transport;
@@ -855,12 +856,28 @@ impl Surface {
                         .is_some_and(|reference| frame.resources.contains_key(reference))
             });
         let changed = doc["revision"].as_u64() != self.revision || resource_ready;
-        if changed && protected && self.revision.is_some() {
+        let safe_text_update = reconcile::text_only(&self.document, doc)
+            && nodes.iter().all(|(id, node)| {
+                if self.document["elements"][id] == *node || node["type"] != "Text@1" {
+                    return true;
+                }
+                self.elements
+                    .get(id)
+                    .and_then(|e| e.label.as_ref())
+                    .is_some_and(|label| !label.has_focus() && label.selection_bounds().is_none())
+            });
+        if changed && protected && self.revision.is_some() && !safe_text_update {
             let retained = self.document.clone();
             self.update(id, &retained, frame, commands, drafts);
             return;
         }
-        if changed {
+        if changed && protected && safe_text_update {
+            // Preserve every GTK child and its IM context. The full new
+            // revision is visible because only unprotected text props differ.
+            self.revision = doc["revision"].as_u64();
+            self.document = doc.clone();
+        }
+        if changed && !(protected && safe_text_update) {
             self.window.set_title(Some(&format!(
                 "Agent view · {}",
                 doc["title"].as_str().unwrap_or("Work")

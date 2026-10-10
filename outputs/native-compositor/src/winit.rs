@@ -74,7 +74,6 @@ pub fn init_winit(
                 WinitEvent::Input(event) => state.process_input_event(event),
                 WinitEvent::Redraw => {
                     let _timing = crate::timings::Span::new("compositor.nested_render_submit");
-                    state.arrange();
                     let size = backend.window_size();
                     let damage = Rectangle::from_size(size);
 
