@@ -64,12 +64,14 @@ impl Control {
                                 .try_send(Request {
                                     value,
                                     reply,
-                                    deadline: Some(Instant::now() + Duration::from_millis(500)),
+                                    // The bridge may wait up to two seconds for one core reply.
+                                    // Queueing remains bounded and expired mutations are skipped.
+                                    deadline: Some(Instant::now() + Duration::from_secs(5)),
                                 })
                                 .is_ok()
                             {
-                                rx.recv_timeout(Duration::from_millis(500)).unwrap_or_else(
-                                    |_| json!({"ok":false,"error":"Compositor unavailable"}),
+                                rx.recv_timeout(Duration::from_secs(5)).unwrap_or_else(
+                                    |_| json!({"ok":false,"error":"Compositor unavailable; outcome may be unknown"}),
                                 )
                             } else {
                                 json!({"ok":false,"error":"Compositor busy"})
@@ -212,7 +214,7 @@ mod deadline_tests {
         let control = Control::start_at(path.clone()).unwrap();
         let mut stream = UnixStream::connect(&path).unwrap();
         stream
-            .set_read_timeout(Some(Duration::from_secs(3)))
+            .set_read_timeout(Some(Duration::from_secs(6)))
             .unwrap();
         writeln!(stream, "{}", json!({"op":"undo","expected_revision":1})).unwrap();
         // Keep the render loop stalled while the actual socket worker times out.
@@ -220,7 +222,7 @@ mod deadline_tests {
         BufReader::new(stream).read_line(&mut line).unwrap();
         assert_eq!(
             serde_json::from_str::<Value>(&line).unwrap()["error"],
-            "Compositor unavailable"
+            "Compositor unavailable; outcome may be unknown"
         );
         let request = control
             .requests

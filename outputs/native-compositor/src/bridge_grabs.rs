@@ -161,7 +161,7 @@ impl Grabs {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::os::unix::net::UnixListener;
+    use std::{io::{BufRead, BufReader, Write}, os::unix::net::UnixListener};
     #[test]
     fn release_commits_frozen_revision_and_always_releases_lease() {
         for reject in [false, true] {

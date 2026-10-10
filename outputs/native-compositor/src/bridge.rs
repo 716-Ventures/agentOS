@@ -3,7 +3,7 @@ use crate::{control::Request, policy::Rect};
 use serde_json::{json, Value};
 use std::{
     collections::{BTreeMap, BTreeSet},
-    io::{BufRead, BufReader, Read, Write},
+    io::Read,
     os::unix::net::UnixStream,
     path::PathBuf,
     sync::{
@@ -580,21 +580,9 @@ impl Drop for Bridge {
     }
 }
 fn call(socket: &PathBuf, value: &Value) -> Result<Value, String> {
-    let mut conn = UnixStream::connect(socket).map_err(|e| e.to_string())?;
-    conn.set_read_timeout(Some(Duration::from_millis(200)))
-        .map_err(|e| e.to_string())?;
-    conn.set_write_timeout(Some(Duration::from_millis(200)))
-        .map_err(|e| e.to_string())?;
-    writeln!(conn, "{value}").map_err(|e| e.to_string())?;
-    let mut line = String::new();
-    BufReader::new(conn)
-        .take(4 * 1024 * 1024 + 1)
-        .read_line(&mut line)
-        .map_err(|e| e.to_string())?;
-    if line.len() > 4 * 1024 * 1024 || !line.ends_with('\n') {
-        return Err("Invalid core response".into());
-    }
-    let response: Value = serde_json::from_str(&line).map_err(|e| e.to_string())?;
+    let conn = UnixStream::connect(socket).map_err(|e| e.to_string())?;
+    let line = crate::core_ipc::exchange(conn, format!("{value}\n").as_bytes())?;
+    let response: Value = serde_json::from_slice(&line).map_err(|e| e.to_string())?;
     if response["ok"] != true {
         return Err(response["error"]
             .as_str()

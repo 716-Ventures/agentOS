@@ -3,6 +3,7 @@
 
 mod bridge;
 mod control;
+mod core_ipc;
 mod handlers;
 mod policy;
 mod pressure;
