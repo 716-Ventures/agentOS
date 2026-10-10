@@ -39,7 +39,7 @@ def digest(path):
     return h.hexdigest()
 
 
-def machine():
+def machine(require_ssh=True):
     path = RUN / 'utm.json'
     if not path.exists():
         raise RuntimeError('Run prepare first, or migrate the existing disk with bundle.')
@@ -47,16 +47,19 @@ def machine():
     config=plistlib.loads((Path(current['bundle'])/'config.plist').read_bytes())
     if config['Information']['UUID']!=current['uuid']:
         raise RuntimeError('Selected VM metadata does not match the bundle UUID')
-    actual=config['Network'][0]['PortForward'][0]['HostPort']
-    if actual!=LOCK['ssh_port']:
-        raise RuntimeError(f'Selected VM forwards SSH on {actual}, but the requested port is {LOCK["ssh_port"]}. Set AGENT_OS_VM_SSH_PORT to match.')
+    if require_ssh:
+        try:actual=config['Network'][0]['PortForward'][0]['HostPort']
+        except (KeyError,IndexError):
+            raise RuntimeError('Selected VM has no SSH forwarding. Use console-only lifecycle control and the serial console or guest agent.') from None
+        if actual!=LOCK['ssh_port']:
+            raise RuntimeError(f'Selected VM forwards SSH on {actual}, but the requested port is {LOCK["ssh_port"]}. Set AGENT_OS_VM_SSH_PORT to match.')
     return current
 
 
 def status():
     if not (RUN / 'utm.json').exists():
         return 'stopped'
-    current = machine()
+    current = machine(require_ssh=False)
     control = controller()
     deadline = time.monotonic() + 10
     while True:
@@ -192,23 +195,25 @@ def prepare(source=None):
     print('First-boot configuration ready. Credentials:', credentials)
 
 
-def start(hide=False):
+def start(hide=False, console_only=False):
+    current=machine(require_ssh=not console_only)
     if alive():
         raise RuntimeError('VM is already running or suspended; inspect UTM before restarting.')
     try:
-        call([controller(), 'start'] + (['--hide'] if hide else []) + [machine()['uuid']], timeout=30)
+        call([controller(), 'start'] + (['--hide'] if hide else []) + [current['uuid']], timeout=30)
     except subprocess.TimeoutExpired as exc:
         raise RuntimeError('UTM start did not acknowledge within 30 seconds; do not retry automatically. Inspect the selected guest before continuing.') from exc
     observed = status()
     if observed != 'started':
         raise RuntimeError(f'UTM start returned but guest state is {observed!r}; do not retry automatically. Inspect the selected guest before continuing.')
-    print(f'UTM guest started; SSH is forwarded on localhost:{LOCK["ssh_port"]}.')
+    if console_only:print('UTM guest started; check readiness through its console or guest agent.')
+    else:print(f'UTM guest started; SSH is forwarded on localhost:{LOCK["ssh_port"]}.')
 
 
 def stop():
     if alive():
         try:
-            call([controller(), 'stop', machine()['uuid'], '--request'], timeout=15)
+            call([controller(), 'stop', machine(require_ssh=False)['uuid'], '--request'], timeout=15)
         except subprocess.TimeoutExpired as exc:
             raise RuntimeError('UTM shutdown did not acknowledge within 15 seconds; inspect the selected guest before continuing.') from exc
         print('Requested orderly guest shutdown. Check status before restarting.')
@@ -220,7 +225,7 @@ def console():
     if not sys.stdin.isatty():
         raise RuntimeError('Open console in an interactive terminal.')
     # UTM 4.7.5 attach prints the PTY path but does not relay input/output.
-    result = call([controller(), 'attach', machine()['uuid']], capture_output=True, text=True)
+    result = call([controller(), 'attach', machine(require_ssh=False)['uuid']], capture_output=True, text=True)
     paths = [line.split(':', 1)[1].strip() for line in result.stdout.splitlines()
              if line.startswith('PTTY:')]
     if len(paths) != 1 or not paths[0].startswith('/dev/tty'):
@@ -285,6 +290,7 @@ def main():
     commands = p.add_subparsers(dest='command', required=True)
     b = commands.add_parser('prepare'); b.add_argument('--base')
     s = commands.add_parser('start')
+    s.add_argument('--console-only',action='store_true',help='Allow startup without SSH forwarding; does not alter networking')
     display = s.add_mutually_exclusive_group()
     display.add_argument('--hide', dest='hide', action='store_true', default=False,
                          help='Hide the UTM library window; the VM console is still created')
@@ -293,19 +299,22 @@ def main():
     commands.add_parser('bundle')
     w = commands.add_parser('wait'); w.add_argument('--seconds', type=int, default=60)
     c = commands.add_parser('ssh'); c.add_argument('remote', nargs=argparse.REMAINDER)
-    for cmd in ['status', 'stop', 'reboot', 'console']:
+    status_parser=commands.add_parser('status')
+    status_parser.add_argument('--state-only',action='store_true',help='Read UTM state without an SSH health request')
+    for cmd in ['stop', 'reboot', 'console']:
         commands.add_parser(cmd)
     args = p.parse_args()
     if args.command == 'prepare': prepare(args.base)
     elif args.command == 'bundle': bundle()
-    elif args.command == 'start': start(args.hide)
+    elif args.command == 'start': start(args.hide,args.console_only)
     elif args.command == 'wait': wait_ready(args.seconds)
     elif args.command == 'console': console()
     elif args.command == 'ssh':
         os.execvp('ssh', ssh_args() + args.remote)
     elif args.command == 'status':
-        print('UTM guest:', status(), flush=True)
-        if alive():
+        observed=status()
+        print('UTM guest:', observed, flush=True)
+        if observed!='stopped' and not args.state_only:
             sys.exit(ssh('agent-os-status').returncode)
     elif args.command == 'stop': stop()
     elif args.command == 'reboot':

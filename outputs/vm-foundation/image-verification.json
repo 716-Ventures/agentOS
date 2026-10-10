@@ -1,16 +1,16 @@
 {
-  "verified_at": "2026-10-10T17:44:11.160393+00:00",
+  "verified_at": "2026-10-10T18:52:05.581504+00:00",
   "result": "pass",
   "image": {
     "architecture": "arm64",
     "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
     "bootstrap_sha256": "e60ac4a8f76a106946ad3d91a392be97b7c0671587a75f4c5111d57dfb4c4879",
-    "builder_sha256": "54b66b7f1216762730d762552de281d7948c64e59e040ccc1b8f6209ca278bfe",
+    "builder_sha256": "0770570989b7a4bd38adf05d95c55223589fe179ba97578a3ce30f5255ab7969",
     "compression": "none",
     "contains_personal_account": false,
     "contains_provider_credentials": false,
-    "dependency_manifest_sha256": "7b679fd6a6827b5173475ccc889da9e157754beb2fe7219c697cfda84b8b2009",
-    "dependency_profile_sha256": "c9cfeb7ecbe8e4af734ed07ddf0f8c77e598bda490c7c2b453bca5105ebcbca3",
+    "dependency_manifest_sha256": "d0812f2d560c26cdbc596d445dae73b3f3ec0098e01f7aec44869e7ba17d6b23",
+    "dependency_profile_sha256": "e76be92153567973abe0df91b2a9c27b3e58cfe306a41337020448471908e923",
     "disk_size": "20G",
     "first_run_sha256": "8dc0c5b4a0d212667000bb009905458de85125c7fad98e1d876fb2f766471b57",
     "first_run_unit_sha256": "c4d2376b281a0d5879ce71a15e192ede8598ebc531d58b7dff3203ca66986b09",
@@ -20,9 +20,9 @@
       "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
       "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
     },
-    "image_sha256": "3e216330b8a08684adb4c3037c6ae0f72031dc8e7bc6b44902418422713a8260",
+    "image_sha256": "008f5312afeeb41f564c0b14ca3ee7e4417be289b1bd80443fd6726146a0bad6",
     "name": "agentOS experimental native image",
-    "runtime_release": "9aa030eca916f7b1bd3363711288723f7c4b7ad42f65f4101dc6944c3688e843",
+    "runtime_release": "b990c0f461e3cc72c1ff26f43cafa4be3e52d45392a9b0a2ad7d35982f9ffd99",
     "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
     "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
   },
@@ -48,7 +48,10 @@
     "all six services recover without models or network",
     "latest signed runtime can reactivate offline after setup recovery",
     "qualification-only SSH key and sudo authority removed; development disk/config/EFI restored; VM stopped and owned UTM app closed",
-    "original signed distribution remains unbooted"
+    "original signed distribution remains unbooted",
+    "HTTP/HTTPS Firefox defaults; native Link launches isolated real browser and shared conventional window online and on loopback-only boot",
+    "image publication reuses completed inode; 19 tooling tests pass including offline lifecycle UUID guards and no uncertain start replay",
+    "two complete kernel-input journeys with observed pointer position before button events"
   ],
   "not_tested": [
     "production signing/distribution authority",
@@ -58,8 +61,8 @@
     "live Gateway or Jev inference; no configured credentials",
     "incompatible future state-format migrations"
   ],
-  "runtime_source_revision": "26ab95cfbb573463bd1dedb181f95c1e7d8a5327",
-  "runtime_716_ui": "v0.1.0-alpha.21",
+  "runtime_source_revision": "6e2781aacc4b3ecd4ddf9a0be748241ae869a502",
+  "runtime_716_ui": "v0.1.0-alpha.22",
   "compatible_rollback_probe": {
     "release": "3ebc478291575d588f89c5349397c930093233a51eb45c8892611cb38bebdc1f",
     "signed_bundle_sha256": "ede34e9cebebf6f393383ef7933c134aa37e215afb2155717abb8a06d91b25ad"
@@ -68,8 +71,8 @@
     "result": "pass",
     "before": {
       "result": "pass",
-      "boot_id": "d206315d-196d-43ca-93eb-bf6e8521ba14",
-      "runtime": "9aa030eca916f7b1bd3363711288723f7c4b7ad42f65f4101dc6944c3688e843",
+      "boot_id": "a64821ea-aea3-4780-9344-07d579c04124",
+      "runtime": "b990c0f461e3cc72c1ff26f43cafa4be3e52d45392a9b0a2ad7d35982f9ffd99",
       "uid": 1000,
       "activity": 1,
       "file_persisted": true,
@@ -88,8 +91,8 @@
     },
     "reboot": {
       "result": "pass",
-      "boot_id": "ea34a4ca-179a-487a-8e65-61e209e87b67",
-      "runtime": "9aa030eca916f7b1bd3363711288723f7c4b7ad42f65f4101dc6944c3688e843",
+      "boot_id": "8202c4c7-2765-4b6f-9fc3-89777277fb9d",
+      "runtime": "b990c0f461e3cc72c1ff26f43cafa4be3e52d45392a9b0a2ad7d35982f9ffd99",
       "uid": 1000,
       "activity": 1,
       "file_persisted": true,
@@ -108,8 +111,8 @@
     },
     "offline": {
       "result": "pass",
-      "boot_id": "b3983fd3-336c-4036-9e97-2efc6b8c7c41",
-      "runtime": "9aa030eca916f7b1bd3363711288723f7c4b7ad42f65f4101dc6944c3688e843",
+      "boot_id": "74502e0d-dd34-4e48-9c13-02e64220e279",
+      "runtime": "b990c0f461e3cc72c1ff26f43cafa4be3e52d45392a9b0a2ad7d35982f9ffd99",
       "uid": 1000,
       "activity": 1,
       "file_persisted": true,
@@ -135,8 +138,56 @@
         "all six services recover without models or network"
       ]
     },
-    "final_offline_runtime": "9aa030eca916f7b1bd3363711288723f7c4b7ad42f65f4101dc6944c3688e843",
+    "offline_browser": {
+      "result": "pass",
+      "checks": [
+        "system HTTP/HTTPS handler",
+        "actual native Link action",
+        "GIO launch with isolated profile",
+        "real Firefox local page retrieval and title",
+        "conventional shared identity",
+        "durable focus/maximize",
+        "browser disconnect"
+      ],
+      "not_tested": [
+        "physical input",
+        "remote website compatibility",
+        "hardware acceleration",
+        "mailto account/client"
+      ],
+      "firefox_debian_version": "153.4.0esr-1~deb13u1",
+      "installed_executables": true,
+      "cleanup_verified": true
+    },
+    "final_offline_runtime": "b990c0f461e3cc72c1ff26f43cafa4be3e52d45392a9b0a2ad7d35982f9ffd99",
     "development_disk_restored": true,
     "guest_stopped": true
-  }
+  },
+  "factory_source_revision": "40a982296d712b7b0b722659827cf6ce4e0a1277",
+  "browser": {
+    "result": "pass",
+    "checks": [
+      "system HTTP/HTTPS handler",
+      "actual native Link action",
+      "GIO launch with isolated profile",
+      "real Firefox local page retrieval and title",
+      "conventional shared identity",
+      "durable focus/maximize",
+      "browser disconnect"
+    ],
+    "not_tested": [
+      "physical input",
+      "remote website compatibility",
+      "hardware acceleration",
+      "mailto account/client"
+    ],
+    "firefox_debian_version": "153.4.0esr-1~deb13u1",
+    "installed_executables": true,
+    "cleanup_verified": true
+  },
+  "qualification_observations": [
+    "Initial image input run did not focus editor; diagnostic retry passed. Two subsequent complete runs use compositor pointer-position acknowledgement before clicks. The original intermittent failure was not causally reproduced.",
+    "The original offline helper returned a startup error while bypassing bounded VM lookup. Inspection confirmed the guest stopped and no QEMU process; console-only wrapper startup then passed."
+  ],
+  "direct_input_test_sha256": "5f477edc85eba8684d0510f1a7f3551e451ea2b62d0f887caf789e1bb996e26a"
 }

@@ -44,6 +44,48 @@ class VMSelection(unittest.TestCase):
                 (bundle/'config.plist').write_bytes(plistlib.dumps(config))
                 with self.assertRaisesRegex(RuntimeError,'UUID'):vm.machine()
 
+    def test_offline_lifecycle_keeps_uuid_guard_and_does_not_require_or_change_networking(self):
+        with tempfile.TemporaryDirectory() as directory:
+            run=Path(directory);bundle=run/'offline.utm';bundle.mkdir()
+            config={'Information':{'UUID':'fixture'},'Network':[]}
+            (bundle/'config.plist').write_bytes(plistlib.dumps(config))
+            (run/'utm.json').write_text(json.dumps({'uuid':'fixture','bundle':str(bundle)}))
+            calls=[];state=['stopped'];missing=[True]
+            def control(argv,**kwargs):
+                calls.append(argv)
+                if argv[1]=='status':
+                    if missing[0]:
+                        missing[0]=False
+                        raise subprocess.CalledProcessError(1,argv,stderr='Error: Virtual machine not found.')
+                    return subprocess.CompletedProcess(argv,0,stdout=state[0]+'\n')
+                state[0]='started' if argv[1]=='start' else 'stopped'
+                return subprocess.CompletedProcess(argv,0)
+            with patch.object(vm,'RUN',run),patch.object(vm,'call',side_effect=control):
+                with self.assertRaisesRegex(RuntimeError,'no SSH forwarding'):vm.start()
+                self.assertEqual(calls,[])
+                vm.start(console_only=True)
+                self.assertEqual(vm.status(),'started')
+                vm.stop()
+                self.assertEqual(vm.status(),'stopped')
+                self.assertEqual(sum(argv[1]=='start' for argv in calls),1)
+                self.assertEqual(sum(argv[1]=='stop' for argv in calls),1)
+                self.assertEqual(plistlib.loads((bundle/'config.plist').read_bytes())['Network'],[])
+                config['Information']['UUID']='wrong'
+                (bundle/'config.plist').write_bytes(plistlib.dumps(config))
+                before=len(calls)
+                with self.assertRaisesRegex(RuntimeError,'UUID'):vm.start(console_only=True)
+                self.assertEqual(len(calls),before)
+
+    def test_console_only_uncertain_start_is_never_replayed(self):
+        with patch.object(vm,'alive',return_value=False),patch.object(vm,'machine',return_value={'uuid':'fixture'}),patch.object(vm,'call',side_effect=subprocess.TimeoutExpired('utmctl',30)) as call:
+            with self.assertRaisesRegex(RuntimeError,'do not retry automatically'):vm.start(console_only=True)
+            self.assertEqual(call.call_count,1)
+
+    def test_state_only_status_never_attempts_ssh(self):
+        with patch.object(vm.sys,'argv',['vm.py','status','--state-only']),patch.object(vm,'status',return_value='started'),patch.object(vm,'ssh') as ssh:
+            vm.main()
+            ssh.assert_not_called()
+
     def test_control_timeouts_leave_state_unknown_and_never_retry_start(self):
         with tempfile.TemporaryDirectory() as directory,patch.object(vm,'RUN',Path(directory)):
             (Path(directory)/'utm.json').write_text('{}')

@@ -18,7 +18,8 @@ import time
 
 
 class Device:
-    def __init__(self,keyboard):
+    def __init__(self,keyboard,motion_ready=None):
+        self.motion_ready=motion_ready
         self.fd=os.open('/dev/uinput',os.O_WRONLY|os.O_NONBLOCK)
         try:
             fcntl.ioctl(self.fd,0x40045564,1) # UI_SET_EVBIT EV_KEY
@@ -43,7 +44,8 @@ class Device:
         for key in reversed(keys):self.event(1,key,0);self.sync()
     def click(self,x,y,width,height,button=272):
         self.event(3,0,round(x*65535/width));self.event(3,1,round(y*65535/height));self.sync()
-        time.sleep(.1)
+        if self.motion_ready:self.motion_ready(x,y)
+        else:time.sleep(.1)
         self.chord(button)
     def drag(self,start,end,width,height,observe=None):
         def move(x,y):
@@ -195,7 +197,15 @@ def verify(metrics,output,core,scene,target,login_user,presentation):
                 if time.monotonic()>deadline:raise RuntimeError('Direct input did not reach the expected GTK state: '+repr(last))
                 time.sleep(.05)
         initial=wait(lambda value:value['text']=='')
-        keyboard=Device(True);pointer=Device(False)
+        def motion_ready(x,y):
+            deadline=time.monotonic()+5
+            while True:
+                observed=scene();point=observed.get('pointer_location')
+                if observed.get('direct_active') and point and abs(point[0]-x)<2 and abs(point[1]-y)<2:return
+                if time.monotonic()>deadline:
+                    raise RuntimeError('Kernel pointer motion was not acknowledged before click: '+json.dumps({'expected':[x,y],'scene':observed}))
+                time.sleep(.05)
+        keyboard=Device(True);pointer=Device(False,motion_ready)
         subprocess.run(['udevadm','settle','--timeout=5'],check=True)
         for node in Path('/sys/class/input').glob('event*'):
             try:
@@ -214,7 +224,11 @@ def verify(metrics,output,core,scene,target,login_user,presentation):
         time.sleep(.2)
         observed=scene()
         assert observed['seat_focus']==target,'Kernel click changed the focused window unexpectedly'
-        wait(lambda value:value['focused'])
+        try:
+            wait(lambda value:value['focused'])
+        except RuntimeError:
+            print('Initial kernel focus observation:',json.dumps({'before':initial,'after':snapshot(),'scene':scene()}),flush=True)
+            raise
         for key in (30,34,18,49,20,24,31):keyboard.chord(key) # agentos
         wait(lambda value:value['text']=='agentos')
         # Include the separator in the copied span. GTK coalesces adjacent single-word inserts.
