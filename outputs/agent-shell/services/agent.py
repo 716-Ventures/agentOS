@@ -32,6 +32,8 @@ TOOLS = [
     tool('list_jobs', 'Read a bounded page of broker work in this activity, including complete history. Pass next_cursor as cursor and the same revision as expected_revision for subsequent pages.', {'cursor':{'type':'string'},'expected_revision':{'type':'string'},'limit':{'type':'integer','minimum':1,'maximum':32}}, []),
     tool('read_file', 'Read a UTF-8 file, up to 64 KiB, with hash for guarded updates. Paths may be absolute or relative to the activity workspace. Uses OS-level authority; sensitive reads and changes are assessed by the broker.',
          {'path':{'type':'string'}}, ['path']),
+    tool('preview_image', 'Display a local PNG as an immutable native image view in the current activity after broker read assessment. At most 256 KiB and 4 MiPixels; byte publication stays in the trusted helper. Returns a surface ID and resource metadata, not image bytes or image analysis. Use this for requested file previews; never infer a path from unrelated command output.',
+         {'path':{'type':'string'},'label':{'type':'string','description':'Alternative description or filename, 1–256 UTF-8 bytes'}}, ['path']),
     tool('list_directory', 'Inspect up to 200 directory entries. Normal Unix permissions apply.',
          {'path':{'type':'string'}}, ['path']),
     tool('write_file', 'Create or replace a UTF-8 file anywhere on the Linux OS, preserving a backup for replacements after effect assessment. Supply the hash from read_file, or missing when creating. For a patch, read the file, edit its text, and submit the complete result with its hash.',

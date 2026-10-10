@@ -60,6 +60,13 @@ class Observations(unittest.TestCase):
                        {'argv':['/usr/bin/python3',HELPER,json.dumps({'op':'write'})]}):
             self.assertIsNone(self.store.completed({**job,**change}))
         self.assertFalse(self.publisher.pending)
+    def test_image_preview_observation_requires_its_assessed_activity(self):
+        job={'id':'e'*32,'argv':['/usr/bin/python3',HELPER,json.dumps({'op':'image','path':str(self.path),'activity_id':1})],
+             'activity':1,'status':'succeeded','exit_code':0}
+        (self.root/(job['id']+'.log')).write_text(json.dumps({'metadata':files.metadata(self.path),'surface_id':'preview'}))
+        self.assertTrue(self.store.completed(job))
+        job['argv'][-1]=json.dumps({'op':'image','path':str(self.path),'activity_id':2})
+        self.assertIsNone(self.store.completed(job))
     def test_metadata_types_and_no_content_extension(self):
         values=files.metadata(self.path);self.assertTrue(valid(values));self.assertEqual(values['kind'],'file')
         link=self.root/'link';link.symlink_to(self.path);self.assertEqual(files.metadata(link)['kind'],'symlink')

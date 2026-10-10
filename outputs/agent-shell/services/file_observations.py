@@ -43,7 +43,8 @@ class FileObservations:
         if (job.get('status')!='succeeded' or job.get('exit_code')!=0 or job.get('output_truncated') or job.get('terminal')
                 or len(argv) not in (3,4) or argv[:2]!=['/usr/bin/python3',HELPER]):return None
         descriptor=json.loads(argv[-1])
-        if not isinstance(descriptor,dict) or descriptor.get('op') not in ('read','list','write'):return None
+        if not isinstance(descriptor,dict) or descriptor.get('op') not in ('read','list','write','image'):return None
+        if descriptor['op']=='image' and descriptor.get('activity_id')!=job.get('activity'):return None
         if len(argv)==4 and (argv[2]!='--stdin-content' or descriptor['op']!='write'):return None
         if len(argv)==3 and descriptor['op']=='write':return None
         path=self.directory.parent/(job['id']+'.log')

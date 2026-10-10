@@ -202,9 +202,10 @@ def handle(req, conn):
                 if name=='execute':
                     job=execute_broker('execute',current_request=prompt,conversation_context=conversation_context,**args)
                 else:
-                    operation={'read_file':'read','list_directory':'list','write_file':'write'}[name]
+                    operation={'read_file':'read','list_directory':'list','write_file':'write','preview_image':'image'}[name]
                     fields={}
                     descriptor={'op':operation,**args}
+                    if name=='preview_image':descriptor['activity_id']=activity
                     argv=['/usr/bin/python3','/usr/local/lib/agent-os/services/files.py']
                     if name=='write_file':
                         content=descriptor.pop('content')
@@ -226,7 +227,7 @@ def handle(req, conn):
                 emit(conn,'Broker job '+ident+': '+job['status']+
                     (' · exit '+str(job['exit_code']) if job['exit_code'] is not None else ''))
                 result={**job,'job_id':ident}
-                if name in ('read_file','list_directory','write_file') and job['status'] not in ('starting','running','cancelling'):
+                if name in ('read_file','list_directory','write_file','preview_image') and job['status'] not in ('starting','running','cancelling'):
                     result=collect_file_result(job)
                 if result.get('output'):emit(conn,result['output'])
                 return result

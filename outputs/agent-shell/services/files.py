@@ -35,6 +35,14 @@ def operate(req):
                 s=e.stat(follow_symlinks=False)
                 rows.append({'name':e.name,'directory':e.is_dir(follow_symlinks=False),'symlink':e.is_symlink(),'size_bytes':s.st_size})
         return {'path':str(path),'entries':rows,'limit':200}
+    if op=='image':
+        activity=req.get('activity_id')
+        if type(activity) is not int or not 1<=activity<=2147483647:raise ValueError('Image preview requires the assessed activity')
+        # This helper runs only after broker assessment. The model gets references, never bytes.
+        sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'client'))
+        import image_resources
+        from presentation_client import request
+        return {'path':str(path),**image_resources.publish(request,activity,path,req.get('label'))}
     if op=='read':
         if not path.exists():return {'path':str(path),'exists':False,'expected_sha256':'missing','note':'For a new file, write_file expected_sha256 must be the literal string missing.'}
         data=read_regular(path)

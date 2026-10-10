@@ -224,6 +224,15 @@ def main():
             assert restored['surface_id']=='persistent-conventional' and restored['reconciled']
             assert next(row for row in ok({'op':'source.list','activity_id':str(activity),'after':'window:','limit':64})['sources'] if row['source']=='window:persistent-conventional')['availability']=='available'
             print('PASS: dead authenticated host reconciliation retains a unique conventional identity; model adoption denied')
+            preview_descriptor={'op':'image','path':str(ROOT/'tests/fixtures/pixel.png'),'activity_id':activity,'label':'Assessed PNG fixture'}
+            raw=subprocess.check_output(['sudo','-n','env','AGENT_OS_SOCKET='+endpoint,'/usr/bin/python3',str(ROOT/'services/files.py'),json.dumps(preview_descriptor)],text=True)
+            preview=json.loads(raw);reference=preview['resource']['reference']
+            assert 'png_hex' not in raw and preview['metadata']['kind']=='file'
+            assert ok({'op':'presentation.get','document_id':preview['surface_id']})['elements']['image']['props']['reference']==reference
+            assert ok({'op':'resource.get','activity_id':str(activity),'reference':reference})['png_hex']==(ROOT/'tests/fixtures/pixel.png').read_bytes().hex()
+            assert not other({'op':'resource.get','activity_id':str(activity),'reference':reference},agent=True)['ok']
+            assert any(row['reference']==reference for row in other({'op':'resource.list','activity_id':str(activity)},agent=True)['result']['resources'])
+            print('PASS: trusted file-helper PNG preview, root-owned byte delivery to native humans, metadata-only model discovery')
             print('PASS: presentation IPC principals, atomic receipts, two clients, draft recovery, ordered changes, undo')
         finally:
             if proc:stop(proc)
