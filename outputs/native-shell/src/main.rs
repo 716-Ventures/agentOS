@@ -8,6 +8,7 @@ mod job_list;
 mod log_view;
 mod preferences;
 mod presentation_pages;
+mod state_pages;
 mod transport;
 mod verification;
 mod voice;

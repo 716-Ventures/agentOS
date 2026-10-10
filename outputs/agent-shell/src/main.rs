@@ -163,6 +163,75 @@ impl Core {
             json!({"revision":revision(&db)?,"activities":activities,"jobs":jobs,"version":env!("CARGO_PKG_VERSION"),"mode":"Gateway agent with effects-based broker; Jev typed advisory; separate offline voice service"}),
         )
     }
+    fn state_page(&self, v: &Value) -> Result<Value> {
+        let collection = field(v, "collection")?;
+        if !["activities", "jobs"].contains(&collection) {
+            return Err("Invalid state collection".into());
+        }
+        let before = match v.get("before_id") {
+            None | Some(Value::Null) => i64::MAX,
+            Some(value) => value
+                .as_i64()
+                .filter(|n| *n > 0)
+                .ok_or("Invalid state cursor")?,
+        };
+        let activity = match v.get("activity_id") {
+            None | Some(Value::Null) => None,
+            Some(value) => Some(
+                value
+                    .as_i64()
+                    .filter(|n| *n > 0)
+                    .ok_or("Invalid activity filter")?,
+            ),
+        };
+        let limit = match v.get("limit") {
+            None => 64,
+            Some(value) => value
+                .as_u64()
+                .filter(|n| (1..=128).contains(n))
+                .ok_or("Invalid state page size")?,
+        };
+        let db = self.db.lock().unwrap();
+        let revision = revision(&db)?;
+        if let Some(expected) = v.get("expected_revision") {
+            if expected.as_i64() != Some(revision) {
+                return Err(json!({"code":"resync_required","detail":"Runtime state changed while reading pages"}).to_string());
+            }
+        }
+        let sql = if collection == "activities" {
+            "SELECT id,name,created_at FROM activities WHERE id<?1 AND (?2 IS NULL OR id=?2) AND id NOT IN (SELECT activity_id FROM removed_activities) ORDER BY id DESC LIMIT ?3"
+        } else {
+            "SELECT id,activity_id,argv,status,exit_code,created_at,finished_at,error FROM jobs WHERE id<?1 AND (?2 IS NULL OR activity_id=?2) ORDER BY id DESC LIMIT ?3"
+        };
+        let mut query = db.prepare(sql).map_err(err)?;
+        let rows=query.query_map(params![before,activity,limit+1],|row| {
+            if collection=="jobs" {job_value(row)} else {let id:i64=row.get(0)?;Ok(json!({"id":id,"name":row.get::<_,String>(1)?,"created_at":row.get::<_,i64>(2)?,"workspace":self.root.join("workspaces").join(id.to_string())}))}
+        }).map_err(err)?;
+        let mut values = Vec::<Value>::new();
+        let mut bytes = 256;
+        let mut more = false;
+        for row in rows {
+            let value = row.map_err(err)?;
+            let size = serde_json::to_vec(&value).map_err(err)?.len() + 1;
+            if values.len() >= limit as usize || bytes + size > 1024 * 1024 {
+                if values.is_empty() {
+                    return Err("State record exceeds page byte limit".into());
+                }
+                more = true;
+                break;
+            }
+            bytes += size;
+            values.push(value);
+        }
+        let next = if more {
+            values.last().map(|row| row["id"].clone())
+        } else {
+            None
+        };
+        Ok(
+            json!({"collection":collection,"revision":revision,"rows":values,"next_before_id":next,"version":env!("CARGO_PKG_VERSION")}),
+        )
+    }
     fn create(&self, v: &Value) -> Result<Value> {
         let name = field(v, "name")?.trim();
         if name.is_empty() || name.len() > 100 || name.chars().any(char::is_control) {
@@ -441,6 +510,8 @@ impl Core {
     fn handle(self: &Arc<Self>, v: &Value) -> Result<Value> {
         match field(v, "op")? {
             "snapshot" => self.snapshot(),
+            "state.page" => self.state_page(v),
+            "job.get" => self.db.lock().unwrap().query_row("SELECT id,activity_id,argv,status,exit_code,created_at,finished_at,error FROM jobs WHERE id=?",[id(v,"job_id")?],job_value).map_err(err),
             "create" => self.create(v),
             "remove_activity" => self.remove_activity(v, false),
             "restore_activity" => self.remove_activity(v, true),
@@ -676,6 +747,67 @@ mod tests {
         }
         assert_eq!(log_text(&[0xff, 0xe6, 0x97], false), ("�".into(), 1));
         assert_eq!(log_text(&[0xe6, 0x97], true), ("�".into(), 2));
+    }
+    #[test]
+    fn runtime_pages_bound_bytes_preserve_history_and_reject_mixed_revisions() {
+        let fixture = Fixture::new();
+        let core = fixture.open();
+        let activity = core.create(&json!({"name":"Paged work"})).unwrap()["id"]
+            .as_i64()
+            .unwrap();
+        {
+            let db = core.db.lock().unwrap();
+            let argv = json!(["x".repeat(60000)]).to_string();
+            for _ in 0..300 {
+                db.execute("INSERT INTO jobs(activity_id,argv,status,created_at) VALUES(?,?,'succeeded',0)",params![activity,argv]).unwrap();
+            }
+        }
+        let first = core
+            .state_page(&json!({"collection":"jobs","limit":128}))
+            .unwrap();
+        assert!(first["rows"].as_array().unwrap().len() < 128);
+        assert!(first.to_string().len() <= 1024 * 1024);
+        let mut before = Value::Null;
+        let mut ids = Vec::new();
+        loop {
+            let page=core.state_page(&json!({"collection":"jobs","before_id":before,"activity_id":activity,"expected_revision":first["revision"]})).unwrap();
+            ids.extend(
+                page["rows"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|row| row["id"].as_i64().unwrap()),
+            );
+            before = page["next_before_id"].clone();
+            if before.is_null() {
+                break;
+            }
+        }
+        assert_eq!(ids.len(), 300);
+        assert!(ids.windows(2).all(|pair| pair[0] > pair[1]));
+        assert_eq!(
+            core.handle(&json!({"op":"job.get","job_id":1})).unwrap()["id"],
+            1
+        );
+        assert!(core
+            .state_page(&json!({"collection":"jobs","activity_id":activity+1}))
+            .unwrap()["rows"]
+            .as_array()
+            .unwrap()
+            .is_empty());
+        core.create(&json!({"name":"Interleaved"})).unwrap();
+        assert!(core
+            .state_page(&json!({"collection":"jobs","expected_revision":first["revision"]}))
+            .unwrap_err()
+            .contains("resync_required"));
+        for invalid in [
+            json!({"collection":"events"}),
+            json!({"collection":"jobs","limit":129}),
+            json!({"collection":"jobs","before_id":-1}),
+            json!({"collection":"jobs","activity_id":"1"}),
+        ] {
+            assert!(core.state_page(&invalid).is_err());
+        }
     }
     #[test]
     fn activities_and_history_survive_reopen() {

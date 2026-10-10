@@ -1103,7 +1103,7 @@ def main():
     c.add_argument('activity',type=int);c.add_argument('--lifetime',type=int,default=86400)
     c.add_argument('argv',nargs=argparse.REMAINDER)
     c=sub.add_parser('attach',help='Attach a terminal job; Ctrl-] detaches without stopping it');c.add_argument('job')
-    c=sub.add_parser('jobs');c.add_argument('activity',type=int,nargs='?')
+    c=sub.add_parser('jobs');c.add_argument('activity',type=int,nargs='?');c.add_argument('--all',action='store_true',help='Read complete core history through revision-consistent pages')
     c=sub.add_parser('stop');c.add_argument('job')
     c=sub.add_parser('stop-activity');c.add_argument('activity',type=int)
     c=sub.add_parser('history');c.add_argument('activity',type=int)
@@ -1158,7 +1158,12 @@ def main():
         result=broker_request('execute',activity=args.activity,argv=argv,purpose='Human interactive terminal session',
             terminal=True,background=True,lifetime_seconds=args.lifetime,request_confirmation=True)
         result['work_ref']='broker:'+result['id']
-    elif args.cmd=='jobs': result=[j for j in work_projection(request('snapshot'),broker_request('list')) if args.activity is None or j['activity_id']==args.activity]
+    elif args.cmd=='jobs':
+        if args.all:
+            from state_pages import read as read_state
+            state=read_state(request,args.activity)
+        else:state=request('snapshot')
+        result=[j for j in work_projection(state,broker_request('list')) if args.activity is None or j['activity_id']==args.activity]
     elif args.cmd=='stop': result=stop_work(args.job)
     elif args.cmd=='stop-activity': result=stop_activity_work(args.activity)
     elif args.cmd=='history': result=request('history',activity_id=args.activity)

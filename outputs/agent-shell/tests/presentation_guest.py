@@ -43,6 +43,13 @@ def main():
         proc=None
         try:
             proc=start();activity=ok({'op':'create','name':'Presentation fixture'})['id']
+            sys.path.insert(0,str(ROOT/'client'))
+            from state_pages import read as read_state
+            for number in range(70):ok({'op':'create','name':f'Paged activity {number}'})
+            runtime=read_state(lambda op,**fields:ok({'op':op,**fields}),activity)
+            assert len(runtime['activities'])==71 and runtime['jobs']==[]
+            stale=call({'op':'state.page','collection':'jobs','expected_revision':0})
+            assert not stale['ok'] and 'resync_required' in stale['error']
             doc={'protocol':PROTOCOL,'catalog_revision':CATALOG,'surface_id':'surface-fixture','activity_id':str(activity),'revision':0,'title':'Fixture','root':'text','elements':{'text':{'type':'Text@1','props':{'text':'Original'}}},'bindings':{},'actions':{}}
             create={'op':'presentation.apply','protocol':PROTOCOL,'catalog_revision':CATALOG,'request_id':'create','expected_revisions':{'surface-fixture':None},'operations':[{'op':'surface.create','document':doc}]}
             receipt=ok(create);assert ok(create)==receipt

@@ -290,7 +290,7 @@ fn run(
                                 if surface=="native-monitor" {
                                     let reference=&context["job_ref"];
                                     let valid=if let Some(id)=reference.as_i64() {
-                                        request(&socket,&json!({"op":"snapshot"})).ok().and_then(|s|s["jobs"].as_array().map(|rows|rows.iter().any(|j|j["id"]==id && j["activity_id"]==activity))).unwrap_or(false)
+                                        request(&socket,&json!({"op":"job.get","job_id":id})).map(|job|job["id"]==id && job["activity_id"]==activity).unwrap_or(false)
                                     }else if let Some(id)=reference.as_str().and_then(|r|r.strip_prefix("broker:")) {
                                         request(&broker_socket(),&json!({"op":"poll","job_id":id})).map(|job|job["activity"]==activity).unwrap_or(false)
                                     }else{false};
@@ -415,8 +415,12 @@ fn run(
                         .map(|v| v["shared"].clone())
                         .unwrap_or_else(|error| json!({"unavailable":error}));
                 }
-                next.core = request(&socket, &json!({"op":"snapshot"}))
-                    .unwrap_or_else(|e| json!({"unavailable":e}));
+                next.core = super::state_pages::read(
+                    |query| request(&socket, query),
+                    activity.as_ref().and_then(|id| id.parse().ok()),
+                    || stop.load(Ordering::Relaxed),
+                )
+                .unwrap_or_else(|e| json!({"unavailable":e}));
                 next.broker = request(&broker_socket(), &json!({"op":"list"}))
                     .unwrap_or_else(|e| json!({"unavailable":e}));
                 next.usage = std::fs::read_to_string(
