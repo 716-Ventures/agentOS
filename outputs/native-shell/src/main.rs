@@ -856,7 +856,9 @@ impl Surface {
                         .is_some_and(|reference| frame.resources.contains_key(reference))
             });
         let changed = doc["revision"].as_u64() != self.revision || resource_ready;
-        let safe_text_update = reconcile::text_only(&self.document, doc)
+        let safe_text_update = changed
+            && protected
+            && reconcile::text_only(&self.document, doc)
             && nodes.iter().all(|(id, node)| {
                 if self.document["elements"][id] == *node || node["type"] != "Text@1" {
                     return true;

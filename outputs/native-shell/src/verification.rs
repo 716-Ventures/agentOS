@@ -181,7 +181,9 @@ fn verify_container_replacement(
         .unwrap()
         .control
         .is_active());
-    assert_eq!(surface.revision, Some(12));
+    // An otherwise identical document may advance its revision while drafts
+    // remain local; no GTK children or committed field values are replaced.
+    assert_eq!(surface.revision, Some(13));
     drafts
         .lock()
         .unwrap()
@@ -320,13 +322,13 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             drafts.lock().unwrap().values_mut().for_each(|d|{d.dirty=false;d.resolved=Some(1);d.expected=1;});
             frame.drafts.insert(("native-fixture".into(),"field".into()),json!({"draft_revision":1,"draft":null}));doc["elements"]["field"]["props"]["value"]=json!("Unsaved λ 日本語");
             surface.elements["link"].link.as_ref().unwrap().grab_focus();
-            doc["elements"]["root"]["slots"]["children"]=json!(["field","reading","status","button","link","progress"]);
+            doc["elements"]["root"]["slots"]["children"]=json!(["field","reading","status","button","link","progress"]);doc["revision"]=json!(2);
             surface.update("native-fixture",&doc,&frame,&commands,&drafts);
             println!("CHECK: reordered retained widgets");
             assert_eq!(surface.elements["reading"].widget,widget);assert_eq!(field.entry.text(),"Unsaved λ 日本語");
             assert_eq!(surface.elements["root"].container.as_ref().unwrap().first_child().unwrap(),field.widget.clone().upcast::<gtk::Widget>());
             assert!(!surface.elements["button"].button.as_ref().unwrap().is_sensitive());
-            doc["actions"]["click"]=json!({"ref":"fixture-action"});doc["elements"]["button"]["events"]=json!({"activate":{"action":"click"}});doc["elements"]["field"]["events"]=json!({"submit":{"action":"click"}});doc["revision"]=json!(2);
+            doc["actions"]["click"]=json!({"ref":"fixture-action"});doc["elements"]["button"]["events"]=json!({"activate":{"action":"click"}});doc["elements"]["field"]["events"]=json!({"submit":{"action":"click"}});doc["revision"]=json!(3);
             frame.actions.insert("fixture-action".into(),json!({"available":true}));surface.update("native-fixture",&doc,&frame,&commands,&drafts);
             doc["elements"]["failure"]["events"]=json!({"recover":{"action":"click"}});surface.update("native-fixture",&doc,&frame,&commands,&drafts);
             let failure=surface.elements["failure"].outcome.as_ref().unwrap();assert!(failure.recovery.is_sensitive());failure.recovery.emit_clicked();
@@ -337,7 +339,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             assert_eq!(rx.try_iter().filter(|c|matches!(c,Command::Action{reference,..} if reference=="fixture-action")).count(),1,"Text field submit must dispatch exactly once");
             let editor=surface.elements["editor"].area.as_ref().unwrap();editor.view.buffer().set_text("Human edited document 日本語");
             let toolbar=surface.elements["editor"].widget.last_child().unwrap();let save=toolbar.first_child().unwrap().first_child().unwrap().downcast::<gtk::Button>().unwrap();save.emit_clicked();
-            assert!(rx.try_iter().any(|c|matches!(c,Command::ResolveDraft{surface,element,commit:true,revision:2} if surface=="native-fixture" && element=="editor")));
+            assert!(rx.try_iter().any(|c|matches!(c,Command::ResolveDraft{surface,element,commit:true,revision:3} if surface=="native-fixture" && element=="editor")));
             frame.connected=false;surface.update("native-fixture",&doc,&frame,&commands,&drafts);assert_eq!(field.entry.text(),"Unsaved λ 日本語");
             // Capture after GTK has rendered the verified final state.
             glib::timeout_add_local_once(Duration::from_millis(180),move || {
