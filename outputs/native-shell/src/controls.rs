@@ -277,7 +277,7 @@ impl Controls {
         let output_displayed = Rc::new(RefCell::new(None::<log_view::Page>));
         let (sender, output_guard, buffer) = (
             commands.clone(),
-            output_output_guard.clone(),
+            output_changing.clone(),
             inspection.buffer(),
         );
         output_follow.connect_toggled(move |control| {
@@ -293,7 +293,7 @@ impl Controls {
             commands.clone(),
             output_displayed.clone(),
             output_follow.clone(),
-            output_output_guard.clone(),
+            output_changing.clone(),
         );
         inspection
             .buffer()
@@ -432,7 +432,7 @@ impl Controls {
     pub fn present(&self) {
         self.monitor.present();
     }
-    pub fn update(&mut self, frame: &Frame, commands: &Sender<Command>) {
+    pub fn update(&mut self, frame: &Frame, _commands: &Sender<Command>) {
         *self.activity.borrow_mut() = frame.activity.clone();
         self.workspace.update(frame);
         let voice = self.voice.state.lock().unwrap().clone();
