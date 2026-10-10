@@ -14,7 +14,7 @@ pub fn trusted(who: &Principal) -> bool {
             .unwrap_or(false)
 }
 pub fn init(db: &Connection) -> Result<()> {
-    db.execute_batch("CREATE TABLE IF NOT EXISTS presentation_host_surfaces(id TEXT PRIMARY KEY,activity TEXT NOT NULL,uid INTEGER NOT NULL,session TEXT NOT NULL,title TEXT NOT NULL,app_id TEXT NOT NULL,connected INTEGER NOT NULL,observed_at INTEGER NOT NULL);").map_err(|e|e.to_string())
+    db.execute_batch("CREATE TABLE IF NOT EXISTS presentation_host_surfaces(id TEXT PRIMARY KEY,activity TEXT NOT NULL,uid INTEGER NOT NULL,session TEXT NOT NULL,title TEXT NOT NULL,app_id TEXT NOT NULL,connected INTEGER NOT NULL,observed_at INTEGER NOT NULL); CREATE TABLE IF NOT EXISTS presentation_renderers(surface TEXT PRIMARY KEY,uid INTEGER NOT NULL,session TEXT NOT NULL);").map_err(|e|e.to_string())
 }
 fn ident(value: &str) -> bool {
     !value.is_empty()
@@ -95,7 +95,7 @@ pub fn activity(db: &Connection, id: &str) -> Result<Option<String>> {
     .optional()
     .map_err(|e| e.to_string())
 }
-fn alive(session: &str) -> bool {
+pub fn alive(session: &str) -> bool {
     let Some((pid, start)) = session.split_once(':') else {
         return false;
     };
@@ -132,6 +132,65 @@ pub fn snapshot(db: &Connection) -> Result<Value> {
         let (id, activity, session, title, app_id, connected, observed_at) =
             row.map_err(|e| e.to_string())?;
         result.insert(id,json!({"activity_id":activity,"title":title,"app_id":app_id,"availability":if connected && alive(&session){"available"}else{"unavailable"},"observed_at":observed_at}));
+    }
+    Ok(json!(result))
+}
+
+/// Bind a native surface to the authenticated renderer process, never to an app-id claim.
+pub fn renderer(db: &Connection, v: &Value, who: &Principal) -> Result<Value> {
+    if who.uid != 0 && who.uid < 1000 {
+        return Err("unauthorized: Native renderer registration requires a user session".into());
+    }
+    let id = v["surface_id"]
+        .as_str()
+        .ok_or("missing_reference: Surface required")?;
+    let body: Option<String> = db
+        .query_row(
+            "SELECT body FROM presentation_documents WHERE id=?",
+            [id],
+            |r| r.get(0),
+        )
+        .optional()
+        .map_err(|e| e.to_string())?;
+    let document: Value =
+        serde_json::from_str(&body.ok_or("missing_reference: Surface unavailable")?)
+            .map_err(|e| e.to_string())?;
+    if document["surface_id"].as_str() != Some(id) {
+        return Err("missing_reference: Native surface required".into());
+    }
+    let previous: Option<(u32, String)> = db
+        .query_row(
+            "SELECT uid,session FROM presentation_renderers WHERE surface=?",
+            [id],
+            |r| Ok((r.get(0)?, r.get(1)?)),
+        )
+        .optional()
+        .map_err(|e| e.to_string())?;
+    if let Some((uid, session)) = previous {
+        if (uid != who.uid || session != who.session) && alive(&session) {
+            return Err("interaction_conflict: Surface already has a live renderer".into());
+        }
+    }
+    db.execute("INSERT INTO presentation_renderers VALUES(?,?,?) ON CONFLICT(surface) DO UPDATE SET uid=excluded.uid,session=excluded.session",params![id,who.uid,who.session]).map_err(|e|e.to_string())?;
+    Ok(json!({"surface_id":id}))
+}
+pub fn renderers(db: &Connection) -> Result<Value> {
+    let mut q = db.prepare("SELECT surface,uid,session FROM presentation_renderers WHERE surface IN (SELECT id FROM presentation_documents)").map_err(|e|e.to_string())?;
+    let rows = q
+        .query_map([], |r| {
+            Ok((
+                r.get::<_, String>(0)?,
+                r.get::<_, u32>(1)?,
+                r.get::<_, String>(2)?,
+            ))
+        })
+        .map_err(|e| e.to_string())?;
+    let mut result = BTreeMap::new();
+    for row in rows {
+        let (id, uid, session) = row.map_err(|e| e.to_string())?;
+        if alive(&session) {
+            result.insert(id, json!({"uid":uid,"session":session}));
+        }
     }
     Ok(json!(result))
 }

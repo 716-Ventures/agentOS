@@ -75,6 +75,7 @@ pub struct Frame {
 }
 #[derive(Debug)]
 pub enum Command {
+    RegisterRenderer(String),
     ResolveDraft {
         surface: String,
         element: String,
@@ -160,6 +161,7 @@ fn run(
             }
             Ok(command) => {
                 let result=match command {
+                    Command::RegisterRenderer(surface)=>request(&socket,&json!({"op":"host.renderer","surface_id":surface})),
                     Command::ResolveDraft{surface,element,commit}=>resolve_draft(&socket,&surface,&element,commit,&drafts),
                     Command::Preferences(value)=>super::preferences::save(&value),
                     Command::Setup=>std::process::Command::new("weston-terminal").args(["--shell","/usr/local/bin/agent-os-setup"]).spawn().map(|mut child|{std::thread::spawn(move||{let _=child.wait();});json!({"status":"Setup opened"})}).map_err(|e|e.to_string()),

@@ -52,6 +52,11 @@ def main():
                 argv=['/usr/bin/python3','-c',script,endpoint,json.dumps(value)]
                 if agent:argv=['sudo','-n','-u','agentos-ai',*argv]
                 return json.loads(subprocess.check_output(argv,text=True))
+            ok({'op':'host.renderer','surface_id':'surface-fixture'})
+            owner=ok({'op':'presentation.snapshot'})['renderers']['surface-fixture']
+            assert owner['session'].split(':')[0]==str(os.getpid()),owner
+            assert not other({'op':'host.renderer','surface_id':'surface-fixture'})['ok']
+            assert not other({'op':'host.renderer','surface_id':'surface-fixture'},agent=True)['ok']
             conflict=other(change);assert not conflict['ok'] and 'interaction_conflict' in conflict['error'],conflict
             forged=other({'op':'interaction.begin','surface_id':'surface-fixture','element_id':'text','actor':'human'},agent=True)
             assert not forged['ok'] and 'unauthorized' in forged['error'],forged

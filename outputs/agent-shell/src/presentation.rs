@@ -657,7 +657,7 @@ fn snapshot(db: &Connection) -> Result<Value> {
         )
         .map_err(db_error)?;
     Ok(
-        json!({"protocol":PROTOCOL,"catalog_revision":CATALOG,"documents":docs,"host_surfaces":crate::presentation_hosts::snapshot(db)?,"event_cursor":cursor}),
+        json!({"protocol":PROTOCOL,"catalog_revision":CATALOG,"documents":docs,"host_surfaces":crate::presentation_hosts::snapshot(db)?,"renderers":crate::presentation_hosts::renderers(db)?,"event_cursor":cursor}),
     )
 }
 fn element_path(surface: &SurfaceDocument, target: &str) -> Vec<(String, String, usize)> {
@@ -1115,6 +1115,7 @@ fn commit(
 pub fn handle(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> {
     match v["op"].as_str().unwrap_or("") {
         "catalog.get" => Ok(catalog()),
+        "host.renderer" => crate::presentation_hosts::renderer(db, v, who),
         "host.surface" => crate::presentation_hosts::register(db, v, who),
         "action.issue" | "action.revoke" | "action.metadata" | "action.status" => {
             crate::presentation_actions::handle(db, v, who)

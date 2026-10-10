@@ -325,20 +325,22 @@ impl Surface {
         scroll.set_margin_bottom(24);
         scroll.set_margin_start(24);
         scroll.set_margin_end(24);
-        let (surface, commands) = (id.to_string(), commands.clone());
+        let (surface, close_commands) = (id.to_string(), commands.clone());
         window.connect_close_request(move |_| {
-            let _ = commands.send(Command::Close {
+            let _ = close_commands.send(Command::Close {
                 surface: surface.clone(),
             });
             glib::Propagation::Stop
         });
         let identity = format!("agentos.surface.{id}");
+        let (registered, commands) = (id.to_string(), commands.clone());
         window.connect_realize(move |window| {
             if let Some(surface) = window
                 .surface()
                 .and_then(|s| s.downcast::<gdk4_wayland::WaylandToplevel>().ok())
             {
                 surface.set_application_id(&identity);
+                let _ = commands.send(Command::RegisterRenderer(registered.clone()));
             }
         });
         // Mapping a result does not request an activation token. The compositor owns focus policy.
