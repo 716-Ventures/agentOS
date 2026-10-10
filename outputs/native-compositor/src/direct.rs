@@ -24,7 +24,7 @@ use smithay::{
         udev::{primary_gpu, UdevBackend, UdevEvent},
     },
     input::pointer::{CursorImageStatus, CursorImageSurfaceData},
-    output::{Mode, Output, PhysicalProperties, Subpixel},
+    output::{Mode, Output, PhysicalProperties, Scale, Subpixel},
     reexports::{
         calloop::{
             timer::{TimeoutAction, Timer},
@@ -35,7 +35,7 @@ use smithay::{
         rustix::fs::OFlags,
         wayland_server::backend::GlobalId,
     },
-    utils::{DeviceFd, Scale, Transform},
+    utils::{DeviceFd, Transform},
     wayland::compositor::with_states,
 };
 use std::{
