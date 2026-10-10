@@ -37,8 +37,9 @@ def text(node):
 def activate(node):
     states=node.getState()
     assert not states.contains(pyatspi.STATE_DEFUNCT),'Accessible action refers to a destroyed control'
-    if not states.contains(pyatspi.STATE_ENABLED):
-        print('OBSERVED: GTK action has no AT-SPI ENABLED flag; states='+str(states.getStates()),flush=True)
+    # GTK 4.14 maps disabled=false to SENSITIVE, not ENABLED:
+    # https://github.com/GNOME/gtk/blob/4.14.5/gtk/a11y/gtkatspicontext.c
+    assert states.contains(pyatspi.STATE_SENSITIVE)
     action=node.queryAction();assert action.nActions>0
     assert action.doAction(0)
 
