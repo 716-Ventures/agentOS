@@ -575,6 +575,8 @@ fn validate(
                     }
                     match docs.get(id) {
                         Some(Document::Surface(s)) if s.activity_id == w.activity_id => {}
+                        _ if crate::presentation_hosts::activity(db, id)?.as_deref()
+                            == Some(w.activity_id.as_str()) => {}
                         _ => {
                             return Err(error(
                                 "missing_reference",
@@ -608,8 +610,8 @@ fn validate(
                         return Err(error("missing_reference", "Focus surface not placed"));
                     }
                     if let Some(id) = &f.element_id {
-                        match &docs[&f.surface_id] {
-                            Document::Surface(s) if s.elements.contains_key(id) => {}
+                        match docs.get(&f.surface_id) {
+                            Some(Document::Surface(s)) if s.elements.contains_key(id) => {}
                             _ => return Err(error("missing_reference", "Focus element absent")),
                         }
                     }
@@ -629,6 +631,7 @@ pub fn init(db: &Connection) -> Result<()> {
         CREATE TABLE IF NOT EXISTS presentation_leases(document TEXT NOT NULL,element TEXT NOT NULL,uid INTEGER NOT NULL,session TEXT NOT NULL,expires INTEGER NOT NULL,draft_revision INTEGER NOT NULL DEFAULT 0,draft TEXT,PRIMARY KEY(document,element));
         CREATE TABLE IF NOT EXISTS presentation_outputs(id TEXT PRIMARY KEY,width REAL NOT NULL,height REAL NOT NULL,connected INTEGER NOT NULL);
         CREATE TABLE IF NOT EXISTS presentation_actions(reference TEXT PRIMARY KEY,uid INTEGER NOT NULL,activity TEXT NOT NULL,revoked INTEGER NOT NULL DEFAULT 0);").map_err(db_error)?;
+    crate::presentation_hosts::init(db)?;
     crate::presentation_actions::init(db)
 }
 fn documents(db: &Connection) -> Result<BTreeMap<String, Document>> {
@@ -654,7 +657,7 @@ fn snapshot(db: &Connection) -> Result<Value> {
         )
         .map_err(db_error)?;
     Ok(
-        json!({"protocol":PROTOCOL,"catalog_revision":CATALOG,"documents":docs,"event_cursor":cursor}),
+        json!({"protocol":PROTOCOL,"catalog_revision":CATALOG,"documents":docs,"host_surfaces":crate::presentation_hosts::snapshot(db)?,"event_cursor":cursor}),
     )
 }
 fn element_path(surface: &SurfaceDocument, target: &str) -> Vec<(String, String, usize)> {
@@ -1112,6 +1115,7 @@ fn commit(
 pub fn handle(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> {
     match v["op"].as_str().unwrap_or("") {
         "catalog.get" => Ok(catalog()),
+        "host.surface" => crate::presentation_hosts::register(db, v, who),
         "action.issue" | "action.revoke" | "action.metadata" | "action.status" => {
             crate::presentation_actions::handle(db, v, who)
         }
@@ -1141,7 +1145,7 @@ pub fn handle(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> 
             Ok(json!({"protocol":PROTOCOL,"events":events,"latest_cursor":latest}))
         }
         "outputs.register" => {
-            if who.uid != 0 {
+            if !crate::presentation_hosts::trusted(who) {
                 return Err(error(
                     "unauthorized",
                     "Only the trusted compositor can advertise outputs",
@@ -1729,5 +1733,59 @@ mod tests {
         .unwrap();
         assert!(draft["draft"].is_null());
         assert_eq!(draft["draft_revision"], 2);
+    }
+    #[test]
+    fn conventional_surface_registration_is_host_scoped_and_placeholders_are_durable() {
+        let mut db = fixture();
+        let root = Principal {
+            uid: 0,
+            session: "compositor-old-session".into(),
+        };
+        let registration = json!({"op":"host.surface","surface_id":"app-fixture","activity_id":"1","title":"Conventional editor","app_id":"org.example.Editor","connected":true});
+        assert!(handle(&mut db, &registration, &agent())
+            .unwrap_err()
+            .contains("unauthorized"));
+        handle(&mut db, &registration, &root).unwrap();
+        let other = Principal {
+            uid: 0,
+            session: "different-compositor".into(),
+        };
+        assert!(handle(&mut db, &registration, &other).is_err());
+        handle(
+            &mut db,
+            &json!({"op":"outputs.register","output_id":"output-a","width":1280,"height":720}),
+            &root,
+        )
+        .unwrap();
+        let mut document = workspace();
+        document["outputs"]["output-a"]["tiles"]["surface_id"] = json!("app-fixture");
+        document["focus"] = json!({"surface_id":"app-fixture","element_id":null});
+        let mut apply = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"conventional-workspace","expected_revisions":{"workspace-a":null},"operations":[{"op":"workspace.put","document":document}]});
+        let mut foreign = apply.clone();
+        foreign["operations"][0]["document"]["activity_id"] = json!("2");
+        assert!(handle(&mut db, &foreign, &human()).is_err());
+        let mut element = apply.clone();
+        element["operations"][0]["document"]["focus"]["element_id"] = json!("invented-element");
+        assert!(handle(&mut db, &element, &human()).is_err());
+        handle(&mut db, &apply, &human()).unwrap();
+        let snapshot = snapshot(&db).unwrap();
+        assert_eq!(
+            snapshot["host_surfaces"]["app-fixture"]["availability"],
+            "unavailable"
+        );
+        assert_eq!(
+            snapshot["documents"]["workspace-a"]["outputs"]["output-a"]["tiles"]["surface_id"],
+            "app-fixture"
+        );
+        let mut disconnect = registration.clone();
+        disconnect["connected"] = json!(false);
+        handle(&mut db, &disconnect, &root).unwrap();
+        apply["request_id"] = json!("keep-disconnected-placeholder");
+        apply["expected_revisions"]["workspace-a"] = json!(0);
+        handle(&mut db, &apply, &human()).unwrap();
+        let mut reuse = surface();
+        reuse["surface_id"] = json!("app-fixture");
+        let recycle = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"recycle-app-id","expected_revisions":{"app-fixture":null},"operations":[{"op":"surface.create","document":reuse}]});
+        assert!(handle(&mut db, &recycle, &human()).is_err());
     }
 }

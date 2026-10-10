@@ -1,5 +1,8 @@
 name: Linux runtime contracts
 on: [push, pull_request, workflow_dispatch]
+concurrency:
+  group: contracts-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:

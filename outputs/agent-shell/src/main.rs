@@ -1,5 +1,6 @@
 mod presentation;
 mod presentation_actions;
+mod presentation_hosts;
 use rusqlite::{params, Connection};
 use serde_json::{json, Value};
 use std::{
@@ -534,6 +535,7 @@ fn serve(core: Arc<Core>, mut stream: UnixStream) {
                     "draft.",
                     "binding.",
                     "outputs.",
+                    "host.",
                     "action.",
                 ]
                 .iter()
