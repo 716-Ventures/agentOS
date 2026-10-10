@@ -354,6 +354,9 @@ fn walk_elements(
                         .as_f64()
                         .map(|x| x.is_finite() && (0.0..=1.0).contains(&x))
                         .unwrap_or(false),
+                    Some(kind @ ("richruns" | "chartpoints")) => {
+                        seven_sixteen_ui::content::valid_literal(kind, value)
+                    }
                     Some(kind @ ("stringlist" | "keyedrows")) => {
                         seven_sixteen_ui::catalog::valid_collection(kind, value)
                     }
@@ -2749,6 +2752,34 @@ mod tests {
                 snapshot(&db).unwrap()["documents"]["surface-a"]["elements"]["input"]["props"]
                     ["value"],
                 result
+            );
+        }
+    }
+    #[test]
+    fn rich_text_and_chart_literals_reject_unbounded_or_executable_shapes() {
+        for (kind, props, invalid) in [
+            (
+                "RichText@1",
+                json!({"runs":[{"text":"Literal <script>日本語","style":"strong"}]}),
+                json!({"runs":[{"text":"Content","style":"markup"}]}),
+            ),
+            (
+                "Chart@1",
+                json!({"label":"Comparison","points":[{"id":"a","label":"A","value":-2.5}]}),
+                json!({"label":"Comparison","points":[{"id":"a","label":"A","value":1e13}]}),
+            ),
+        ] {
+            let mut db = fixture();
+            let mut doc = surface();
+            doc["elements"]["text"] = json!({"type":kind,"props":props});
+            let create = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"reading-view","expected_revisions":{"surface-a":null},"operations":[{"op":"surface.create","document":doc}]});
+            let mut bad = create.clone();
+            bad["operations"][0]["document"]["elements"]["text"]["props"] = invalid;
+            assert!(handle(&mut db, &bad, &human()).is_err());
+            handle(&mut db, &create, &human()).unwrap();
+            assert_eq!(
+                snapshot(&db).unwrap()["documents"]["surface-a"]["elements"]["text"]["props"],
+                props
             );
         }
     }

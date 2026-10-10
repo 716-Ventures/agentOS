@@ -36,6 +36,8 @@ struct Element {
     kind: String,
     widget: gtk::Widget,
     label: Option<gtk::Label>,
+    rich: Option<ui::RichText>,
+    chart: Option<ui::BoundedChart>,
     field: Option<TextField>,
     choice: Option<ui::Choice>,
     selection_notice: Option<gtk::Label>,
@@ -129,6 +131,8 @@ fn construct(
         kind: kind.clone(),
         widget: gtk::Box::new(gtk::Orientation::Vertical, 0).upcast(),
         label: None,
+        rich: None,
+        chart: None,
         field: None,
         choice: None,
         selection_notice: None,
@@ -149,6 +153,22 @@ fn construct(
         children: Vec::new(),
     };
     match kind.as_str() {
+        "RichText@1" => {
+            let runs = serde_json::from_value::<Vec<ui::RichRun>>(props["runs"].clone()).unwrap();
+            let rich = ui::RichText::new(&runs).unwrap();
+            result.widget = rich.widget.clone().upcast();
+            result.label = Some(rich.widget.clone());
+            lease(&result.widget, surface, id, commands);
+            result.rich = Some(rich);
+        }
+        "Chart@1" => {
+            let points =
+                serde_json::from_value::<Vec<ui::ChartPoint>>(props["points"].clone()).unwrap();
+            let chart = ui::BoundedChart::new(props["label"].as_str().unwrap(), &points).unwrap();
+            result.widget = chart.widget.clone().upcast();
+            lease(&result.widget, surface, id, commands);
+            result.chart = Some(chart);
+        }
         "Table@1" => {
             let columns = props["columns"]
                 .as_array()
@@ -620,6 +640,12 @@ impl Surface {
                     .as_ref()
                     .map(|table| table.view.has_focus() || table.view.focus_child().is_some())
                     .unwrap_or(false)
+                || e.chart
+                    .as_ref()
+                    .map(|chart| {
+                        chart.data.view.has_focus() || chart.data.view.focus_child().is_some()
+                    })
+                    .unwrap_or(false)
                 || e.list
                     .as_ref()
                     .map(|list| list.view.has_focus() || list.view.focus_child().is_some())
@@ -834,9 +860,21 @@ impl Surface {
                     }
                 }
                 e.applying.set(true);
+                if let Some(chart) = e.chart.as_mut() {
+                    let points =
+                        serde_json::from_value::<Vec<ui::ChartPoint>>(props["points"].clone())
+                            .unwrap();
+                    let _ = chart.update(props["label"].as_str().unwrap(), &points);
+                }
+                if let Some(rich) = &e.rich {
+                    let runs =
+                        serde_json::from_value::<Vec<ui::RichRun>>(props["runs"].clone()).unwrap();
+                    let _ = rich.reconcile(&runs);
+                }
                 if let Some(label) = &e.label {
-                    if e.kind == "Status@1"
-                        || (!label.has_focus() && label.selection_bounds().is_none())
+                    if e.rich.is_none()
+                        && (e.kind == "Status@1"
+                            || (!label.has_focus() && label.selection_bounds().is_none()))
                     {
                         let text = if e.kind == "Status@1" {
                             bound(id, &props["value"], frame)

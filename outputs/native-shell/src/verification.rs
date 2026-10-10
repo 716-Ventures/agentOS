@@ -210,6 +210,32 @@ fn verify_container_replacement(
             .any(|(surface, _)| surface == id),
         "Programmatic reconciliation must not create edits"
     );
+    doc["revision"] = json!(14);
+    doc["elements"]["root"]["slots"]["children"] =
+        json!(["a", "choice", "toggle", "rich", "chart"]);
+    doc["elements"]["rich"] = json!({"type":"RichText@1","props":{"runs":[{"text":"Literal <b>日本語</b>","style":"strong"}]}});
+    doc["elements"]["chart"] = json!({"type":"Chart@1","props":{"label":"Comparison","points":[{"id":"loss","label":"Loss","value":-2.5},{"id":"gain","label":"Gain","value":7.0}]}});
+    surface.update(id, &doc, frame, commands, drafts);
+    assert_eq!(
+        surface.elements["rich"].label.as_ref().unwrap().text(),
+        "Literal <b>日本語</b>"
+    );
+    let chart = surface.elements["chart"].chart.as_ref().unwrap();
+    assert_eq!(chart.data.row_count(), 2);
+    assert!(chart.data.select_key("gain"));
+    doc["revision"] = json!(15);
+    doc["elements"]["chart"]["props"]["points"] = json!([{"id":"gain","label":"Gain updated","value":8.0},{"id":"loss","label":"Loss","value":-2.5}]);
+    surface.update(id, &doc, frame, commands, drafts);
+    assert_eq!(
+        surface.elements["chart"]
+            .chart
+            .as_ref()
+            .unwrap()
+            .data
+            .selected_key()
+            .as_deref(),
+        Some("gain")
+    );
     surface.window.destroy();
 }
 pub fn run(socket: PathBuf, capture: Option<String>) {

@@ -55,6 +55,12 @@ class Projection(unittest.TestCase):
             self.assertEqual(next(fields['draft'] for op,fields in calls if op=='draft.save'),value)
             self.assertEqual(sum(op=='presentation.apply' for op,_ in calls),1)
             with self.assertRaises(ValueError):view.edit(request,doc,'field',lambda _:'unknown',lambda _:None)
+    def test_rich_text_and_charts_keep_exact_inert_terminal_alternatives(self):
+        doc=document();doc['elements']['rich']={'type':'RichText@1','props':{'runs':[{'text':'<b>日本語</b>','style':'strong'},{'text':' λ','style':'emphasis'}]}}
+        doc['elements']['chart']={'type':'Chart@1','props':{'label':'Comparison','points':[{'id':'a','label':'Loss','value':-2.5},{'id':'b','label':'Gain','value':7}]}}
+        doc['elements']['root']['slots']['children']+=['rich','chart'];lines,controls=view.project(doc);text='\n'.join(lines)
+        self.assertIn('<b>日本語</b> λ',text);self.assertIn('Loss: -2.5',text);self.assertIn('Gain: 7',text)
+        self.assertNotIn('rich',controls);self.assertNotIn('chart',controls)
     def test_completed_multiline_input_survives_interruption(self):
         doc=document();doc['elements']['field']['props']['multiline']=True;calls=[]
         def request(op,**fields):calls.append(op);return {'draft_revision':0,'draft':None}
