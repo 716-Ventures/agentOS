@@ -32,6 +32,13 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             assert_eq!(reading.text(),"Native café · 日本語 · select this text");
             assert_eq!(surface.elements["status"].label.as_ref().unwrap().text(),"running");
             println!("CHECK: selection and live binding preserved");
+            doc["elements"]["progress"]["props"]["value"]=json!({"binding":"numeric"});
+            frame.bindings.get_mut("native-fixture").unwrap()["bindings"]["numeric"]=json!({"availability":"available","value":2});
+            surface.update("native-fixture",&doc,&frame,&commands,&drafts);
+            let progress=surface.elements["progress"].progress.as_ref().unwrap();assert_eq!(progress.fraction(),0.0);assert_eq!(progress.text().as_deref(),Some("Source unavailable"));
+            frame.bindings.get_mut("native-fixture").unwrap()["bindings"]["numeric"]["value"]=json!(0.5);
+            surface.update("native-fixture",&doc,&frame,&commands,&drafts);assert_eq!(surface.elements["progress"].progress.as_ref().unwrap().fraction(),0.5);
+            println!("CHECK: typed numeric progress and invalid-range availability");
             reading.select_region(0,0);field.entry.grab_focus();field.entry.set_text("Unsaved λ 日本語");
             assert_eq!(drafts.lock().unwrap()[&("native-fixture".into(),"field".into())].text,"Unsaved λ 日本語");
             surface.update("native-fixture",&doc,&frame,&commands,&drafts);assert_eq!(field.entry.text(),"Unsaved λ 日本語");

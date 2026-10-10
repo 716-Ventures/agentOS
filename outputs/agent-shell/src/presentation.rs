@@ -332,7 +332,7 @@ fn walk_elements(
                 .ok_or_else(|| error("missing_reference", name))?;
             let source_type = match bound.path.as_str() {
                 "/status" | "/error" | "/title" | "/app_id" | "/availability" => "string",
-                _ => "integer",
+                _ => "number",
             };
             if spec.as_str() != Some(source_type) {
                 return Err(invalid(
@@ -1843,6 +1843,18 @@ mod tests {
             assert!(handle(&mut db, &request, &human()).is_err(), "case {case}");
             assert_eq!(snapshot(&db).unwrap()["documents"], json!({}));
         }
+    }
+    #[test]
+    fn numeric_bindings_use_the_released_catalog_number_type() {
+        let mut db = fixture();
+        let mut doc = surface();
+        doc["elements"]["text"] = json!({"type":"Progress@1","props":{"label":"Observed fraction","value":{"binding":"number"}}});
+        doc["bindings"]["number"] = json!({"source":"job:1","path":"/exit_code","access":"read"});
+        let create = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"numeric-binding","expected_revisions":{"surface-a":null},"operations":[{"op":"surface.create","document":doc}]});
+        let mut bad = create.clone();
+        bad["operations"][0]["document"]["bindings"]["number"]["path"] = json!("/status");
+        assert!(handle(&mut db, &bad, &human()).is_err());
+        assert!(handle(&mut db, &create, &human()).is_ok());
     }
     #[test]
     fn typed_source_bindings_are_live_and_cross_activity_access_is_rejected() {

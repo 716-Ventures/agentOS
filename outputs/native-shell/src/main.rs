@@ -568,8 +568,11 @@ impl Surface {
                 if let Some(progress) = &e.progress {
                     let value = bound(id, &props["value"], frame);
                     progress.set_text(Some(props["label"].as_str().unwrap_or("Work")));
-                    if let Some(value) = value.as_f64() {
-                        progress.set_fraction(value.clamp(0.0, 1.0));
+                    if let Some(value) = value
+                        .as_f64()
+                        .filter(|n| n.is_finite() && (0.0..=1.0).contains(n))
+                    {
+                        progress.set_fraction(value);
                     } else {
                         progress.set_text(Some("Source unavailable"));
                         progress.set_fraction(0.0);
