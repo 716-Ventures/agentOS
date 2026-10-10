@@ -1,5 +1,6 @@
 //! Native shell client: stable GTK controls over the core's inert presentation API.
 mod transport;
+mod verification;
 use gtk::{glib, prelude::*};
 use serde_json::{json, Value};
 use seven_sixteen_ui::{self as ui, gtk, Appearance, ButtonVariant, InputEvent, TextField};
@@ -435,6 +436,10 @@ fn main() {
     };
     let socket =
         PathBuf::from(option("--socket").unwrap_or_else(|| "/run/agent-os/runtime.sock".into()));
+    if args.iter().any(|a| a == "--self-test") {
+        verification::run(socket, option("--capture"));
+        return;
+    }
     let backend = Rc::new(RefCell::new(Backend::start(socket, option("--activity"))));
     let app = gtk::Application::builder()
         .application_id("com.agentos.Desktop")

@@ -17,3 +17,6 @@ node_modules/
 /outputs/agent-shell/models-*.png
 /outputs/agent-shell/models-*.txt
 /outputs/vm-foundation/verification.json
+
+outputs/native-shell/target/
+outputs/native-shell/test-output/
