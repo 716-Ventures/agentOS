@@ -202,9 +202,14 @@ def edit(request,document,element,input_fn=input,output=print):
 
 def interact(activity,request,input_fn=input,output=print):
     """Ordinary terminal controls explicitly separated from agent/command input."""
-    selected=None;offset=0
+    selected=None;offset=0;ensured=set()
     while True:
         try:
+            jobs=[job['id'] for job in request('snapshot').get('jobs',[]) if str(job.get('activity_id'))==str(activity) and job['id'] not in ensured][:64]
+            if jobs:
+                request('action.ensure',activity_id=int(activity),job_ids=jobs)
+                if len(ensured)>4096:ensured.clear()
+                ensured.update(jobs)
             documents={key:doc for key,doc in presentation_pages.read(request,activity,metadata=False)['documents'].items() if doc.get('surface_id') and doc['activity_id']==str(activity)}
             output('\nShared views — activity '+str(activity))
             if selected not in documents:

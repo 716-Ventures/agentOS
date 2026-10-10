@@ -15,7 +15,7 @@ class PresentationClientTests(unittest.TestCase):
                 {'op':'surface.replace','document':{'surface_id':'foreign','activity_id':'1'}},
             ):
                 with self.assertRaises(ValueError):client.apply_for_activity(1,{'op':'presentation.apply','operations':[operation]})
-            self.assertTrue(all(c.args in (('presentation.page',),('presentation.metadata',),('source.list',)) for c in request.call_args_list))
+            self.assertTrue(all(c.args in (('presentation.page',),('presentation.metadata',),('source.list',),('action.list',)) for c in request.call_args_list))
     def test_scoped_snapshot_and_valid_forwarding(self):
         state={'documents':{'allowed':{'activity_id':'1'},'foreign':{'activity_id':'2'}},'event_cursor':4,'host_surfaces':{'local':{'activity_id':'1'},'foreign':{'activity_id':'2'}},'renderers':{'allowed':{'uid':1000},'foreign':{'uid':1000}}}
         with patch.object(client,'request',return_value=state):

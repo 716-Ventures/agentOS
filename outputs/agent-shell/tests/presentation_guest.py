@@ -97,9 +97,15 @@ def main():
             deadline=time.monotonic()+5
             while next(j for j in ok({'op':'snapshot'})['jobs'] if j['id']==output_job)['status']!='succeeded':
                 assert time.monotonic()<deadline;time.sleep(.02)
-            output_action=ok({'op':'action.issue','activity_id':activity,'job_id':output_job,'operation':'job.read_output'})
+            defaults=ok({'op':'action.ensure','activity_id':activity,'job_ids':[output_job]})
+            assert ok({'op':'action.ensure','activity_id':activity,'job_ids':[output_job]})==defaults
+            output_action=next(action for action in defaults['actions'] if action['operation']=='job.read_output')
+            discovery=other({'op':'action.list','activity_id':str(activity)},agent=True)
+            assert discovery['ok'] and any(action['reference']==output_action['reference'] for action in discovery['result']['actions'])
+            assert not other({'op':'action.ensure','activity_id':activity,'job_ids':[output_job]},agent=True)['ok']
             form={'protocol':PROTOCOL,'catalog_revision':CATALOG,'surface_id':'output-form','activity_id':str(activity),'revision':0,'title':'Paged callback form','root':'root','elements':{'root':{'type':'Stack@1','props':{},'slots':{'children':['offset','read']}},'offset':{'type':'TextField@1','props':{'label':'Byte offset','value':'0'},'events':{'submit':{'action':'read'}}},'read':{'type':'Button@1','props':{'label':'Read output'},'events':{'activate':{'action':'read'}}}},'bindings':{},'actions':{'read':{'ref':output_action['reference'],'parameters':{'offset':{'kind':'field','element_id':'offset'}}}}}
-            ok({'op':'presentation.apply','protocol':PROTOCOL,'catalog_revision':CATALOG,'request_id':'create-output-form','expected_revisions':{'output-form':None},'operations':[{'op':'surface.create','document':form}]})
+            composed=other({'op':'presentation.apply','protocol':PROTOCOL,'catalog_revision':CATALOG,'request_id':'create-output-form','expected_revisions':{'output-form':None},'operations':[{'op':'surface.create','document':form}]},agent=True)
+            assert composed['ok'],composed
             output_action=ok({'op':'action.metadata','reference':output_action['reference']})
             read={'op':'action.invoke','reference':output_action['reference'],'request_id':'read-output-form','expected_source_revision':output_action['source_revision'],'surface_id':'output-form','expected_surface_revision':0,'action_id':'read','parameters':{'offset':0}}
             receipt=ok(read);assert receipt['status']=='succeeded' and receipt['observed_target']['text']=='Callback λ 日本語\n',receipt
@@ -133,6 +139,10 @@ def main():
             single=ok({'op':'presentation.get','document_id':'paged-069','activity_id':str(activity)})
             assert single['surface_id']=='paged-069'
             print('PASS: real IPC collection paging, journal consistency, single-document reads and 70-view assembly')
+            ok({'op':'action.revoke','reference':output_action['reference']})
+            retained=ok({'op':'action.ensure','activity_id':activity,'job_ids':[output_job]})
+            assert next(action for action in retained['actions'] if action['reference']==output_action['reference'])['revoked']
+            print('PASS: host callback defaults, model discovery/composition, human-only invocation and retained revocation')
             print('PASS: terminal shared projection, lease-owned edit/commit and actual opaque output callback')
             print('PASS: typed edited callback parameters, actual bounded Unicode output, idempotency and stale-form rejection')
             print('PASS: host-issued stop action, actual process cancellation, idempotent callback receipt, forged actor rejection, revocation')

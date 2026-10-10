@@ -37,6 +37,13 @@ struct Issue {
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
+struct Ensure {
+    op: String,
+    activity_id: i64,
+    job_ids: Vec<i64>,
+}
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct Invoke {
     op: String,
     reference: String,
@@ -61,6 +68,7 @@ pub enum Prepared {
 
 pub fn init(db: &Connection) -> Result<()> {
     db.execute_batch("CREATE TABLE IF NOT EXISTS presentation_action_targets(reference TEXT PRIMARY KEY,operation TEXT NOT NULL,job INTEGER NOT NULL);
+        CREATE TABLE IF NOT EXISTS presentation_action_defaults(uid INTEGER NOT NULL,job INTEGER NOT NULL,operation TEXT NOT NULL,reference TEXT NOT NULL,PRIMARY KEY(uid,job,operation));
         CREATE TABLE IF NOT EXISTS presentation_action_invocations(uid INTEGER NOT NULL,request TEXT NOT NULL,payload TEXT NOT NULL,reference TEXT NOT NULL,job INTEGER NOT NULL,operation TEXT NOT NULL,receipt TEXT NOT NULL,PRIMARY KEY(uid,request));").map_err(storage)?;
     // A lost in-flight response is reconciled from observed target state, never replayed.
     let mut q = db
@@ -113,6 +121,11 @@ pub fn metadata(db: &Connection, reference: &str) -> Result<Value> {
         "source_revision":revision,"parameter_schema":parameter_schema(&operation),"observed_target":source}),
     )
 }
+fn discovery(db: &Connection, reference: &str) -> Result<Value> {
+    let mut value = metadata(db, reference)?;
+    value.as_object_mut().unwrap().remove("observed_target");
+    Ok(value)
+}
 pub fn parameter_schema(operation: &str) -> Value {
     if operation == "job.read_output" {
         json!({"offset":{"type":"integer","minimum":0,"maximum":1048676}})
@@ -146,6 +159,100 @@ pub fn validate_parameters(
 }
 pub fn handle(db: &mut Connection, value: &Value, who: &Principal) -> Result<Value> {
     match value["op"].as_str().unwrap_or("") {
+        "action.ensure" => {
+            human(who)?;
+            let req: Ensure =
+                serde_json::from_value(value.clone()).map_err(|e| error("invalid_event", e))?;
+            if req.op != "action.ensure"
+                || req.job_ids.len() > 64
+                || req.activity_id <= 0
+                || req.job_ids.iter().any(|id| *id <= 0)
+            {
+                return Err(error(
+                    "resource_limit",
+                    "At most 64 valid job identities are accepted",
+                ));
+            }
+            let active:bool=db.query_row("SELECT EXISTS(SELECT 1 FROM activities WHERE id=? AND id NOT IN(SELECT activity_id FROM removed_activities))",[req.activity_id],|r|r.get(0)).map_err(storage)?;
+            if !active {
+                return Err(error("missing_reference", "Activity unavailable"));
+            }
+            let jobs = req
+                .job_ids
+                .into_iter()
+                .collect::<std::collections::BTreeSet<_>>();
+            for id in &jobs {
+                if job(db, *id)?["activity_id"] != req.activity_id {
+                    return Err(error("unauthorized", "Target is in another activity"));
+                }
+            }
+            let tx = db.transaction().map_err(storage)?;
+            let mut actions = Vec::new();
+            for job in jobs {
+                for operation in ["job.inspect", "job.cancel", "job.read_output"] {
+                    let previous:Option<String>=tx.query_row("SELECT reference FROM presentation_action_defaults WHERE uid=? AND job=? AND operation=?",params![who.uid,job,operation],|r|r.get(0)).optional().map_err(storage)?;
+                    let reference = if let Some(reference) = previous {
+                        reference
+                    } else {
+                        let id: i64 = tx
+                            .query_row(
+                                "SELECT COALESCE(MAX(rowid),0)+1 FROM presentation_actions",
+                                [],
+                                |r| r.get(0),
+                            )
+                            .map_err(storage)?;
+                        let reference = format!("action:{id}");
+                        tx.execute(
+                            "INSERT INTO presentation_actions VALUES(?,?,?,0)",
+                            params![reference, who.uid, req.activity_id.to_string()],
+                        )
+                        .map_err(storage)?;
+                        tx.execute(
+                            "INSERT INTO presentation_action_targets VALUES(?,?,?)",
+                            params![reference, operation, job],
+                        )
+                        .map_err(storage)?;
+                        tx.execute(
+                            "INSERT INTO presentation_action_defaults VALUES(?,?,?,?)",
+                            params![who.uid, job, operation, reference],
+                        )
+                        .map_err(storage)?;
+                        reference
+                    };
+                    actions.push(discovery(&tx, &reference)?);
+                }
+            }
+            tx.commit().map_err(storage)?;
+            Ok(json!({"actions":actions}))
+        }
+        "action.list" => {
+            let activity = value["activity_id"]
+                .as_str()
+                .filter(|s| s.parse::<i64>().is_ok_and(|n| n > 0))
+                .ok_or_else(|| error("invalid_event", "Activity identity required"))?;
+            let after = value["after"].as_str().unwrap_or("");
+            let limit = value
+                .get("limit")
+                .map(|v| v.as_u64().filter(|n| (1..=128).contains(n)))
+                .unwrap_or(Some(32))
+                .ok_or_else(|| error("invalid_event", "Page size must be between 1 and 128"))?;
+            let mut q=db.prepare("SELECT reference FROM presentation_actions WHERE activity=? AND reference>? ORDER BY reference LIMIT ?").map_err(storage)?;
+            let mut refs = q
+                .query_map(params![activity, after, limit + 1], |r| {
+                    r.get::<_, String>(0)
+                })
+                .map_err(storage)?
+                .collect::<std::result::Result<Vec<_>, _>>()
+                .map_err(storage)?;
+            let more = refs.len() > limit as usize;
+            refs.truncate(limit as usize);
+            let next = if more { refs.last().cloned() } else { None };
+            let actions = refs
+                .iter()
+                .map(|reference| discovery(db, reference))
+                .collect::<Result<Vec<_>>>()?;
+            Ok(json!({"actions":actions,"next":next}))
+        }
         "action.issue" => {
             human(who)?;
             let req: Issue =
@@ -416,6 +523,69 @@ mod tests {
     }
     fn invoke(info: &Value, key: &str) -> Value {
         json!({"op":"action.invoke","reference":info["reference"],"request_id":key,"expected_source_revision":info["source_revision"]})
+    }
+    #[test]
+    fn defaults_are_stable_user_scoped_discoverable_and_keep_revocation() {
+        let mut db = fixture();
+        let agent = Principal {
+            uid: 999,
+            session: "model".into(),
+        };
+        let ensure = json!({"op":"action.ensure","activity_id":1,"job_ids":[1,1]});
+        assert!(handle(&mut db, &ensure, &agent).is_err());
+        let first = handle(&mut db, &ensure, &human()).unwrap();
+        assert_eq!(first["actions"].as_array().unwrap().len(), 3);
+        assert_eq!(first, handle(&mut db, &ensure, &human()).unwrap());
+        let listed = handle(
+            &mut db,
+            &json!({"op":"action.list","activity_id":"1","limit":2}),
+            &agent,
+        )
+        .unwrap();
+        assert_eq!(listed["actions"].as_array().unwrap().len(), 2);
+        assert!(listed["actions"][0].get("observed_target").is_none());
+        let last = handle(
+            &mut db,
+            &json!({"op":"action.list","activity_id":"1","limit":2,"after":listed["next"]}),
+            &agent,
+        )
+        .unwrap();
+        assert_eq!(last["actions"].as_array().unwrap().len(), 1);
+        assert!(last["next"].is_null());
+        let reference = first["actions"][0]["reference"].clone();
+        handle(
+            &mut db,
+            &json!({"op":"action.revoke","reference":reference}),
+            &human(),
+        )
+        .unwrap();
+        let retained = handle(&mut db, &ensure, &human()).unwrap();
+        assert_eq!(retained["actions"][0]["reference"], reference);
+        assert_eq!(retained["actions"][0]["revoked"], true);
+        let other = Principal {
+            uid: 1001,
+            session: "another-human".into(),
+        };
+        let separate = handle(&mut db, &ensure, &other).unwrap();
+        assert_ne!(separate["actions"][0]["reference"], reference);
+        let count: i64 = db
+            .query_row(
+                "SELECT COUNT(*) FROM presentation_action_invocations",
+                [],
+                |r| r.get(0),
+            )
+            .unwrap();
+        assert_eq!(count, 0);
+        let invalid = json!({"op":"action.ensure","activity_id":1,"job_ids":[1,999]});
+        assert!(handle(&mut db, &invalid, &human()).is_err());
+        let count: i64 = db
+            .query_row(
+                "SELECT COUNT(*) FROM presentation_action_defaults",
+                [],
+                |r| r.get(0),
+            )
+            .unwrap();
+        assert_eq!(count, 6);
     }
     #[test]
     fn only_core_issued_scoped_callbacks_are_available() {

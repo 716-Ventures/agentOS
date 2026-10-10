@@ -191,6 +191,7 @@ fn run(
     let mut leases = BTreeMap::<(String, String), Instant>::new();
     let mut last = Instant::now() - Duration::from_secs(1);
     let mut shown_activity = None::<String>;
+    let mut ensured = std::collections::BTreeSet::<i64>::new();
     let mut recovered = drafts.lock().unwrap().keys().cloned().collect::<Vec<_>>();
     let mut saved_cache = Vec::new();
     let approval_pending = Arc::new(AtomicBool::new(false));
@@ -434,6 +435,30 @@ fn run(
                     }
                 }
                 next.activity = activity.clone();
+                if let Some(id) = activity.as_ref().and_then(|id| id.parse::<i64>().ok()) {
+                    let jobs = next.core["jobs"]
+                        .as_array()
+                        .into_iter()
+                        .flatten()
+                        .filter(|job| job["activity_id"].as_i64() == Some(id))
+                        .filter_map(|job| job["id"].as_i64())
+                        .filter(|id| !ensured.contains(id))
+                        .take(64)
+                        .collect::<Vec<_>>();
+                    if !jobs.is_empty() && !stop.load(Ordering::Relaxed) {
+                        if request(
+                            &socket,
+                            &json!({"op":"action.ensure","activity_id":id,"job_ids":jobs}),
+                        )
+                        .is_ok()
+                        {
+                            if ensured.len() > 4096 {
+                                ensured.clear();
+                            }
+                            ensured.extend(jobs);
+                        }
+                    }
+                }
                 if let Some(documents) = state["documents"].as_object() {
                     for (id, doc) in documents {
                         if stop.load(Ordering::Relaxed) {
