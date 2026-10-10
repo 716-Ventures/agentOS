@@ -145,6 +145,26 @@ def main():
             assert len(paged['documents'])==72 and paged['documents']==ok({'op':'presentation.snapshot'})['documents']
             single=ok({'op':'presentation.get','document_id':'paged-069','activity_id':str(activity)})
             assert single['surface_id']=='paged-069'
+            cache=presentation_view.presentation_pages.Cache()
+            cache.read(terminal_request,activity)
+            ok({'op':'presentation.apply','protocol':PROTOCOL,'catalog_revision':CATALOG,'request_id':'incremental-edit','expected_revisions':{'paged-069':0},'operations':[{'op':'element.set_props','surface_id':'paged-069','element_id':'offset','props':{'label':'Byte offset','value':'8'}}]})
+            transfers=[]
+            def incremental_request(op,**fields):
+                transfers.append((op,fields))
+                return terminal_request(op,**fields)
+            incremental=cache.read(incremental_request,activity)
+            assert incremental['documents']==ok({'op':'presentation.snapshot'})['documents']
+            assert [fields['document_id'] for op,fields in transfers if op=='presentation.get']==['paged-069']
+            assert not any(op=='presentation.page' for op,_ in transfers)
+            ok({'op':'presentation.apply','protocol':PROTOCOL,'catalog_revision':CATALOG,'request_id':'incremental-close','expected_revisions':{'paged-068':0},'operations':[{'op':'surface.close','surface_id':'paged-068'}]})
+            transfers.clear();incremental=cache.read(incremental_request,activity)
+            assert 'paged-068' not in incremental['documents']
+            assert not any(op=='presentation.get' for op,_ in transfers)
+            stop(proc);proc=None;Path(endpoint).unlink(missing_ok=True);proc=start()
+            transfers.clear();incremental=cache.read(incremental_request,activity)
+            assert incremental['documents']==ok({'op':'presentation.snapshot'})['documents']
+            assert not any(op in ('presentation.get','presentation.page') for op,_ in transfers)
+            print('PASS: incremental IPC fetches one edited document, tombstones close without bodies, and cache survives core restart')
             print('PASS: real IPC collection paging, journal consistency, single-document reads and 70-view assembly')
             ok({'op':'action.revoke','reference':output_action['reference']})
             retained=ok({'op':'action.ensure','activity_id':activity,'job_ids':[output_job]})

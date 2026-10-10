@@ -205,6 +205,7 @@ def edit(request,document,element,input_fn=input,output=print):
 def interact(activity,request,input_fn=input,output=print):
     """Ordinary terminal controls explicitly separated from agent/command input."""
     selected=None;offset=0;ensured=set();ensured_sources=set();source_after=""
+    document_cache=presentation_pages.Cache()
     while True:
         try:
             jobs=[job['id'] for job in request('snapshot').get('jobs',[]) if str(job.get('activity_id'))==str(activity) and job['id'] not in ensured][:64]
@@ -219,7 +220,7 @@ def interact(activity,request,input_fn=input,output=print):
                 if len(ensured_sources)>4096:ensured_sources.clear()
                 ensured_sources.update(sources)
             source_after=page.get('next','') if page.get('has_more') else ''
-            documents={key:doc for key,doc in presentation_pages.read(request,activity,metadata=False)['documents'].items() if doc.get('surface_id') and doc['activity_id']==str(activity)}
+            documents={key:doc for key,doc in document_cache.read(request,activity,metadata=False)['documents'].items() if doc.get('surface_id') and doc['activity_id']==str(activity)}
             output('\nShared views — activity '+str(activity))
             if selected not in documents:
                 selected=None

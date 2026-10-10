@@ -35,4 +35,34 @@ class Pages(unittest.TestCase):
         self.assertEqual(len(calls),1)
         with self.assertRaisesRegex(RuntimeError,'cursor'):pages.read(lambda *_a,**_k:{'event_cursor':0,'documents':{},'next_after_id':''})
 
+
+
+class Incremental(unittest.TestCase):
+    def test_changed_documents_tombstones_and_unchanged_refresh(self):
+        cache=pages.Cache();cache.scope='1';cache.state={'event_cursor':1,'documents':{'a':{'revision':0},'gone':{}}}
+        calls=[]
+        def request(op,**fields):
+            calls.append(op)
+            if op=='presentation.changes':return {'events':[{'event_cursor':2,'revisions':{'a':1,'gone':None}}],'latest_cursor':2,'next_cursor':2,'has_more':False}
+            if op=='presentation.get':
+                self.assertEqual(fields,{'document_id':'a','expected_cursor':2,'activity_id':'1'})
+                return {'revision':1}
+            if op=='presentation.metadata':return {'event_cursor':2}
+            self.fail('Unexpected full scan')
+        self.assertEqual(cache.read(request,1)['documents'],{'a':{'revision':1}})
+        self.assertEqual(calls,['presentation.changes','presentation.get','presentation.metadata'])
+        def unchanged(op,**fields):
+            if op=='presentation.changes':return {'events':[],'latest_cursor':2,'next_cursor':2,'has_more':False}
+            self.fail('Unchanged document fetched')
+        self.assertEqual(cache.read(unchanged,1,metadata=False)['documents'],{'a':{'revision':1}})
+
+    def test_incomplete_refresh_never_overwrites_a_consistent_cache(self):
+        cache=pages.Cache();cache.state={'event_cursor':1,'documents':{'a':{}}}
+        old=cache.state.copy()
+        with self.assertRaisesRegex(RuntimeError,'cancelled'):
+            cache.read(lambda *args,**kw:self.fail('Cancelled request'),stopped=lambda:True)
+        with self.assertRaisesRegex(RuntimeError,'continuation'):
+            cache.read(lambda *args,**kw:{'events':[],'latest_cursor':2,'next_cursor':1,'has_more':True})
+        self.assertEqual(cache.state,old)
+
 if __name__=='__main__':unittest.main()

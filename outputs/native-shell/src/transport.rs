@@ -190,6 +190,7 @@ fn run(
     drafts: Arc<Mutex<BTreeMap<(String, String), Draft>>>,
     stop: Arc<AtomicBool>,
 ) {
+    let mut presentation_cache = super::presentation_pages::Cache::default();
     let mut output_view = None::<super::log_view::LogView>;
     let mut leases = BTreeMap::<(String, String), Instant>::new();
     let mut last = Instant::now() - Duration::from_secs(1);
@@ -423,7 +424,7 @@ fn run(
             .is_err()
         });
         flush(&socket, &drafts, &frame, &stop);
-        match super::presentation_pages::read(
+        match presentation_cache.read(
             |value| request(&socket, value),
             activity.as_deref(),
             || stop.load(Ordering::Relaxed),

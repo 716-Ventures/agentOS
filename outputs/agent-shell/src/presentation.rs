@@ -913,7 +913,90 @@ fn metadata(db: &Connection, value: &Value) -> Result<Value> {
     }
     Ok(state)
 }
+/// A bounded invalidation journal. Revisions include null tombstones for removals;
+/// document bodies are fetched separately against the same journal cursor.
+fn changes(db: &Connection, value: &Value) -> Result<Value> {
+    let after = match value.get("after_cursor") {
+        None => 0,
+        Some(v) => v
+            .as_i64()
+            .filter(|n| *n >= 0)
+            .ok_or_else(|| invalid("Invalid journal cursor"))?,
+    };
+    let limit = match value.get("limit") {
+        None => 64,
+        Some(v) => v
+            .as_u64()
+            .filter(|n| (1..=128).contains(n))
+            .ok_or_else(|| invalid("Invalid journal page size"))?,
+    };
+    let latest: i64 = db
+        .query_row(
+            "SELECT COALESCE(MAX(cursor),0) FROM presentation_events",
+            [],
+            |r| r.get(0),
+        )
+        .map_err(db_error)?;
+    if after > latest
+        || value
+            .get("expected_cursor")
+            .is_some_and(|v| v.as_i64() != Some(latest))
+    {
+        return Err(error("resync_required", "Presentation journal changed"));
+    }
+    let mut query = db
+        .prepare(
+            "SELECT cursor,receipt FROM presentation_events WHERE cursor>? ORDER BY cursor LIMIT ?",
+        )
+        .map_err(db_error)?;
+    let rows = query
+        .query_map(params![after, limit + 1], |r| {
+            Ok((r.get::<_, i64>(0)?, r.get::<_, String>(1)?))
+        })
+        .map_err(db_error)?;
+    let mut events = Vec::new();
+    let mut bytes = 256;
+    let mut next = after;
+    let mut more = false;
+    for row in rows {
+        let (cursor, raw) = row.map_err(db_error)?;
+        let receipt: Value = serde_json::from_str(&raw).map_err(db_error)?;
+        let event = json!({"event_cursor":cursor,"revisions":receipt["revisions"]});
+        let size = event.to_string().len() + 1;
+        if events.len() >= limit as usize || bytes + size > 512 * 1024 {
+            if events.is_empty() {
+                return Err(error(
+                    "resource_limit",
+                    "Journal record exceeds page budget",
+                ));
+            }
+            more = true;
+            break;
+        }
+        bytes += size;
+        next = cursor;
+        events.push(event);
+    }
+    Ok(
+        json!({"protocol":PROTOCOL,"events":events,"latest_cursor":latest,"next_cursor":next,"has_more":more}),
+    )
+}
 fn get_document(db: &Connection, value: &Value) -> Result<Value> {
+    if let Some(expected) = value.get("expected_cursor") {
+        let latest: i64 = db
+            .query_row(
+                "SELECT COALESCE(MAX(cursor),0) FROM presentation_events",
+                [],
+                |r| r.get(0),
+            )
+            .map_err(db_error)?;
+        if expected.as_i64() != Some(latest) {
+            return Err(error(
+                "resync_required",
+                "Presentation changed before document read",
+            ));
+        }
+    }
     let id = value["document_id"]
         .as_str()
         .filter(|id| ident(id))
@@ -1432,6 +1515,7 @@ pub fn handle(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> 
         "presentation.page" => page(db, v),
         "presentation.metadata" => metadata(db, v),
         "presentation.get" => get_document(db, v),
+        "presentation.changes" => changes(db, v),
         "presentation.apply" => apply(db, v, who),
         "presentation.subscribe" => {
             let cursor = v["after_cursor"].as_i64().unwrap_or(0);
@@ -2141,6 +2225,67 @@ mod tests {
             snapshot(&db).unwrap()["documents"]["surface-a"]["revision"],
             0
         );
+    }
+    #[test]
+    fn compact_change_pages_preserve_tombstones_and_guard_document_reads() {
+        let mut db = fixture();
+        create(&mut db);
+        handle(
+            &mut db,
+            &props("compact-edit", 0, "text", "Private body"),
+            &human(),
+        )
+        .unwrap();
+        let first = changes(&db, &json!({"after_cursor":0,"limit":1})).unwrap();
+        assert_eq!(first["latest_cursor"], 2);
+        assert_eq!(first["next_cursor"], 1);
+        assert_eq!(first["has_more"], true);
+        assert_eq!(first["events"][0]["revisions"]["surface-a"], 0);
+        assert!(!first.to_string().contains("Private body"));
+        let second = changes(&db, &json!({"after_cursor":1,"expected_cursor":2})).unwrap();
+        assert_eq!(second["events"][0]["revisions"]["surface-a"], 1);
+        assert_eq!(second["next_cursor"], 2);
+        assert_eq!(second["has_more"], false);
+        assert!(
+            get_document(&db, &json!({"document_id":"surface-a","expected_cursor":1}))
+                .unwrap_err()
+                .contains("resync_required")
+        );
+        assert_eq!(
+            get_document(&db, &json!({"document_id":"surface-a","expected_cursor":2})).unwrap()
+                ["revision"],
+            1
+        );
+        db.execute("INSERT INTO presentation_events(uid,request,before_state,after_state,receipt) VALUES(0,'deleted','{}','{}',?)",[json!({"revisions":{"surface-a":null}}).to_string()]).unwrap();
+        let removed = changes(&db, &json!({"after_cursor":2})).unwrap();
+        assert!(removed["events"][0]["revisions"]
+            .get("surface-a")
+            .unwrap()
+            .is_null());
+        assert!(changes(&db, &json!({"after_cursor":1,"expected_cursor":2}))
+            .unwrap_err()
+            .contains("resync_required"));
+        assert!(changes(&db, &json!({"after_cursor":99}))
+            .unwrap_err()
+            .contains("resync_required"));
+        for value in [
+            json!({"after_cursor":-1}),
+            json!({"after_cursor":true}),
+            json!({"limit":129}),
+        ] {
+            assert!(changes(&db, &value).is_err());
+        }
+        // Large receipts must split even when the requested item count would fit.
+        let revisions: BTreeMap<_, _> = (0..128)
+            .map(|i| (format!("{}-{i}", "x".repeat(250)), json!(i)))
+            .collect();
+        for i in 0..32 {
+            db.execute("INSERT INTO presentation_events(uid,request,before_state,after_state,receipt) VALUES(0,?,'{}','{}',?)",params![format!("large-{i}"),json!({"revisions":revisions}).to_string()]).unwrap();
+        }
+        let large = changes(&db, &json!({"after_cursor":3,"limit":128})).unwrap();
+        assert!(large.to_string().len() <= 512 * 1024);
+        assert_eq!(large["has_more"], true);
+        assert!(large["events"].as_array().unwrap().len() < 32);
     }
     #[test]
     fn ordered_subscription_and_reopen_preserve_receipts() {
