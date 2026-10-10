@@ -65,6 +65,29 @@ def main():
             events=ok({'op':'presentation.subscribe','after_cursor':1});assert events['events'][0]['event_cursor']==2
             undone=ok({'op':'presentation.undo','event_cursor':2,'request_id':'undo'});assert undone['revisions']['surface-fixture']==2
             assert ok({'op':'presentation.snapshot'})['documents']['surface-fixture']['elements']['text']['props']['text']=='Original'
+            job=ok({'op':'run','activity_id':activity,'argv':['/bin/sleep','30']})['id']
+            deadline=time.monotonic()+5
+            while True:
+                observed=next(j for j in ok({'op':'snapshot'})['jobs'] if j['id']==job)
+                if observed['status']=='running':break
+                assert time.monotonic()<deadline;time.sleep(.02)
+            action=ok({'op':'action.issue','activity_id':activity,'job_id':job,'operation':'job.cancel'})
+            invocation={'op':'action.invoke','reference':action['reference'],'request_id':'stop-click','expected_source_revision':action['source_revision']}
+            first=ok(invocation);assert ok(invocation)==first
+            forged=other({**invocation,'request_id':'forged-click'},agent=True)
+            assert not forged['ok'] and 'unauthorized' in forged['error'],forged
+            deadline=time.monotonic()+5
+            while True:
+                status=ok({'op':'action.status','request_id':'stop-click'})
+                if status['status']=='succeeded':break
+                assert time.monotonic()<deadline;time.sleep(.02)
+            assert status['observed_target']['status']=='cancelled',status
+            ok({'op':'action.revoke','reference':action['reference']})
+            metadata=ok({'op':'action.metadata','reference':action['reference']})
+            revoked=call({**invocation,'request_id':'revoked-click','expected_source_revision':metadata['source_revision']})
+            assert not revoked['ok'],revoked
+            assert ok({'op':'presentation.snapshot'})['documents']['surface-fixture']['revision']==2
+            print('PASS: host-issued stop action, actual process cancellation, idempotent callback receipt, forged actor rejection, revocation')
             print('PASS: presentation IPC principals, atomic receipts, two clients, draft recovery, ordered changes, undo')
         finally:
             if proc:stop(proc)

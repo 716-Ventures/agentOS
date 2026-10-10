@@ -381,7 +381,7 @@ fn walk_elements(
     }
     Ok(())
 }
-fn surface_valid(db: &Connection, s: &SurfaceDocument, principal: &Principal) -> Result<()> {
+fn surface_valid(db: &Connection, s: &SurfaceDocument, _principal: &Principal) -> Result<()> {
     if s.protocol != PROTOCOL || s.catalog_revision != CATALOG {
         return Err(error("unsupported_protocol", "Protocol/catalog mismatch"));
     }
@@ -443,7 +443,7 @@ fn surface_valid(db: &Connection, s: &SurfaceDocument, principal: &Principal) ->
         }
     }
     for action in s.actions.values() {
-        let allowed:bool=db.query_row("SELECT EXISTS(SELECT 1 FROM presentation_actions WHERE reference=? AND uid=? AND activity=? AND revoked=0)",params![action.reference,principal.uid,s.activity_id],|r|r.get(0)).map_err(db_error)?;
+        let allowed:bool=db.query_row("SELECT EXISTS(SELECT 1 FROM presentation_actions WHERE reference=? AND activity=?)",params![action.reference,s.activity_id],|r|r.get(0)).map_err(db_error)?;
         if !allowed {
             return Err(error(
                 "unauthorized",
@@ -630,7 +630,8 @@ pub fn init(db: &Connection) -> Result<()> {
         CREATE TABLE IF NOT EXISTS presentation_events(cursor INTEGER PRIMARY KEY AUTOINCREMENT,uid INTEGER NOT NULL,request TEXT NOT NULL,before_state TEXT NOT NULL,after_state TEXT NOT NULL,receipt TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS presentation_leases(document TEXT NOT NULL,element TEXT NOT NULL,uid INTEGER NOT NULL,session TEXT NOT NULL,expires INTEGER NOT NULL,draft_revision INTEGER NOT NULL DEFAULT 0,draft TEXT,PRIMARY KEY(document,element));
         CREATE TABLE IF NOT EXISTS presentation_outputs(id TEXT PRIMARY KEY,width REAL NOT NULL,height REAL NOT NULL,connected INTEGER NOT NULL);
-        CREATE TABLE IF NOT EXISTS presentation_actions(reference TEXT PRIMARY KEY,uid INTEGER NOT NULL,activity TEXT NOT NULL,revoked INTEGER NOT NULL DEFAULT 0);").map_err(db_error)
+        CREATE TABLE IF NOT EXISTS presentation_actions(reference TEXT PRIMARY KEY,uid INTEGER NOT NULL,activity TEXT NOT NULL,revoked INTEGER NOT NULL DEFAULT 0);").map_err(db_error)?;
+    crate::presentation_actions::init(db)
 }
 fn documents(db: &Connection) -> Result<BTreeMap<String, Document>> {
     let mut q = db
@@ -1078,6 +1079,9 @@ fn commit(
 pub fn handle(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> {
     match v["op"].as_str().unwrap_or("") {
         "catalog.get" => Ok(catalog()),
+        "action.issue" | "action.revoke" | "action.metadata" | "action.status" => {
+            crate::presentation_actions::handle(db, v, who)
+        }
         "presentation.snapshot" => snapshot(db),
         "presentation.apply" => apply(db, v, who),
         "presentation.subscribe" => {

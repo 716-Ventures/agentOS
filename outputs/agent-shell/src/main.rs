@@ -1,4 +1,5 @@
 mod presentation;
+mod presentation_actions;
 use rusqlite::{params, Connection};
 use serde_json::{json, Value};
 use std::{
@@ -533,12 +534,25 @@ fn serve(core: Arc<Core>, mut stream: UnixStream) {
                     "draft.",
                     "binding.",
                     "outputs.",
+                    "action.",
                 ]
                 .iter()
                 .any(|prefix| op.starts_with(prefix))
             {
                 let principal = presentation_peer(&stream)?;
-                presentation::handle(&mut core.db.lock().unwrap(), &v, &principal)
+                if op=="action.invoke" {
+                    let prepared=presentation_actions::prepare(&mut core.db.lock().unwrap(),&v,&principal)?;
+                    match prepared {
+                        presentation_actions::Prepared::Cached(receipt)=>Ok(receipt),
+                        presentation_actions::Prepared::Run{request_id,job,operation}=>{
+                            let result=if operation=="job.cancel" {core.cancel(&json!({"job_id":job}))} else {
+                                let db=core.db.lock().unwrap();
+                                db.query_row("SELECT id,activity_id,argv,status,exit_code,created_at,finished_at,error FROM jobs WHERE id=?",[job],job_value).map_err(err)
+                            };
+                            presentation_actions::finish(&core.db.lock().unwrap(),&principal,&request_id,result,&operation)
+                        }
+                    }
+                } else {presentation::handle(&mut core.db.lock().unwrap(), &v, &principal)}
             } else if line.len() > 65536 {
                 Err("Request too large".into())
             } else {

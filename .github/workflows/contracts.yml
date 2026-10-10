@@ -1,0 +1,26 @@
+name: Linux runtime contracts
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: outputs/agent-shell
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Linux test identity and toolchain
+        run: |
+          sudo useradd --system --user-group --shell /usr/sbin/nologin agentos-ai
+          rustup toolchain install 1.85.1 --profile minimal
+      - name: Python and Rust contracts
+        run: |
+          python3 -m unittest discover -s tests -p '*_test.py'
+          cargo +1.85.1 test --locked
+          cargo +1.85.1 build --release --locked
+      - name: Authenticated presentation and callback IPC
+        run: python3 tests/presentation_guest.py
