@@ -256,6 +256,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         let (commands,rx)=mpsc::channel();let drafts=Arc::new(Mutex::new(BTreeMap::new()));
         frame.core=transport::request(&socket,&json!({"op":"snapshot"})).unwrap();frame.activity=doc["activity_id"].as_str().map(String::from);frame.usage=json!({"unavailable":true});frame.broker=json!([]);
         verify_container_replacement(app,&frame,&commands,&drafts);
+        image_controls::verify();
         let mut controls=controls::Controls::new(app,commands.clone());controls.verify_controls(&frame,&commands);
         let gestures=rx.try_iter().collect::<Vec<_>>();assert!(gestures.iter().any(|c|matches!(c,Command::Ask{prompt,..} if prompt=="Explicit native request λ")));assert!(gestures.iter().any(|c|matches!(c,Command::CreateDocument)));
 

@@ -31,6 +31,7 @@ pub struct Controls {
     new_document: gtk::Button,
     import_document: gtk::Button,
     workspace: workspace_controls::WorkspaceControls,
+    images: image_controls::ImageControls,
 }
 impl Controls {
     pub fn new(app: &gtk::Application, commands: Sender<Command>) -> Self {
@@ -246,6 +247,8 @@ impl Controls {
         monitor_content.append(&ui::text("Agent Monitor", true));
         let model_text = ui::text("Model configuration and measured usage unavailable", false);
         monitor_content.append(&model_text);
+        let images = image_controls::ImageControls::new(commands.clone());
+        widget.append(&images.widget);
         let workspace = workspace_controls::WorkspaceControls::new(commands.clone());
         monitor_content.append(&workspace.widget);
         let jobs = super::job_list::JobList::new(app, &commands);
@@ -378,6 +381,7 @@ impl Controls {
             new_document,
             import_document,
             workspace,
+            images,
         }
     }
     pub fn verify_controls(&mut self, frame: &Frame, commands: &Sender<Command>) {
@@ -460,6 +464,7 @@ impl Controls {
         self.monitor.present();
     }
     pub fn update(&mut self, frame: &Frame, _commands: &Sender<Command>) {
+        self.images.update(frame);
         self.import_document
             .set_sensitive(frame.connected && frame.activity.is_some());
         self.new_document

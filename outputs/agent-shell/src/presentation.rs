@@ -1882,7 +1882,7 @@ fn resolve_reference(db: &Connection, v: &Value, who: &Principal) -> Result<Valu
 pub fn handle(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> {
     match v["op"].as_str().unwrap_or("") {
         "catalog.get" => Ok(catalog()),
-        "resource.publish" | "resource.get" | "resource.list" => {
+        "resource.publish" | "resource.get" | "resource.list" | "resource.release" => {
             crate::presentation_resources::handle(db, v, who)
         }
         "source.publish" | "source.heartbeat" | "source.list" => {
@@ -2257,7 +2257,7 @@ mod tests {
     fn repeated_image_references_share_an_aggregate_decoded_pixel_budget() {
         let mut db = fixture();
         let reference = format!("resource-{}", "f".repeat(32));
-        db.execute("INSERT INTO presentation_resources VALUES(?, '1', 1000, 'Large image', '', 2048, 2048, 0)",[&reference]).unwrap();
+        db.execute("INSERT INTO presentation_resources VALUES(?, '1', 1000, 'Large image', '00', 2048, 2048, 0)",[&reference]).unwrap();
         let mut doc = surface();
         doc["elements"] =
             json!({"root":{"type":"Stack@1","slots":{"children":["a","b","c","d","e"]}}});
@@ -3277,6 +3277,77 @@ mod tests {
                 props
             );
         }
+    }
+    #[test]
+    fn unused_image_release_is_human_owned_in_use_guarded_and_never_rebinds_an_identity() {
+        let mut db = fixture();
+        let bytes = include_bytes!("../tests/fixtures/pixel.png");
+        let hex = bytes
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect::<String>();
+        let reference = format!("resource-{}", "a".repeat(32));
+        let publish = json!({"op":"resource.publish","activity_id":"1","reference":reference,"label":"Blue pixel","png_hex":hex});
+        handle(&mut db, &publish, &human()).unwrap();
+        let release = json!({"op":"resource.release","activity_id":"1","reference":reference});
+        assert!(handle(&mut db, &release, &agent()).is_err());
+        assert!(handle(
+            &mut db,
+            &release,
+            &Principal {
+                uid: 1001,
+                session: "other".into()
+            }
+        )
+        .is_err());
+        let mut doc = surface();
+        doc["root"] = json!("image");
+        doc["elements"] = json!({"image":{"type":"Image@1","props":{"label":"Blue pixel","reference":reference}}});
+        handle(&mut db,&json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"image-view","expected_revisions":{"surface-a":null},"operations":[{"op":"surface.create","document":doc}]}),&human()).unwrap();
+        assert!(handle(&mut db, &release, &human())
+            .unwrap_err()
+            .contains("resource_in_use"));
+        handle(&mut db,&json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"close-image","expected_revisions":{"surface-a":0},"operations":[{"op":"surface.close","surface_id":"surface-a"}]}),&human()).unwrap();
+        assert_eq!(
+            handle(&mut db, &release, &human()).unwrap()["released"],
+            true
+        );
+        assert_eq!(
+            handle(&mut db, &release, &human()).unwrap()["released"],
+            true
+        );
+        assert!(handle(
+            &mut db,
+            &json!({"op":"resource.get","activity_id":"1","reference":reference}),
+            &human()
+        )
+        .is_err());
+        assert_eq!(
+            handle(
+                &mut db,
+                &json!({"op":"resource.list","activity_id":"1"}),
+                &human()
+            )
+            .unwrap()["resources"],
+            json!([])
+        );
+        assert!(crate::presentation_resources::activity(&db, &reference)
+            .unwrap()
+            .is_none());
+        assert!(handle(&mut db, &publish, &human())
+            .unwrap_err()
+            .contains("immutable_resource"));
+        // Released identity tombstones do not consume the 64-live-image byte budget.
+        for number in 0..64 {
+            let mut next = publish.clone();
+            next["reference"] = json!(format!("resource-{number:032x}"));
+            handle(&mut db, &next, &human()).unwrap();
+        }
+        let mut extra = publish;
+        extra["reference"] = json!(format!("resource-{}", "b".repeat(32)));
+        assert!(handle(&mut db, &extra, &human())
+            .unwrap_err()
+            .contains("resource_limit"));
     }
     #[test]
     fn image_resources_are_immutable_scoped_human_owned_and_metadata_only_for_models() {

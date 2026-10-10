@@ -22,7 +22,7 @@ pub fn init(db: &Connection) -> Result<()> {
 }
 pub fn activity(db: &Connection, id: &str) -> Result<Option<String>> {
     db.query_row(
-        "SELECT activity FROM presentation_resources WHERE reference=?",
+        "SELECT activity FROM presentation_resources WHERE reference=? AND body!=''",
         [id],
         |r| r.get(0),
     )
@@ -58,7 +58,7 @@ pub fn handle(db: &mut Connection, value: &Value, who: &Principal) -> Result<Val
                 .filter(|v| (1..=64).contains(v))
                 .ok_or_else(|| fail("invalid_resource", "Invalid resource page size"))?,
         };
-        let mut query=db.prepare("SELECT reference,label,width,height,created FROM presentation_resources WHERE activity=? AND reference>? ORDER BY reference LIMIT ?").map_err(storage)?;
+        let mut query=db.prepare("SELECT reference,label,width,height,created FROM presentation_resources WHERE activity=? AND body!='' AND reference>? ORDER BY reference LIMIT ?").map_err(storage)?;
         let rows=query.query_map(params![activity,after,limit+1],|r|Ok(json!({"reference":r.get::<_,String>(0)?,"label":r.get::<_,String>(1)?,"width":r.get::<_,u32>(2)?,"height":r.get::<_,u32>(3)?,"created_at":r.get::<_,i64>(4)?,"mime":"image/png"}))).map_err(storage)?;
         let mut resources = rows
             .collect::<std::result::Result<Vec<_>, _>>()
@@ -107,7 +107,7 @@ pub fn handle(db: &mut Connection, value: &Value, who: &Principal) -> Result<Val
         } else {
             let count: i64 = tx
                 .query_row(
-                    "SELECT COUNT(*) FROM presentation_resources WHERE activity=?",
+                    "SELECT COUNT(*) FROM presentation_resources WHERE activity=? AND body!=''",
                     [activity],
                     |r| r.get(0),
                 )
@@ -125,10 +125,58 @@ pub fn handle(db: &mut Connection, value: &Value, who: &Principal) -> Result<Val
             json!({"reference":id,"activity_id":activity,"width":width,"height":height,"mime":"image/png"}),
         );
     }
+    if op == "resource.release" {
+        let tx = db.transaction().map_err(storage)?;
+        let row: Option<(u32, String)> = tx
+            .query_row(
+                "SELECT uid,body FROM presentation_resources WHERE reference=? AND activity=?",
+                params![id, activity],
+                |r| Ok((r.get(0)?, r.get(1)?)),
+            )
+            .optional()
+            .map_err(storage)?;
+        let (owner, body) =
+            row.ok_or_else(|| fail("missing_reference", "Resource unavailable in this activity"))?;
+        if who.uid != 0 && owner != 0 && owner != who.uid {
+            return Err(fail(
+                "unauthorized",
+                "Resource belongs to another local user",
+            ));
+        }
+        if !body.is_empty() {
+            let mut query=tx.prepare("SELECT body FROM presentation_documents WHERE json_extract(body,'$.activity_id')=?").map_err(storage)?;
+            let rows = query
+                .query_map([activity], |r| r.get::<_, String>(0))
+                .map_err(storage)?;
+            for raw in rows {
+                let doc: Value = serde_json::from_str(&raw.map_err(storage)?).map_err(storage)?;
+                if doc["elements"]
+                    .as_object()
+                    .into_iter()
+                    .flat_map(|nodes| nodes.values())
+                    .any(|node| node["type"] == "Image@1" && node["props"]["reference"] == id)
+                {
+                    return Err(fail(
+                        "resource_in_use",
+                        "Close all views using this image before removing its stored bytes",
+                    ));
+                }
+            }
+            drop(query);
+            // Retain the opaque identity as a tombstone, preventing cached references from rebinding.
+            tx.execute(
+                "UPDATE presentation_resources SET body='' WHERE reference=?",
+                [id],
+            )
+            .map_err(storage)?;
+        }
+        tx.commit().map_err(storage)?;
+        return Ok(json!({"reference":id,"released":true,"status":"Unused stored image removed"}));
+    }
     if op != "resource.get" {
         return Err(fail("unsupported_operation", "Unknown resource operation"));
     }
-    let row:Option<(String,String,u32,u32,u32)>=db.query_row("SELECT label,body,width,height,uid FROM presentation_resources WHERE reference=? AND activity=?",params![id,activity],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?))).optional().map_err(storage)?;
+    let row:Option<(String,String,u32,u32,u32)>=db.query_row("SELECT label,body,width,height,uid FROM presentation_resources WHERE reference=? AND activity=? AND body!=''",params![id,activity],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?))).optional().map_err(storage)?;
     let (label, body, width, height, uid) =
         row.ok_or_else(|| fail("missing_reference", "Resource unavailable in this activity"))?;
     if who.uid != 0 && uid != 0 && uid != who.uid {

@@ -6,6 +6,7 @@ mod controls;
 mod document_dialog;
 mod draft_cache;
 mod first_run;
+mod image_controls;
 mod job_list;
 mod log_view;
 mod preferences;

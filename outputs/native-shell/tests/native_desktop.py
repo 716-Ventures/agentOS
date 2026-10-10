@@ -154,7 +154,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                         assert restored['ok'],restored
                         assert workspace()['outputs']==before['outputs']
                         document=workspace();document['outputs']['nested-primary']['maximized']=surface_id
-                        assert put(document,'manual-maximize')['ok']
+                        response=put(document,'manual-maximize');assert response['ok'],response
                         wait_shared(lambda s:next(w for w in s['windows'] if w['id']==ident)['geometry']['width']==1280)
                         assert workspace()['focus']['surface_id']==surface_id
                         second_activity=call({'op':'create','name':'Set-aside verification'})['id']

@@ -63,6 +63,7 @@ pub struct Draft {
 pub struct Frame {
     pub documents: BTreeMap<String, Value>,
     pub resources: BTreeMap<String, Arc<Vec<u8>>>,
+    pub stored_images: Value,
     pub bindings: BTreeMap<String, Value>,
     pub actions: BTreeMap<String, Value>,
     pub drafts: BTreeMap<(String, String), Value>,
@@ -101,6 +102,10 @@ pub enum Command {
     },
     Attach(Value),
     EmbedTerminal(Value),
+    ReleaseImage {
+        activity: String,
+        reference: String,
+    },
     OpenTerminal,
     ImportDocument {
         activity: String,
@@ -320,6 +325,7 @@ fn run(
                     Command::Resume(job)=>super::broker_controls::job_id(&job).and_then(|id|request(&broker_socket(),&json!({"op":"poll","job_id":id}))).and_then(|current|super::broker_controls::continuation_request(&current).ok_or("No approved agent request is associated with this work".into())).and_then(|query|request(&socket,&query)),
                     Command::Attach(job)=>super::broker_controls::attach(&job),
                     Command::EmbedTerminal(job)=>{let current=frame.lock().unwrap().clone();embed_terminal(&socket,&current,&job)},
+                    Command::ReleaseImage{activity,reference}=>request(&socket,&json!({"op":"resource.release","activity_id":activity,"reference":reference})),
                     Command::OpenTerminal=>super::broker_controls::open_terminal(),
                     Command::ReconnectWindow{missing,live,missing_revision,live_revision}=>reconnect_window(&socket,&missing,&live,missing_revision,live_revision),
                     Command::Navigate{surface,element,revision}=>{let current=frame.lock().unwrap().clone();navigate(&socket,&current,&surface,&element,revision).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt})},
@@ -715,6 +721,15 @@ fn run(
                             }
                         }
                     }
+                }
+                if let Some(activity) = &next.activity {
+                    next.stored_images = match request(
+                        &socket,
+                        &json!({"op":"resource.list","activity_id":activity,"limit":64}),
+                    ) {
+                        Ok(value) => value,
+                        Err(error) => json!({"unavailable":error}),
+                    };
                 }
                 resource_cache.retain(|(owned, reference), _| {
                     next.activity.as_deref() == Some(owned.as_str())

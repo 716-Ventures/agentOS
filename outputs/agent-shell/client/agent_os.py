@@ -1110,6 +1110,7 @@ def main():
     for action in ('export','review','replace'):
         c=dc.add_parser(action);c.add_argument('surface');c.add_argument('path');c.add_argument('--revision',type=int,required=True)
         if action=='replace':c.add_argument('--expected-sha256',required=True)
+    c=sub.add_parser('resources',help='List stored PNGs or explicitly remove unused image bytes (references remain reserved)');c.add_argument('activity',type=int);c.add_argument('--release')
     c=sub.add_parser('image',help='Import a bounded PNG as a private native image view');c.add_argument('activity',type=int);c.add_argument('path');c.add_argument('--label')
     c=sub.add_parser('views',help='Inspect and control shared presentation views from the terminal');c.add_argument('activity',type=int);c.add_argument('--text',action='store_true')
     c=sub.add_parser('disk');c.add_argument('activity',type=int)
@@ -1147,6 +1148,9 @@ def main():
         elif args.document_command=='import':result=document_files.publish(request,args.activity,args.path)
         elif args.document_command=='replace':result=document_files.replace(request,args.surface,args.path,args.revision,args.expected_sha256)
         else:result=getattr(document_files,args.document_command)(request,args.surface,args.path,args.revision)
+    elif args.cmd=='resources':
+        if args.release:result=request('resource.release',activity_id=str(args.activity),reference=args.release)
+        else:result=request('resource.list',activity_id=str(args.activity),limit=64)
     elif args.cmd=='image':
         import image_resources
         result=image_resources.publish(request,args.activity,args.path,args.label)
