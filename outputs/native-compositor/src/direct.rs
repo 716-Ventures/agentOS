@@ -18,7 +18,7 @@ use smithay::{
                 Kind,
             },
             gles::GlesRenderer,
-            Bind, ImportDma,
+            Bind, ImportAll, ImportDma, ImportMem,
         },
         session::{libseat::LibSeatSession, Event as SessionEvent, Session},
         udev::{primary_gpu, UdevBackend, UdevEvent},
@@ -40,14 +40,14 @@ use smithay::{
 };
 use std::{
     cell::RefCell,
-    collections::{BTreeMap, BTreeSet},
+    collections::{HashMap, HashSet},
     path::PathBuf,
     rc::Rc,
     time::Duration,
 };
 type Scanout = GbmBufferedSurface<GbmAllocator<DrmDeviceFd>, ()>;
 smithay::render_elements! {
-    Cursor<R> where R: smithay::backend::renderer::ImportAll + smithay::backend::renderer::ImportMem;
+    Cursor<R> where R: ImportAll + ImportMem;
     Surface=WaylandSurfaceRenderElement<R>,
     Memory=MemoryRenderBufferRenderElement<R>,
 }
@@ -62,7 +62,7 @@ struct Device {
     drm: DrmDevice,
     gbm: GbmDevice<DrmDeviceFd>,
     renderer: GlesRenderer,
-    heads: BTreeMap<crtc::Handle, Head>,
+    heads: HashMap<crtc::Handle, Head>,
     active: bool,
     cursor: MemoryRenderBuffer,
     retry_at: std::time::Instant,
@@ -77,7 +77,7 @@ impl Device {
     fn scan(&mut self, data: &mut CalloopData) -> Result<(), Box<dyn std::error::Error>> {
         self.disconnect(data);
         let resources = self.drm.resource_handles()?;
-        let mut used = BTreeSet::new();
+        let mut used = HashSet::new();
         let mut x = 0;
         for handle in resources.connectors() {
             let connector = self.drm.get_connector(*handle, true)?;
@@ -307,7 +307,7 @@ pub fn init(
         drm,
         gbm,
         renderer,
-        heads: BTreeMap::new(),
+        heads: HashMap::new(),
         active: session.is_active(),
         cursor: cursor(),
         retry_at: std::time::Instant::now(),
@@ -319,7 +319,7 @@ pub fn init(
     let mut input =
         Libinput::new_with_udev::<LibinputSessionInterface<LibSeatSession>>(session.clone().into());
     input
-        .udev_assign_seat(session.seat())
+        .udev_assign_seat(&seat_name)
         .map_err(|_| "Cannot assign libinput seat")?;
     let backend = LibinputInputBackend::new(input.clone());
     let active = device.clone();
