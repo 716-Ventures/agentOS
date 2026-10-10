@@ -149,10 +149,11 @@ fn run(
             return Ok(());
         }
         let mut grid = *size.lock().unwrap();
-        let attached = super::transport::request(
+        let attached = super::transport::request_timeout(
             &socket,
             &json!({"op":"terminal_attach","job_id":job,"rows":grid.0,"cols":grid.1}),
-        )?;
+            Duration::from_secs(3),
+        ).map_err(|error| format!("Attachment was not confirmed: {error}. No input was sent. If the broker retained a controller, wait 15 seconds before attaching again."))?;
         let owned = attached["token"]
             .as_str()
             .filter(|v| v.len() == 32 && v.bytes().all(|b| b.is_ascii_hexdigit()))
@@ -263,7 +264,10 @@ mod tests {
                 calls.lock().unwrap().push(op.into());
                 let result = match op {
                     "poll" => json!({"id":job,"activity":1,"terminal":true,"status":"running"}),
-                    "terminal_attach" => json!({"token":"b".repeat(32),"cursor":0}),
+                    "terminal_attach" => {
+                        thread::sleep(Duration::from_millis(600));
+                        json!({"token":"b".repeat(32),"cursor":0})
+                    }
                     "terminal_read" => {
                         let bytes = if cursor == 0 {
                             b"\x1b[32mready\r\n".to_vec()
@@ -322,6 +326,63 @@ mod tests {
         let calls = observed.lock().unwrap();
         assert_eq!(calls.iter().filter(|op| *op == "terminal_write").count(), 2);
         assert_eq!(calls.last().unwrap(), "terminal_detach");
+    }
+    #[test]
+    #[ignore = "requires isolated Linux tmux broker fixture"]
+    fn real_broker_terminal_round_trip_and_reattach() {
+        let socket = PathBuf::from(std::env::var("AGENT_OS_PTY_TEST_SOCKET").unwrap());
+        let job = std::env::var("AGENT_OS_PTY_TEST_JOB").unwrap();
+        fn until(session: &Session, marker: &str) {
+            let deadline = Instant::now() + Duration::from_secs(8);
+            let mut output = Vec::new();
+            loop {
+                let mut state = session.display.lock().unwrap();
+                while let Some((bytes, _)) = state.chunks.pop_front() {
+                    output.extend(bytes);
+                }
+                if String::from_utf8_lossy(&output).contains(marker) {
+                    return;
+                }
+                assert!(
+                    !state.finished,
+                    "Terminal ended: {} / {}",
+                    state.notice,
+                    String::from_utf8_lossy(&output)
+                );
+                assert!(
+                    Instant::now() < deadline,
+                    "Missing {marker}: {} / {}",
+                    state.notice,
+                    String::from_utf8_lossy(&output)
+                );
+                drop(state);
+                thread::sleep(Duration::from_millis(20));
+            }
+        }
+        let session = Session::start(socket.clone(), job.clone(), "1".into(), (24, 80)).unwrap();
+        until(&session, "NATIVE_READY");
+        session.write("Ada λ 日本語\n".as_bytes().to_vec()).unwrap();
+        until(&session, "HELLO Ada λ 日本語");
+        session.resize((31, 103));
+        until(&session, "GRID 103 31");
+        drop(session);
+        let restored = Session::start(socket.clone(), job.clone(), "1".into(), (31, 103)).unwrap();
+        until(&restored, "HELLO Ada λ 日本語");
+        restored.write(b"again\n".to_vec()).unwrap();
+        until(&restored, "HELLO again");
+        drop(restored);
+        // Drop releases the exclusive controller and reaps the display reader.
+        let attached = super::super::transport::request_timeout(
+            &socket,
+            &json!({"op":"terminal_attach","job_id":job}),
+            Duration::from_secs(3),
+        )
+        .unwrap();
+        super::super::transport::request(
+            &socket,
+            &json!({"op":"terminal_detach","job_id":job,"token":attached["token"]}),
+        )
+        .unwrap();
     }
     #[test]
     fn terminal_pages_preserve_raw_bytes_and_require_exact_cursor_boundaries() {

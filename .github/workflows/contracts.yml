@@ -55,6 +55,10 @@ jobs:
           cargo +1.85.1 test --locked --manifest-path outputs/native-shell/Cargo.toml
           cargo +1.85.1 build --locked --manifest-path outputs/native-shell/Cargo.toml
           cargo +1.85.1 build --release --locked --manifest-path outputs/agent-shell/Cargo.toml
+      - name: Native transport with real broker and PTY screen keeper
+        run: |
+          sudo apt-get install -y --no-install-recommends tmux
+          python3 outputs/native-shell/tests/pty_broker.py
       - name: Real native rendering and interaction
         run: dbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
