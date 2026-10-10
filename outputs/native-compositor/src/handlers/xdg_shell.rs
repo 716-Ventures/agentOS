@@ -1,3 +1,4 @@
+use smithay::desktop::{PopupKeyboardGrab, PopupPointerGrab, PopupUngrabStrategy};
 use smithay::{
     delegate_xdg_shell,
     desktop::{
