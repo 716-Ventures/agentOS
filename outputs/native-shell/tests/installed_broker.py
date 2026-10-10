@@ -98,6 +98,10 @@ def main():
                    'GSK_RENDERER': 'cairo', 'GTK_A11Y': 'atspi', 'G_DEBUG': 'fatal-criticals'}
             env.pop('AGENT_OS_SOCKET', None)
             env.pop('AGENT_OS_BROKER_SOCKET', None)
+            # D-Bus activation must use this user's private test runtime, too.
+            subprocess.run(['dbus-update-activation-environment', 'HOME', 'XDG_RUNTIME_DIR',
+                            'XDG_CONFIG_HOME', 'XDG_STATE_HOME', 'GDK_BACKEND', 'GTK_A11Y'],
+                           env=env, check=True)
             with (OUTPUT / 'installed-broker.log').open('w') as log:
                 try:
                     host = subprocess.Popen(['weston', '--backend=headless-backend.so', '--use-pixman',

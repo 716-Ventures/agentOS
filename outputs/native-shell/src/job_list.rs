@@ -97,9 +97,11 @@ impl Row {
         }
     }
     fn update(&self, item: &Item) {
-        self.widget.update_property(&[gtk::accessible::Property::Label(
-            &format!("Work {}", item.key),
-        )]);
+        self.widget
+            .update_property(&[gtk::accessible::Property::Label(&format!(
+                "Work {}",
+                item.key
+            ))]);
         let argv = item.job["argv"]
             .as_array()
             .map(|a| {
@@ -150,7 +152,8 @@ impl Row {
         *self.current.borrow_mut() = Some(item.clone());
     }
     fn clear(&self) {
-        self.widget.update_property(&[gtk::accessible::Property::Label("Unavailable work row")]);
+        self.widget
+            .update_property(&[gtk::accessible::Property::Label("Unavailable work row")]);
         *self.current.borrow_mut() = None;
         for button in [
             &self.stop,
@@ -254,7 +257,11 @@ impl JobList {
                 }
             }
             for job in rows.into_iter().flatten() {
-                let key = format!("{}:{}", source, job["id"]);
+                let id = job["id"]
+                    .as_str()
+                    .map(str::to_owned)
+                    .unwrap_or_else(|| job["id"].to_string());
+                let key = format!("{source}:{id}");
                 seen.insert(key.clone());
                 let item = Item {
                     key: key.clone(),
