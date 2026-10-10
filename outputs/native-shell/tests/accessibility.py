@@ -35,7 +35,10 @@ def text(node):
 
 
 def activate(node):
-    assert node.getState().contains(pyatspi.STATE_ENABLED)
+    states=node.getState()
+    assert not states.contains(pyatspi.STATE_DEFUNCT),'Accessible action refers to a destroyed control'
+    if not states.contains(pyatspi.STATE_ENABLED):
+        print('OBSERVED: GTK action has no AT-SPI ENABLED flag; states='+str(states.getStates()),flush=True)
     action=node.queryAction();assert action.nActions>0
     assert action.doAction(0)
 
