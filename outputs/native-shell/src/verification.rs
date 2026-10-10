@@ -10,7 +10,7 @@ fn verify_container_replacement(
     let id = "container-reconciliation";
     let mut surface = Surface::new(app, id, commands);
     surface.window.set_visible(false);
-    let mut doc = json!({"surface_id":id,"title":"Container reconciliation","revision":0,"root":"root","elements":{"root":{"type":"Stack@1","props":{},"slots":{"children":["a","b"]}},"a":{"type":"Text@1","props":{"text":"Stable a"}},"b":{"type":"Text@1","props":{"text":"Stable b"}}}});
+    let mut doc = json!({"surface_id":id,"activity_id":"1","title":"Container reconciliation","revision":0,"root":"root","elements":{"root":{"type":"Stack@1","props":{},"slots":{"children":["a","b"]}},"a":{"type":"Text@1","props":{"text":"Stable a"}},"b":{"type":"Text@1","props":{"text":"Stable b"}}}});
     surface.update(id, &doc, frame, commands, drafts);
     let a = surface.elements["a"].widget.clone();
     let b = surface.elements["b"].widget.clone();

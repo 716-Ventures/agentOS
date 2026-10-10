@@ -690,6 +690,8 @@ fn validate(
     principal: &Principal,
 ) -> Result<()> {
     let mut placed = BTreeSet::new();
+    let mut image_pixels = BTreeMap::<String, u64>::new();
+    let mut dimensions = BTreeMap::<String, u64>::new();
     for d in docs.values() {
         if serde_json::to_vec(d).map_err(invalid)?.len() > DOCUMENT_LIMIT {
             return Err(error("resource_limit", "Document exceeds 1 MiB"));
@@ -701,6 +703,40 @@ fn validate(
         match d {
             Document::Surface(s) => {
                 surface_valid(db, s, principal)?;
+                // Count every rendered occurrence: reusing one resource in many
+                // elements still allocates a native texture for each view.
+                for element in s
+                    .elements
+                    .values()
+                    .filter(|element| element.kind == "Image@1")
+                {
+                    let reference = element.props["reference"].as_str().unwrap();
+                    let pixels = if let Some(pixels) = dimensions.get(reference) {
+                        *pixels
+                    } else {
+                        let (width, height): (u32, u32) = db
+                            .query_row(
+                                "SELECT width,height FROM presentation_resources WHERE reference=?",
+                                [reference],
+                                |r| Ok((r.get(0)?, r.get(1)?)),
+                            )
+                            .map_err(db_error)?;
+                        let pixels = u64::from(width) * u64::from(height);
+                        dimensions.insert(reference.into(), pixels);
+                        pixels
+                    };
+                    let total = image_pixels.entry(s.activity_id.clone()).or_default();
+                    *total = total
+                        .checked_add(pixels)
+                        .ok_or_else(|| error("resource_limit", "Image pixel budget overflow"))?;
+                    if *total > 16 * 1024 * 1024 {
+                        return Err(error(
+                            "resource_limit",
+                            "Rendered images exceed the activity's 16 MiPixel budget",
+                        ));
+                    }
+                }
+
                 for (id, element) in s.elements.iter().filter(|(_, e)| is_reference(&e.kind)) {
                     let target = element.props["target"].as_str().unwrap();
                     if reference_target(db, docs, s, element).is_err() {
@@ -2145,6 +2181,33 @@ mod tests {
     }
     fn props(request: &str, revision: u64, element: &str, text: &str) -> Value {
         json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":request,"expected_revisions":{"surface-a":revision},"operations":[{"op":"element.set_props","surface_id":"surface-a","element_id":element,"props":{"text":text}}]})
+    }
+    #[test]
+    fn repeated_image_references_share_an_aggregate_decoded_pixel_budget() {
+        let mut db = fixture();
+        let reference = format!("resource-{}", "f".repeat(32));
+        db.execute("INSERT INTO presentation_resources VALUES(?, '1', 1000, 'Large image', '', 2048, 2048, 0)",[&reference]).unwrap();
+        let mut doc = surface();
+        doc["elements"] =
+            json!({"root":{"type":"Stack@1","slots":{"children":["a","b","c","d","e"]}}});
+        for id in ["a", "b", "c", "d", "e"] {
+            doc["elements"][id] = json!({"type":"Image@1","props":{"label":"Large referenced image","reference":reference}});
+        }
+        let mut request = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"image-budget","expected_revisions":{"surface-a":null},"operations":[{"op":"surface.create","document":doc}]});
+        assert!(handle(&mut db, &request, &agent())
+            .unwrap_err()
+            .contains("16 MiPixel"));
+        assert!(snapshot(&db).unwrap()["documents"]
+            .as_object()
+            .unwrap()
+            .is_empty());
+        request["operations"][0]["document"]["elements"]
+            .as_object_mut()
+            .unwrap()
+            .remove("e");
+        request["operations"][0]["document"]["elements"]["root"]["slots"]["children"] =
+            json!(["a", "b", "c", "d"]);
+        handle(&mut db, &request, &agent()).unwrap();
     }
     #[test]
     fn embedded_terminals_only_reference_registered_same_activity_broker_work() {
