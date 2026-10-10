@@ -206,6 +206,23 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                         observed_host=call({'op':'presentation.metadata'})['host_surfaces'][surface_id]
                         assert binding['availability']=='available' and binding['value']==observed_host['title'],binding
                         assert any(source['source']=='window:'+surface_id for source in call({'op':'source.list','activity_id':str(activity)})['sources'])
+                        # Reassociate a deliberately restarted application; app-id alone never adopts it.
+                        simple.terminate();simple.wait(timeout=5)
+                        wait_shared(lambda s:ident not in s['shared']['identities'])
+                        previous_windows={w['id'] for w in snapshot()['windows']}
+                        replacement=subprocess.Popen(['weston-simple-shm'],env=childenv,stdout=nestedlog,stderr=subprocess.STDOUT,start_new_session=True);applications.append(replacement)
+                        state=wait_shared(lambda s:any(w['id'] not in previous_windows and w['id'] in s['shared']['identities'] for w in s['windows']))
+                        returning_runtime=next(w['id'] for w in state['windows'] if w['id'] not in previous_windows and w['id'] in state['shared']['identities'])
+                        returning_id=state['shared']['identities'][returning_runtime]
+                        assert returning_id!=surface_id,'A new application process was silently adopted'
+                        metadata=call({'op':'presentation.metadata'})['host_surfaces'];current=workspace()
+                        associate={'op':'host.reconnect','request_id':'reconnect-conventional-fixture','missing_surface':surface_id,'live_surface':returning_id,'missing_revision':metadata[surface_id]['source_revision'],'live_revision':metadata[returning_id]['source_revision'],'expected_workspaces':{current['workspace_id']:current['revision']}}
+                        receipt=call(associate);assert call(associate)==receipt
+                        state=wait_shared(lambda s:s['shared']['identities'].get(returning_runtime)==surface_id)
+                        assert replacement.poll() is None
+                        assert call({'op':'presentation.metadata'})['host_surfaces'][surface_id]['availability']=='available'
+                        assert call({'op':'binding.snapshot','surface_id':'window-binding-fixture'})['bindings']['observed-title']['availability']=='available'
+                        print('PASS: explicit returning-process association, atomic transient-placement removal, retained identity/binding and idempotent receipt')
                         print('PASS: live conventional window metadata, typed source binding and source discovery')
                         print('PASS: simulated output loss, temporary reachable projection, preserved placement and explicit recovery')
                         print('PASS: authenticated native identity, conventional registration, durable shared layout/focus, stale revision rejection, actual float/maximize rendering and journal undo')

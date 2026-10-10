@@ -82,6 +82,12 @@ pub struct Frame {
 #[derive(Debug)]
 pub enum Command {
     RegisterRenderer(String),
+    ReconnectWindow {
+        missing: String,
+        live: String,
+        missing_revision: u64,
+        live_revision: u64,
+    },
     Navigate {
         surface: String,
         element: String,
@@ -315,6 +321,7 @@ fn run(
                     Command::Attach(job)=>super::broker_controls::attach(&job),
                     Command::EmbedTerminal(job)=>{let current=frame.lock().unwrap().clone();embed_terminal(&socket,&current,&job)},
                     Command::OpenTerminal=>super::broker_controls::open_terminal(),
+                    Command::ReconnectWindow{missing,live,missing_revision,live_revision}=>reconnect_window(&socket,&missing,&live,missing_revision,live_revision),
                     Command::Navigate{surface,element,revision}=>{let current=frame.lock().unwrap().clone();navigate(&socket,&current,&surface,&element,revision).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt})},
                     Command::WorkspaceEdit{workspace,revision,edit}=>request(&socket,&json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("workspace-{}",super::nonce()),"expected_revisions":{workspace.clone():revision},"operations":[{"op":"workspace.edit","workspace_id":workspace,"edit":edit}]})).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt}),
                     Command::WorkspaceUndo(cursor)=>request(&socket,&json!({"op":"presentation.undo","event_cursor":cursor,"request_id":format!("undo-{}",super::nonce())})).map(|receipt|{frame.lock().unwrap().workspace_undo=None;receipt}),
@@ -917,6 +924,50 @@ fn resolve_draft(
         &json!({"op":"interaction.end","surface_id":surface,"element_id":element}),
     );
     result.and_then(|receipt| ended.map(|_| receipt))
+}
+
+fn reconnect_window(
+    socket: &PathBuf,
+    missing: &str,
+    live: &str,
+    missing_revision: u64,
+    live_revision: u64,
+) -> Result<Value, String> {
+    let state = super::presentation_pages::read(|value| request(socket, value), None, || false)?;
+    let old = &state["host_surfaces"][missing];
+    let new = &state["host_surfaces"][live];
+    if old["availability"] != "unavailable"
+        || new["availability"] != "available"
+        || old["activity_id"] != new["activity_id"]
+        || old["source_revision"].as_u64() != Some(missing_revision)
+        || new["source_revision"].as_u64() != Some(live_revision)
+    {
+        return Err("Window association changed; refresh and select a missing view and a returning application in the same activity".into());
+    }
+    fn contains(value: &Value, id: &str) -> bool {
+        match value {
+            Value::Object(map) => {
+                map.get("surface_id").and_then(Value::as_str) == Some(id)
+                    || map.values().any(|v| contains(v, id))
+            }
+            Value::Array(values) => values.iter().any(|v| contains(v, id)),
+            _ => false,
+        }
+    }
+    let mut expected = json!({});
+    for doc in state["documents"]
+        .as_object()
+        .into_iter()
+        .flat_map(|m| m.values())
+    {
+        if let Some(workspace) = doc["workspace_id"].as_str() {
+            if contains(&doc["outputs"], live) {
+                expected[workspace] = doc["revision"].clone();
+            }
+        }
+    }
+    let association = json!({"op":"host.reconnect","request_id":format!("reconnect-{}",super::nonce()),"missing_surface":missing,"live_surface":live,"missing_revision":missing_revision,"live_revision":live_revision,"expected_workspaces":expected});
+    request(socket, &association).or_else(|_| request(socket, &association))
 }
 
 fn navigate(

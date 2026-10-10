@@ -13,6 +13,8 @@ pub struct WorkspaceControls {
     undo: gtk::Button,
     undo_cursor: Rc<Cell<Option<i64>>>,
     apply: gtk::Button,
+    reconnect: gtk::Button,
+    hosts: Rc<RefCell<Value>>,
 }
 fn dropdown(label: &str) -> (gtk::DropDown, gtk::StringList) {
     let model = gtk::StringList::new(&[]);
@@ -87,6 +89,28 @@ impl WorkspaceControls {
             Vec::<String>::new(),
             None::<Value>,
         )));
+        let reconnect = ui::button(
+            "Reconnect missing surface to selected second application",
+            ButtonVariant::Outline,
+            false,
+        );
+        content.append(&ui::text("For a returning application, select its missing saved view as the surface and its current live window as the second surface. Reconnect retains the saved view’s placement and references; it does not restart the app or recover its internal document state.",false));
+        content.append(&reconnect);
+        let hosts = Rc::new(RefCell::new(Value::Null));
+        let (model, metadata, s, t, sender, message) = (
+            state.clone(),
+            hosts.clone(),
+            surfaces.clone(),
+            targets.clone(),
+            commands.clone(),
+            notice.clone(),
+        );
+        reconnect.connect_clicked(move |_| {
+            let state=model.borrow();let metadata=metadata.borrow();
+            let Some(old)=state.0.get(s.selected() as usize) else{return;};let Some(new)=state.0.get(t.selected() as usize) else{return;};
+            if metadata[old]["availability"]!="unavailable" || metadata[new]["availability"]!="available" || metadata[old]["activity_id"]!=metadata[new]["activity_id"] {message.set_text("Choose a missing conventional view and a live returning application in the same activity.");return;}
+            let _=sender.send(Command::ReconnectWindow{missing:old.clone(),live:new.clone(),missing_revision:metadata[old]["source_revision"].as_u64().unwrap_or(0),live_revision:metadata[new]["source_revision"].as_u64().unwrap_or(0)});
+        });
         let undo_cursor = Rc::new(Cell::new(None));
         let model = state.clone();
         let sender = commands.clone();
@@ -121,6 +145,8 @@ impl WorkspaceControls {
             undo,
             undo_cursor,
             apply,
+            reconnect,
+            hosts,
         }
     }
     pub fn verify(&self, frame: &Frame) {
@@ -134,6 +160,8 @@ impl WorkspaceControls {
         }
     }
     pub fn update(&self, frame: &Frame) {
+        *self.hosts.borrow_mut() = frame.host_surfaces.clone();
+        self.reconnect.set_sensitive(frame.connected);
         let message = frame.compositor["unavailable"]
             .as_str()
             .or_else(|| frame.compositor["error"].as_str())

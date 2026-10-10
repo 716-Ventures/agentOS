@@ -1669,6 +1669,76 @@ fn apply(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> {
     tx.commit().map_err(db_error)?;
     Ok(receipt)
 }
+/// Remove a returning window's transient placement inside the host association transaction.
+/// Host metadata and the journaled workspace edit therefore become visible atomically.
+pub(crate) fn reconnect_placement(
+    db: &Connection,
+    v: &Value,
+    who: &Principal,
+    live: &str,
+    activity: &str,
+) -> Result<Option<Value>> {
+    let before = documents(db)?;
+    let mut after = before.clone();
+    let mut affected = BTreeSet::new();
+    let expected = v
+        .get("expected_workspaces")
+        .cloned()
+        .unwrap_or_else(|| json!({}));
+    let expected = expected
+        .as_object()
+        .ok_or_else(|| invalid("Expected workspace revisions must be an object"))?;
+    for (id, doc) in &before {
+        if let Document::Workspace(w) = doc {
+            if workspace::placement(w, live).is_some() {
+                if w.activity_id != activity
+                    || expected.get(id).and_then(Value::as_u64) != Some(w.revision)
+                {
+                    return Err(error(
+                        "stale_revision",
+                        "Returning placement needs current workspace revisions",
+                    ));
+                }
+                if let Some(Document::Workspace(next)) = after.get_mut(id) {
+                    workspace::apply(
+                        next,
+                        workspace::Edit::Remove {
+                            surface_id: live.into(),
+                        },
+                    )?;
+                    next.revision = next
+                        .revision
+                        .checked_add(1)
+                        .ok_or_else(|| error("resource_limit", "Workspace revision overflow"))?;
+                }
+                affected.insert(id.clone());
+            }
+        }
+    }
+    if expected.keys().cloned().collect::<BTreeSet<_>>() != affected {
+        return Err(error(
+            "stale_revision",
+            "Supply exact workspace revisions for the returning placement",
+        ));
+    }
+    if affected.is_empty() {
+        return Ok(None);
+    }
+    guard(db, &before, &after, who)?;
+    validate(db, &after, who)?;
+    let request = format!("{}-placement", v["request_id"].as_str().unwrap_or(""));
+    commit(
+        db,
+        who,
+        &request,
+        &v.to_string(),
+        &before,
+        &after,
+        &affected,
+    )
+    .map(Some)
+}
+
 fn commit(
     db: &Connection,
     who: &Principal,
@@ -1819,6 +1889,7 @@ pub fn handle(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> 
             crate::presentation_sources::handle(db, v, who)
         }
         "host.renderer" => crate::presentation_hosts::renderer(db, v, who),
+        "host.reconnect" => crate::presentation_hosts::reconnect(db, v, who),
         "host.surface" => crate::presentation_hosts::register(db, v, who),
         "action.issue"
         | "action.ensure"
@@ -3552,6 +3623,92 @@ mod tests {
             handle(&mut db, &reconnect, &new).unwrap()["surface_id"],
             "second-host-window"
         );
+    }
+    #[test]
+    fn human_reconnect_preserves_logical_identity_and_durable_receipt() {
+        let Ok(stat) = std::fs::read_to_string(format!("/proc/{}/stat", std::process::id())) else {
+            return;
+        };
+        let start = stat
+            .rsplit_once(')')
+            .unwrap()
+            .1
+            .split_whitespace()
+            .nth(19)
+            .unwrap();
+        let host = Principal {
+            uid: 0,
+            session: format!("{}:{start}", std::process::id()),
+        };
+        let old = Principal {
+            uid: 0,
+            session: "4294967295:0".into(),
+        };
+        let mut db = fixture();
+        let missing = json!({"op":"host.surface","surface_id":"missing-editor","activity_id":"1","title":"Old editor","app_id":"example.Editor","connected":true,"client_uid":1000,"client_session":"100:1"});
+        let returning = json!({"op":"host.surface","surface_id":"returning-editor","activity_id":"1","title":"Returning editor","app_id":"example.Editor","connected":true,"client_uid":1000,"client_session":"101:2"});
+        handle(&mut db, &missing, &old).unwrap();
+        handle(&mut db, &returning, &host).unwrap();
+        let request = json!({"op":"host.reconnect","request_id":"explicit-reconnect","missing_surface":"missing-editor","live_surface":"returning-editor","missing_revision":1,"live_revision":1});
+        assert!(handle(&mut db, &request, &agent()).is_err());
+        let mut stale = request.clone();
+        stale["live_revision"] = json!(2);
+        assert!(handle(&mut db, &stale, &human())
+            .unwrap_err()
+            .contains("unauthorized"));
+        assert!(handle(&mut db, &stale, &host)
+            .unwrap_err()
+            .contains("stale_revision"));
+        handle(
+            &mut db,
+            &json!({"op":"outputs.register","output_id":"output-a","width":1280,"height":720}),
+            &host,
+        )
+        .unwrap();
+        let mut doc = workspace();
+        doc["outputs"]["output-a"]["tiles"] = json!({"kind":"split","axis":"horizontal","ratios":[0.5,0.5],"children":[{"kind":"leaf","surface_id":"missing-editor"},{"kind":"leaf","surface_id":"returning-editor"}]});
+        handle(&mut db,&json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"place-returning","expected_revisions":{"workspace-a":null},"operations":[{"op":"workspace.put","document":doc}]}),&host).unwrap();
+        assert!(handle(&mut db, &request, &host)
+            .unwrap_err()
+            .contains("placement"));
+        let mut request = request;
+        request["expected_workspaces"] = json!({"workspace-a":1});
+        assert!(handle(&mut db, &request, &host).is_err());
+        assert_eq!(
+            crate::presentation_hosts::source(&db, "returning-editor")
+                .unwrap()
+                .unwrap()["availability"],
+            "available"
+        );
+        request["expected_workspaces"] = json!({"workspace-a":0});
+        let receipt = handle(&mut db, &request, &host).unwrap();
+        assert_eq!(receipt["surface_id"], "missing-editor");
+        assert_eq!(handle(&mut db, &request, &host).unwrap(), receipt);
+        assert_eq!(
+            handle(&mut db, &returning, &host).unwrap()["surface_id"],
+            "missing-editor"
+        );
+        let placed = snapshot(&db).unwrap()["documents"]["workspace-a"].clone();
+        assert_eq!(placed["revision"], 1);
+        assert_eq!(
+            placed["outputs"]["output-a"]["tiles"],
+            json!({"kind":"leaf","surface_id":"missing-editor"})
+        );
+        assert_eq!(
+            crate::presentation_hosts::source(&db, "missing-editor")
+                .unwrap()
+                .unwrap()["availability"],
+            "available"
+        );
+        assert_eq!(
+            crate::presentation_hosts::source(&db, "returning-editor")
+                .unwrap()
+                .unwrap()["availability"],
+            "unavailable"
+        );
+        let mut collision = request;
+        collision["missing_revision"] = json!(99);
+        assert!(handle(&mut db, &collision, &host).is_err());
     }
     #[test]
     fn conventional_surface_registration_is_host_scoped_and_placeholders_are_durable() {
