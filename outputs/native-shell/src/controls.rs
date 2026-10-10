@@ -1,13 +1,5 @@
 //! Direct human controls; authority is dispatched through the existing core/broker.
 use super::*;
-struct JobRow {
-    widget: gtk::Box,
-    label: gtk::Label,
-    stop: gtk::Button,
-    review: gtk::Button,
-    attach: gtk::Button,
-    proposal: Rc<RefCell<Value>>,
-}
 pub struct Controls {
     pub widget: gtk::Box,
     activity: Rc<RefCell<Option<String>>>,
@@ -16,8 +8,7 @@ pub struct Controls {
     chooser_model: gtk::StringList,
     changing: Rc<Cell<bool>>,
     monitor: gtk::ApplicationWindow,
-    jobs: gtk::Box,
-    rows: BTreeMap<String, JobRow>,
+    jobs: super::job_list::JobList,
     message: gtk::Label,
     model_text: gtk::Label,
     inspection: gtk::TextView,
@@ -247,8 +238,8 @@ impl Controls {
         monitor_content.append(&model_text);
         let workspace = workspace_controls::WorkspaceControls::new(commands.clone());
         monitor_content.append(&workspace.widget);
-        let jobs = ui::column(12);
-        monitor_content.append(&jobs);
+        let jobs = super::job_list::JobList::new(app, &commands);
+        monitor_content.append(&jobs.widget);
         let inspection = gtk::TextView::new();
         inspection.set_editable(false);
         inspection.set_cursor_visible(true);
@@ -342,7 +333,6 @@ impl Controls {
             changing,
             monitor,
             jobs,
-            rows: BTreeMap::new(),
             message,
             model_text,
             inspection,
@@ -372,10 +362,14 @@ impl Controls {
             .entry
             .set_text("Explicit native request λ");
         self.request_field.entry.emit_activate();
-        assert!(self.rows.values().all(|row| !row.stop.is_sensitive()));
+        self.jobs.verify_initial();
         assert!(!self.model_text.text().is_empty());
         self.workspace.verify(frame);
+
         self.present();
+    }
+    pub fn verify_history(&mut self, frame: &Frame, commands: &Sender<Command>) {
+        self.jobs.verify_virtualization(frame, commands);
     }
     pub fn verify_output(&mut self, frame: &Frame, commands: &Sender<Command>) {
         let mut fixture = frame.clone();
@@ -517,104 +511,7 @@ impl Controls {
                     "Core unavailable · reconnecting"
                 }),
         );
-        let mut seen = Vec::new();
-        for (source, rows) in [
-            ("core", frame.core["jobs"].as_array()),
-            ("broker", frame.broker.as_array()),
-        ] {
-            for job in rows.into_iter().flatten() {
-                let key = format!("{}:{}", source, job["id"]);
-                seen.push(key.clone());
-                let row = self.rows.entry(key).or_insert_with(|| {
-                    let widget = ui::column(8);
-                    let label = ui::text("", false);
-                    widget.append(&label);
-                    let inspect = ui::button("Read output", ButtonVariant::Outline, false);
-                    let stop = ui::button("Stop work", ButtonVariant::Destructive, false);
-                    let actions = gtk::FlowBox::new();
-                    actions.set_selection_mode(gtk::SelectionMode::None);
-                    actions.set_min_children_per_line(1);
-                    actions.set_max_children_per_line(4);
-                    actions.set_column_spacing(8);
-                    actions.set_row_spacing(8);
-                    actions.insert(&inspect, -1);
-                    actions.insert(&stop, -1);
-                    let review = ui::button("Review approval", ButtonVariant::Outline, false);
-                    let attach = ui::button("Attach terminal", ButtonVariant::Outline, false);
-                    actions.insert(&review, -1);
-                    actions.insert(&attach, -1);
-                    widget.append(&actions);
-                    let proposal = Rc::new(RefCell::new(job.clone()));
-                    let (current, sender, app) = (
-                        proposal.clone(),
-                        commands.clone(),
-                        self.monitor.application().unwrap(),
-                    );
-                    review.connect_clicked(move |_| {
-                        review_proposal(&app, current.borrow().clone(), sender.clone())
-                    });
-                    let (current, sender) = (proposal.clone(), commands.clone());
-                    attach.connect_clicked(move |_| {
-                        let _ = sender.send(Command::Attach(current.borrow().clone()));
-                    });
-                    self.jobs.append(&widget);
-                    let (sender, source_name, id) =
-                        (commands.clone(), source.to_string(), job["id"].clone());
-                    inspect.connect_clicked(move |_| {
-                        let _ = sender.send(Command::Inspect {
-                            source: source_name.clone(),
-                            job: id.clone(),
-                        });
-                    });
-                    let (sender, source_name, id) =
-                        (commands.clone(), source.to_string(), job["id"].clone());
-                    stop.connect_clicked(move |_| {
-                        let _ = sender.send(Command::Stop {
-                            source: source_name.clone(),
-                            job: id.clone(),
-                        });
-                    });
-                    JobRow {
-                        widget,
-                        label,
-                        stop,
-                        review,
-                        attach,
-                        proposal,
-                    }
-                });
-                let argv = job["argv"]
-                    .as_array()
-                    .map(|a| {
-                        a.iter()
-                            .filter_map(Value::as_str)
-                            .collect::<Vec<_>>()
-                            .join(" ")
-                    })
-                    .unwrap_or_default();
-                let status = job["status"].as_str().unwrap_or("unavailable");
-                row.label
-                    .set_text(&format!("{} · {}\n{}", source, status, argv));
-                *row.proposal.borrow_mut() = job.clone();
-                row.review
-                    .set_sensitive(source == "broker" && status == "approval_required");
-                row.attach.set_sensitive(
-                    source == "broker" && status == "running" && job["terminal"] == true,
-                );
-                row.stop.set_sensitive(matches!(
-                    status,
-                    "starting" | "running" | "cancelling" | "approval_required"
-                ));
-            }
-        }
-        self.rows.retain(|id, row| {
-            if seen.contains(id) {
-                true
-            } else {
-                self.jobs.remove(&row.widget);
-                false
-            }
-        });
+        self.jobs.update(frame);
         let usage = if frame.usage["unavailable"] == true {
             "Model configuration and measured usage unavailable".into()
         } else {
@@ -692,7 +589,7 @@ impl Controls {
     }
 }
 
-fn review_proposal(app: &gtk::Application, proposal: Value, commands: Sender<Command>) {
+pub(super) fn review_proposal(app: &gtk::Application, proposal: Value, commands: Sender<Command>) {
     let content = ui::column(12);
     content.set_margin_top(20);
     content.set_margin_bottom(20);

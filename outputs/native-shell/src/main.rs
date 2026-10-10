@@ -4,6 +4,7 @@ mod broker_controls;
 mod controls;
 mod draft_cache;
 mod first_run;
+mod job_list;
 mod log_view;
 mod preferences;
 mod presentation_pages;
