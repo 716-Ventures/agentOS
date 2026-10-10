@@ -1,3 +1,4 @@
+mod presentation;
 use rusqlite::{params, Connection};
 use serde_json::{json, Value};
 use std::{
@@ -91,6 +92,7 @@ impl Core {
           CREATE TABLE IF NOT EXISTS activities(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,created_at INTEGER NOT NULL);
           CREATE TABLE IF NOT EXISTS jobs(id INTEGER PRIMARY KEY AUTOINCREMENT,activity_id INTEGER NOT NULL REFERENCES activities(id),argv TEXT NOT NULL,status TEXT NOT NULL,exit_code INTEGER,created_at INTEGER NOT NULL,finished_at INTEGER,error TEXT);
           CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY AUTOINCREMENT,at INTEGER NOT NULL,activity_id INTEGER,job_id INTEGER,kind TEXT NOT NULL,detail TEXT NOT NULL);").map_err(err)?;
+        presentation::init(&db)?;
         let tx = db.transaction().map_err(err)?;
         let stale: Vec<(i64, i64)> = {
             let mut s = tx.prepare("SELECT id,activity_id FROM jobs WHERE status IN ('starting','running','cancelling')").map_err(err)?;
@@ -478,20 +480,70 @@ fn pump<R: Read + Send + 'static>(
         }
     })
 }
+#[cfg(target_os = "linux")]
+fn presentation_peer(stream: &UnixStream) -> Result<presentation::Principal> {
+    use std::os::fd::AsRawFd;
+    let mut cred: libc::ucred = unsafe { std::mem::zeroed() };
+    let mut len = std::mem::size_of::<libc::ucred>() as libc::socklen_t;
+    if unsafe {
+        libc::getsockopt(
+            stream.as_raw_fd(),
+            libc::SOL_SOCKET,
+            libc::SO_PEERCRED,
+            &mut cred as *mut _ as *mut libc::c_void,
+            &mut len,
+        )
+    } != 0
+    {
+        return Err("Cannot authenticate presentation peer".into());
+    }
+    // Include process start time so a reused PID cannot acquire another client's lease.
+    let stat = fs::read_to_string(format!("/proc/{}/stat", cred.pid)).map_err(err)?;
+    let start = stat
+        .rsplit_once(')')
+        .and_then(|(_, tail)| tail.split_whitespace().nth(19))
+        .ok_or("Cannot authenticate presentation session")?;
+    Ok(presentation::Principal {
+        uid: cred.uid,
+        session: format!("{}:{start}", cred.pid),
+    })
+}
+#[cfg(not(target_os = "linux"))]
+fn presentation_peer(_: &UnixStream) -> Result<presentation::Principal> {
+    Err("Authenticated presentation IPC requires Linux SO_PEERCRED".into())
+}
 fn serve(core: Arc<Core>, mut stream: UnixStream) {
     let _ = stream.set_read_timeout(Some(Duration::from_secs(5)));
     let _ = stream.set_write_timeout(Some(Duration::from_secs(5)));
     let mut line = String::new();
     let result = BufReader::new(&stream)
-        .take(65537)
+        .take(4 * 1024 * 1024 + 1)
         .read_line(&mut line)
         .map_err(err)
         .and_then(|_| {
-            if line.len() > 65536 {
+            if line.len() > 4 * 1024 * 1024 {
                 return Err("Request too large".into());
             }
             let v: Value = serde_json::from_str(&line).map_err(err)?;
-            core.handle(&v)
+            let op = v["op"].as_str().unwrap_or("");
+            if op == "catalog.get"
+                || [
+                    "presentation.",
+                    "interaction.",
+                    "draft.",
+                    "binding.",
+                    "outputs.",
+                ]
+                .iter()
+                .any(|prefix| op.starts_with(prefix))
+            {
+                let principal = presentation_peer(&stream)?;
+                presentation::handle(&mut core.db.lock().unwrap(), &v, &principal)
+            } else if line.len() > 65536 {
+                Err("Request too large".into())
+            } else {
+                core.handle(&v)
+            }
         });
     let response = match result {
         Ok(v) => json!({"ok":true,"result":v}),

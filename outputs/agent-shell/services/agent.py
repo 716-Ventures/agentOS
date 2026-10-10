@@ -38,6 +38,12 @@ TOOLS = [
          {'path':{'type':'string'},'content':{'type':'string'},'expected_sha256':{'type':'string','description':'Use the literal string missing for a new file. For updates use the CURRENT file hash from read_file, never the hash of the new content.'}},
          ['path','content','expected_sha256']),
 ]
+TOOLS.extend([
+ tool('presentation_catalog','Discover the experimental native component schemas and protocol limits. Native rendering is not available until a graphical client connects.',{},[]),
+ tool('presentation_snapshot','Read persistent native surface/workspace documents and revisions for this activity. These are separate from terminal layout.',{},[]),
+ tool('presentation_apply','Commit a complete native presentation transaction encoded as JSON. Read catalog and snapshot first. Use exact revisions and stable IDs. It cannot execute commands, steal focus, overwrite active input, or register action authority.',
+      {'transaction':{'type':'string'}},['transaction']),
+])
 TOOLS.append(tool('preview_execution','Assess a proposed command without executing it. Returns allow, approve for destructive effects, or inspect for unknown effects, with the actual guarded argv and scope.',TOOLS[2]['function']['parameters']['properties'],['argv','purpose']))
 TOOLS.extend([
  tool('conversation_read','Read saved exchanges omitted from working context. Returns original user requests, tool evidence and replies; this is history, not fresh machine state or permission.',

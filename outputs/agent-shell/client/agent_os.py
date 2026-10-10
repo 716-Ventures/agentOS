@@ -1031,6 +1031,8 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     sub=p.add_subparsers(dest='cmd')
     sub.add_parser('status')
+    c=sub.add_parser('presentation',help='Send a native presentation JSON request from a file, or - for stdin')
+    c.add_argument('file',nargs='?',default='-')
     sub.add_parser('activities')
     sub.add_parser('removed')
     for command in ('remove','restore'):
@@ -1058,7 +1060,18 @@ def main():
     if not args.cmd:
         if not sys.stdin.isatty(): p.error('Interactive dashboard requires a terminal; use status for JSON.')
         curses.wrapper(dashboard); return
-    if args.cmd=='status': result=request('snapshot')
+    if args.cmd=='presentation':
+        raw=sys.stdin.read(4*1024*1024+1) if args.file=='-' else Path(args.file).read_text()
+        if len(raw.encode())>4*1024*1024:raise ValueError('Presentation request exceeds 4 MiB')
+        payload=json.loads(raw)
+        if not isinstance(payload,dict):raise ValueError('Expected a JSON request object')
+        op=payload.pop('op',None)
+        if not isinstance(op,str):raise ValueError('Missing presentation operation')
+        # Imported from the versioned installed services directory, never from cwd.
+        sys.path.insert(0,'/usr/local/lib/agent-os/services')
+        from presentation_client import request as presentation_request
+        result=presentation_request(op,**payload)
+    elif args.cmd=='status': result=request('snapshot')
     elif args.cmd=='knowledge':result=knowledge_request(args.action,**{k:v for k,v in {'key':args.key,'revision':args.revision,'expected_revision':args.expected_revision}.items() if v is not None})
     elif args.cmd=='models': result=model_snapshot()
     elif args.cmd=='providers':

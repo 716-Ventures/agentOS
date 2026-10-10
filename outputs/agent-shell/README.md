@@ -114,3 +114,5 @@ scripts. These tests create activities/files and the core integration script
 restarts its service. Historical verification reports do not substitute for a
 fresh run of the current source. Voice, native graphics, release updates and
 formal accessibility validation remain outside this runtime hardening scope.
+
+The initial Rust native presentation contract is implemented and tested headlessly. See [PRESENTATION.md](PRESENTATION.md) for operations, guarantees and remaining graphical integration work.

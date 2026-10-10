@@ -16,6 +16,7 @@ from agent import run as run_agent
 from decisions import Decisions
 from broker_client import request as broker_request
 from layout_client import request as layout_request
+import presentation_client
 
 STATE = Path('/var/lib/agent-os-ai')
 
@@ -150,6 +151,9 @@ def handle(req, conn):
             history.append({'role':'user','content':'Fresh broker job state is unavailable; inspect before repeating any previous action.'})
         def dispatch(name,args):
             try:
+                if name=='presentation_catalog':return presentation_client.request('catalog.get')
+                if name=='presentation_snapshot':return presentation_client.for_activity(activity)
+                if name=='presentation_apply':return presentation_client.apply_for_activity(activity,json.loads(args['transaction']))
                 if name=='conversation_read':
                     offset=args['offset'];limit=args.get('limit',1)
                     return {'total_exchanges':len(turns),'offset':offset,'exchanges':turns[offset:offset+limit],'next_offset':min(len(turns),offset+limit)}
