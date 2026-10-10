@@ -84,6 +84,60 @@ fn verify_container_replacement(
             .accessible_role(),
         gtk::AccessibleRole::Label
     );
+    doc["revision"] = json!(7);
+    doc["elements"]["root"] =
+        json!({"type":"Split@1","props":{"label":"Comparison"},"slots":{"children":["a","b"]}});
+    doc["elements"].as_object_mut().unwrap().remove("region");
+    surface.update(id, &doc, frame, commands, drafts);
+    let split = surface.elements["root"].split.as_ref().unwrap();
+    assert_eq!(
+        split.children(),
+        vec![surface.elements["a"].widget.clone(), b.clone()]
+    );
+    split.widget.set_position(120);
+    let position = split.widget.position();
+    doc["revision"] = json!(8);
+    doc["elements"]["root"]["props"]["label"] = json!("Updated comparison");
+    surface.update(id, &doc, frame, commands, drafts);
+    assert_eq!(
+        surface.elements["root"]
+            .split
+            .as_ref()
+            .unwrap()
+            .widget
+            .position(),
+        position
+    );
+    doc["revision"] = json!(9);
+    doc["elements"]["root"] = json!({"type":"Tabs@1","props":{"label":"Details","labels":["A","B"]},"slots":{"children":["a","b"]}});
+    surface.update(id, &doc, frame, commands, drafts);
+    assert!(surface.elements["root"]
+        .tabs
+        .as_ref()
+        .unwrap()
+        .select_key("b"));
+    doc["revision"] = json!(10);
+    doc["elements"]["root"]["slots"]["children"] = json!(["b", "a"]);
+    doc["elements"]["root"]["props"]["labels"] = json!(["B renamed", "A"]);
+    surface.update(id, &doc, frame, commands, drafts);
+    let tabs = surface.elements["root"].tabs.as_ref().unwrap();
+    assert_eq!(tabs.selected_key().as_deref(), Some("b"));
+    assert_eq!(tabs.widget.tab_label_text(&b).as_deref(), Some("B renamed"));
+    assert_eq!(surface.elements["b"].widget, b);
+    doc["revision"] = json!(11);
+    doc["elements"]["root"]["slots"]["children"] = json!(["a"]);
+    doc["elements"]["root"]["props"]["labels"] = json!(["A"]);
+    doc["elements"].as_object_mut().unwrap().remove("b");
+    surface.update(id, &doc, frame, commands, drafts);
+    assert_eq!(
+        surface.elements["root"]
+            .tabs
+            .as_ref()
+            .unwrap()
+            .selected_key()
+            .as_deref(),
+        Some("a")
+    );
     surface.window.destroy();
 }
 pub fn run(socket: PathBuf, capture: Option<String>) {

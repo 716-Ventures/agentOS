@@ -35,6 +35,12 @@ class Projection(unittest.TestCase):
         lines,controls=view.project(doc);text='\n'.join(lines)
         self.assertIn('Section 日本語',text);self.assertIn('Scrollable details',text);self.assertIn('Café 日本語',text);self.assertNotIn('evil',text)
         self.assertEqual(set(controls),{'field','button'})
+    def test_tabs_and_splits_project_every_page_and_control_without_hiding_content(self):
+        doc=document();doc['elements']['root']={'type':'Tabs@1','props':{'label':'Details','labels':['Read','Edit']},'slots':{'children':['text','split']}}
+        doc['elements']['split']={'type':'Split@1','props':{'label':'Inputs'},'slots':{'children':['field','button']}}
+        lines,controls=view.project(doc);text='\n'.join(lines)
+        self.assertIn('Read',text);self.assertIn('Edit',text);self.assertIn('Inputs',text);self.assertIn('Café 日本語',text)
+        self.assertEqual(set(controls),{'field','button'})
     def test_completed_multiline_input_survives_interruption(self):
         doc=document();doc['elements']['field']['props']['multiline']=True;calls=[]
         def request(op,**fields):calls.append(op);return {'draft_revision':0,'draft':None}

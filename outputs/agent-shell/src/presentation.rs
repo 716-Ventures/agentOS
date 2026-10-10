@@ -385,6 +385,19 @@ fn walk_elements(
             return Err(invalid("Collection cell count must match its schema"));
         }
     }
+    if node.kind == "Tabs@1" {
+        let labels = node.props["labels"].as_array().unwrap();
+        if node.slots.get("children").map(Vec::len) != Some(labels.len())
+            || labels
+                .iter()
+                .any(|label| label.as_str().unwrap().trim().is_empty())
+        {
+            return Err(invalid("Tabs require one meaningful label per child"));
+        }
+    }
+    if node.kind == "Split@1" && node.slots.get("children").map(Vec::len) != Some(2) {
+        return Err(invalid("Split requires exactly two children"));
+    }
     if node.kind == "Link@1" {
         let url = node.props["url"].as_str().unwrap();
         if !(url.starts_with("https://")
@@ -2523,6 +2536,33 @@ mod tests {
             json!(["root"]);
         assert!(handle(&mut db, &bad, &human()).is_err());
         handle(&mut db, &create, &human()).unwrap();
+    }
+    #[test]
+    fn tabs_and_splits_require_complete_bounded_labeled_children() {
+        for kind in ["Split@1", "Tabs@1"] {
+            let mut db = fixture();
+            let mut doc = surface();
+            doc["elements"]["root"] = json!({"type":kind,"props":{"label":"Details"},"slots":{"children":["text","input"]}});
+            if kind == "Tabs@1" {
+                doc["elements"]["root"]["props"]["labels"] = json!(["Text", "Input"]);
+            }
+            let create = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"panes-view","expected_revisions":{"surface-a":null},"operations":[{"op":"surface.create","document":doc}]});
+            let mut bad = create.clone();
+            bad["operations"][0]["document"]["elements"]["root"]["slots"]
+                .as_object_mut()
+                .unwrap()
+                .remove("children");
+            assert!(handle(&mut db, &bad, &human()).is_err());
+            if kind == "Tabs@1" {
+                for labels in [json!(["Text"]), json!(["Text", " "]), json!([])] {
+                    bad = create.clone();
+                    bad["operations"][0]["document"]["elements"]["root"]["props"]["labels"] =
+                        labels;
+                    assert!(handle(&mut db, &bad, &human()).is_err());
+                }
+            }
+            handle(&mut db, &create, &human()).unwrap();
+        }
     }
     #[test]
     fn file_metadata_is_typed_private_scoped_and_monotonic() {

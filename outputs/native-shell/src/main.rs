@@ -41,6 +41,8 @@ struct Element {
     button: Option<gtk::Button>,
     progress: Option<gtk::ProgressBar>,
     container: Option<gtk::Box>,
+    split: Option<ui::SplitView>,
+    tabs: Option<ui::Tabs>,
     section: Option<ui::Section>,
     region: Option<ui::ScrollRegion>,
     table: Option<ui::DataTable>,
@@ -49,6 +51,36 @@ struct Element {
     events: Rc<RefCell<Value>>,
     applying: Rc<Cell<bool>>,
     children: Vec<String>,
+}
+impl Element {
+    fn child_widgets(&self) -> Option<Vec<gtk::Widget>> {
+        if let Some(container) = &self.container {
+            let mut widgets = Vec::new();
+            let mut child = container.first_child();
+            while let Some(widget) = child {
+                child = widget.next_sibling();
+                widgets.push(widget);
+            }
+            Some(widgets)
+        } else if let Some(split) = &self.split {
+            Some(split.children())
+        } else {
+            self.tabs.as_ref().map(|tabs| tabs.children())
+        }
+    }
+    fn detach_children(&self) {
+        if let Some(container) = &self.container {
+            while let Some(child) = container.first_child() {
+                container.remove(&child);
+            }
+        }
+        if let Some(split) = &self.split {
+            split.clear();
+        }
+        if let Some(tabs) = &self.tabs {
+            tabs.clear();
+        }
+    }
 }
 struct Surface {
     window: gtk::ApplicationWindow,
@@ -99,6 +131,8 @@ fn construct(
         button: None,
         progress: None,
         container: None,
+        split: None,
+        tabs: None,
         section: None,
         region: None,
         table: None,
@@ -128,6 +162,21 @@ fn construct(
             result.widget = list.widget.clone().upcast();
             lease(&result.widget, surface, id, commands);
             result.list = Some(list);
+        }
+        "Split@1" => {
+            let split = ui::SplitView::new(
+                props["label"].as_str().unwrap(),
+                props["axis"] == "vertical",
+            )
+            .unwrap();
+            result.widget = split.widget.clone().upcast();
+            result.split = Some(split);
+        }
+        "Tabs@1" => {
+            let tabs = ui::Tabs::new(props["label"].as_str().unwrap()).unwrap();
+            result.widget = tabs.widget.clone().upcast();
+            lease(&result.widget, surface, id, commands);
+            result.tabs = Some(tabs);
         }
         "Section@1" => {
             let section = ui::Section::new(props["label"].as_str().unwrap()).unwrap();
@@ -459,6 +508,10 @@ impl Surface {
                     .as_ref()
                     .map(|list| list.view.has_focus() || list.view.focus_child().is_some())
                     .unwrap_or(false)
+                || ((e.tabs.is_some() || e.split.is_some())
+                    && gtk::prelude::GtkWindowExt::focus(&self.window)
+                        .map(|focus| focus == e.widget || focus.is_ancestor(&e.widget))
+                        .unwrap_or(false))
                 || e.label
                     .as_ref()
                     .map(|l| l.selection_bounds().is_some())
@@ -503,14 +556,8 @@ impl Surface {
                     })
                     .unwrap_or(true)
                 {
-                    if let Some(container) = self
-                        .elements
-                        .get(element)
-                        .and_then(|old| old.container.as_ref())
-                    {
-                        while let Some(child) = container.first_child() {
-                            container.remove(&child);
-                        }
+                    if let Some(old) = self.elements.get(element) {
+                        old.detach_children();
                     }
                     self.elements.insert(
                         element.clone(),
@@ -523,11 +570,7 @@ impl Surface {
                 .iter()
                 .filter(|(key, _)| !nodes.contains_key(*key))
             {
-                if let Some(container) = &old.container {
-                    while let Some(child) = container.first_child() {
-                        container.remove(&child);
-                    }
-                }
+                old.detach_children();
             }
             self.elements.retain(|key, _| nodes.contains_key(key));
             if doc["root"].as_str() != Some(self.root.as_str()) {
@@ -548,19 +591,15 @@ impl Surface {
                     .filter_map(|child| self.elements.get(child).map(|e| e.widget.clone()))
                     .collect::<Vec<_>>();
                 if let Some(e) = self.elements.get_mut(element) {
-                    if let Some(container) = &e.container {
-                        let mut current = Vec::new();
-                        let mut child = container.first_child();
-                        while let Some(widget) = child {
-                            child = widget.next_sibling();
-                            current.push(widget);
-                        }
+                    if let Some(current) = e.child_widgets() {
                         if current != widgets {
-                            while let Some(child) = container.first_child() {
-                                container.remove(&child);
-                            }
+                            e.detach_children();
+                        }
+                        if current != widgets || e.tabs.is_some() {
                             plans.push((element.clone(), children, widgets));
                         }
+                    }
+                    if let Some(container) = &e.container {
                         container.set_spacing(match node["props"]["spacing"].as_str() {
                             Some("compact") => 6,
                             Some("relaxed") => 20,
@@ -572,11 +611,30 @@ impl Surface {
             for (element, children, widgets) in plans {
                 if let Some(e) = self.elements.get_mut(&element) {
                     if let Some(container) = &e.container {
-                        for child in widgets {
-                            container.append(&child);
+                        for child in &widgets {
+                            container.append(child);
                         }
-                        e.children = children;
                     }
+                    if let Some(split) = &e.split {
+                        split.set_children(&widgets[0], &widgets[1]).unwrap();
+                    }
+                    if let Some(tabs) = &e.tabs {
+                        let labels = nodes[&element]["props"]["labels"].as_array().unwrap();
+                        let pages = children
+                            .iter()
+                            .zip(&widgets)
+                            .zip(labels)
+                            .map(|((key, widget), title)| {
+                                (
+                                    key.clone(),
+                                    title.as_str().unwrap().to_string(),
+                                    widget.clone(),
+                                )
+                            })
+                            .collect::<Vec<_>>();
+                        tabs.set_pages(&pages).unwrap();
+                    }
+                    e.children = children;
                 }
             }
             if let Some(root) = doc["root"].as_str() {
@@ -593,6 +651,26 @@ impl Surface {
         for (element, node) in nodes {
             if let Some(e) = self.elements.get_mut(element) {
                 let props = &node["props"];
+                if let Some(split) = &e.split {
+                    split
+                        .widget
+                        .set_orientation(if props["axis"] == "vertical" {
+                            gtk::Orientation::Vertical
+                        } else {
+                            gtk::Orientation::Horizontal
+                        });
+                    split
+                        .widget
+                        .update_property(&[gtk::accessible::Property::Label(
+                            props["label"].as_str().unwrap(),
+                        )]);
+                }
+                if let Some(tabs) = &e.tabs {
+                    tabs.widget
+                        .update_property(&[gtk::accessible::Property::Label(
+                            props["label"].as_str().unwrap(),
+                        )]);
+                }
                 if let Some(section) = &e.section {
                     let _ = section.set_label(props["label"].as_str().unwrap());
                 }
