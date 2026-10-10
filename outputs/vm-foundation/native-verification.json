@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-10-10T18:05:38.805128+00:00",
+  "started_at": "2026-10-10T18:20:53.598082+00:00",
   "result": "pass",
   "vm_uuid": "27176EA2-E994-4165-9BBA-70FEED59E66B",
   "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -41,6 +41,7 @@
     "native-session-host-loss",
     "native-session-compositor-loss",
     "direct-display-input-vt",
+    "conventional-browser-links",
     "signed-graphical-release",
     "terminal",
     "interactive-terminal",
@@ -61,19 +62,16 @@
     "OS update rollback"
   ],
   "deployment": {
-    "created_at": "2026-10-10T18:05:52.385508+00:00",
-    "source_archive_sha256": "2648b0967d6a8f64cdef38bb8ac27a090a7a9eaeb4e8e18ad6489038471fb258",
-    "repository_revision": "b9ad423a4e6212148bc2c4b5e9ad3395ded02773",
+    "created_at": "2026-10-10T18:20:56.548167+00:00",
+    "source_archive_sha256": "9d9b1bd20216dd561593a65d4e294604d687cf9d567f5bcd6da44b2bb60654a9",
+    "repository_revision": "e78ee02f75c1bb773210c360a0846ea65d6c8033",
     "source_changes": [
-      " M outputs/agent-shell/Cargo.lock",
-      " M outputs/agent-shell/Cargo.toml",
-      " M outputs/native-shell/Cargo.lock",
-      " M outputs/native-shell/Cargo.toml",
-      " M outputs/native-shell/README.md"
+      "M  outputs/agent-shell/dependencies.json",
+      "A  outputs/native-shell/tests/browser_links.py"
     ],
     "installed": true
   },
-  "runtime_release": "36cd7ddfac5cf9739c61dbfa5186facd0456fdc61bc6f1f3b2d38cc79e86f6bb",
+  "runtime_release": "b990c0f461e3cc72c1ff26f43cafa4be3e52d45392a9b0a2ad7d35982f9ffd99",
   "dependency_manifest": {
     "packages": {
       "adduser": "3.152",
@@ -127,6 +125,7 @@
       "debconf": "1.5.91",
       "debian-archive-keyring": "2025.1",
       "debianutils": "5.23.2",
+      "desktop-file-utils": "0.28-1",
       "dhcpcd-base": "1:10.1.0-11+deb13u4",
       "diffutils": "1:3.10-4",
       "distro-info-data": "0.66+deb13u2",
@@ -141,6 +140,7 @@
       "fdisk": "2.41.5-0+deb13u1",
       "file": "1:5.46-5",
       "findutils": "4.10.0-3",
+      "firefox-esr": "153.4.0esr-1~deb13u1",
       "fontconfig": "2.15.0-2.3",
       "fontconfig-config": "2.15.0-2.3",
       "fonts-dejavu-core": "2.37-8",
@@ -380,6 +380,8 @@
       "libgssapi-krb5-2:arm64": "1.21.3-5+deb13u1",
       "libgstreamer-plugins-base1.0-0:arm64": "1.26.2-1+deb13u2",
       "libgstreamer1.0-0:arm64": "1.26.2-2",
+      "libgtk-3-0t64:arm64": "3.24.49-3",
+      "libgtk-3-common": "3.24.49-3",
       "libgtk-4-1:arm64": "4.18.6+ds-2",
       "libgtk-4-common": "4.18.6+ds-2",
       "libgtk-4-dev:arm64": "4.18.6+ds-2",
@@ -468,6 +470,7 @@
       "libngtcp2-16:arm64": "1.11.0-1+deb13u1",
       "libngtcp2-crypto-gnutls8:arm64": "1.11.0-1+deb13u1",
       "libnorm1t64:arm64": "1.5.9+dfsg-3.1+b2",
+      "libnspr4:arm64": "2:4.36-1",
       "libnss-myhostname:arm64": "257.13-1~deb13u1",
       "libnss-resolve:arm64": "257.13-1~deb13u1",
       "libnuma1:arm64": "2.0.19-1",
@@ -840,6 +843,7 @@
       "whiptail": "0.52.25-1",
       "x11-common": "1:7.7+24+deb13u1",
       "x11proto-dev": "2024.1-1",
+      "xdg-utils": "1.2.1-2",
       "xkb-data": "2.42-1",
       "xml-core": "0.19",
       "xorg-sgml-doctools": "1:1.11-1.1",
@@ -849,7 +853,7 @@
       "zlib1g:arm64": "1:1.3.dfsg+really1.3.1-1+b1",
       "zstd": "1.5.7+dfsg-1"
     },
-    "profile_sha256": "c9cfeb7ecbe8e4af734ed07ddf0f8c77e598bda490c7c2b453bca5105ebcbca3"
+    "profile_sha256": "e76be92153567973abe0df91b2a9c27b3e58cfe306a41337020448471908e923"
   },
   "host_tools": {
     "utm": "4.7.5",
@@ -857,5 +861,27 @@
     "python": "Python 3.9.6"
   },
   "guest_stopped": true,
-  "finished_at": "2026-10-10T18:09:58.745441+00:00"
+  "finished_at": "2026-10-10T18:27:57.108896+00:00",
+  "additional_installed_browser_check": {
+    "result": "pass",
+    "checks": [
+      "system HTTP/HTTPS handler",
+      "actual native Link action",
+      "GIO launch with isolated profile",
+      "real Firefox local page retrieval and title",
+      "conventional shared identity",
+      "durable focus/maximize",
+      "browser disconnect"
+    ],
+    "not_tested": [
+      "physical input",
+      "remote website compatibility",
+      "hardware acceleration",
+      "mailto account/client"
+    ],
+    "firefox_debian_version": "153.4.0esr-1~deb13u1",
+    "installed_executables": true,
+    "cleanup_verified": true,
+    "test_source_sha256": "9a6b4c8672009aa4c6efce5c41e3de4da0f8b0136aa3999dd7ceb102be8d9eb5"
+  }
 }

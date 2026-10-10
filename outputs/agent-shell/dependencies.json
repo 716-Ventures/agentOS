@@ -55,6 +55,9 @@
     "libseat-dev",
     "dbus-user-session",
     "dbus-x11",
-    "libvte-2.91-gtk4-dev"
+    "libvte-2.91-gtk4-dev",
+    "firefox-esr",
+    "xdg-utils",
+    "desktop-file-utils"
   ]
 }
