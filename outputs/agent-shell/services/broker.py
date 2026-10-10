@@ -450,7 +450,24 @@ def recover_jobs():
     for job in recovered.values():SOURCES.mark(job)
 
 
+
+def source_backfill():
+    # Stream authoritative records after queue pressure; never retain a second unbounded queue.
+    for directory,adapter in ((STATE,SOURCES.job_payload),(STATE/'file-observations',SOURCES.file_payload)):
+        try:
+            with os.scandir(directory) as entries:
+                for entry in entries:
+                    try:
+                        if not entry.name.endswith('.json') or not entry.is_file(follow_symlinks=False) or entry.stat().st_size>1024*1024:continue
+                        with open(entry.path) as stream:record=json.load(stream)
+                        payload=adapter(record)
+                        if payload:yield payload
+                    except (OSError,ValueError,KeyError,TypeError):continue
+        except FileNotFoundError:continue
+
+
 def main():
+    SOURCES.replay=source_backfill
     recover_jobs()
     FileObservations(STATE/'file-observations',SOURCES).recover()
     SOURCES.start()

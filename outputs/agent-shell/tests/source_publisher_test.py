@@ -26,3 +26,30 @@ class Sources(unittest.TestCase):
             import json
             self.assertEqual(json.loads((Path(directory)/(job['id']+'.json')).read_text())['source_revision'],2)
             mark.assert_called_once_with(job)
+
+    def test_queue_pressure_streams_every_durable_observation_without_restart(self):
+        records=[{**self.job(), 'id':format(i,'032x')} for i in range(1100)]
+        sources=BrokerSources('/unused',replay=lambda:(sources.job_payload(job) for job in records))
+        for job in records:sources.mark(job)
+        self.assertEqual(len(sources.pending),1024);self.assertTrue(sources.needs_replay)
+        seen=set()
+        def deliver(payload):
+            seen.add(payload['source'])
+            if len(seen)==len(records):sources.stop.set()
+        with patch.object(sources,'request',side_effect=deliver),patch.object(sources.stop,'wait'):
+            sources.run()
+        self.assertEqual(len(seen),1100)
+        self.assertLessEqual(len(sources.pending),1024)
+
+    def test_backfill_reads_only_bounded_regular_durable_records(self):
+        import json
+        import files
+        from file_observations import FileObservations
+        with tempfile.TemporaryDirectory() as directory,patch.object(broker,'STATE',Path(directory)):
+            root=Path(directory);job=self.job();(root/(job['id']+'.json')).write_text(json.dumps(job))
+            (root/'bad.json').write_text('{bad')
+            (root/'link.json').symlink_to(root/(job['id']+'.json'))
+            FileObservations(root/'file-observations',BrokerSources()).save(1,files.metadata(root/'missing'))
+            rows=list(broker.source_backfill())
+            self.assertEqual(len(rows),2);self.assertEqual({r['source'].split(':')[0] for r in rows},{'broker','file'})
+            self.assertNotIn('private input',json.dumps(rows))
