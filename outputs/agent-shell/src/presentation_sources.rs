@@ -12,6 +12,7 @@ fn storage(e: impl std::fmt::Display) -> String {
 fn valid(source: &str) -> bool {
     source
         .strip_prefix("broker:")
+        .or_else(|| source.strip_prefix("file:"))
         .map(|id| {
             id.len() == 32
                 && id
@@ -35,9 +36,15 @@ pub fn activity(db: &Connection, source: &str) -> Result<Option<String>> {
 fn observed(db: &Connection, source: &str) -> Result<Option<Value>> {
     let row:Option<(String,i64,String,String,i64,i64)>=db.query_row("SELECT s.activity,s.revision,s.body,s.session,s.observed,COALESCE(o.observed,s.observed) FROM presentation_external_sources s LEFT JOIN presentation_source_owners o USING(session) WHERE source=?",[source],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?,r.get(5)?))).optional().map_err(storage)?;
     row.map(|(activity,revision,body,session,at,heartbeat)| {
-        let body:Value=serde_json::from_str(&body).map_err(storage)?;
-        let available=crate::presentation_hosts::alive(&session) && heartbeat>=crate::now()-15;
-        Ok(json!({"source":source,"activity_id":activity,"source_revision":revision,"observed_at":at,"availability":if available {"available"} else {"unavailable"},"values":body}))
+        let mut body:Value=serde_json::from_str(&body).map_err(storage)?;
+        let file=source.starts_with("file:");
+        if file {
+            body["size_text"]=json!(body["size_bytes"].as_u64().map(|n|format!("{n} bytes")).unwrap_or_else(||"Unavailable".into()));
+            body["mode_text"]=json!(body["mode"].as_u64().map(|n|format!("{n:04o}")).unwrap_or_else(||"Unavailable".into()));
+            body["modified_text"]=json!(body["modified_at"].as_f64().map(|n|format!("{n} Unix seconds")).unwrap_or_else(||"Unavailable".into()));
+        }
+        let available=(!file || body["kind"]!="unavailable") && crate::presentation_hosts::alive(&session) && heartbeat>=crate::now()-15;
+        Ok(json!({"source":source,"activity_id":activity,"source_revision":revision,"observed_at":if file {body["measured_at"].clone()} else {json!(at)},"availability":if available {"available"} else {"unavailable"},"values":body}))
     }).transpose()
 }
 pub fn binding(db: &Connection, source: &str, activity: &str, path: &str) -> Result<Value> {
@@ -79,29 +86,55 @@ pub fn handle(db: &mut Connection, value: &Value, who: &Principal) -> Result<Val
             let values = value["values"]
                 .as_object()
                 .ok_or_else(|| error("invalid_event", "Observed values required"))?;
-            if values.len() != 5
-                || values.iter().any(|(key, v)| match key.as_str() {
-                    "status" => !v
-                        .as_str()
-                        .map(|s| !s.is_empty() && s.len() <= 128)
-                        .unwrap_or(false),
-                    "error" => {
-                        !v.is_null() && !v.as_str().map(|s| s.len() <= 16384).unwrap_or(false)
-                    }
-                    "exit_code" => !v.is_null() && v.as_i64().is_none(),
-                    "created_at" | "finished_at" => {
-                        !v.is_null()
-                            && !v
-                                .as_f64()
-                                .map(|n| n.is_finite() && n >= 0.0)
-                                .unwrap_or(false)
-                    }
-                    _ => true,
-                })
-            {
+            let file = source.starts_with("file:");
+            let bad = if file {
+                values.len() != 6
+                    || values.iter().any(|(key, v)| match key.as_str() {
+                        "path" => !v.as_str().is_some_and(|s| {
+                            s.starts_with('/') && s.len() <= 4096 && !s.contains('\0')
+                        }),
+                        "kind" => !v.as_str().is_some_and(|s| {
+                            [
+                                "file",
+                                "directory",
+                                "symlink",
+                                "missing",
+                                "other",
+                                "unavailable",
+                            ]
+                            .contains(&s)
+                        }),
+                        "size_bytes" => !v.is_null() && !v.as_i64().is_some_and(|n| n >= 0),
+                        "mode" => !v.is_null() && !v.as_u64().is_some_and(|n| n <= 0o7777),
+                        "modified_at" => !v.is_null() && !v.as_f64().is_some_and(f64::is_finite),
+                        "measured_at" => !v.as_f64().is_some_and(|n| n.is_finite() && n >= 0.),
+                        _ => true,
+                    })
+            } else {
+                values.len() != 5
+                    || values.iter().any(|(key, v)| match key.as_str() {
+                        "status" => !v
+                            .as_str()
+                            .map(|s| !s.is_empty() && s.len() <= 128)
+                            .unwrap_or(false),
+                        "error" => {
+                            !v.is_null() && !v.as_str().map(|s| s.len() <= 16384).unwrap_or(false)
+                        }
+                        "exit_code" => !v.is_null() && v.as_i64().is_none(),
+                        "created_at" | "finished_at" => {
+                            !v.is_null()
+                                && !v
+                                    .as_f64()
+                                    .map(|n| n.is_finite() && n >= 0.0)
+                                    .unwrap_or(false)
+                        }
+                        _ => true,
+                    })
+            };
+            if bad {
                 return Err(error(
                     "invalid_event",
-                    "Unsupported or invalid observed broker field",
+                    "Unsupported or invalid observed field",
                 ));
             }
             let tx = db.transaction().map_err(storage)?;
@@ -119,6 +152,9 @@ pub fn handle(db: &mut Connection, value: &Value, who: &Principal) -> Result<Val
             let body = json!(values).to_string();
             if let Some((owned, old, raw, session)) = previous {
                 if owned != activity
+                    || (file
+                        && serde_json::from_str::<Value>(&raw).map_err(storage)?["path"]
+                            != values["path"])
                     || (session != who.session && crate::presentation_hosts::alive(&session))
                 {
                     return Err(error("unauthorized", "Source ownership cannot be rebound"));
@@ -175,7 +211,19 @@ pub fn handle(db: &mut Connection, value: &Value, who: &Principal) -> Result<Val
                 };
                 if let Some(mut row) = value {
                     row.as_object_mut().unwrap().remove("values");
-                    row["paths"] = if source.starts_with("window:") {
+                    row["paths"] = if source.starts_with("file:") {
+                        json!([
+                            "/path",
+                            "/kind",
+                            "/size_bytes",
+                            "/modified_at",
+                            "/mode",
+                            "/measured_at",
+                            "/size_text",
+                            "/modified_text",
+                            "/mode_text"
+                        ])
+                    } else if source.starts_with("window:") {
                         json!(["/title", "/app_id", "/availability"])
                     } else {
                         json!([

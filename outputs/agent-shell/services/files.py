@@ -9,6 +9,7 @@ from pathlib import Path
 import sys
 import stat
 import uuid
+import time
 
 BACKUPS=Path('/var/lib/agent-os-file-backups')
 
@@ -22,7 +23,7 @@ def read_regular(path):
         return f.read(65537)
 
 
-def run(req):
+def operate(req):
     path=Path(req['path'])
     if not path.is_absolute():path=Path.cwd()/path
     op=req['op']
@@ -47,6 +48,21 @@ def run(req):
             fcntl.flock(lock,fcntl.LOCK_EX)
             return write_guarded(target,req)
     raise ValueError('Unknown file operation')
+
+
+def metadata(path):
+    path=Path(os.path.abspath(path))
+    try:
+        info=path.lstat()
+        kind='file' if stat.S_ISREG(info.st_mode) else 'directory' if stat.S_ISDIR(info.st_mode) else 'symlink' if stat.S_ISLNK(info.st_mode) else 'other'
+        return {'path':str(path),'kind':kind,'size_bytes':info.st_size,'modified_at':info.st_mtime,'mode':stat.S_IMODE(info.st_mode),'measured_at':time.time()}
+    except FileNotFoundError:kind='missing'
+    except OSError:kind='unavailable'
+    return {'path':str(path),'kind':kind,'size_bytes':None,'modified_at':None,'mode':None,'measured_at':time.time()}
+
+
+def run(req):
+    result=operate(req);result['metadata']=metadata(result['path']);return result
 
 
 def write_guarded(target, req):

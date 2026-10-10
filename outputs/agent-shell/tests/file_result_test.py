@@ -38,6 +38,8 @@ class FileResults(unittest.TestCase):
                 self.assertGreater(len(raw), 32768)
                 result = self.collect(raw)
                 self.assertNotIn('error', result)
+                measured = result['file_result']['metadata'].pop('measured_at')
+                self.assertGreaterEqual(measured, expected['metadata'].pop('measured_at'))
                 self.assertEqual(result['file_result'], expected)
                 self.assertEqual(result['file_result']['content'], content)
                 self.assertEqual(result['file_result']['sha256'], hashlib.sha256(path.read_bytes()).hexdigest())

@@ -4,6 +4,7 @@ import json
 import select
 import terminal_sessions
 from source_publisher import BrokerSources
+from file_observations import FileObservations
 import codecs
 import math
 import hashlib
@@ -179,7 +180,12 @@ def launch(job):
             if proc is not None:
                 if proc.stdout is not None:proc.stdout.close()
                 if terminal and proc.stdin is not None:proc.stdin.close()
-            job['finished_at'] = time.time(); persist(job)
+            job['finished_at'] = time.time()
+            try:
+                source=FileObservations(STATE/'file-observations',SOURCES).completed(job)
+                if source:job['file_source']=source
+            except (OSError,ValueError,KeyError,TypeError):job['metadata_observation_unavailable']=True
+            persist(job)
 
 
 def checked_input(job):
@@ -446,6 +452,7 @@ def recover_jobs():
 
 def main():
     recover_jobs()
+    FileObservations(STATE/'file-observations',SOURCES).recover()
     SOURCES.start()
     def reap_terminals():
         while True:

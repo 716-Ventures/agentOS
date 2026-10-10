@@ -17,6 +17,13 @@ class BrokerSources:
         if isinstance(error,str) and len(error.encode())>16000:error=error.encode()[:15900].decode(errors='ignore')+' [truncated]'
         payload={'op':'source.publish','source':'broker:'+job['id'],'activity_id':str(job['activity']),'source_revision':job.get('source_revision',0),
                  'values':{'status':job['status'],'exit_code':job.get('exit_code'),'error':error,'created_at':job.get('created_at'),'finished_at':job.get('finished_at')}}
+        self.enqueue(payload)
+    def mark_file(self,record):
+        from file_observations import record_valid
+        if not record_valid(record):return
+        self.enqueue({'op':'source.publish','source':record['source'],'activity_id':str(record['activity']),
+                      'source_revision':record['source_revision'],'values':dict(record['values'])})
+    def enqueue(self,payload):
         with self.lock:
             if len(self.pending)>=1024 and payload['source'] not in self.pending:self.pending.pop(next(iter(self.pending)))
             self.pending[payload['source']]=payload

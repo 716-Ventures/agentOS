@@ -278,7 +278,7 @@ pub fn catalog() -> Value {
     json!({"protocol":PROTOCOL,"catalog_revision":CATALOG,
     "limits":{"document_bytes":DOCUMENT_LIMIT,"transaction_bytes":TRANSACTION_LIMIT,"elements":2048,"depth":32,"operations":128},
     "components":seven_sixteen_ui::catalog::components(),
-    "sources":{"discovery":"source.list","job:":["/status","/exit_code","/error","/created_at","/finished_at"],"broker:":["/status","/exit_code","/error","/created_at","/finished_at"],"window:":["/title","/app_id","/availability"]},
+    "sources":{"discovery":"source.list","job:":["/status","/exit_code","/error","/created_at","/finished_at"],"broker:":["/status","/exit_code","/error","/created_at","/finished_at"],"window:":["/title","/app_id","/availability"],"file:":["/path","/kind","/size_bytes","/modified_at","/mode","/measured_at","/size_text","/modified_text","/mode_text"]},
     "action_parameters":{"kinds":[{"kind":"literal","value":"Typed host-schema value"},{"kind":"field","element_id":"TextField@1 identity"}],"schema_source":"action.metadata.parameter_schema","submission":"Authenticated native input; exact surface and source revisions; no expressions"}})
 }
 
@@ -331,7 +331,8 @@ fn walk_elements(
                 .get(name)
                 .ok_or_else(|| error("missing_reference", name))?;
             let source_type = match bound.path.as_str() {
-                "/status" | "/error" | "/title" | "/app_id" | "/availability" => "string",
+                "/status" | "/error" | "/title" | "/app_id" | "/availability" | "/path"
+                | "/kind" | "/size_text" | "/modified_text" | "/mode_text" => "string",
                 _ => "number",
             };
             if spec.as_str() != Some(source_type) {
@@ -421,7 +422,19 @@ fn surface_valid(db: &Connection, s: &SurfaceDocument, _principal: &Principal) -
         return Err(invalid("Unreachable elements"));
     }
     for binding in s.bindings.values() {
-        let paths = if binding.source.starts_with("window:") {
+        let paths = if binding.source.starts_with("file:") {
+            &[
+                "/path",
+                "/kind",
+                "/size_bytes",
+                "/modified_at",
+                "/mode",
+                "/measured_at",
+                "/size_text",
+                "/modified_text",
+                "/mode_text",
+            ][..]
+        } else if binding.source.starts_with("window:") {
             &["/title", "/app_id", "/availability"][..]
         } else {
             &[
@@ -448,7 +461,7 @@ fn surface_valid(db: &Connection, s: &SurfaceDocument, _principal: &Principal) -
             }
             continue;
         }
-        if binding.source.starts_with("broker:") {
+        if binding.source.starts_with("broker:") || binding.source.starts_with("file:") {
             if crate::presentation_sources::activity(db, &binding.source)?.as_deref()
                 != Some(s.activity_id.as_str())
             {
@@ -1582,7 +1595,10 @@ fn bindings(db: &Connection, v: &Value) -> Result<Value> {
         })
         .map_err(db_error)?;
     for (key, b) in &s.bindings {
-        if b.source.starts_with("broker:") || b.source.starts_with("window:") {
+        if b.source.starts_with("broker:")
+            || b.source.starts_with("window:")
+            || b.source.starts_with("file:")
+        {
             values.insert(
                 key,
                 crate::presentation_sources::binding(db, &b.source, &s.activity_id, &b.path)?,
@@ -2258,6 +2274,99 @@ mod tests {
                 .len(),
             5
         );
+    }
+    #[test]
+    fn file_metadata_is_typed_private_scoped_and_monotonic() {
+        let mut db = fixture();
+        let root = Principal {
+            uid: 0,
+            session: "file-fixture".into(),
+        };
+        let source = format!("file:{}", "b".repeat(32));
+        let mut publication = json!({"op":"source.publish","source":source,"activity_id":"1","source_revision":1,"values":{"path":"/tmp/note","kind":"file","size_bytes":123,"mode":420,"modified_at":2.5,"measured_at":3.5}});
+        assert!(handle(&mut db, &publication, &human())
+            .unwrap_err()
+            .contains("unauthorized"));
+        assert!(handle(&mut db, &publication, &agent())
+            .unwrap_err()
+            .contains("unauthorized"));
+        handle(&mut db, &publication, &root).unwrap();
+        let mut doc = surface();
+        doc["bindings"] =
+            json!({"file-size":{"source":source,"path":"/size_text","access":"read"}});
+        doc["elements"]["status"] =
+            json!({"type":"Status@1","props":{"value":{"binding":"file-size"}}});
+        doc["elements"]["root"]["slots"]["children"]
+            .as_array_mut()
+            .unwrap()
+            .push(json!("status"));
+        let create = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"file-view","expected_revisions":{"surface-a":null},"operations":[{"op":"surface.create","document":doc}]});
+        let mut bad = create.clone();
+        bad["operations"][0]["document"]["activity_id"] = json!("2");
+        assert!(handle(&mut db, &bad, &human())
+            .unwrap_err()
+            .contains("unauthorized"));
+        bad = create.clone();
+        bad["operations"][0]["document"]["bindings"]["file-size"]["path"] = json!("/content");
+        assert!(handle(&mut db, &bad, &human()).is_err());
+        handle(&mut db, &create, &human()).unwrap();
+        let query = json!({"op":"binding.snapshot","surface_id":"surface-a"});
+        let observed = handle(&mut db, &query, &human()).unwrap();
+        assert_eq!(observed["bindings"]["file-size"]["value"], "123 bytes");
+        assert_eq!(observed["bindings"]["file-size"]["observed_at"], 3.5);
+        let mode = crate::presentation_sources::binding(&db, &source, "1", "/mode_text").unwrap();
+        assert_eq!(mode["value"], "0644");
+        for change in [
+            json!({"path":"/tmp/other"}),
+            json!({"content":"private"}),
+            json!({"size_bytes":-1}),
+            json!({"mode":8192}),
+        ] {
+            let mut bad = publication.clone();
+            bad["source_revision"] = json!(2);
+            for (key, value) in change.as_object().unwrap() {
+                bad["values"][key] = value.clone();
+            }
+            assert!(handle(&mut db, &bad, &root).is_err());
+        }
+        let mut bad = publication.clone();
+        bad["activity_id"] = json!("2");
+        bad["source_revision"] = json!(2);
+        assert!(handle(&mut db, &bad, &root)
+            .unwrap_err()
+            .contains("unauthorized"));
+        publication["values"]["size_bytes"] = json!(42);
+        assert!(handle(&mut db, &publication, &root)
+            .unwrap_err()
+            .contains("stale_revision"));
+        publication["source_revision"] = json!(2);
+        handle(&mut db, &publication, &root).unwrap();
+        assert_eq!(
+            handle(&mut db, &query, &human()).unwrap()["bindings"]["file-size"]["value"],
+            "42 bytes"
+        );
+        publication["source_revision"] = json!(3);
+        publication["values"]["kind"] = json!("missing");
+        publication["values"]["size_bytes"] = Value::Null;
+        handle(&mut db, &publication, &root).unwrap();
+        assert_eq!(
+            handle(&mut db, &query, &human()).unwrap()["bindings"]["file-size"]["value"],
+            "Unavailable"
+        );
+        let listing = handle(
+            &mut db,
+            &json!({"op":"source.list","activity_id":"1"}),
+            &agent(),
+        )
+        .unwrap();
+        let row = listing["sources"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|r| r["source"] == source)
+            .unwrap();
+        assert_eq!(row["paths"].as_array().unwrap().len(), 9);
+        assert!(!row.to_string().contains("/content"));
     }
     #[test]
     fn conventional_window_metadata_is_typed_scoped_and_host_observed() {
