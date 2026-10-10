@@ -70,6 +70,22 @@ class Projection(unittest.TestCase):
             self.assertIn('Related 日本語 → view-target','\n'.join(lines));self.assertNotIn('evil','\n'.join(lines))
             self.assertEqual(controls['reference']['type'],kind)
             doc['elements']['root']['slots']['children'].remove('reference')
+    def test_results_and_errors_keep_source_content_and_explicit_recovery_callbacks(self):
+        doc=document();doc['elements']['result']={'type':'Result@1','props':{'label':'Completed','value':{'binding':'status'}}}
+        doc['elements']['failure']={'type':'Error@1','props':{'label':'Failed','message':'Literal <retry> 日本語','recovery_label':'Inspect work'},'events':{'recover':{'action':'inspect'}}}
+        doc['actions']['inspect']={'ref':'inspect-callback'};doc['elements']['root']['slots']['children']+=['result','failure']
+        lines,controls=view.project(doc,{'status':{'availability':'available','value':'succeeded'}})
+        self.assertIn('Completed: succeeded','\n'.join(lines));self.assertIn('Failed: Literal <retry> 日本語','\n'.join(lines));self.assertIn('[failure] Inspect work','\n'.join(lines))
+        self.assertNotIn('result',controls);self.assertIn('failure',controls)
+        calls=[]
+        def request(op,**fields):
+            calls.append((op,fields))
+            if op=='action.metadata':return {'source_revision':4,'parameter_schema':{}}
+            return {'status':'succeeded'}
+        view.invoke(request,doc,'failure')
+        invoked=next(fields for op,fields in calls if op=='action.invoke')
+        self.assertEqual(invoked['reference'],'inspect-callback');self.assertEqual(invoked['action_id'],'inspect')
+        self.assertEqual(invoked['expected_surface_revision'],doc['revision'])
     def test_images_have_inert_labeled_terminal_fallbacks(self):
         doc=document();doc['elements']['image']={'type':'Image@1','props':{'label':'Blue pixel 日本語','reference':'resource-'+'a'*32}}
         doc['elements']['root']['slots']['children'].append('image');lines,controls=view.project(doc)

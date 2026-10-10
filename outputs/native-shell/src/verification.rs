@@ -270,6 +270,9 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             println!("CHECK: mapped native surface");
             let image=surface.elements["image"].image.as_ref().unwrap();assert!(image.picture.paintable().is_some());assert_eq!(image.caption.text(),"Native blue pixel");
             println!("CHECK: authenticated immutable image resource and native texture");
+            let outcome=surface.elements["result"].outcome.as_ref().unwrap();assert_eq!(outcome.widget.accessible_role(),gtk::AccessibleRole::Status);assert_eq!(outcome.message.text(),"succeeded");
+            let failure=surface.elements["failure"].outcome.as_ref().unwrap();assert_eq!(failure.widget.accessible_role(),gtk::AccessibleRole::Alert);assert_eq!(failure.message.text(),"Fixture reason 日本語");assert!(!failure.recovery.is_visible());
+
             let reference=surface.elements["reference"].reference.as_ref().unwrap();assert!(reference.widget.is_sensitive());reference.widget.emit_clicked();
             assert!(rx.try_iter().any(|c|matches!(c,Command::Navigate{surface,element,revision} if surface=="native-fixture" && element=="reference" && revision==doc["revision"].as_u64().unwrap())));
             let mut missing=frame.clone();missing.documents.remove("native-fixture");surface.update("native-fixture",&doc,&missing,&commands,&drafts);
@@ -314,6 +317,9 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             assert!(!surface.elements["button"].button.as_ref().unwrap().is_sensitive());
             doc["actions"]["click"]=json!({"ref":"fixture-action"});doc["elements"]["button"]["events"]=json!({"activate":{"action":"click"}});doc["elements"]["field"]["events"]=json!({"submit":{"action":"click"}});doc["revision"]=json!(2);
             frame.actions.insert("fixture-action".into(),json!({"available":true}));surface.update("native-fixture",&doc,&frame,&commands,&drafts);
+            doc["elements"]["failure"]["events"]=json!({"recover":{"action":"click"}});surface.update("native-fixture",&doc,&frame,&commands,&drafts);
+            let failure=surface.elements["failure"].outcome.as_ref().unwrap();assert!(failure.recovery.is_sensitive());failure.recovery.emit_clicked();
+            assert!(rx.try_iter().any(|c|matches!(c,Command::Action{reference,action,..} if reference=="fixture-action" && action=="click")));
             surface.elements["button"].button.as_ref().unwrap().emit_clicked();
             assert!(rx.try_iter().any(|c|matches!(c,Command::Action{reference,..} if reference=="fixture-action")));
             field.entry.emit_activate();

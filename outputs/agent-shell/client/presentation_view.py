@@ -42,6 +42,10 @@ def project(document,bindings=None,width=80):
                 walk(child,depth+1)
             return
         if kind in ('Text@1','Status@1'):text=text_value(props.get('text' if kind=='Text@1' else 'value'),bindings)
+        elif kind=='Result@1':text=props['label']+': '+text_value(props['value'],bindings)
+        elif kind=='Error@1':
+            text=props['label']+': '+text_value(props['message'],bindings)
+            if 'recover' in node.get('events',{}):text+=f"\n[{key}] "+props.get('recovery_label','Try again');controls[key]=node
         elif kind=='Image@1':text='[Image] '+props['label']+' ('+props['reference']+')'
         elif kind=='RichText@1':text=''.join(run['text'] for run in props['runs'])
         elif kind=='Chart@1':text='\n'.join([props['label'],*(point['label']+': '+str(point['value']) for point in props['points'])])
@@ -82,7 +86,7 @@ def parameters(action,metadata,fields):
 
 
 def invoke(request,document,element,key=None):
-    node=document['elements'][element];event='submit' if node['type']=='TextField@1' else 'activate'
+    node=document['elements'][element];event='submit' if node['type']=='TextField@1' else 'recover' if node['type']=='Error@1' else 'activate'
     action_id=node.get('events',{}).get(event,{}).get('action')
     if not action_id:raise ValueError('This control has no registered action')
     action=document['actions'][action_id];metadata=request('action.metadata',reference=action['ref'])

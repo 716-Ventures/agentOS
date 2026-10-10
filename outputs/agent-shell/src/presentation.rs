@@ -377,7 +377,10 @@ fn walk_elements(
             }
         }
     }
-    if let Some(label) = node.props.get("label").and_then(Value::as_str) {
+    for label in ["label", "recovery_label"]
+        .iter()
+        .filter_map(|key| node.props.get(*key).and_then(Value::as_str))
+    {
         if label.trim().is_empty() || label.len() > 256 || label.contains('\0') {
             return Err(invalid("A bounded accessible label is required"));
         }
@@ -2124,6 +2127,27 @@ mod tests {
     }
     fn props(request: &str, revision: u64, element: &str, text: &str) -> Value {
         json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":request,"expected_revisions":{"surface-a":revision},"operations":[{"op":"element.set_props","surface_id":"surface-a","element_id":element,"props":{"text":text}}]})
+    }
+    #[test]
+    fn result_and_error_content_is_bounded_typed_and_source_bindable() {
+        for (kind, key) in [("Result@1", "value"), ("Error@1", "message")] {
+            let mut db = fixture();
+            let mut doc = surface();
+            doc["elements"]["text"] =
+                json!({"type":kind,"props":{"label":"Observed outcome",key:{"binding":"outcome"}}});
+            doc["bindings"]["outcome"] = json!({"source":"job:1","path":"/error","access":"read"});
+            let request = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"outcome","expected_revisions":{"surface-a":null},"operations":[{"op":"surface.create","document":doc}]});
+            handle(&mut db, &request, &agent()).unwrap();
+            let mut invalid = request.clone();
+            invalid["request_id"] = json!("bad-outcome");
+            invalid["expected_revisions"]["surface-a"] = json!(0);
+            invalid["operations"] = json!([{"op":"element.set_props","surface_id":"surface-a","element_id":"text","props":{"label":"Outcome",key:42}}]);
+            assert!(handle(&mut db, &invalid, &agent()).is_err());
+            assert_eq!(
+                snapshot(&db).unwrap()["documents"]["surface-a"]["revision"],
+                0
+            );
+        }
     }
     #[test]
     fn references_are_scoped_guarded_and_survive_target_closure() {

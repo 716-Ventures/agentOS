@@ -39,6 +39,7 @@ struct Element {
     rich: Option<ui::RichText>,
     image: Option<ui::ImageView>,
     reference: Option<ui::ReferenceView>,
+    outcome: Option<ui::OutcomeView>,
     image_attempted: bool,
     chart: Option<ui::BoundedChart>,
     field: Option<TextField>,
@@ -137,6 +138,7 @@ fn construct(
         rich: None,
         image: None,
         reference: None,
+        outcome: None,
         image_attempted: false,
         chart: None,
         field: None,
@@ -159,6 +161,26 @@ fn construct(
         children: Vec::new(),
     };
     match kind.as_str() {
+        "Result@1" | "Error@1" => {
+            let key = if kind == "Error@1" {
+                "message"
+            } else {
+                "value"
+            };
+            let value = bound(surface, &props[key], frame);
+            let outcome = ui::OutcomeView::new(
+                props["label"].as_str().unwrap(),
+                value.as_str().unwrap_or("Unavailable"),
+                kind == "Error@1",
+            )
+            .unwrap();
+            let (events, sender) = (events.clone(), commands.clone());
+            outcome.on_recover(move || dispatch_action(&events, &sender));
+            lease(&outcome.message.clone().upcast(), surface, id, commands);
+            lease(&outcome.heading.clone().upcast(), surface, id, commands);
+            result.widget = outcome.widget.clone().upcast();
+            result.outcome = Some(outcome);
+        }
         "DocumentReference@1" | "ApplicationReference@1" => {
             let reference = ui::ReferenceView::new(props["label"].as_str().unwrap()).unwrap();
             let (state, sender, element) = (events.clone(), commands.clone(), id.to_string());
@@ -699,6 +721,10 @@ impl Surface {
                     && gtk::prelude::GtkWindowExt::focus(&self.window)
                         .map(|focus| focus == e.widget || focus.is_ancestor(&e.widget))
                         .unwrap_or(false))
+                || e.outcome.as_ref().is_some_and(|view| {
+                    view.message.selection_bounds().is_some()
+                        || view.heading.selection_bounds().is_some()
+                })
                 || e.label
                     .as_ref()
                     .map(|l| l.selection_bounds().is_some())
@@ -1029,6 +1055,37 @@ impl Surface {
                 if e.field.is_some() || e.area.is_some() {
                     let key = node["events"]["submit"]["action"].as_str().unwrap_or("");
                     let action = doc["actions"][key]["ref"].as_str();
+                    *e.events.borrow_mut() = json!({"host_reference":action,"surface":id,"revision":doc["revision"],"action":key,"parameters":doc["actions"][key]["parameters"]});
+                }
+                if let Some(outcome) = &e.outcome {
+                    let value = bound(
+                        id,
+                        &props[if e.kind == "Error@1" {
+                            "message"
+                        } else {
+                            "value"
+                        }],
+                        frame,
+                    );
+                    let _ = outcome.reconcile(
+                        props["label"].as_str().unwrap(),
+                        value.as_str().unwrap_or("Unavailable"),
+                    );
+                    let key = node["events"]["recover"]["action"].as_str().unwrap_or("");
+                    let action = doc["actions"][key]["ref"].as_str();
+                    if let Some(action) = action {
+                        let available = frame
+                            .actions
+                            .get(action)
+                            .is_some_and(|info| info["available"] == true);
+                        let _ = outcome.set_recovery(
+                            props["recovery_label"].as_str().unwrap_or("Try again"),
+                            available,
+                        );
+                    } else {
+                        outcome.recovery.set_visible(false);
+                        outcome.recovery.set_sensitive(false);
+                    }
                     *e.events.borrow_mut() = json!({"host_reference":action,"surface":id,"revision":doc["revision"],"action":key,"parameters":doc["actions"][key]["parameters"]});
                 }
                 if let Some(reference) = &e.reference {
