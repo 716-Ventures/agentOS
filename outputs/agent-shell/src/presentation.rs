@@ -657,6 +657,14 @@ fn documents(db: &Connection) -> Result<BTreeMap<String, Document>> {
 }
 fn snapshot(db: &Connection) -> Result<Value> {
     let docs = documents(db)?;
+    let referenced = docs
+        .values()
+        .filter_map(|d| match d {
+            Document::Workspace(w) => Some(workspace::surfaces(w)),
+            _ => None,
+        })
+        .flatten()
+        .collect::<BTreeSet<_>>();
     let cursor: i64 = db
         .query_row(
             "SELECT COALESCE(MAX(cursor),0) FROM presentation_events",
@@ -665,7 +673,7 @@ fn snapshot(db: &Connection) -> Result<Value> {
         )
         .map_err(db_error)?;
     Ok(
-        json!({"protocol":PROTOCOL,"catalog_revision":CATALOG,"documents":docs,"host_surfaces":crate::presentation_hosts::snapshot(db)?,"renderers":crate::presentation_hosts::renderers(db)?,"event_cursor":cursor}),
+        json!({"protocol":PROTOCOL,"catalog_revision":CATALOG,"documents":docs,"host_surfaces":crate::presentation_hosts::snapshot(db,&referenced)?,"renderers":crate::presentation_hosts::renderers(db)?,"event_cursor":cursor}),
     )
 }
 fn element_path(surface: &SurfaceDocument, target: &str) -> Vec<(String, String, usize)> {
@@ -1777,6 +1785,39 @@ mod tests {
         .unwrap();
         assert!(draft["draft"].is_null());
         assert_eq!(draft["draft_revision"], 2);
+    }
+    #[test]
+    fn dead_host_connections_do_not_exhaust_capacity_or_inflate_live_snapshots() {
+        let mut db = fixture();
+        for i in 0..1024 {
+            db.execute("INSERT INTO presentation_host_surfaces VALUES(?, '1', 0, '999999999:1', 'Old app', 'old.app', 1, 0)",[format!("retired-{i}")]).unwrap();
+        }
+        let root = Principal {
+            uid: 0,
+            session: "new-host".into(),
+        };
+        handle(&mut db,&json!({"op":"host.surface","surface_id":"new-app","activity_id":"1","title":"New app","app_id":"new.app","connected":true}),&root).unwrap();
+        let connected: i64 = db
+            .query_row(
+                "SELECT COUNT(*) FROM presentation_host_surfaces WHERE connected=1",
+                [],
+                |r| r.get(0),
+            )
+            .unwrap();
+        assert_eq!(connected, 1);
+        assert!(snapshot(&db).unwrap()["host_surfaces"]
+            .as_object()
+            .unwrap()
+            .is_empty());
+        let stored: i64 = db
+            .query_row("SELECT COUNT(*) FROM presentation_host_surfaces", [], |r| {
+                r.get(0)
+            })
+            .unwrap();
+        assert_eq!(
+            stored, 1025,
+            "Restore metadata must survive process retirement"
+        );
     }
     #[test]
     fn conventional_surface_registration_is_host_scoped_and_placeholders_are_durable() {

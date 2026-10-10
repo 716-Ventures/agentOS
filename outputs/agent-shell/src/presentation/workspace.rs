@@ -393,3 +393,26 @@ pub fn placement(w: &WorkspaceDocument, id: &str) -> Option<Value> {
     }
     None
 }
+
+pub fn surfaces(w: &WorkspaceDocument) -> BTreeSet<String> {
+    fn walk(tile: &Tile, ids: &mut BTreeSet<String>) {
+        match tile {
+            Tile::Leaf { surface_id } => {
+                ids.insert(surface_id.clone());
+            }
+            Tile::Split { children, .. } => {
+                for child in children {
+                    walk(child, ids)
+                }
+            }
+        }
+    }
+    let mut ids = BTreeSet::new();
+    for layout in w.outputs.values() {
+        if let Some(tile) = &layout.tiles {
+            walk(tile, &mut ids)
+        }
+        ids.extend(layout.floating.iter().map(|f| f.surface_id.clone()));
+    }
+    ids
+}

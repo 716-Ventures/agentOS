@@ -5,6 +5,7 @@ mod bridge;
 mod control;
 mod handlers;
 mod policy;
+mod process;
 
 mod grabs;
 mod input;
@@ -57,7 +58,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         serde_json::json!({"wayland_display":data.state.socket_name.to_string_lossy(),"control_socket":control.path})
     );
     let child = std::sync::Arc::new(std::sync::Mutex::new(None::<std::process::Child>));
-    let owned = child.clone();
+    let _owned = process::OwnedChild(child.clone());
     let mut args = std::env::args().skip(1);
     if matches!(args.next().as_deref(), Some("-c" | "--command")) {
         if let Some(command) = args.next() {
@@ -107,22 +108,5 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         },
     )?;
 
-    if let Some(mut child) = owned.lock().unwrap().take() {
-        let pid = child.id() as i32;
-        unsafe {
-            libc::kill(-pid, libc::SIGTERM);
-        }
-        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(3);
-        while child.try_wait()?.is_none() {
-            if std::time::Instant::now() >= deadline {
-                unsafe {
-                    libc::kill(-pid, libc::SIGKILL);
-                }
-                break;
-            }
-            std::thread::sleep(std::time::Duration::from_millis(20));
-        }
-        let _ = child.wait();
-    }
     Ok(())
 }

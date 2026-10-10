@@ -2,7 +2,7 @@
 use crate::presentation::Principal;
 use rusqlite::{params, Connection, OptionalExtension};
 use serde_json::{json, Value};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 type Result<T> = std::result::Result<T, String>;
 pub fn trusted(who: &Principal) -> bool {
     who.uid == 0
@@ -66,6 +66,27 @@ pub fn register(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value
             return Err("unauthorized: Host surface identity cannot be rebound to another session or activity".into());
         }
     } else {
+        // A crashed compositor cannot publish disconnects. Retire only the
+        // connection flag of dead process identities, preserving restore metadata.
+        let stale = {
+            let mut q = tx
+                .prepare(
+                    "SELECT DISTINCT session FROM presentation_host_surfaces WHERE connected=1",
+                )
+                .map_err(|e| e.to_string())?;
+            let rows = q
+                .query_map([], |r| r.get::<_, String>(0))
+                .map_err(|e| e.to_string())?;
+            rows.collect::<std::result::Result<Vec<_>, _>>()
+                .map_err(|e| e.to_string())?
+        };
+        for session in stale.into_iter().filter(|s| !alive(s)) {
+            tx.execute(
+                "UPDATE presentation_host_surfaces SET connected=0 WHERE session=?",
+                [session],
+            )
+            .map_err(|e| e.to_string())?;
+        }
         let count: i64 = tx
             .query_row(
                 "SELECT COUNT(*) FROM presentation_host_surfaces WHERE connected=1",
@@ -112,7 +133,7 @@ pub fn alive(session: &str) -> bool {
         .map(|observed| observed == start)
         .unwrap_or(false)
 }
-pub fn snapshot(db: &Connection) -> Result<Value> {
+pub fn snapshot(db: &Connection, referenced: &BTreeSet<String>) -> Result<Value> {
     let mut query=db.prepare("SELECT id,activity,session,title,app_id,connected,observed_at FROM presentation_host_surfaces ORDER BY id").map_err(|e|e.to_string())?;
     let rows = query
         .query_map([], |r| {
@@ -131,7 +152,11 @@ pub fn snapshot(db: &Connection) -> Result<Value> {
     for row in rows {
         let (id, activity, session, title, app_id, connected, observed_at) =
             row.map_err(|e| e.to_string())?;
-        result.insert(id,json!({"activity_id":activity,"title":title,"app_id":app_id,"availability":if connected && alive(&session){"available"}else{"unavailable"},"observed_at":observed_at}));
+        let available = connected && alive(&session);
+        if !available && !referenced.contains(&id) {
+            continue;
+        }
+        result.insert(id,json!({"activity_id":activity,"title":title,"app_id":app_id,"availability":if available{"available"}else{"unavailable"},"observed_at":observed_at}));
     }
     Ok(json!(result))
 }

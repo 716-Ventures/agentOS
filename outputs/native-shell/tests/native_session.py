@@ -6,6 +6,7 @@ from pathlib import Path
 import signal
 import socket
 import subprocess
+import sys
 import tempfile
 import time
 
@@ -49,7 +50,8 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
          'AGENT_OS_SOCKET':str(endpoint),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),
          'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','G_DEBUG':'fatal-criticals'}
     env.pop('WAYLAND_DISPLAY',None);env.pop('DISPLAY',None)
-    with (OUTPUT/'session.log').open('w') as log:
+    host_failure='--host-failure' in sys.argv
+    with (OUTPUT/('session-host-failure.log' if host_failure else 'session.log')).open('w') as log:
         core=subprocess.Popen([str(ROOT.parent/'agent-shell/target/release/agent-os-core')],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
         session=None;owned=[]
         try:
@@ -70,13 +72,25 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 try:values=(proc/'environ').read_bytes().split(b'\0')
                 except (PermissionError,FileNotFoundError,ProcessLookupError):continue
                 if ('XDG_RUNTIME_DIR='+str(runtime)).encode() in values:owned.append(int(proc.name))
-            session.terminate();assert session.wait(timeout=15)==0
+            if host_failure:
+                # Simulate display-host loss, rather than the ordinary logout path.
+                host=int(Path(f'/proc/{session.pid}/task/{session.pid}/children').read_text().split()[0])
+                os.kill(host,signal.SIGTERM)
+            else:session.terminate()
+            assert session.wait(timeout=20)==0
             remaining=lambda:[pid for pid in owned if alive(pid)]
             try:wait_for(lambda:not remaining(),[core],timeout=5)
             except AssertionError:raise AssertionError('Session processes survived shutdown: '+str({pid:Path(f'/proc/{pid}/cmdline').read_bytes().replace(bytes([0]),b' ') for pid in remaining()}))
             assert not control.exists(),'Compositor socket leaked'
             assert not list(runtime.glob('agentos-session-*')),'Session directory leaked'
-            print('PASS: normal native session maps authenticated surfaces and reaps display host, compositor and renderer')
+            print('PASS: '+('display-host loss' if host_failure else 'normal session')+' maps authenticated surfaces and reaps display host, compositor and renderer')
         finally:
             if session:reap(session)
+            for pid in owned:
+                try:
+                    values=Path(f'/proc/{pid}/environ').read_bytes().split(b'\0')
+                    if ('XDG_RUNTIME_DIR='+str(runtime)).encode() in values and alive(pid):
+                        if os.getpgid(pid)==pid:os.killpg(pid,signal.SIGKILL)
+                        else:os.kill(pid,signal.SIGKILL)
+                except (FileNotFoundError,ProcessLookupError,PermissionError):pass
             reap(core)
