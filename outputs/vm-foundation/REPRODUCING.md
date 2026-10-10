@@ -1,6 +1,6 @@
 # Rebuild and verify agentOS
 
-The reproducible development recipe combines the SHA-512-pinned Debian ARM64 base, the checked-in UTM configuration, a dated Debian package snapshot, Cargo.lock, and the runtime source. It captures the build tools plus Weston, Mesa, ALSA, seatd and QEMU guest-agent packages previously installed by hand. Provider keys and a graphical desktop application are not bundled.
+The reproducible development recipe combines the SHA-512-pinned Debian ARM64 base, the checked-in UTM configuration, a dated Debian package snapshot, Cargo.lock, and the runtime source. It captures the build tools plus Weston, Mesa, ALSA, seatd and QEMU guest-agent packages previously installed by hand. Provider keys are not bundled. The runtime now includes an experimental native desktop; its full UTM qualification is pending.
 
 Run from the repository root on an Apple silicon Mac with UTM, Python 3, Homebrew `qemu-img`, OpenSSL 3 and `hdiutil` available. Use a separate runtime directory and unused SSH port so the existing guest keeps its disk and identity:
 
@@ -35,7 +35,7 @@ Cargo builds with `--locked` and verifies registry crate checksums. First provis
 
 ## Runtime installation and recovery
 
-`deploy.py` stages an exact source tree, retains the previous copied tree and reuses its Cargo build cache, then invokes `install.sh`; the same guest-side script performs dependency setup, the locked Cargo build, and runtime activation. It can now install on the clean foundation without manual package commands.
+`deploy.py` stages the tracked runtime source files (including current edits to those files), retains the previous copied tree and reuses its Cargo build cache, and excludes ignored files, local credentials, generated license bundles and build caches, then invokes `install.sh`; the same guest-side script performs dependency setup, the locked Cargo build, and runtime activation. It can now install on the clean foundation without manual package commands.
 
 The installer validates Python syntax and the ARM64 Linux executable, then stages a complete content-addressed release under `/usr/local/lib/agent-os/releases/<SHA256>`. It verifies every staged file before stopping services. `/usr/local/lib/agent-os/current` selects the active release atomically; stable command and service paths refer to that release. Prior releases are retained. Existing installations with a real services directory retain that directory as a legacy copy during migration.
 
@@ -53,4 +53,4 @@ Recovery completes the recorded installation; it does not provide automatic OS/p
 
 The clean UTM guest built on 2026-10-07 used the pinned base and this dependency recipe, without additional package setup. Checks cover local Python/Rust tests; real core, broker, guarded-file, layout and lifecycle behavior; real SSH terminal controls and interactive PTYs (prompts, full-screen curses, resize, Ctrl-C, reconnect, screen restoration after heavy output and connection loss, vi editing, cancellation and restart); forced installer termination at stopped and activated phases; recovery from staged files; retained state and configuration; guest reboot/cold start; and stable release identity on repeated installation.
 
-Live provider inference, microphone/speaker signal quality, graphical application behavior, physical hardware and OS update rollback remain separate acceptance work. Installed graphics/audio packages reproduce the platform prerequisites; they do not constitute an agentOS desktop or voice implementation.
+Live provider inference, microphone/speaker signal quality, graphical application behavior, physical hardware and OS update rollback remain separate acceptance work. The packaged desktop and voice paths are implemented; complete physical graphical/audio acceptance remains separate from package and headless CI checks.

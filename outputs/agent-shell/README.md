@@ -49,7 +49,7 @@ The terminal and future desktop can use the same service boundaries. This is a s
 
 ## Build and validation
 
-Follow [Rebuild and verify agentOS](../vm-foundation/REPRODUCING.md) for a clean guest and the complete acceptance path. Run `python3 deploy.py` from this directory to update a running selected guest. `install.sh` installs the captured snapshot dependencies, builds with Cargo.lock, stages a complete release and activates it with a durable recovery journal. Credentials and user activity data are preserved; unfinished work is interrupted rather than replayed. Recovery from the ordinary shell is `sudo python3 /usr/local/lib/agent-os/install-recovery.py --recover`.
+Follow [Rebuild and verify agentOS](../vm-foundation/REPRODUCING.md) for a clean guest and the complete acceptance path. Run `python3 deploy.py` from this directory to update a running selected guest. Deployment packages Git-tracked runtime files with their current contents; add new source files to Git first. Ignored files and generated artifacts stay on the host and required build outputs are recreated in the guest. `install.sh` installs the captured snapshot dependencies, builds with Cargo.lock, stages a complete release and activates it with a durable recovery journal. Credentials and user activity data are preserved; unfinished work is interrupted rather than replayed. Recovery from the ordinary shell is `sudo python3 /usr/local/lib/agent-os/install-recovery.py --recover`.
 
 - `tests/terminal_screen_guest.py`: screen restoration after heavy output and connection loss, detached resizing, vi buffer/mode preservation, raw logs and command exit status.
 - `tests/terminal_sessions_test.py`: bounded raw transport, controller leases, backpressure and service-identity separation.
