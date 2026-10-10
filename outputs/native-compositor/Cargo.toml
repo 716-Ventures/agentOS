@@ -28,3 +28,8 @@ features = [
 
 [profile.dev]
 debug = 0
+
+[dev-dependencies]
+wayland-client = "0.31.15"
+wayland-protocols = { version = "0.32.12", features = ["client", "unstable"] }
+wayland-protocols-misc = { version = "0.3.12", features = ["client"] }

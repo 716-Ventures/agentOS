@@ -478,6 +478,8 @@ impl Smallvil {
 pub struct ClientState {
     pub compositor_state: CompositorClientState,
     pub peer: Option<(u32, String)>,
+    // Only a compositor-created private socket can receive this capability.
+    pub input_method: bool,
 }
 
 impl ClientData for ClientState {

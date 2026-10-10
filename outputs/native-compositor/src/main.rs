@@ -15,6 +15,9 @@ mod timings;
 mod direct;
 mod grabs;
 mod input;
+mod input_method;
+#[cfg(test)]
+mod input_method_tests;
 #[cfg(feature = "direct-display")]
 mod output_config;
 mod pointer_geometry;
@@ -68,6 +71,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         _ => return Err("Unsupported compositor backend".into()),
     }
 
+    let input_method = input_method::Service::start(&mut data.state)?;
     let control = control::Control::start()?;
     std::env::set_var("AGENT_OS_COMPOSITOR_SOCKET", &control.path);
     println!(
@@ -89,6 +93,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Some(std::time::Duration::from_millis(16)),
         &mut data,
         move |data| {
+            if let Some(service) = &input_method {
+                if let Err(error) = service.check() {
+                    eprintln!("Input method unavailable: {error}");
+                    data.state.loop_signal.stop();
+                }
+            }
             if TERMINATE.load(std::sync::atomic::Ordering::Relaxed) {
                 data.state.loop_signal.stop();
             }
@@ -125,5 +135,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         },
     )?;
 
+    if let Some(service) = &input_method {
+        service.check()?;
+    }
     Ok(())
 }
