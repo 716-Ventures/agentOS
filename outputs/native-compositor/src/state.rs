@@ -318,7 +318,7 @@ impl Smallvil {
         let mut placements = self.policy.arrange(area);
         let mut maximized = std::collections::BTreeSet::new();
         if let Some(bridge) = &self.bridge {
-            bridge.observe(windows.iter().map(observe).collect(), area);
+            bridge.observe(windows.iter().map(observe).collect(), area,serde_json::json!({"scale":output.current_scale().fractional_scale(),"transform":format!("{:?}",output.current_transform())}));
             let scene = bridge.scene.lock().unwrap().clone();
             for id in scene
                 .identities

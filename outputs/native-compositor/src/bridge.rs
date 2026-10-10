@@ -43,6 +43,7 @@ pub struct Scene {
 struct Observation {
     windows: Vec<Observed>,
     area: Rect,
+    output: Value,
 }
 pub struct Bridge {
     observation: Arc<Mutex<Option<Observation>>>,
@@ -165,12 +166,12 @@ impl Bridge {
                             .cloned()
                             .or_else(|| available.first().map(|a| a["id"].to_string()))
                             .ok_or("No active activity")?;
-                        if output_area != Some(observed.area) {
+                        if output_area != Some((observed.area, observed.output.clone())) {
                             call(
                                 &socket,
-                                &json!({"op":"outputs.register","output_id":"nested-primary","width":observed.area.width,"height":observed.area.height}),
+                                &json!({"op":"outputs.register","output_id":"nested-primary","width":observed.area.width,"height":observed.area.height,"x":observed.area.x,"y":observed.area.y,"scale":observed.output["scale"],"transform":observed.output["transform"]}),
                             )?;
-                            output_area = Some(observed.area);
+                            output_area = Some((observed.area, observed.output.clone()));
                         }
                         let mut identities = BTreeMap::new();
                         let live = observed
@@ -305,6 +306,7 @@ impl Bridge {
                             .map(|(runtime, surface)| (surface.clone(), runtime.clone()))
                             .collect::<BTreeMap<_, _>>();
                         let mut floating = BTreeSet::new();
+                        let mut recovered_outputs = BTreeSet::new();
                         for doc in next
                             .workspaces
                             .as_object()
@@ -333,6 +335,30 @@ impl Bridge {
                                     }
                                 }
                             }
+                            for (id, layout) in doc["outputs"]
+                                .as_object()
+                                .into_iter()
+                                .flatten()
+                                .filter(|(id, _)| id.as_str() != "nested-primary")
+                            {
+                                let available = state["outputs"]["outputs"]
+                                    .as_array()
+                                    .into_iter()
+                                    .flatten()
+                                    .any(|output| {
+                                        output["output_id"] == id.as_str()
+                                            && output["availability"] == "available"
+                                    });
+                                if available {
+                                    continue;
+                                }
+                                for (surface, rect) in rectangles(layout, observed.area)? {
+                                    if let Some(runtime) = reverse.get(&surface) {
+                                        next.rectangles.insert(runtime.clone(), rect);
+                                        recovered_outputs.insert(id.clone());
+                                    }
+                                }
+                            }
                             if let Some(surface) = doc["focus"]["surface_id"].as_str() {
                                 next.focus = reverse.get(surface).cloned();
                             }
@@ -342,13 +368,22 @@ impl Bridge {
                             .filter(|(_, when)| when.elapsed() < Duration::from_secs(10))
                             .map(|(message, _)| message.clone());
                         next.visible = next.rectangles.keys().cloned().collect();
-                        next.overview = crate::pressure::project(
+                        next.overview = crate::pressure::project_recovery(
                             &mut next.rectangles,
                             &observed.windows,
-                            &floating,
+                            if recovered_outputs.is_empty() {
+                                &floating
+                            } else {
+                                floating.clear();
+                                &floating
+                            },
                             next.focus.as_ref(),
                             observed.area,
+                            !recovered_outputs.is_empty(),
                         );
+                        if !recovered_outputs.is_empty() {
+                            next.overview["recovered_outputs"] = json!(recovered_outputs);
+                        }
                         Ok(next)
                     })();
                     match result {
@@ -359,6 +394,10 @@ impl Bridge {
                 thread::sleep(Duration::from_millis(100));
             }
             grabs.stop(&socket);
+            let _ = call(
+                &socket,
+                &json!({"op":"outputs.disconnect","output_id":"nested-primary"}),
+            );
             // Core availability also checks this process's start identity, including crashes.
         });
         Self {
@@ -457,10 +496,11 @@ impl Bridge {
                 Some("Workspace input queue busy; refresh before retrying".into());
         }
     }
-    pub fn observe(&self, windows: Vec<Observed>, area: Rect) {
+    pub fn observe(&self, windows: Vec<Observed>, area: Rect, output: Value) {
         *self.observation.lock().unwrap() = Some(Observation {
             windows: windows.into_iter().take(1024).collect(),
             area,
+            output,
         });
     }
 }

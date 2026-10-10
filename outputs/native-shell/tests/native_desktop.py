@@ -168,6 +168,22 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                         assert workspace()['outputs']==preferred['outputs'],'Pressure handling rewrote preferred placement'
                         assert minimum.poll() is None,'Pressure handling terminated a preserved view'
                         print('PASS: measured minimum sizes, viewport edges, preserved hidden geometry, activity restore and unchanged preferred placement')
+                        # Simulate losing a previously observed output; no physical second
+                        # monitor is claimed by this headless recovery-policy check.
+                        call({'op':'outputs.register','output_id':'removed-fixture','width':1280,'height':800})
+                        saved=workspace();off_output=copy.deepcopy(saved)
+                        off_output['outputs']['nested-primary']['tiles']=remove(off_output['outputs']['nested-primary']['tiles'],surface_id)
+                        off_output['outputs']['nested-primary']['floating']=[entry for entry in off_output['outputs']['nested-primary']['floating'] if entry['surface_id']!=surface_id]
+                        if off_output['outputs']['nested-primary']['maximized']==surface_id:off_output['outputs']['nested-primary']['maximized']=None
+                        off_output['outputs']['removed-fixture']={'tiles':{'kind':'leaf','surface_id':surface_id},'floating':[],'maximized':None}
+                        off_output['focus']={'surface_id':surface_id,'element_id':None}
+                        assert put(off_output,'move-to-removed-output')['ok']
+                        call({'op':'outputs.disconnect','output_id':'removed-fixture'})
+                        state=wait_shared(lambda s:'removed-fixture' in ((s['shared'].get('overview') or {}).get('recovered_outputs') or []) and next(w for w in s['windows'] if w['id']==ident)['geometry']['x']==0)
+                        retained=workspace();assert retained['outputs']['removed-fixture']==off_output['outputs']['removed-fixture']
+                        saved['revision']=retained['revision'];assert put(saved,'restore-from-removed-output')['ok']
+                        wait_shared(lambda s:not ((s['shared'].get('overview') or {}).get('recovered_outputs')))
+                        print('PASS: simulated output loss, temporary reachable projection, preserved placement and explicit recovery')
                         print('PASS: authenticated native identity, conventional registration, durable shared layout/focus, stale revision rejection, actual float/maximize rendering and journal undo')
                     else:
                         revision=state['layout']['revision']

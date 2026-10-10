@@ -1,6 +1,7 @@
 mod presentation;
 mod presentation_actions;
 mod presentation_hosts;
+mod presentation_outputs;
 mod presentation_sources;
 use rusqlite::{params, Connection};
 use serde_json::{json, Value};

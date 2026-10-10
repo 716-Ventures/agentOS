@@ -9,6 +9,16 @@ pub fn project(
     focus: Option<&String>,
     area: Rect,
 ) -> Value {
+    project_recovery(rectangles, windows, floating, focus, area, false)
+}
+pub fn project_recovery(
+    rectangles: &mut BTreeMap<String, Rect>,
+    windows: &[Observed],
+    floating: &BTreeSet<String>,
+    focus: Option<&String>,
+    area: Rect,
+    recovery: bool,
+) -> Value {
     let pressured = windows
         .iter()
         .filter(|w| {
@@ -26,7 +36,7 @@ pub fn project(
         })
         .map(|w| w.id.clone())
         .collect::<BTreeSet<_>>();
-    if pressured.is_empty() {
+    if pressured.is_empty() && !recovery {
         return Value::Null;
     }
     let ids = rectangles.keys().cloned().collect::<Vec<_>>();
@@ -61,7 +71,7 @@ pub fn project(
             rectangles.remove(id);
         }
     }
-    json!({"reason":"Client minimum sizes exceed the current arrangement. Preferred placement is retained. Switch views with Ctrl+Alt+Tab or Agent Monitor.","selected":selected,"views":ids,"constrained":pressured})
+    json!({"reason":if recovery {"Some preferred outputs are unavailable. Views are temporarily reachable on this output; saved placement is retained. Switch views with Ctrl+Alt+Tab or Agent Monitor."} else {"Client minimum sizes exceed the current arrangement. Preferred placement is retained. Switch views with Ctrl+Alt+Tab or Agent Monitor."},"selected":selected,"views":ids,"constrained":pressured})
 }
 /// Viewport offsets expose oversized clients without altering their size or preferred layout.
 pub fn viewport(mut rect: Rect, area: Rect, offset: &mut (i32, i32)) -> Rect {
@@ -81,6 +91,34 @@ pub fn viewport(mut rect: Rect, area: Rect, offset: &mut (i32, i32)) -> Rect {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn disconnected_output_recovery_exposes_views_without_rewriting_preferences() {
+        let area = Rect {
+            x: 0,
+            y: 0,
+            width: 800,
+            height: 600,
+        };
+        let preferred = BTreeMap::from([("first".into(), area), ("removed".into(), area)]);
+        let mut projected = preferred.clone();
+        let overview = project_recovery(
+            &mut projected,
+            &[],
+            &BTreeSet::new(),
+            Some(&"removed".into()),
+            area,
+            true,
+        );
+        assert_eq!(projected.len(), 1);
+        assert!(projected.contains_key("removed"));
+        assert_eq!(overview["views"].as_array().unwrap().len(), 2);
+        assert_eq!(preferred.len(), 2);
+        let mut restored = preferred.clone();
+        assert!(
+            project_recovery(&mut restored, &[], &BTreeSet::new(), None, area, false).is_null()
+        );
+        assert_eq!(restored, preferred);
+    }
     #[test]
     fn viewport_exposes_every_edge_and_retains_client_dimensions() {
         let area = Rect {

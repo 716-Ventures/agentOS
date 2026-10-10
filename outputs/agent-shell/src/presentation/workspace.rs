@@ -416,3 +416,42 @@ pub fn surfaces(w: &WorkspaceDocument) -> BTreeSet<String> {
     }
     ids
 }
+
+/// Recovery may remove views from a retained output without introducing new geometry.
+pub fn removes_only(before: &super::OutputLayout, after: &super::OutputLayout) -> bool {
+    fn ids(tile: &Option<Tile>, out: &mut BTreeSet<String>) {
+        fn walk(tile: &Tile, out: &mut BTreeSet<String>) {
+            match tile {
+                Tile::Leaf { surface_id } => {
+                    out.insert(surface_id.clone());
+                }
+                Tile::Split { children, .. } => {
+                    for child in children {
+                        walk(child, out)
+                    }
+                }
+            }
+        }
+        if let Some(tile) = tile {
+            walk(tile, out)
+        }
+    }
+    let mut old = BTreeSet::new();
+    ids(&before.tiles, &mut old);
+    old.extend(before.floating.iter().map(|f| f.surface_id.clone()));
+    let mut new = BTreeSet::new();
+    ids(&after.tiles, &mut new);
+    new.extend(after.floating.iter().map(|f| f.surface_id.clone()));
+    if !new.is_subset(&old) {
+        return false;
+    }
+    let mut expected = before.clone();
+    for id in old.difference(&new) {
+        expected.tiles = remove(expected.tiles, id);
+        expected.floating.retain(|f| &f.surface_id != id);
+        if expected.maximized.as_ref() == Some(id) {
+            expected.maximized = None;
+        }
+    }
+    &expected == after
+}

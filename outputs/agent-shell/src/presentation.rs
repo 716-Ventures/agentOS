@@ -577,16 +577,61 @@ fn validate(
                 if w.protocol != PROTOCOL || !ident(&w.workspace_id) {
                     return Err(invalid("Workspace protocol/identity mismatch"));
                 }
+                let previous: Option<String> = db
+                    .query_row(
+                        "SELECT body FROM presentation_documents WHERE id=?",
+                        [&w.workspace_id],
+                        |r| r.get(0),
+                    )
+                    .optional()
+                    .map_err(db_error)?;
+                let previous = previous
+                    .map(|body| serde_json::from_str::<Document>(&body).map_err(db_error))
+                    .transpose()?;
+                let previous = match &previous {
+                    Some(Document::Workspace(w)) => Some(w),
+                    _ => None,
+                };
                 let mut local = BTreeSet::new();
                 let mut locations = BTreeMap::new();
                 for (output, layout) in &w.outputs {
-                    let size:Option<(f64,f64)>=db.query_row("SELECT width,height FROM presentation_outputs WHERE id=? AND connected=1",[output],|r|Ok((r.get(0)?,r.get(1)?))).optional().map_err(db_error)?;
-                    let (width, height) = size.ok_or_else(|| {
+                    let unchanged = previous
+                        .and_then(|w| w.outputs.get(output))
+                        .is_some_and(|old| workspace::removes_only(old, layout));
+                    let size: Option<(f64, f64, bool,Option<String>)> = db
+                        .query_row(
+                            "SELECT o.width,o.height,o.connected,s.session FROM presentation_outputs o LEFT JOIN presentation_output_observations s USING(id) WHERE o.id=?",
+                            [output],
+                            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?,r.get(3)?)),
+                        )
+                        .optional()
+                        .map_err(db_error)?;
+                    let (width, height, connected, owner) = size.ok_or_else(|| {
                         error("missing_reference", format!("Output {output} unavailable"))
                     })?;
+                    let connected = connected
+                        && !owner.as_deref().is_some_and(|s| {
+                            s.split_once(':').is_some_and(|(pid, start)| {
+                                pid.parse::<u32>().is_ok() && start.parse::<u64>().is_ok()
+                            }) && !crate::presentation_hosts::alive(s)
+                        });
+                    if !connected && !unchanged {
+                        return Err(error(
+                            "missing_reference",
+                            format!(
+                                "Output {output} is disconnected; preferred placement was retained"
+                            ),
+                        ));
+                    }
                     let before = local.clone();
                     if let Some(t) = &layout.tiles {
-                        tile_valid(t, &mut local, 1, width, height)?
+                        tile_valid(
+                            t,
+                            &mut local,
+                            1,
+                            if unchanged { f64::INFINITY } else { width },
+                            if unchanged { f64::INFINITY } else { height },
+                        )?
                     }
                     for f in &layout.floating {
                         if ![f.x, f.y, f.width, f.height].iter().all(|v| v.is_finite())
@@ -594,8 +639,7 @@ fn validate(
                             || f.height < 32.0
                             || f.x < 0.0
                             || f.y < 0.0
-                            || f.x + f.width > width
-                            || f.y + f.height > height
+                            || (!unchanged && (f.x + f.width > width || f.y + f.height > height))
                         {
                             return Err(error(
                                 "constraint_conflict",
@@ -682,6 +726,7 @@ pub fn init(db: &Connection) -> Result<()> {
         CREATE TABLE IF NOT EXISTS presentation_outputs(id TEXT PRIMARY KEY,width REAL NOT NULL,height REAL NOT NULL,connected INTEGER NOT NULL);
         CREATE TABLE IF NOT EXISTS presentation_actions(reference TEXT PRIMARY KEY,uid INTEGER NOT NULL,activity TEXT NOT NULL,revoked INTEGER NOT NULL DEFAULT 0);").map_err(db_error)?;
     crate::presentation_hosts::init(db)?;
+    crate::presentation_outputs::init(db)?;
     crate::presentation_sources::init(db)?;
     crate::presentation_actions::init(db)
 }
@@ -816,7 +861,7 @@ fn metadata(db: &Connection, value: &Value) -> Result<Value> {
             referenced.extend(workspace::surfaces(&workspace));
         }
     }
-    let state = json!({"protocol":PROTOCOL,"catalog_revision":CATALOG,"event_cursor":cursor,"host_surfaces":crate::presentation_hosts::snapshot_for(db,&referenced,activity)?,"renderers":crate::presentation_hosts::renderers_for(db,activity)?});
+    let state = json!({"protocol":PROTOCOL,"catalog_revision":CATALOG,"event_cursor":cursor,"host_surfaces":crate::presentation_hosts::snapshot_for(db,&referenced,activity)?,"renderers":crate::presentation_hosts::renderers_for(db,activity)?,"outputs":crate::presentation_outputs::list(db,&json!({"limit":64,"connected_only":true}))?});
     if state.to_string().len() > TRANSACTION_LIMIT {
         return Err(error(
             "resource_limit",
@@ -1364,31 +1409,8 @@ pub fn handle(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> 
                 .map(|r|{let(c,d,receipt)=r.map_err(db_error)?;Ok(json!({"event_cursor":c,"documents":serde_json::from_str::<Value>(&d).map_err(db_error)?,"receipt":serde_json::from_str::<Value>(&receipt).map_err(db_error)?}))}).collect::<Result<Vec<_>>>()?;
             Ok(json!({"protocol":PROTOCOL,"events":events,"latest_cursor":latest}))
         }
-        "outputs.register" => {
-            if !crate::presentation_hosts::trusted(who) {
-                return Err(error(
-                    "unauthorized",
-                    "Only the trusted compositor can advertise outputs",
-                ));
-            }
-            let id = v["output_id"]
-                .as_str()
-                .filter(|x| ident(x))
-                .ok_or_else(|| invalid("Invalid output ID"))?;
-            let width = v["width"]
-                .as_f64()
-                .filter(|x| x.is_finite() && (80.0..=32768.0).contains(x))
-                .ok_or_else(|| invalid("Invalid output width"))?;
-            let height = v["height"]
-                .as_f64()
-                .filter(|x| x.is_finite() && (32.0..=32768.0).contains(x))
-                .ok_or_else(|| invalid("Invalid output height"))?;
-            // Refuse a size change that would silently invalidate the committed placement.
-            let tx = db.transaction().map_err(db_error)?;
-            tx.execute("INSERT INTO presentation_outputs VALUES(?,?,?,1) ON CONFLICT(id) DO UPDATE SET width=excluded.width,height=excluded.height,connected=1",params![id,width,height]).map_err(db_error)?;
-            validate(&tx, &documents(&tx)?, who)?;
-            tx.commit().map_err(db_error)?;
-            Ok(json!({"output_id":id,"width":width,"height":height}))
+        "outputs.register" | "outputs.disconnect" | "outputs.list" => {
+            crate::presentation_outputs::handle(db, v, who)
         }
         "interaction.begin" | "interaction.renew" | "interaction.end" | "draft.save"
         | "draft.get" => interaction(db, v, who),
@@ -1411,10 +1433,19 @@ fn interaction(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value>
         .as_str()
         .ok_or_else(|| invalid("Missing surface ID"))?;
     let element = v["element_id"].as_str().unwrap_or("");
-    let docs = documents(db)?;
-    let document = docs.get(id).ok_or_else(|| error("missing_reference", id))?;
+    let body: Option<String> = db
+        .query_row(
+            "SELECT body FROM presentation_documents WHERE id=?",
+            [id],
+            |r| r.get(0),
+        )
+        .optional()
+        .map_err(db_error)?;
+    let document: Document =
+        serde_json::from_str(&body.ok_or_else(|| error("missing_reference", id))?)
+            .map_err(db_error)?;
     if !element.is_empty() {
-        match document {
+        match &document {
             Document::Surface(s) if s.elements.contains_key(element) => {}
             _ => return Err(error("missing_reference", element)),
         }
@@ -1511,12 +1542,22 @@ fn interaction(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value>
     Ok(json!({"status":"accepted"}))
 }
 fn bindings(db: &Connection, v: &Value) -> Result<Value> {
-    let docs = documents(db)?;
     let id = v["surface_id"]
         .as_str()
         .ok_or_else(|| invalid("Missing surface ID"))?;
-    let s = match docs.get(id) {
-        Some(Document::Surface(s)) => s,
+    let body: Option<String> = db
+        .query_row(
+            "SELECT body FROM presentation_documents WHERE id=?",
+            [id],
+            |r| r.get(0),
+        )
+        .optional()
+        .map_err(db_error)?;
+    let document: Document =
+        serde_json::from_str(&body.ok_or_else(|| error("missing_reference", id))?)
+            .map_err(db_error)?;
+    let s = match document {
+        Document::Surface(s) => s,
         _ => return Err(error("missing_reference", id)),
     };
     let mut values = BTreeMap::new();
@@ -1861,6 +1902,81 @@ mod tests {
     }
     fn workspace() -> Value {
         json!({"protocol":PROTOCOL,"workspace_id":"workspace-a","activity_id":"1","revision":0,"outputs":{"output-a":{"tiles":{"kind":"leaf","surface_id":"surface-a"},"floating":[],"maximized":null}},"constraints":[],"focus":null})
+    }
+    #[test]
+    fn output_resize_disconnect_and_restore_preserve_preferred_work() {
+        let mut db = fixture();
+        create(&mut db);
+        let root = Principal {
+            uid: 0,
+            session: "compositor".into(),
+        };
+        let original =
+            json!({"op":"outputs.register","output_id":"output-a","width":1920,"height":1080});
+        handle(&mut db, &original, &root).unwrap();
+        let mut w = workspace();
+        w["outputs"]["output-a"]["tiles"] = Value::Null;
+        w["outputs"]["output-a"]["floating"] =
+            json!([{"surface_id":"surface-a","x":100,"y":80,"width":1000,"height":600}]);
+        handle(&mut db,&json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"initial-float","expected_revisions":{"workspace-a":null},"operations":[{"op":"workspace.put","document":w}]}),&human()).unwrap();
+        let before = get_document(&db, &json!({"document_id":"workspace-a"})).unwrap();
+        handle(&mut db,&json!({"op":"outputs.register","output_id":"output-a","width":320,"height":240,"x":100,"y":200,"scale":2,"transform":"_90"}),&root).unwrap();
+        assert_eq!(
+            get_document(&db, &json!({"document_id":"workspace-a"})).unwrap(),
+            before
+        );
+        handle(
+            &mut db,
+            &props("edit-during-pressure", 0, "text", "Still editable"),
+            &human(),
+        )
+        .unwrap();
+        let outputs = handle(&mut db, &json!({"op":"outputs.list"}), &human()).unwrap();
+        assert_eq!(outputs["outputs"][0]["scale"], 2.);
+        assert_eq!(outputs["outputs"][0]["transform"], "_90");
+        assert_eq!(outputs["outputs"][0]["width"], 320.);
+        let mut changed = before.clone();
+        changed["outputs"]["output-a"]["floating"][0]["x"] = json!(120);
+        let bad = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"new-out-of-bounds","expected_revisions":{"workspace-a":0},"operations":[{"op":"workspace.put","document":changed}]});
+        assert!(handle(&mut db, &bad, &human())
+            .unwrap_err()
+            .contains("constraint_conflict"));
+        assert!(handle(
+            &mut db,
+            &json!({"op":"outputs.disconnect","output_id":"output-a"}),
+            &agent()
+        )
+        .is_err());
+        handle(
+            &mut db,
+            &json!({"op":"outputs.disconnect","output_id":"output-a"}),
+            &root,
+        )
+        .unwrap();
+        handle(
+            &mut db,
+            &props("edit-without-output", 1, "text", "Work retained"),
+            &human(),
+        )
+        .unwrap();
+        let state = handle(&mut db, &json!({"op":"outputs.list"}), &human()).unwrap();
+        assert_eq!(state["outputs"][0]["connected"], false);
+        assert!(handle(&mut db, &bad, &human())
+            .unwrap_err()
+            .contains("missing_reference"));
+        handle(&mut db, &original, &root).unwrap();
+        assert_eq!(
+            get_document(&db, &json!({"document_id":"workspace-a"})).unwrap(),
+            before
+        );
+        handle(
+            &mut db,
+            &json!({"op":"outputs.disconnect","output_id":"output-a"}),
+            &root,
+        )
+        .unwrap();
+        let close = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"close-on-removed-output","expected_revisions":{"workspace-a":0,"surface-a":2},"operations":[{"op":"workspace.edit","workspace_id":"workspace-a","edit":{"kind":"remove","surface_id":"surface-a"}},{"op":"surface.close","surface_id":"surface-a"}]});
+        assert!(handle(&mut db, &close, &human()).is_ok());
     }
     #[test]
     fn workspace_enforces_outputs_placements_sizes_focus_and_provenance() {

@@ -67,6 +67,7 @@ pub struct Frame {
     pub drafts: BTreeMap<(String, String), Value>,
     pub core: Value,
     pub host_surfaces: Value,
+    pub outputs: Value,
     pub compositor: Value,
     pub workspace_undo: Option<i64>,
     pub broker: Value,
@@ -393,6 +394,7 @@ fn run(
                     ..Frame::default()
                 };
                 next.host_surfaces = state["host_surfaces"].clone();
+                next.outputs = state["outputs"].clone();
                 if let Some(path) = std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET") {
                     next.compositor = request(&PathBuf::from(path), &json!({"op":"snapshot"}))
                         .map(|v| v["shared"].clone())

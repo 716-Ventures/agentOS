@@ -216,10 +216,17 @@ impl WorkspaceControls {
         }
         let ids = entries.keys().cloned().collect::<Vec<_>>();
         let names = entries.values().map(String::as_str).collect::<Vec<_>>();
-        let outputs = doc
-            .and_then(|d| d["outputs"].as_object())
-            .map(|o| o.keys().cloned().collect::<Vec<_>>())
-            .unwrap_or_default();
+        let outputs = if let Some(outputs) = frame.outputs["outputs"].as_array() {
+            outputs
+                .iter()
+                .filter(|output| output["availability"] == "available")
+                .filter_map(|output| output["output_id"].as_str().map(String::from))
+                .collect::<Vec<_>>()
+        } else {
+            doc.and_then(|d| d["outputs"].as_object())
+                .map(|o| o.keys().cloned().collect::<Vec<_>>())
+                .unwrap_or_default()
+        };
         let mut current = self.state.borrow_mut();
         if current.0 != ids
             || (0..self.surface_model.n_items())
