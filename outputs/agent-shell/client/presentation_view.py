@@ -3,6 +3,8 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
+import stat
 import tempfile
 import textwrap
 import threading
@@ -100,35 +102,94 @@ class Lease:
         except (OSError,RuntimeError):pass
 
 
-def preserve(text,surface,element):
+def recovery_root():
     root=Path(os.environ.get('XDG_STATE_HOME',str(Path.home()/'.local/state')))/'agent-os/terminal-drafts'
     root.mkdir(mode=0o700,parents=True,exist_ok=True)
+    if root.is_symlink() or root.stat().st_uid!=os.getuid():raise ValueError('Draft recovery directory must belong to this user')
+    root.chmod(0o700)
+    return root
+
+
+def preserve(text,surface,element,previous=None):
+    root=recovery_root()
     fd,name=tempfile.mkstemp(prefix='recovered-',suffix='.json',dir=root)
-    with os.fdopen(fd,'w') as stream:
-        os.fchmod(stream.fileno(),0o600);json.dump({'format':1,'surface_id':surface,'element_id':element,'text':text},stream,ensure_ascii=False);stream.flush();os.fsync(stream.fileno())
-    return name
+    temporary=Path(name)
+    try:
+        with os.fdopen(fd,'w') as stream:
+            os.fchmod(stream.fileno(),0o600);json.dump({'format':1,'surface_id':surface,'element_id':element,'text':text},stream,ensure_ascii=False);stream.flush();os.fsync(stream.fileno())
+        if previous:
+            previous=Path(previous)
+            if previous.parent!=root or previous.is_symlink():raise ValueError('Invalid recovery file')
+            os.replace(name,previous);name=str(previous)
+        parent=os.open(root,os.O_RDONLY|os.O_DIRECTORY)
+        try:os.fsync(parent)
+        finally:os.close(parent)
+        return name
+    except BaseException:
+        temporary.unlink(missing_ok=True);raise
+
+
+def recover(request,document,input_fn=input,output=print):
+    records=[];surface=document['surface_id']
+    # Bound discovery and reads; malformed files remain intact for manual recovery.
+    for path in sorted(recovery_root().glob('recovered-*.json'))[:100]:
+        try:
+            fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK)
+            with os.fdopen(fd,'r') as stream:
+                info=os.fstat(stream.fileno())
+                if not stat.S_ISREG(info.st_mode) or info.st_uid!=os.getuid() or info.st_size>128*1024:continue
+                value=json.load(stream)
+            if (value.get('format')==1 and value.get('surface_id')==surface and isinstance(value.get('text'),str)
+                    and len(value['text'].encode())<=65536 and document['elements'].get(value.get('element_id'),{}).get('type')=='TextField@1'):
+                records.append((path,value))
+        except (OSError,ValueError,TypeError,AttributeError):continue
+    if not records:output('No local recovery drafts match this view.');return
+    for index,(_,value) in enumerate(records,1):output(f"{index}. [{clean(value['element_id'])}] {clean(value['text'][:160])}")
+    choice=input_fn('Recovery number, or Enter to return: ').strip()
+    if not choice.isdigit() or not 1<=int(choice)<=len(records):return
+    path,value=records[int(choice)-1];element=value['element_id']
+    with Lease(request,surface,element):
+        current=request('draft.get',surface_id=surface,element_id=element)
+        output('Current draft: '+clean(current.get('draft') or ''))
+        output('Recovered text: '+clean(value['text']))
+        if input_fn('Type restore to replace the draft (view text stays unchanged): ').strip()!='restore':return
+        request('draft.save',surface_id=surface,element_id=element,expected_draft_revision=current['draft_revision'],draft=value['text'])
+        path.unlink(missing_ok=True)
+        output('Recovered into the editable draft. Open the field to save it to the view.')
 
 
 def edit(request,document,element,input_fn=input,output=print):
     surface=document['surface_id'];node=document['elements'][element]
     with Lease(request,surface,element) as lease:
         recovered=request('draft.get',surface_id=surface,element_id=element)
-        output('Current text: '+clean(recovered.get('draft') if recovered.get('draft') is not None else node.get('props',{}).get('value','')))
+        existing=recovered.get('draft') if recovered.get('draft') is not None else node.get('props',{}).get('value','')
+        output('Current text: '+clean(existing))
+        output('Enter :draft to use the current text; ::draft enters that literal text.')
+        local=None
         if node.get('props',{}).get('multiline'):
             output('Enter lines. A single period finishes; two periods enter a literal period.');rows=[]
             while True:
                 line=input_fn('> ')
+                if line==':draft' and not rows:rows=[existing];break
+                if line=='::draft':line=':draft'
                 if line=='.':break
+                candidate='\n'.join([*rows,'.' if line=='..' else line])
+                if len(candidate.encode())>65536:raise ValueError('Draft exceeds 64 KiB')
                 rows.append('.' if line=='..' else line)
-                if len('\n'.join(rows).encode())>65536:raise ValueError('Draft exceeds 64 KiB')
+                local=preserve(candidate,surface,element,local)
             text='\n'.join(rows)
-        else:text=input_fn('New text: ')
+        else:
+            text=input_fn('New text: ')
+            if text==':draft':text=existing
+            elif text=='::draft':text=':draft'
         if len(text.encode())>65536:raise ValueError('Draft exceeds 64 KiB')
+        local=preserve(text,surface,element,local)
         try:
             if lease.error:raise RuntimeError(str(lease.error))
             saved=request('draft.save',surface_id=surface,element_id=element,expected_draft_revision=recovered['draft_revision'],draft=text)
         except (OSError,RuntimeError):
-            output('Draft saved locally for recovery: '+preserve(text,surface,element));raise
+            output('Draft saved locally for recovery: '+local);raise
+        Path(local).unlink(missing_ok=True)
         choice=input_fn('[s] Save to view  [k] Keep draft  [d] Discard: ').strip().lower()
         if choice=='s':
             current=request('presentation.snapshot')['documents'][surface]
@@ -154,17 +215,19 @@ def interact(activity,request,input_fn=input,output=print):
                 if not choice.isdigit() or not 1<=int(choice)<=len(documents):continue
                 selected=list(documents)[int(choice)-1];offset=0
             document=documents[selected];bindings=request('binding.snapshot',surface_id=selected)['bindings']
-            lines,controls=project(document,bindings)
+            dimensions=shutil.get_terminal_size((80,30));page=max(4,dimensions.lines-6)
+            lines,controls=project(document,bindings,width=dimensions.columns)
             offset=max(0,min(offset,max(0,len(lines)-1)))
             output(clean(document['title'])+f' · revision {document["revision"]}')
-            for line in lines[offset:offset+24]:output(line)
-            output(f'Lines {offset+1}–{min(offset+24,len(lines))}/{len(lines)}')
-            choice=input_fn('Control ID · + next · - previous · b views · r refresh · q back: ').strip()
+            for line in lines[offset:offset+page]:output(line)
+            output(f'Lines {offset+1}–{min(offset+page,len(lines))}/{len(lines)}')
+            choice=input_fn('Control ID · + next · - previous · b views · r refresh · recover drafts · q back: ').strip()
             if choice=='q':return
-            if choice=='+':offset+=24;continue
-            if choice=='-':offset=max(0,offset-24);continue
+            if choice=='+':offset+=page;continue
+            if choice=='-':offset=max(0,offset-page);continue
             if choice=='b':selected=None;continue
             if choice=='r':continue
+            if choice=='recover':recover(request,document,input_fn,output);continue
             if choice not in controls:output('Choose a listed control ID.');continue
             node=controls[choice]
             if node['type']=='Link@1':output(clean(node.get('props',{}).get('url','')))
