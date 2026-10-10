@@ -241,6 +241,15 @@ impl Surface {
             });
             glib::Propagation::Stop
         });
+        let identity = format!("agentos.surface.{id}");
+        window.connect_realize(move |window| {
+            if let Some(surface) = window
+                .surface()
+                .and_then(|s| s.downcast::<gdk4_wayland::WaylandToplevel>().ok())
+            {
+                surface.set_application_id(&identity);
+            }
+        });
         // Mapping a result does not request an activation token. The compositor owns focus policy.
         window.set_visible(true);
         Self {

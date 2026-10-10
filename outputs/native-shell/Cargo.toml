@@ -8,6 +8,7 @@ license = "Apache-2.0"
 [dependencies]
 seven-sixteen-ui = { git = "https://github.com/716-Ventures/716-ui", tag = "v0.1.0-alpha.1" }
 serde_json = "1"
+gdk4-wayland = "=0.9.6"
 
 [profile.dev]
 debug = 0

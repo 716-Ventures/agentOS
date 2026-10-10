@@ -81,7 +81,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                         deadline=time.monotonic()+10
                         while True:
                             state=snapshot()
-                            if len(state['windows'])>=count:return state
+                            if len(state['windows'])>=count and len(state['layout']['order'])>=count:return state
                             assert time.monotonic()<deadline,state
                             time.sleep(.02)
                     simple=subprocess.Popen(['weston-simple-shm'],env=childenv,stdout=nestedlog,stderr=subprocess.STDOUT,start_new_session=True);applications.append(simple)
@@ -93,7 +93,9 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                     state=wait_windows(3);assert state['layout']['focus']==ident,'A conventional app stole focus'
                     revision=state['layout']['revision']
                     assert not control_call({'op':'place','id':ident,'expected_revision':revision-1,'placement':{'mode':'maximized'}})['ok']
-                    assert control_call({'op':'place','id':ident,'expected_revision':revision,'placement':{'mode':'floating','rect':{'x':100,'y':80,'width':320,'height':240}}})['ok']
+                    revision=snapshot()['layout']['revision']
+                    response=control_call({'op':'place','id':ident,'expected_revision':revision,'placement':{'mode':'floating','rect':{'x':100,'y':80,'width':320,'height':240}}})
+                    assert response['ok'],response
                     state=snapshot();assert state['layout']['placements'][ident]['mode']=='floating'
                     assert control_call({'op':'undo','expected_revision':state['layout']['revision']})['ok']
                     state=snapshot();assert state['layout']['placements'][ident]['mode']=='tiled'
