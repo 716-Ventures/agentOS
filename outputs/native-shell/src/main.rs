@@ -479,10 +479,30 @@ impl Surface {
                     })
                     .unwrap_or(true)
                 {
+                    if let Some(container) = self
+                        .elements
+                        .get(element)
+                        .and_then(|old| old.container.as_ref())
+                    {
+                        while let Some(child) = container.first_child() {
+                            container.remove(&child);
+                        }
+                    }
                     self.elements.insert(
                         element.clone(),
                         construct(id, element, node, frame, commands, drafts),
                     );
+                }
+            }
+            for (_, old) in self
+                .elements
+                .iter()
+                .filter(|(key, _)| !nodes.contains_key(*key))
+            {
+                if let Some(container) = &old.container {
+                    while let Some(child) = container.first_child() {
+                        container.remove(&child);
+                    }
                 }
             }
             self.elements.retain(|key, _| nodes.contains_key(key));

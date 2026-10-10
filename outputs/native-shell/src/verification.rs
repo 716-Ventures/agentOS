@@ -1,6 +1,41 @@
 //! Executed only by the explicit --self-test verification mode on a private display.
 use super::*;
 use std::sync::mpsc;
+fn verify_container_replacement(
+    app: &gtk::Application,
+    frame: &Frame,
+    commands: &Sender<Command>,
+    drafts: &Arc<Mutex<BTreeMap<(String, String), Draft>>>,
+) {
+    let id = "container-reconciliation";
+    let mut surface = Surface::new(app, id, commands);
+    surface.window.set_visible(false);
+    let mut doc = json!({"surface_id":id,"title":"Container reconciliation","revision":0,"root":"root","elements":{"root":{"type":"Stack@1","props":{},"slots":{"children":["a","b"]}},"a":{"type":"Text@1","props":{"text":"Stable a"}},"b":{"type":"Text@1","props":{"text":"Stable b"}}}});
+    surface.update(id, &doc, frame, commands, drafts);
+    let a = surface.elements["a"].widget.clone();
+    let b = surface.elements["b"].widget.clone();
+    let old = surface.elements["root"].widget.clone();
+    doc["revision"] = json!(1);
+    doc["elements"]["root"]["type"] = json!("Row@1");
+    surface.update(id, &doc, frame, commands, drafts);
+    let row = surface.elements["root"].widget.clone();
+    assert_ne!(old, row);
+    assert_eq!(surface.elements["a"].widget, a);
+    assert_eq!(a.parent().as_ref(), Some(&row));
+    doc["revision"] = json!(2);
+    doc["elements"]["group"] = json!({"type":"Stack@1","props":{},"slots":{"children":["a","b"]}});
+    doc["elements"]["root"]["slots"]["children"] = json!(["group"]);
+    surface.update(id, &doc, frame, commands, drafts);
+    assert_eq!(a.parent().as_ref(), Some(&surface.elements["group"].widget));
+    doc["revision"] = json!(3);
+    doc["elements"].as_object_mut().unwrap().remove("group");
+    doc["elements"]["root"]["slots"]["children"] = json!(["a", "b"]);
+    surface.update(id, &doc, frame, commands, drafts);
+    assert_eq!(a.parent().as_ref(), Some(&row));
+    assert_eq!(b.parent().as_ref(), Some(&row));
+    assert_eq!(surface.elements["b"].widget, b);
+    surface.window.destroy();
+}
 pub fn run(socket: PathBuf, capture: Option<String>) {
     let app = gtk::Application::builder()
         .application_id("com.agentos.DesktopVerification")
@@ -15,6 +50,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         let bindings=transport::request(&socket,&json!({"op":"binding.snapshot","surface_id":"native-fixture"})).unwrap();frame.bindings.insert("native-fixture".into(),bindings);
         let (commands,rx)=mpsc::channel();let drafts=Arc::new(Mutex::new(BTreeMap::new()));
         frame.core=transport::request(&socket,&json!({"op":"snapshot"})).unwrap();frame.activity=doc["activity_id"].as_str().map(String::from);frame.usage=json!({"unavailable":true});frame.broker=json!([]);
+        verify_container_replacement(app,&frame,&commands,&drafts);
         let mut controls=controls::Controls::new(app,commands.clone());controls.verify_controls(&frame,&commands);
         assert!(rx.try_iter().any(|c|matches!(c,Command::Ask{prompt,..} if prompt=="Explicit native request λ")));
 
