@@ -41,6 +41,7 @@ TOOLS = [
 TOOLS.extend([
  tool('presentation_catalog','Discover the experimental native component schemas and protocol limits. Native rendering is not available until a graphical client connects.',{},[]),
  tool('presentation_snapshot','Read persistent native surface/workspace documents and revisions for this activity. Includes discovered host-issued callback references, their issuer UID, immutable target, parameter schema and availability; use only those references for buttons/forms. Native user input is required to invoke them. These are separate from terminal layout.',{},[]),
+ tool('presentation_resources','Read the next metadata page of immutable native image references in this activity; this does not grant byte publication or retrieval.',{'after':{'type':'string'},'limit':{'type':'integer','minimum':1,'maximum':64}},[]),
  tool('presentation_sources','Read the next page of registered source identities and typed paths for this activity; observations are read-only evidence.',{'after':{'type':'string'},'limit':{'type':'integer','minimum':1,'maximum':128}},[]),
  tool('presentation_actions','Read the next page of host-issued callback references for this activity; discovery grants no invocation authority.',{'after':{'type':'string'},'limit':{'type':'integer','minimum':1,'maximum':128}},[]),
  tool('presentation_apply','Commit a complete native presentation transaction encoded as JSON. Read catalog and snapshot first. Use exact revisions and stable IDs. It cannot execute commands, steal focus, overwrite active input, or register action authority.',

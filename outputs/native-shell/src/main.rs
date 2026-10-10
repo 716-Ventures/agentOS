@@ -37,6 +37,8 @@ struct Element {
     widget: gtk::Widget,
     label: Option<gtk::Label>,
     rich: Option<ui::RichText>,
+    image: Option<ui::ImageView>,
+    image_attempted: bool,
     chart: Option<ui::BoundedChart>,
     field: Option<TextField>,
     choice: Option<ui::Choice>,
@@ -132,6 +134,8 @@ fn construct(
         widget: gtk::Box::new(gtk::Orientation::Vertical, 0).upcast(),
         label: None,
         rich: None,
+        image: None,
+        image_attempted: false,
         chart: None,
         field: None,
         choice: None,
@@ -153,6 +157,25 @@ fn construct(
         children: Vec::new(),
     };
     match kind.as_str() {
+        "Image@1" => {
+            let reference = props["reference"].as_str().unwrap();
+            let label = props["label"].as_str().unwrap();
+            result.image_attempted = frame.resources.contains_key(reference);
+            let image = frame
+                .resources
+                .get(reference)
+                .and_then(|bytes| ui::ImageView::new(label, bytes).ok());
+            if let Some(image) = image {
+                result.widget = image.widget.clone().upcast();
+                result.label = Some(image.caption.clone());
+                lease(&image.caption.clone().upcast(), surface, id, commands);
+                result.image = Some(image);
+            } else {
+                let unavailable = ui::text(&format!("Image unavailable · {label}"), false);
+                result.widget = unavailable.clone().upcast();
+                result.label = Some(unavailable);
+            }
+        }
         "RichText@1" => {
             let runs = serde_json::from_value::<Vec<ui::RichRun>>(props["runs"].clone()).unwrap();
             let rich = ui::RichText::new(&runs).unwrap();
@@ -643,7 +666,9 @@ impl Surface {
                 || e.chart
                     .as_ref()
                     .map(|chart| {
-                        chart.data.view.has_focus() || chart.data.view.focus_child().is_some()
+                        chart.data.view.has_focus()
+                            || chart.data.view.focus_child().is_some()
+                            || chart.heading.selection_bounds().is_some()
                     })
                     .unwrap_or(false)
                 || e.list
@@ -663,7 +688,18 @@ impl Surface {
             .unwrap()
             .iter()
             .any(|((s, _), d)| s == id && (d.dirty || d.resolved.is_none()));
-        let changed = doc["revision"].as_u64() != self.revision;
+        let resource_ready = !protected
+            && nodes.iter().any(|(id, node)| {
+                node["type"] == "Image@1"
+                    && self
+                        .elements
+                        .get(id)
+                        .is_some_and(|element| !element.image_attempted)
+                    && node["props"]["reference"]
+                        .as_str()
+                        .is_some_and(|reference| frame.resources.contains_key(reference))
+            });
+        let changed = doc["revision"].as_u64() != self.revision || resource_ready;
         if changed && protected && self.revision.is_some() {
             let retained = self.document.clone();
             self.update(id, &retained, frame, commands, drafts);
@@ -680,6 +716,13 @@ impl Surface {
                     .get(element)
                     .map(|e| {
                         Some(e.kind.as_str()) != node["type"].as_str()
+                            || (e.kind == "Image@1"
+                                && (self.document["elements"][element]["props"]["reference"]
+                                    != node["props"]["reference"]
+                                    || (!e.image_attempted
+                                        && node["props"]["reference"].as_str().is_some_and(
+                                            |reference| frame.resources.contains_key(reference),
+                                        ))))
                             || (e.kind == "Table@1"
                                 && e.table
                                     .as_ref()
@@ -860,6 +903,17 @@ impl Surface {
                     }
                 }
                 e.applying.set(true);
+                if e.kind == "Image@1" && e.image.is_none() {
+                    if let Some(label) = &e.label {
+                        label.set_text(&format!(
+                            "Image unavailable · {}",
+                            props["label"].as_str().unwrap()
+                        ));
+                    }
+                }
+                if let Some(image) = &e.image {
+                    let _ = image.set_label(props["label"].as_str().unwrap());
+                }
                 if let Some(chart) = e.chart.as_mut() {
                     let points =
                         serde_json::from_value::<Vec<ui::ChartPoint>>(props["points"].clone())
@@ -873,6 +927,7 @@ impl Surface {
                 }
                 if let Some(label) = &e.label {
                     if e.rich.is_none()
+                        && e.kind != "Image@1"
                         && (e.kind == "Status@1"
                             || (!label.has_focus() && label.selection_bounds().is_none()))
                     {

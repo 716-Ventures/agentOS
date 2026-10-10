@@ -12,5 +12,27 @@
   "rollback": "Preserve live user and service state; permit only matching state contracts",
   "desktop": {
     "format": 1
-  }
+  },
+  "components": [
+    "Button@1",
+    "Chart@1",
+    "Choice@1",
+    "Image@1",
+    "KeyValue@1",
+    "Link@1",
+    "List@1",
+    "Progress@1",
+    "RichText@1",
+    "Row@1",
+    "Scroll@1",
+    "Section@1",
+    "Split@1",
+    "Stack@1",
+    "Status@1",
+    "Table@1",
+    "Tabs@1",
+    "Text@1",
+    "TextField@1",
+    "Toggle@1"
+  ]
 }

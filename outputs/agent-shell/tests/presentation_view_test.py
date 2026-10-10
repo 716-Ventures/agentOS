@@ -61,6 +61,10 @@ class Projection(unittest.TestCase):
         doc['elements']['root']['slots']['children']+=['rich','chart'];lines,controls=view.project(doc);text='\n'.join(lines)
         self.assertIn('<b>日本語</b> λ',text);self.assertIn('Loss: -2.5',text);self.assertIn('Gain: 7',text)
         self.assertNotIn('rich',controls);self.assertNotIn('chart',controls)
+    def test_images_have_inert_labeled_terminal_fallbacks(self):
+        doc=document();doc['elements']['image']={'type':'Image@1','props':{'label':'Blue pixel 日本語','reference':'resource-'+'a'*32}}
+        doc['elements']['root']['slots']['children'].append('image');lines,controls=view.project(doc)
+        self.assertIn('[Image] Blue pixel 日本語','\n'.join(lines));self.assertNotIn('image',controls)
     def test_completed_multiline_input_survives_interruption(self):
         doc=document();doc['elements']['field']['props']['multiline']=True;calls=[]
         def request(op,**fields):calls.append(op);return {'draft_revision':0,'draft':None}

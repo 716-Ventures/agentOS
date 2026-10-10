@@ -25,6 +25,7 @@ jobs:
           python3 -m unittest discover -s tests -p '*_test.py'
           cargo +1.85.1 test --locked
           cargo +1.85.1 build --release --locked
+          python3 tests/release_catalog.py
       - name: Authenticated presentation and callback IPC
         run: |
           python3 tests/presentation_guest.py

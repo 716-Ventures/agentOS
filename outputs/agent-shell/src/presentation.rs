@@ -472,6 +472,20 @@ fn surface_valid(db: &Connection, s: &SurfaceDocument, _principal: &Principal) -
     if seen.len() != s.elements.len() {
         return Err(invalid("Unreachable elements"));
     }
+    for element in s.elements.values().filter(|node| node.kind == "Image@1") {
+        if crate::presentation_resources::activity(
+            db,
+            element.props["reference"].as_str().unwrap(),
+        )?
+        .as_deref()
+            != Some(s.activity_id.as_str())
+        {
+            return Err(error(
+                "missing_reference",
+                "Image resource unavailable in this activity",
+            ));
+        }
+    }
     for binding in s.bindings.values() {
         let paths = if binding.source.starts_with("file:") {
             &[
@@ -808,6 +822,7 @@ pub fn init(db: &Connection) -> Result<()> {
     crate::presentation_hosts::init(db)?;
     crate::presentation_outputs::init(db)?;
     crate::presentation_sources::init(db)?;
+    crate::presentation_resources::init(db)?;
     crate::presentation_actions::init(db)
 }
 fn documents(db: &Connection) -> Result<BTreeMap<String, Document>> {
@@ -1564,6 +1579,9 @@ fn commit(
 pub fn handle(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> {
     match v["op"].as_str().unwrap_or("") {
         "catalog.get" => Ok(catalog()),
+        "resource.publish" | "resource.get" | "resource.list" => {
+            crate::presentation_resources::handle(db, v, who)
+        }
         "source.publish" | "source.heartbeat" | "source.list" => {
             crate::presentation_sources::handle(db, v, who)
         }
@@ -2782,6 +2800,65 @@ mod tests {
                 props
             );
         }
+    }
+    #[test]
+    fn image_resources_are_immutable_scoped_human_owned_and_metadata_only_for_models() {
+        let mut db = fixture();
+        let bytes = include_bytes!("../tests/fixtures/pixel.png");
+        let hex = bytes
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect::<String>();
+        let reference = format!("resource-{}", "a".repeat(32));
+        let publish = json!({"op":"resource.publish","activity_id":"1","reference":reference,"label":"Blue pixel","png_hex":hex});
+        assert!(handle(&mut db, &publish, &agent())
+            .unwrap_err()
+            .contains("unauthorized"));
+        let receipt = handle(&mut db, &publish, &human()).unwrap();
+        assert_eq!(handle(&mut db, &publish, &human()).unwrap(), receipt);
+        let mut changed = publish.clone();
+        changed["label"] = json!("Different image");
+        assert!(handle(&mut db, &changed, &human())
+            .unwrap_err()
+            .contains("immutable_resource"));
+        let get = json!({"op":"resource.get","activity_id":"1","reference":reference});
+        assert_eq!(handle(&mut db, &get, &human()).unwrap()["png_hex"], hex);
+        assert!(handle(&mut db, &get, &agent()).is_err());
+        assert!(handle(
+            &mut db,
+            &get,
+            &Principal {
+                uid: 1001,
+                session: "another-user".into()
+            }
+        )
+        .is_err());
+        assert!(handle(
+            &mut db,
+            &json!({"op":"resource.get","activity_id":"2","reference":reference}),
+            &human()
+        )
+        .is_err());
+        let list = handle(
+            &mut db,
+            &json!({"op":"resource.list","activity_id":"1"}),
+            &agent(),
+        )
+        .unwrap();
+        assert_eq!(list["resources"][0]["reference"], reference);
+        assert!(list["resources"][0].get("png_hex").is_none());
+        let mut doc = surface();
+        doc["elements"]["text"] =
+            json!({"type":"Image@1","props":{"label":"Blue pixel","reference":reference}});
+        let create = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"image-view","expected_revisions":{"surface-a":null},"operations":[{"op":"surface.create","document":doc}]});
+        let mut bad = create.clone();
+        bad["operations"][0]["document"]["elements"]["text"]["props"]["reference"] =
+            json!("/etc/shadow");
+        assert!(handle(&mut db, &bad, &human()).is_err());
+        bad = create.clone();
+        bad["operations"][0]["document"]["activity_id"] = json!("2");
+        assert!(handle(&mut db, &bad, &human()).is_err());
+        handle(&mut db, &create, &human()).unwrap();
     }
     #[test]
     fn file_metadata_is_typed_private_scoped_and_monotonic() {

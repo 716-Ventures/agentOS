@@ -13,6 +13,7 @@ import re
 import shutil
 import signal
 import socket
+import sqlite3
 import stat
 import subprocess
 import tempfile
@@ -119,10 +120,37 @@ class Installer:
                 or len(set(value['units']))!=len(value['units'])
                 or any(unit not in UNITS or not (release/'systemd'/f'{unit}.service').is_file() for unit in value['units'])):
             raise ValueError('Invalid runtime release contract')
+        if 'components' in value:
+            components=value['components']
+            if (not isinstance(components,list) or not components or len(components)>256
+                    or any(not isinstance(kind,str) or not re.fullmatch(r'[A-Za-z][A-Za-z0-9]*@[1-9][0-9]*',kind) for kind in components)
+                    or len(set(components))!=len(components)):
+                raise ValueError('Invalid release component capabilities')
         if value.get('desktop') is not None:
             required=('native/agent-os-desktop','native/agent-os-compositor','services/desktop_session.py','services/session-launcher.sh','session/agent-os.desktop','third-party-licenses/dependencies.json')
             if value['desktop']!={'format':1} or any(not (release/name).is_file() for name in required):raise ValueError('Invalid graphical runtime contract')
         return value
+
+    def compatible_components(self,contract):
+        # Old releases predate catalog declarations and support only the original
+        # vocabulary. A matching SQLite format alone does not make them safe.
+        supported=set(contract.get('components',[
+            'Stack@1','Row@1','Text@1','Status@1','Button@1','Link@1','TextField@1','Progress@1']))
+        path=self.path('/var/lib/agent-os-runtime/state.sqlite3')
+        if not path.exists():return
+        with sqlite3.connect(path.resolve().as_uri()+'?mode=ro',uri=True,timeout=5) as db:
+            if not db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='presentation_documents'").fetchone():return
+            # Stream documents and reject oversized data before transferring it.
+            for ident,body in db.execute("SELECT id,CASE WHEN length(CAST(body AS BLOB))<=1048576 THEN body END FROM presentation_documents"):
+                if body is None:raise ValueError('Saved document exceeds compatibility read limit: '+ident)
+                document=json.loads(body)
+                if not isinstance(document,dict):raise ValueError('Invalid saved presentation document')
+                elements=document.get('elements',{})
+                if not isinstance(elements,dict):raise ValueError('Invalid saved presentation elements')
+                for element in elements.values():
+                    kind=element.get('type') if isinstance(element,dict) else None
+                    if kind not in supported:
+                        raise ValueError('Release lacks saved component '+str(kind)+'; an explicit migration is required')
 
     def link(self,path,target):
         path.parent.mkdir(parents=True,exist_ok=True)
@@ -159,7 +187,7 @@ class Installer:
                 # An active PID/socket alone cannot establish core startup/recovery readiness.
                 with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as conn:
                     conn.settimeout(3);conn.connect(str(self.path('/run/agent-os/runtime.sock')))
-                    conn.sendall(b'{"op":"snapshot"}\n')
+                    conn.sendall(b'{"op":"state.page","collection":"activities","limit":1}\n')
                     with conn.makefile('rb') as stream:result=json.loads(stream.readline(2*1024*1024))
                 if result.get('ok'):return
             time.sleep(.2)
@@ -180,6 +208,8 @@ class Installer:
             live=self.contract(current)
             if live['state_contract']!=contract['state_contract']:
                 raise ValueError('Incompatible state contract; an explicit migration is required before activation')
+        self.compatible_components(contract)
+        prior_journal=self.journal.read_bytes() if self.journal.exists() else None
         previous=str(current.resolve()) if current.exists() else None
         if self.journal.exists():
             prior=json.loads(self.journal.read_text())
@@ -193,6 +223,15 @@ class Installer:
         self.accounts()
         existing=[name for name in UNITS if self.path('/etc/systemd/system/'+name+'.service').exists()]
         if existing:self.run(['systemctl','stop',*existing])
+        try:
+            # Recheck after writers stop: a new component may have been saved
+            # between the initial preflight and service shutdown.
+            self.compatible_components(contract)
+        except Exception:
+            if prior_journal is None:self.journal.unlink(missing_ok=True)
+            else:atomic_write(self.journal,prior_journal,0o600)
+            if existing:self.run(['systemctl','start',*existing])
+            raise
         transaction['phase']='stopped';self.record(transaction)
         if interrupt=='stopped':os.kill(os.getpid(),signal.SIGKILL)
         self.link(current,release)

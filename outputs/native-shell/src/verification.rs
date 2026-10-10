@@ -250,6 +250,9 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         let mut frame=Frame{connected:true,..Frame::default()};
         frame.documents=serde_json::from_value(state["documents"].clone()).unwrap();frame.host_surfaces=state["host_surfaces"].clone();
         let bindings=transport::request(&socket,&json!({"op":"binding.snapshot","surface_id":"native-fixture"})).unwrap();frame.bindings.insert("native-fixture".into(),bindings);
+        let reference=doc["elements"]["image"]["props"]["reference"].as_str().unwrap();
+        let image=transport::request(&socket,&json!({"op":"resource.get","activity_id":doc["activity_id"],"reference":reference})).unwrap();
+        frame.resources.insert(reference.into(),Arc::new(ui::content::image_hex(image["png_hex"].as_str().unwrap()).unwrap()));
         let (commands,rx)=mpsc::channel();let drafts=Arc::new(Mutex::new(BTreeMap::new()));
         frame.core=transport::request(&socket,&json!({"op":"snapshot"})).unwrap();frame.activity=doc["activity_id"].as_str().map(String::from);frame.usage=json!({"unavailable":true});frame.broker=json!([]);
         verify_container_replacement(app,&frame,&commands,&drafts);
@@ -265,6 +268,8 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         let paintable=gtk::WidgetPaintable::new(Some(&surface.scroll));let quit=app.clone();let capture=capture.clone();
         glib::timeout_add_local_once(Duration::from_millis(std::env::var("AGENT_OS_NATIVE_TEST_DELAY_MS").ok().and_then(|s|s.parse::<u64>().ok()).unwrap_or(700).clamp(700,10000)),move || {
             println!("CHECK: mapped native surface");
+            let image=surface.elements["image"].image.as_ref().unwrap();assert!(image.picture.paintable().is_some());assert_eq!(image.caption.text(),"Native blue pixel");
+            println!("CHECK: authenticated immutable image resource and native texture");
             let table=surface.elements["table"].table.as_ref().unwrap();assert_eq!(table.row_count(),200);assert!(table.select_key("row-7"));assert_eq!(table.selected_key().as_deref(),Some("row-7"));
             let list=surface.elements["list"].list.as_ref().unwrap();assert_eq!(list.row_count(),200);assert!(list.select_key("item-7"));assert_eq!(list.selected_key().as_deref(),Some("item-7"));
             assert_eq!(surface.elements["details"].list.as_ref().unwrap().row_count(),2);

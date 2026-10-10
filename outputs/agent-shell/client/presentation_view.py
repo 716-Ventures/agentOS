@@ -42,6 +42,7 @@ def project(document,bindings=None,width=80):
                 walk(child,depth+1)
             return
         if kind in ('Text@1','Status@1'):text=text_value(props.get('text' if kind=='Text@1' else 'value'),bindings)
+        elif kind=='Image@1':text='[Image] '+props['label']+' ('+props['reference']+')'
         elif kind=='RichText@1':text=''.join(run['text'] for run in props['runs'])
         elif kind=='Chart@1':text='\n'.join([props['label'],*(point['label']+': '+str(point['value']) for point in props['points'])])
         elif kind=='Progress@1':

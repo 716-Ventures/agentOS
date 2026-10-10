@@ -3,6 +3,7 @@ mod presentation_actions;
 mod presentation_external_actions;
 mod presentation_hosts;
 mod presentation_outputs;
+mod presentation_resources;
 mod presentation_sources;
 use rusqlite::{params, Connection};
 use serde_json::{json, Value};
@@ -669,6 +670,7 @@ fn serve(core: Arc<Core>, mut stream: UnixStream) {
                     "host.",
                     "action.",
                     "source.",
+                    "resource.",
                 ]
                 .iter()
                 .any(|prefix| op.starts_with(prefix))
@@ -708,6 +710,10 @@ fn serve(core: Arc<Core>, mut stream: UnixStream) {
     let _ = writeln!(stream, "{response}");
 }
 fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
+    if std::env::args().nth(1).as_deref() == Some("--catalog") {
+        println!("{}", presentation::catalog());
+        return Ok(());
+    }
     let root = PathBuf::from(
         std::env::var("AGENT_OS_STATE").unwrap_or("/var/lib/agent-os-runtime".into()),
     );
@@ -740,6 +746,24 @@ fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn packaged_component_capabilities_match_the_validator() {
+        let contract: Value =
+            serde_json::from_str(include_str!("../release-contract.json")).unwrap();
+        let declared = contract["components"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|v| v.as_str().unwrap().to_string())
+            .collect::<std::collections::BTreeSet<_>>();
+        let supported = presentation::catalog()["components"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .cloned()
+            .collect::<std::collections::BTreeSet<_>>();
+        assert_eq!(declared, supported);
+    }
     struct Fixture(PathBuf);
     impl Fixture {
         fn new() -> Self {

@@ -62,6 +62,7 @@ pub struct Draft {
 #[derive(Clone, Default, Debug)]
 pub struct Frame {
     pub documents: BTreeMap<String, Value>,
+    pub resources: BTreeMap<String, Arc<Vec<u8>>>,
     pub bindings: BTreeMap<String, Value>,
     pub actions: BTreeMap<String, Value>,
     pub drafts: BTreeMap<(String, String), Value>,
@@ -190,6 +191,7 @@ fn run(
     drafts: Arc<Mutex<BTreeMap<(String, String), Draft>>>,
     stop: Arc<AtomicBool>,
 ) {
+    let mut resource_cache = BTreeMap::<(String, String), Arc<Vec<u8>>>::new();
     let mut presentation_cache = super::presentation_pages::Cache::default();
     let mut output_view = None::<super::log_view::LogView>;
     let mut leases = BTreeMap::<(String, String), Instant>::new();
@@ -554,6 +556,54 @@ fn run(
                         {
                             continue;
                         }
+                        for node in doc["elements"]
+                            .as_object()
+                            .into_iter()
+                            .flat_map(|elements| elements.values())
+                            .filter(|node| node["type"] == "Image@1")
+                        {
+                            if stop.load(Ordering::Relaxed) {
+                                break;
+                            }
+                            let Some(reference) = node["props"]["reference"].as_str() else {
+                                continue;
+                            };
+                            let owned = doc["activity_id"].as_str().unwrap_or("").to_string();
+                            let key = (owned.clone(), reference.to_string());
+                            if !resource_cache.contains_key(&key) {
+                                if let Ok(resource) = request(
+                                    &socket,
+                                    &json!({"op":"resource.get","activity_id":owned,"reference":reference}),
+                                ) {
+                                    if resource["reference"] == reference
+                                        && resource["activity_id"] == owned
+                                    {
+                                        if let Some(hex) =
+                                            resource["png_hex"].as_str().filter(|hex| {
+                                                hex.len() <= 512 * 1024
+                                                    && hex.len() % 2 == 0
+                                                    && hex.bytes().all(|byte| {
+                                                        byte.is_ascii_digit()
+                                                            || (b'a'..=b'f').contains(&byte)
+                                                    })
+                                            })
+                                        {
+                                            let bytes = (0..hex.len())
+                                                .step_by(2)
+                                                .map(|offset| {
+                                                    u8::from_str_radix(&hex[offset..offset + 2], 16)
+                                                        .unwrap()
+                                                })
+                                                .collect::<Vec<_>>();
+                                            resource_cache.insert(key.clone(), Arc::new(bytes));
+                                        }
+                                    }
+                                }
+                            }
+                            if let Some(bytes) = resource_cache.get(&key) {
+                                next.resources.insert(reference.into(), bytes.clone());
+                            }
+                        }
                         next.documents.insert(id.clone(), doc.clone());
                         if doc.get("surface_id").is_none() {
                             continue;
@@ -598,6 +648,10 @@ fn run(
                         }
                     }
                 }
+                resource_cache.retain(|(owned, reference), _| {
+                    next.activity.as_deref() == Some(owned.as_str())
+                        && next.resources.contains_key(reference)
+                });
                 let mut old = frame.lock().unwrap();
                 next.workspace_undo = old.workspace_undo;
                 if next.error.is_none() {

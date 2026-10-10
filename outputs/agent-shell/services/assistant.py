@@ -168,6 +168,7 @@ def handle(req, conn):
             try:
                 if name=='presentation_catalog':return presentation_client.request('catalog.get')
                 if name=='presentation_snapshot':return presentation_client.for_activity(activity)
+                if name=='presentation_resources':return presentation_client.request('resource.list',activity_id=str(activity),after=args.get('after',''),limit=args.get('limit',32))
                 if name=='presentation_sources':return presentation_client.request('source.list',activity_id=str(activity),after=args.get('after',''),limit=args.get('limit',64))
                 if name=='presentation_actions':return presentation_client.request('action.list',activity_id=str(activity),after=args.get('after',''),limit=args.get('limit',32))
                 if name=='presentation_apply':return presentation_client.apply_for_activity(activity,json.loads(args['transaction']))

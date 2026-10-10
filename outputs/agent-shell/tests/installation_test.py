@@ -2,6 +2,8 @@ import importlib.util
 import json
 from pathlib import Path
 import tempfile
+import socket
+import threading
 import unittest
 from unittest.mock import patch
 root=Path(__file__).resolve().parents[1]
@@ -25,6 +27,21 @@ class Installation(unittest.TestCase):
         (instance.state/'voice.json').write_text('{}')
         return instance,source
 
+    def test_runtime_health_uses_a_bounded_database_read_instead_of_complete_history(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            instance,source=self.fixture(tmp);instance.active_units=['agent-os-core']
+            path=instance.path('/run/agent-os/runtime.sock');path.parent.mkdir(parents=True)
+            listener=socket.socket(socket.AF_UNIX);listener.bind(str(path));listener.listen(1);listener.settimeout(3)
+            observed=[]
+            def serve():
+                with listener.accept()[0] as conn:
+                    observed.append(json.loads(conn.makefile('rb').readline()))
+                    conn.sendall(b'{"ok":true,"result":{"revision":12,"rows":[]}}\n')
+            thread=threading.Thread(target=serve);thread.start()
+            try:
+                with patch.object(install.subprocess,'run',return_value=type('Result',(),{'stdout':'active\n'})()):instance.health()
+            finally:thread.join(timeout=3);listener.close()
+            self.assertFalse(thread.is_alive());self.assertEqual(observed,[{'op':'state.page','collection':'activities','limit':1}])
     def test_staging_is_content_addressed_and_does_not_touch_live_files(self):
         with tempfile.TemporaryDirectory() as tmp:
             instance,source=self.fixture(tmp)
@@ -98,6 +115,50 @@ class Installation(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError,'migration'):instance.activate(second)
                 with self.assertRaisesRegex(ValueError,'incompatible'):instance.rollback(second)
             run.assert_not_called();self.assertEqual(instance.journal.read_bytes(),before);self.assertEqual((instance.root/'current').resolve().name,first)
+
+    def saved_component(self,instance,kind):
+        import sqlite3
+        path=instance.path('/var/lib/agent-os-runtime/state.sqlite3');path.parent.mkdir(parents=True,exist_ok=True)
+        with sqlite3.connect(path) as db:
+            db.execute('CREATE TABLE IF NOT EXISTS presentation_documents(id TEXT PRIMARY KEY,body TEXT NOT NULL)')
+            db.execute('INSERT OR REPLACE INTO presentation_documents VALUES (?,?)',('surface',json.dumps({'elements':{'item':{'type':kind}}})))
+
+    def test_rollback_refuses_new_components_without_stopping_the_live_runtime(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            instance,source=self.fixture(tmp);first=instance.stage(source);self.activate_fixture(instance,first)
+            contract=json.loads((source/'release-contract.json').read_text());contract['components']=['Text@1','Image@1']
+            (source/'release-contract.json').write_text(json.dumps(contract));second=instance.stage(source);self.activate_fixture(instance,second)
+            self.saved_component(instance,'Image@1');before=instance.journal.read_bytes()
+            with patch.object(instance,'run') as run:
+                with self.assertRaisesRegex(ValueError,'Image@1'):instance.rollback(first)
+            run.assert_not_called();self.assertEqual(instance.journal.read_bytes(),before)
+            self.assertEqual((instance.root/'current').resolve().name,second)
+            self.saved_component(instance,'Text@1')
+            with patch.object(instance,'accounts'),patch.object(instance,'run'),patch.object(instance,'health'):instance.rollback(first)
+            self.assertEqual((instance.root/'current').resolve().name,first)
+
+    def test_component_saved_during_preflight_restores_old_services_and_journal(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            instance,source=self.fixture(tmp);first=instance.stage(source);self.activate_fixture(instance,first)
+            contract=json.loads((source/'release-contract.json').read_text());contract['components']=['Text@1']
+            (source/'release-contract.json').write_text(json.dumps(contract));second=instance.stage(source)
+            self.saved_component(instance,'Text@1');before=instance.journal.read_bytes();calls=[]
+            def run(args):
+                calls.append(args)
+                if args[:2]==['systemctl','stop']:self.saved_component(instance,'Image@1')
+            with patch.object(instance,'accounts'),patch.object(instance,'run',side_effect=run),patch.object(instance,'health'):
+                with self.assertRaisesRegex(ValueError,'Image@1'):instance.activate(second)
+            self.assertIn(['systemctl','start','agent-os-core'],calls)
+            self.assertEqual(instance.journal.read_bytes(),before)
+            self.assertEqual((instance.root/'current').resolve().name,first)
+
+    def test_component_contract_rejects_duplicates_and_malformed_versions(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            instance,source=self.fixture(tmp)
+            for components in (['Text@1','Text@1'],['Text'],['Text@0'],[],'Text@1'):
+                contract=json.loads((source/'release-contract.json').read_text());contract['components']=components
+                (source/'release-contract.json').write_text(json.dumps(contract));ident=instance.stage(source)
+                with self.assertRaisesRegex(ValueError,'component'):instance.contract(instance.root/'releases'/ident)
 
     def test_interrupted_activation_preserves_original_previous_release(self):
         with tempfile.TemporaryDirectory() as tmp:

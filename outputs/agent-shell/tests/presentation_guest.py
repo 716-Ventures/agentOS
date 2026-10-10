@@ -60,6 +60,17 @@ def main():
                 argv=['/usr/bin/python3','-c',script,endpoint,json.dumps(value)]
                 if agent:argv=['sudo','-n','-u','agentos-ai',*argv]
                 return json.loads(subprocess.check_output(argv,text=True))
+            image_reference='resource-'+'c'*32
+            image_bytes=(ROOT/'tests/fixtures/pixel.png').read_bytes().hex()
+            publication={'op':'resource.publish','activity_id':str(activity),'reference':image_reference,'label':'Private pixel','png_hex':image_bytes}
+            assert not other(publication,agent=True)['ok']
+            image_receipt=ok(publication);assert ok(publication)==image_receipt
+            image_get={'op':'resource.get','activity_id':str(activity),'reference':image_reference}
+            assert ok(image_get)['png_hex']==image_bytes
+            assert not other(image_get,agent=True)['ok']
+            discovered=other({'op':'resource.list','activity_id':str(activity)},agent=True)
+            assert discovered['ok'] and discovered['result']['resources'][0]['reference']==image_reference
+            assert 'png_hex' not in discovered['result']['resources'][0]
             ok({'op':'host.renderer','surface_id':'surface-fixture'})
             owner=ok({'op':'presentation.snapshot'})['renderers']['surface-fixture']
             assert owner['session'].split(':')[0]==str(os.getpid()),owner
@@ -71,6 +82,7 @@ def main():
             ok({'op':'draft.save','surface_id':'surface-fixture','element_id':'text','expected_draft_revision':0,'draft':'Unsaved Unicode λ'})
             stop(proc);proc=None;Path(endpoint).unlink(missing_ok=True);proc=start()
             assert ok(create)==receipt
+            assert ok(image_get)['png_hex']==image_bytes
             recovered=ok({'op':'draft.get','surface_id':'surface-fixture','element_id':'text'});assert recovered['draft']=='Unsaved Unicode λ'
             assert not other(change)['ok']
             # This is the original authenticated input session, so a direct change is valid.
