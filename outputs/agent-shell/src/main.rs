@@ -605,9 +605,19 @@ mod tests {
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
                 .as_nanos();
-            let root =
-                std::env::temp_dir().join(format!("agent-os-test-{}-{nonce}", std::process::id()));
-            Self(root)
+            static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+            loop {
+                let sequence = NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                let root = std::env::temp_dir().join(format!(
+                    "agent-os-test-{}-{nonce}-{sequence}",
+                    std::process::id()
+                ));
+                match fs::create_dir(&root) {
+                    Ok(()) => return Self(root),
+                    Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
+                    Err(error) => panic!("Create isolated fixture: {error}"),
+                }
+            }
         }
         fn open(&self) -> Arc<Core> {
             Core::open(self.0.clone()).unwrap()
