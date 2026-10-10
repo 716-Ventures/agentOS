@@ -26,6 +26,9 @@ pub struct Controls {
     output_previous: gtk::Button,
     output_next: gtk::Button,
     output_refresh: gtk::Button,
+    output_follow: gtk::CheckButton,
+    output_changing: Rc<Cell<bool>>,
+    output_displayed: Rc<RefCell<Option<log_view::Page>>>,
     voice: voice::Voice,
     voice_button: gtk::Button,
     voice_status: gtk::Label,
@@ -277,6 +280,43 @@ impl Controls {
             });
         }
         monitor_content.append(&pages);
+        let output_follow = gtk::CheckButton::with_label("Follow live output");
+        output_follow.set_sensitive(false);
+        let output_changing = Rc::new(Cell::new(false));
+        let output_displayed = Rc::new(RefCell::new(None::<log_view::Page>));
+        let (sender, changing, buffer) = (
+            commands.clone(),
+            output_changing.clone(),
+            inspection.buffer(),
+        );
+        output_follow.connect_toggled(move |control| {
+            if changing.get() {
+                return;
+            }
+            if control.is_active() && buffer.has_selection() {
+                buffer.place_cursor(&buffer.end_iter());
+            }
+            let _ = sender.send(Command::FollowOutput(control.is_active()));
+        });
+        let (sender, displayed, control, changing) = (
+            commands.clone(),
+            output_displayed.clone(),
+            output_follow.clone(),
+            output_changing.clone(),
+        );
+        inspection
+            .buffer()
+            .connect_notify_local(Some("has-selection"), move |buffer, _| {
+                if buffer.has_selection() {
+                    if let Some(page) = displayed.borrow().as_ref() {
+                        let _ = sender.send(Command::FreezeOutput(page.start));
+                    }
+                    changing.set(true);
+                    control.set_active(false);
+                    changing.set(false);
+                }
+            });
+        monitor_content.append(&output_follow);
         let scroll = gtk::ScrolledWindow::builder()
             .hscrollbar_policy(gtk::PolicyType::Never)
             .child(&monitor_content)
@@ -311,6 +351,9 @@ impl Controls {
             output_previous,
             output_next,
             output_refresh,
+            output_follow,
+            output_changing,
+            output_displayed,
             voice,
             voice_button,
             voice_status,
@@ -333,6 +376,36 @@ impl Controls {
         assert!(!self.model_text.text().is_empty());
         self.workspace.verify(frame);
         self.present();
+    }
+    pub fn verify_output(&mut self, frame: &Frame, commands: &Sender<Command>) {
+        let mut fixture = frame.clone();
+        fixture.inspection = Some(log_view::Page {
+            text: "Selected λ output".into(),
+            source: "core".into(),
+            job: json!(7),
+            activity: 1,
+            title: "Live fixture".into(),
+            start: 10,
+            end: 30,
+            has_more: false,
+            has_previous: true,
+            following: true,
+        });
+        self.update(&fixture, commands);
+        assert!(self.output_follow.is_active());
+        let buffer = self.inspection.buffer();
+        buffer.select_range(&buffer.start_iter(), &buffer.end_iter());
+        assert!(!self.output_follow.is_active());
+        fixture.inspection.as_mut().unwrap().text = "New incoming output".into();
+        self.update(&fixture, commands);
+        assert_eq!(
+            buffer.text(&buffer.start_iter(), &buffer.end_iter(), false),
+            "Selected λ output"
+        );
+        assert_eq!(self.output_page.as_ref().unwrap().start, 10);
+        self.output_follow.set_active(true);
+        assert!(!buffer.has_selection());
+        self.output_previous.emit_clicked();
     }
     pub fn context(&self, mut context: Value) {
         let buffer = self.inspection.buffer();
@@ -591,15 +664,29 @@ impl Controls {
             self.output_previous.set_sensitive(output.has_previous);
             self.output_next.set_sensitive(output.has_more);
             self.output_refresh.set_sensitive(frame.connected);
+            self.output_follow.set_sensitive(frame.connected);
+            self.output_changing.set(true);
+            self.output_follow
+                .set_active(output.following && !buffer.has_selection());
+            self.output_changing.set(false);
             if !buffer.has_selection() {
                 if buffer.text(&buffer.start_iter(), &buffer.end_iter(), false) != output.text {
                     buffer.set_text(&output.text);
                 }
                 self.output_label.set_text(&format!(
-                    "{} work {} · output bytes {}–{}",
-                    output.source, output.job, output.start, output.end
+                    "{} work {} · output bytes {}–{} · {}",
+                    output.source,
+                    output.job,
+                    output.start,
+                    output.end,
+                    if output.following {
+                        "Following"
+                    } else {
+                        "Paused"
+                    }
                 ));
                 self.output_page = Some(output.clone());
+                *self.output_displayed.borrow_mut() = Some(output.clone());
             }
         }
     }

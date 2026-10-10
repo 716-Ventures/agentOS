@@ -12,6 +12,7 @@ pub struct Page {
     pub end: u64,
     pub has_more: bool,
     pub has_previous: bool,
+    pub following: bool,
 }
 pub struct LogView {
     source: String,
@@ -22,6 +23,7 @@ pub struct LogView {
     position: usize,
     next: u64,
     more: bool,
+    pub following: bool,
 }
 impl LogView {
     pub fn new(source: String, job: Value, activity: i64, title: String) -> Result<Self, String> {
@@ -40,7 +42,28 @@ impl LogView {
             position: 0,
             next: 0,
             more: false,
+            following: false,
         })
+    }
+    pub fn pause_at(&mut self, offset: u64) {
+        self.following = false;
+        if let Some(position) = self
+            .offsets
+            .iter()
+            .position(|candidate| *candidate == offset)
+        {
+            self.position = position;
+            self.next = offset;
+            self.more = false;
+        } else {
+            self.start_at(offset);
+        }
+    }
+    pub fn follow(&mut self, core: &PathBuf) -> Result<Option<Page>, String> {
+        if !self.following {
+            return Ok(None);
+        }
+        self.read(core, if self.more { 1 } else { 0 }).map(Some)
     }
     pub fn start_at(&mut self, offset: u64) {
         self.offsets = if offset == 0 {
@@ -110,6 +133,7 @@ impl LogView {
             end,
             has_more: self.more && end > offset,
             has_previous: self.position > 0,
+            following: self.following,
         })
     }
 }
@@ -121,6 +145,46 @@ mod tests {
         os::unix::net::UnixListener,
         thread,
     };
+    #[test]
+    fn live_follow_refreshes_the_tail_and_selection_can_freeze_its_page() {
+        let root = std::env::temp_dir().join(format!(
+            "agentos-follow-{}-{}",
+            std::process::id(),
+            super::super::nonce()
+        ));
+        std::fs::create_dir(&root).unwrap();
+        let path = root.join("core.sock");
+        let listener = UnixListener::bind(&path).unwrap();
+        let server = thread::spawn(move || {
+            for (index, expected) in [0, 0, 10, 0].into_iter().enumerate() {
+                let (mut conn, _) = listener.accept().unwrap();
+                let mut line = String::new();
+                BufReader::new(conn.try_clone().unwrap())
+                    .read_line(&mut line)
+                    .unwrap();
+                let request: Value = serde_json::from_str(&line).unwrap();
+                assert_eq!(request["offset"], expected);
+                writeln!(conn,"{}",json!({"ok":true,"result":{"text":if expected==0{"first λ"}else{"new 日本語"},"offset":expected+10,"has_more":index==1}})).unwrap();
+            }
+        });
+        let mut view = LogView::new("core".into(), json!(7), 3, "Live work".into()).unwrap();
+        assert!(!view.read(&path, 0).unwrap().following);
+        view.following = true;
+        let refreshed = view.follow(&path).unwrap().unwrap();
+        assert_eq!(refreshed.start, 0);
+        assert!(refreshed.following);
+        assert!(refreshed.has_more);
+        let tail = view.follow(&path).unwrap().unwrap();
+        assert_eq!(tail.start, 10);
+        assert_eq!(tail.text, "new 日本語");
+        view.pause_at(0);
+        assert!(view.follow(&path).unwrap().is_none());
+        let frozen = view.read(&path, 0).unwrap();
+        assert_eq!(frozen.start, 0);
+        assert!(!frozen.following);
+        server.join().unwrap();
+        std::fs::remove_dir_all(root).unwrap();
+    }
     #[test]
     fn pages_keep_identity_and_retry_the_same_offset_after_disconnect() {
         let root = std::env::temp_dir().join(format!(

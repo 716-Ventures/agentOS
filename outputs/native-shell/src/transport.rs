@@ -89,6 +89,8 @@ pub enum Command {
     Attach(Value),
     OpenTerminal,
     PageOutput(i8),
+    FollowOutput(bool),
+    FreezeOutput(u64),
     WorkspaceEdit {
         workspace: String,
         revision: u64,
@@ -310,11 +312,13 @@ fn run(
                         let rows=if source=="core"{current.core["jobs"].as_array()}else{current.broker.as_array()};
                         let metadata=rows.and_then(|rows|rows.iter().find(|row|row["id"]==job));
                         match metadata.and_then(|row|row[if source=="core"{"activity_id"}else{"activity"}].as_i64().map(|activity|(activity,row["argv"].to_string()))) {
-                            Some((activity,title))=>super::log_view::LogView::new(source,job,activity,title).and_then(|mut view|{let page=view.read(&socket,0)?;frame.lock().unwrap().inspection=Some(page);output_view=Some(view);Ok(json!({"status":"Output page loaded"}))}),
+                            Some((activity,title))=>super::log_view::LogView::new(source,job,activity,title).and_then(|mut view|{view.following=true;let page=view.read(&socket,0)?;frame.lock().unwrap().inspection=Some(page);output_view=Some(view);Ok(json!({"status":"Output page loaded"}))}),
                             None=>Err("This work is no longer available in the current snapshot".into()),
                         }
                     },
-                    Command::PageOutput(direction)=>match output_view.as_mut(){Some(view)=>view.read(&socket,direction).map(|page|{frame.lock().unwrap().inspection=Some(page);json!({"status":"Output page loaded"})}),None=>Err("Select work to inspect first".into())},
+                    Command::PageOutput(direction)=>match output_view.as_mut(){Some(view)=>{view.following=false;view.read(&socket,direction).map(|page|{frame.lock().unwrap().inspection=Some(page);json!({"status":"Output page loaded"})})},None=>Err("Select work to inspect first".into())},
+                    Command::FollowOutput(following)=>match output_view.as_mut(){Some(view)=>{view.following=following;if let Some(page)=frame.lock().unwrap().inspection.as_mut(){page.following=following;}Ok(json!({"status":if following{"Following output"}else{"Output paused"}}))},None=>Err("Select work to inspect first".into())},
+                    Command::FreezeOutput(offset)=>{if let Some(view)=output_view.as_mut(){view.pause_at(offset);}if let Some(page)=frame.lock().unwrap().inspection.as_mut(){page.following=false;}Ok(json!({"status":"Output paused for selection"}))},
                     Command::Lease{surface,element,begin}=>{
                         let key=(surface.clone(),element.clone());
                         if begin {leases.insert(key,Instant::now());}else{leases.remove(&key);}
@@ -373,6 +377,16 @@ fn run(
             continue;
         }
         last = Instant::now();
+        if let Some(view) = output_view.as_mut() {
+            match view.follow(&socket) {
+                Ok(Some(page)) => frame.lock().unwrap().inspection = Some(page),
+                Err(error) => {
+                    frame.lock().unwrap().error =
+                        Some(format!("Live output temporarily unavailable: {error}"))
+                }
+                _ => {}
+            }
+        }
         recovered.retain(|(surface, element)| {
             if stop.load(Ordering::Relaxed) {
                 return true;
