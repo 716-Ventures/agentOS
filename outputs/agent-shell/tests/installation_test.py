@@ -5,7 +5,7 @@ import tempfile
 import socket
 import threading
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 root=Path(__file__).resolve().parents[1]
 def load(name):
     spec=importlib.util.spec_from_file_location(name,root/(name+'.py'))
@@ -23,9 +23,19 @@ class Installation(unittest.TestCase):
             elif name=='target/release/agent-os-core':path.write_bytes(b'\x7fELF\x02\x01'+b'\0'*12+(183).to_bytes(2,'little'))
             else:path.write_text('fixture '+name)
         instance=install.Installer(base/'system');instance.state.mkdir(parents=True)
+        instance.reset_start_limits=Mock()
         (instance.state/'dependencies.json').write_text('{}')
         (instance.state/'voice.json').write_text('{}')
         return instance,source
+
+    def test_counter_reset_skips_new_units_and_only_touches_loaded_release_units(self):
+        instance=install.Installer();instance.active_units=['agent-os-core','agent-os-broker']
+        for rows,expected in [([],None),([{'unit':'agent-os-core.service'},{'unit':'unrelated.service'}],['systemctl','reset-failed','agent-os-core'])]:
+            with self.subTest(rows=rows),patch.object(instance,'run',return_value=Mock(stdout=json.dumps(rows))) as run:
+                instance.reset_start_limits()
+                self.assertEqual(run.call_args_list[0].args[0],['systemctl','list-units','--all','--plain','--output=json','agent-os-core.service','agent-os-broker.service'])
+                self.assertEqual(run.call_count,1 if expected is None else 2)
+                if expected:self.assertEqual(run.call_args.args[0],expected)
 
     def test_runtime_health_uses_a_bounded_database_read_instead_of_complete_history(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -173,6 +173,15 @@ class Installer:
         self.run(['usermod','-a','-G','agentos-broker','agentos-ai'])
         self.path('/var/lib/agent-os-workspaces').mkdir(mode=0o755,exist_ok=True)
 
+    def reset_start_limits(self):
+        # reset-failed rejects never-loaded units on a first install. Such units
+        # have no counters to clear; query only already loaded release units.
+        result=self.run(['systemctl','list-units','--all','--plain','--output=json',
+                         *[unit+'.service' for unit in self.active_units]],capture_output=True,text=True)
+        loaded={row['unit'] for row in json.loads(result.stdout)}
+        units=[unit for unit in self.active_units if unit+'.service' in loaded]
+        if units:self.run(['systemctl','reset-failed',*units])
+
     def health(self):
         deadline=time.monotonic()+30
         units=getattr(self,'active_units',UNITS)
@@ -263,7 +272,7 @@ class Installer:
         # A deliberate activation/recovery may follow several rapid updates or
         # failed starts. Clear only these release units' exhausted start counters;
         # their ordinary crash-loop limits remain configured and enforced.
-        self.run(['systemctl','reset-failed',*self.active_units])
+        self.reset_start_limits()
         self.run(['systemctl','enable','--now',*self.active_units])
         self.health()
         metadata=self.path('/etc/agent-os/release.json')
