@@ -51,11 +51,13 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                 assert time.monotonic()<deadline,'Fixture job did not finish'
                 time.sleep(.02)
             doc={'protocol':'agentos.presentation/1','catalog_revision':'native-core/1','surface_id':'native-fixture','activity_id':str(activity),'revision':0,'title':'Native presentation fixture','root':'root','elements':{
-                'root':{'type':'Stack@1','props':{'spacing':'relaxed'},'slots':{'children':['reading','field','status','button','link','progress','table']}},
+                'root':{'type':'Stack@1','props':{'spacing':'relaxed'},'slots':{'children':['reading','field','status','button','link','progress','table','list','details']}},
                 'reading':{'type':'Text@1','props':{'text':'Native café · 日本語 · select this text'}},
                 'field':{'type':'TextField@1','props':{'label':'Editable local draft','value':'Original draft'}},
                 'status':{'type':'Status@1','props':{'value':{'binding':'work'}}},
                 'button':{'type':'Button@1','props':{'label':'Host action'}},
+                'list':{'type':'List@1','props':{'label':'Observed items','rows':[{'id':f'item-{i}','cells':[f'Item {i} · 日本語']} for i in range(200)]}},
+                'details':{'type':'KeyValue@1','props':{'label':'Last observed metadata','rows':[{'id':'kind','cells':['Kind','File']},{'id':'mode','cells':['Mode','0644']}]}},
                 'table':{'type':'Table@1','props':{'label':'Observed resources','columns':['Resource','State'],'rows':[{'id':f'row-{i}','cells':[f'Resource {i} · 日本語','Observed']} for i in range(200)]}},
                 'link':{'type':'Link@1','props':{'label':'716 UI','url':'https://github.com/716-Ventures/716-ui'}},
                 'progress':{'type':'Progress@1','props':{'label':'Observed work','value':{'binding':'numeric'}}},

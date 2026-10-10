@@ -365,15 +365,24 @@ fn walk_elements(
             }
         }
     }
-    if node.kind == "Table@1" {
-        let columns = node.props["columns"].as_array().unwrap().len();
+    if let Some(label) = node.props.get("label").and_then(Value::as_str) {
+        if label.trim().is_empty() || label.len() > 256 || label.contains('\0') {
+            return Err(invalid("A bounded accessible label is required"));
+        }
+    }
+    if ["Table@1", "List@1", "KeyValue@1"].contains(&node.kind.as_str()) {
+        let columns = match node.kind.as_str() {
+            "Table@1" => node.props["columns"].as_array().unwrap().len(),
+            "List@1" => 1,
+            _ => 2,
+        };
         if node.props["rows"]
             .as_array()
             .unwrap()
             .iter()
             .any(|row| row["cells"].as_array().unwrap().len() != columns)
         {
-            return Err(invalid("Table cell count must match its columns"));
+            return Err(invalid("Collection cell count must match its schema"));
         }
     }
     if node.kind == "Link@1" {
@@ -2461,6 +2470,33 @@ mod tests {
             assert!(handle(&mut db, &bad, &human()).is_err());
         }
         handle(&mut db, &create, &human()).unwrap();
+    }
+    #[test]
+    fn lists_and_key_value_groups_enforce_exact_cells_and_accessible_labels() {
+        for (kind, cells) in [
+            ("List@1", json!(["Observed item"])),
+            ("KeyValue@1", json!(["Kind", "File"])),
+        ] {
+            let mut db = fixture();
+            let mut doc = surface();
+            doc["elements"]["text"] = json!({"type":kind,"props":{"label":"Observed data","rows":[{"id":"item-a","cells":cells}]}});
+            let create = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"collection","expected_revisions":{"surface-a":null},"operations":[{"op":"surface.create","document":doc}]});
+            let mut bad = create.clone();
+            bad["operations"][0]["document"]["elements"]["text"]["props"]["rows"][0]["cells"] =
+                json!(["a", "b", "c"]);
+            assert!(handle(&mut db, &bad, &human())
+                .unwrap_err()
+                .contains("cell count"));
+            for label in ["".to_string(), " ".into(), "x".repeat(257)] {
+                let mut bad = create.clone();
+                bad["operations"][0]["document"]["elements"]["text"]["props"]["label"] =
+                    json!(label);
+                assert!(handle(&mut db, &bad, &human())
+                    .unwrap_err()
+                    .contains("accessible label"));
+            }
+            handle(&mut db, &create, &human()).unwrap();
+        }
     }
     #[test]
     fn file_metadata_is_typed_private_scoped_and_monotonic() {

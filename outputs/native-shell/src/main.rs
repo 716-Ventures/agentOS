@@ -42,6 +42,7 @@ struct Element {
     progress: Option<gtk::ProgressBar>,
     container: Option<gtk::Box>,
     table: Option<ui::DataTable>,
+    list: Option<ui::DataList>,
     link: Option<gtk::LinkButton>,
     events: Rc<RefCell<Value>>,
     applying: Rc<Cell<bool>>,
@@ -97,6 +98,7 @@ fn construct(
         progress: None,
         container: None,
         table: None,
+        list: None,
         link: None,
         events: events.clone(),
         applying: applying.clone(),
@@ -115,6 +117,13 @@ fn construct(
             result.widget = table.widget.clone().upcast();
             lease(&result.widget, surface, id, commands);
             result.table = Some(table);
+        }
+        "List@1" | "KeyValue@1" => {
+            let list =
+                ui::DataList::new(props["label"].as_str().unwrap(), kind == "KeyValue@1").unwrap();
+            result.widget = list.widget.clone().upcast();
+            lease(&result.widget, surface, id, commands);
+            result.list = Some(list);
         }
         "Stack@1" | "Row@1" => {
             let container = if kind == "Stack@1" {
@@ -430,6 +439,10 @@ impl Surface {
                     .as_ref()
                     .map(|table| table.view.has_focus() || table.view.focus_child().is_some())
                     .unwrap_or(false)
+                || e.list
+                    .as_ref()
+                    .map(|list| list.view.has_focus() || list.view.focus_child().is_some())
+                    .unwrap_or(false)
                 || e.label
                     .as_ref()
                     .map(|l| l.selection_bounds().is_some())
@@ -536,7 +549,7 @@ impl Surface {
         for (element, node) in nodes {
             if let Some(e) = self.elements.get_mut(element) {
                 let props = &node["props"];
-                if let Some(table) = e.table.as_mut() {
+                if e.table.is_some() || e.list.is_some() {
                     let rows = props["rows"]
                         .as_array()
                         .into_iter()
@@ -552,12 +565,18 @@ impl Surface {
                                 .collect(),
                         })
                         .collect::<Vec<_>>();
-                    let _ = table.update(&rows);
-                    table
-                        .view
-                        .update_property(&[gtk::accessible::Property::Label(
-                            props["label"].as_str().unwrap_or("Table"),
-                        )]);
+                    let label = props["label"].as_str().unwrap_or("Collection");
+                    if let Some(table) = e.table.as_mut() {
+                        let _ = table.update(&rows);
+                        table
+                            .view
+                            .update_property(&[gtk::accessible::Property::Label(label)]);
+                    }
+                    if let Some(list) = e.list.as_mut() {
+                        let _ = list.update(&rows);
+                        list.view
+                            .update_property(&[gtk::accessible::Property::Label(label)]);
+                    }
                 }
                 e.applying.set(true);
                 if let Some(label) = &e.label {

@@ -588,8 +588,8 @@ dependencies = [
 
 [[package]]
 name = "seven-sixteen-ui"
-version = "0.1.0-alpha.3"
-source = "git+https://github.com/716-Ventures/716-ui?tag=v0.1.0-alpha.3#53299a12658ce350a85655dd92654fe8588ca25a"
+version = "0.1.0-alpha.4"
+source = "git+https://github.com/716-Ventures/716-ui?tag=v0.1.0-alpha.4#3ff940d0f0165478536ff6e8550b4a124eec90cb"
 dependencies = [
  "gtk4",
  "serde",

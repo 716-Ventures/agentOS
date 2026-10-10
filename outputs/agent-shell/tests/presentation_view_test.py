@@ -22,6 +22,13 @@ class Projection(unittest.TestCase):
         doc['elements']['root']['slots']['children'].append('table')
         lines,controls=view.project(doc,width=40);text='\n'.join(lines)
         self.assertIn('Name | State',text);self.assertIn('日本語 | Ready',text);self.assertNotIn('evil',text);self.assertNotIn('table',controls)
+    def test_lists_and_key_value_groups_project_read_only_sanitized_text(self):
+        doc=document();doc['elements']['list']={'type':'List@1','props':{'label':'Items','rows':[{'id':'a','cells':['日本語\x1b]52;c;evil\x07']}]}}
+        doc['elements']['details']={'type':'KeyValue@1','props':{'label':'Details','rows':[{'id':'mode','cells':['Mode','0644']}]}}
+        doc['elements']['root']['slots']['children']+=['list','details']
+        lines,controls=view.project(doc);text='\n'.join(lines)
+        self.assertIn('• 日本語',text);self.assertIn('Mode: 0644',text);self.assertNotIn('evil',text)
+        self.assertNotIn('list',controls);self.assertNotIn('details',controls)
     def test_completed_multiline_input_survives_interruption(self):
         doc=document();doc['elements']['field']['props']['multiline']=True;calls=[]
         def request(op,**fields):calls.append(op);return {'draft_revision':0,'draft':None}
