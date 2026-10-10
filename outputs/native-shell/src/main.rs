@@ -40,6 +40,7 @@ struct Element {
     button: Option<gtk::Button>,
     progress: Option<gtk::ProgressBar>,
     container: Option<gtk::Box>,
+    table: Option<ui::DataTable>,
     link: Option<gtk::LinkButton>,
     events: Rc<RefCell<Value>>,
     applying: Rc<Cell<bool>>,
@@ -94,12 +95,26 @@ fn construct(
         button: None,
         progress: None,
         container: None,
+        table: None,
         link: None,
         events: events.clone(),
         applying: applying.clone(),
         children: Vec::new(),
     };
     match kind.as_str() {
+        "Table@1" => {
+            let columns = props["columns"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|v| v.as_str().unwrap().to_string())
+                .collect::<Vec<_>>();
+            let table =
+                ui::DataTable::new(props["label"].as_str().unwrap_or("Table"), &columns).unwrap();
+            result.widget = table.widget.clone().upcast();
+            lease(&result.widget, surface, id, commands);
+            result.table = Some(table);
+        }
         "Stack@1" | "Row@1" => {
             let container = if kind == "Stack@1" {
                 ui::column(12)
@@ -410,6 +425,10 @@ impl Surface {
                             || a.view.buffer().selection_bounds().is_some()
                     })
                     .unwrap_or(false)
+                || e.table
+                    .as_ref()
+                    .map(|table| table.view.has_focus() || table.view.focus_child().is_some())
+                    .unwrap_or(false)
                 || e.label
                     .as_ref()
                     .map(|l| l.selection_bounds().is_some())
@@ -436,6 +455,11 @@ impl Surface {
                     .get(element)
                     .map(|e| {
                         Some(e.kind.as_str()) != node["type"].as_str()
+                            || (e.kind == "Table@1"
+                                && e.table
+                                    .as_ref()
+                                    .map(|table| json!(table.columns()) != node["props"]["columns"])
+                                    .unwrap_or(true))
                             || (e.kind == "TextField@1"
                                 && e.area.is_some() != (node["props"]["multiline"] == true))
                     })
@@ -511,6 +535,29 @@ impl Surface {
         for (element, node) in nodes {
             if let Some(e) = self.elements.get_mut(element) {
                 let props = &node["props"];
+                if let Some(table) = e.table.as_mut() {
+                    let rows = props["rows"]
+                        .as_array()
+                        .into_iter()
+                        .flatten()
+                        .map(|row| ui::TableRow {
+                            id: row["id"].as_str().unwrap_or("").into(),
+                            cells: row["cells"]
+                                .as_array()
+                                .into_iter()
+                                .flatten()
+                                .filter_map(Value::as_str)
+                                .map(String::from)
+                                .collect(),
+                        })
+                        .collect::<Vec<_>>();
+                    let _ = table.update(&rows);
+                    table
+                        .view
+                        .update_property(&[gtk::accessible::Property::Label(
+                            props["label"].as_str().unwrap_or("Table"),
+                        )]);
+                }
                 e.applying.set(true);
                 if let Some(label) = &e.label {
                     if e.kind == "Status@1"

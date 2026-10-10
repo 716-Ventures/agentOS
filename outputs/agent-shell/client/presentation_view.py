@@ -43,6 +43,8 @@ def project(document,bindings=None,width=80):
             try:amount=float(value);progress=f'{amount*100:.0f}%' if 0<=amount<=1 else 'Unavailable'
             except (ValueError,TypeError):progress='Unavailable'
             text=f"{props.get('label','Work')}: {progress}"
+        elif kind=='Table@1':
+            text='\n'.join([props.get('label','Table'),' | '.join(props.get('columns',[])),*(' | '.join(row['cells']) for row in props.get('rows',[]))])
         elif kind=='TextField@1':text=f"[{key}] {props.get('label','Text')}: {props.get('value','')}";controls[key]=node
         elif kind=='Button@1':
             text=f"[{key}] {props.get('label','Action')}"+(' (disabled)' if props.get('disabled') else '')

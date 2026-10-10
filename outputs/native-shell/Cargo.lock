@@ -6,8 +6,8 @@ version = 4
 name = "agent-os-desktop"
 version = "0.1.0-alpha.1"
 dependencies = [
- "libc",
  "gdk4-wayland",
+ "libc",
  "serde_json",
  "seven-sixteen-ui",
 ]
@@ -588,11 +588,12 @@ dependencies = [
 
 [[package]]
 name = "seven-sixteen-ui"
-version = "0.1.0-alpha.2"
-source = "git+https://github.com/716-Ventures/716-ui?tag=v0.1.0-alpha.2#11e76e8187956b411eb450a4346ccf55efbcda69"
+version = "0.1.0-alpha.3"
+source = "git+https://github.com/716-Ventures/716-ui?tag=v0.1.0-alpha.3#53299a12658ce350a85655dd92654fe8588ca25a"
 dependencies = [
  "gtk4",
  "serde",
+ "serde_json",
 ]
 
 [[package]]

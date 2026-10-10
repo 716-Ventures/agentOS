@@ -27,6 +27,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         let paintable=gtk::WidgetPaintable::new(Some(&surface.scroll));let quit=app.clone();let capture=capture.clone();
         glib::timeout_add_local_once(Duration::from_millis(std::env::var("AGENT_OS_NATIVE_TEST_DELAY_MS").ok().and_then(|s|s.parse::<u64>().ok()).unwrap_or(700).clamp(700,10000)),move || {
             println!("CHECK: mapped native surface");
+            let table=surface.elements["table"].table.as_ref().unwrap();assert_eq!(table.row_count(),200);assert!(table.select_key("row-7"));assert_eq!(table.selected_key().as_deref(),Some("row-7"));
             controls.verify_history(&frame,&commands);
             println!("CHECK: virtualized work history with stable identities and recycled controls");
             let reading=surface.elements["reading"].label.clone().unwrap();

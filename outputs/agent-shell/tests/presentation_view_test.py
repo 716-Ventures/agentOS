@@ -17,6 +17,11 @@ class Projection(unittest.TestCase):
     def setUp(self):
         directory=tempfile.TemporaryDirectory();self.addCleanup(directory.cleanup);self.state=Path(directory.name)
         env=patch.dict(view.os.environ,{'XDG_STATE_HOME':str(self.state)});env.start();self.addCleanup(env.stop)
+    def test_table_projects_headers_and_rows_as_inert_terminal_text(self):
+        doc=document();doc['elements']['table']={'type':'Table@1','props':{'label':'Observed files','columns':['Name','State'],'rows':[{'id':'a','cells':['日本語','Ready\x1b]52;c;evil\x07']}]}}
+        doc['elements']['root']['slots']['children'].append('table')
+        lines,controls=view.project(doc,width=40);text='\n'.join(lines)
+        self.assertIn('Name | State',text);self.assertIn('日本語 | Ready',text);self.assertNotIn('evil',text);self.assertNotIn('table',controls)
     def test_completed_multiline_input_survives_interruption(self):
         doc=document();doc['elements']['field']['props']['multiline']=True;calls=[]
         def request(op,**fields):calls.append(op);return {'draft_revision':0,'draft':None}

@@ -354,12 +354,26 @@ fn walk_elements(
                         .as_f64()
                         .map(|x| x.is_finite() && (0.0..=1.0).contains(&x))
                         .unwrap_or(false),
+                    Some(kind @ ("stringlist" | "keyedrows")) => {
+                        seven_sixteen_ui::catalog::valid_collection(kind, value)
+                    }
                     _ => false,
                 }
             };
             if !valid {
                 return Err(invalid(format!("Invalid value for {key}")));
             }
+        }
+    }
+    if node.kind == "Table@1" {
+        let columns = node.props["columns"].as_array().unwrap().len();
+        if node.props["rows"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|row| row["cells"].as_array().unwrap().len() != columns)
+        {
+            return Err(invalid("Table cell count must match its columns"));
         }
     }
     if node.kind == "Link@1" {
@@ -2274,6 +2288,23 @@ mod tests {
                 .len(),
             5
         );
+    }
+    #[test]
+    fn table_documents_validate_keyed_rows_before_native_allocation() {
+        let mut db = fixture();
+        let mut doc = surface();
+        doc["elements"]["text"] = json!({"type":"Table@1","props":{"label":"Observed resources","columns":["Name","Status"],"rows":[{"id":"item-a","cells":["日本語","Ready"]},{"id":"item-b","cells":["Other","Pending"]}]}});
+        let create = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"table-view","expected_revisions":{"surface-a":null},"operations":[{"op":"surface.create","document":doc}]});
+        for rows in [
+            json!([{"id":"a","cells":["Missing column"]}]),
+            json!([{"id":"a","cells":["Name","Ready"]},{"id":"a","cells":["Other","Ready"]}]),
+            json!([{"id":"a","cells":["Name",42]}]),
+        ] {
+            let mut bad = create.clone();
+            bad["operations"][0]["document"]["elements"]["text"]["props"]["rows"] = rows;
+            assert!(handle(&mut db, &bad, &human()).is_err());
+        }
+        handle(&mut db, &create, &human()).unwrap();
     }
     #[test]
     fn file_metadata_is_typed_private_scoped_and_monotonic() {
