@@ -56,7 +56,9 @@ def status():
         return 'stopped'
     current = machine()
     try:
-        result = call(['utmctl', 'status', current['uuid']], capture_output=True, text=True)
+        result = call(['utmctl', 'status', current['uuid']], capture_output=True, text=True, timeout=10)
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError('UTM status timed out after 10 seconds; VM state is unknown. Inspect UTM before retrying.') from exc
     except subprocess.CalledProcessError as exc:
         raise RuntimeError(f'UTM cannot find/control this guest. Open {current["bundle"]} in UTM to register it.\n{exc.stderr.strip()}') from exc
     return result.stdout.strip()
@@ -173,13 +175,19 @@ def prepare(source=None):
 def start(hide=False):
     if alive():
         raise RuntimeError('VM is already running or suspended; inspect UTM before restarting.')
-    call(['utmctl', 'start'] + (['--hide'] if hide else []) + [machine()['uuid']])
+    try:
+        call(['utmctl', 'start'] + (['--hide'] if hide else []) + [machine()['uuid']], timeout=30)
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError('UTM start did not acknowledge within 30 seconds; do not retry automatically. Inspect the selected guest before continuing.') from exc
     print(f'UTM guest started; SSH is forwarded on localhost:{LOCK["ssh_port"]}.')
 
 
 def stop():
     if alive():
-        call(['utmctl', 'stop', machine()['uuid'], '--request'])
+        try:
+            call(['utmctl', 'stop', machine()['uuid'], '--request'], timeout=15)
+        except subprocess.TimeoutExpired as exc:
+            raise RuntimeError('UTM shutdown did not acknowledge within 15 seconds; inspect the selected guest before continuing.') from exc
         print('Requested orderly guest shutdown. Check status before restarting.')
     else:
         print('VM already stopped.')

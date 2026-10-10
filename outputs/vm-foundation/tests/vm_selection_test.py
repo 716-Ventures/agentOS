@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import plistlib
 import tempfile
+import subprocess
 import unittest
 from unittest.mock import patch
 spec=importlib.util.spec_from_file_location('selected_vm',Path(__file__).resolve().parents[1]/'vm.py')
@@ -23,3 +24,18 @@ class VMSelection(unittest.TestCase):
                 config['Information']['UUID']='other'
                 (bundle/'config.plist').write_bytes(plistlib.dumps(config))
                 with self.assertRaisesRegex(RuntimeError,'UUID'):vm.machine()
+
+    def test_control_timeouts_leave_state_unknown_and_never_retry_start(self):
+        with patch.object(vm,'machine',return_value={'uuid':'fixture'}),patch.object(vm,'call',side_effect=subprocess.TimeoutExpired('utmctl',10)) as call:
+            with self.assertRaisesRegex(RuntimeError,'state is unknown'):vm.status()
+            self.assertEqual(call.call_count,1)
+            self.assertEqual(call.call_args.kwargs['timeout'],10)
+        with patch.object(vm,'alive',return_value=False),patch.object(vm,'machine',return_value={'uuid':'fixture'}),patch.object(vm,'call',side_effect=subprocess.TimeoutExpired('utmctl',30)) as call:
+            with self.assertRaisesRegex(RuntimeError,'do not retry automatically'):vm.start(hide=True)
+            self.assertEqual(call.call_count,1)
+            self.assertEqual(call.call_args.args[0],['utmctl','start','--hide','fixture'])
+            self.assertEqual(call.call_args.kwargs['timeout'],30)
+        with patch.object(vm,'alive',return_value=True),patch.object(vm,'machine',return_value={'uuid':'fixture'}),patch.object(vm,'call',side_effect=subprocess.TimeoutExpired('utmctl',15)) as call:
+            with self.assertRaisesRegex(RuntimeError,'shutdown did not acknowledge'):vm.stop()
+            self.assertEqual(call.call_count,1)
+            self.assertEqual(call.call_args.kwargs['timeout'],15)

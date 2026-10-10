@@ -122,7 +122,15 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                         with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as conn:
                             conn.settimeout(3);conn.connect(str(control));conn.sendall(json.dumps(value).encode()+b'\n')
                             with conn.makefile('rb') as stream:return json.loads(stream.readline())
-                    def snapshot():return control_call({'op':'snapshot'})['result']
+                    def snapshot():
+                        end=time.monotonic()+10
+                        while True:
+                            response=control_call({'op':'snapshot'})
+                            if response.get('ok'):return response['result']
+                            assert response.get('error') in ('Compositor unavailable','Compositor busy'),response
+                            assert time.monotonic()<end,response
+                            assert nested.poll() is None,'Compositor exited during snapshot'
+                            time.sleep(.05)
                     def wait_windows(count):
                         deadline=time.monotonic()+10
                         while True:
@@ -262,6 +270,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                     assert desktop.wait(timeout=30)==0
                     print('PASS: agentOS Wayland compositor renders native and conventional apps, exact revisions, float/maximize/undo, no focus stealing')
                     assert control_call({'op':'shutdown'})['ok'];nested.wait(timeout=10)
+            for worker in load_workers:assert worker.poll() is None,'CPU contention worker exited early'
 
         finally:
             for worker in load_workers:reap(worker)

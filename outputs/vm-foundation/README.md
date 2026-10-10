@@ -116,3 +116,5 @@ The environment core and terminal client are now installed: persistent activitie
 - [UTM scripting and CLI](https://docs.getutm.app/scripting/scripting/)
 - [UTM display configuration](https://docs.getutm.app/settings-qemu/devices/display/)
 - [UTM audio configuration](https://docs.getutm.app/settings-qemu/devices/sound/)
+
+UTM status, start and shutdown acknowledgements have bounded 10/30/15-second timeouts. A timed-out status is unknown rather than stopped; an uncertain start is never retried automatically. Inspect the selected VM before another start, and retain reproduction failure logs. A responsive status command does not guarantee that UTM can start a VM while the Mac screen is locked.

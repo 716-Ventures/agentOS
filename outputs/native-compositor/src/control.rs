@@ -10,11 +10,19 @@ use std::{
         Arc,
     },
     thread,
-    time::Duration,
+    time::{Duration, Instant},
 };
 pub struct Request {
     pub value: Value,
     pub reply: SyncSender<Value>,
+    pub deadline: Option<Instant>,
+}
+impl Request {
+    pub fn expired(&self) -> bool {
+        self.deadline
+            .map(|deadline| Instant::now() >= deadline)
+            .unwrap_or(false)
+    }
 }
 pub struct Control {
     pub requests: Receiver<Request>,
@@ -28,6 +36,9 @@ impl Control {
             .ok_or_else(|| std::io::Error::other("XDG_RUNTIME_DIR required"))?;
         let path =
             PathBuf::from(runtime).join(format!("agentos-compositor-{}.sock", std::process::id()));
+        Self::start_at(path)
+    }
+    fn start_at(path: PathBuf) -> std::io::Result<Self> {
         let listener = UnixListener::bind(&path)?;
         std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o600))?;
         listener.set_nonblocking(true)?;
@@ -49,7 +60,14 @@ impl Control {
                             .and_then(|_| serde_json::from_str::<Value>(&line).ok());
                         let result = if let Some(value) = parsed {
                             let (reply, rx) = mpsc::sync_channel(1);
-                            if sender.try_send(Request { value, reply }).is_ok() {
+                            if sender
+                                .try_send(Request {
+                                    value,
+                                    reply,
+                                    deadline: Some(Instant::now() + Duration::from_millis(500)),
+                                })
+                                .is_ok()
+                            {
                                 rx.recv_timeout(Duration::from_millis(500)).unwrap_or_else(
                                     |_| json!({"ok":false,"error":"Compositor unavailable"}),
                                 )
@@ -173,5 +191,41 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
     match result {
         Ok(value) => json!({"ok":true,"result":value}),
         Err(error) => json!({"ok":false,"error":error}),
+    }
+}
+
+#[cfg(test)]
+mod deadline_tests {
+    use super::*;
+    #[test]
+    fn socket_timeout_expires_the_request_still_waiting_in_the_render_queue() {
+        use std::os::unix::net::UnixStream;
+        let path = std::env::temp_dir().join(format!(
+            "agentos-control-deadline-{}.sock",
+            std::process::id()
+        ));
+        let control = Control::start_at(path.clone()).unwrap();
+        let mut stream = UnixStream::connect(&path).unwrap();
+        stream
+            .set_read_timeout(Some(Duration::from_secs(3)))
+            .unwrap();
+        writeln!(stream, "{}", json!({"op":"undo","expected_revision":1})).unwrap();
+        // Keep the render loop stalled while the actual socket worker times out.
+        let mut line = String::new();
+        BufReader::new(stream).read_line(&mut line).unwrap();
+        assert_eq!(
+            serde_json::from_str::<Value>(&line).unwrap()["error"],
+            "Compositor unavailable"
+        );
+        let request = control
+            .requests
+            .recv_timeout(Duration::from_secs(1))
+            .unwrap();
+        assert!(
+            request.expired(),
+            "A timed-out command must be skipped on dequeue"
+        );
+        drop(control);
+        assert!(!path.exists(), "Control worker/socket must be cleaned up");
     }
 }

@@ -142,6 +142,9 @@ impl Bridge {
             while !stopping.load(Ordering::Relaxed) {
                 // Bounded command queue; each operation has exact core revision checks.
                 for req in rx.try_iter().take(8) {
+                    if req.expired() {
+                        continue;
+                    }
                     let scene = output.lock().unwrap().clone();
                     let result = if let Some(result) = grabs.handle(&socket, &scene, &req.value) {
                         result
@@ -483,7 +486,7 @@ impl Bridge {
             .unwrap_or_default()
             .as_nanos();
         let (reply, _) = mpsc::sync_channel(1);
-        if self.commands.try_send(Request {value:json!({"op":"workspace.undo","event_cursor":cursor,"request_id":format!("keyboard-undo-{}-{stamp}",std::process::id())}),reply}).is_err() {
+        if self.commands.try_send(Request {value:json!({"op":"workspace.undo","event_cursor":cursor,"request_id":format!("keyboard-undo-{}-{stamp}",std::process::id())}),reply,deadline:None}).is_err() {
             self.scene.lock().unwrap().error=Some("Workspace input queue busy".into());
         }
     }
@@ -515,6 +518,7 @@ impl Bridge {
             .try_send(Request {
                 value: json!({"op":format!("workspace.grab.{operation}"),"runtime":runtime}),
                 reply,
+                deadline: None,
             })
             .is_err()
         {
@@ -551,6 +555,7 @@ impl Bridge {
             .try_send(Request {
                 value: json!({"op":"workspace.transaction","transaction":transaction}),
                 reply,
+                deadline: None,
             })
             .is_err()
         {

@@ -93,6 +93,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 data.state.loop_signal.stop();
             }
             for req in control.requests.try_iter().take(8) {
+                if req.expired() {
+                    continue;
+                }
                 if req.value["op"]
                     .as_str()
                     .map(|op| op.starts_with("workspace."))
