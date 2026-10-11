@@ -1,0 +1,81 @@
+{
+  "source": {
+    "started_at": "2026-10-11T22:50:50.752477+00:00",
+    "source_revision": "028511a92190921519d2c5619ec807f9d6ef0c0e",
+    "source_changes": [
+      " M outputs/agent-shell/tests/direct_presentation_probe.py",
+      " M outputs/native-compositor/src/policy.rs",
+      " M outputs/native-shell/src/main.rs",
+      " M outputs/native-shell/src/verification.rs",
+      " M outputs/native-shell/tests/native_desktop.py"
+    ],
+    "source_archive_sha256": "70f48e0ac5df92a4d03fe7794e88d317b1728bc2b95b2cb4fb04c45cbdb67ce3",
+    "passed": true,
+    "owned_utm_identity": [
+      39544,
+      "Sun Oct 11 18:50:50 2026"
+    ],
+    "owned_utm_closed": true,
+    "finished_at": "2026-10-11T22:52:36.854835+00:00"
+  },
+  "baseline_failures_reproduced": [
+    "selected Status structural replacement after focus release",
+    "rejected legacy Undo consumed placement history"
+  ],
+  "qualified": [
+    "All 51 compositor tests",
+    "Four native light/dark scale 1/2 profiles with exact selected Status structural deferral and latest binding notice",
+    "Both nested and shared compositor journeys",
+    "Three installed virtual-KMS presentation journeys with original two-second first-receipt age bound, kernel-triggered receipts, superseded discard, unmap, VT and owned cleanup"
+  ],
+  "initial_receipt_observations": [
+    {
+      "receipt": {
+        "flags": 7,
+        "id": 2,
+        "key_time_ms": null,
+        "kind": "presented",
+        "refresh_ns": 13334400,
+        "sequence": 0,
+        "time_ns": 49290784000
+      },
+      "observed_ns": 49291483330,
+      "age_ms": 0.69933
+    },
+    {
+      "receipt": {
+        "flags": 7,
+        "id": 2,
+        "key_time_ms": null,
+        "kind": "presented",
+        "refresh_ns": 13334400,
+        "sequence": 0,
+        "time_ns": 62585651000
+      },
+      "observed_ns": 62600392383,
+      "age_ms": 14.741383
+    },
+    {
+      "receipt": {
+        "flags": 7,
+        "id": 2,
+        "key_time_ms": null,
+        "kind": "presented",
+        "refresh_ns": 13334400,
+        "sequence": 0,
+        "time_ns": 81428249000
+      },
+      "observed_ns": 81444348067,
+      "age_ms": 16.099067
+    }
+  ],
+  "post_focus_age_ms": [
+    1748.018697,
+    1901.912468,
+    1762.548941
+  ],
+  "historical_presentation_failure": "qualified-runs/status-alpha42-presentation-age-full-run/verification.json",
+  "historical_ci_undo_failure": "qualified-runs/status-alpha42-unchanged-ci-undo/observation.json",
+  "historical_cause": "Neither passing repeats nor the independent atomic-history correction establish the exact cause of the earlier CI Undo rejection or presentation observer timing.",
+  "scope": "Targeted source qualification; complete committed-source and signed-image qualification remain separate."
+}

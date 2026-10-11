@@ -150,6 +150,33 @@ fn verify_choice_heading(app: &gtk::Application, frame: &Frame, commands: &Sende
     println!("CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends");
 }
 
+fn verify_status_structure(app: &gtk::Application, frame: &Frame, commands: &Sender<Command>) {
+    let id="selected-status-structure";
+    let drafts=Arc::new(Mutex::new(BTreeMap::new()));
+    let mut live=frame.clone();live.connected=true;
+    live.bindings.insert(id.into(),json!({"bindings":{"work":{"availability":"available","value":"running λ"}}}));
+    let mut doc=json!({"surface_id":id,"activity_id":"1","revision":0,"title":"Status selection","root":"value","elements":{"value":{"type":"Status@1","props":{"value":{"binding":"work"}}}},"actions":{},"bindings":{}});
+    let mut surface=Surface::new(app,id,commands);surface.update(id,&doc,&live,commands,&drafts);
+    let original=surface.elements["value"].widget.clone();
+    let label=surface.elements["value"].status.as_ref().unwrap().value.clone();
+    label.select_region(0,-1);let selected=label.selection_bounds();assert!(selected.is_some());
+    // Selection remains meaningful after keyboard focus moves elsewhere.
+    gtk::prelude::RootExt::set_focus(&surface.window,None::<&gtk::Widget>);
+    doc["revision"]=json!(1);doc["elements"]["value"]=json!({"type":"Text@1","props":{"text":"Replacement"}});
+    live.bindings.get_mut(id).unwrap()["bindings"]["work"]["value"]=json!("failed 日本語");
+    surface.update(id,&doc,&live,commands,&drafts);
+    assert_eq!(surface.elements["value"].widget,original,"Selected Status lost its native widget during structural replacement");
+    assert_eq!(surface.revision,Some(0));assert_eq!(label.text(),"running λ");assert_eq!(label.selection_bounds(),selected);
+    let status=surface.elements["value"].status.as_ref().unwrap();
+    assert!(status.current.is_visible());assert_eq!(status.current.text(),"Current value:\nfailed 日本語");
+    label.select_region(0,0);
+    surface.update(id,&doc,&live,commands,&drafts);
+    assert_eq!(surface.revision,Some(1));assert_eq!(surface.elements["value"].kind,"Text@1");
+    assert_eq!(surface.elements["value"].label.as_ref().unwrap().text(),"Replacement");
+    surface.window.destroy();
+    println!("CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement");
+}
+
 fn verify_form_owners(frame: &Frame, commands: &Sender<Command>) {
     let drafts = Arc::new(Mutex::new(BTreeMap::new()));
     let baseline = Arc::strong_count(&drafts);
@@ -448,6 +475,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         verify_validation_feedback(app,&frame,&commands);
         verify_local_form_feedback(app,&frame,&commands);
         verify_choice_heading(app,&frame,&commands);
+        verify_status_structure(app,&frame,&commands);
         verify_container_replacement(app,&frame,&commands,&drafts);
         image_controls::verify();
         let mut controls=controls::Controls::new(app,commands.clone());controls.verify_controls(&frame,&commands);

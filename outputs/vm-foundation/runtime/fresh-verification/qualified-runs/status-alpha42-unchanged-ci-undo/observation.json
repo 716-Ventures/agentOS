@@ -1,0 +1,10 @@
+{
+  "source_revision": "028511a92190921519d2c5619ec807f9d6ef0c0e",
+  "ci_run": 38180949669,
+  "attempt": 1,
+  "failure": "The legacy local-layout Undo assertion returned ok=false; its original assertion does not preserve the response. Exact cause remains unestablished.",
+  "unchanged_vm_nested_and_shared_journeys_passed": true,
+  "unchanged_ci_repeat": "pass",
+  "runtime_changed_for_repeat": false,
+  "repeat_attempt": 2
+}

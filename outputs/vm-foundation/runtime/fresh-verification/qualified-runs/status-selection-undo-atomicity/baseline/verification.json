@@ -1,0 +1,25 @@
+{
+  "started_at": "2026-10-11T22:49:18.353894+00:00",
+  "source_revision": "028511a92190921519d2c5619ec807f9d6ef0c0e",
+  "source_changes": [
+    " M outputs/native-compositor/src/policy.rs",
+    " M outputs/native-shell/src/verification.rs"
+  ],
+  "source_archive_sha256": "dde8a8c9d817a26c7edf1e1f055cd38ae01d0c4c9fda3da4459145b827869afa",
+  "passed": false,
+  "undo": {
+    "expected_failure_reproduced": true,
+    "returncode": 101
+  },
+  "status": {
+    "expected_failure_reproduced": true,
+    "returncode": 1
+  },
+  "baseline_failures_reproduced": true,
+  "owned_utm_identity": [
+    38361,
+    "Sun Oct 11 18:49:18 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T22:49:43.104783+00:00"
+}

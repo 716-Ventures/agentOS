@@ -76,12 +76,13 @@ impl Policy {
         Ok(())
     }
     pub fn undo(&mut self) -> Result<(), String> {
-        let before = self.history.pop().ok_or("No layout change to undo")?;
+        let before = self.history.last().ok_or("No layout change to undo")?;
         if before.order.iter().collect::<BTreeSet<_>>()
             != self.current.order.iter().collect::<BTreeSet<_>>()
         {
             return Err("Window set changed; layout undo would diverge".into());
         }
+        let before = self.history.pop().expect("Validated undo history");
         let revision = self.current.revision + 1;
         self.current = before;
         self.current.revision = revision;
@@ -159,8 +160,18 @@ mod tests {
         assert!(p.change("a", Placement::Maximized, 0).is_err());
         p.change("a", Placement::Maximized, 1).unwrap();
         p.synchronize(&["a".into(), "b".into()]);
+        let retained = p.current.clone();
         assert!(p.undo().is_err());
-        assert_eq!(p.current.order.len(), 2);
+        assert_eq!(p.current, retained);
+        // A temporary new window prevents Undo, but must not consume the
+        // user's prior placement change. Removing it makes that Undo valid.
+        p.synchronize(&["a".into()]);
+        let revision = p.current.revision;
+        assert_eq!(p.current.placements["a"], Placement::Maximized);
+        p.undo().unwrap();
+        assert_eq!(p.current.placements["a"], Placement::Tiled);
+        assert!(p.current.revision > revision);
+        assert!(p.undo().is_err());
     }
     #[test]
     fn floating_windows_survive_smaller_output() {

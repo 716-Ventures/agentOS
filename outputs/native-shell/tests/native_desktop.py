@@ -291,7 +291,8 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                         response=control_call({'op':'place','id':ident,'expected_revision':revision,'placement':{'mode':'floating','rect':{'x':100,'y':80,'width':320,'height':240}}})
                         assert response['ok'],response
                         state=snapshot();assert state['layout']['placements'][ident]['mode']=='floating'
-                        assert control_call({'op':'undo','expected_revision':state['layout']['revision']})['ok']
+                        response=control_call({'op':'undo','expected_revision':state['layout']['revision']})
+                        assert response['ok'],{'operation':'undo','reply':response,'before':state['layout'],'current':snapshot()['layout']}
                         state=snapshot();assert state['layout']['placements'][ident]['mode']=='tiled'
                         assert control_call({'op':'place','id':ident,'expected_revision':state['layout']['revision'],'placement':{'mode':'maximized'}})['ok']
                     assert desktop.wait(timeout=30)==0

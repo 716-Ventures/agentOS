@@ -1,0 +1,22 @@
+
+running 1 test
+test policy::tests::exact_revisions_and_divergent_undo ... FAILED
+
+failures:
+
+---- policy::tests::exact_revisions_and_divergent_undo stdout ----
+
+thread 'policy::tests::exact_revisions_and_divergent_undo' panicked at src/policy.rs:170:18:
+called `Result::unwrap()` on an `Err` value: "No layout change to undo"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    policy::tests::exact_revisions_and_divergent_undo
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 50 filtered out; finished in 0.00s
+
+   Compiling agent-os-compositor v0.1.0 (/home/developer/agent-os-source/native-compositor)
+    Finished `test` profile [unoptimized] target(s) in 2.45s
+     Running unittests src/main.rs (native-compositor/target/debug/deps/agent_os_compositor-c02510f001e032dc)
+error: test failed, to rerun pass `--bin agent-os-compositor`

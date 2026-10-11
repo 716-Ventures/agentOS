@@ -923,6 +923,7 @@ impl Surface {
                         .map(|focus| focus == e.widget || focus.is_ancestor(&e.widget))
                         .unwrap_or(false))
                 || e.pty.as_ref().is_some_and(|view| view.view.is_protected())
+                || e.status.as_ref().is_some_and(|view| view.value.selection_bounds().is_some())
                 || e.outcome.as_ref().is_some_and(|view| {
                     view.message.selection_bounds().is_some()
                         || view.heading.selection_bounds().is_some()

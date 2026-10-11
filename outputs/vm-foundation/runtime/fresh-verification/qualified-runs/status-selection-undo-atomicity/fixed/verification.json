@@ -1,0 +1,19 @@
+{
+  "started_at": "2026-10-11T22:50:50.752477+00:00",
+  "source_revision": "028511a92190921519d2c5619ec807f9d6ef0c0e",
+  "source_changes": [
+    " M outputs/agent-shell/tests/direct_presentation_probe.py",
+    " M outputs/native-compositor/src/policy.rs",
+    " M outputs/native-shell/src/main.rs",
+    " M outputs/native-shell/src/verification.rs",
+    " M outputs/native-shell/tests/native_desktop.py"
+  ],
+  "source_archive_sha256": "70f48e0ac5df92a4d03fe7794e88d317b1728bc2b95b2cb4fb04c45cbdb67ce3",
+  "passed": true,
+  "owned_utm_identity": [
+    39544,
+    "Sun Oct 11 18:50:50 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T22:52:36.854835+00:00"
+}

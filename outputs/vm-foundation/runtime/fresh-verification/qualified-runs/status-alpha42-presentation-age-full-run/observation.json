@@ -1,0 +1,67 @@
+{
+  "failure": "Initial virtual-KMS presentation receipt age exceeded 2 seconds when observed after window registration, workspace placement and focus acknowledgement. Exact historical elapsed timing was not logged.",
+  "planned_correction": "Observe and validate the initial receipt immediately after mapping, preserving the same two-second age bound before independent focus work.",
+  "native_input_receipts": {
+    "direct-native-feedback": {
+      "clock_id": 1,
+      "discarded": 0,
+      "format": 1,
+      "invalid": 0,
+      "max_ms": 47,
+      "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+      "p50_ms": 34,
+      "p95_ms": 46,
+      "pending": 0,
+      "presented": 20,
+      "requested": 20,
+      "sample_limit": 256,
+      "profile": "idle editor",
+      "measurement_seconds": 3.347,
+      "completed_frames_between_observer_snapshots": 214,
+      "input_frame_wakeups_between_observer_snapshots": 20
+    },
+    "direct-native-feedback-load": {
+      "clock_id": 1,
+      "discarded": 0,
+      "format": 1,
+      "invalid": 0,
+      "max_ms": 46,
+      "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+      "p50_ms": 31,
+      "p95_ms": 38,
+      "pending": 0,
+      "presented": 20,
+      "requested": 20,
+      "sample_limit": 256,
+      "profile": "two concurrent broker CPU jobs",
+      "job_cpu_usage_usec": [
+        2293037,
+        2211737
+      ],
+      "measurement_seconds": 2.675,
+      "completed_frames_between_observer_snapshots": 150,
+      "input_frame_wakeups_between_observer_snapshots": 17
+    },
+    "direct-rotated-output": {
+      "clock_id": 1,
+      "discarded": 0,
+      "format": 1,
+      "invalid": 0,
+      "max_ms": 47,
+      "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+      "p50_ms": 34,
+      "p95_ms": 41,
+      "pending": 0,
+      "presented": 20,
+      "requested": 20,
+      "sample_limit": 256,
+      "profile": "idle editor",
+      "measurement_seconds": 3.383,
+      "completed_frames_between_observer_snapshots": 215,
+      "input_frame_wakeups_between_observer_snapshots": 20
+    }
+  },
+  "source_revision": "028511a92190921519d2c5619ec807f9d6ef0c0e",
+  "completed_check_count": 57,
+  "not_a_complete70_pass": true
+}

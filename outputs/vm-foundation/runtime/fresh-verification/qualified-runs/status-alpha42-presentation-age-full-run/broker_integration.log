@@ -1,0 +1,14 @@
+{
+  "activity": 1704,
+  "checks": [
+    "General execute returns the real guest kernel",
+    "Assessed execution uses root authority and can inspect OS files/tools",
+    "OS-wide writes are available; activity directories are organizational",
+    "File reads, guarded writes, backups and stale-hash rejection work",
+    "Activities do not impose filesystem isolation",
+    "Exit codes and bounded output are retained",
+    "Runtime deadline stops a command through systemd",
+    "Cancellation removes the entire service cgroup, including a setsid descendant",
+    "Hazard proposal requires local root approval; the approved harmless fixture runs"
+  ]
+}

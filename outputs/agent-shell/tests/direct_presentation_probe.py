@@ -44,6 +44,13 @@ def verify(env, metrics, core, scene, login_user, presentation, keyboard):
                 time.sleep(.02)
             before=scene()['direct_frames_presented']
             mapped=method('map')['id']
+            # Validate the initial clock observation before independent window
+            # registration/placement/focus work can age a valid receipt.
+            first=wait(lambda:receipt(mapped,'presented'),'Mapped frame was not presented')
+            observed_ns=time.monotonic_ns()
+            age_ns=observed_ns-first['time_ns']
+            assert abs(age_ns)<2_000_000_000,{'receipt':first,'observed_ns':observed_ns,'age_ns':age_ns}
+            print('Initial presentation receipt observation '+json.dumps({'receipt':first,'observed_ns':observed_ns,'age_ms':age_ns/1e6}),flush=True)
             def window():
                 observed=scene()
                 return next((row for row in observed['windows'] if row['app_id']=='com.agentos.PresentationFixture' and row['id'] in observed['shared']['identities']),None)
@@ -60,11 +67,10 @@ def verify(env, metrics, core, scene, login_user, presentation, keyboard):
                     if '"code":"stale_revision"' not in str(exc) or time.monotonic()>deadline:raise
                     time.sleep(.02)
             wait(lambda:scene()['seat_focus']==target['id'],'Presentation client did not receive keyboard focus')
-            first=wait(lambda:receipt(mapped,'presented'),'Mapped frame was not presented')
             wait(lambda:receipt(1,'discarded'),'Superseded unbuffered commit was not discarded')
             assert first['flags']&1 and first['refresh_ns']>0,first
             assert scene()['direct_frames_presented']>before,'Receipt preceded all completed KMS frames'
-            assert abs(time.monotonic_ns()-first['time_ns'])<2_000_000_000,first
+            print('Initial receipt age after workspace focus ms:',(time.monotonic_ns()-first['time_ns'])/1e6,flush=True)
             latencies=[]
             for _ in range(20):
                 previous=max(r['id'] for r in method('status')['receipts'])
