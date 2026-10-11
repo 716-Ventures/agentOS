@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-10-11T00:44:36.027542+00:00",
+  "started_at": "2026-10-11T01:15:55.479987+00:00",
   "result": "pass",
   "vm_uuid": "27176EA2-E994-4165-9BBA-70FEED59E66B",
   "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -67,19 +67,25 @@
     "VTE IME"
   ],
   "deployment": {
-    "created_at": "2026-10-11T00:44:49.494349+00:00",
-    "source_archive_sha256": "9c3177aca8a58a4ac69ad72381ed09aeb15e19fe82de9dc734e163c82acfb507",
-    "repository_revision": "932ffade4b5b561ccec435e958954736bceb248f",
+    "created_at": "2026-10-11T01:16:08.913624+00:00",
+    "source_archive_sha256": "880040fe28a9162edead00492d323207e37ac2618d2b0fb331fabdc706c45cd0",
+    "repository_revision": "8941a48e797aacd7a5d8fdaffc74db87dcdcba9a",
     "source_changes": [
       "M  outputs/agent-shell/tests/direct_display_guest.py",
       "M  outputs/agent-shell/tests/direct_input_probe.py",
-      "M  outputs/native-compositor/src/bridge_grabs.rs",
-      "M  outputs/native-compositor/src/input_revision.rs",
-      "M  outputs/native-shell/README.md"
+      "M  outputs/agent-shell/tests/direct_terminal_probe.py",
+      "M  outputs/native-compositor/src/input.rs",
+      "M  outputs/native-compositor/src/state.rs",
+      "M  outputs/native-shell/Cargo.lock",
+      "M  outputs/native-shell/Cargo.toml",
+      "M  outputs/native-shell/README.md",
+      "M  outputs/native-shell/src/main.rs",
+      "M  outputs/native-shell/src/pty_view.rs",
+      "A  outputs/native-shell/src/terminal_actions.rs"
     ],
     "installed": true
   },
-  "runtime_release": "b3f42df34221509414654f5b3957e41b875987acf977ddf2bb8513aacf4947be",
+  "runtime_release": "373f5f2a2c710d78ed130153814c625ec8e2cfc849762a055e39ab4a576a99cf",
   "dependency_manifest": {
     "packages": {
       "adduser": "3.152",
@@ -869,7 +875,7 @@
     "python": "Python 3.9.6"
   },
   "guest_stopped": true,
-  "finished_at": "2026-10-11T00:49:06.026277+00:00",
+  "finished_at": "2026-10-11T01:20:29.870621+00:00",
   "public_ui_release": {
     "tag": "v0.1.0-alpha.25",
     "revision": "7b7bac9c252e759fafb4f6c1d50af5ef056d0677",
@@ -896,7 +902,8 @@
       "corrected": "Kernel typing/pointer focus, Unicode clipboard-to-PTY, explicit detach/reattach and detached-input rejection pass",
       "source_sha256": "54884753c8bd25a7e164b2c1901193880c86d0174a2c847b602c0632a745c3df",
       "fixture_sha256": "32bce32a63936c521fbfc6105310da0980d39ddf0c721c8b873349183bc4230d",
-      "boundary": "Synthetic kernel input; physical input and VTE IME remain unqualified"
+      "boundary": "Synthetic kernel input; physical input and VTE IME remain unqualified",
+      "verified_revision": "932ffade4b5b561ccec435e958954736bceb248f"
     },
     "pointer_lease_focus": {
       "baseline": "Actual prior Grabs.begin rejected a lease solely because renderer element focus advanced",
@@ -911,6 +918,27 @@
       "baseline": "Snapshot response exceeded 64 KiB and was parsed after truncation",
       "corrected": "Reader accepts complete snapshots up to 16 MiB and explicitly rejects oversized or incomplete responses",
       "fixture_sha256": "76314a4c175db44057ec7e7e60b38fc35fe6f5454bad186d67680d0674769b1b"
+    },
+    "native_terminal_clipboard_menu": {
+      "qualified": [
+        "Explicit accessible Copy/Paste names, roles and sensitivity",
+        "Secondary-click and kernel Shift+F10 invocation",
+        "Exact selected Unicode output line, including newline, read by another Wayland client through keyboard and menu Copy",
+        "Menu Paste reaches the installed broker PTY",
+        "Closed popup restores local and authoritative seat focus before further input",
+        "First absolute pointer motion after popup dismissal reaches its new position",
+        "Detached Paste is disabled and input remains rejected",
+        "Explicit reattachment and ordinary Ctrl+C program interrupt",
+        "Real GTK/broker controls release their terminal owner on close"
+      ],
+      "popup_motion_baseline": "The first absolute motion after closing a popup was discarded, leaving the pointer at its old position",
+      "popup_motion_baseline_log_sha256": "815ea2e125bc825b1dd484e590cad6d78780a3247f9f31f8810211d74a1ecdbb",
+      "host_actions_sha256": "ff0c125232cd1c7861fdf8fb2cfa8a407eb1f8b5cf57ad6e9dd9b51c56b6a6e4",
+      "pty_host_sha256": "655258ed8f1e3cefb5391c0079a472a79aaad7e4f528365f9aa19d91d81226bf",
+      "compositor_input_sha256": "7844adc50c071f3741a8ce4a8918eef057c5c5764aa87af2e756f729e8b63002",
+      "compositor_focus_sha256": "792b841a68fedc4feb89e0deb0342565d1bd51669ab970bb8bcf8fe988226f40",
+      "fixture_sha256": "78e367ff7549c85ba455b28a12527d6c22e998118e1746de13d2b2833adbd55e",
+      "boundary": "Synthetic kernel input and private Wayland clipboard client; physical input, VTE IME and a complete screen-reader usability assessment remain unqualified"
     }
   },
   "observations": [

@@ -39,16 +39,23 @@ impl Smallvil {
         let Some(pointer) = self.seat.get_pointer() else {
             return;
         };
+        let popup_grab = pointer
+            .with_grab(|_, grab| grab.is::<smithay::desktop::PopupPointerGrab<Smallvil>>())
+            .unwrap_or(false);
         let under = self.surface_under(pos);
-        pointer.motion(
-            self,
-            under,
-            &MotionEvent {
-                location: pos,
-                serial: SERIAL_COUNTER.next_serial(),
-                time,
-            },
-        );
+        let event = MotionEvent {
+            location: pos,
+            serial: SERIAL_COUNTER.next_serial(),
+            time,
+        };
+        pointer.motion(self, under, &event);
+        // The pinned popup grab drops the motion that releases an ended grab.
+        // Forward that position once after release, without replaying a button
+        // or action. Other grab kinds and already-delivered motion stay intact.
+        if popup_grab && !pointer.is_grabbed() && pointer.current_location() != pos {
+            let under = self.surface_under(pos);
+            pointer.motion(self, under, &event);
+        }
         pointer.frame(self);
     }
 
@@ -76,7 +83,8 @@ impl Smallvil {
                             }
                             #[cfg(feature = "direct-display")]
                             if state == KeyState::Pressed && modifiers.ctrl && modifiers.alt {
-                                let symbol = crate::shortcuts::function_key(handle.modified_sym().raw());
+                                let symbol =
+                                    crate::shortcuts::function_key(handle.modified_sym().raw());
                                 if (0xffbe..=0xffc3).contains(&symbol) {
                                     if let Some(session) = data.direct_session.as_mut() {
                                         use smithay::backend::session::Session;

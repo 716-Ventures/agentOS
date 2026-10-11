@@ -422,6 +422,23 @@ impl Smallvil {
                 // A shared surface can be selected before its Wayland window
                 // maps. Retain the pending focus until the seat actually gets
                 // that window; otherwise later mapping never sends keyboard enter.
+            } else if let Some(keyboard) = self.seat.get_keyboard() {
+                let popup_grab = keyboard
+                    .with_grab(|_, grab| grab.is::<smithay::desktop::PopupKeyboardGrab<Smallvil>>())
+                    .unwrap_or(false);
+                if popup_grab {
+                    // The popup grab rejects this while active, and restores
+                    // the authoritative root once ended. Do not leave focus
+                    // on a closed popup until another key happens to arrive.
+                    let focus = windows
+                        .iter()
+                        .find(|w| {
+                            Some(format!("{:?}", w.toplevel().unwrap().wl_surface().id()))
+                                == scene.focus
+                        })
+                        .map(|w| w.toplevel().unwrap().wl_surface().clone());
+                    keyboard.set_focus(self, focus, smithay::utils::SERIAL_COUNTER.next_serial());
+                }
             }
         }
         self.viewport_offsets.retain(|id, _| ids.contains(id));

@@ -16,6 +16,7 @@ mod pty_transport;
 mod pty_view;
 mod reconcile;
 mod state_pages;
+mod terminal_actions;
 mod timings;
 mod transport;
 mod verification;

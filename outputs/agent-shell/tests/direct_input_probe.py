@@ -87,12 +87,21 @@ def transfer_source():
         def publish(*_):
             Gdk.Display.get_default().get_primary_clipboard().set_content(Gdk.ContentProvider.new_for_bytes('text/plain;charset=utf-8',GLib.Bytes.new(b' PRIMARY')))
             state['primary']+=1;record()
-        primary.connect('clicked',publish)
+        if '--terminal-clipboard' in sys.argv:
+            primary.set_label('Read terminal clipboard')
+            def read_clipboard(*_):
+                clipboard=Gdk.Display.get_default().get_clipboard()
+                def read(sender,result):
+                    state['copied']=sender.read_text_finish(result);record()
+                clipboard.read_text_async(None,read)
+            primary.connect('clicked',read_clipboard)
+        else:primary.connect('clicked',publish)
         box.append(primary)
         if '--terminal-clipboard' in sys.argv:
             clipboard=Gtk.Button(label='Publish terminal clipboard')
             def publish_clipboard(*_):
                 Gdk.Display.get_default().get_clipboard().set_content(Gdk.ContentProvider.new_for_bytes('text/plain;charset=utf-8',GLib.Bytes.new(' λ 日本語'.encode())))
+                state.pop('copied',None)
                 state['clipboard']+=1;record()
             clipboard.connect('clicked',publish_clipboard);box.append(clipboard)
         window=Gtk.ApplicationWindow(application=app,title='Direct transfer source',default_width=300,default_height=220 if '--terminal-clipboard' in sys.argv else 180,child=box)
@@ -114,10 +123,21 @@ def assistive():
                 queue.extend(node[index] for index in range(min(node.childCount,128)))
             except (RuntimeError,LookupError,NotImplementedError):pass
         errors=[row for row in observed if any(word in row[0].lower() for word in ('stale','diverg','conflict','undo','lease'))]
-        raise ValueError('Input fixture accessible control unavailable: '+name+'; tree='+repr(observed[:80])+'; notices='+repr(errors))
+        raise ValueError('Input fixture accessible control unavailable: '+name+'; matches='+repr([row for row in observed if row[0]==name])+'; tree='+repr(observed[:80])+'; notices='+repr(errors))
     for line in sys.stdin:
         try:
             request=line.strip()
+            if request=='tree':
+                queue=deque([pyatspi.Registry.getDesktop(0)]);rows=[];remaining=49152
+                while queue and len(rows)<1024:
+                    node=queue.popleft()
+                    try:
+                        row=[node.name[:256],node.getRoleName()];cost=len(json.dumps(row))+2
+                        if cost>remaining:break
+                        rows.append(row);remaining-=cost
+                        queue.extend(node[index] for index in range(min(node.childCount,128)))
+                    except (RuntimeError,LookupError,NotImplementedError):pass
+                print(json.dumps({'nodes':rows}),flush=True);continue
             if request in ('open-monitor','arrange-status','expand-workspace'):
                 control=find('Agent Monitor' if request=='open-monitor' else 'Arrange workspace',pyatspi.ROLE_PUSH_BUTTON if request=='open-monitor' else None)
                 response={'expanded':control.getState().contains(pyatspi.STATE_EXPANDED)}
@@ -136,6 +156,23 @@ def assistive():
                     terminal=find('Kernel terminal fixture',pyatspi.ROLE_TERMINAL)
                     r=terminal.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
                     response={'point':[r.x+r.width/2,r.y+r.height/2],'focused':terminal.getState().contains(pyatspi.STATE_FOCUSED)}
+                    if action=='copy-span':
+                        text=terminal.queryText();value=text.getText(0,min(text.characterCount,65536))
+                        wanted='KERNEL_VTE_ACK  λ 日本語';start=value.index(wanted)
+                        first=text.getCharacterExtents(start,pyatspi.WINDOW_COORDS)
+                        # The fixture's three CJK glyphs occupy two VTE cells.
+                        # Measure an ASCII cell rather than relying on the
+                        # non-ASCII character extents to describe both cells.
+                        columns=sum(2 if char in '日本語' else 1 for char in wanted)
+                        # End beyond the line text: copy the exact output line,
+                        # including VTE's selected line ending.
+                        response.update({'start':[first[0]+1,first[1]+first[3]/2],'end':[first[0]+first[2]*(columns+2),first[1]+first[3]/2]})
+                print(json.dumps(response),flush=True);continue
+            if request.startswith('terminal-menu:'):
+                action=request.split(':',1)[1];name=action.removesuffix('-activate')
+                control=find(name,None)
+                response={'sensitive':control.getState().contains(pyatspi.STATE_SENSITIVE)}
+                if action.endswith('-activate'):response['requested']=control.queryAction().doAction(0)
                 print(json.dumps(response),flush=True);continue
             if request.startswith('transfer:'):
                 button=find(request.split(':',1)[1],pyatspi.ROLE_PUSH_BUTTON)

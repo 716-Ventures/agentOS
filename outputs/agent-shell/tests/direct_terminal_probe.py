@@ -27,7 +27,7 @@ def verify(metrics, output, core, scene, login_user, presentation, observe, keyb
     job = None
     surface = 'kernel-terminal-'+uuid.uuid4().hex
     try:
-        code="import sys,time;print('KERNEL_VTE_READY',flush=True)\nwhile True:\n value=input()\n print('KERNEL_VTE_ACK '+value,flush=True)"
+        code="import sys,time,signal;signal.signal(signal.SIGINT,lambda *_:print('KERNEL_VTE_INTERRUPT',flush=True));print('KERNEL_VTE_READY',flush=True)\nwhile True:\n value=input()\n print('KERNEL_VTE_ACK '+value,flush=True)"
         job = broker('execute',activity=activity,argv=['/usr/bin/python3','-u','-c',code],purpose='Harmless installed native terminal kernel-input fixture',terminal=True,background=True,lifetime_seconds=90,request_confirmation=True,rows=24,cols=80)['id']
         state = broker('poll',job_id=job)
         assert state['status']=='approval_required',state
@@ -57,7 +57,11 @@ def verify(metrics, output, core, scene, login_user, presentation, observe, keyb
                     # Only a definite stale rejection permits a fresh transaction.
                     if '"code":"stale_revision"' not in str(exc) or time.monotonic()>deadline:raise
                     time.sleep(.05)
-            wait(lambda:scene()['seat_focus']==terminal['id'] and terminal_window()['geometry']==geometry,'Terminal did not receive its requested geometry and seat focus')
+            try:wait(lambda:scene()['seat_focus']==terminal['id'] and terminal_window()['geometry']==geometry,'Terminal did not receive its requested geometry and seat focus')
+            except RuntimeError:
+                current=scene()
+                print('Terminal focus/geometry diagnostic:',{'expected_window':terminal['id'],'expected_geometry':geometry,'actual_focus':current['seat_focus'],'actual_window':terminal_window(),'error':current['shared']['error']},flush=True)
+                raise
 
         focus()
         wait(lambda:observe('terminal:attach-state')['sensitive'],'Attach control did not become available')
@@ -91,15 +95,81 @@ def verify(metrics, output, core, scene, login_user, presentation, observe, keyb
             print('Owned terminal output:',repr(broker('poll',job_id=job)['output']),flush=True);raise
         keyboard.chord(28)
         wait(lambda:'KERNEL_VTE_ACK  λ 日本語' in broker('poll',job_id=job)['output'],'Unicode clipboard paste did not reach installed PTY')
+        def menu(from_keyboard=False):
+            geometry=terminal_window()['geometry'];location=point()
+            if from_keyboard:keyboard.chord(42,68)
+            else:pointer.click(geometry['x']+location[0],geometry['y']+location[1],output['width'],output['height'],button=273)
+            try:return wait(lambda:observe('terminal-menu:Paste'),'VTE context menu did not open')
+            except RuntimeError:
+                print('VTE menu focus:',observe('terminal:snapshot'),scene()['seat_focus'],flush=True)
+                print('VTE menu accessible tree:',observe('tree'),flush=True)
+                keyboard.chord(42,68) # Diagnostic keyboard context-menu invocation.
+                try:print('VTE keyboard menu:',wait(lambda:observe('terminal-menu:Paste'),'Keyboard context menu unavailable',seconds=3),flush=True)
+                except RuntimeError as exc:print('VTE keyboard menu:',str(exc),flush=True)
+                raise
+        echoes=broker('poll',job_id=job)['output'].count('λ 日本語')
+        assert menu()['sensitive'],'Attached terminal menu disabled paste'
+        assert observe('terminal-menu:Paste-activate')['requested']
+        wait(lambda:broker('poll',job_id=job)['output'].count('λ 日本語')>echoes,'Context-menu paste did not echo before Enter')
+        wait(lambda:observe('terminal:snapshot')['focused'] and scene()['seat_focus']==terminal['id'],'Terminal did not regain local and seat focus after context-menu paste')
+        keyboard.chord(28)
+        try:wait(lambda:broker('poll',job_id=job)['output'].count('KERNEL_VTE_ACK  λ 日本語')==2,'Context-menu paste did not reach installed PTY')
+        except RuntimeError:
+            print('Context-menu terminal output:',repr(broker('poll',job_id=job)['output']),flush=True)
+            raise
+        # Select actual rendered VTE output with the kernel pointer, then copy.
+        span=wait(lambda:observe('terminal:copy-span'),'Terminal output text extents unavailable')
+        geometry=terminal_window()['geometry']
+        pointer.drag([geometry['x']+span['start'][0],geometry['y']+span['start'][1]],
+                     [geometry['x']+span['end'][0],geometry['y']+span['end'][1]],output['width'],output['height'])
+        assert menu()['sensitive']
+        assert observe('terminal-menu:Copy')['sensitive'],'Selected terminal text did not enable Copy'
+        keyboard.chord(1) # Dismiss menu without changing VTE selection.
+        wait(lambda:observe('terminal:snapshot')['focused'] and scene()['seat_focus']==terminal['id'],'Terminal did not regain local and seat focus after menu dismissal')
+        keyboard.chord(29,42,46) # Ctrl+Shift+C publishes regular Wayland clipboard.
+        focus(False)
+        source=next(row for row in scene()['windows'] if row['title']=='Direct transfer source')
+        value=observe('transfer:Read terminal clipboard')['point']
+        pointer.click(source['geometry']['x']+value[0],source['geometry']['y']+value[1],output['width'],output['height'])
+        wait(lambda:scene()['seat_focus']==source['id'],'Clipboard receiver did not receive focus')
+        pointer.click(source['geometry']['x']+value[0],source['geometry']['y']+value[1],output['width'],output['height'])
+        try:wait(lambda:json.loads((metrics/'transfer-receipts.json').read_text()).get('copied')=='KERNEL_VTE_ACK  λ 日本語\n','Selected Unicode terminal line was not copied exactly to the owned Wayland client')
+        except RuntimeError:
+            print('Terminal-copy receiver receipt:',json.loads((metrics/'transfer-receipts.json').read_text()),flush=True)
+            raise
+        # Replace the clipboard, then independently qualify the menu's Copy action.
+        count=json.loads((metrics/'transfer-receipts.json').read_text())['clipboard']
+        value=observe('transfer:Publish terminal clipboard')['point']
+        pointer.click(source['geometry']['x']+value[0],source['geometry']['y']+value[1],output['width'],output['height'])
+        wait(lambda:json.loads((metrics/'transfer-receipts.json').read_text())['clipboard']>count,'Clipboard replacement was not acknowledged')
+        focus()
+        span=observe('terminal:copy-span');geometry=terminal_window()['geometry']
+        pointer.drag([geometry['x']+span['start'][0],geometry['y']+span['start'][1]],
+                     [geometry['x']+span['end'][0],geometry['y']+span['end'][1]],output['width'],output['height'])
+        menu(True)
+        assert observe('terminal-menu:Copy-activate')['requested']
+        wait(lambda:observe('terminal:snapshot')['focused'] and scene()['seat_focus']==terminal['id'],'Terminal did not regain local and seat focus after menu copy')
+        focus(False)
+        value=observe('transfer:Read terminal clipboard')['point']
+        pointer.click(source['geometry']['x']+value[0],source['geometry']['y']+value[1],output['width'],output['height'])
+        wait(lambda:scene()['seat_focus']==source['id'],'Menu-copy receiver did not receive focus')
+        pointer.click(source['geometry']['x']+value[0],source['geometry']['y']+value[1],output['width'],output['height'])
+        wait(lambda:json.loads((metrics/'transfer-receipts.json').read_text()).get('copied')=='KERNEL_VTE_ACK  λ 日本語\n','Context-menu Copy did not publish the exact selected Unicode line')
+        focus()
         before_detach=broker('poll',job_id=job)['output']
         assert observe('terminal:detach')['requested']
         wait(lambda:observe('terminal:attach-state')['sensitive'],'Attach control did not become available')
+        assert not menu()['sensitive'],'Detached terminal context menu enabled Paste'
+        keyboard.chord(1)
+        wait(lambda:observe('terminal:snapshot')['focused'] and scene()['seat_focus']==terminal['id'],'Detached terminal did not regain local and seat focus after menu dismissal')
         keyboard.chord(29,42,47);keyboard.chord(28)
         time.sleep(.2) # Let queued kernel/Wayland events drain while explicitly detached.
         assert broker('poll',job_id=job)['output']==before_detach,'Detached terminal accepted program input'
         assert observe('terminal:attach')['requested']
         wait(lambda:observe('terminal:status')['attached'],'Native terminal did not confirm attachment')
-        print('PASS: installed native VTE kernel keyboard, pointer focus, Unicode Wayland clipboard paste and explicit detach/reattach',flush=True)
+        keyboard.chord(29,46) # Ordinary Ctrl+C remains a program interrupt.
+        wait(lambda:'KERNEL_VTE_INTERRUPT' in broker('poll',job_id=job)['output'],'Ordinary Ctrl+C did not reach the attached program')
+        print('PASS: installed native VTE kernel keyboard, pointer selection/copy, Unicode Wayland clipboard, accessible context-menu copy/paste, program interrupt and detached-input rejection',flush=True)
     finally:
         if job is not None:
             broker('cancel',job_id=job)

@@ -8,34 +8,12 @@ pub struct PtyView {
     session: Rc<RefCell<Option<Session>>>,
     timer: Option<glib::SourceId>,
     available: Rc<Cell<bool>>,
+    clipboard: Rc<terminal_actions::ClipboardActions>,
 }
 impl PtyView {
     pub fn new(label: &str, source: &str, activity: &str) -> Self {
         let view = Rc::new(ui::TerminalView::new(label).unwrap());
-        // Terminal application shortcuts are host policy; VTE otherwise forwards
-        // Ctrl+Shift+V as program input. Keep ordinary Ctrl+C available to the PTY.
-        let keys = gtk::EventControllerKey::new();
-        keys.set_propagation_phase(gtk::PropagationPhase::Capture);
-        let terminal = Rc::downgrade(&view);
-        keys.connect_key_pressed(move |_, key, _, modifiers| {
-            use gtk::gdk::{Key, ModifierType as M};
-            let relevant = M::CONTROL_MASK | M::SHIFT_MASK | M::ALT_MASK | M::SUPER_MASK | M::META_MASK | M::HYPER_MASK;
-            if modifiers & relevant != (M::CONTROL_MASK | M::SHIFT_MASK) {
-                return glib::Propagation::Proceed;
-            }
-            let Some(terminal) = terminal.upgrade() else { return glib::Propagation::Proceed; };
-            if matches!(key, Key::c | Key::C) {
-                terminal.terminal.emit_by_name::<()>("copy-clipboard", &[]);
-            } else if matches!(key, Key::v | Key::V) {
-                if terminal.input_enabled() {
-                    terminal.terminal.emit_by_name::<()>("paste-clipboard", &[]);
-                }
-            } else { return glib::Propagation::Proceed; }
-            glib::Propagation::Stop
-        });
-        view.terminal.add_controller(keys);
-        view.terminal.set_tooltip_text(Some("Copy: Ctrl+Shift+C · Paste: Ctrl+Shift+V (attached only)"));
-        view.terminal.update_property(&[gtk::accessible::Property::Description("Ctrl+Shift+C copies selected terminal text. Ctrl+Shift+V pastes only while attached. Ctrl+C remains program input.")]);
+        let clipboard = Rc::new(terminal_actions::ClipboardActions::install(&view));
         let widget = ui::column(8);
         widget.append(&view.widget);
         let notice = ui::text("Detached · attach explicitly to send keyboard input", false);
@@ -74,8 +52,10 @@ impl PtyView {
             }
         });
         let (state, terminal, message) = (session.clone(), view.clone(), notice.clone());
+        let actions = clipboard.clone();
         detach.connect_clicked(move |_| {
             terminal.set_attached(false);
+            actions.set_attached(false);
             state.borrow_mut().take();
             message.set_text("Detached · running work continues independently");
         });
@@ -102,6 +82,7 @@ impl PtyView {
             detach,
         );
         let availability = available.clone();
+        let actions = clipboard.clone();
         let timer = glib::timeout_add_local(Duration::from_millis(20), move || {
             // Release all state borrows before feeding VTE: display protocol
             // responses may synchronously emit its commit signal.
@@ -136,6 +117,7 @@ impl PtyView {
                 d.set_sensitive(false);
                 a.set_sensitive(availability.get());
             }
+            actions.set_attached(terminal.input_enabled());
             glib::ControlFlow::Continue
         });
         Self {
@@ -145,6 +127,7 @@ impl PtyView {
             session,
             timer: Some(timer),
             available,
+            clipboard,
         }
     }
     pub fn reconcile(&self, label: &str, available: bool) {
@@ -156,6 +139,7 @@ impl PtyView {
             .set_sensitive(available && self.session.borrow().is_none());
         if !available {
             self.view.set_attached(false);
+            self.clipboard.set_attached(false);
             self.session.borrow_mut().take();
         }
     }
@@ -181,7 +165,11 @@ mod tests {
         let job = std::env::var("AGENT_OS_PTY_TEST_JOB").unwrap();
         let socket = std::env::var("AGENT_OS_PTY_TEST_SOCKET").unwrap();
         std::env::set_var("AGENT_OS_BROKER_SOCKET", socket);
-        let view = PtyView::new("Interactive fixture λ 日本語", &format!("broker:{job}"), "1");
+        let view = PtyView::new(
+            "Interactive fixture λ 日本語",
+            &format!("broker:{job}"),
+            "1",
+        );
         let window = gtk::Window::builder().child(&view.widget).build();
         window.present();
         let pump = |predicate: &dyn Fn() -> bool| {
@@ -190,8 +178,13 @@ mod tests {
                 while glib::MainContext::default().pending() {
                     glib::MainContext::default().iteration(false);
                 }
-                if predicate() { break; }
-                assert!(std::time::Instant::now() < deadline, "Terminal controls did not reach the expected state without a source refresh");
+                if predicate() {
+                    break;
+                }
+                assert!(
+                    std::time::Instant::now() < deadline,
+                    "Terminal controls did not reach the expected state without a source refresh"
+                );
                 std::thread::sleep(Duration::from_millis(10));
             }
         };
@@ -202,7 +195,14 @@ mod tests {
         view.attach.emit_clicked();
         pump(&|| view.view.input_enabled());
         assert!(!view.attach.is_sensitive());
-        let detach = view.widget.last_child().unwrap().last_child().unwrap().downcast::<gtk::Button>().unwrap();
+        let detach = view
+            .widget
+            .last_child()
+            .unwrap()
+            .last_child()
+            .unwrap()
+            .downcast::<gtk::Button>()
+            .unwrap();
         detach.emit_clicked();
         pump(&|| view.attach.is_sensitive());
         assert!(!view.view.input_enabled());
@@ -220,7 +220,10 @@ mod tests {
         }
         view.reconcile("Interactive fixture λ 日本語", true);
         assert!(view.attach.is_sensitive());
-        assert!(!view.view.input_enabled(), "Source recovery attached without a human action");
+        assert!(
+            !view.view.input_enabled(),
+            "Source recovery attached without a human action"
+        );
         view.attach.emit_clicked();
         pump(&|| view.view.input_enabled());
         drop(detach);
