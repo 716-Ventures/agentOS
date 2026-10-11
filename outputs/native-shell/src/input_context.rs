@@ -152,6 +152,24 @@ pub fn snapshot(surfaces: &BTreeMap<String, Surface>, frame: &Frame) -> Value {
                 }
             }
         }
+    } else if let Some(id) = focus.and_then(|f| f["surface_id"].as_str()) {
+        let host = &frame.host_surfaces[id];
+        if frame.connected
+            && activity.is_some_and(|id| id > 0)
+            && host["availability"] == "available"
+            && host["activity_id"].as_str() == frame.activity.as_deref()
+            && host["source_revision"].as_u64().is_some()
+        {
+            context["surface_id"] = json!(id);
+            context["surface_title"] = json!(host["title"]
+                .as_str()
+                .unwrap_or("Application")
+                .chars()
+                .take(200)
+                .collect::<String>());
+            context["layout_revision"] = host["source_revision"].clone();
+            context["selection_kind"] = json!("focused_application");
+        }
     }
     context["selection_captured_at"] = json!(SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -288,6 +306,27 @@ pub fn prepare(
         }
     } else if surface != "native-launcher" {
         let snapshot = presentation_pages::read(&mut core, Some(&activity.to_string()), &stopped)?;
+        if context["selection_kind"] == "focused_application" {
+            let host = &snapshot["host_surfaces"][surface];
+            if host["availability"] != "available"
+                || host["activity_id"].as_str() != Some(activity.to_string().as_str())
+                || host["source_revision"].as_u64().is_none()
+                || host["source_revision"] != context["layout_revision"]
+                || context.get("element_id").is_some()
+                || context.get("object_id").is_some()
+                || !context["job_ref"].is_null()
+                || context["selection"].as_str() != Some("")
+            {
+                return Err(
+                    "The referenced application changed or disconnected. Open a new request."
+                        .into(),
+                );
+            }
+            if stopped() {
+                return Err("Request cancelled".into());
+            }
+            return Ok(context);
+        }
         let doc = &snapshot["documents"][surface];
         if doc["activity_id"].as_str() != Some(activity.to_string().as_str()) {
             return Err("The referenced view was closed or moved. Open a new request.".into());
@@ -324,6 +363,121 @@ pub fn prepare(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    #[ignore]
+    fn real_core_application_context_rechecks_registered_revision_and_connection() {
+        let socket = PathBuf::from(std::env::var("AGENT_OS_SOCKET").unwrap());
+        let call = |query: &Value| transport::request(&socket, query);
+        let activity = call(&json!({"op":"snapshot"})).unwrap()["activities"][0]["id"]
+            .as_i64()
+            .unwrap();
+        let mut host = json!({"op":"host.surface","surface_id":"request-context-host","activity_id":activity.to_string(),"title":"Original application","app_id":"org.example.Context","connected":true});
+        call(&host).unwrap();
+        let state = presentation_pages::read(call, Some(&activity.to_string()), || false).unwrap();
+        let mut context = json!({"activity_id":activity,"modality":"typed","surface_id":"request-context-host","selection_kind":"focused_application","selection":"","layout_revision":state["host_surfaces"]["request-context-host"]["source_revision"],"job_ref":null,"surface_title":"Original application"});
+        let prepare_now = |context| {
+            prepare(
+                context,
+                activity,
+                call,
+                |_| Ok(json!({"generation":7})),
+                || false,
+            )
+        };
+        assert!(prepare_now(context.clone()).is_ok());
+        host["title"] = json!("Updated application");
+        call(&host).unwrap();
+        assert!(
+            prepare_now(context.clone()).is_err(),
+            "Changed host revision accepted"
+        );
+        let state = presentation_pages::read(call, Some(&activity.to_string()), || false).unwrap();
+        context["layout_revision"] =
+            state["host_surfaces"]["request-context-host"]["source_revision"].clone();
+        assert!(prepare_now(context.clone()).is_ok());
+        host["connected"] = json!(false);
+        call(&host).unwrap();
+        assert!(
+            prepare_now(context).is_err(),
+            "Disconnected application accepted"
+        );
+        println!("PASS: real authenticated core application context rejects changed revisions and disconnection without inference");
+    }
+    #[test]
+    fn application_context_uses_authenticated_workspace_identity_never_a_title_match() {
+        let mut frame = Frame {
+            connected: true,
+            activity: Some("1".into()),
+            ..Frame::default()
+        };
+        frame.documents.insert("workspace".into(),json!({"workspace_id":"workspace","activity_id":"1","focus":{"surface_id":"chosen-host"}}));
+        frame.host_surfaces = json!({"other-host":{"activity_id":"1","availability":"available","title":"Same title","source_revision":8},"chosen-host":{"activity_id":"1","availability":"available","title":"Same title","source_revision":3}});
+        let captured = snapshot(&BTreeMap::new(), &frame);
+        assert_eq!(captured["surface_id"], "chosen-host");
+        assert_eq!(captured["selection_kind"], "focused_application");
+        assert_eq!(captured["layout_revision"], 3);
+        assert_eq!(captured["selection"], "");
+        assert!(captured.get("element_id").is_none());
+        for change in [
+            json!({"availability":"unavailable"}),
+            json!({"activity_id":"2"}),
+            json!({"source_revision":null}),
+        ] {
+            let mut changed = frame.clone();
+            changed.host_surfaces["chosen-host"]
+                .as_object_mut()
+                .unwrap()
+                .extend(change.as_object().unwrap().clone());
+            assert_eq!(
+                snapshot(&BTreeMap::new(), &changed)["surface_id"],
+                "native-launcher"
+            );
+        }
+        frame.connected = false;
+        assert_eq!(
+            snapshot(&BTreeMap::new(), &frame)["surface_id"],
+            "native-launcher"
+        );
+    }
+    #[test]
+    fn application_context_rejects_changed_disconnected_moved_or_forged_referents() {
+        for mode in [
+            "current",
+            "changed",
+            "disconnected",
+            "moved",
+            "missing",
+            "forged-element",
+            "forged-selection",
+        ] {
+            let mut context = json!({"activity_id":1,"modality":"typed","surface_id":"host","selection_kind":"focused_application","selection":"","layout_revision":3,"job_ref":null,"surface_title":"Original title"});
+            if mode == "forged-element" {
+                context["element_id"] = json!("invented-control");
+            }
+            if mode == "forged-selection" {
+                context["selection"] = json!("Unobserved application text");
+            }
+            let result = prepare(
+                context,
+                1,
+                |q| match q["op"].as_str().unwrap() {
+                    "presentation.page" => {
+                        Ok(json!({"event_cursor":7,"next_after_id":null,"documents":{}}))
+                    }
+                    "presentation.metadata" => Ok(
+                        json!({"event_cursor":7,"host_surfaces":if mode=="missing" {json!({})}else{json!({"host":{"activity_id":if mode=="moved"{"2"}else{"1"},"availability":if mode=="disconnected"{"unavailable"}else{"available"},"source_revision":if mode=="changed"{4}else{3},"title":"Current title"}})}}),
+                    ),
+                    _ => panic!("Unexpected operation {q}"),
+                },
+                |_| Ok(json!({"generation":4})),
+                || false,
+            );
+            assert_eq!(result.is_ok(), mode == "current", "{mode}");
+            if let Ok(value) = result {
+                assert_eq!(value["surface_title"], "Original title");
+            }
+        }
+    }
     #[test]
     fn selected_object_context_keeps_original_content_and_rejects_removed_or_moved_targets() {
         for mode in ["current", "removed", "moved", "control-removed"] {

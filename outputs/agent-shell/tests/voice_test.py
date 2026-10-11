@@ -65,6 +65,11 @@ class GroundingTests(unittest.TestCase):
             {'selection_captured_at':float('nan')},{'selection_captured_at':True},{'selection_captured_at':time.time()+100},
             {'element_id':''},{'object_id':[]},{'object_id':'x'*129}):
             with self.assertRaises(ValueError):grounding.validate({**self.context(),**change},1)
+    def test_focused_application_carries_no_unobserved_control_or_text(self):
+        context={**self.context(),'modality':'typed','selection_kind':'focused_application','selection':'','job_ref':None}
+        self.assertEqual(grounding.validate(context,1),context)
+        for forged in ({'selection':'Unobserved text'},{'element_id':'invented'},{'object_id':'invented'},{'job_ref':1}):
+            with self.assertRaises(ValueError):grounding.validate({**context,**forged},1)
     def test_invalid_referents_and_revisions_are_rejected(self):
         for change in ({'activity_id':2},{'captured_at':float('nan')},{'captured_at':time.time()+100},
             {'layout_revision':True},{'expected_generation':-1},{'actor':'human'},{'job_ref':'/tmp/other'},

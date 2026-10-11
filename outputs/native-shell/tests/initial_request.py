@@ -14,7 +14,8 @@ SHELL=ROOT.parent if (ROOT.parent/'install_runtime.py').is_file() else ROOT.pare
 with tempfile.TemporaryDirectory(prefix='agentos-initial-request-') as directory:
     root=Path(directory);endpoint=root/'core.sock'
     env={**os.environ,'AGENT_OS_SOCKET':str(endpoint),'AGENT_OS_STATE':str(root/'core-state'),
-         'XDG_STATE_HOME':str(root/'state'),'AGENT_OS_BROKER_SOCKET':str(root/'absent-broker.sock')}
+         'XDG_STATE_HOME':str(root/'state'),'AGENT_OS_BROKER_SOCKET':str(root/'absent-broker.sock'),
+         'AGENT_OS_COMPOSITOR_UID':str(os.getuid())}
     with (root/'core.log').open('w') as log:
         core=subprocess.Popen([str(SHELL/'target/release/agent-os-core')],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
         try:
@@ -30,6 +31,9 @@ with tempfile.TemporaryDirectory(prefix='agentos-initial-request-') as directory
                 response=json.loads(conn.makefile('rb').readline());assert response['ok'],response
                 assert len(response['result']['activities'])==1 and response['result']['jobs']==[]
             print('PASS: blank typed request creates no activity; explicit requests reuse one internal activity; broker failure launches no inference')
+            subprocess.run(['cargo','test','--locked','--manifest-path',str(ROOT/'Cargo.toml'),
+                'input_context::tests::real_core_application_context_rechecks_registered_revision_and_connection',
+                '--','--ignored','--exact','--nocapture'],env=env,check=True,timeout=60)
         finally:
             if core.poll() is None:os.killpg(core.pid,signal.SIGTERM)
             try:core.wait(timeout=5)
