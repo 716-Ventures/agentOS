@@ -1419,11 +1419,30 @@
         "AT-SPI traversal skips explicitly absent children during teardown; real action sensitivity/defunct checks remain enforced"
       ],
       "boundary": "Virtual headless session evidence; physical input and live provider quality remain unqualified."
+    },
+    "collection_placement_observation": {
+      "runtime_release": "cef183dc015ba1cb20060093485e7b3c6c219b87dbae716dae7cb96e120fe675",
+      "result": "unresolved",
+      "failed_reproduction_sha256": "60d277f5b2341287bf8480807fe40136f9f50b6031109e5a1d63a1fe7c8783f1",
+      "failed_table_log_sha256": "0777dbae1558a408162d9aa6d0ddf2d49900df9665b2eb7017ba202f84e9c5d2",
+      "diagnostic_log_sha256": "6a40a01dfdce9d08a46330532dba9780f5109cc55f437d7cd6cf34cf7027c09a",
+      "diagnostic_source_sha256": "b8167196531f41f041477c6189504d58db8a7c3aac6f51dc61f1f6965158825c",
+      "detail": "The failed run did not record actual geometry. The observer now retains up to eight geometry/work-area transitions and emits workspace/output state on failure. The one subsequent targeted Table journey passed with no runtime fix; it does not erase or explain the original observation. Owned guest/app cleanup passed."
+    },
+    "immutable_native_request_context_targeted": {
+      "implementation_revision": "2ac50ee9c6254b4cd1a8e7797faa08e8f5f9de4f",
+      "targeted_log_sha256": "adc9b2462530952606eb56d153362569157ac4b468ef54ab7f8eb2fe659b119f",
+      "ci_revision": "1bc32876249c7d076d4bdedfc8937db96a0d3d4b",
+      "ci_run": 38118440007,
+      "ci_result": "success",
+      "native_source_sha256": "8f44f34cc0875a2214cf983250e7a796e5dfc1a496e4d2f0d27960cfb208ca79",
+      "boundary": "Real native Unicode/text/keyed row/VTE and frozen request context checks pass, with initial-request absent-broker integration and complete session cleanup. The installed reproduction did not finish because of the separately retained Table placement observation; the preceding complete 62-check runtime and signed v10 retain their own identities."
     }
   },
   "observations": [
     "The earlier intermittent Close/Undo stress failure recorded a later empty conventional window placement. Unbuffered-toplevel publication was reproduced and corrected; ten consecutive installed journeys then passed. Later genuine placement changes intentionally still reject Undo.",
-    "Clean v9 qualification exposed one primary-transfer destination focus failure; an instrumented repeat and complete fresh-copy run passed without a runtime change. The observation remains open; the kernel fixture now records the last click, actual pointer location and full workspace/error state on focus failure."
+    "Clean v9 qualification exposed one primary-transfer destination focus failure; an instrumented repeat and complete fresh-copy run passed without a runtime change. The observation remains open; the kernel fixture now records the last click, actual pointer location and full workspace/error state on focus failure.",
+    "The contextual-request installed reproduction stopped before completing at Table fixture placement: the requested 900x400 geometry was not observed within ten seconds. The following diagnostic probe passed without a runtime change and recorded normal asynchronous geometry convergence. The original failure remains unresolved; no retry is treated as a correction. Exact failed reproduction and diagnostic log hashes are retained separately."
   ],
   "owned_utm_app_closed": true
 }

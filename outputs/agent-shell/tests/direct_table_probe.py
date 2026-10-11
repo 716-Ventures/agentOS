@@ -50,7 +50,22 @@ def verify(metrics, output, core, scene, login_user, presentation, observe, keyb
                 if '"code":"stale_revision"' not in str(exc) or time.monotonic() > deadline:
                     raise
                 time.sleep(.05)
-        wait(lambda: window(logical)['geometry'] == {'x': x, 'y': work_area['y'], 'width': width, 'height': 400}, 'Table fixture placement was not applied')
+        observed=[]
+        expected={'x': x, 'y': work_area['y'], 'width': width, 'height': 400}
+        def placed():
+            current=scene()
+            row=next((row for row in current['windows'] if current['shared']['identities'].get(row['id'])==logical),None)
+            sample={'geometry':row['geometry'] if row else None,'work_areas':[layer['work_area'] for layer in current['system_layers'] if layer['namespace']=='agentos-system-bar' and layer['mapped']]}
+            if not observed or observed[-1]!=sample:
+                observed.append(sample)
+                if len(observed)>8:observed.pop(0)
+            return sample['geometry']==expected
+        try:
+            wait(placed, 'Table fixture placement was not applied')
+        except RuntimeError as exc:
+            current=scene()
+            raise RuntimeError(str(exc)+'; placement diagnostics: '+json.dumps({'expected':expected,'observed':observed,'workspaces':current['shared']['workspaces'],'outputs':current['outputs']})) from exc
+        print('CHECK: collection placement '+json.dumps({'expected':expected,'observed':observed}),flush=True)
 
     def click(logical, point, button=272):
         geometry = window(logical)['geometry']
