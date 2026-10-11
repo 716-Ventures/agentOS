@@ -20,7 +20,7 @@ The initial artifact can be a preinstalled bootable virtual disk plus a reproduc
 
 Validate microphone capture inside the guest. A host audio bridge may support interim interaction testing, but must be identified as such and cannot count as verified native guest audio. VM validation also does not establish physical-hardware compatibility.
 
-**Image qualification · October 11:** Signed candidate v18 now passes fresh-account, installed-reader and offline cold-boot qualification at the exact clean-source 126edde runtime. Repeated launcher reopens retain the unsent draft and actual request speech; update/rollback, browser handoff and activation recovery also pass. The failed v17 image and earlier qualified v16 remain separately recorded. See [image verification and limits](vm-foundation/image-verification.json).
+**Image qualification · October 11:** Signed candidate v19 now passes fresh-account, installed-reader and offline cold-boot qualification at the exact clean-source bb830f3 runtime. Selectable live status retains older text, focus and clipboard while current failures are shown and spoken once, online and offline. Repeated launcher reopens retain the unsent draft and actual request speech; update/rollback, browser handoff and activation recovery also pass. The failed v17 image and earlier qualified v18/v16 remain separately recorded. See [image verification and limits](vm-foundation/image-verification.json).
 
 ## Historical implementation status — September 17, 2026
 
