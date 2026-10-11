@@ -97,10 +97,22 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 launcher=next(layer for layer in opened['system_layers'] if layer['namespace']=='agentos-launcher')
                 assert launcher['work_area']==bar['work_area'],(launcher,bar)
                 assert not any(w['title']=='Agent launcher' for w in opened['windows']),opened
+                monitor=next(w for w in opened['windows'] if w['title']=='Agent Monitor')
+                monitor_surface=opened['shared']['identities'][monitor['id']]
+                workspace_id=f'desktop-{activity}'
+                workspace=call(endpoint,{'op':'presentation.snapshot'})['documents'][workspace_id]
+                assert workspace['focus'] is None or workspace['focus']['surface_id']!=monitor_surface
+                call(endpoint,{'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
+                    'request_id':'launcher-background-focus','expected_revisions':{workspace_id:workspace['revision']},
+                    'operations':[{'op':'workspace.edit','workspace_id':workspace_id,'edit':{'kind':'focus','surface_id':monitor_surface,'element_id':None}}]})
+                reconciled=wait_for(lambda:(lambda s:s if (s['shared']['workspaces'][workspace_id]['focus'] or {}).get('surface_id')==monitor_surface else None)(call(control,{'op':'snapshot'})),[core,session])
+                assert reconciled['seat_focus']==launcher['id'], 'Background workspace reconciliation stole launcher keyboard focus: '+json.dumps({'seat_focus':reconciled['seat_focus'],'launcher':launcher['id']})
+                print('PASS: background workspace focus reconciliation preserves active launcher typing')
                 request=accessibility.find('Ask Agent',pyatspi.ROLE_TEXT)
                 assert request.queryEditableText().setTextContents('Retain this launcher draft λ')
                 accessibility.activate(accessibility.find('Close launcher',pyatspi.ROLE_PUSH_BUTTON))
                 wait_for(lambda:not any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in call(control,{'op':'snapshot'})['system_layers']),[core,session])
+                wait_for(lambda:call(control,{'op':'snapshot'})['seat_focus']==monitor['id'],[core,session])
                 accessibility.activate(accessibility.find('Open launcher',pyatspi.ROLE_PUSH_BUTTON))
                 wait_for(lambda:any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in call(control,{'op':'snapshot'})['system_layers']),[core,session])
                 assert accessibility.text(accessibility.find('Ask Agent',pyatspi.ROLE_TEXT))=='Retain this launcher draft λ'

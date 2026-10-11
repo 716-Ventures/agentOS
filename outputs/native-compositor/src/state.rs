@@ -430,7 +430,9 @@ impl Smallvil {
                 placements.insert(id.clone(), preview.rect);
                 maximized.remove(id);
             }
-            if scene.focus != self.applied_focus {
+            // Keep the deliberate launcher interaction independent of workspace
+            // reconciliation. Closing it reapplies the latest committed focus.
+            if scene.focus != self.applied_focus && self.active_launcher.is_none() {
                 if let Some(window) = windows.iter().find(|w| {
                     Some(format!("{:?}", w.toplevel().unwrap().wl_surface().id())) == scene.focus
                 }) {

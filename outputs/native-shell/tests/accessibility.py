@@ -19,6 +19,7 @@ def find(name,role):
         visited=0
         while queue and visited<4096:
             node=queue.popleft();visited+=1
+            if node is None:continue # AT-SPI can expose an absent child during widget teardown.
             try:
                 if node.name==name and node.getRole()==role:
                     found.append(node);return True

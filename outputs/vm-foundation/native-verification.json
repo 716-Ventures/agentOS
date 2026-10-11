@@ -1402,6 +1402,23 @@
         "Isolated core outage teardown accepts actual SIGTERM termination status"
       ],
       "boundary": "This qualifies virtual single-output behavior. Typed contextual selected-object grounding is the next implementation gap. Live provider quality, physical input/audio/GPU, multi-output layers and hotplug remain unqualified. The separately signed v10 image retains its alpha.31/runtime identity; the historical v9 primary-focus observation remains open."
+    },
+    "launcher_workspace_focus_isolation": {
+      "qualification": "Source-built real headless Wayland/GTK session in the selected UTM guest; the full 62-check installed runtime above retains its preceding identity.",
+      "baseline_log_sha256": "2d64c2103b364dd28c874908145b6345cbe5ca17c704ca3141599886f3682fa2",
+      "fixed_log_sha256": "b3d6a42c2f001b4e6d4c7491850b059484386a6695e990547592ee47427cfdb3",
+      "source_sha256": {
+        "outputs/native-compositor/src/state.rs": "cf77272dc3583810e8537c76c4854250f6f3ce111d3495d8fbd04e690b74e219",
+        "outputs/native-shell/tests/native_session.py": "599f9c69a2b45702041fd6f4dd0541773c0ed73edc34fc4bb5eaf2d224007e0f",
+        "outputs/native-shell/tests/accessibility.py": "fedaa8d3a720aea1b77a972bac7f8d4cf5ca5e7228bbb6c1296d0b8d9c790c0b"
+      },
+      "qualified": [
+        "Workspace focus reconciliation previously moved the seat from the active launcher to Agent Monitor",
+        "The active launcher now retains its keyboard focus until deliberate close; close restores the latest committed workspace target",
+        "Unicode draft retention, Save/Discard, core outage controls and exact session/guest/app cleanup all pass",
+        "AT-SPI traversal skips explicitly absent children during teardown; real action sensitivity/defunct checks remain enforced"
+      ],
+      "boundary": "Virtual headless session evidence; physical input and live provider quality remain unqualified."
     }
   },
   "observations": [
