@@ -42,7 +42,9 @@ def verify(metrics, core, login_user, keyboard, wait_text, load=False, scene=Non
                 wait(lambda:broker('poll',job_id=job)['status']=='running' and 'CPU_LOAD_READY' in broker('poll',job_id=job)['output'],'Owned CPU work did not start')
             before={job:cpu_usage(job) for job in jobs}
         measurement_started=time.monotonic()
-        frames_before=scene()['direct_frames_presented'] if scene else None
+        initial_scene=scene() if scene else {}
+        frames_before=initial_scene.get('direct_frames_presented')
+        wakes_before=initial_scene.get('input_frame_wakeups',0)
         for index in range(20):
             keyboard.chord(30)
             wait_text(lambda value:value['text']=='a'*(index+1))
@@ -60,9 +62,11 @@ def verify(metrics, core, login_user, keyboard, wait_text, load=False, scene=Non
             report={**report,'profile':'two concurrent broker CPU jobs','job_cpu_usage_usec':usage}
         else:report={**report,'profile':'idle editor'}
         if scene:
-            frames_after=scene()['direct_frames_presented']
+            final_scene=scene()
+            frames_after=final_scene['direct_frames_presented']
             report={**report,'measurement_seconds':round(time.monotonic()-measurement_started,3),
-                    'completed_frames_between_observer_snapshots':frames_after-frames_before}
+                    'completed_frames_between_observer_snapshots':frames_after-frames_before,
+                    'input_frame_wakeups_between_observer_snapshots':final_scene.get('input_frame_wakeups',0)-wakes_before}
         print('Native GTK input-to-presentation measurement '+json.dumps(report),flush=True)
         assert report['p95_ms']<=50,report
         print('PASS: native GTK editor kernel input-to-presentation '+json.dumps(report),flush=True)

@@ -156,7 +156,7 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
                     .and_then(|keyboard| keyboard.current_focus())
                     .map(|surface| format!("{:?}", surface.id()));
                 Ok(
-                    json!({"launcher_requests":state.launcher_requests,"system_layers":crate::system_shell::snapshot(state),"seat_focus":seat_focus,"pointer_location":state.seat.get_pointer().map(|pointer|{let point=pointer.current_location();json!([point.x,point.y])}),"layout":state.policy.current,"windows":windows,"outputs":outputs,"direct_frames_presented":state.direct_frames_presented,"drag_icon":state.drag_icon.is_some(),"drag_icon_render_submissions":state.drag_icon_render_submissions,"direct_active":state.direct_active,"direct_resume_error":state.direct_resume_error,"shared":scene.map(|s|json!({"identities":s.identities,"workspaces":s.workspaces,"error":s.error,"overview":s.overview}))}),
+                    json!({"launcher_requests":state.launcher_requests,"system_layers":crate::system_shell::snapshot(state),"seat_focus":seat_focus,"pointer_location":state.seat.get_pointer().map(|pointer|{let point=pointer.current_location();json!([point.x,point.y])}),"layout":state.policy.current,"windows":windows,"outputs":outputs,"direct_frames_presented":state.direct_frames_presented,"input_frame_wakeups":state.input_frame_wakeups,"drag_icon":state.drag_icon.is_some(),"drag_icon_render_submissions":state.drag_icon_render_submissions,"direct_active":state.direct_active,"direct_resume_error":state.direct_resume_error,"shared":scene.map(|s|json!({"identities":s.identities,"workspaces":s.workspaces,"error":s.error,"overview":s.overview}))}),
                 )
             }
             Some("viewport.pan") => {

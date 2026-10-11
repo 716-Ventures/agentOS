@@ -79,6 +79,7 @@ impl Smallvil {
 
                 let key = event.key_code().raw();
                 let state = event.state();
+                let mut forwarded = false;
                 let action = self
                     .seat
                     .get_keyboard()
@@ -121,12 +122,16 @@ impl Smallvil {
                                     return FilterResult::Intercept(Some(action));
                                 }
                             }
+                            forwarded = true;
                             FilterResult::Forward
                         },
                     )
                     .flatten();
                 if let Some(action) = action {
                     self.shortcut(action)
+                }
+                if forwarded && state == KeyState::Pressed && self.direct_active == Some(true) {
+                    self.request_input_frame();
                 }
             }
             InputEvent::PointerMotion { event, .. } => {

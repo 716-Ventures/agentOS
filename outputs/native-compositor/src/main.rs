@@ -18,8 +18,8 @@ mod direct;
 #[cfg(feature = "direct-display")]
 mod presentation_feedback;
 mod accessibility;
-#[cfg(feature = "direct-display")]
 mod frame_cadence;
+mod input_frame;
 mod grabs;
 mod input;
 mod input_revision;
@@ -113,6 +113,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         &mut data,
         |data| {
             if let Some(service)=&data.state.accessibility {service.dispatch();}
+            data.state.wake_input_frame();
             // Core/seat reconciliation must progress when the outer compositor
             // throttles frame callbacks (for example an occluded nested window).
             if backend == "winit" {

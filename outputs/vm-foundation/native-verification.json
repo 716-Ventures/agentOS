@@ -2083,5 +2083,131 @@
     ],
     "test_sha256": "cf4fd108b209d228631703ddbffb45c350eb52072567140f286a93f7900adcfe",
     "linux_full_reproduction": "pending"
+  },
+  "input_frame_preparation": {
+    "result": "targeted_pass",
+    "runtime_release": "2381a84dd5e23ee2ad436e482c61128c207bcc9fdf4b74f72a6b625162b84ef3",
+    "deployment": {
+      "created_at": "2026-10-11T10:00:35.108026+00:00",
+      "source_archive_sha256": "4f33b0b052f179f3733ee0163ecd760ef1c83c527401398d978502947feb52b3",
+      "repository_revision": "da6d9a32329b8687995675851248e8203c97bddf",
+      "source_changes": [
+        " M outputs/agent-shell/tests/direct_native_feedback.py",
+        " M outputs/native-compositor/src/control.rs",
+        " M outputs/native-compositor/src/frame_cadence.rs",
+        " M outputs/native-compositor/src/input.rs",
+        " A outputs/native-compositor/src/input_frame.rs",
+        " M outputs/native-compositor/src/main.rs",
+        " M outputs/native-compositor/src/state.rs"
+      ],
+      "installed": true
+    },
+    "compositor_tests": 47,
+    "profiles": [
+      {
+        "clock_id": 1,
+        "discarded": 0,
+        "format": 1,
+        "invalid": 0,
+        "max_ms": 43,
+        "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+        "p50_ms": 28,
+        "p95_ms": 41,
+        "pending": 0,
+        "presented": 20,
+        "requested": 20,
+        "sample_limit": 256,
+        "profile": "idle editor",
+        "measurement_seconds": 3.145,
+        "completed_frames_between_observer_snapshots": 208,
+        "input_frame_wakeups_between_observer_snapshots": 20
+      },
+      {
+        "clock_id": 1,
+        "discarded": 0,
+        "format": 1,
+        "invalid": 0,
+        "max_ms": 41,
+        "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+        "p50_ms": 34,
+        "p95_ms": 40,
+        "pending": 0,
+        "presented": 20,
+        "requested": 20,
+        "sample_limit": 256,
+        "profile": "idle editor",
+        "measurement_seconds": 3.148,
+        "completed_frames_between_observer_snapshots": 204,
+        "input_frame_wakeups_between_observer_snapshots": 20
+      },
+      {
+        "clock_id": 1,
+        "discarded": 0,
+        "format": 1,
+        "invalid": 0,
+        "max_ms": 42,
+        "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+        "p50_ms": 29,
+        "p95_ms": 39,
+        "pending": 0,
+        "presented": 20,
+        "requested": 20,
+        "sample_limit": 256,
+        "profile": "idle editor",
+        "measurement_seconds": 3.098,
+        "completed_frames_between_observer_snapshots": 198,
+        "input_frame_wakeups_between_observer_snapshots": 20
+      },
+      {
+        "clock_id": 1,
+        "discarded": 0,
+        "format": 1,
+        "invalid": 0,
+        "max_ms": 40,
+        "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+        "p50_ms": 32,
+        "p95_ms": 40,
+        "pending": 0,
+        "presented": 20,
+        "requested": 20,
+        "sample_limit": 256,
+        "profile": "two concurrent broker CPU jobs",
+        "job_cpu_usage_usec": [
+          1714086,
+          1761524
+        ],
+        "measurement_seconds": 2.036,
+        "completed_frames_between_observer_snapshots": 110,
+        "input_frame_wakeups_between_observer_snapshots": 20
+      }
+    ],
+    "checks": [
+      "forwarded key presses let the focused visible direct-output client prepare a frame before the existing fixed GPU scanout deadline",
+      "wakeups wait for an actual outstanding root frame callback and are bounded to once per refresh; stale/cancelled requests expire",
+      "no new GPU render/queue or presentation-receipt path; all receipts still come from actual DRM completion",
+      "synthetic actual presentation, superseded discard and unmap pass",
+      "reader authentication, grabs, normal typing and rescue VT pass",
+      "owned guest/app shutdown passes"
+    ],
+    "preceding_complete_run_attempt": {
+      "result": "failed",
+      "source_revision": "da6d9a32329b8687995675851248e8203c97bddf",
+      "installed_runtime_release": "a90f79ab208822974ad5148d7eef47c65162880a2a67620fb36a671bbea5e4ef",
+      "completed_checks": 53,
+      "failed_check": "direct-rotated-output",
+      "p50_ms": 34,
+      "p95_ms": 53,
+      "max_ms": 55,
+      "presented": 20,
+      "pending": 0,
+      "invalid": 0,
+      "discarded": 0,
+      "owned_utm_app_closed": true,
+      "report_sha256": "c7b059fa584c8d99a9b221ae39701d661a878cd661227ba5ac907259eea7803d",
+      "latency_log_sha256": "89f547819553cb730358d786a896a9dda87ba6a779281639c619ff4e90a975de"
+    },
+    "targeted_log_sha256": "1d6b7ca4defa4087c46a0fdebc11577955399bccd72ba6bedb472ffab86c23f0",
+    "complete_current_source_reproduction": "pending",
+    "qualification_boundary": "Selected virtual-display editor profiles; host scheduling variation, other controls and physical display/input remain unqualified. The unchanged p95 limit is 50 ms."
   }
 }
