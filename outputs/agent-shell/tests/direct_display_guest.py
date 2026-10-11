@@ -30,7 +30,9 @@ def main():
     modes.add_argument('--terminal-ime',action='store_true',help='Qualify the installed VTE through the private trusted Wayland input-method fixture')
     modes.add_argument('--presentation-feedback',action='store_true',help='Verify real Wayland feedback from completed virtual KMS frames')
     modes.add_argument('--native-feedback',action='store_true',help='Measure kernel typing to actual native GTK presentation receipts')
+    modes.add_argument('--native-feedback-load',action='store_true',help='Measure native feedback during two bounded real broker CPU jobs')
     args = parser.parse_args()
+    if args.native_feedback_load:args.native_feedback=True
     if args.native_feedback:args.input=True
     if args.presentation_feedback:args.input=True
     if args.terminal_ime:args.terminal_input=True
@@ -171,7 +173,7 @@ def main():
                     if target is not None and observed.get('seat_focus')==target:break
                     if time.monotonic()>deadline:raise RuntimeError('Direct input fixture did not receive seat focus')
                     time.sleep(.05)
-                direct_input_probe.verify(metrics,snapshot['outputs'][0],core,lambda:control(endpoint,'snapshot'),target,user.pw_name,presentation,terminal_input=args.terminal_input,terminal_ime=args.terminal_ime,presentation_feedback=args.presentation_feedback,native_feedback=args.native_feedback)
+                direct_input_probe.verify(metrics,snapshot['outputs'][0],core,lambda:control(endpoint,'snapshot'),target,user.pw_name,presentation,terminal_input=args.terminal_input,terminal_ime=args.terminal_ime,presentation_feedback=args.presentation_feedback,native_feedback=args.native_feedback,native_feedback_load=args.native_feedback_load)
             if args.hold_seconds:
                 print('Direct desktop ready for console inspection', flush=True)
                 time.sleep(args.hold_seconds)
@@ -230,11 +232,12 @@ def main():
                           'frames_before_vt': snapshot['direct_frames_presented'],
                           'frames_after_vt': resumed['direct_frames_presented'],
                           'checks': ['direct native window', 'KMS output discovery', 'shared core connection',
-                                     'VT switch and resume', 'orderly shutdown', 'session directory cleanup', 'owned login scope cleanup'] + (['native GTK editor kernel key-to-presentation receipts, 20 sequential samples'] if args.native_feedback else ['Wayland presentation timestamps from completed virtual KMS frames','kernel key-triggered content feedback','superseded frame discard and unmap'] if args.presentation_feedback else ['kernel keyboard and absolute pointer','clipboard copy/paste','undo/redo','retained draft','deliberate pointer Save','kernel workspace move/resize/maximize/restore/undo','native titlebar drag with durable placement','kernel focus cycling','kernel VT shortcut and acknowledged resume','kernel close and native assistive undo','focused primary middle-paste across Wayland clients','Unicode COPY drag/drop and grouped undo','oversized drop rejection','drag icon rendering and release cleanup'] if args.input and not args.terminal_input else ['kernel keyboard and absolute pointer in VTE','trusted Wayland IME preedit and Unicode commit','concurrent native rendering during VTE composition','detached IME commit rejected without reattach replay'] if args.terminal_ime else ['kernel keyboard and absolute pointer in VTE','Unicode Wayland clipboard to PTY','explicit native detach and reattach','kernel pointer selection and exact Unicode line copy','accessible secondary-click and Shift+F10 clipboard menus','closed-popup seat focus and first absolute pointer motion','detached menu Paste disabled and input rejected','ordinary Ctrl+C program interruption'] if args.terminal_input else []),
+                                     'VT switch and resume', 'orderly shutdown', 'session directory cleanup', 'owned login scope cleanup'] + (['native GTK editor kernel key-to-presentation receipts, 20 sequential samples']+(['two distinct concurrent broker CPU jobs with measured CPU consumption','owned CPU work cancellation and unit cleanup'] if args.native_feedback_load else []) if args.native_feedback else ['Wayland presentation timestamps from completed virtual KMS frames','kernel key-triggered content feedback','superseded frame discard and unmap'] if args.presentation_feedback else ['kernel keyboard and absolute pointer','clipboard copy/paste','undo/redo','retained draft','deliberate pointer Save','kernel workspace move/resize/maximize/restore/undo','native titlebar drag with durable placement','kernel focus cycling','kernel VT shortcut and acknowledged resume','kernel close and native assistive undo','focused primary middle-paste across Wayland clients','Unicode COPY drag/drop and grouped undo','oversized drop rejection','drag icon rendering and release cleanup'] if args.input and not args.terminal_input else ['kernel keyboard and absolute pointer in VTE','trusted Wayland IME preedit and Unicode commit','concurrent native rendering during VTE composition','detached IME commit rejected without reattach replay'] if args.terminal_ime else ['kernel keyboard and absolute pointer in VTE','Unicode Wayland clipboard to PTY','explicit native detach and reattach','kernel pointer selection and exact Unicode line copy','accessible secondary-click and Shift+F10 clipboard menus','closed-popup seat focus and first absolute pointer motion','detached menu Paste disabled and input rejected','ordinary Ctrl+C program interruption'] if args.terminal_input else []),
                           'terminal_input_qualified': args.terminal_input,
                           'terminal_ime_qualified': args.terminal_ime,
                           'presentation_feedback_qualified': args.presentation_feedback,
                           'native_feedback_qualified': args.native_feedback,
+                          'native_feedback_load_qualified': args.native_feedback_load,
                           'not_tested': ['physical input', 'hotplug', 'physical GPU presentation']}))
 
 

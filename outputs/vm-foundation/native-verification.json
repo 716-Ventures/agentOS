@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-10-11T02:15:02.924028+00:00",
+  "started_at": "2026-10-11T02:30:04.823680+00:00",
   "result": "pass",
   "vm_uuid": "27176EA2-E994-4165-9BBA-70FEED59E66B",
   "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -46,6 +46,7 @@
     "direct-display-input-vt",
     "direct-display-terminal",
     "direct-display-terminal-ime",
+    "direct-native-feedback-load",
     "direct-native-feedback",
     "direct-display-presentation",
     "conventional-browser-links",
@@ -71,21 +72,21 @@
     "native control latency outside the measured editor profile; physical display and live inference-load latency"
   ],
   "deployment": {
-    "created_at": "2026-10-11T02:15:16.372170+00:00",
-    "source_archive_sha256": "81b593b1a98dbb50affd8280c16dbd34231716f8895d9b1964554812885a3bd3",
-    "repository_revision": "414d6b33d7a169281477d02b13d49781c1b2627d",
+    "created_at": "2026-10-11T02:30:18.246604+00:00",
+    "source_archive_sha256": "3daa7216203ccac779704a8d3415cc13c9a81aa00e27122fb1d4b730415553f6",
+    "repository_revision": "df58ebc27c8a31e8ff6b2048de4cf0b9c5871e27",
     "source_changes": [
+      " M outputs/agent-shell/Cargo.lock",
+      " M outputs/agent-shell/Cargo.toml",
       " M outputs/agent-shell/tests/direct_display_guest.py",
       " M outputs/agent-shell/tests/direct_input_probe.py",
+      "AM outputs/agent-shell/tests/direct_native_feedback.py",
       " M outputs/native-shell/Cargo.lock",
-      " M outputs/native-shell/Cargo.toml",
-      " M outputs/native-shell/README.md",
-      "AM outputs/native-shell/src/feedback_metrics.rs",
-      " M outputs/native-shell/src/main.rs"
+      " M outputs/native-shell/Cargo.toml"
     ],
     "installed": true
   },
-  "runtime_release": "93c98fed9a787850e2b8862057261c127bd37e51639abe9df9f78353e6fc869d",
+  "runtime_release": "25039f8189f6ac2ec2afda7adc425b089986b1007cbf2b8dbc20ad4f16c0e8ea",
   "dependency_manifest": {
     "packages": {
       "adduser": "3.152",
@@ -875,11 +876,11 @@
     "python": "Python 3.9.6"
   },
   "guest_stopped": true,
-  "finished_at": "2026-10-11T02:21:00.876657+00:00",
+  "finished_at": "2026-10-11T02:35:55.623807+00:00",
   "public_ui_release": {
-    "tag": "v0.1.0-alpha.25",
-    "revision": "7b7bac9c252e759fafb4f6c1d50af5ef056d0677",
-    "public_ci_run": 38096178175
+    "tag": "v0.1.0-alpha.26",
+    "revision": "7b1333f5657ce7d776c6b1731a5765b410b55b0c",
+    "public_ci_run": 38105151636
   },
   "additional_targeted_regressions": {
     "queued_initial_documents": {
@@ -1011,20 +1012,21 @@
       "collector_sha256": "847cfb831aa9982543abf8841d240f2d3c64fc191795fa2564d582b2cc23305a"
     },
     "native_gtk_presentation_feedback": {
-      "runtime_release": "93c98fed9a787850e2b8862057261c127bd37e51639abe9df9f78353e6fc869d",
+      "runtime_release": "25039f8189f6ac2ec2afda7adc425b089986b1007cbf2b8dbc20ad4f16c0e8ea",
       "measurement": {
         "clock_id": 1,
         "discarded": 0,
         "format": 1,
         "invalid": 0,
-        "max_ms": 48,
+        "max_ms": 49,
         "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-        "p50_ms": 36,
+        "p50_ms": 40,
         "p95_ms": 48,
         "pending": 0,
         "presented": 20,
         "requested": 20,
-        "sample_limit": 256
+        "sample_limit": 256,
+        "profile": "idle editor"
       },
       "qualified": [
         "Actual installed GTK editor root surface, not a synthetic Wayland drawing client",
@@ -1034,12 +1036,61 @@
         "Existing editor, arrangement, transfer, VTE clipboard/menu/IME, VT and lifecycle journeys pass in the full reproduction"
       ],
       "collector_sha256": "03ca158ae7254431d6e5d632bcd099136f9a80712142cb5796303a1fc6db8739",
-      "probe_sha256": "0d56d50fcfa651c7b4dc5aa22470ae0fed486e8494204c900be893b6b6256e40",
+      "probe_sha256": "ec160ed5809a8555b310b9472c7eadd319a509796f1db1dc59748a1bbb74882e",
       "baseline_log_sha256": "5e3eceeeae3550f67cab15076a031cf5d9adeda13e4ccdb0ab58112df6baa60b",
       "targeted_log_sha256": "654add5b529532736165de1b254979b802250e408df5a71fcfa1fef88164c2b6",
-      "full_reproduction_log_sha256": "f4ac5d3e7f693dd051c1305ec6ed0fc108f58122de852f0bba7515c8959e348d",
-      "display_log_sha256": "516180f583f9a53648ae54c8259b2dc8d4491a9a37fb2587820ab3298d1d5e0c",
-      "boundary": "Opt-in diagnostics with at most 256 key-triggered requests per window. No key codes, text or document identity recorded. Event millisecond quantization contributes less than 1ms. This native editor/UTM profile does not qualify every control, physical display, subjective responsiveness or live inference load."
+      "full_reproduction_log_sha256": "67a75c6953e58590aa007451490d811e3194af36c648ba96951e2d2d2da1a296",
+      "display_log_sha256": "784b954bc8b12ecd77ccba98ed68a61b8fbb1bf85328a4aa46caf447b3560409",
+      "boundary": "Opt-in diagnostics with at most 256 key-triggered requests per window. No key codes, text or document identity recorded. Event millisecond quantization contributes less than 1ms. This native editor/UTM profile does not qualify every control, physical display, subjective responsiveness or live inference load.",
+      "typing_fixture_sha256": "01f8bc588e4dd90583824479172861d03ed6000ac1dd16393225f318ec15982c",
+      "cpu_job_profile": {
+        "measurement": {
+          "clock_id": 1,
+          "discarded": 0,
+          "format": 1,
+          "invalid": 0,
+          "max_ms": 51,
+          "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+          "p50_ms": 37,
+          "p95_ms": 48,
+          "pending": 0,
+          "presented": 20,
+          "requested": 20,
+          "sample_limit": 256,
+          "profile": "two concurrent broker CPU jobs",
+          "job_cpu_usage_usec": [
+            2478624,
+            2506164
+          ]
+        },
+        "log_sha256": "11fa356de4c0e1594e6fc98239dfd2df1ff40d4370ab8569f8b8ca329929efd2",
+        "targeted_log_sha256": "0755068a7baae888347be14f2d749bc50e230c3fc8e3f67dae8b7ad1e7b78dc1",
+        "qualified": [
+          "Two distinct real broker jobs consumed CPU throughout measurement",
+          "Twenty real kernel characters acknowledged through AT-SPI and native GTK presentation",
+          "Both jobs cancelled and exact work units verified stopped"
+        ],
+        "boundary": "Broker CPU contention, not live model inference or physical display qualification."
+      }
+    },
+    "choice_trigger_style": {
+      "public_ui_release": {
+        "tag": "v0.1.0-alpha.26",
+        "revision": "7b1333f5657ce7d776c6b1731a5765b410b55b0c",
+        "public_ci_run": 38105151636
+      },
+      "component_reference_sha256": "962830436bd0b7ee50e556f0747e277d6a86869ed27d167516346b15f26309d8",
+      "observation_sha256": "4844d7e53943a0c89d622c3b5afbda44ce694ad5774792e38ef2209c46d8fff4",
+      "native_fixture_sha256": "c1138ede505c4a6a2b200eb08fa9d04b7536694665cb488d0e188f192652031f",
+      "baseline_log_sha256": "81900d69a2ce0d084b1a2f70adfb89e6c74c3ed5152f9db1493da7e68d2a3ee2",
+      "full_gallery_log_sha256": "61172814e825f3e1ff71c39998e41041731c633543bd7ff54d7f601d978f0b61",
+      "qualified": [
+        "Pinned actual browser Select trigger and basic local keyboard observation",
+        "Native 190x36 regular-weight trigger and light/dark normal/hover/disabled background endpoints",
+        "All four painted edges of actual native focus ring",
+        "Complete standalone native gallery and independent AT-SPI journeys"
+      ],
+      "boundary": "GTK popup/keyboard semantics, arrow, stronger borders and focus remain native adaptations. Full appearance/motion parity, physical input and RTL remain unqualified."
     }
   },
   "observations": [
