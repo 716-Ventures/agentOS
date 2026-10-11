@@ -8,22 +8,35 @@ fn request(value: Value) -> Result<Value, String> {
     transport::request_timeout(&path, &value, Duration::from_millis(300))
 }
 
+#[derive(Clone)]
+struct Commands {
+    sender: std::sync::mpsc::SyncSender<(std::time::Instant, u64, Value)>,
+    latest: Arc<std::sync::atomic::AtomicU64>,
+}
+impl Commands {
+    fn send(&self, value: Value) -> Result<(), String> {
+        let sequence = self.latest.fetch_add(1, std::sync::atomic::Ordering::Relaxed) + 1;
+        self.sender.try_send((std::time::Instant::now(), sequence, value))
+            .map_err(|_| "Keyboard busy; try again".to_owned())
+    }
+}
 struct Input {
-    commands: std::sync::mpsc::SyncSender<(std::time::Instant, Value)>,
+    commands: Commands,
     stop: Arc<std::sync::atomic::AtomicBool>,
     worker: Mutex<Option<std::thread::JoinHandle<()>>>,
 }
 impl Input {
     fn start(status: &gtk::Label) -> Self {
-        let (commands, requests) = std::sync::mpsc::sync_channel::<(std::time::Instant, Value)>(4);
+        let (commands, requests) = std::sync::mpsc::sync_channel::<(std::time::Instant, u64, Value)>(4);
+        let latest = Arc::new(std::sync::atomic::AtomicU64::new(0));
         let stop = Arc::new(std::sync::atomic::AtomicBool::new(false));
         let stopping = stop.clone();
-        let replies = Arc::new(Mutex::new(None::<String>));
+        let replies = Arc::new(Mutex::new(None::<(u64, String)>));
         let results = replies.clone();
         let worker = std::thread::spawn(move || {
             while !stopping.load(std::sync::atomic::Ordering::Relaxed) {
-                if let Ok((created, value)) = requests.recv_timeout(Duration::from_millis(50)) {
-                    *results.lock().unwrap() = Some(
+                if let Ok((created, sequence, value)) = requests.recv_timeout(Duration::from_millis(50)) {
+                    *results.lock().unwrap() = Some((sequence,
                         if std::time::Instant::now().duration_since(created)
                             > Duration::from_millis(150)
                         {
@@ -31,16 +44,20 @@ impl Input {
                         } else {
                             request(value).err().unwrap_or_default()
                         },
-                    );
+                    ));
                 }
             }
         });
         let weak = status.downgrade();
+        let current = latest.clone();
         glib::timeout_add_local(Duration::from_millis(50), move || {
             let Some(status) = weak.upgrade() else {
                 return glib::ControlFlow::Break;
             };
-            if let Some(value) = replies.lock().unwrap().take() {
+            if let Some((sequence, value)) = replies.lock().unwrap().take() {
+                if sequence != current.load(std::sync::atomic::Ordering::Relaxed) {
+                    return glib::ControlFlow::Continue;
+                }
                 status.set_text(if value.is_empty() {
                     "Keyboard ready"
                 } else {
@@ -50,7 +67,7 @@ impl Input {
             glib::ControlFlow::Continue
         });
         Self {
-            commands,
+            commands: Commands { sender: commands, latest },
             stop,
             worker: Mutex::new(Some(worker)),
         }
@@ -284,11 +301,17 @@ impl Keyboard {
         });
         if let Ok(path) = std::env::var("AGENT_OS_KEYBOARD_CAPTURE") {
             let weak = window.downgrade();
+            let dismissal = close.downgrade();
             glib::timeout_add_local(Duration::from_millis(100), move || {
                 let Some(window) = weak.upgrade() else {
                     return glib::ControlFlow::Break;
                 };
                 if window.is_visible() && system_bar::capture(&window, &path) {
+                    if let Some(bounds) = dismissal.upgrade().and_then(|button| button.compute_bounds(&window)) {
+                        let geometry = json!({"window":[window.width(),window.height()],
+                            "dismissal":[bounds.x(),bounds.y(),bounds.width(),bounds.height()]});
+                        let _ = std::fs::write(PathBuf::from(&path).with_extension("json"), geometry.to_string());
+                    }
                     glib::ControlFlow::Break
                 } else {
                     glib::ControlFlow::Continue
@@ -308,10 +331,7 @@ impl Keyboard {
     pub fn toggle(&self) {
         self.window.set_visible(!self.window.is_visible());
         if self.window.is_visible() {
-            let _ = self.input.commands.try_send((
-                std::time::Instant::now(),
-                json!({"op":"keyboard.restore_focus"}),
-            ));
+            let _ = self.input.commands.send(json!({"op":"keyboard.restore_focus"}));
         }
     }
 }
@@ -322,7 +342,7 @@ fn append_key(
     key: gtk::gdk::Key,
     modifiers: Rc<Cell<u64>>,
     status: gtk::Label,
-    commands: std::sync::mpsc::SyncSender<(std::time::Instant, Value)>,
+    commands: Commands,
     character: Option<char>,
 ) -> gtk::Button {
     let button = ui::button(label, ButtonVariant::Outline, false);
@@ -334,8 +354,8 @@ fn append_key(
         // replace IME input or claim a complete international layout picker.
         let symbol = if character.is_some() {button.label().and_then(|label|label.chars().next()).map(symbol).unwrap_or(key)} else {key};
         let mapping = button.display().map_keyval(symbol).and_then(|keys|keys.into_iter().find(|entry| entry.group()==0 && (0..=1).contains(&entry.level())));
-        let result = if let Some(mapping) = mapping {commands.try_send((std::time::Instant::now(),json!({"op":"keyboard.stroke","keycode":mapping.keycode(),"modifiers":modifiers.get() | if mapping.level()==1 {1} else {0}}))).map_err(|_|"Keyboard busy; try again".to_owned())} else {Err("This key is unavailable in the current layout".into())};
-        status.set_text(result.err().as_deref().unwrap_or("Keyboard ready"));
+        let result = if let Some(mapping) = mapping {commands.send(json!({"op":"keyboard.stroke","keycode":mapping.keycode(),"modifiers":modifiers.get() | if mapping.level()==1 {1} else {0}}))} else {Err("This key is unavailable in the current layout".into())};
+        status.set_text(result.err().as_deref().unwrap_or("Sending input…"));
     });
     row.append(&button);
     button

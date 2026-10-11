@@ -339,6 +339,12 @@ impl Service {
         *self.reader.borrow_mut() = Some((pid, start.to_owned()));
         Ok(())
     }
+    /// Current registration state only; never expose captured keys or history.
+    pub fn status(&self) -> serde_json::Value {
+        let rules = self.rules.borrow();
+        serde_json::json!({"verified":rules.verified,"watching":rules.watch,
+            "grabbing":rules.grab,"insert_registered":rules.modifiers.contains(&0xff63)})
+    }
     pub fn dispatch(&self) {
         let context = glib::MainContext::default();
         for _ in 0..16 {

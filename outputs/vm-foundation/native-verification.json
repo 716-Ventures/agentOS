@@ -2323,7 +2323,7 @@
     }
   },
   "on_screen_keyboard": {
-    "status": "targeted current-source session qualification passes; expanded 68-check installed reproduction pending",
+    "status": "current installed keyboard and reader targeted checks pass; clean-source 68-check reproduction and CI pending",
     "source": {
       "source_archive_sha256": "4ddf1cb7aa0142884d02a4da5d26b3893488fca41a8bc87bbaa9f6ca02d63cd7",
       "revision": "80562c8b4df633f42018c41423d15514b619d985",
@@ -2364,8 +2364,7 @@
       "Ctrl+Alt+Space invokes the existing launcher",
       "on-screen Insert+H reaches Orca; learn-mode grabs isolate typing and Escape exits",
       "rendered successful input status",
-      "always-visible dismissal at text scale 2",
-      "exact owned guest/app exit"
+      "always-visible dismissal at text scale 2"
     ],
     "evidence": {
       "/tmp/agentos-screen-keyboard-current-positive.log": "593e3ddcffdeb49931eb5ebea794974fbd0789eb1616d84b10350296585c313e",
@@ -2378,21 +2377,69 @@
         "runtime_release": "c201bec49806b9f566d2f46866bfe05208c34cd79d255fb4f2775bcf6cbd0646",
         "observation": "The installed pointer journey correctly refused a clipped Backspace at x=1434 on a 1280-wide output. Homogeneous letter rows expanded every key to the widest special-key minimum. Non-homogeneous expanding letter keys and a separately visible header replace this layout.",
         "driver_log_sha256": "1fbb198a9d99fec82fff1698474a075e4836230369fe3b3ac6ec7ab642a40bb0",
-        "owned_resources_closed": true
+        "owned_resources_closed": false,
+        "guest_stopped": true
       },
       {
         "runtime_release": "a98271157ffe20121f8beddabbfb423c3ba4a650d312ce4adbd7bda7f593400b",
         "observation": "The status fixture wrongly searched for status text as its accessible name. Current fixtures inspect the rendered AT-SPI Text interface, as existing status barriers do. Successful private IPC also previously double-unwrapped the transport response and displayed an erroneous unavailable status; that response handling is corrected.",
         "driver_log_sha256": "d0c149235d733221649e5d5ad6da84aa71c7258b2df2a3abb67b2968928ac22c",
-        "owned_resources_closed": true
+        "owned_resources_closed": false,
+        "guest_stopped": true
+      },
+      {
+        "source_revision": "2860f84a6a2455843a9a50e95ed80a6304fcd558",
+        "source_archive_sha256": "6bef0502b623a61b64987d31542170ea9290ab14c28b2a40256d3aaad45bf991",
+        "passed_checks": 40,
+        "failed_check": "native-session-screen-keyboard",
+        "observation": "Orca initialized and announced the native field, but virtual Insert+H did not enter learn mode. The original temporary speech log was not retained. Subsequent fixtures preserve that log, expose current authenticated watch/grab registration, wait for Insert registration and compositor acknowledgment. Six consecutive targeted sessions passed; the original cause is not established.",
+        "report_sha256": "995b21d51f125b137870243857366da15b9307ebc0098be67671cb5176cf087d",
+        "guest_stopped": true,
+        "preexisting_task_owned_app_preserved": true
+      },
+      {
+        "ci_runs": [
+          38133432420,
+          38133939110
+        ],
+        "observation": "AT-SPI reported Hide keyboard at x1153 width131 on a1280 frame although the painted screenshot ended within the output. Subtracting frame origin did not fix it. Clipping is now measured from GTK widget bounds; AT-SPI center and the installed kernel pointer journey remain separate reachability checks.",
+        "bounds_fix_pending_ci": true
       }
     ],
     "boundaries": [
-      "current installed kernel-pointer/modifier isolation and complete 68-check reproduction still pending",
+      "complete clean-source 68-check reproduction and CI pending",
       "compact ASCII/navigation palette; no complete international layout picker",
       "large text uses scrolling; header and dismissal remain visible",
       "physical input, multi-output placement and audible speech remain unqualified",
       "signed v11 distribution retains its earlier runtime identity"
-    ]
+    ],
+    "cleanup_correction": {
+      "detail": "Temporary drivers called vm.status before recording app ownership. This launched UTM and later drivers incorrectly claimed app exit. Those claims are withdrawn; guest shutdown remains valid. After both registered guests were verified stopped, exact task-owned PID 27281 with start Sun Oct 11 06:18:55 2026 was closed and its exit verified. Temporary drivers now capture identity before any controller/status call. Production reproduce.py already used the correct order.",
+      "exact_owned_application_closed": true
+    },
+    "repeated_reader_sessions": {
+      "passed": 6,
+      "log_sha256": "0680fe63b443d6d8242bc95066b94f40e32f4b5317bb845d0ae655e2efe1277c",
+      "boundary": "Before final acknowledgment sequence filtering; final installed validation pending",
+      "guest_stopped": true,
+      "owned_utm_app_closed": true
+    },
+    "installed_current": {
+      "runtime_release": "212c0bb724b9696bf36024bc7462ee03b1f380194cf8708fdab65296c2e70742",
+      "source_archive_sha256": "25f16576d3d3e8dba4cee165cb0af05a234866375b6c19a872a1740c3750c7ec",
+      "compositor_tests": 49,
+      "native_tests": 32,
+      "native_ignored": 7,
+      "checks": [
+        "dark keyboard session",
+        "light scale2 keyboard and independent outage controls",
+        "session-owned reader Insert+H learn mode, isolated input, Escape",
+        "installed kernel shortcut/pointer typing, Shift/Backspace, held physical Shift denial, exact seat focus/workspace restoration",
+        "existing direct Unicode clipboard, drag/drop, workspace controls and VT resume"
+      ],
+      "log_sha256": "2bc0b2e623bcaafb19e964ef9b13f868471e5fe0ae9c0547028a36e78105cab8",
+      "guest_stopped": true,
+      "owned_utm_app_closed": true
+    }
   }
 }

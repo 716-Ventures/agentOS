@@ -61,6 +61,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
         env['AGENT_OS_SYSTEM_BAR_CAPTURE']=str(OUTPUT/f'system-bar-{appearance}-{scale:g}.png')
         env['AGENT_OS_LAUNCHER_CAPTURE']=str(OUTPUT/f'launcher-{appearance}-{scale:g}.png')
     if screen_keyboard:
+        (OUTPUT/'screen-keyboard.json').unlink(missing_ok=True)
         env['AGENT_OS_KEYBOARD_CAPTURE']=str(OUTPUT/'screen-keyboard.png')
         env['AGENT_OS_NATIVE_IME_FIXTURE']='1'
     screen_reader='--screen-reader' in sys.argv
@@ -125,10 +126,17 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 assert shown['seat_focus']==original,shown
                 close=accessibility.find('Hide keyboard',pyatspi.ROLE_PUSH_BUTTON).queryComponent().getExtents(pyatspi.WINDOW_COORDS)
                 frame=accessibility.find('On-screen keyboard',pyatspi.ROLE_FRAME).queryComponent().getExtents(pyatspi.WINDOW_COORDS)
-                # GTK 4.14 includes its native frame origin in WINDOW extents.
-                # Compare within that frame, rather than with the Wayland origin.
+                # Compare accessibility coordinates within the native frame.
                 assert frame.width==keyboard['geometry']['width'],(frame,keyboard)
-                assert 0<=close.x-frame.x and close.x-frame.x+close.width<=frame.width,('Hide keyboard clipped',close,frame,keyboard)
+                # CI reports padded AT-SPI extents beyond the painted button.
+                # Use native widget bounds for clipping and AT-SPI's centre for
+                # pointer reachability (also exercised by the kernel journey).
+                geometry_path=OUTPUT/'screen-keyboard.json'
+                geometry=wait_for(lambda:json.loads(geometry_path.read_text()) if geometry_path.exists() else None,[core,session])
+                x,y,w,h=geometry['dismissal'];width,height=geometry['window']
+                assert width==frame.width and height==frame.height,geometry
+                assert 0<=x and x+w<=width and 0<=y and y+h<=height,geometry
+                assert 0<=close.x-frame.x+close.width/2<frame.width,(close,frame)
                 assert 0<=close.y-frame.y and close.y-frame.y+close.height<=frame.height,('Hide keyboard clipped vertically',close,frame,keyboard)
                 assert keyboard['work_area']['height'] < bar['work_area']['height'],keyboard
                 assert keyboard['geometry']['y']+keyboard['geometry']['height']==output['y']+output['height'],keyboard
@@ -182,10 +190,15 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 if screen_keyboard:
                     accessibility.activate(accessibility.find('Keyboard',pyatspi.ROLE_PUSH_BUTTON))
                     wait_for(lambda:any(layer['namespace']=='agentos-keyboard' and layer['mapped'] for layer in call(control,{'op':'snapshot'})['system_layers']),[core,session])
+                    wait_for(lambda:(lambda r:r and r['verified'] and r['watching'] and r['insert_registered'])(call(control,{'op':'snapshot'})['reader']),[core,session])
                     baseline=len(reader_log.read_text())
                     accessibility.activate(accessibility.find('Insert',pyatspi.ROLE_PUSH_BUTTON))
                     accessibility.activate(accessibility.find('h',pyatspi.ROLE_PUSH_BUTTON))
-                    wait_for(lambda:'Entering learn mode.' in reader_log.read_text()[baseline:],[core,session])
+                    wait_for(lambda:ime_accessibility.rendered_text('Keyboard ready'),[core,session])
+                    try:wait_for(lambda:'Entering learn mode.' in reader_log.read_text()[baseline:],[core,session])
+                    except AssertionError:
+                        print('Keyboard reader failure:',json.dumps({'field':accessibility.text(field),'scene':call(control,{'op':'snapshot'}),'speech':reader_log.read_text()[baseline:],'input_expired':ime_accessibility.rendered_text('Input expired; try again')}),flush=True)
+                        raise
                     accessibility.activate(accessibility.find('Insert on',pyatspi.ROLE_PUSH_BUTTON))
                     accessibility.activate(accessibility.find('a',pyatspi.ROLE_PUSH_BUTTON))
                     time.sleep(.2)
@@ -332,6 +345,9 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 assert (OUTPUT/'session-ime-failure.log').read_text().count('Input method unavailable:')==1,'Helper failure must be reported exactly once'
             print('PASS: '+('abrupt compositor loss' if compositor_failure else 'display-host loss' if host_failure else 'normal session')+' maps authenticated surfaces and reaps display host, compositor and renderer')
         finally:
+            if screen_reader and 'pidfile' in locals():
+                speech_log=pidfile.parent/'orca-speech.log'
+                if speech_log.exists():(OUTPUT/'session-orca-speech.log').write_bytes(speech_log.read_bytes())
             if session:reap(session)
             for pid in owned:
                 try:
