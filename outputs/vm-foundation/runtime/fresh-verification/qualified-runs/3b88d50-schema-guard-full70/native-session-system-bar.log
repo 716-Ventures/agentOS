@@ -1,0 +1,11 @@
+dbus-daemon[13795]: [session uid=1000 pid=13795 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=13814 comm="/tmp/agentos-session-test-a_42_m24/bin/agent-os-de")
+dbus-daemon[13795]: [session uid=1000 pid=13795 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[13838]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=13814 comm="/tmp/agentos-session-test-a_42_m24/bin/agent-os-de")
+dbus-daemon[13838]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: background workspace focus reconciliation preserves active launcher typing
+PASS: private system bar reserves work area; launcher opens, closes and retains drafts without workspace tiles
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: core outage is visible; independent launcher and retained draft remain reachable without model work
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer

@@ -1,0 +1,10 @@
+dbus-daemon[18390]: [session uid=1000 pid=18390 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.3' (uid=1000 pid=18424 comm="/tmp/agentos-session-test-su9s9hes/bin/agent-os-de")
+dbus-daemon[18390]: [session uid=1000 pid=18390 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[18449]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=18424 comm="/tmp/agentos-session-test-su9s9hes/bin/agent-os-de")
+dbus-daemon[18449]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+dbus-daemon[18390]: [session uid=1000 pid=18390 pidfd=5] Activating service name='ca.desrt.dconf' requested by ':1.4' (uid=1000 pid=18441 comm="/usr/libexec/at-spi-bus-launcher")
+dbus-daemon[18390]: [session uid=1000 pid=18390 pidfd=5] Successfully activated service 'ca.desrt.dconf'
+PASS: session-owned Orca initializes speech and announces the focused native field
+PASS: owned reader and speech processes reaped after compositor failure
+PASS: abrupt compositor loss maps authenticated surfaces and reaps display host, compositor and renderer

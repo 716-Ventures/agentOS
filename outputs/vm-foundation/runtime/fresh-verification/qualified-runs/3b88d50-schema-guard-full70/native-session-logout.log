@@ -1,0 +1,8 @@
+dbus-daemon[13057]: [session uid=1000 pid=13057 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=13076 comm="/tmp/agentos-session-test-o811s34q/bin/agent-os-de")
+dbus-daemon[13057]: [session uid=1000 pid=13057 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[13102]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=13076 comm="/tmp/agentos-session-test-o811s34q/bin/agent-os-de")
+dbus-daemon[13102]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
