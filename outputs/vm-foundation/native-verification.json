@@ -976,6 +976,34 @@
       "trusted_helper_sha256": "da4fbf84204036c7387bc4fcbb0e8be260ea7075db439e3951f5c3463cc5c66c",
       "targeted_log_sha256": "2dc4045b319bac23d93620de9a7443a8d714a521f0f960aa7d26b41cd3f29ccf",
       "boundary": "Private protocol fixture, not an actual language engine. Physical IME input, candidate behavior and visual preedit quality remain unqualified."
+    },
+    "wayland_presentation_feedback": {
+      "runtime_release": "299a1922b46103aca5d6494894a5f104455b2ae2f130e599f0ba0eb616f58c8f",
+      "measurement": {
+        "meaning": "Synthetic Wayland client kernel-event to virtual KMS presentation receipt; not native GTK or physical display latency",
+        "samples": 20,
+        "p50_ms": 30,
+        "p95_ms": 33,
+        "max_ms": 33,
+        "clock": "CLOCK_MONOTONIC",
+        "timestamp_quantization_ms": 1,
+        "target_ms": 50,
+        "target_met": true
+      },
+      "qualified": [
+        "Presentation global only in direct scanout mode",
+        "Unbuffered and superseded commit handling",
+        "Feedback from completed virtual DRM page flips, with monotonic clock and refresh",
+        "20 actual kernel key-triggered content updates in a private Wayland client",
+        "Unmap removes shared publication",
+        "Existing installed editor/arrangement and VTE menu/clipboard/interrupt journeys"
+      ],
+      "boundary": "The synthetic client measurement does not qualify native GTK feedback, physical display latency or inference load. Top-level complete reproduction retains its previous runtime identity.",
+      "baseline": "Prior installed runtime failed with Presentation protocol unavailable",
+      "baseline_log_sha256": "19bbc70552613867b08e5bef9438bc321ae587be7aae2f1b4a49c6182878216d",
+      "target_log_sha256": "a5c455df47db9315fc8dee8de5b25eb338b5012310d6c666413b9a09f5ad53a6",
+      "direct_backend_sha256": "94cfb2dd4867af9d830f159d880080b9d2cf6eb7282249c5b1985e37d2687fcf",
+      "collector_sha256": "847cfb831aa9982543abf8841d240f2d3c64fc191795fa2564d582b2cc23305a"
     }
   },
   "observations": [

@@ -7,7 +7,7 @@ use smithay::{
             gbm::{GbmAllocator, GbmBufferFlags, GbmDevice},
             Fourcc,
         },
-        drm::{DrmDevice, DrmDeviceFd, DrmEvent, GbmBufferedSurface},
+        drm::{DrmDevice, DrmDeviceFd, DrmEvent, DrmEventTime, GbmBufferedSurface},
         egl::{EGLContext, EGLDisplay},
         libinput::{LibinputInputBackend, LibinputSessionInterface},
         renderer::{
@@ -35,7 +35,7 @@ use smithay::{
         rustix::fs::OFlags,
         wayland_server::backend::GlobalId,
     },
-    utils::{DeviceFd, Transform},
+    utils::{Clock, DeviceFd, Monotonic, Transform},
     wayland::compositor::with_states,
 };
 use std::{
@@ -45,7 +45,9 @@ use std::{
     rc::Rc,
     time::Duration,
 };
-type Scanout = GbmBufferedSurface<GbmAllocator<DrmDeviceFd>, ()>;
+type Scanout = GbmBufferedSurface<
+    GbmAllocator<DrmDeviceFd>, smithay::desktop::utils::OutputPresentationFeedback,
+>;
 smithay::render_elements! {
     Cursor<R> where R: ImportAll + ImportMem;
     Surface=WaylandSurfaceRenderElement<R>,
@@ -67,6 +69,7 @@ struct Device {
     cursor: MemoryRenderBuffer,
     retry_at: std::time::Instant,
     config: crate::output_config::Config,
+    clock: Clock<Monotonic>,
 }
 impl Device {
     fn disconnect(&mut self, data: &mut CalloopData) {
@@ -260,9 +263,12 @@ impl Device {
                     &mut head.damage,
                     [0.1, 0.1, 0.1, 1.0],
                 )?;
+                let feedback = crate::presentation_feedback::collect(
+                    &data.state, &head.output, &result.states,
+                );
                 let sync = result.sync;
                 drop(target);
-                head.scanout.queue_buffer(Some(sync), None, ())?;
+                head.scanout.queue_buffer(Some(sync), None, feedback)?;
                 head.pending = true;
                 if icon_rendered {
                     data.state.drag_icon_render_submissions =
@@ -347,6 +353,7 @@ pub fn init(
     let display = unsafe { EGLDisplay::new(gbm.clone())? };
     let context = EGLContext::new(&display)?;
     let renderer = unsafe { GlesRenderer::new(context)? };
+    let clock = Clock::<Monotonic>::new();
     let device = Rc::new(RefCell::new(Device {
         drm,
         gbm,
@@ -356,12 +363,18 @@ pub fn init(
         cursor: cursor(),
         retry_at: std::time::Instant::now(),
         config,
+        clock,
     }));
     device.borrow_mut().scan(data)?;
     data.state.direct_active = Some(device.borrow().active);
     if device.borrow().heads.is_empty() {
         return Err("No usable connected DRM output".into());
     }
+    // Only direct scanout advertises receipts: nested submit is not a
+    // presentation acknowledgment from the outer compositor.
+    data.state.presentation_state = Some(smithay::wayland::presentation::PresentationState::new::<Smallvil>(
+        &data.display_handle, device.borrow().clock.id() as u32,
+    ));
     let mut input =
         Libinput::new_with_udev::<LibinputSessionInterface<LibSeatSession>>(session.clone().into());
     input
@@ -417,18 +430,34 @@ pub fn init(
     let frames = device.clone();
     event_loop
         .handle()
-        .insert_source(drm_events, move |event, _, data| {
+        .insert_source(drm_events, move |event, metadata, data| {
             let mut device = frames.borrow_mut();
             match event {
                 DrmEvent::VBlank(crtc) => {
+                    use smithay::reexports::wayland_protocols::wp::presentation_time::server::wp_presentation_feedback::Kind;
+                    let (time, flags) = match metadata.as_ref().map(|m| m.time) {
+                        Some(DrmEventTime::Monotonic(time)) if !time.is_zero() =>
+                            (time.into(), Kind::Vsync | Kind::HwClock | Kind::HwCompletion),
+                        _ => (device.clock.now(), Kind::Vsync),
+                    };
+                    let sequence = metadata.as_ref().map(|m| u64::from(m.sequence)).unwrap_or(0);
                     if let Some(head) = device.heads.get_mut(&crtc) {
                         if !head.pending {
                             return;
                         }
                         match head.scanout.frame_submitted() {
-                            Ok(_) => {
+                            Ok(feedback) => {
+                                if let Some(mut feedback) = feedback {
+                                    let refresh = head.output.current_mode()
+                                        .filter(|mode| mode.refresh > 0)
+                                        .map(|mode| smithay::wayland::presentation::Refresh::fixed(
+                                            Duration::from_secs_f64(1000.0 / f64::from(mode.refresh)),
+                                        ))
+                                        .unwrap_or(smithay::wayland::presentation::Refresh::Unknown);
+                                    feedback.presented(time, refresh, sequence, flags);
+                                }
                                 data.state.direct_frames_presented =
-                                    data.state.direct_frames_presented.saturating_add(1)
+                                    data.state.direct_frames_presented.saturating_add(1);
                             }
                             Err(error) => eprintln!("Scanout completion failed: {error}"),
                         }

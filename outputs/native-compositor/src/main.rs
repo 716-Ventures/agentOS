@@ -14,6 +14,8 @@ mod timings;
 
 #[cfg(feature = "direct-display")]
 mod direct;
+#[cfg(feature = "direct-display")]
+mod presentation_feedback;
 mod grabs;
 mod input;
 mod input_revision;

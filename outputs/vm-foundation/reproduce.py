@@ -41,6 +41,7 @@ def graphical_checks():
     checks.append(('direct-display-input-vt','sudo -n python3 tests/direct_display_guest.py --input',120))
     checks.append(('direct-display-terminal','sudo -n python3 tests/direct_display_guest.py --terminal-input',150))
     checks.append(('direct-display-terminal-ime','sudo -n python3 tests/direct_display_guest.py --terminal-ime',150))
+    checks.append(('direct-display-presentation','sudo -n python3 tests/direct_display_guest.py --presentation-feedback',150))
     checks.append(('conventional-browser-links','dbus-run-session -- python3 native-shell/tests/browser_links.py',180))
     checks.append(('signed-graphical-release','python3 tests/graphical_release.py',300))
     return checks

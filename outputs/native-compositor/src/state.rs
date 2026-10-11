@@ -55,6 +55,7 @@ pub struct Smallvil {
     pub direct_frames_presented: u64,
     pub direct_active: Option<bool>,
     pub direct_resume_error: Option<String>,
+    pub presentation_state: Option<smithay::wayland::presentation::PresentationState>,
     #[cfg(feature = "direct-display")]
     pub direct_session: Option<smithay::backend::session::libseat::LibSeatSession>,
     pub seat: Seat<Self>,
@@ -128,6 +129,7 @@ impl Smallvil {
             direct_frames_presented: 0,
             direct_active: None,
             direct_resume_error: None,
+            presentation_state: None,
             #[cfg(feature = "direct-display")]
             direct_session: None,
             seat,
@@ -588,3 +590,5 @@ fn peer_identity(stream: &std::os::unix::net::UnixStream) -> Option<(u32, String
     let start = stat.rsplit_once(')')?.1.split_whitespace().nth(19)?;
     Some((credential.uid, format!("{}:{start}", credential.pid)))
 }
+
+smithay::delegate_presentation!(Smallvil);

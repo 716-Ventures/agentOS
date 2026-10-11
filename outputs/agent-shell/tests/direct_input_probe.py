@@ -225,7 +225,7 @@ def assistive():
         print(json.dumps(response),flush=True)
 
 
-def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False):
+def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False,presentation_feedback=False):
     subprocess.run(['modprobe','uinput'],check=True)
     # Join only this test session's accessibility bus; never inspect other users.
     bus=None;observer_runtime=None;wayland=None;deadline=time.monotonic()+10
@@ -286,6 +286,10 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
             except OSError:pass
         time.sleep(.5) # bounded kernel/udev/libinput hotplug discovery
         width,height=output['width'],output['height']
+        if presentation_feedback:
+            import direct_presentation_probe
+            direct_presentation_probe.verify(env,metrics,core,scene,login_user,presentation,keyboard)
+            return
         if terminal_input:
             if terminal_ime:
                 import direct_terminal_probe
