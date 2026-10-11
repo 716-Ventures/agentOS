@@ -2784,7 +2784,9 @@
       "evidence": "qualified-runs/keyboard-save-diagnostics/verification.json",
       "five_repeats_passed": true,
       "diagnostics_added": true,
-      "cause": "unresolved; subsequent complete CI and Debian runs passing do not establish a fix"
+      "cause": "unresolved; subsequent complete CI and Debian runs passing do not establish a fix",
+      "second_failed_ci_run": 38153193074,
+      "second_failure_observation": "Unicode local/durable draft intact and visible, committed document still prior value; fixture render barrier under investigation"
     },
     "pre_schema_guard_complete_70": {
       "runtime_release": "ebc8f4be3fc669080c2a9a14481ceab4fbc4288afb78d4f9659b6d6df0039209",
@@ -2951,6 +2953,13 @@
       "supported_properties_values_bindings_slots_and_events": "checked before stopping services and after writers stop",
       "legacy_plain_button_compatibility": "pass",
       "self_contained_recovery": "pass"
+    },
+    "signed_v14_image": {
+      "candidate": "candidate-v14",
+      "image_sha256": "bca15fc2e32c6461088d8a0c8686dfb37f8333c29b44cb63134624eb7f719463",
+      "runtime_release": "99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf",
+      "record": "image-verification.json",
+      "fresh_account_and_offline_qualification": "pass"
     }
   },
   "observations": [
@@ -2971,7 +2980,8 @@
     "Signed candidate-v13 passes fresh account/password sudo, compatible signed update/rollback, first-run kernel keyboard/zoom, collections/VTE/IME, presentation, browser, speech/reader, reboot, loopback-only cold boot and activation recovery at exact full70 runtime 30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42. Original disk/EFI inodes and config bytes restored; test authority/password file removed; owned guest/app stopped. Failed v12 and historical unresolved observations remain separate.",
     "Clean source c550d0e passes all 70 runtime checks with 716 UI alpha.35 at 5ce4bab4c7d1931d2ab2c9ab068cb21baecf01397d1414a69a47231ded1a12c2. Editor presentation p95 is 43 ms idle, 42 ms loaded and 44 ms rotated. Launch-boundary UTM ownership and exact guest/app exit pass; private CI 38147114470 and public CI 38146772296 are green. The earlier browser-default pollution failure and baseline restoration are retained. The signed v13 image keeps its separate alpha.32 identity; historical rare focus/geometry observations remain unresolved.",
     "Clean source f53d0b9 passes all 70 runtime checks with typed 716 UI alpha.36 buttons and nested dependency notices at ebc8f4be3fc669080c2a9a14481ceab4fbc4288afb78d4f9659b6d6df0039209. Editor presentation p95 is 41 ms idle, 40 ms loaded and 44 ms rotated. Reboot, repeat install and exact owned guest/app exit pass; private CI 38150499965 and public CI 38149743897 are green. The signed v13 image retains its separate alpha.32 identity pending a new image qualification. The earlier intermittent Ubuntu accessible Save failure remains unexplained with bounded diagnostics retained; passing repeats do not establish a fix. Historical rare PRIMARY-focus and collection geometry observations remain unresolved.",
-    "Clean source 3b88d50 passes all 70 runtime checks with typed 716 UI alpha.36 buttons, nested dependency notices and saved-property rollback guards at 99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf. Editor presentation p95 is 45 ms idle, 42 ms loaded and 38 ms rotated. Reboot, repeat install and exact owned guest/app exit pass; private CI 38152277278 and public CI 38149743897 are green. The signed v13 image retains its separate alpha.32 identity pending a new image qualification. The earlier intermittent Ubuntu accessible Save failure remains unexplained with bounded diagnostics retained; passing repeats do not establish a fix. Historical rare PRIMARY-focus and collection geometry observations remain unresolved."
+    "Clean source 3b88d50 passes all 70 runtime checks with typed 716 UI alpha.36 buttons, nested dependency notices and saved-property rollback guards at 99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf. Editor presentation p95 is 45 ms idle, 42 ms loaded and 38 ms rotated. Reboot, repeat install and exact owned guest/app exit pass; private CI 38152277278 and public CI 38149743897 are green. The signed v13 image retains its separate alpha.32 identity pending a new image qualification. The earlier intermittent Ubuntu accessible Save failure remains unexplained with bounded diagnostics retained; passing repeats do not establish a fix. Historical rare PRIMARY-focus and collection geometry observations remain unresolved.",
+    "Signed candidate-v14 passes fresh account/password sudo, compatible signed update/rollback, installed keyboard/zoom, collections, VTE/IME, typed button accessibility, reader, browser, reboot, loopback-only cold boot and activation recovery at exact full70 runtime 99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf (image SHA-256 bca15fc2e32c6461088d8a0c8686dfb37f8333c29b44cb63134624eb7f719463). Original disk/EFI inode identities and config bytes restored; test SSH/sudo authority and password file removed; owned guest/app stopped and unbooted signature reverified. The prior v13 image and unresolved historical observations remain distinct."
   ],
   "owned_utm_app_closed": true,
   "full_run_evidence": {
@@ -3782,7 +3792,8 @@
     "public_ci_run": 38149743897,
     "public_ci_result": "success",
     "declarative_button_metadata": "typed variant, size, Plus/ArrowRight icon and leading/trailing/only positioning; host action authority retained",
-    "signed_v13_image_ui": "v0.1.0-alpha.32"
+    "signed_v13_image_ui": "v0.1.0-alpha.32",
+    "signed_v14_image_ui": "v0.1.0-alpha.36"
   },
   "utm_application_ownership": {
     "status": "launch-boundary identity guard verified by isolated tests, real launch/exit probe and full reproduction",
