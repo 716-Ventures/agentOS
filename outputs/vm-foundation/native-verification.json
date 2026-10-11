@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-10-11T01:39:55.076792+00:00",
+  "started_at": "2026-10-11T02:15:02.924028+00:00",
   "result": "pass",
   "vm_uuid": "27176EA2-E994-4165-9BBA-70FEED59E66B",
   "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -46,6 +46,8 @@
     "direct-display-input-vt",
     "direct-display-terminal",
     "direct-display-terminal-ime",
+    "direct-native-feedback",
+    "direct-display-presentation",
     "conventional-browser-links",
     "signed-graphical-release",
     "terminal",
@@ -65,22 +67,25 @@
     "physical graphical input",
     "physical hardware",
     "OS update rollback",
-    "physical VTE IME, language-engine/candidate behavior and visual preedit quality"
+    "physical VTE IME, language-engine/candidate behavior and visual preedit quality",
+    "native control latency outside the measured editor profile; physical display and live inference-load latency"
   ],
   "deployment": {
-    "created_at": "2026-10-11T01:40:08.487056+00:00",
-    "source_archive_sha256": "494f0d42f4f1899199d4e4fba74ba45156ded9f4ab4ea9e54e548421ddfffd00",
-    "repository_revision": "60e9c0d3620c33765e22d2a8667c2af600b5ba4e",
+    "created_at": "2026-10-11T02:15:16.372170+00:00",
+    "source_archive_sha256": "81b593b1a98dbb50affd8280c16dbd34231716f8895d9b1964554812885a3bd3",
+    "repository_revision": "414d6b33d7a169281477d02b13d49781c1b2627d",
     "source_changes": [
       " M outputs/agent-shell/tests/direct_display_guest.py",
       " M outputs/agent-shell/tests/direct_input_probe.py",
-      "A  outputs/agent-shell/tests/direct_terminal_ime.py",
-      " M outputs/agent-shell/tests/direct_terminal_probe.py",
-      " M outputs/native-shell/README.md"
+      " M outputs/native-shell/Cargo.lock",
+      " M outputs/native-shell/Cargo.toml",
+      " M outputs/native-shell/README.md",
+      "AM outputs/native-shell/src/feedback_metrics.rs",
+      " M outputs/native-shell/src/main.rs"
     ],
     "installed": true
   },
-  "runtime_release": "59b2c1cf7303bd87a066aa0435bb952908d3fe9b92bec256af4547db7867493c",
+  "runtime_release": "93c98fed9a787850e2b8862057261c127bd37e51639abe9df9f78353e6fc869d",
   "dependency_manifest": {
     "packages": {
       "adduser": "3.152",
@@ -870,7 +875,7 @@
     "python": "Python 3.9.6"
   },
   "guest_stopped": true,
-  "finished_at": "2026-10-11T01:44:42.166616+00:00",
+  "finished_at": "2026-10-11T02:21:00.876657+00:00",
   "public_ui_release": {
     "tag": "v0.1.0-alpha.25",
     "revision": "7b7bac9c252e759fafb4f6c1d50af5ef056d0677",
@@ -1004,6 +1009,37 @@
       "target_log_sha256": "a5c455df47db9315fc8dee8de5b25eb338b5012310d6c666413b9a09f5ad53a6",
       "direct_backend_sha256": "94cfb2dd4867af9d830f159d880080b9d2cf6eb7282249c5b1985e37d2687fcf",
       "collector_sha256": "847cfb831aa9982543abf8841d240f2d3c64fc191795fa2564d582b2cc23305a"
+    },
+    "native_gtk_presentation_feedback": {
+      "runtime_release": "93c98fed9a787850e2b8862057261c127bd37e51639abe9df9f78353e6fc869d",
+      "measurement": {
+        "clock_id": 1,
+        "discarded": 0,
+        "format": 1,
+        "invalid": 0,
+        "max_ms": 48,
+        "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+        "p50_ms": 36,
+        "p95_ms": 48,
+        "pending": 0,
+        "presented": 20,
+        "requested": 20,
+        "sample_limit": 256
+      },
+      "qualified": [
+        "Actual installed GTK editor root surface, not a synthetic Wayland drawing client",
+        "Twenty sequential kernel/libinput/Wayland character presses, each acknowledged through AT-SPI text and wp_presentation before the next press",
+        "Actual completed virtual KMS presentation, not GDK frame-clock estimates",
+        "No discarded, invalid or pending measurements; p95 within the selected 50ms VM target",
+        "Existing editor, arrangement, transfer, VTE clipboard/menu/IME, VT and lifecycle journeys pass in the full reproduction"
+      ],
+      "collector_sha256": "03ca158ae7254431d6e5d632bcd099136f9a80712142cb5796303a1fc6db8739",
+      "probe_sha256": "0d56d50fcfa651c7b4dc5aa22470ae0fed486e8494204c900be893b6b6256e40",
+      "baseline_log_sha256": "5e3eceeeae3550f67cab15076a031cf5d9adeda13e4ccdb0ab58112df6baa60b",
+      "targeted_log_sha256": "654add5b529532736165de1b254979b802250e408df5a71fcfa1fef88164c2b6",
+      "full_reproduction_log_sha256": "f4ac5d3e7f693dd051c1305ec6ed0fc108f58122de852f0bba7515c8959e348d",
+      "display_log_sha256": "516180f583f9a53648ae54c8259b2dc8d4491a9a37fb2587820ab3298d1d5e0c",
+      "boundary": "Opt-in diagnostics with at most 256 key-triggered requests per window. No key codes, text or document identity recorded. Event millisecond quantization contributes less than 1ms. This native editor/UTM profile does not qualify every control, physical display, subjective responsiveness or live inference load."
     }
   },
   "observations": [

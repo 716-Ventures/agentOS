@@ -6,6 +6,7 @@ mod controls;
 mod document_dialog;
 mod draft_cache;
 mod draft_dialog;
+mod feedback_metrics;
 mod first_run;
 mod image_controls;
 mod job_list;
@@ -796,7 +797,11 @@ impl Surface {
         });
         let identity = format!("agentos.surface.{id}");
         let (registered, commands) = (id.to_string(), commands.clone());
+        let metrics_installed = Cell::new(false);
         window.connect_map(move |window| {
+            if !metrics_installed.replace(true) {
+                feedback_metrics::install(window);
+            }
             if let Some(surface) = window
                 .surface()
                 .and_then(|s| s.downcast::<gdk4_wayland::WaylandToplevel>().ok())

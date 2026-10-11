@@ -225,7 +225,7 @@ def assistive():
         print(json.dumps(response),flush=True)
 
 
-def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False,presentation_feedback=False):
+def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False,presentation_feedback=False,native_feedback=False):
     subprocess.run(['modprobe','uinput'],check=True)
     # Join only this test session's accessibility bus; never inspect other users.
     bus=None;observer_runtime=None;wayland=None;deadline=time.monotonic()+10
@@ -334,6 +334,23 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
         except RuntimeError:
             print('Initial kernel focus observation:',json.dumps({'before':initial,'after':snapshot(),'scene':scene()}),flush=True)
             raise
+        if native_feedback:
+            def receipt():
+                reports=[json.loads(p.read_text()) for p in metrics.glob('feedback-*.json')]
+                return next((r for r in reports if r['requested']),None)
+            for index in range(20):
+                keyboard.chord(30)
+                wait(lambda value:value['text']=='a'*(index+1))
+                deadline=time.monotonic()+5
+                while True:
+                    report=receipt()
+                    if report and report['presented']==index+1:break
+                    if time.monotonic()>deadline:raise RuntimeError('Native GTK presentation receipt missing: '+repr(report))
+                    time.sleep(.01)
+                assert report['requested']==index+1 and report['discarded']==0 and report['invalid']==0 and report['pending']==0,report
+            assert report['p95_ms']<=50,report
+            print('PASS: native GTK editor kernel input-to-presentation '+json.dumps(report),flush=True)
+            return
         for key in (30,34,18,49,20,24,31):keyboard.chord(key) # agentos
         wait(lambda value:value['text']=='agentos')
         # Include the separator in the copied span. GTK coalesces adjacent single-word inserts.
