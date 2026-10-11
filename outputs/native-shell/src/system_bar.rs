@@ -101,6 +101,7 @@ pub struct LauncherEvents {
     pub sequence: Arc<AtomicU64>,
     pub keyboard_sequence: Arc<AtomicU64>,
     zoom: Arc<AtomicU64>,
+    keyboard_height: Arc<AtomicU64>,
     stop: Arc<AtomicBool>,
     worker: Option<std::thread::JoinHandle<()>>,
 }
@@ -111,6 +112,8 @@ impl LauncherEvents {
         let keyboard_events = keyboard_sequence.clone();
         let zoom=Arc::new(AtomicU64::new(1.0f64.to_bits()));
         let zoom_events=zoom.clone();
+        let keyboard_height=Arc::new(AtomicU64::new(0));
+        let height_events=keyboard_height.clone();
         let stop = Arc::new(AtomicBool::new(false));
         let (events, stopping) = (sequence.clone(), stop.clone());
         let path = std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET").map(PathBuf::from);
@@ -125,6 +128,7 @@ impl LauncherEvents {
                         Duration::from_millis(300),
                     ) {
                         if let Some(factor)=value["display_zoom"].as_f64().filter(|factor| factor.is_finite() && (1.0..=2.0).contains(factor)) {zoom_events.store(factor.to_bits(),Ordering::Relaxed);}
+                        height_events.store(value["keyboard_output_height"].as_u64().unwrap_or(0), Ordering::Relaxed);
                         if let Some(current) = value["keyboard_sequence"].as_u64() {
                             if prior_keyboard.is_some_and(|old| current > old) {
                                 keyboard_events.fetch_add(1, Ordering::Relaxed);
@@ -146,10 +150,12 @@ impl LauncherEvents {
             sequence,
             keyboard_sequence,
             zoom,
+            keyboard_height,
             stop,
             worker,
         }
     }
+    pub fn keyboard_output_height(&self) -> i32 {self.keyboard_height.load(Ordering::Relaxed).min(i32::MAX as u64) as i32}
     pub fn zoom(&self) -> f64 {f64::from_bits(self.zoom.load(Ordering::Relaxed))}
     pub fn current(&self) -> u64 {
         self.sequence.load(Ordering::Relaxed)

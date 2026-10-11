@@ -37,6 +37,9 @@ def main():
     modes.add_argument('--presentation-feedback',action='store_true',help='Verify real Wayland feedback from completed virtual KMS frames')
     modes.add_argument('--native-feedback',action='store_true',help='Measure kernel typing to actual native GTK presentation receipts')
     modes.add_argument('--native-feedback-load',action='store_true',help='Measure native feedback during two bounded real broker CPU jobs')
+    parser.add_argument("--bin-dir", type=Path, help="Use explicitly selected qualification binaries")
+    parser.add_argument("--keyboard-geometry", type=Path, help="Write read-only native keyboard geometry diagnostics")
+    parser.add_argument("--fresh-profile", action="store_true", help="Exercise a private first-run desktop with default preferences")
     args = parser.parse_args()
     if args.focus_transfers > 1:args.input=True
     collection_kind = "List@1" if args.list_input else "KeyValue@1" if args.keyvalue_input else "Table@1" if args.table_input else None
@@ -84,9 +87,19 @@ def main():
                 os.chown(path,user.pw_uid,user.pw_gid)
 
         reader_config=None
+        if args.fresh_profile and not args.screen_reader_input:
+            reader_config=metrics/"fresh-home";reader_config.mkdir()
+            os.chown(reader_config,user.pw_uid,user.pw_gid)
         if args.screen_reader_input:
             reader_config=metrics/'reader-home';speech=reader_config/'.config/speech-dispatcher';speech.mkdir(parents=True)
             (speech/'speechd.conf').write_text('AddModule "espeak-ng" "sd_espeak-ng" "/etc/speech-dispatcher/modules/espeak-ng.conf"\nDefaultModule espeak-ng\nAudioOutputMethod "alsa"\nAudioALSADevice "null"\n')
+            for path in [reader_config,*reader_config.rglob('*')]:os.chown(path,user.pw_uid,user.pw_gid)
+
+        if reader_config and output_config:
+            configured=reader_config/'.config/agentos'
+            configured.mkdir(parents=True,exist_ok=True)
+            preference=configured/'outputs.json'
+            preference.write_bytes((output_config/'agentos/outputs.json').read_bytes())
             for path in [reader_config,*reader_config.rglob('*')]:os.chown(path,user.pw_uid,user.pw_gid)
 
         def control(path, op):
@@ -125,10 +138,13 @@ def main():
                     '--setenv=LIBSEAT_BACKEND=logind', '--setenv=AGENT_OS_METRICS_DIR=' + directory,
                     *(['--setenv=XDG_CONFIG_HOME='+str(output_config)] if output_config else []),
                     *(['--setenv=GTK_A11Y=atspi'] if args.input else []),
-                    *(['--setenv=HOME='+str(reader_config),'--setenv=XDG_CONFIG_HOME='+str(reader_config/'.config'),'--setenv=XDG_DATA_HOME='+str(reader_config/'.local/share'),'--setenv=XDG_STATE_HOME='+str(reader_config/'.local/state'),'--setenv=GSETTINGS_BACKEND=keyfile','--setenv=LANG=C.UTF-8','--setenv=AGENT_OS_SCREEN_READER_VERIFY=1'] if reader_config else []),
+                    *(['--setenv=AGENT_OS_KEYBOARD_GEOMETRY='+str(args.keyboard_geometry.resolve())] if args.keyboard_geometry else []),
+                    *(['--setenv=HOME='+str(reader_config),'--setenv=XDG_CONFIG_HOME='+str(reader_config/'.config'),'--setenv=XDG_DATA_HOME='+str(reader_config/'.local/share'),'--setenv=XDG_STATE_HOME='+str(reader_config/'.local/state'),'--setenv=GSETTINGS_BACKEND=keyfile','--setenv=LANG=C.UTF-8'] if reader_config else []),
+                    *(['--setenv=AGENT_OS_SCREEN_READER_VERIFY=1'] if args.screen_reader_input else []),
                     *(['--setenv=AGENT_OS_FEEDBACK_METRICS=1'] if args.native_feedback else []),
                     *(['--setenv=GTK_IM_MODULE=wayland', '--setenv=AGENT_OS_INPUT_METHOD_ARGV='+json.dumps([str(Path(__file__).resolve().parents[1]/'native-compositor/target/debug/examples/ime_fixture'),str(metrics/'ime-test.sock')])] if args.terminal_ime else []),
                     '/usr/bin/dbus-run-session', '--', '/usr/local/bin/agent-os-session', '--backend', 'direct',
+                    *(['--bin-dir',str(args.bin_dir.resolve())] if args.bin_dir else []),
                     *(['--activity',str(activity)] if activity else []),
                     *(['--screen-reader'] if args.screen_reader_input else []))
             leader = int(subprocess.check_output(['systemctl', 'show', unit, '--property=MainPID', '--value'], text=True))
@@ -150,6 +166,11 @@ def main():
                 time.sleep(.1)
             if endpoint is None:
                 raise RuntimeError('Direct display did not expose a mapped native system bar and output within 30 seconds')
+            if args.fresh_profile:
+                deadline=time.monotonic()+8
+                while not any(window['title']=='Welcome to agentOS' for window in snapshot['windows']):
+                    assert time.monotonic()<deadline,('First-run window did not map',snapshot)
+                    time.sleep(.05);snapshot=control(endpoint,'snapshot')
             assert all(row['width'] > 0 and row['height'] > 0 for row in snapshot['outputs']), snapshot
             if args.output_transform:
                 expected = {'normal':'Normal','90':'_90','180':'_180','270':'_270','flipped':'Flipped','flipped-90':'Flipped90','flipped-180':'Flipped180','flipped-270':'Flipped270'}[args.output_transform]
@@ -264,7 +285,7 @@ def main():
         reports = [json.loads(path.read_text()) for path in metrics.glob('render-*.json')]
         assert any(row['stages'].get('compositor.direct_render_attempt', {}).get('samples_total', 0) > 0
                    for row in reports), 'Direct session produced no render diagnostics'
-        print(json.dumps({'result': 'pass', 'outputs': snapshot['outputs'], 'metrics': reports,
+        print(json.dumps({'result': 'pass', 'fresh_profile_qualified':args.fresh_profile, 'binary_directory':str(args.bin_dir.resolve()) if args.bin_dir else '/usr/local/bin', 'outputs': snapshot['outputs'], 'metrics': reports,
                           'native_feedback': [json.loads(path.read_text()) for path in metrics.glob('feedback-*.json')],
                           'frames_before_vt': snapshot['direct_frames_presented'],
                           'frames_after_vt': resumed['direct_frames_presented'],

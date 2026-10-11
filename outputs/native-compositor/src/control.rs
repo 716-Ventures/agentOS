@@ -144,7 +144,7 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
     use smithay::reexports::wayland_server::Resource;
     let result = (|| -> Result<Value, String> {
         match v["op"].as_str() {
-            Some("launcher.state") => Ok(json!({"sequence":state.launcher_requests,"keyboard_sequence":state.keyboard_requests,"display_zoom":state.output_zoom.factor()})),
+            Some("launcher.state") => Ok(json!({"sequence":state.launcher_requests,"keyboard_sequence":state.keyboard_requests,"keyboard_output_height":crate::system_shell::keyboard_output_height(state),"display_zoom":state.output_zoom.factor()})),
             Some("snapshot") => {
                 state.arrange();
                 let windows=state.space.elements().map(|w|{let surface=w.toplevel().unwrap().wl_surface();let (title,app_id)=smithay::wayland::compositor::with_states(surface,|states|{let data=states.data_map.get::<smithay::wayland::shell::xdg::XdgToplevelSurfaceData>().unwrap().lock().unwrap();(data.title.clone(),data.app_id.clone())});let geometry=state.space.element_geometry(w);json!({"id":format!("{:?}",surface.id()),"title":title,"app_id":app_id,"xdg":xdg_diagnostics(surface),"geometry":geometry.map(|r|json!({"x":r.loc.x,"y":r.loc.y,"width":r.size.w,"height":r.size.h}))})}).collect::<Vec<_>>();

@@ -103,6 +103,12 @@ pub struct Keyboard {
     zoom_input: Input,
     zoom_controls: gtk::Box,
     zoom_label: gtk::Label,
+    root: gtk::Box,
+    scroller: gtk::ScrolledWindow,
+    header: gtk::Box,
+    title: gtk::Label,
+    status: gtk::Label,
+    dismissal: gtk::Button,
 }
 impl Keyboard {
     pub fn new(app: &gtk::Application) -> Result<Self, String> {
@@ -151,47 +157,32 @@ impl Keyboard {
             .child(&body)
             .build();
         root.append(&scroller);
-        let scroll = scroller.downgrade();
-        let head = header.downgrade();
-        let heading = title.downgrade();
-        let feedback = status.downgrade();
-        let dismissal = close.downgrade();
-        window.add_tick_callback(move |window, _| {
-            if let (Some(scroll), Some(head), Some(monitor)) = (
-                scroll.upgrade(),
-                head.upgrade(),
-                window.surface().and_then(|surface| {
-                    gtk::prelude::WidgetExt::display(window).monitor_at_surface(&surface)
-                }),
-            ) {
-                if let (Some(title), Some(status), Some(close)) =
-                    (heading.upgrade(), feedback.upgrade(), dismissal.upgrade())
-                {
-                    // Keep the operation status and dismissal readable before
-                    // spending scarce width on the redundant frame heading.
-                    let title_width = title
-                        .create_pango_layout(Some(title.text().as_str()))
-                        .pixel_size()
-                        .0;
-                    let status_width = status
-                        .create_pango_layout(Some(status.text().as_str()))
-                        .pixel_size()
-                        .0;
-                    title.set_visible(
-                        title_width
-                            + status_width
-                            + close.measure(gtk::Orientation::Horizontal, -1).1
-                            + 48
-                            <= window.width(),
-                    );
+        // Read-only qualification diagnostics; do not request frames or renders.
+        if let Ok(path) = std::env::var("AGENT_OS_KEYBOARD_GEOMETRY") {
+            let weak = window.downgrade();
+            let scroll = scroller.downgrade();
+            let head = header.downgrade();
+            let mut history = Vec::new();
+            glib::timeout_add_local(Duration::from_millis(100), move || {
+                let (Some(window), Some(scroll), Some(head)) =
+                    (weak.upgrade(), scroll.upgrade(), head.upgrade())
+                else {
+                    return glib::ControlFlow::Break;
+                };
+                let monitor = window.surface().and_then(|surface| {
+                    gtk::prelude::WidgetExt::display(&window).monitor_at_surface(&surface)
+                });
+                let value = json!({"window":[window.width(),window.height()],"header":head.height(),"scroller":scroll.height(),"max":scroll.max_content_height(),"min":scroll.min_content_height(),"monitor":monitor.map(|m| {let g=m.geometry();json!([g.width(),g.height()])})});
+                if history.last() != Some(&value) {
+                    if history.len() == 64 {
+                        history.remove(0);
+                    }
+                    history.push(value);
+                    let _ = std::fs::write(&path, serde_json::to_string(&history).unwrap());
                 }
-                let limit = (monitor.geometry().height() / 2 - head.height() - 32).clamp(1, 280);
-                if scroll.max_content_height() != limit {
-                    scroll.set_max_content_height(limit);
-                }
-            }
-            glib::ControlFlow::Continue
-        });
+                glib::ControlFlow::Continue
+            });
+        }
         let modifiers = Rc::new(Cell::new(0u64));
         let shifts = Rc::new(RefCell::new(Vec::<(gtk::Button, String, String)>::new()));
         let letters = [
@@ -405,7 +396,52 @@ impl Keyboard {
             zoom_input,
             zoom_controls,
             zoom_label,
+            root,
+            scroller,
+            header,
+            title,
+            status,
+            dismissal: close,
         })
+    }
+    /// Output geometry comes from the compositor's layer assignment. GTK's
+    /// frame clock and monitor cache must not govern an exclusive reservation.
+    pub fn update_available_height(&self, output_height: i32) {
+        if output_height <= 0 {
+            return;
+        }
+        let header_height = self.header.measure(gtk::Orientation::Vertical, -1).1;
+        let limit = (output_height / 2 - header_height - 32).clamp(1, 280);
+        if self.scroller.max_content_height() != limit {
+            self.scroller.set_max_content_height(limit);
+        }
+        let title_width = self
+            .title
+            .create_pango_layout(Some(self.title.text().as_str()))
+            .pixel_size()
+            .0;
+        let status_width = self
+            .status
+            .create_pango_layout(Some(self.status.text().as_str()))
+            .pixel_size()
+            .0;
+        self.title.set_visible(
+            title_width
+                + status_width
+                + self.dismissal.measure(gtk::Orientation::Horizontal, -1).1
+                + 48
+                <= self.window.width(),
+        );
+        // Shrinking the child alone can leave the layer window at its previous
+        // allocation. Explicitly renew its natural height after reflow.
+        let width = self
+            .window
+            .width()
+            .max(self.root.measure(gtk::Orientation::Horizontal, -1).0);
+        let height = self.root.measure(gtk::Orientation::Vertical, width).1;
+        if self.window.default_height() != height {
+            self.window.set_default_size(-1, height);
+        }
     }
     pub fn zoom_controls(&self) -> gtk::Box {
         self.zoom_controls.clone()

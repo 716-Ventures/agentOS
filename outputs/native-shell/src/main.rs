@@ -1547,7 +1547,7 @@ fn main() {
                 if let Ok(path) = std::env::var("AGENT_OS_LAUNCHER_CAPTURE") { launcher_captured = system_bar::capture(&main, &path); }
             }
             if let Some(events) = launcher_events.borrow().as_ref() {
-                if let Some(keyboard)=&screen_keyboard {keyboard.set_zoom(events.zoom());}
+                if let Some(keyboard)=&screen_keyboard {keyboard.set_zoom(events.zoom());keyboard.update_available_height(events.keyboard_output_height());}
                 let keyboard_current = events.keyboard_sequence.load(std::sync::atomic::Ordering::Relaxed);
                 if keyboard_current != keyboard_sequence {
                     keyboard_sequence = keyboard_current;

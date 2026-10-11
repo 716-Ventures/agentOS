@@ -188,6 +188,15 @@ fn release_launcher(state: &mut Smallvil, surface: &WlSurface) {
 }
 smithay::delegate_layer_shell!(Smallvil);
 
+/// Match the actual keyboard layer's output, including after a remap. Before
+/// its first map, use the same fallback output as new_layer_surface.
+pub fn keyboard_output_height(state: &Smallvil) -> Option<i32> {
+    let output = state.space.outputs().find(|output| {
+        layer_map_for_output(output).layers().any(|layer| layer.namespace() == "agentos-keyboard")
+    }).or_else(|| state.space.outputs().next())?;
+    state.space.output_geometry(output).map(|geometry| geometry.size.h)
+}
+
 /// Output-local reservation translated into the compositor's global coordinates.
 pub fn work_area(
     state: &Smallvil,

@@ -2754,7 +2754,7 @@
     }
   },
   "display_zoom": {
-    "status": "clean committed source passes full 69 UTM reproduction and CI",
+    "status": "window sizing correction passes native profiles and three first-run image-copy kernel journeys; full 70-check reproduction and new signed image qualification pending",
     "source": {
       "source_archive_sha256": "426f6e519760ddb4d23847743b63b8cbb6ac65fd28599d986f0baeb28c34cad5",
       "revision": "0f22ce6873d57f27f939de86df62127466ffc5eb",
@@ -2811,6 +2811,25 @@
       {
         "observation": "Initial doubled-text capture crowded status behind the frame title. Responsive title yielding restores full Keyboard ready and Hide keyboard labels.",
         "capture_sha256": "b191196694091c4fbbe2bfcc577c60df7d8dc3f7479330b7d0ed31f7b2b0c52f"
+      },
+      {
+        "observation": "Four original installed image-copy zoom journeys passed; a later diagnostic-binary journey passed zoom but failed PRIMARY destination focus. Root unestablished; this is not evidence of a zoom failure or fix.",
+        "evidence": {
+          "/tmp/agentos-zoom-diagnose-4.log": "dd590656642900d1cc752e67b8b8e4b443e26238e108b06be213e94bddbc2cc5"
+        }
+      },
+      {
+        "observation": "First proposed compositor-height-only correction failed headless zoom sizing: scroll area reached 132 pixels but native/layer window retained 229. Explicit natural window height renewal added before qualification.",
+        "evidence": {
+          "/tmp/agentos-zoom-fixed-targeted.log": "4a0d8499efa1c16e4434f2684dd824a1d01e061a7e34c6e222738c38a3e5e498",
+          "/tmp/agentos-zoom-sizing-debug.log": "564bd179356da00d434e0e982eb7adf0420a86324826b6f8bf1dbd5a8219a35b"
+        }
+      },
+      {
+        "observation": "Initial successful captures could retain an intermediate 229-pixel allocation. Native qualification now requires captured window width AND height to match the final layer, and checks reserved height at every zoom step.",
+        "evidence": {
+          "/tmp/agentos-zoom-fixed-light-2.png": "9160f0c538021910695f47eca88972f1c46b8e6c20d71fceb77fc7f9d70061be"
+        }
       }
     ],
     "boundaries": [
@@ -2828,6 +2847,116 @@
       "owned_utm_app_closed": true,
       "ci_run": 38136072885,
       "ci_result": "success"
+    },
+    "fresh_image_failure": {
+      "candidate": "candidate-v12",
+      "source_revision": "6695be825f357b6950e2da48fbe612166708f646",
+      "runtime_release": "de02fdba74bc2e07cc08590a2e06bb2c36c16b4d71a0bdbbd8c096003e1a3a08",
+      "image_sha256": "d06f576190ca8c001980e8d93cb390500c2b439964933ed1bc3512c5faa27951",
+      "observed": {
+        "zoom": 2.0,
+        "output_logical_size": [
+          640,
+          400
+        ],
+        "keyboard_height": 266,
+        "maximum_expected_height": 200,
+        "remaining_work_area_height": 74,
+        "first_run_window_present": true
+      },
+      "root_cause": "not yet established",
+      "evidence": {
+        "/tmp/agentos-image-v12-retry-qualification.log": "921cfe04742de58bf19affd4c8da025808b08eb08b70b3be7cb6239b7539d761"
+      },
+      "signed_candidate_preserved": true,
+      "original_development_disk_and_efi_inodes_restored": true,
+      "original_configuration_restored": true,
+      "owned_guest_stopped": true,
+      "owned_utm_app_closed": true,
+      "firstboot_password_file_removed": true,
+      "qualification_complete": false,
+      "correction": {
+        "source": {
+          "source_archive_sha256": "ffadb0b508802b14d72f682671854a16423c9c5cd3c65d61a970a0c1fdaf025c",
+          "revision": "b830054ea2d338c470734de187aace7d37b9ab8c",
+          "changes": [
+            " M outputs/agent-shell/tests/direct_display_guest.py",
+            " M outputs/implementation-status.md",
+            " M outputs/native-compositor/src/control.rs",
+            " M outputs/native-compositor/src/system_shell.rs",
+            " M outputs/native-shell/src/main.rs",
+            " M outputs/native-shell/src/screen_keyboard.rs",
+            " M outputs/native-shell/src/system_bar.rs",
+            " M outputs/native-shell/tests/native_session.py",
+            " M outputs/vm-foundation/native-verification.json",
+            " M outputs/vm-foundation/reproduce.py"
+          ]
+        },
+        "behavior": "Use assigned compositor output height through the existing launcher poll; update scroll cap and explicitly renew native layer window height from the reflowed root. No new production timer or request loop.",
+        "diagnosis": "The initial compositor-height-only correction reproduced a 229-pixel layer/native window despite a 132-pixel scroll area at 640x400. Explicit window height renewal corrects the retained allocation. The original v12 failure did not capture GTK internals, so its precise historical mechanism remains unestablished.",
+        "native_unit_tests": {
+          "passed": 32,
+          "ignored": 7
+        },
+        "compositor_unit_tests": 51,
+        "native_profiles": [
+          "dark",
+          "light with doubled text and independent core outage",
+          "session-owned screen reader with Insert+H learn-mode isolation"
+        ],
+        "actual_zoom_capture_sizes": {
+          "dark": [
+            640,
+            200
+          ],
+          "light-2": [
+            640,
+            200
+          ],
+          "reader": [
+            640,
+            200
+          ]
+        },
+        "image_copy_first_run_kernel_journeys_passed": 3,
+        "image_copy_original_signed_runtime": "de02fdba74bc2e07cc08590a2e06bb2c36c16b4d71a0bdbbd8c096003e1a3a08",
+        "image_copy_replacement_binaries_only": true,
+        "new_signed_image_qualified": false,
+        "evidence": {
+          "/tmp/agentos-zoom-fixed-targeted-second.log": "c3373f15f6254a2c780936eb65f24518a2e9791c78c8de4de3b32a4f1d00b9c7",
+          "/tmp/agentos-zoom-strict-profiles.log": "04def881ca204b1f7a4aa6a6538086509ce16697f19e7b0b394e7cf6ef1d196e",
+          "/tmp/agentos-zoom-fixed-image-geometry-1.json": "ec2d93cb56044954c4270316010cd139090b3138bc219eb2dc03407cb49244ca",
+          "/tmp/agentos-zoom-fixed-image-geometry-2.json": "d1d5cb714d9ff84fd0cb163c8a9cbfb3559aaa2a266b2c49c7dcf3c21c60f34e",
+          "/tmp/agentos-zoom-fixed-image-geometry-3.json": "0a22c92863b643619736ff778accfd7a3a2942baab1c7b324dd454fb7cf9634b",
+          "/tmp/agentos-zoom-strict-dark-display-zoom.png": "d1f567ce1cdd44dbb51360d4e9e0c056588acf8a7168ffce803561c6d5eaaea5",
+          "/tmp/agentos-zoom-strict-light-2-display-zoom.png": "b24d04a046458644552cb8dcd64953416cdc4c88bc11a43fd8f8ec7ced8c0633",
+          "/tmp/agentos-zoom-strict-reader-display-zoom.png": "d1f567ce1cdd44dbb51360d4e9e0c056588acf8a7168ffce803561c6d5eaaea5"
+        },
+        "original_development_disks_and_configuration_restored": true,
+        "owned_guests_stopped_and_apps_closed": true,
+        "baseline_regression": {
+          "runtime": "de02fdba74bc2e07cc08590a2e06bb2c36c16b4d71a0bdbbd8c096003e1a3a08",
+          "native_binary_sha256": "bf7be90a5f8bc94c7e4dc481c9450c8d7815fdd15d08dc080895c160e265bd52",
+          "result": "original native binary fails stricter per-step reserved-height regression in two runs; corrected native binary passes all three strict profiles",
+          "zoom": 1.25,
+          "output_logical_size": [
+            1024,
+            640
+          ],
+          "actual_native_window_size": [
+            1024,
+            324
+          ],
+          "expected_maximum_height": 320,
+          "evidence": {
+            "/tmp/agentos-zoom-baseline-corrected.log": "15ad8306cb5e5d81d262c76a50b35773e93d548a2c854d8c5f8d37027ff824c3",
+            "/tmp/agentos-zoom-baseline-corrected-regression.log": "5eec184d7d66275b1fc3af25602f4f2aad46fa49e8cade2da53896be77e05ea8",
+            "/tmp/agentos-zoom-baseline-diagnostic.log": "15ad8306cb5e5d81d262c76a50b35773e93d548a2c854d8c5f8d37027ff824c3",
+            "/tmp/agentos-zoom-baseline-diagnostic-regression.log": "bda8ef831581b36085d309ab3f0e8e9c57cdd3d302237698175d2ac1ef7276fe"
+          },
+          "note": "An earlier baseline fixture used an incorrect binary path and failed startup; that attempt is not counted as a functional regression."
+        }
+      }
     }
   }
 }

@@ -63,7 +63,9 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
         env['AGENT_OS_LAUNCHER_CAPTURE']=str(OUTPUT/f'launcher-{appearance}-{scale:g}.png')
     if screen_keyboard:
         (OUTPUT/'screen-keyboard.json').unlink(missing_ok=True)
+        (OUTPUT/'screen-keyboard-geometry.json').unlink(missing_ok=True)
         env['AGENT_OS_KEYBOARD_CAPTURE']=str(OUTPUT/'screen-keyboard.png')
+        env['AGENT_OS_KEYBOARD_GEOMETRY']=str(OUTPUT/'screen-keyboard-geometry.json')
         env['AGENT_OS_NATIVE_IME_FIXTURE']='1'
     screen_reader='--screen-reader' in sys.argv
     if screen_reader:
@@ -181,22 +183,31 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                     with conn.makefile('rb') as stream:response=json.loads(stream.readline())
                 assert not response['ok'] and call(control,{'op':'snapshot'})['display_zoom']==denied,response
                 accessibility.activate(accessibility.find('Keyboard',pyatspi.ROLE_PUSH_BUTTON))
-                for factor in (1.25,1.5,1.75,2.0):
-                    accessibility.activate(accessibility.find('Zoom in',pyatspi.ROLE_PUSH_BUTTON))
-                    wait_for(lambda:call(control,{'op':'snapshot'})['display_zoom']==factor,[core,session])
-                    wait_for(lambda:ime_accessibility.rendered_text(f'Display zoom {factor*100:.0f}%'),[core,session])
                 def zoomed_keyboard():
                     state=call(control,{'op':'snapshot'})
                     layer=next((layer for layer in state['system_layers'] if layer['namespace']=='agentos-keyboard' and layer['mapped']),None)
                     return (state,layer) if layer and 0<layer['geometry']['height']<=state['outputs'][0]['height']/2 else None
-                zoomed,layer=wait_for(zoomed_keyboard,[core,session])
+                def wait_zoomed_keyboard():
+                    try:return wait_for(zoomed_keyboard,[core,session])
+                    except AssertionError:
+                        print('Zoom sizing failure:',json.dumps(call(control,{'op':'snapshot'})),flush=True)
+                        for name in ['screen-keyboard.json','screen-keyboard-geometry.json']:
+                            geometry=OUTPUT/name
+                            if geometry.exists():print('Native '+name+':',geometry.read_text(),flush=True)
+                        raise
+                for factor in (1.25,1.5,1.75,2.0):
+                    accessibility.activate(accessibility.find('Zoom in',pyatspi.ROLE_PUSH_BUTTON))
+                    wait_for(lambda:call(control,{'op':'snapshot'})['display_zoom']==factor,[core,session])
+                    wait_for(lambda:ime_accessibility.rendered_text(f'Display zoom {factor*100:.0f}%'),[core,session])
+                    wait_zoomed_keyboard()
+                zoomed,layer=wait_zoomed_keyboard()
                 assert zoomed['outputs'][0]['width']==output['width']//2,zoomed
                 assert zoomed['outputs'][0]['height']==output['height']//2,zoomed
                 assert layer['work_area']['height']>0,layer
                 assert zoomed['seat_focus']==original,zoomed
                 def fitted_dismissal():
                     geometry=json.loads((OUTPUT/'screen-keyboard.json').read_text())
-                    if geometry['window'][0]!=zoomed['outputs'][0]['width']:return None
+                    if geometry['window']!=[layer['geometry']['width'],layer['geometry']['height']]:return None
                     x,y,w,h=geometry['dismissal'];width,height=geometry['window']
                     return geometry if 0<=x and x+w<=width and 0<=y and y+h<=height else None
                 wait_for(fitted_dismissal,[core,session])
