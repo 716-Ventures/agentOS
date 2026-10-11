@@ -1,0 +1,49 @@
+Save-diagnostic-probe-1
+dbus-daemon[829]: [session uid=1000 pid=829 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=850 comm="/tmp/agentos-session-test-mh6sdx54/bin/agent-os-de")
+dbus-daemon[829]: [session uid=1000 pid=829 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[874]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=850 comm="/tmp/agentos-session-test-mh6sdx54/bin/agent-os-de")
+dbus-daemon[874]: Successfully activated service 'org.a11y.atspi.Registry'SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+Save-diagnostic-probe-2
+dbus-daemon[1894]: [session uid=1000 pid=1894 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=1913 comm="/tmp/agentos-session-test-usx7u16q/bin/agent-os-de")
+dbus-daemon[1894]: [session uid=1000 pid=1894 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[1937]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=1913 comm="/tmp/agentos-session-test-usx7u16q/bin/agent-os-de")
+dbus-daemon[1937]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+Save-diagnostic-probe-3
+dbus-daemon[3340]: [session uid=1000 pid=3340 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=3359 comm="/tmp/agentos-session-test-b0x32mq4/bin/agent-os-de")
+dbus-daemon[3340]: [session uid=1000 pid=3340 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[3385]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=3359 comm="/tmp/agentos-session-test-b0x32mq4/bin/agent-os-de")
+dbus-daemon[3385]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+Save-diagnostic-probe-4
+dbus-daemon[4417]: [session uid=1000 pid=4417 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=4436 comm="/tmp/agentos-session-test-ghvuodrb/bin/agent-os-de")
+dbus-daemon[4417]: [session uid=1000 pid=4417 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[4460]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=4436 comm="/tmp/agentos-session-test-ghvuodrb/bin/agent-os-de")
+dbus-daemon[4460]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+Save-diagnostic-probe-5
+dbus-daemon[5474]: [session uid=1000 pid=5474 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=5493 comm="/tmp/agentos-session-test-w1wze3ji/bin/agent-os-de")
+dbus-daemon[5474]: [session uid=1000 pid=5474 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[5517]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=5493 comm="/tmp/agentos-session-test-w1wze3ji/bin/agent-os-de")
+dbus-daemon[5517]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+Requested orderly guest shutdown. Check status before restarting.
+{"started_at": "2026-10-11T15:03:22.896552+00:00", "source_revision": "d50def72c0e8e61c93542c15427be6cf28c6a667", "source_changes": [" M outputs/native-shell/tests/accessibility.py"], "source_archive_sha256": "748f4949deeee5c699d97d31fc10dc84c296096bd82356671906d879105819f7", "passed": true, "owned_utm_identity": [55334, "Sun Oct 11 11:03:23 2026"], "owned_utm_closed": true, "finished_at": "2026-10-11T15:04:24.850767+00:00"}

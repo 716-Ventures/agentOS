@@ -1,0 +1,63 @@
+compositor	Full graphical login lifecycle and staged release	﻿2026-10-11T14:57:32.7294930Z ##[group]Run dbus-run-session -- python3 outputs/native-shell/tests/native_session.py
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:32.7295572Z ^[[36;1mdbus-run-session -- python3 outputs/native-shell/tests/native_session.py^[[0m
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:32.7296134Z ^[[36;1mdbus-run-session -- python3 outputs/native-shell/tests/native_session.py --system-bar^[[0m
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:32.7296711Z ^[[36;1mdbus-run-session -- python3 outputs/native-shell/tests/native_session.py --ime^[[0m
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:32.7297289Z ^[[36;1mdbus-run-session -- python3 outputs/native-shell/tests/native_session.py --ime-editor^[[0m
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:32.7298098Z ^[[36;1mdbus-run-session -- python3 outputs/native-shell/tests/native_session.py --screen-keyboard^[[0m
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:32.7298718Z ^[[36;1mdbus-run-session -- python3 outputs/native-shell/tests/native_session.py --display-zoom^[[0m
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:32.7299329Z ^[[36;1mdbus-run-session -- python3 outputs/native-shell/tests/native_session.py --ime-failure^[[0m
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:32.7299931Z ^[[36;1mdbus-run-session -- python3 outputs/native-shell/tests/native_session.py --host-failure^[[0m
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:32.7300596Z ^[[36;1mdbus-run-session -- python3 outputs/native-shell/tests/native_session.py --compositor-failure^[[0m
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:32.7301123Z ^[[36;1mpython3 outputs/agent-shell/tests/graphical_release.py^[[0m
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:32.7301518Z ^[[36;1mpython3 outputs/agent-shell/tests/deployed_graphics.py^[[0m
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:32.7350113Z shell: /usr/bin/bash -e {0}
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:32.7350345Z env:
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:32.7350520Z   RUSTUP_TOOLCHAIN: 1.85.1
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:32.7350728Z ##[endgroup]
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:33.0428189Z dbus-daemon[8587]: [session uid=1001 pid=8587] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1001 pid=8606 comm="/tmp/agentos-session-test-bz54p1bg/bin/agent-os-de" label="unconfined")
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:33.0467456Z dbus-daemon[8587]: [session uid=1001 pid=8587] Successfully activated service 'org.a11y.Bus'
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:33.1064148Z dbus-daemon[8626]: Activating service name='org.a11y.atspi.Registry' requested by ':1.0' (uid=1001 pid=8606 comm="/tmp/agentos-session-test-bz54p1bg/bin/agent-os-de" label="unconfined")
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:33.1099370Z dbus-daemon[8626]: Successfully activated service 'org.a11y.atspi.Registry'
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:33.1100167Z SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:34.6917160Z PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:34.6918010Z PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:35.0099072Z dbus-daemon[8819]: [session uid=1001 pid=8819] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1001 pid=8840 comm="/tmp/agentos-session-test-j3vjmvua/bin/agent-os-de" label="unconfined")
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:35.0138633Z dbus-daemon[8819]: [session uid=1001 pid=8819] Successfully activated service 'org.a11y.Bus'
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:35.0737015Z dbus-daemon[8860]: Activating service name='org.a11y.atspi.Registry' requested by ':1.0' (uid=1001 pid=8840 comm="/tmp/agentos-session-test-j3vjmvua/bin/agent-os-de" label="unconfined")
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:35.0772639Z dbus-daemon[8860]: Successfully activated service 'org.a11y.atspi.Registry'
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:35.0774455Z SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:39.3625021Z PASS: background workspace focus reconciliation preserves active launcher typing
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:39.3625742Z PASS: private system bar reserves work area; launcher opens, closes and retains drafts without workspace tiles
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:39.3626415Z PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:39.3627046Z PASS: core outage is visible; independent launcher and retained draft remain reachable without model work
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:39.3627858Z PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:39.6811955Z dbus-daemon[9210]: [session uid=1001 pid=9210] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1001 pid=9230 comm="/tmp/agentos-session-test-94p6bojx/bin/agent-os-de" label="unconfined")
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:39.6852941Z dbus-daemon[9210]: [session uid=1001 pid=9210] Successfully activated service 'org.a11y.Bus'
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:39.7485435Z dbus-daemon[9250]: Activating service name='org.a11y.atspi.Registry' requested by ':1.0' (uid=1001 pid=9230 comm="/tmp/agentos-session-test-94p6bojx/bin/agent-os-de" label="unconfined")
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:39.7523595Z dbus-daemon[9250]: Successfully activated service 'org.a11y.atspi.Registry'
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:39.7524315Z SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:41.2343913Z PASS: GTK text-input-v3 Unicode preedit/commit survives unrelated rendering; draft and Save remain distinct
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:41.2344739Z PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:41.5510455Z dbus-daemon[9420]: [session uid=1001 pid=9420] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1001 pid=9440 comm="/tmp/agentos-session-test-48dvb6xu/bin/agent-os-de" label="unconfined")
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:41.5551059Z dbus-daemon[9420]: [session uid=1001 pid=9420] Successfully activated service 'org.a11y.Bus'
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:41.6153814Z dbus-daemon[9460]: Activating service name='org.a11y.atspi.Registry' requested by ':1.0' (uid=1001 pid=9440 comm="/tmp/agentos-session-test-48dvb6xu/bin/agent-os-de" label="unconfined")
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:41.6190538Z dbus-daemon[9460]: Successfully activated service 'org.a11y.atspi.Registry'
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:41.6191224Z SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:43.6068990Z PASS: actual GTK text-input-v3 editor overflow preserves selected text, exact durable draft and committed value
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:43.6069801Z PASS: GTK text-input-v3 Unicode preedit/commit survives unrelated rendering; draft and Save remain distinct
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:43.6070489Z PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:43.9201210Z dbus-daemon[9679]: [session uid=1001 pid=9679] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1001 pid=9698 comm="/tmp/agentos-session-test-zd5tk23y/bin/agent-os-de" label="unconfined")
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:43.9248282Z dbus-daemon[9679]: [session uid=1001 pid=9679] Successfully activated service 'org.a11y.Bus'
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:43.9863943Z dbus-daemon[9723]: Activating service name='org.a11y.atspi.Registry' requested by ':1.0' (uid=1001 pid=9698 comm="/tmp/agentos-session-test-zd5tk23y/bin/agent-os-de" label="unconfined")
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:43.9898187Z dbus-daemon[9723]: Successfully activated service 'org.a11y.atspi.Registry'
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:43.9900315Z SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:57:50.3208743Z PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:58:00.8625504Z Traceback (most recent call last):
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:58:00.8626097Z   File "/home/runner/work/agentOS/agentOS/outputs/native-shell/tests/native_session.py", line 347, in <module>
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:58:00.8626652Z     accessibility.verify(lambda value:call(endpoint,value))
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:58:00.8627190Z   File "/home/runner/work/agentOS/agentOS/outputs/native-shell/tests/accessibility.py", line 61, in verify
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:58:00.8627916Z     wait(lambda:saved()==value,'Accessible Save did not commit the exact Unicode draft')
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:58:00.8628545Z   File "/home/runner/work/agentOS/agentOS/outputs/native-shell/tests/accessibility.py", line 13, in wait
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:58:00.8629022Z     raise AssertionError(description)
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:58:00.8629372Z AssertionError: Accessible Save did not commit the exact Unicode draft
+compositor	Full graphical login lifecycle and staged release	2026-10-11T14:58:00.8835717Z ##[error]Process completed with exit code 1.

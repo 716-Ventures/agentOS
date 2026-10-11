@@ -58,7 +58,19 @@ def verify(call):
     wait(lambda:draft()==value,'Accessible edit was not retained by core')
     assert saved()=='Original accessible value','Editing committed without deliberate save'
     activate(find('Save draft',pyatspi.ROLE_PUSH_BUTTON))
-    wait(lambda:saved()==value,'Accessible Save did not commit the exact Unicode draft')
+    try:
+        wait(lambda:saved()==value,'Accessible Save did not commit the exact Unicode draft')
+    except AssertionError:
+        queue=deque([pyatspi.Registry.getDesktop(0)]);labels=[];visited=0
+        while queue and visited<256 and len(labels)<64:
+            node=queue.popleft();visited+=1
+            if node is None:continue
+            try:
+                if node.name:labels.append({'role':node.getRoleName(),'name':node.name[:512]})
+                queue.extend(node[index] for index in range(min(node.childCount,64)))
+            except (RuntimeError,LookupError):pass
+        print('Accessible Save diagnostics: '+json.dumps({'document':call({'op':'presentation.get','document_id':'session-fixture'}),'draft':call({'op':'draft.get','surface_id':'session-fixture','element_id':'field'}),'visible':text(field),'accessible_labels':labels}),flush=True)
+        raise
     assert field.queryEditableText().setTextContents('Discard this accessible edit')
     wait(lambda:draft()=='Discard this accessible edit','Second edit was not retained')
     activate(find('Discard draft',pyatspi.ROLE_PUSH_BUTTON))
