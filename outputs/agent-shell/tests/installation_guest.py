@@ -83,6 +83,39 @@ def interrupts():
         verify();checks.append('SIGKILL at '+phase+' recovered from staged release; state and config preserved')
     return checks
 
+def property_rollback_guard(installer,source):
+    probe=verify();ident='install-property-probe-'+os.urandom(12).hex()
+    def present(value):
+        return json.loads(subprocess.check_output(['agent-os','presentation','-'],input=json.dumps(value).encode()))
+    def apply(request,expected,operations):
+        return present({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
+                        'request_id':ident+'-'+request,'expected_revisions':{ident:expected},'operations':operations})
+    document={'protocol':'agentos.presentation/1','catalog_revision':'native-core/1','surface_id':ident,
+              'activity_id':str(probe['activity']),'revision':0,'title':'Install property guard',
+              'root':'button','elements':{'button':{'type':'Button@1','props':{'label':'Next λ','icon':'arrow-right','icon_position':'only','size':'xs'}}},'actions':{},'bindings':{}}
+    apply('create',None,[{'op':'surface.create','document':document}])
+    try:
+        contract=json.loads((source/'release-contract.json').read_text());contract.pop('component_schemas')
+        (source/'release-contract.json').write_text(json.dumps(contract));legacy=installer.stage(source)
+        current=Path('/usr/local/lib/agent-os/current').resolve().name;journal=installer.journal.read_bytes()
+        units=installer.contract(Path('/usr/local/lib/agent-os/current'))['units']
+        def identities():return subprocess.check_output(['systemctl','show','--property=MainPID','--property=ActiveEnterTimestampMonotonic',*units],text=True)
+        before=identities();saved=present({'op':'presentation.get','document_id':ident})
+        try:installer.activate(legacy)
+        except ValueError as error:assert 'Button@1.icon' in str(error),error
+        else:raise AssertionError('Unannotated legacy runtime accepted saved icon properties')
+        assert identities()==before,'Incompatible preflight stopped or restarted a live service'
+        assert installer.journal.read_bytes()==journal
+        assert Path('/usr/local/lib/agent-os/current').resolve().name==current
+        assert present({'op':'presentation.get','document_id':ident})==saved
+        apply('plain',saved['revision'],[{'op':'element.set_props','surface_id':ident,'element_id':'button','props':{'label':'Plain legacy action λ'}}])
+        installer.compatible_components(installer.contract(installer.root/'releases'/legacy))
+        verify()
+        print('PASS: installed schema preflight rejects saved icon properties without stopping services or changing journal/document; plain legacy button remains compatible',flush=True)
+    finally:
+        current=present({'op':'presentation.get','document_id':ident})
+        apply('close',current['revision'],[{'op':'surface.close','surface_id':ident}])
+
 def rollbacks():
     setup()
     spec=importlib.util.spec_from_file_location('installed_installer',SOURCE/'install_runtime.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
@@ -105,8 +138,10 @@ def rollbacks():
             assert result.returncode==-9,result.returncode
             subprocess.run([sys.executable,'/usr/local/lib/agent-os/install-recovery.py','--recover'],check=True)
             verify();assert Path('/usr/local/lib/agent-os/current').resolve().name==original
+        property_rollback_guard(installer,source)
     return ['Compatible update and rollback preserve activities, outputs, layouts, pending approvals, user files and provider configuration',
-            'SIGKILL during rollback at stopped and activated phases recovers to the selected release without rewinding live state']
+            'SIGKILL during rollback at stopped and activated phases recovers to the selected release without rewinding live state',
+            'Saved property/schema incompatibility is rejected without stopping live services, changing document/journal or preventing plain legacy buttons']
 
 def cleanup():
     probe=verify()

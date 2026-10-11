@@ -1,0 +1,251 @@
+Dependency profile and installed versions unchanged.
+Verified offline speech assets: 9f796231bf027914973e24315967f66a2698220f2e40420d87155963793be634
+     Removed 0 files
+     Removed 8 files, 9.1MiB total
+   Compiling agent-os-core v0.5.0 (/home/developer/agent-os-source)
+    Finished `release` profile [optimized] target(s) in 8.03s
+     Removed 0 files
+     Removed 9 files, 6.9MiB total
+   Compiling agent-os-desktop v0.1.0-alpha.1 (/home/developer/agent-os-source/native-shell)
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+ --> src/document_dialog.rs:8:11
+  |
+8 | ) -> gtk::FileChooserNative {
+  |           ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:10:23
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:61:23
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:10:42
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:11:10
+   |
+11 |         .title(if save {
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:16:10
+   |
+16 |         .action(if save {
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:21:10
+   |
+21 |         .accept_label(if save { "Export" } else { "Import" })
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:22:10
+   |
+22 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:23:10
+   |
+23 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:24:10
+   |
+24 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+  --> src/document_dialog.rs:27:16
+   |
+27 |         dialog.set_current_name("document.txt");
+   |                ^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:31:40
+   |
+31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:61:42
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:62:10
+   |
+62 |         .title("Choose existing text file to review")
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:63:10
+   |
+63 |         .action(gtk::FileChooserAction::Open)
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:64:10
+   |
+64 |         .accept_label("Review replacement")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:65:10
+   |
+65 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:66:10
+   |
+66 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:67:10
+   |
+67 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:72:40
+   |
+72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: `agent-os-desktop` (bin "agent-os-desktop") generated 20 warnings
+    Finished `release` profile [optimized] target(s) in 8.28s
+     Removed 0 files
+     Removed 9 files, 22.0MiB total
+   Compiling agent-os-compositor v0.1.0 (/home/developer/agent-os-source/native-compositor)
+warning: function `project` is never used
+ --> src/pressure.rs:5:8
+  |
+5 | pub fn project(
+  |        ^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: `agent-os-compositor` (bin "agent-os-compositor") generated 1 warning
+    Finished `release` profile [optimized] target(s) in 13.74s
+Collected dependency notices: 187
+Installed and healthy: 99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf
+Installed. Reconnect your login session for group membership, then run agent-os.
+../usr/lib/python3.13/functools.py:59: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffa46355d0>
+  getattr(wrapper, attr).update(getattr(wrapped, attr, {}))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+..../usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffa4635b70>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffa4635c60>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffa4635f30>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+............/usr/lib/python3.13/unittest/mock.py:1459: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffa504fa60>
+  original = getattr(target, name, DEFAULT)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:1459: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffa4635990>
+  original = getattr(target, name, DEFAULT)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:1459: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffa4635f30>
+  original = getattr(target, name, DEFAULT)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:1459: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffa4635c60>
+  original = getattr(target, name, DEFAULT)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+../usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffa524d990>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffa46358a0>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffa504fa60>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffa4635990>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+../usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffa46354e0>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffa4634f40>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+....
+----------------------------------------------------------------------
+Ran 26 tests in 0.157s
+
+OK
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: f54377b28d9b78332a38ad8d3e727e06b020c79116c35dda146d944591127058
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: 053d91f750b495b78a6e505c06cd3aeb86c8492f20ae6edf78d9a8266671d99f
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: f9290cca929587683a2f29e1469b48f760cef71f724a90d6a04e4eec0007739a
+Installed and healthy: 0a1ca4afc8b7d7e3133a768f90bca3adaa047f2ef36f484dadbe91a4b47e5649
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: fe9db2e8e50d0b9e9e369546dd2e253cff8724d06c30f61bf097b0d5f441eb7a
+Installed and healthy: fe9db2e8e50d0b9e9e369546dd2e253cff8724d06c30f61bf097b0d5f441eb7a
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: 9bda9c7be8901f916db65412888ced3a379135f2e77fe635db33850fe98c2314
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: 559a66ce8a5e0197635bbb547d694831f3b7d69468fc33378493bdd53bee096a
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: accfd4660901b81066d7f384aea05ba2357acd14d257edad75191e6c6b5c641c
+Installed and healthy: f4d2a338b90f0edd1fe43e371c9f00c21d37053e025f80e29d48d4acb198dc7f
+Installed and healthy: 8ccf27552d9942597ed671107f2113b14e302fdc10d8b6034c97306568d3899f
+Installed and healthy: eefb3748c5db358172b9aa421f2153464b080ca51eb6e331b8624daf71c317a8
+Installed and healthy: 1b2a5a9792bda21d1560ae99ecc8da3ca7661e108a5466715b11efbd1fad79c3
+Installed and healthy: 01b92b015f2f11e6a9601b31aa837043feaeac3af2498eb58d6f413b8c6ed5af
+Installed and healthy: 17a81e3e33a855b2d3593b46e4952634da4ea4216894e8288fdbe3ad11de4af9
+Installed and healthy: 74ea2d209e7c7e49f5bc3f59d347a8dddef876a31d4461db620402e50238976d
+Installed and healthy: 99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf
+Warning: The unit file, source configuration file or drop-ins of agent-os-core.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-layout.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-disk.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-broker.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-ai.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-voice.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Installed and healthy: 99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf
+Installed and healthy: d8387ba5f8398011744d4ccecaad2aa253dc3e5559c295cff706a854a732e5a5
+Installed and healthy: 99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf
+Installed and healthy: d8387ba5f8398011744d4ccecaad2aa253dc3e5559c295cff706a854a732e5a5
+Installed and healthy: d8387ba5f8398011744d4ccecaad2aa253dc3e5559c295cff706a854a732e5a5
+PASS: installed schema preflight rejects saved icon properties without stopping services or changing journal/document; plain legacy button remains compatible
+{"result": "pass", "checks": ["Compatible update and rollback preserve activities, outputs, layouts, pending approvals, user files and provider configuration", "SIGKILL during rollback at stopped and activated phases recovers to the selected release without rewinding live state", "Saved property/schema incompatibility is rejected without stopping live services, changing document/journal or preventing plain legacy buttons"], "provider_calls": "none"}
+Installed and healthy: 99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf
+Warning: The unit file, source configuration file or drop-ins of agent-os-core.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-layout.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-disk.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-broker.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-ai.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-voice.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Installed and healthy: 99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf
+{"result": "pass", "checks": ["SIGKILL at stopped recovered from staged release; state and config preserved", "SIGKILL at activated recovered from staged release; state and config preserved"], "provider_calls": "none"}
+{"result": "pass", "checks": ["cleanup"], "provider_calls": "none"}
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+Requested orderly guest shutdown. Check status before restarting.
+{"started_at": "2026-10-11T15:38:32.181483+00:00", "source_revision": "c0f57f8b4a01bf6ac7e618a93585245baaa5b674", "source_changes": [" M outputs/agent-shell/install_runtime.py", " M outputs/agent-shell/release-contract.json", " M outputs/agent-shell/src/main.rs", " M outputs/agent-shell/tests/installation_guest.py", " M outputs/agent-shell/tests/installation_test.py"], "source_archive_sha256": "99d50a8fbdbcbecccb16f9cfb1bb9596e260ac3a8bc75dca230fc3f838be094b", "passed": true, "owned_utm_identity": [84028, "Sun Oct 11 11:38:32 2026"], "owned_utm_closed": true, "finished_at": "2026-10-11T15:39:29.581477+00:00"}

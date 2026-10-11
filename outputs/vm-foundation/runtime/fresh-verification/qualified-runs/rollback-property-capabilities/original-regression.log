@@ -1,0 +1,18 @@
+test_rollback_refuses_saved_button_properties_missing_from_legacy_schema (installation_regression.Installation) ... FAIL
+
+======================================================================
+FAIL: test_rollback_refuses_saved_button_properties_missing_from_legacy_schema (installation_regression.Installation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chrisjdavis/development/agentOS/outputs/agent-shell/tests/installation_test.py", line 234, in test_rollback_refuses_saved_button_properties_missing_from_legacy_schema
+    with self.assertRaisesRegex(ValueError,'Button@1.*icon'):instance.rollback(legacy)
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.052s
+
+FAILED (failures=1)
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: 559a66ce8a5e0197635bbb547d694831f3b7d69468fc33378493bdd53bee096a
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Confirmed original installer regression: incompatible saved icon properties were permitted

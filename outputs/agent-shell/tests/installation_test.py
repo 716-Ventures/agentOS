@@ -216,12 +216,88 @@ class Installation(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError,'incompatible'):instance.rollback(second)
             run.assert_not_called();self.assertEqual(instance.journal.read_bytes(),before);self.assertEqual((instance.root/'current').resolve().name,first)
 
-    def saved_component(self,instance,kind):
+    def saved_component(self,instance,kind,props=None):
         import sqlite3
         path=instance.path('/var/lib/agent-os-runtime/state.sqlite3');path.parent.mkdir(parents=True,exist_ok=True)
         with sqlite3.connect(path) as db:
             db.execute('CREATE TABLE IF NOT EXISTS presentation_documents(id TEXT PRIMARY KEY,body TEXT NOT NULL)')
-            db.execute('INSERT OR REPLACE INTO presentation_documents VALUES (?,?)',('surface',json.dumps({'elements':{'item':{'type':kind}}})))
+            db.execute('INSERT OR REPLACE INTO presentation_documents VALUES (?,?)',('surface',json.dumps({'elements':{'item':{'type':kind,**({'props':props} if props is not None else {})}}})))
+
+    def test_rollback_refuses_saved_button_properties_missing_from_legacy_schema(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            instance,source=self.fixture(tmp);legacy=instance.stage(source);self.activate_fixture(instance,legacy)
+            contract=json.loads((source/'release-contract.json').read_text());contract['components']=['Button@1']
+            contract['component_schemas']={'Button@1':{'props':{'label':'string','disabled':'boolean','icon':['plus','arrow-right']},'bindable':[],'events':['activate'],'slots':{}}}
+            (source/'release-contract.json').write_text(json.dumps(contract));current=instance.stage(source);self.activate_fixture(instance,current)
+            self.saved_component(instance,'Button@1',{'label':'Next','icon':'plus'});before=instance.journal.read_bytes()
+            with patch.object(instance,'run') as run,patch.object(instance,'accounts'),patch.object(instance,'health'):
+                with self.assertRaisesRegex(ValueError,'Button@1.*icon'):instance.rollback(legacy)
+            run.assert_not_called();self.assertEqual(instance.journal.read_bytes(),before)
+            self.assertEqual((instance.root/'current').resolve().name,current)
+            self.saved_component(instance,'Button@1',{'label':'Next','disabled':False})
+            with patch.object(instance,'accounts'),patch.object(instance,'run'),patch.object(instance,'health'):instance.rollback(legacy)
+            self.assertEqual((instance.root/'current').resolve().name,legacy)
+
+    def test_saved_property_values_bindings_slots_and_events_gate_rollback(self):
+        import sqlite3
+        cases=[
+            ('Button@1',{'props':{'label':'string','icon':['plus']},'bindable':[],'events':[],'slots':{}},
+             {'props':{'label':'string','icon':['plus','arrow-right']},'bindable':[],'events':[],'slots':{}},
+             {'props':{'label':'Next','icon':'arrow-right'}},'icon'),
+            ('Status@1',{'props':{'value':'string'},'bindable':[],'events':[],'slots':{}},
+             {'props':{'value':'string'},'bindable':['value'],'events':[],'slots':{}},
+             {'props':{'value':{'binding':'work'}}},'value'),
+            ('Stack@1',{'props':{},'bindable':[],'events':[],'slots':{'children':[0,1]}},
+             {'props':{},'bindable':[],'events':[],'slots':{'children':[0,4]}},
+             {'slots':{'children':['a','b']}},'children'),
+            ('Button@1',{'props':{'label':'string'},'bindable':[],'events':[],'slots':{}},
+             {'props':{'label':'string'},'bindable':[],'events':['activate'],'slots':{}},
+             {'props':{'label':'Next'},'events':{'activate':{'action':'click'}}},'activate'),
+        ]
+        for kind,old_schema,new_schema,fields,member in cases:
+            with self.subTest(kind=kind,member=member),tempfile.TemporaryDirectory() as tmp:
+                instance,source=self.fixture(tmp);contract=json.loads((source/'release-contract.json').read_text())
+                contract.update(components=[kind],component_schemas={kind:old_schema});(source/'release-contract.json').write_text(json.dumps(contract))
+                first=instance.stage(source);self.activate_fixture(instance,first)
+                contract['component_schemas'][kind]=new_schema;(source/'release-contract.json').write_text(json.dumps(contract))
+                current=instance.stage(source);self.activate_fixture(instance,current);self.saved_component(instance,kind)
+                path=instance.path('/var/lib/agent-os-runtime/state.sqlite3')
+                with sqlite3.connect(path) as db:db.execute('UPDATE presentation_documents SET body=?',(json.dumps({'elements':{'item':{'type':kind,**fields}}}),))
+                before=instance.journal.read_bytes()
+                with patch.object(instance,'run') as run,patch.object(instance,'accounts'),patch.object(instance,'health'):
+                    with self.assertRaisesRegex(ValueError,kind+'.*'+member):instance.rollback(first)
+                run.assert_not_called();self.assertEqual(instance.journal.read_bytes(),before)
+                self.assertEqual((instance.root/'current').resolve().name,current)
+
+    def test_property_saved_after_preflight_restores_live_runtime_and_journal(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            instance,source=self.fixture(tmp)
+            contract=json.loads((source/'release-contract.json').read_text());contract['components']=['Button@1']
+            contract['component_schemas']={'Button@1':{'props':{'label':'string','icon':['plus']},'bindable':[],'events':['activate'],'slots':{}}}
+            (source/'release-contract.json').write_text(json.dumps(contract));first=instance.stage(source);self.activate_fixture(instance,first)
+            contract.pop('component_schemas');(source/'release-contract.json').write_text(json.dumps(contract));legacy=instance.stage(source)
+            self.saved_component(instance,'Button@1',{'label':'Next'});before=instance.journal.read_bytes();calls=[]
+            def run(args):
+                calls.append(args)
+                if args[:2]==['systemctl','stop']:self.saved_component(instance,'Button@1',{'label':'Next','icon':'plus'})
+            with patch.object(instance,'accounts'),patch.object(instance,'run',side_effect=run),patch.object(instance,'health'):
+                with self.assertRaisesRegex(ValueError,'Button@1.*icon'):instance.activate(legacy)
+            self.assertIn(['systemctl','start','agent-os-core'],calls)
+            self.assertEqual(instance.journal.read_bytes(),before)
+            self.assertEqual((instance.root/'current').resolve().name,first)
+
+    def test_release_property_schemas_are_bounded_and_match_advertised_components(self):
+        import copy
+        valid={'Button@1':{'props':{'label':'string','icon':['plus']},'bindable':[],'events':['activate'],'slots':{}}}
+        invalid=[{},[],{'Text@1':valid['Button@1']}]
+        for path,value in [('props',[]),('props',{'icon':['plus','plus']}),('props',{'icon':[{}]}),('props',{'label':'executable'}),('bindable',['missing']),('events',['activate','activate']),('slots',{'children':[True,4]}),('slots',{'children':[3,2]})]:
+            schema=copy.deepcopy(valid);schema['Button@1'][path]=value;invalid.append(schema)
+        with tempfile.TemporaryDirectory() as tmp:
+            instance,source=self.fixture(tmp)
+            for schema in invalid:
+                contract=json.loads((source/'release-contract.json').read_text());contract.update(components=['Button@1'],component_schemas=schema)
+                (source/'release-contract.json').write_text(json.dumps(contract));ident=instance.stage(source)
+                with self.assertRaisesRegex(ValueError,'component|properties|bindable'):instance.contract(instance.root/'releases'/ident)
 
     def test_rollback_refuses_new_components_without_stopping_the_live_runtime(self):
         with tempfile.TemporaryDirectory() as tmp:

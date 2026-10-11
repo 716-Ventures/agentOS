@@ -6,6 +6,7 @@ import fcntl
 import hashlib
 import importlib.util
 import json
+import math
 import os
 from pathlib import Path
 import pwd
@@ -21,6 +22,177 @@ import time
 
 SOURCE=Path(__file__).resolve().parent
 UNITS=['agent-os-core','agent-os-layout','agent-os-disk','agent-os-broker','agent-os-ai','agent-os-voice']
+
+# Keep recovery self-contained: install-recovery.py is copied before stopping
+# services and cannot import new helpers through an older current-release link.
+# Frozen legacy presentation metadata: 716 UI alpha.35, b6d6a3c90cd791424ad0a2f3744dbd5ec041f049.
+# Older contracts are filtered by their advertised component names. These checks
+# establish representation compatibility; core validation still owns content limits.
+LEGACY_COMPONENT_SCHEMAS = {'ApplicationReference@1': {'bindable': [],
+                            'events': [],
+                            'props': {'label': 'string', 'target': 'string'},
+                            'slots': {}},
+ 'Button@1': {'bindable': [],
+              'events': ['activate'],
+              'props': {'disabled': 'boolean', 'label': 'string'},
+              'slots': {}},
+ 'Chart@1': {'bindable': [],
+             'events': [],
+             'props': {'label': 'string', 'points': 'chartpoints'},
+             'slots': {}},
+ 'Choice@1': {'bindable': [],
+              'events': [],
+              'props': {'label': 'string', 'options': 'stringlist', 'value': 'string'},
+              'slots': {}},
+ 'DocumentEditor@1': {'bindable': [],
+                      'events': ['submit', 'change'],
+                      'props': {'label': 'string', 'value': 'string'},
+                      'slots': {}},
+ 'DocumentReference@1': {'bindable': [],
+                         'events': [],
+                         'props': {'label': 'string', 'target': 'string'},
+                         'slots': {}},
+ 'Error@1': {'bindable': ['message'],
+             'events': ['recover'],
+             'props': {'label': 'string', 'message': 'string', 'recovery_label': 'string'},
+             'slots': {}},
+ 'Image@1': {'bindable': [],
+             'events': [],
+             'props': {'label': 'string', 'reference': 'string'},
+             'slots': {}},
+ 'KeyValue@1': {'bindable': [],
+                'events': [],
+                'props': {'label': 'string', 'rows': 'keyedrows'},
+                'slots': {}},
+ 'Link@1': {'bindable': [],
+            'events': ['activate'],
+            'props': {'label': 'string', 'url': 'string'},
+            'slots': {}},
+ 'List@1': {'bindable': [],
+            'events': [],
+            'props': {'label': 'string', 'rows': 'keyedrows'},
+            'slots': {}},
+ 'Progress@1': {'bindable': ['value'],
+                'events': [],
+                'props': {'label': 'string', 'value': 'number'},
+                'slots': {}},
+ 'PtySession@1': {'bindable': [],
+                  'events': [],
+                  'props': {'label': 'string', 'source': 'string'},
+                  'slots': {}},
+ 'Result@1': {'bindable': ['value'],
+              'events': [],
+              'props': {'label': 'string', 'value': 'string'},
+              'slots': {}},
+ 'RichText@1': {'bindable': [], 'events': [], 'props': {'runs': 'richruns'}, 'slots': {}},
+ 'Row@1': {'bindable': [],
+           'events': [],
+           'props': {'spacing': ['compact', 'normal', 'relaxed']},
+           'slots': {'children': [0, 2048]}},
+ 'Scroll@1': {'bindable': [],
+              'events': [],
+              'props': {'label': 'string', 'spacing': ['compact', 'normal', 'relaxed']},
+              'slots': {'children': [0, 2048]}},
+ 'Section@1': {'bindable': [],
+               'events': [],
+               'props': {'label': 'string', 'spacing': ['compact', 'normal', 'relaxed']},
+               'slots': {'children': [0, 2048]}},
+ 'Split@1': {'bindable': [],
+             'events': [],
+             'props': {'axis': ['horizontal', 'vertical'], 'label': 'string'},
+             'slots': {'children': [2, 2]}},
+ 'Stack@1': {'bindable': [],
+             'events': [],
+             'props': {'spacing': ['compact', 'normal', 'relaxed']},
+             'slots': {'children': [0, 2048]}},
+ 'Status@1': {'bindable': ['value'], 'events': [], 'props': {'value': 'string'}, 'slots': {}},
+ 'Table@1': {'bindable': [],
+             'events': [],
+             'props': {'columns': 'stringlist', 'label': 'string', 'rows': 'keyedrows'},
+             'slots': {}},
+ 'Tabs@1': {'bindable': [],
+            'events': [],
+            'props': {'label': 'string', 'labels': 'stringlist'},
+            'slots': {'children': [1, 32]}},
+ 'Text@1': {'bindable': [],
+            'events': [],
+            'props': {'role': ['text', 'heading'], 'text': 'string'},
+            'slots': {}},
+ 'TextField@1': {'bindable': [],
+                 'events': ['submit', 'change'],
+                 'props': {'label': 'string',
+                           'multiline': 'boolean',
+                           'placeholder': 'string',
+                           'value': 'string'},
+                 'slots': {}},
+ 'Toggle@1': {'bindable': [],
+              'events': [],
+              'props': {'label': 'string', 'value': 'boolean'},
+              'slots': {}}}
+
+COMPONENT_PROPERTY_TYPES={'string','boolean','number','richruns','chartpoints','stringlist','keyedrows'}
+COMPONENT_MEMBER_NAME=re.compile(r'[a-z][a-z0-9_]{0,63}')
+
+def validate_component_schemas(schemas,components):
+    if not isinstance(schemas,dict) or set(schemas)!=set(components):
+        raise ValueError('Release component schemas must match its component capabilities')
+    for kind,schema in schemas.items():
+        if not isinstance(schema,dict) or set(schema)!={'props','bindable','events','slots'}:
+            raise ValueError('Invalid release component schema: '+kind)
+        props=schema['props']
+        if not isinstance(props,dict) or len(props)>64:
+            raise ValueError('Invalid release component properties: '+kind)
+        for name,spec in props.items():
+            if not isinstance(name,str) or not COMPONENT_MEMBER_NAME.fullmatch(name):
+                raise ValueError('Invalid release component property name: '+kind)
+            if isinstance(spec,list):
+                valid=0<len(spec)<=128 and all(isinstance(v,str) and 0<len(v)<=256 for v in spec) and len(set(spec))==len(spec)
+            else:valid=isinstance(spec,str) and spec in COMPONENT_PROPERTY_TYPES
+            if not valid:raise ValueError('Invalid release component property schema: '+kind+'.'+name)
+        for field in ('bindable','events'):
+            values=schema[field]
+            if (not isinstance(values,list) or len(values)>64
+                    or any(not isinstance(v,str) or not COMPONENT_MEMBER_NAME.fullmatch(v) for v in values)
+                    or len(set(values))!=len(values)):
+                raise ValueError('Invalid release component '+field+': '+kind)
+        if not set(schema['bindable'])<=set(props):
+            raise ValueError('Release bindable properties are not declared: '+kind)
+        slots=schema['slots']
+        if (not isinstance(slots,dict) or len(slots)>16
+                or any(not isinstance(name,str) or not COMPONENT_MEMBER_NAME.fullmatch(name)
+                       or not isinstance(bounds,list) or len(bounds)!=2
+                       or any(type(n) is not int for n in bounds)
+                       or not 0<=bounds[0]<=bounds[1]<=2048 for name,bounds in slots.items())):
+            raise ValueError('Invalid release component slots: '+kind)
+
+
+def compatible_element(element,schema):
+    kind=element['type']
+    if schema is None:raise ValueError('Release lacks saved component schema '+kind+'; an explicit migration is required')
+    props=element.get('props',{})
+    if not isinstance(props,dict):raise ValueError('Invalid saved component properties: '+kind)
+    for name,value in props.items():
+        spec=schema['props'].get(name)
+        if spec is None:raise ValueError('Release lacks saved component property '+kind+'.'+name+'; an explicit migration is required')
+        if isinstance(value,dict) and 'binding' in value:
+            valid=name in schema['bindable'] and set(value)=={'binding'} and isinstance(value['binding'],str) and bool(value['binding'])
+        elif isinstance(spec,list):valid=isinstance(value,str) and value in spec
+        elif spec=='string':valid=isinstance(value,str)
+        elif spec=='boolean':valid=type(value) is bool
+        elif spec=='number':valid=type(value) in (int,float) and 0<=value<=1 and math.isfinite(value)
+        else:valid=isinstance(value,list) # Existing bounded literal collection types.
+        if not valid:raise ValueError('Release lacks saved property value or binding '+kind+'.'+name+'; an explicit migration is required')
+    slots=element.get('slots',{})
+    if not isinstance(slots,dict):raise ValueError('Invalid saved component slots: '+kind)
+    for name,children in slots.items():
+        bounds=schema['slots'].get(name)
+        if bounds is None or not isinstance(children,list) or not bounds[0]<=len(children)<=bounds[1]:
+            raise ValueError('Release lacks saved component slot '+kind+'.'+name+'; an explicit migration is required')
+    events=element.get('events',{})
+    if not isinstance(events,dict):raise ValueError('Invalid saved component events: '+kind)
+    for name in events:
+        if name not in schema['events']:
+            raise ValueError('Release lacks saved component event '+kind+'.'+name+'; an explicit migration is required')
 
 
 def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -152,6 +324,8 @@ class Installer:
                     or any(not isinstance(kind,str) or not re.fullmatch(r'[A-Za-z][A-Za-z0-9]*@[1-9][0-9]*',kind) for kind in components)
                     or len(set(components))!=len(components)):
                 raise ValueError('Invalid release component capabilities')
+        if 'component_schemas' in value:
+            validate_component_schemas(value['component_schemas'],value.get('components',[]))
         if value.get('desktop') is not None:
             required=('native/agent-os-desktop','native/agent-os-compositor','services/desktop_session.py','services/session-launcher.sh','session/agent-os.desktop','third-party-licenses/dependencies.json')
             if value['desktop']!={'format':1} or any(not (release/name).is_file() for name in required):raise ValueError('Invalid graphical runtime contract')
@@ -162,6 +336,7 @@ class Installer:
         # vocabulary. A matching SQLite format alone does not make them safe.
         supported=set(contract.get('components',[
             'Stack@1','Row@1','Text@1','Status@1','Button@1','Link@1','TextField@1','Progress@1']))
+        schemas=contract.get('component_schemas',LEGACY_COMPONENT_SCHEMAS)
         path=self.path('/var/lib/agent-os-runtime/state.sqlite3')
         if not path.exists():return
         with sqlite3.connect(path.resolve().as_uri()+'?mode=ro',uri=True,timeout=5) as db:
@@ -175,8 +350,9 @@ class Installer:
                 if not isinstance(elements,dict):raise ValueError('Invalid saved presentation elements')
                 for element in elements.values():
                     kind=element.get('type') if isinstance(element,dict) else None
-                    if kind not in supported:
+                    if not isinstance(kind,str) or kind not in supported:
                         raise ValueError('Release lacks saved component '+str(kind)+'; an explicit migration is required')
+                    compatible_element(element,schemas.get(kind))
 
     def link(self,path,target):
         path.parent.mkdir(parents=True,exist_ok=True)

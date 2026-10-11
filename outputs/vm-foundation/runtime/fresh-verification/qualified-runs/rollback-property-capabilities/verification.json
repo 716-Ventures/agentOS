@@ -1,0 +1,29 @@
+{
+  "started_at": "2026-10-11T15:38:32.181483+00:00",
+  "source_revision": "c0f57f8b4a01bf6ac7e618a93585245baaa5b674",
+  "source_changes": [
+    " M outputs/agent-shell/install_runtime.py",
+    " M outputs/agent-shell/release-contract.json",
+    " M outputs/agent-shell/src/main.rs",
+    " M outputs/agent-shell/tests/installation_guest.py",
+    " M outputs/agent-shell/tests/installation_test.py"
+  ],
+  "source_archive_sha256": "99d50a8fbdbcbecccb16f9cfb1bb9596e260ac3a8bc75dca230fc3f838be094b",
+  "passed": true,
+  "owned_utm_identity": [
+    84028,
+    "Sun Oct 11 11:38:32 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T15:39:29.581477+00:00",
+  "original_installer_regression": "incompatible icon properties permitted despite matching component name",
+  "python_tests": 280,
+  "python_skips": 3,
+  "core_host_tests": 62,
+  "installation_tests": 26,
+  "installed_incompatible_schema_refusal": "document, activation journal, current link and service PIDs/start times unchanged",
+  "compatible_plain_button": "pass",
+  "installed_compatible_rollback_and_four_sigkill_recovery_probes": "pass",
+  "recovery_dependency": "self-contained installer; no import through an older current-release service directory",
+  "scope": "Targeted installed lifecycle qualification; a clean-source full70 and new image follow separately"
+}

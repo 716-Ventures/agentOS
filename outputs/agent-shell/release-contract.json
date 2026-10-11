@@ -41,5 +41,337 @@
     "TextField@1",
     "Toggle@1"
   ],
-  "login_identity": 1
+  "login_identity": 1,
+  "component_schemas": {
+    "ApplicationReference@1": {
+      "props": {
+        "label": "string",
+        "target": "string"
+      },
+      "bindable": [],
+      "events": [],
+      "slots": {}
+    },
+    "Button@1": {
+      "props": {
+        "disabled": "boolean",
+        "icon": [
+          "plus",
+          "arrow-right"
+        ],
+        "icon_position": [
+          "leading",
+          "trailing",
+          "only"
+        ],
+        "label": "string",
+        "size": [
+          "default",
+          "xs",
+          "sm",
+          "lg"
+        ],
+        "variant": [
+          "default",
+          "secondary",
+          "outline",
+          "ghost",
+          "destructive",
+          "link"
+        ]
+      },
+      "bindable": [],
+      "events": [
+        "activate"
+      ],
+      "slots": {}
+    },
+    "Chart@1": {
+      "props": {
+        "label": "string",
+        "points": "chartpoints"
+      },
+      "bindable": [],
+      "events": [],
+      "slots": {}
+    },
+    "Choice@1": {
+      "props": {
+        "label": "string",
+        "options": "stringlist",
+        "value": "string"
+      },
+      "bindable": [],
+      "events": [],
+      "slots": {}
+    },
+    "DocumentEditor@1": {
+      "props": {
+        "label": "string",
+        "value": "string"
+      },
+      "bindable": [],
+      "events": [
+        "submit",
+        "change"
+      ],
+      "slots": {}
+    },
+    "DocumentReference@1": {
+      "props": {
+        "label": "string",
+        "target": "string"
+      },
+      "bindable": [],
+      "events": [],
+      "slots": {}
+    },
+    "Error@1": {
+      "props": {
+        "label": "string",
+        "message": "string",
+        "recovery_label": "string"
+      },
+      "bindable": [
+        "message"
+      ],
+      "events": [
+        "recover"
+      ],
+      "slots": {}
+    },
+    "Image@1": {
+      "props": {
+        "label": "string",
+        "reference": "string"
+      },
+      "bindable": [],
+      "events": [],
+      "slots": {}
+    },
+    "KeyValue@1": {
+      "props": {
+        "label": "string",
+        "rows": "keyedrows"
+      },
+      "bindable": [],
+      "events": [],
+      "slots": {}
+    },
+    "Link@1": {
+      "props": {
+        "label": "string",
+        "url": "string"
+      },
+      "bindable": [],
+      "events": [
+        "activate"
+      ],
+      "slots": {}
+    },
+    "List@1": {
+      "props": {
+        "label": "string",
+        "rows": "keyedrows"
+      },
+      "bindable": [],
+      "events": [],
+      "slots": {}
+    },
+    "Progress@1": {
+      "props": {
+        "label": "string",
+        "value": "number"
+      },
+      "bindable": [
+        "value"
+      ],
+      "events": [],
+      "slots": {}
+    },
+    "PtySession@1": {
+      "props": {
+        "label": "string",
+        "source": "string"
+      },
+      "bindable": [],
+      "events": [],
+      "slots": {}
+    },
+    "Result@1": {
+      "props": {
+        "label": "string",
+        "value": "string"
+      },
+      "bindable": [
+        "value"
+      ],
+      "events": [],
+      "slots": {}
+    },
+    "RichText@1": {
+      "props": {
+        "runs": "richruns"
+      },
+      "bindable": [],
+      "events": [],
+      "slots": {}
+    },
+    "Row@1": {
+      "props": {
+        "spacing": [
+          "compact",
+          "normal",
+          "relaxed"
+        ]
+      },
+      "bindable": [],
+      "events": [],
+      "slots": {
+        "children": [
+          0,
+          2048
+        ]
+      }
+    },
+    "Scroll@1": {
+      "props": {
+        "label": "string",
+        "spacing": [
+          "compact",
+          "normal",
+          "relaxed"
+        ]
+      },
+      "bindable": [],
+      "events": [],
+      "slots": {
+        "children": [
+          0,
+          2048
+        ]
+      }
+    },
+    "Section@1": {
+      "props": {
+        "label": "string",
+        "spacing": [
+          "compact",
+          "normal",
+          "relaxed"
+        ]
+      },
+      "bindable": [],
+      "events": [],
+      "slots": {
+        "children": [
+          0,
+          2048
+        ]
+      }
+    },
+    "Split@1": {
+      "props": {
+        "axis": [
+          "horizontal",
+          "vertical"
+        ],
+        "label": "string"
+      },
+      "bindable": [],
+      "events": [],
+      "slots": {
+        "children": [
+          2,
+          2
+        ]
+      }
+    },
+    "Stack@1": {
+      "props": {
+        "spacing": [
+          "compact",
+          "normal",
+          "relaxed"
+        ]
+      },
+      "bindable": [],
+      "events": [],
+      "slots": {
+        "children": [
+          0,
+          2048
+        ]
+      }
+    },
+    "Status@1": {
+      "props": {
+        "value": "string"
+      },
+      "bindable": [
+        "value"
+      ],
+      "events": [],
+      "slots": {}
+    },
+    "Table@1": {
+      "props": {
+        "columns": "stringlist",
+        "label": "string",
+        "rows": "keyedrows"
+      },
+      "bindable": [],
+      "events": [],
+      "slots": {}
+    },
+    "Tabs@1": {
+      "props": {
+        "label": "string",
+        "labels": "stringlist"
+      },
+      "bindable": [],
+      "events": [],
+      "slots": {
+        "children": [
+          1,
+          32
+        ]
+      }
+    },
+    "Text@1": {
+      "props": {
+        "role": [
+          "text",
+          "heading"
+        ],
+        "text": "string"
+      },
+      "bindable": [],
+      "events": [],
+      "slots": {}
+    },
+    "TextField@1": {
+      "props": {
+        "label": "string",
+        "multiline": "boolean",
+        "placeholder": "string",
+        "value": "string"
+      },
+      "bindable": [],
+      "events": [
+        "submit",
+        "change"
+      ],
+      "slots": {}
+    },
+    "Toggle@1": {
+      "props": {
+        "label": "string",
+        "value": "boolean"
+      },
+      "bindable": [],
+      "events": [],
+      "slots": {}
+    }
+  }
 }

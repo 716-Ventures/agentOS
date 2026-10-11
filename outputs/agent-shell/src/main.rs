@@ -763,6 +763,10 @@ mod tests {
             .cloned()
             .collect::<std::collections::BTreeSet<_>>();
         assert_eq!(declared, supported);
+        let schemas = presentation::catalog()["components"].as_object().unwrap().iter()
+            .map(|(name, schema)| (name.clone(),json!({"props":schema["props"],"bindable":schema["bindable"],"events":schema["events"],"slots":schema["slots"]})))
+            .collect::<serde_json::Map<String,Value>>();
+        assert_eq!(contract["component_schemas"], Value::Object(schemas));
     }
     struct Fixture(PathBuf);
     impl Fixture {
