@@ -17,6 +17,12 @@ class Projection(unittest.TestCase):
     def setUp(self):
         directory=tempfile.TemporaryDirectory();self.addCleanup(directory.cleanup);self.state=Path(directory.name)
         env=patch.dict(view.os.environ,{'XDG_STATE_HOME':str(self.state)});env.start();self.addCleanup(env.stop)
+    def test_icon_only_buttons_keep_literal_labels_and_disabled_actions_in_terminal(self):
+        doc=document();props=doc['elements']['button']['props']
+        props.update(label='Next 日本語',variant='outline',size='xs',icon='arrow-right',icon_position='only')
+        lines,controls=view.project(doc);self.assertIn('[button] Next 日本語','\n'.join(lines));self.assertIn('button',controls)
+        props['disabled']=True
+        lines,controls=view.project(doc);self.assertIn('[button] Next 日本語 (disabled)','\n'.join(lines));self.assertNotIn('button',controls)
     def test_table_projects_headers_and_rows_as_inert_terminal_text(self):
         doc=document();doc['elements']['table']={'type':'Table@1','props':{'label':'Observed files','columns':['Name','State'],'rows':[{'id':'a','cells':['日本語','Ready\x1b]52;c;evil\x07']}]}}
         doc['elements']['root']['slots']['children'].append('table')

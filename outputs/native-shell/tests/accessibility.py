@@ -93,3 +93,31 @@ def verify(call):
         raise
     assert saved()==value
     print('PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state')
+
+
+def verify_button(call):
+    # Use a separate view: focused editors deliberately defer composition.
+    activity=call({'op':'presentation.get','document_id':'session-fixture'})['activity_id']
+    document={'protocol':'agentos.presentation/1','catalog_revision':'native-core/1','surface_id':'button-session-fixture','activity_id':activity,'revision':0,'title':'Styled button fixture','root':'styled-button','elements':{'styled-button':{'type':'Button@1','props':{'label':'Accessible styled action λ','variant':'outline','size':'xs','icon':'plus'}}},'bindings':{},'actions':{}}
+    assert call({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':'styled-button-create','expected_revisions':{'button-session-fixture':None},'operations':[{'op':'surface.create','document':document}]})['status']=='committed'
+    button=find('Accessible styled action λ',pyatspi.ROLE_PUSH_BUTTON)
+    assert not button.getState().contains(pyatspi.STATE_SENSITIVE),'Missing host action enabled a styled button'
+    before=call({'op':'presentation.get','document_id':'button-session-fixture'})
+    request={'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
+             'request_id':'styled-button-change','expected_revisions':{'button-session-fixture':before['revision']},
+             'operations':[{'op':'element.set_props','surface_id':'button-session-fixture','element_id':'styled-button',
+                            'props':{'label':'Next styled action 日本語','variant':'secondary','size':'lg','icon':'arrow-right','icon_position':'only'}}]}
+    assert call(request)['status']=='committed'
+    renamed=find('Next styled action 日本語',pyatspi.ROLE_PUSH_BUTTON)
+    assert not renamed.getState().contains(pyatspi.STATE_SENSITIVE)
+    assert renamed.queryAction().nActions>0
+    current=call({'op':'presentation.get','document_id':'button-session-fixture'})
+    request['request_id']='styled-button-reject';request['expected_revisions']['button-session-fixture']=current['revision']
+    request['operations'][0]['props']={'label':'Invalid unnamed icon','icon_position':'only'}
+    try:call(request)
+    except (AssertionError,RuntimeError) as error:
+        assert 'Invalid button declaration' in str(error),error
+    else:raise AssertionError('Core accepted an icon position without an icon')
+    assert call({'op':'presentation.get','document_id':'button-session-fixture'})==current
+    assert find('Next styled action 日本語',pyatspi.ROLE_PUSH_BUTTON).queryAction().nActions>0
+    print('PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision')

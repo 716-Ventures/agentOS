@@ -344,6 +344,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                         print('PASS: failed input method leaves the native desktop and deliberate Unicode Save available',flush=True)
                 else:
                     import accessibility
+                    accessibility.verify_button(lambda value:call(endpoint,value))
                     accessibility.verify(lambda value:call(endpoint,value))
             if system_bar:
                 core.terminate();assert core.wait(timeout=5) in (0,-signal.SIGTERM)

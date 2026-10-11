@@ -1,0 +1,49 @@
+{
+  "started_at": "2026-10-11T15:13:37.076454+00:00",
+  "source_revision": "1b6ad058db266f1065ec9db661f57283eeee8de5",
+  "source_changes": [
+    " M outputs/agent-shell/Cargo.lock",
+    " M outputs/agent-shell/Cargo.toml",
+    " M outputs/agent-shell/src/presentation.rs",
+    " M outputs/agent-shell/tests/presentation_view_test.py",
+    " M outputs/native-shell/Cargo.lock",
+    " M outputs/native-shell/Cargo.toml",
+    " M outputs/native-shell/src/main.rs",
+    " M outputs/native-shell/src/verification.rs",
+    " M outputs/native-shell/tests/accessibility.py",
+    " M outputs/native-shell/tests/native_session.py"
+  ],
+  "source_archive_sha256": "22e48087398615f4c809ef3da1f3bb6eb56e37e71f4aa3224f817e2023d736e9",
+  "passed": true,
+  "owned_utm_identity": [
+    64104,
+    "Sun Oct 11 11:13:37 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T15:14:38.914517+00:00",
+  "public_ui_revision": "8c9d9982225d00622ebc049dc530c206bca273df",
+  "public_ui_tag": "v0.1.0-alpha.36",
+  "public_ui_ci": {
+    "run_id": 38149743897,
+    "result": "success"
+  },
+  "checks": {
+    "core_linux": 64,
+    "native_unit": 32,
+    "native_ignored_fixture_tests": 7,
+    "terminal_projection": 21,
+    "native_profiles": [
+      "light-1",
+      "light-2",
+      "dark-1",
+      "dark-2"
+    ],
+    "sessions": [
+      "normal",
+      "screen-keyboard",
+      "display-zoom"
+    ],
+    "graphical_signed_packaging": "pass"
+  },
+  "scope": "Targeted typed button validation/reconciliation and independent AT-SPI updates; complete installed-system verification follows separately"
+}

@@ -73,7 +73,7 @@ struct Element {
     selection_notice: Option<gtk::Label>,
     toggle: Option<ui::Toggle>,
     area: Option<ui::TextArea>,
-    button: Option<gtk::Button>,
+    button: Option<ui::ActionButton>,
     progress: Option<gtk::ProgressBar>,
     container: Option<gtk::Box>,
     split: Option<ui::SplitView>,
@@ -613,15 +613,24 @@ fn construct(
             result.field = Some(field);
         }
         "Button@1" => {
-            let button = ui::button(
-                props["label"].as_str().unwrap_or("Action"),
-                ButtonVariant::Primary,
-                props["disabled"] == true,
-            );
-            let (events, commands) = (events.clone(), commands.clone());
-            button.connect_clicked(move |_| dispatch_action(&events, &commands));
-            result.widget = button.clone().upcast();
-            result.button = Some(button);
+            match ui::ButtonProps::from_value(props.clone())
+                .and_then(|mut props| {
+                    // Wait for authenticated host action availability before enabling.
+                    props.disabled = true;
+                    ui::ActionButton::new(&props).map_err(str::to_owned)
+                })
+            {
+                Ok(button) => {
+                    let (events, commands) = (events.clone(), commands.clone());
+                    button.widget.connect_clicked(move |_| dispatch_action(&events, &commands));
+                    result.widget = button.widget.clone().upcast();
+                    result.button = Some(button);
+                }
+                Err(_) => {
+                    let fallback = ui::button("Action unavailable", ButtonVariant::Primary, true);
+                    result.widget = fallback.upcast();
+                }
+            }
         }
         "Link@1" => {
             match ui::link(
@@ -1332,8 +1341,7 @@ impl Surface {
                     let _ = reference.reconcile(props["label"].as_str().unwrap(), available);
                     *e.events.borrow_mut() = json!({"surface":id,"revision":doc["revision"]});
                 }
-                if let Some(button) = &e.button {
-                    button.set_label(props["label"].as_str().unwrap_or("Action"));
+                if let Some(button) = &mut e.button {
                     let action = node["events"]["activate"]["action"]
                         .as_str()
                         .and_then(|key| doc["actions"][key]["ref"].as_str());
@@ -1341,9 +1349,20 @@ impl Surface {
                         .and_then(|reference| frame.actions.get(reference))
                         .map(|a| a["available"] == true)
                         .unwrap_or(false);
-                    button.set_sensitive(props["disabled"] != true && available);
-                    let key = node["events"]["activate"]["action"].as_str().unwrap_or("");
-                    *e.events.borrow_mut() = json!({"host_reference":action,"surface":id,"revision":doc["revision"],"action":key,"parameters":doc["actions"][key]["parameters"]});
+                    let declaration = ui::ButtonProps::from_value(props.clone()).and_then(|mut props| {
+                        props.disabled |= !available;
+                        button.reconcile(&props).map_err(str::to_owned)?;
+                        // A prior rejected frame disables the retained widget directly.
+                        button.widget.set_sensitive(!props.disabled);
+                        Ok(())
+                    });
+                    if declaration.is_ok() && button.widget.is_sensitive() {
+                        let key = node["events"]["activate"]["action"].as_str().unwrap_or("");
+                        *e.events.borrow_mut() = json!({"host_reference":action,"surface":id,"revision":doc["revision"],"action":key,"parameters":doc["actions"][key]["parameters"]});
+                    } else {
+                        button.widget.set_sensitive(false);
+                        *e.events.borrow_mut() = Value::Null;
+                    }
                 }
                 if let Some(progress) = &e.progress {
                     let value = bound(id, &props["value"], frame);

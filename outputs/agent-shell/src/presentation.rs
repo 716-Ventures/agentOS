@@ -385,6 +385,10 @@ fn walk_elements(
             return Err(invalid("A bounded accessible label is required"));
         }
     }
+    if node.kind == "Button@1" {
+        seven_sixteen_ui::ButtonProps::from_value(json!(node.props))
+            .map_err(|error| invalid(format!("Invalid button declaration: {error}")))?;
+    }
     if ["Table@1", "List@1", "KeyValue@1"].contains(&node.kind.as_str()) {
         let columns = match node.kind.as_str() {
             "Table@1" => node.props["columns"].as_array().unwrap().len(),
@@ -2303,6 +2307,36 @@ mod tests {
     }
     fn props(request: &str, revision: u64, element: &str, text: &str) -> Value {
         json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":request,"expected_revisions":{"surface-a":revision},"operations":[{"op":"element.set_props","surface_id":"surface-a","element_id":element,"props":{"text":text}}]})
+    }
+    #[test]
+    fn button_choices_and_dependent_icons_validate_atomically() {
+        let mut db = fixture();
+        let mut doc = surface();
+        doc["elements"]["input"] = json!({"type":"Button@1","props":{"label":"Continue λ","variant":"outline","size":"xs","icon":"arrow-right","icon_position":"only"}});
+        let create = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"button-create","expected_revisions":{"surface-a":null},"operations":[{"op":"surface.create","document":doc}]});
+        handle(&mut db, &create, &human()).unwrap();
+        let before = snapshot(&db).unwrap();
+        for (index, invalid_props) in [
+            json!({"label":"Next","icon_position":"only"}),
+            json!({"label":"Next","icon":"host-icon"}),
+            json!({"label":"Next","variant":"#ff0000"}),
+            json!({"label":"Next","size":"huge"}),
+            json!({"label":"Next\nline","icon":"plus"}),
+            json!({"label":"Next","icon":null}),
+        ].into_iter().enumerate() {
+            let request = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":format!("invalid-button-{index}"),"expected_revisions":{"surface-a":0},"operations":[
+                {"op":"element.set_props","surface_id":"surface-a","element_id":"text","props":{"text":"Must roll back"}},
+                {"op":"element.set_props","surface_id":"surface-a","element_id":"input","props":invalid_props}
+            ]});
+            assert!(handle(&mut db, &request, &human()).is_err());
+            assert_eq!(snapshot(&db).unwrap(), before, "Invalid button changed a document or revision");
+        }
+        let defaults = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"button-defaults","expected_revisions":{"surface-a":0},"operations":[{"op":"element.set_props","surface_id":"surface-a","element_id":"input","props":{"label":"Continue λ"}}]});
+        handle(&mut db, &defaults, &human()).unwrap();
+        assert_eq!(snapshot(&db).unwrap()["documents"]["surface-a"]["elements"]["input"]["props"],json!({"label":"Continue λ"}));
+        let mut stale = defaults;
+        stale["request_id"] = json!("stale-button");
+        assert!(handle(&mut db, &stale, &human()).is_err());
     }
     #[test]
     fn repeated_image_references_share_an_aggregate_decoded_pixel_budget() {
