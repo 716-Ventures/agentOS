@@ -93,7 +93,12 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 import accessibility,pyatspi
                 accessibility.activate(accessibility.find('Agent Monitor',pyatspi.ROLE_PUSH_BUTTON))
                 accessibility.activate(accessibility.find('Open launcher',pyatspi.ROLE_PUSH_BUTTON))
-                opened=wait_for(lambda:(lambda s:s if any(layer['namespace']=='agentos-launcher' and layer['mapped'] and s['seat_focus']==layer['id'] for layer in s['system_layers']) else None)(call(control,{'op':'snapshot'})),[core,session])
+                def launcher_ready():
+                    state=call(control,{'op':'snapshot'})
+                    focused=any(layer['namespace']=='agentos-launcher' and layer['mapped'] and state['seat_focus']==layer['id'] for layer in state['system_layers'])
+                    registered=any(window['title']=='Agent Monitor' and window['id'] in state['shared']['identities'] for window in state['windows'])
+                    return state if focused and registered else None
+                opened=wait_for(launcher_ready,[core,session])
                 launcher=next(layer for layer in opened['system_layers'] if layer['namespace']=='agentos-launcher')
                 assert launcher['work_area']==bar['work_area'],(launcher,bar)
                 assert not any(w['title']=='Agent launcher' for w in opened['windows']),opened
