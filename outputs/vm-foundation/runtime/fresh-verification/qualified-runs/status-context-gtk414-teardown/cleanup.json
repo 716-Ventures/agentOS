@@ -1,0 +1,10 @@
+{
+  "guest_stopped": true,
+  "owned_utm_closed": true,
+  "owned_identity": [
+    46892,
+    "Sun Oct 11 19:00:00 2026"
+  ],
+  "runner_orderly_shutdown_deadline_exceeded": true,
+  "serial_observation": "session-46.scope stop waiting for its 90-second deadline; allowed orderly shutdown to finish"
+}

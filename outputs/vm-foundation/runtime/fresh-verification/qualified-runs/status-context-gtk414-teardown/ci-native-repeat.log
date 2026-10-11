@@ -1,0 +1,2180 @@
+﻿2026-10-11T23:02:51.9696672Z Current runner version: '2.337.0'
+2026-10-11T23:02:51.9709664Z ##[group]Runner Image Provisioner
+2026-10-11T23:02:51.9710314Z Hosted Compute Agent
+2026-10-11T23:02:51.9710762Z Version: 20261002.596
+2026-10-11T23:02:51.9711206Z Commit: c3d12f3313a95f25162a1503be624f3b0617f8c0
+2026-10-11T23:02:51.9711762Z Build Date: 2026-10-02T22:28:27Z
+2026-10-11T23:02:51.9712236Z Worker ID: {f976348f-eabf-443c-97c1-c183849fdb9d}
+2026-10-11T23:02:51.9712769Z Region: centralus
+2026-10-11T23:02:51.9713180Z Cloud: Azure
+2026-10-11T23:02:51.9713559Z ##[endgroup]
+2026-10-11T23:02:51.9714385Z ##[group]Operating System
+2026-10-11T23:02:51.9714803Z Ubuntu
+2026-10-11T23:02:51.9715267Z 24.04.5
+2026-10-11T23:02:51.9715656Z LTS
+2026-10-11T23:02:51.9716016Z ##[endgroup]
+2026-10-11T23:02:51.9716607Z ##[group]Runner Image
+2026-10-11T23:02:51.9717027Z Image: ubuntu-24.04-arm
+2026-10-11T23:02:51.9717448Z Version: 20261004.142.1
+2026-10-11T23:02:51.9718355Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24-arm64/20261004.142/images/ubuntu/Ubuntu2404-Arm64-Readme.md
+2026-10-11T23:02:51.9719448Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24-arm64%2F20261004.142
+2026-10-11T23:02:51.9720161Z ##[endgroup]
+2026-10-11T23:02:51.9720928Z ##[group]GITHUB_TOKEN Permissions
+2026-10-11T23:02:51.9722132Z Contents: read
+2026-10-11T23:02:51.9722502Z Metadata: read
+2026-10-11T23:02:51.9722996Z ##[endgroup]
+2026-10-11T23:02:51.9724214Z Secret source: Actions
+2026-10-11T23:02:51.9724840Z Cache mode: write
+2026-10-11T23:02:51.9725418Z Prepare workflow directory
+2026-10-11T23:02:51.9958442Z Prepare all required actions
+2026-10-11T23:02:51.9989568Z Getting action download info
+2026-10-11T23:02:52.2125326Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-11T23:02:52.4016023Z Download action repository 'actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830' (SHA:0057852bfaa89a56745cba8c7296529d2fc39830)
+2026-10-11T23:02:52.5483584Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-11T23:02:52.7680877Z Complete job name: native
+2026-10-11T23:02:52.8109457Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+2026-10-11T23:02:52.8110173Z with:
+2026-10-11T23:02:52.8110570Z   persist-credentials: false
+2026-10-11T23:02:52.8110986Z   repository: 716-Ventures/agentOS
+2026-10-11T23:02:52.8113859Z   token: ***
+2026-10-11T23:02:52.8114212Z   ssh-strict: true
+2026-10-11T23:02:52.8114587Z   ssh-user: git
+2026-10-11T23:02:52.8114946Z   clean: true
+2026-10-11T23:02:52.8115409Z   sparse-checkout-cone-mode: true
+2026-10-11T23:02:52.8115849Z   fetch-depth: 1
+2026-10-11T23:02:52.8116209Z   fetch-tags: false
+2026-10-11T23:02:52.8116580Z   show-progress: true
+2026-10-11T23:02:52.8116957Z   lfs: false
+2026-10-11T23:02:52.8117317Z   submodules: false
+2026-10-11T23:02:52.8117708Z   set-safe-directory: true
+2026-10-11T23:02:52.8118131Z   allow-unsafe-pr-checkout: false
+2026-10-11T23:02:52.8118619Z env:
+2026-10-11T23:02:52.8118991Z   RUSTUP_TOOLCHAIN: 1.85.1
+2026-10-11T23:02:52.8119417Z ##[endgroup]
+2026-10-11T23:02:52.8712887Z Syncing repository: 716-Ventures/agentOS
+2026-10-11T23:02:52.8714159Z ##[group]Getting Git version info
+2026-10-11T23:02:52.8714712Z Working directory is '/home/runner/work/agentOS/agentOS'
+2026-10-11T23:02:52.8715746Z [command]/usr/bin/git version
+2026-10-11T23:02:52.8769646Z git version 2.55.0
+2026-10-11T23:02:52.8772472Z ##[endgroup]
+2026-10-11T23:02:52.8775849Z Temporarily overriding HOME='/home/runner/work/_temp/acb7eb27-d5a6-4c69-ae2b-911f269ef7b7' before making global git config changes
+2026-10-11T23:02:52.8776842Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-11T23:02:52.8778487Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/agentOS/agentOS
+2026-10-11T23:02:52.8816164Z Deleting the contents of '/home/runner/work/agentOS/agentOS'
+2026-10-11T23:02:52.8817402Z ##[group]Initializing the repository
+2026-10-11T23:02:52.8817949Z [command]/usr/bin/git init /home/runner/work/agentOS/agentOS
+2026-10-11T23:02:52.8863319Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-11T23:02:52.8864303Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-11T23:02:52.8865209Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-11T23:02:52.8865772Z hint: call:
+2026-10-11T23:02:52.8866141Z hint:
+2026-10-11T23:02:52.8866598Z hint: 	git config --global init.defaultBranch <name>
+2026-10-11T23:02:52.8867067Z hint:
+2026-10-11T23:02:52.8867550Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-11T23:02:52.8868235Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-11T23:02:52.8868787Z hint:
+2026-10-11T23:02:52.8869197Z hint: 	git branch -m <name>
+2026-10-11T23:02:52.8869585Z hint:
+2026-10-11T23:02:52.8870106Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-11T23:02:52.8870828Z Initialized empty Git repository in /home/runner/work/agentOS/agentOS/.git/
+2026-10-11T23:02:52.8879262Z [command]/usr/bin/git remote add origin https://github.com/716-Ventures/agentOS
+2026-10-11T23:02:52.8901788Z ##[endgroup]
+2026-10-11T23:02:52.8902410Z ##[group]Disabling automatic garbage collection
+2026-10-11T23:02:52.8903846Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-11T23:02:52.8926417Z ##[endgroup]
+2026-10-11T23:02:52.8926981Z ##[group]Setting up auth
+2026-10-11T23:02:52.8927570Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-11T23:02:52.8945497Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-11T23:02:52.9150392Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-11T23:02:52.9168749Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-11T23:02:52.9292361Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T23:02:52.9310890Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-11T23:02:52.9432282Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-11T23:02:52.9455207Z ##[endgroup]
+2026-10-11T23:02:52.9455790Z ##[group]Fetching the repository
+2026-10-11T23:02:52.9460174Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +237cdeae7d046e9077a23d48cd53eda8aa568bdb:refs/remotes/origin/codex/file-target-identity
+2026-10-11T23:02:55.0994328Z From https://github.com/716-Ventures/agentOS
+2026-10-11T23:02:55.0995642Z  * [new ref]         237cdeae7d046e9077a23d48cd53eda8aa568bdb -> origin/codex/file-target-identity
+2026-10-11T23:02:55.0997572Z ##[endgroup]
+2026-10-11T23:02:55.0998236Z ##[group]Determining the checkout info
+2026-10-11T23:02:55.0999019Z ##[endgroup]
+2026-10-11T23:02:55.1000336Z [command]/usr/bin/git sparse-checkout disable
+2026-10-11T23:02:55.1030580Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-11T23:02:55.1049937Z ##[group]Checking out the ref
+2026-10-11T23:02:55.1052339Z [command]/usr/bin/git checkout --progress --force -B codex/file-target-identity refs/remotes/origin/codex/file-target-identity
+2026-10-11T23:02:55.2973606Z Switched to a new branch 'codex/file-target-identity'
+2026-10-11T23:02:55.2974820Z branch 'codex/file-target-identity' set up to track 'origin/codex/file-target-identity'.
+2026-10-11T23:02:55.2983714Z ##[endgroup]
+2026-10-11T23:02:55.3014706Z [command]/usr/bin/git log -1 --format=%H
+2026-10-11T23:02:55.3032036Z 237cdeae7d046e9077a23d48cd53eda8aa568bdb
+2026-10-11T23:02:55.3042050Z ##[group]Removing auth
+2026-10-11T23:02:55.3043414Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-11T23:02:55.3063444Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-11T23:02:55.3188124Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-11T23:02:55.3202437Z http.https://github.com/.extraheader
+2026-10-11T23:02:55.3205611Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-11T23:02:55.3228146Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-11T23:02:55.3348093Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T23:02:55.3367136Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-11T23:02:55.3487474Z ##[endgroup]
+2026-10-11T23:02:55.3644150Z ##[group]Run sudo apt-get update
+2026-10-11T23:02:55.3645287Z [36;1msudo apt-get update[0m
+2026-10-11T23:02:55.3647214Z [36;1msudo apt-get install -y --no-install-recommends libgtk-4-dev libvte-2.91-gtk4-dev weston dbus-x11 fonts-inter fonts-noto-cjk at-spi2-core python3-pyatspi[0m
+2026-10-11T23:02:55.3649331Z [36;1mrustup toolchain install 1.85.1 --profile minimal[0m
+2026-10-11T23:02:55.3714523Z shell: /usr/bin/bash -e {0}
+2026-10-11T23:02:55.3715339Z env:
+2026-10-11T23:02:55.3715920Z   RUSTUP_TOOLCHAIN: 1.85.1
+2026-10-11T23:02:55.3716579Z ##[endgroup]
+2026-10-11T23:02:55.4470896Z Get:1 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+2026-10-11T23:02:55.4850376Z Get:2 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [492 kB]
+2026-10-11T23:02:55.4978261Z Get:3 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [548 kB]
+2026-10-11T23:02:55.5060598Z Get:4 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [12.3 kB]
+2026-10-11T23:02:55.5083285Z Get:5 https://packages.microsoft.com/ubuntu/24.04/prod noble/main all Packages [640 B]
+2026-10-11T23:02:55.8994304Z Hit:6 http://ports.ubuntu.com/ubuntu-ports noble InRelease
+2026-10-11T23:02:56.0252932Z Get:7 http://ports.ubuntu.com/ubuntu-ports noble-updates InRelease [126 kB]
+2026-10-11T23:02:56.5686855Z Get:8 http://ports.ubuntu.com/ubuntu-ports noble-backports InRelease [126 kB]
+2026-10-11T23:02:56.8289119Z Get:9 http://ports.ubuntu.com/ubuntu-ports noble-security InRelease [126 kB]
+2026-10-11T23:02:57.0031030Z Get:10 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 Packages [1431 kB]
+2026-10-11T23:02:57.5997010Z Get:11 http://ports.ubuntu.com/ubuntu-ports noble-updates/main Translation-en [306 kB]
+2026-10-11T23:02:57.7512735Z Get:12 http://ports.ubuntu.com/ubuntu-ports noble-updates/universe arm64 Packages [1745 kB]
+2026-10-11T23:02:58.0664051Z Get:13 http://ports.ubuntu.com/ubuntu-ports noble-updates/universe Translation-en [342 kB]
+2026-10-11T23:02:58.2060448Z Get:14 http://ports.ubuntu.com/ubuntu-ports noble-updates/restricted arm64 Packages [2622 kB]
+2026-10-11T23:02:58.4845195Z Get:15 http://ports.ubuntu.com/ubuntu-ports noble-updates/restricted Translation-en [401 kB]
+2026-10-11T23:02:58.6183010Z Get:16 http://ports.ubuntu.com/ubuntu-ports noble-updates/multiverse arm64 Packages [90.5 kB]
+2026-10-11T23:02:58.7458811Z Get:17 http://ports.ubuntu.com/ubuntu-ports noble-updates/multiverse Translation-en [14.3 kB]
+2026-10-11T23:02:58.8723688Z Get:18 http://ports.ubuntu.com/ubuntu-ports noble-security/main arm64 Packages [1182 kB]
+2026-10-11T23:02:59.0233747Z Get:19 http://ports.ubuntu.com/ubuntu-ports noble-security/main Translation-en [228 kB]
+2026-10-11T23:02:59.3207043Z Get:20 http://ports.ubuntu.com/ubuntu-ports noble-security/universe arm64 Packages [1296 kB]
+2026-10-11T23:02:59.4745654Z Get:21 http://ports.ubuntu.com/ubuntu-ports noble-security/universe Translation-en [245 kB]
+2026-10-11T23:02:59.6055825Z Get:22 http://ports.ubuntu.com/ubuntu-ports noble-security/restricted arm64 Packages [2518 kB]
+2026-10-11T23:02:59.7861600Z Get:23 http://ports.ubuntu.com/ubuntu-ports noble-security/restricted Translation-en [383 kB]
+2026-10-11T23:02:59.9196806Z Get:24 http://ports.ubuntu.com/ubuntu-ports noble-security/multiverse arm64 Packages [86.5 kB]
+2026-10-11T23:03:00.0463439Z Get:25 http://ports.ubuntu.com/ubuntu-ports noble-security/multiverse Translation-en [12.4 kB]
+2026-10-11T23:03:02.3107935Z Fetched 14.3 MB in 5s (3095 kB/s)
+2026-10-11T23:03:02.9760105Z Reading package lists...
+2026-10-11T23:03:02.9998287Z Reading package lists...
+2026-10-11T23:03:03.1345730Z Building dependency tree...
+2026-10-11T23:03:03.1349835Z Reading state information...
+2026-10-11T23:03:03.2748436Z at-spi2-core is already the newest version (2.52.0-1build1).
+2026-10-11T23:03:03.2749457Z at-spi2-core set to manually installed.
+2026-10-11T23:03:03.2749903Z The following additional packages will be installed:
+2026-10-11T23:03:03.2750841Z   gir1.2-atspi-2.0 gir1.2-freedesktop gir1.2-freedesktop-dev
+2026-10-11T23:03:03.2751332Z   gir1.2-gdkpixbuf-2.0 gir1.2-glib-2.0-dev gir1.2-graphene-1.0 gir1.2-gtk-4.0
+2026-10-11T23:03:03.2751816Z   gir1.2-harfbuzz-0.0 gir1.2-pango-1.0 gir1.2-vte-3.91 libaml0t64 libass9
+2026-10-11T23:03:03.2752234Z   libasyncns0 libatk-adaptor libavcodec60 libavfilter9 libavformat60
+2026-10-11T23:03:03.2752642Z   libavutil58 libblas3 libblkid-dev libbluray2 libbrotli-dev libbs2b0
+2026-10-11T23:03:03.2753038Z   libbz2-dev libcairo-script-interpreter2 libcairo2-dev libchromaprint1
+2026-10-11T23:03:03.2753452Z   libcjson1 libcodec2-1.2 libdatrie-dev libdav1d7 libdeflate-dev libegl-dev
+2026-10-11T23:03:03.2753858Z   libegl-mesa0 libegl1 libegl1-mesa-dev libepoxy-dev libevent-2.1-7t64
+2026-10-11T23:03:03.2754273Z   libflac12t64 libflite1 libfontconfig-dev libfreerdp-server2-2t64
+2026-10-11T23:03:03.2754647Z   libfreerdp2-2t64 libfreetype-dev libfreetype6 libfribidi-dev
+2026-10-11T23:03:03.2755279Z   libgdk-pixbuf-2.0-dev libgirepository-2.0-0 libgl-dev libgles-dev libgles1
+2026-10-11T23:03:03.2755701Z   libgles2 libglib2.0-dev libglib2.0-dev-bin libglvnd-core-dev libglvnd-dev
+2026-10-11T23:03:03.2756110Z   libglx-dev libgme0 libgnutls-dane0t64 libgnutls-openssl27t64 libgnutls28-dev
+2026-10-11T23:03:03.2756521Z   libgraphene-1.0-0 libgraphene-1.0-dev libgraphite2-dev libgsm1
+2026-10-11T23:03:03.2756940Z   libgstreamer-plugins-base1.0-0 libgtk-4-1 libgtk-4-common libharfbuzz-cairo0
+2026-10-11T23:03:03.2757355Z   libharfbuzz-dev libharfbuzz-gobject0 libharfbuzz-icu0 libharfbuzz-subset0
+2026-10-11T23:03:03.2757780Z   libhwy1t64 libice-dev libidn2-dev libinput-bin libinput10 libjbig-dev
+2026-10-11T23:03:03.2758195Z   libjpeg-dev libjpeg-turbo8-dev libjpeg8-dev libjxl0.7 liblapack3 liblerc-dev
+2026-10-11T23:03:03.2758609Z   liblilv-0-0 liblzma-dev libmbedcrypto7t64 libmount-dev libmp3lame0
+2026-10-11T23:03:03.2759018Z   libmpg123-0t64 libmtdev1t64 libmysofa1 libneatvnc0 libopengl-dev libopengl0
+2026-10-11T23:03:03.2759450Z   libopenmpt0t64 libopus0 liborc-0.4-0t64 libp11-kit-dev libpango1.0-dev
+2026-10-11T23:03:03.2759842Z   libpangoxft-1.0-0 libpipewire-0.3-0t64 libpixman-1-dev libplacebo338
+2026-10-11T23:03:03.2760192Z   libpng-dev libpng16-16t64 libpocketsphinx3 libpostproc57
+2026-10-11T23:03:03.2760585Z   libpthread-stubs0-dev libpulse0 librav1e0 librist4 librubberband2
+2026-10-11T23:03:03.2760987Z   libsamplerate0 libseat1 libselinux1-dev libsepol-dev libserd-0-0
+2026-10-11T23:03:03.2761364Z   libsharpyuv-dev libshine3 libsm-dev libsndfile1 libsord-0-0 libsoxr0
+2026-10-11T23:03:03.2761733Z   libspa-0.2-modules libspeex1 libsphinxbase3t64 libsratom-0-0
+2026-10-11T23:03:03.2762109Z   libsrt1.5-gnutls libssh-gcrypt-4 libsvtav1enc1d1 libswresample4 libswscale7
+2026-10-11T23:03:03.2762649Z   libtasn1-6-dev libthai-dev libtheora0 libtiff-dev libtiffxx6 libturbojpeg
+2026-10-11T23:03:03.2763069Z   libtwolame0 libudfread0 libunbound8 libunibreak5 libva-drm2 libva-x11-2
+2026-10-11T23:03:03.2763453Z   libva2 libvdpau1 libvidstab1.1 libvorbisenc2 libvpx9 libvte-2.91-common
+2026-10-11T23:03:03.2763888Z   libvte-2.91-gtk4-0 libvulkan-dev libwacom-common libwacom9 libwayland-bin
+2026-10-11T23:03:03.2764254Z   libwayland-dev libwayland-server0 libwebp-dev libwebpdecoder3
+2026-10-11T23:03:03.2764638Z   libwebrtc-audio-processing1 libweston-13-0 libwinpr2-2t64 libx11-dev
+2026-10-11T23:03:03.2765079Z   libx264-164 libx265-199 libxau-dev libxcb-composite0 libxcb-render0-dev
+2026-10-11T23:03:03.2765457Z   libxcb-shm0-dev libxcb-xkb1 libxcb1-dev libxcomposite-dev libxcursor-dev
+2026-10-11T23:03:03.2765894Z   libxdamage-dev libxdmcp-dev libxext-dev libxfixes-dev libxft-dev libxi-dev
+2026-10-11T23:03:03.2766298Z   libxinerama-dev libxkbcommon-dev libxrandr-dev libxrender-dev libxvidcore4
+2026-10-11T23:03:03.2766726Z   libzimg2 libzix-0-0 libzvbi-common libzvbi0t64 nettle-dev ocl-icd-libopencl1
+2026-10-11T23:03:03.2767167Z   pango1.0-tools uuid-dev wayland-protocols x11proto-core-dev x11proto-dev
+2026-10-11T23:03:03.2767478Z   xorg-sgml-doctools xtrans-dev
+2026-10-11T23:03:03.2767794Z Suggested packages:
+2026-10-11T23:03:03.2768075Z   fonts-noto-cjk-extra libcuda1 libnvcuvid1 libnvidia-encode1 libbluray-bdj
+2026-10-11T23:03:03.2768484Z   libcairo2-doc libdatrie-doc freerdp2-x11 freetype2-doc libglib2.0-doc
+2026-10-11T23:03:03.2768888Z   libxml2-utils dns-root-data gnutls-bin gnutls-doc libgraphene-doc
+2026-10-11T23:03:03.2769270Z   libgraphite2-utils libvisual-0.4-plugins gvfs libgtk-4-doc gtk-4-examples
+2026-10-11T23:03:03.2769682Z   libice-doc liblzma-doc opus-tools p11-kit-doc libpango1.0-doc pipewire
+2026-10-11T23:03:03.2770063Z   pulseaudio serdi libsm-doc sordi speex libthai-doc libwacom-bin
+2026-10-11T23:03:03.2770469Z   libwayland-doc libx11-doc libxcb-doc libxext-doc opencl-icd graphicsmagick
+2026-10-11T23:03:03.2770793Z   wayland-utils
+2026-10-11T23:03:03.2770977Z Recommended packages:
+2026-10-11T23:03:03.2771239Z   libaacs0 bzip2-doc gstreamer1.0-plugins-base libgtk-4-bin
+2026-10-11T23:03:03.2771576Z   libgtk-4-media-gstreamer libpipewire-0.3-common libpng-tools
+2026-10-11T23:03:03.2771945Z   pocketsphinx-en-us libtasn1-doc va-driver-all | va-driver vdpau-driver-all
+2026-10-11T23:03:03.2772321Z   | vdpau-driver libvte-2.91-doc
+2026-10-11T23:03:03.3189336Z The following NEW packages will be installed:
+2026-10-11T23:03:03.3189772Z   dbus-x11 fonts-inter fonts-noto-cjk gir1.2-atspi-2.0 gir1.2-freedesktop
+2026-10-11T23:03:03.3190189Z   gir1.2-freedesktop-dev gir1.2-gdkpixbuf-2.0 gir1.2-glib-2.0-dev
+2026-10-11T23:03:03.3190579Z   gir1.2-graphene-1.0 gir1.2-gtk-4.0 gir1.2-harfbuzz-0.0 gir1.2-pango-1.0
+2026-10-11T23:03:03.3191021Z   gir1.2-vte-3.91 libaml0t64 libass9 libasyncns0 libatk-adaptor libavcodec60
+2026-10-11T23:03:03.3191401Z   libavfilter9 libavformat60 libavutil58 libblas3 libblkid-dev libbluray2
+2026-10-11T23:03:03.3191843Z   libbrotli-dev libbs2b0 libbz2-dev libcairo-script-interpreter2 libcairo2-dev
+2026-10-11T23:03:03.3192300Z   libchromaprint1 libcjson1 libcodec2-1.2 libdatrie-dev libdav1d7
+2026-10-11T23:03:03.3192749Z   libdeflate-dev libegl-dev libegl-mesa0 libegl1 libegl1-mesa-dev libepoxy-dev
+2026-10-11T23:03:03.3193113Z   libevent-2.1-7t64 libflac12t64 libflite1 libfontconfig-dev
+2026-10-11T23:03:03.3193458Z   libfreerdp-server2-2t64 libfreerdp2-2t64 libfreetype-dev libfribidi-dev
+2026-10-11T23:03:03.3193860Z   libgdk-pixbuf-2.0-dev libgirepository-2.0-0 libgl-dev libgles-dev libgles1
+2026-10-11T23:03:03.3194292Z   libgles2 libglib2.0-dev libglib2.0-dev-bin libglvnd-core-dev libglvnd-dev
+2026-10-11T23:03:03.3194698Z   libglx-dev libgme0 libgnutls-dane0t64 libgnutls-openssl27t64 libgnutls28-dev
+2026-10-11T23:03:03.3195131Z   libgraphene-1.0-0 libgraphene-1.0-dev libgraphite2-dev libgsm1
+2026-10-11T23:03:03.3195501Z   libgstreamer-plugins-base1.0-0 libgtk-4-1 libgtk-4-common libgtk-4-dev
+2026-10-11T23:03:03.3196137Z   libharfbuzz-cairo0 libharfbuzz-dev libharfbuzz-gobject0 libharfbuzz-icu0
+2026-10-11T23:03:03.3196516Z   libharfbuzz-subset0 libhwy1t64 libice-dev libidn2-dev libinput-bin
+2026-10-11T23:03:03.3196900Z   libinput10 libjbig-dev libjpeg-dev libjpeg-turbo8-dev libjpeg8-dev libjxl0.7
+2026-10-11T23:03:03.3197317Z   liblapack3 liblerc-dev liblilv-0-0 liblzma-dev libmbedcrypto7t64
+2026-10-11T23:03:03.3197690Z   libmount-dev libmp3lame0 libmpg123-0t64 libmtdev1t64 libmysofa1 libneatvnc0
+2026-10-11T23:03:03.3198100Z   libopengl-dev libopengl0 libopenmpt0t64 libopus0 liborc-0.4-0t64
+2026-10-11T23:03:03.3198470Z   libp11-kit-dev libpango1.0-dev libpangoxft-1.0-0 libpipewire-0.3-0t64
+2026-10-11T23:03:03.3198846Z   libpixman-1-dev libplacebo338 libpng-dev libpocketsphinx3 libpostproc57
+2026-10-11T23:03:03.3199269Z   libpthread-stubs0-dev libpulse0 librav1e0 librist4 librubberband2
+2026-10-11T23:03:03.3199632Z   libsamplerate0 libseat1 libselinux1-dev libsepol-dev libserd-0-0
+2026-10-11T23:03:03.3200059Z   libsharpyuv-dev libshine3 libsm-dev libsndfile1 libsord-0-0 libsoxr0
+2026-10-11T23:03:03.3200414Z   libspa-0.2-modules libspeex1 libsphinxbase3t64 libsratom-0-0
+2026-10-11T23:03:03.3200772Z   libsrt1.5-gnutls libssh-gcrypt-4 libsvtav1enc1d1 libswresample4 libswscale7
+2026-10-11T23:03:03.3201274Z   libtasn1-6-dev libthai-dev libtheora0 libtiff-dev libtiffxx6 libturbojpeg
+2026-10-11T23:03:03.3201662Z   libtwolame0 libudfread0 libunbound8 libunibreak5 libva-drm2 libva-x11-2
+2026-10-11T23:03:03.3202062Z   libva2 libvdpau1 libvidstab1.1 libvorbisenc2 libvpx9 libvte-2.91-common
+2026-10-11T23:03:03.3202438Z   libvte-2.91-gtk4-0 libvte-2.91-gtk4-dev libvulkan-dev libwacom-common
+2026-10-11T23:03:03.3202815Z   libwacom9 libwayland-bin libwayland-dev libwayland-server0 libwebp-dev
+2026-10-11T23:03:03.3203252Z   libwebpdecoder3 libwebrtc-audio-processing1 libweston-13-0 libwinpr2-2t64
+2026-10-11T23:03:03.3203631Z   libx11-dev libx264-164 libx265-199 libxau-dev libxcb-composite0
+2026-10-11T23:03:03.3204039Z   libxcb-render0-dev libxcb-shm0-dev libxcb-xkb1 libxcb1-dev libxcomposite-dev
+2026-10-11T23:03:03.3204444Z   libxcursor-dev libxdamage-dev libxdmcp-dev libxext-dev libxfixes-dev
+2026-10-11T23:03:03.3204812Z   libxft-dev libxi-dev libxinerama-dev libxkbcommon-dev libxrandr-dev
+2026-10-11T23:03:03.3205330Z   libxrender-dev libxvidcore4 libzimg2 libzix-0-0 libzvbi-common libzvbi0t64
+2026-10-11T23:03:03.3205723Z   nettle-dev ocl-icd-libopencl1 pango1.0-tools python3-pyatspi uuid-dev
+2026-10-11T23:03:03.3206162Z   wayland-protocols weston x11proto-core-dev x11proto-dev xorg-sgml-doctools
+2026-10-11T23:03:03.3206475Z   xtrans-dev
+2026-10-11T23:03:03.3206671Z The following packages will be upgraded:
+2026-10-11T23:03:03.3206932Z   libfreetype6 libpng16-16t64
+2026-10-11T23:03:03.4146623Z 2 upgraded, 204 newly installed, 0 to remove and 24 not upgraded.
+2026-10-11T23:03:03.4146993Z Need to get 147 MB of archives.
+2026-10-11T23:03:03.4147264Z After this operation, 404 MB of additional disk space will be used.
+2026-10-11T23:03:03.4147787Z Get:1 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libpng16-16t64 arm64 1.6.43-5ubuntu0.7 [187 kB]
+2026-10-11T23:03:03.6095715Z Get:2 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 dbus-x11 arm64 1.14.10-4ubuntu4.1 [23.2 kB]
+2026-10-11T23:03:03.6513311Z Get:3 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 fonts-inter all 4.0+ds-1 [5193 kB]
+2026-10-11T23:03:04.0040992Z Get:4 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 fonts-noto-cjk all 1:20230817+repack1-3 [61.2 MB]
+2026-10-11T23:03:04.6363680Z Get:5 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 gir1.2-freedesktop arm64 1.80.1-1 [49.7 kB]
+2026-10-11T23:03:04.6751568Z Get:6 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 gir1.2-atspi-2.0 arm64 2.52.0-1build1 [19.8 kB]
+2026-10-11T23:03:04.7139962Z Get:7 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 gir1.2-glib-2.0-dev arm64 2.80.0-6ubuntu3.9 [848 kB]
+2026-10-11T23:03:04.7570374Z Get:8 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 gir1.2-freedesktop-dev arm64 1.80.1-1 [28.8 kB]
+2026-10-11T23:03:04.7959299Z Get:9 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 gir1.2-gdkpixbuf-2.0 arm64 2.42.10+dfsg-3ubuntu3.3 [9486 B]
+2026-10-11T23:03:04.8346270Z Get:10 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libgraphene-1.0-0 arm64 1.10.8-3build2 [47.0 kB]
+2026-10-11T23:03:04.8735772Z Get:11 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 gir1.2-graphene-1.0 arm64 1.10.8-3build2 [11.1 kB]
+2026-10-11T23:03:04.9123576Z Get:12 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libharfbuzz-gobject0 arm64 8.3.0-2build2 [32.8 kB]
+2026-10-11T23:03:04.9513351Z Get:13 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 gir1.2-harfbuzz-0.0 arm64 8.3.0-2build2 [44.5 kB]
+2026-10-11T23:03:04.9902968Z Get:14 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libpangoxft-1.0-0 arm64 1.52.1+ds-1build1 [20.1 kB]
+2026-10-11T23:03:05.0290291Z Get:15 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 gir1.2-pango-1.0 arm64 1.52.1+ds-1build1 [34.8 kB]
+2026-10-11T23:03:05.0682438Z Get:16 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libfreetype6 arm64 2.13.2+dfsg-1ubuntu0.2 [393 kB]
+2026-10-11T23:03:05.1093542Z Get:17 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libcairo-script-interpreter2 arm64 1.18.0-3build1 [60.9 kB]
+2026-10-11T23:03:05.1484866Z Get:18 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libgles2 arm64 1.7.0-1build1 [17.6 kB]
+2026-10-11T23:03:05.2662296Z Get:19 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libgtk-4-common all 4.14.5+ds-0ubuntu0.10 [1497 kB]
+2026-10-11T23:03:05.3131052Z Get:20 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libgtk-4-1 arm64 4.14.5+ds-0ubuntu0.10 [3228 kB]
+2026-10-11T23:03:05.3695662Z Get:21 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 gir1.2-gtk-4.0 arm64 4.14.5+ds-0ubuntu0.10 [223 kB]
+2026-10-11T23:03:05.4097318Z Get:22 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libvte-2.91-common arm64 0.76.0-1ubuntu0.1 [13.4 kB]
+2026-10-11T23:03:05.4486965Z Get:23 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libvte-2.91-gtk4-0 arm64 0.76.0-1ubuntu0.1 [208 kB]
+2026-10-11T23:03:05.4886033Z Get:24 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 gir1.2-vte-3.91 arm64 0.76.0-1ubuntu0.1 [11.1 kB]
+2026-10-11T23:03:05.5274089Z Get:25 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libaml0t64 arm64 0.3.0-1.1build1 [11.6 kB]
+2026-10-11T23:03:05.5662920Z Get:26 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libunibreak5 arm64 5.1-2build1 [25.3 kB]
+2026-10-11T23:03:05.6050208Z Get:27 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libass9 arm64 1:0.17.1-2build1 [91.7 kB]
+2026-10-11T23:03:05.6444430Z Get:28 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libasyncns0 arm64 0.8-6build4 [11.2 kB]
+2026-10-11T23:03:05.6832841Z Get:29 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libatk-adaptor arm64 2.52.0-1build1 [5988 B]
+2026-10-11T23:03:05.7221335Z Get:30 http://ports.ubuntu.com/ubuntu-ports noble-updates/universe arm64 libva2 arm64 2.20.0-2ubuntu0.2 [66.7 kB]
+2026-10-11T23:03:05.7612448Z Get:31 http://ports.ubuntu.com/ubuntu-ports noble-updates/universe arm64 libva-drm2 arm64 2.20.0-2ubuntu0.2 [7076 B]
+2026-10-11T23:03:05.7999124Z Get:32 http://ports.ubuntu.com/ubuntu-ports noble-updates/universe arm64 libva-x11-2 arm64 2.20.0-2ubuntu0.2 [12.1 kB]
+2026-10-11T23:03:05.8386421Z Get:33 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libvdpau1 arm64 1.5-2build1 [26.4 kB]
+2026-10-11T23:03:05.8774657Z Get:34 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 ocl-icd-libopencl1 arm64 2.3.2-1build1 [37.6 kB]
+2026-10-11T23:03:05.9163759Z Get:35 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libavutil58 arm64 7:6.1.1-3ubuntu5 [388 kB]
+2026-10-11T23:03:05.9572365Z Get:36 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libcodec2-1.2 arm64 1.2.0-2build1 [8996 kB]
+2026-10-11T23:03:06.0448035Z Get:37 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libdav1d7 arm64 1.4.1-1build1 [298 kB]
+2026-10-11T23:03:06.1644115Z Get:38 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libgsm1 arm64 1.0.22-1build1 [27.0 kB]
+2026-10-11T23:03:06.2031952Z Get:39 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libhwy1t64 arm64 1.0.7-8.1build1 [437 kB]
+2026-10-11T23:03:06.2442746Z Get:40 http://ports.ubuntu.com/ubuntu-ports noble-updates/universe arm64 libjxl0.7 arm64 0.7.0-10.2ubuntu6.1 [690 kB]
+2026-10-11T23:03:06.2866069Z Get:41 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libmp3lame0 arm64 3.100-6build1 [141 kB]
+2026-10-11T23:03:06.3261924Z Get:42 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libopus0 arm64 1.4-1build1 [198 kB]
+2026-10-11T23:03:06.3661883Z Get:43 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 librav1e0 arm64 0.7.1-2 [760 kB]
+2026-10-11T23:03:06.4091362Z Get:44 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libshine3 arm64 3.1.1-2build1 [25.8 kB]
+2026-10-11T23:03:06.4480354Z Get:45 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libspeex1 arm64 1.2.1-2ubuntu2.24.04.1 [56.2 kB]
+2026-10-11T23:03:06.4872998Z Get:46 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libsvtav1enc1d1 arm64 1.7.0+dfsg-2build1 [1276 kB]
+2026-10-11T23:03:06.5328603Z Get:47 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libsoxr0 arm64 0.1.3-4build3 [56.4 kB]
+2026-10-11T23:03:06.5720212Z Get:48 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libswresample4 arm64 7:6.1.1-3ubuntu5 [57.9 kB]
+2026-10-11T23:03:06.6111840Z Get:49 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libtheora0 arm64 1.1.1+dfsg.1-16.1build3 [224 kB]
+2026-10-11T23:03:06.6510279Z Get:50 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libtwolame0 arm64 0.4.0-2build3 [51.7 kB]
+2026-10-11T23:03:06.6899957Z Get:51 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libvorbisenc2 arm64 1.3.7-1build3 [80.0 kB]
+2026-10-11T23:03:06.7292760Z Get:52 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libvpx9 arm64 1.14.0-1ubuntu2.3 [1233 kB]
+2026-10-11T23:03:06.7749425Z Get:53 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libx264-164 arm64 2:0.164.3108+git31e19f9-1 [542 kB]
+2026-10-11T23:03:06.8166085Z Get:54 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libx265-199 arm64 3.5-2build1 [714 kB]
+2026-10-11T23:03:06.8593922Z Get:55 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libxvidcore4 arm64 2:1.3.7-1build1 [180 kB]
+2026-10-11T23:03:06.8991558Z Get:56 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libzvbi-common all 0.2.42-2 [42.4 kB]
+2026-10-11T23:03:07.0182458Z Get:57 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libzvbi0t64 arm64 0.2.42-2 [259 kB]
+2026-10-11T23:03:07.0582758Z Get:58 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libavcodec60 arm64 7:6.1.1-3ubuntu5 [5769 kB]
+2026-10-11T23:03:07.1282822Z Get:59 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libudfread0 arm64 1.1.2-1build1 [17.0 kB]
+2026-10-11T23:03:07.1670535Z Get:60 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libbluray2 arm64 1:1.3.4-1build1 [149 kB]
+2026-10-11T23:03:07.2066035Z Get:61 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libchromaprint1 arm64 1.5.1-5 [29.3 kB]
+2026-10-11T23:03:07.2453421Z Get:62 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libgme0 arm64 0.6.3-7build1 [129 kB]
+2026-10-11T23:03:07.2847829Z Get:63 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libmpg123-0t64 arm64 1.32.5-1ubuntu1.1 [172 kB]
+2026-10-11T23:03:07.3243129Z Get:64 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libopenmpt0t64 arm64 0.7.3-1.1build3 [618 kB]
+2026-10-11T23:03:07.3664863Z Get:65 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libcjson1 arm64 1.7.17-1 [25.1 kB]
+2026-10-11T23:03:07.4054138Z Get:66 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libmbedcrypto7t64 arm64 2.28.8-1 [209 kB]
+2026-10-11T23:03:07.4453929Z Get:67 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 librist4 arm64 0.2.10+dfsg-2 [76.2 kB]
+2026-10-11T23:03:07.4845622Z Get:68 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libsrt1.5-gnutls arm64 1.5.3-1build2 [306 kB]
+2026-10-11T23:03:07.5250330Z Get:69 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libssh-gcrypt-4 arm64 0.10.6-2ubuntu0.5 [227 kB]
+2026-10-11T23:03:07.5650243Z Get:70 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libavformat60 arm64 7:6.1.1-3ubuntu5 [1188 kB]
+2026-10-11T23:03:07.6102123Z Get:71 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libbs2b0 arm64 3.1.0+dfsg-7build1 [9976 B]
+2026-10-11T23:03:07.6491623Z Get:72 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libflite1 arm64 2.2-6build3 [13.6 MB]
+2026-10-11T23:03:07.7620634Z Get:73 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libserd-0-0 arm64 0.32.2-1 [42.9 kB]
+2026-10-11T23:03:07.8009664Z Get:74 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libzix-0-0 arm64 0.4.2-2build1 [24.0 kB]
+2026-10-11T23:03:07.8399008Z Get:75 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libsord-0-0 arm64 0.16.16-2build1 [15.7 kB]
+2026-10-11T23:03:07.9584730Z Get:76 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libsratom-0-0 arm64 0.6.16-1build1 [15.8 kB]
+2026-10-11T23:03:07.9973225Z Get:77 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 liblilv-0-0 arm64 0.24.22-1build1 [41.1 kB]
+2026-10-11T23:03:08.0362267Z Get:78 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libmysofa1 arm64 1.3.2+dfsg-2ubuntu2 [1157 kB]
+2026-10-11T23:03:08.0816420Z Get:79 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libplacebo338 arm64 6.338.2-2build1 [2570 kB]
+2026-10-11T23:03:08.1345237Z Get:80 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libblas3 arm64 3.12.0-3build1.1 [144 kB]
+2026-10-11T23:03:08.1742409Z Get:81 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 liblapack3 arm64 3.12.0-3build1.1 [2241 kB]
+2026-10-11T23:03:08.2251021Z Get:82 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libflac12t64 arm64 1.4.3+ds-2.1ubuntu2 [170 kB]
+2026-10-11T23:03:08.2648534Z Get:83 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libsndfile1 arm64 1.2.2-1ubuntu5.24.04.1 [208 kB]
+2026-10-11T23:03:08.3050293Z Get:84 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libpulse0 arm64 1:16.1+dfsg1-2ubuntu10.1 [271 kB]
+2026-10-11T23:03:08.3451438Z Get:85 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libsphinxbase3t64 arm64 0.8+5prealpha+1-17build2 [124 kB]
+2026-10-11T23:03:08.3847000Z Get:86 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libpocketsphinx3 arm64 0.8.0+real5prealpha+1-15ubuntu5 [129 kB]
+2026-10-11T23:03:08.4242603Z Get:87 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libpostproc57 arm64 7:6.1.1-3ubuntu5 [41.2 kB]
+2026-10-11T23:03:08.4633881Z Get:88 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libsamplerate0 arm64 0.2.2-4build1 [1343 kB]
+2026-10-11T23:03:08.5095441Z Get:89 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 librubberband2 arm64 3.3.0+dfsg-2build1 [120 kB]
+2026-10-11T23:03:08.5490458Z Get:90 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libswscale7 arm64 7:6.1.1-3ubuntu5 [173 kB]
+2026-10-11T23:03:08.5886468Z Get:91 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libvidstab1.1 arm64 1.1.0-2build1 [38.7 kB]
+2026-10-11T23:03:08.6277053Z Get:92 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libzimg2 arm64 3.0.5+ds1-1build1 [119 kB]
+2026-10-11T23:03:08.6673963Z Get:93 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libavfilter9 arm64 7:6.1.1-3ubuntu5 [4089 kB]
+2026-10-11T23:03:08.7284910Z Get:94 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libbrotli-dev arm64 1.1.0-2build2 [360 kB]
+2026-10-11T23:03:08.8487875Z Get:95 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libbz2-dev arm64 1.0.8-5.1ubuntu0.1 [35.8 kB]
+2026-10-11T23:03:08.8875743Z Get:96 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libpng-dev arm64 1.6.43-5ubuntu0.7 [268 kB]
+2026-10-11T23:03:08.9279109Z Get:97 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libfreetype-dev arm64 2.13.2+dfsg-1ubuntu0.2 [574 kB]
+2026-10-11T23:03:08.9698430Z Get:98 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 uuid-dev arm64 2.39.3-9ubuntu6.6 [34.8 kB]
+2026-10-11T23:03:09.0090300Z Get:99 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libfontconfig-dev arm64 2.15.0-1.1ubuntu2 [165 kB]
+2026-10-11T23:03:09.0486891Z Get:100 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libglib2.0-dev-bin arm64 2.80.0-6ubuntu3.9 [138 kB]
+2026-10-11T23:03:09.0882468Z Get:101 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libblkid-dev arm64 2.39.3-9ubuntu6.6 [219 kB]
+2026-10-11T23:03:09.1787549Z Get:102 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libsepol-dev arm64 3.5-2build1 [395 kB]
+2026-10-11T23:03:09.4581451Z Get:103 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libselinux1-dev arm64 3.5-2ubuntu2.1 [172 kB]
+2026-10-11T23:03:09.5163231Z Get:104 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libmount-dev arm64 2.39.3-9ubuntu6.6 [14.9 kB]
+2026-10-11T23:03:09.5604393Z Get:105 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libgirepository-2.0-0 arm64 2.80.0-6ubuntu3.9 [71.5 kB]
+2026-10-11T23:03:09.6097952Z Get:106 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libglib2.0-dev arm64 2.80.0-6ubuntu3.9 [1964 kB]
+2026-10-11T23:03:09.8094624Z Get:107 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libpixman-1-dev arm64 0.42.2-1build1 [228 kB]
+2026-10-11T23:03:09.8566085Z Get:108 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 xorg-sgml-doctools all 1:1.11-1.1 [10.9 kB]
+2026-10-11T23:03:09.9003953Z Get:109 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 x11proto-dev all 2023.2-1 [602 kB]
+2026-10-11T23:03:09.9555960Z Get:110 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 x11proto-core-dev all 2023.2-1 [2444 B]
+2026-10-11T23:03:09.9989230Z Get:111 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libice-dev arm64 2:1.0.10-1build3 [52.3 kB]
+2026-10-11T23:03:10.0427999Z Get:112 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libsm-dev arm64 2:1.2.3-1build3 [18.9 kB]
+2026-10-11T23:03:10.0863486Z Get:113 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libxau-dev arm64 1:1.0.9-1build6 [10.0 kB]
+2026-10-11T23:03:10.1295156Z Get:114 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libxdmcp-dev arm64 1:1.1.3-0ubuntu6 [26.3 kB]
+2026-10-11T23:03:10.1733760Z Get:115 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 xtrans-dev all 1.4.0-1 [68.9 kB]
+2026-10-11T23:03:10.2171726Z Get:116 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libpthread-stubs0-dev arm64 0.4-1build3 [4734 B]
+2026-10-11T23:03:10.2605131Z Get:117 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libxcb1-dev arm64 1.15-1ubuntu2 [91.2 kB]
+2026-10-11T23:03:10.3051951Z Get:118 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libx11-dev arm64 2:1.8.7-1build1 [742 kB]
+2026-10-11T23:03:10.3639903Z Get:119 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libxcb-render0-dev arm64 1.15-1ubuntu2 [20.9 kB]
+2026-10-11T23:03:10.4076621Z Get:120 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libxcb-shm0-dev arm64 1.15-1ubuntu2 [8750 B]
+2026-10-11T23:03:10.5345325Z Get:121 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libxext-dev arm64 2:1.3.4-1build2 [84.9 kB]
+2026-10-11T23:03:10.5786906Z Get:122 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libxrender-dev arm64 1:0.9.10-1.1build1 [26.9 kB]
+2026-10-11T23:03:10.6223252Z Get:123 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libcairo2-dev arm64 1.18.0-3build1 [41.1 kB]
+2026-10-11T23:03:10.6662449Z Get:124 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libdatrie-dev arm64 0.2.13-3build1 [20.3 kB]
+2026-10-11T23:03:10.7095963Z Get:125 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libdeflate-dev arm64 1.19-1build1.1 [51.2 kB]
+2026-10-11T23:03:10.7534714Z Get:126 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libegl-mesa0 arm64 25.2.8-0ubuntu0.24.04.4 [117 kB]
+2026-10-11T23:03:10.7984134Z Get:127 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libegl1 arm64 1.7.0-1build1 [29.5 kB]
+2026-10-11T23:03:10.8418909Z Get:128 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libglx-dev arm64 1.7.0-1build1 [14.2 kB]
+2026-10-11T23:03:10.8855258Z Get:129 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libgl-dev arm64 1.7.0-1build1 [102 kB]
+2026-10-11T23:03:10.9306271Z Get:130 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libegl-dev arm64 1.7.0-1build1 [18.2 kB]
+2026-10-11T23:03:10.9741444Z Get:131 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libglvnd-core-dev arm64 1.7.0-1build1 [13.5 kB]
+2026-10-11T23:03:11.0175345Z Get:132 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libgles1 arm64 1.7.0-1build1 [11.6 kB]
+2026-10-11T23:03:11.0610306Z Get:133 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libgles-dev arm64 1.7.0-1build1 [50.4 kB]
+2026-10-11T23:03:11.1049259Z Get:134 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libopengl0 arm64 1.7.0-1build1 [35.1 kB]
+2026-10-11T23:03:11.1485856Z Get:135 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libopengl-dev arm64 1.7.0-1build1 [3440 B]
+2026-10-11T23:03:11.1920906Z Get:136 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libglvnd-dev arm64 1.7.0-1build1 [3196 B]
+2026-10-11T23:03:11.2355430Z Get:137 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libegl1-mesa-dev arm64 25.2.8-0ubuntu0.24.04.4 [26.8 kB]
+2026-10-11T23:03:11.2790282Z Get:138 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libepoxy-dev arm64 1.5.10-1build1 [132 kB]
+2026-10-11T23:03:11.3240940Z Get:139 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libevent-2.1-7t64 arm64 2.1.12-stable-9ubuntu2.2 [141 kB]
+2026-10-11T23:03:11.4537369Z Get:140 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libwinpr2-2t64 arm64 2.11.5+dfsg1-1build2 [353 kB]
+2026-10-11T23:03:11.5042893Z Get:141 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libfreerdp2-2t64 arm64 2.11.5+dfsg1-1build2 [525 kB]
+2026-10-11T23:03:11.5581125Z Get:142 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libfreerdp-server2-2t64 arm64 2.11.5+dfsg1-1build2 [103 kB]
+2026-10-11T23:03:11.6031915Z Get:143 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libfribidi-dev arm64 1.0.13-3build1 [65.0 kB]
+2026-10-11T23:03:11.6472698Z Get:144 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libjpeg-turbo8-dev arm64 2.1.5-2ubuntu2 [305 kB]
+2026-10-11T23:03:11.6967192Z Get:145 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libjpeg8-dev arm64 8c-2ubuntu11 [1484 B]
+2026-10-11T23:03:11.7400765Z Get:146 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libjpeg-dev arm64 8c-2ubuntu11 [1482 B]
+2026-10-11T23:03:11.7834858Z Get:147 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libjbig-dev arm64 2.1-6.1ubuntu2 [27.5 kB]
+2026-10-11T23:03:11.8272328Z Get:148 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 liblzma-dev arm64 5.6.1+really5.4.5-1ubuntu0.3 [178 kB]
+2026-10-11T23:03:11.8739887Z Get:149 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libwebpdecoder3 arm64 1.3.2-0.4build3 [88.7 kB]
+2026-10-11T23:03:11.9189587Z Get:150 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libsharpyuv-dev arm64 1.3.2-0.4build3 [15.1 kB]
+2026-10-11T23:03:11.9622280Z Get:151 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libwebp-dev arm64 1.3.2-0.4build3 [334 kB]
+2026-10-11T23:03:12.0123158Z Get:152 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libtiffxx6 arm64 4.5.1+git230720-4ubuntu2.5 [5646 B]
+2026-10-11T23:03:12.0557488Z Get:153 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 liblerc-dev arm64 4.0.0+ds-4ubuntu2 [168 kB]
+2026-10-11T23:03:12.1015995Z Get:154 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libtiff-dev arm64 4.5.1+git230720-4ubuntu2.5 [337 kB]
+2026-10-11T23:03:12.1515721Z Get:155 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libgdk-pixbuf-2.0-dev arm64 2.42.10+dfsg-3ubuntu3.3 [47.9 kB]
+2026-10-11T23:03:12.1953072Z Get:156 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libunbound8 arm64 1.19.2-1ubuntu3.10 [428 kB]
+2026-10-11T23:03:12.2470870Z Get:157 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libgnutls-dane0t64 arm64 3.8.3-1.1ubuntu3.6 [23.5 kB]
+2026-10-11T23:03:12.3747510Z Get:158 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libgnutls-openssl27t64 arm64 3.8.3-1.1ubuntu3.6 [23.5 kB]
+2026-10-11T23:03:12.4182577Z Get:159 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libidn2-dev arm64 2.3.7-2build1.1 [120 kB]
+2026-10-11T23:03:12.4632303Z Get:160 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libp11-kit-dev arm64 0.25.3-4ubuntu2.2 [22.7 kB]
+2026-10-11T23:03:12.5066486Z Get:161 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libtasn1-6-dev arm64 4.19.0-3ubuntu0.24.04.2 [90.9 kB]
+2026-10-11T23:03:12.5512466Z Get:162 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 nettle-dev arm64 3.9.1-2.2build1.1 [1171 kB]
+2026-10-11T23:03:12.6190498Z Get:163 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libgnutls28-dev arm64 3.8.3-1.1ubuntu3.6 [1120 kB]
+2026-10-11T23:03:12.6841548Z Get:164 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libgraphene-1.0-dev arm64 1.10.8-3build2 [58.6 kB]
+2026-10-11T23:03:12.7281553Z Get:165 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libgraphite2-dev arm64 1.3.14-2ubuntu0.24.04.1 [14.7 kB]
+2026-10-11T23:03:12.7717121Z Get:166 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 liborc-0.4-0t64 arm64 1:0.4.38-1ubuntu0.1 [205 kB]
+2026-10-11T23:03:12.8183642Z Get:167 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libgstreamer-plugins-base1.0-0 arm64 1.24.2-1ubuntu0.5 [830 kB]
+2026-10-11T23:03:12.8774384Z Get:168 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libharfbuzz-icu0 arm64 8.3.0-2build2 [13.2 kB]
+2026-10-11T23:03:12.9210146Z Get:169 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libharfbuzz-subset0 arm64 8.3.0-2build2 [413 kB]
+2026-10-11T23:03:12.9723398Z Get:170 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libharfbuzz-cairo0 arm64 8.3.0-2build2 [25.1 kB]
+2026-10-11T23:03:13.0160355Z Get:171 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libharfbuzz-dev arm64 8.3.0-2build2 [142 kB]
+2026-10-11T23:03:13.0617801Z Get:172 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libthai-dev arm64 0.1.29-2build1 [26.3 kB]
+2026-10-11T23:03:13.1054848Z Get:173 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libxft-dev arm64 2.3.6-1build1 [65.0 kB]
+2026-10-11T23:03:13.1494309Z Get:174 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 pango1.0-tools arm64 1.52.1+ds-1build1 [36.3 kB]
+2026-10-11T23:03:13.1931742Z Get:175 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libpango1.0-dev arm64 1.52.1+ds-1build1 [147 kB]
+2026-10-11T23:03:13.2387522Z Get:176 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libwayland-server0 arm64 1.22.0-2.1build1 [34.6 kB]
+2026-10-11T23:03:13.3668043Z Get:177 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libwayland-bin arm64 1.22.0-2.1build1 [20.3 kB]
+2026-10-11T23:03:13.4105213Z Get:178 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libwayland-dev arm64 1.22.0-2.1build1 [71.3 kB]
+2026-10-11T23:03:13.4542556Z Get:179 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libxfixes-dev arm64 1:6.0.0-2build1 [13.0 kB]
+2026-10-11T23:03:13.4975567Z Get:180 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libxcomposite-dev arm64 1:0.4.5-1build3 [9618 B]
+2026-10-11T23:03:13.5409232Z Get:181 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libxcursor-dev arm64 1:1.2.1-1build1 [33.3 kB]
+2026-10-11T23:03:13.5846386Z Get:182 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libxdamage-dev arm64 1:1.1.6-1build1 [5508 B]
+2026-10-11T23:03:13.6281125Z Get:183 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libxi-dev arm64 2:1.8.1-1build1 [193 kB]
+2026-10-11T23:03:13.6747067Z Get:184 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libxinerama-dev arm64 2:1.1.4-3build1 [8148 B]
+2026-10-11T23:03:13.7182533Z Get:185 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libxkbcommon-dev arm64 1.6.0-1build1 [56.3 kB]
+2026-10-11T23:03:13.7621539Z Get:186 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libxrandr-dev arm64 2:1.5.2-2build1 [27.2 kB]
+2026-10-11T23:03:13.8057710Z Get:187 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libvulkan-dev arm64 1.3.275.0-1build1 [1239 kB]
+2026-10-11T23:03:13.8734089Z Get:188 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 wayland-protocols all 1.45-1~ubuntu0.24.04.2 [114 kB]
+2026-10-11T23:03:13.9183262Z Get:189 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libgtk-4-dev arm64 4.14.5+ds-0ubuntu0.10 [939 kB]
+2026-10-11T23:03:13.9790401Z Get:190 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libwacom-common all 2.10.0-2 [63.4 kB]
+2026-10-11T23:03:14.0230134Z Get:191 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libwacom9 arm64 2.10.0-2 [23.7 kB]
+2026-10-11T23:03:14.0667337Z Get:192 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libinput-bin arm64 1.25.0-1ubuntu3.7 [23.6 kB]
+2026-10-11T23:03:14.1103749Z Get:193 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libmtdev1t64 arm64 1.1.6-1.1build1 [14.3 kB]
+2026-10-11T23:03:14.1539383Z Get:194 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libinput10 arm64 1.25.0-1ubuntu3.7 [129 kB]
+2026-10-11T23:03:14.2821831Z Get:195 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libturbojpeg arm64 1:2.1.5-2ubuntu2 [204 kB]
+2026-10-11T23:03:14.3292313Z Get:196 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libneatvnc0 arm64 0.7.1+dfsg-2build3 [54.6 kB]
+2026-10-11T23:03:14.3733808Z Get:197 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libwebrtc-audio-processing1 arm64 0.3.1-0ubuntu6 [285 kB]
+2026-10-11T23:03:14.4214125Z Get:198 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libspa-0.2-modules arm64 1.0.5-1ubuntu3.3 [576 kB]
+2026-10-11T23:03:14.4748020Z Get:199 http://ports.ubuntu.com/ubuntu-ports noble-updates/main arm64 libpipewire-0.3-0t64 arm64 1.0.5-1ubuntu3.3 [247 kB]
+2026-10-11T23:03:14.5223987Z Get:200 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libseat1 arm64 0.8.0-1 [27.7 kB]
+2026-10-11T23:03:14.5662153Z Get:201 http://ports.ubuntu.com/ubuntu-ports noble-updates/universe arm64 libvte-2.91-gtk4-dev arm64 0.76.0-1ubuntu0.1 [41.7 kB]
+2026-10-11T23:03:14.6101549Z Get:202 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libxcb-composite0 arm64 1.15-1ubuntu2 [5430 B]
+2026-10-11T23:03:14.7050464Z Get:203 http://ports.ubuntu.com/ubuntu-ports noble/main arm64 libxcb-xkb1 arm64 1.15-1ubuntu2 [32.6 kB]
+2026-10-11T23:03:14.8159160Z Get:204 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 libweston-13-0 arm64 13.0.0-4build3 [409 kB]
+2026-10-11T23:03:15.0665976Z Get:205 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 python3-pyatspi all 2.46.1-1 [43.1 kB]
+2026-10-11T23:03:15.1171431Z Get:206 http://ports.ubuntu.com/ubuntu-ports noble/universe arm64 weston arm64 13.0.0-4build3 [933 kB]
+2026-10-11T23:03:15.5218357Z Fetched 147 MB in 12s (12.3 MB/s)
+2026-10-11T23:03:15.5516622Z (Reading database ... 
+2026-10-11T23:03:15.5516971Z (Reading database ... 5%
+2026-10-11T23:03:15.5517187Z (Reading database ... 10%
+2026-10-11T23:03:15.5517399Z (Reading database ... 15%
+2026-10-11T23:03:15.5517594Z (Reading database ... 20%
+2026-10-11T23:03:15.5517808Z (Reading database ... 25%
+2026-10-11T23:03:15.5518034Z (Reading database ... 30%
+2026-10-11T23:03:15.5518232Z (Reading database ... 35%
+2026-10-11T23:03:15.5518434Z (Reading database ... 40%
+2026-10-11T23:03:15.5518641Z (Reading database ... 45%
+2026-10-11T23:03:15.5518858Z (Reading database ... 50%
+2026-10-11T23:03:15.5721283Z (Reading database ... 55%
+2026-10-11T23:03:15.7185483Z (Reading database ... 60%
+2026-10-11T23:03:15.9240803Z (Reading database ... 65%
+2026-10-11T23:03:16.1110599Z (Reading database ... 70%
+2026-10-11T23:03:16.3160040Z (Reading database ... 75%
+2026-10-11T23:03:16.4156977Z (Reading database ... 80%
+2026-10-11T23:03:16.6653023Z (Reading database ... 85%
+2026-10-11T23:03:16.8706377Z (Reading database ... 90%
+2026-10-11T23:03:17.0669874Z (Reading database ... 95%
+2026-10-11T23:03:17.0670375Z (Reading database ... 100%
+2026-10-11T23:03:17.0670676Z (Reading database ... 202909 files and directories currently installed.)
+2026-10-11T23:03:17.0696465Z Preparing to unpack .../000-libpng16-16t64_1.6.43-5ubuntu0.7_arm64.deb ...
+2026-10-11T23:03:17.0791359Z Unpacking libpng16-16t64:arm64 (1.6.43-5ubuntu0.7) over (1.6.43-5ubuntu0.6) ...
+2026-10-11T23:03:17.1086536Z Selecting previously unselected package dbus-x11.
+2026-10-11T23:03:17.1206883Z Preparing to unpack .../001-dbus-x11_1.14.10-4ubuntu4.1_arm64.deb ...
+2026-10-11T23:03:17.1212640Z Unpacking dbus-x11 (1.14.10-4ubuntu4.1) ...
+2026-10-11T23:03:17.1414379Z Selecting previously unselected package fonts-inter.
+2026-10-11T23:03:17.1534367Z Preparing to unpack .../002-fonts-inter_4.0+ds-1_all.deb ...
+2026-10-11T23:03:17.1539386Z Unpacking fonts-inter (4.0+ds-1) ...
+2026-10-11T23:03:17.2625297Z Selecting previously unselected package fonts-noto-cjk.
+2026-10-11T23:03:17.2755472Z Preparing to unpack .../003-fonts-noto-cjk_1%3a20230817+repack1-3_all.deb ...
+2026-10-11T23:03:17.2799072Z Unpacking fonts-noto-cjk (1:20230817+repack1-3) ...
+2026-10-11T23:03:17.8379787Z Selecting previously unselected package gir1.2-freedesktop:arm64.
+2026-10-11T23:03:17.8517344Z Preparing to unpack .../004-gir1.2-freedesktop_1.80.1-1_arm64.deb ...
+2026-10-11T23:03:17.8523000Z Unpacking gir1.2-freedesktop:arm64 (1.80.1-1) ...
+2026-10-11T23:03:17.8660853Z Selecting previously unselected package gir1.2-atspi-2.0:arm64.
+2026-10-11T23:03:17.8794278Z Preparing to unpack .../005-gir1.2-atspi-2.0_2.52.0-1build1_arm64.deb ...
+2026-10-11T23:03:17.8800148Z Unpacking gir1.2-atspi-2.0:arm64 (2.52.0-1build1) ...
+2026-10-11T23:03:17.8922271Z Selecting previously unselected package gir1.2-glib-2.0-dev:arm64.
+2026-10-11T23:03:17.9050583Z Preparing to unpack .../006-gir1.2-glib-2.0-dev_2.80.0-6ubuntu3.9_arm64.deb ...
+2026-10-11T23:03:17.9055862Z Unpacking gir1.2-glib-2.0-dev:arm64 (2.80.0-6ubuntu3.9) ...
+2026-10-11T23:03:17.9651335Z Selecting previously unselected package gir1.2-freedesktop-dev:arm64.
+2026-10-11T23:03:17.9779384Z Preparing to unpack .../007-gir1.2-freedesktop-dev_1.80.1-1_arm64.deb ...
+2026-10-11T23:03:17.9785663Z Unpacking gir1.2-freedesktop-dev:arm64 (1.80.1-1) ...
+2026-10-11T23:03:17.9909612Z Selecting previously unselected package gir1.2-gdkpixbuf-2.0:arm64.
+2026-10-11T23:03:18.0038019Z Preparing to unpack .../008-gir1.2-gdkpixbuf-2.0_2.42.10+dfsg-3ubuntu3.3_arm64.deb ...
+2026-10-11T23:03:18.0043482Z Unpacking gir1.2-gdkpixbuf-2.0:arm64 (2.42.10+dfsg-3ubuntu3.3) ...
+2026-10-11T23:03:18.0170839Z Selecting previously unselected package libgraphene-1.0-0:arm64.
+2026-10-11T23:03:18.0295370Z Preparing to unpack .../009-libgraphene-1.0-0_1.10.8-3build2_arm64.deb ...
+2026-10-11T23:03:18.0300524Z Unpacking libgraphene-1.0-0:arm64 (1.10.8-3build2) ...
+2026-10-11T23:03:18.0458395Z Selecting previously unselected package gir1.2-graphene-1.0:arm64.
+2026-10-11T23:03:18.0579916Z Preparing to unpack .../010-gir1.2-graphene-1.0_1.10.8-3build2_arm64.deb ...
+2026-10-11T23:03:18.0585512Z Unpacking gir1.2-graphene-1.0:arm64 (1.10.8-3build2) ...
+2026-10-11T23:03:18.0712817Z Selecting previously unselected package libharfbuzz-gobject0:arm64.
+2026-10-11T23:03:18.0832789Z Preparing to unpack .../011-libharfbuzz-gobject0_8.3.0-2build2_arm64.deb ...
+2026-10-11T23:03:18.0837917Z Unpacking libharfbuzz-gobject0:arm64 (8.3.0-2build2) ...
+2026-10-11T23:03:18.0962776Z Selecting previously unselected package gir1.2-harfbuzz-0.0:arm64.
+2026-10-11T23:03:18.1082043Z Preparing to unpack .../012-gir1.2-harfbuzz-0.0_8.3.0-2build2_arm64.deb ...
+2026-10-11T23:03:18.1089738Z Unpacking gir1.2-harfbuzz-0.0:arm64 (8.3.0-2build2) ...
+2026-10-11T23:03:18.1219873Z Selecting previously unselected package libpangoxft-1.0-0:arm64.
+2026-10-11T23:03:18.1338129Z Preparing to unpack .../013-libpangoxft-1.0-0_1.52.1+ds-1build1_arm64.deb ...
+2026-10-11T23:03:18.1344120Z Unpacking libpangoxft-1.0-0:arm64 (1.52.1+ds-1build1) ...
+2026-10-11T23:03:18.1463151Z Selecting previously unselected package gir1.2-pango-1.0:arm64.
+2026-10-11T23:03:18.1586691Z Preparing to unpack .../014-gir1.2-pango-1.0_1.52.1+ds-1build1_arm64.deb ...
+2026-10-11T23:03:18.1591860Z Unpacking gir1.2-pango-1.0:arm64 (1.52.1+ds-1build1) ...
+2026-10-11T23:03:18.1843593Z Preparing to unpack .../015-libfreetype6_2.13.2+dfsg-1ubuntu0.2_arm64.deb ...
+2026-10-11T23:03:18.1902542Z Unpacking libfreetype6:arm64 (2.13.2+dfsg-1ubuntu0.2) over (2.13.2+dfsg-1ubuntu0.1) ...
+2026-10-11T23:03:18.2115477Z Selecting previously unselected package libcairo-script-interpreter2:arm64.
+2026-10-11T23:03:18.2246486Z Preparing to unpack .../016-libcairo-script-interpreter2_1.18.0-3build1_arm64.deb ...
+2026-10-11T23:03:18.2252302Z Unpacking libcairo-script-interpreter2:arm64 (1.18.0-3build1) ...
+2026-10-11T23:03:18.2389942Z Selecting previously unselected package libgles2:arm64.
+2026-10-11T23:03:18.2500375Z Preparing to unpack .../017-libgles2_1.7.0-1build1_arm64.deb ...
+2026-10-11T23:03:18.2505928Z Unpacking libgles2:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:18.2634956Z Selecting previously unselected package libgtk-4-common.
+2026-10-11T23:03:18.2744486Z Preparing to unpack .../018-libgtk-4-common_4.14.5+ds-0ubuntu0.10_all.deb ...
+2026-10-11T23:03:18.2749835Z Unpacking libgtk-4-common (4.14.5+ds-0ubuntu0.10) ...
+2026-10-11T23:03:18.3089149Z Selecting previously unselected package libgtk-4-1:arm64.
+2026-10-11T23:03:18.3200006Z Preparing to unpack .../019-libgtk-4-1_4.14.5+ds-0ubuntu0.10_arm64.deb ...
+2026-10-11T23:03:18.3205347Z Unpacking libgtk-4-1:arm64 (4.14.5+ds-0ubuntu0.10) ...
+2026-10-11T23:03:18.4073111Z Selecting previously unselected package gir1.2-gtk-4.0:arm64.
+2026-10-11T23:03:18.4197927Z Preparing to unpack .../020-gir1.2-gtk-4.0_4.14.5+ds-0ubuntu0.10_arm64.deb ...
+2026-10-11T23:03:18.4204362Z Unpacking gir1.2-gtk-4.0:arm64 (4.14.5+ds-0ubuntu0.10) ...
+2026-10-11T23:03:18.4351272Z Selecting previously unselected package libvte-2.91-common.
+2026-10-11T23:03:18.4474829Z Preparing to unpack .../021-libvte-2.91-common_0.76.0-1ubuntu0.1_arm64.deb ...
+2026-10-11T23:03:18.4480090Z Unpacking libvte-2.91-common (0.76.0-1ubuntu0.1) ...
+2026-10-11T23:03:18.4612366Z Selecting previously unselected package libvte-2.91-gtk4-0:arm64.
+2026-10-11T23:03:18.4727471Z Preparing to unpack .../022-libvte-2.91-gtk4-0_0.76.0-1ubuntu0.1_arm64.deb ...
+2026-10-11T23:03:18.4733619Z Unpacking libvte-2.91-gtk4-0:arm64 (0.76.0-1ubuntu0.1) ...
+2026-10-11T23:03:18.4869770Z Selecting previously unselected package gir1.2-vte-3.91:arm64.
+2026-10-11T23:03:18.4994790Z Preparing to unpack .../023-gir1.2-vte-3.91_0.76.0-1ubuntu0.1_arm64.deb ...
+2026-10-11T23:03:18.5000579Z Unpacking gir1.2-vte-3.91:arm64 (0.76.0-1ubuntu0.1) ...
+2026-10-11T23:03:18.5122944Z Selecting previously unselected package libaml0t64:arm64.
+2026-10-11T23:03:18.5241249Z Preparing to unpack .../024-libaml0t64_0.3.0-1.1build1_arm64.deb ...
+2026-10-11T23:03:18.5246605Z Unpacking libaml0t64:arm64 (0.3.0-1.1build1) ...
+2026-10-11T23:03:18.5399645Z Selecting previously unselected package libunibreak5:arm64.
+2026-10-11T23:03:18.5515929Z Preparing to unpack .../025-libunibreak5_5.1-2build1_arm64.deb ...
+2026-10-11T23:03:18.5521271Z Unpacking libunibreak5:arm64 (5.1-2build1) ...
+2026-10-11T23:03:18.5650311Z Selecting previously unselected package libass9:arm64.
+2026-10-11T23:03:18.5780185Z Preparing to unpack .../026-libass9_1%3a0.17.1-2build1_arm64.deb ...
+2026-10-11T23:03:18.5786378Z Unpacking libass9:arm64 (1:0.17.1-2build1) ...
+2026-10-11T23:03:18.5918323Z Selecting previously unselected package libasyncns0:arm64.
+2026-10-11T23:03:18.6038624Z Preparing to unpack .../027-libasyncns0_0.8-6build4_arm64.deb ...
+2026-10-11T23:03:18.6045111Z Unpacking libasyncns0:arm64 (0.8-6build4) ...
+2026-10-11T23:03:18.6167892Z Selecting previously unselected package libatk-adaptor:arm64.
+2026-10-11T23:03:18.6286069Z Preparing to unpack .../028-libatk-adaptor_2.52.0-1build1_arm64.deb ...
+2026-10-11T23:03:18.6292171Z Unpacking libatk-adaptor:arm64 (2.52.0-1build1) ...
+2026-10-11T23:03:18.6424618Z Selecting previously unselected package libva2:arm64.
+2026-10-11T23:03:18.6542612Z Preparing to unpack .../029-libva2_2.20.0-2ubuntu0.2_arm64.deb ...
+2026-10-11T23:03:18.6548486Z Unpacking libva2:arm64 (2.20.0-2ubuntu0.2) ...
+2026-10-11T23:03:18.6679018Z Selecting previously unselected package libva-drm2:arm64.
+2026-10-11T23:03:18.6798332Z Preparing to unpack .../030-libva-drm2_2.20.0-2ubuntu0.2_arm64.deb ...
+2026-10-11T23:03:18.6803572Z Unpacking libva-drm2:arm64 (2.20.0-2ubuntu0.2) ...
+2026-10-11T23:03:18.6932929Z Selecting previously unselected package libva-x11-2:arm64.
+2026-10-11T23:03:18.7051022Z Preparing to unpack .../031-libva-x11-2_2.20.0-2ubuntu0.2_arm64.deb ...
+2026-10-11T23:03:18.7057069Z Unpacking libva-x11-2:arm64 (2.20.0-2ubuntu0.2) ...
+2026-10-11T23:03:18.7188447Z Selecting previously unselected package libvdpau1:arm64.
+2026-10-11T23:03:18.7307297Z Preparing to unpack .../032-libvdpau1_1.5-2build1_arm64.deb ...
+2026-10-11T23:03:18.7312674Z Unpacking libvdpau1:arm64 (1.5-2build1) ...
+2026-10-11T23:03:18.7462572Z Selecting previously unselected package ocl-icd-libopencl1:arm64.
+2026-10-11T23:03:18.7581482Z Preparing to unpack .../033-ocl-icd-libopencl1_2.3.2-1build1_arm64.deb ...
+2026-10-11T23:03:18.7586708Z Unpacking ocl-icd-libopencl1:arm64 (2.3.2-1build1) ...
+2026-10-11T23:03:18.7726085Z Selecting previously unselected package libavutil58:arm64.
+2026-10-11T23:03:18.7846608Z Preparing to unpack .../034-libavutil58_7%3a6.1.1-3ubuntu5_arm64.deb ...
+2026-10-11T23:03:18.7852360Z Unpacking libavutil58:arm64 (7:6.1.1-3ubuntu5) ...
+2026-10-11T23:03:18.8009080Z Selecting previously unselected package libcodec2-1.2:arm64.
+2026-10-11T23:03:18.8127962Z Preparing to unpack .../035-libcodec2-1.2_1.2.0-2build1_arm64.deb ...
+2026-10-11T23:03:18.8134602Z Unpacking libcodec2-1.2:arm64 (1.2.0-2build1) ...
+2026-10-11T23:03:19.0249553Z Selecting previously unselected package libdav1d7:arm64.
+2026-10-11T23:03:19.0524408Z Preparing to unpack .../036-libdav1d7_1.4.1-1build1_arm64.deb ...
+2026-10-11T23:03:19.0749844Z Unpacking libdav1d7:arm64 (1.4.1-1build1) ...
+2026-10-11T23:03:19.1957248Z Selecting previously unselected package libgsm1:arm64.
+2026-10-11T23:03:19.2091616Z Preparing to unpack .../037-libgsm1_1.0.22-1build1_arm64.deb ...
+2026-10-11T23:03:19.2155731Z Unpacking libgsm1:arm64 (1.0.22-1build1) ...
+2026-10-11T23:03:19.2856793Z Selecting previously unselected package libhwy1t64:arm64.
+2026-10-11T23:03:19.2991360Z Preparing to unpack .../038-libhwy1t64_1.0.7-8.1build1_arm64.deb ...
+2026-10-11T23:03:19.4647290Z Unpacking libhwy1t64:arm64 (1.0.7-8.1build1) ...
+2026-10-11T23:03:19.9649108Z Selecting previously unselected package libjxl0.7:arm64.
+2026-10-11T23:03:19.9777438Z Preparing to unpack .../039-libjxl0.7_0.7.0-10.2ubuntu6.1_arm64.deb ...
+2026-10-11T23:03:20.1166452Z Unpacking libjxl0.7:arm64 (0.7.0-10.2ubuntu6.1) ...
+2026-10-11T23:03:20.2450675Z Selecting previously unselected package libmp3lame0:arm64.
+2026-10-11T23:03:20.2589459Z Preparing to unpack .../040-libmp3lame0_3.100-6build1_arm64.deb ...
+2026-10-11T23:03:20.2747124Z Unpacking libmp3lame0:arm64 (3.100-6build1) ...
+2026-10-11T23:03:20.5357030Z Selecting previously unselected package libopus0:arm64.
+2026-10-11T23:03:20.5491160Z Preparing to unpack .../041-libopus0_1.4-1build1_arm64.deb ...
+2026-10-11T23:03:20.5601789Z Unpacking libopus0:arm64 (1.4-1build1) ...
+2026-10-11T23:03:20.8448709Z Selecting previously unselected package librav1e0:arm64.
+2026-10-11T23:03:20.8584436Z Preparing to unpack .../042-librav1e0_0.7.1-2_arm64.deb ...
+2026-10-11T23:03:21.0447890Z Unpacking librav1e0:arm64 (0.7.1-2) ...
+2026-10-11T23:03:21.1544793Z Selecting previously unselected package libshine3:arm64.
+2026-10-11T23:03:21.1679835Z Preparing to unpack .../043-libshine3_3.1.1-2build1_arm64.deb ...
+2026-10-11T23:03:21.1685831Z Unpacking libshine3:arm64 (3.1.1-2build1) ...
+2026-10-11T23:03:21.1812686Z Selecting previously unselected package libspeex1:arm64.
+2026-10-11T23:03:21.1940772Z Preparing to unpack .../044-libspeex1_1.2.1-2ubuntu2.24.04.1_arm64.deb ...
+2026-10-11T23:03:21.1946840Z Unpacking libspeex1:arm64 (1.2.1-2ubuntu2.24.04.1) ...
+2026-10-11T23:03:21.2068963Z Selecting previously unselected package libsvtav1enc1d1:arm64.
+2026-10-11T23:03:21.2193651Z Preparing to unpack .../045-libsvtav1enc1d1_1.7.0+dfsg-2build1_arm64.deb ...
+2026-10-11T23:03:21.2198077Z Unpacking libsvtav1enc1d1:arm64 (1.7.0+dfsg-2build1) ...
+2026-10-11T23:03:21.2491141Z Selecting previously unselected package libsoxr0:arm64.
+2026-10-11T23:03:21.2617490Z Preparing to unpack .../046-libsoxr0_0.1.3-4build3_arm64.deb ...
+2026-10-11T23:03:21.2621936Z Unpacking libsoxr0:arm64 (0.1.3-4build3) ...
+2026-10-11T23:03:21.2749107Z Selecting previously unselected package libswresample4:arm64.
+2026-10-11T23:03:21.2873021Z Preparing to unpack .../047-libswresample4_7%3a6.1.1-3ubuntu5_arm64.deb ...
+2026-10-11T23:03:21.2877935Z Unpacking libswresample4:arm64 (7:6.1.1-3ubuntu5) ...
+2026-10-11T23:03:21.3010310Z Selecting previously unselected package libtheora0:arm64.
+2026-10-11T23:03:21.3135129Z Preparing to unpack .../048-libtheora0_1.1.1+dfsg.1-16.1build3_arm64.deb ...
+2026-10-11T23:03:21.3139895Z Unpacking libtheora0:arm64 (1.1.1+dfsg.1-16.1build3) ...
+2026-10-11T23:03:21.3282812Z Selecting previously unselected package libtwolame0:arm64.
+2026-10-11T23:03:21.3403436Z Preparing to unpack .../049-libtwolame0_0.4.0-2build3_arm64.deb ...
+2026-10-11T23:03:21.3407819Z Unpacking libtwolame0:arm64 (0.4.0-2build3) ...
+2026-10-11T23:03:21.3533159Z Selecting previously unselected package libvorbisenc2:arm64.
+2026-10-11T23:03:21.3649283Z Preparing to unpack .../050-libvorbisenc2_1.3.7-1build3_arm64.deb ...
+2026-10-11T23:03:21.3654217Z Unpacking libvorbisenc2:arm64 (1.3.7-1build3) ...
+2026-10-11T23:03:21.3796993Z Selecting previously unselected package libvpx9:arm64.
+2026-10-11T23:03:21.3914384Z Preparing to unpack .../051-libvpx9_1.14.0-1ubuntu2.3_arm64.deb ...
+2026-10-11T23:03:21.3919235Z Unpacking libvpx9:arm64 (1.14.0-1ubuntu2.3) ...
+2026-10-11T23:03:21.4182955Z Selecting previously unselected package libx264-164:arm64.
+2026-10-11T23:03:21.4309923Z Preparing to unpack .../052-libx264-164_2%3a0.164.3108+git31e19f9-1_arm64.deb ...
+2026-10-11T23:03:21.4314519Z Unpacking libx264-164:arm64 (2:0.164.3108+git31e19f9-1) ...
+2026-10-11T23:03:21.4484761Z Selecting previously unselected package libx265-199:arm64.
+2026-10-11T23:03:21.4603390Z Preparing to unpack .../053-libx265-199_3.5-2build1_arm64.deb ...
+2026-10-11T23:03:21.4608393Z Unpacking libx265-199:arm64 (3.5-2build1) ...
+2026-10-11T23:03:21.4882174Z Selecting previously unselected package libxvidcore4:arm64.
+2026-10-11T23:03:21.4992451Z Preparing to unpack .../054-libxvidcore4_2%3a1.3.7-1build1_arm64.deb ...
+2026-10-11T23:03:21.4997900Z Unpacking libxvidcore4:arm64 (2:1.3.7-1build1) ...
+2026-10-11T23:03:21.5154926Z Selecting previously unselected package libzvbi-common.
+2026-10-11T23:03:21.5268957Z Preparing to unpack .../055-libzvbi-common_0.2.42-2_all.deb ...
+2026-10-11T23:03:21.5273513Z Unpacking libzvbi-common (0.2.42-2) ...
+2026-10-11T23:03:21.5653237Z Selecting previously unselected package libzvbi0t64:arm64.
+2026-10-11T23:03:21.5771938Z Preparing to unpack .../056-libzvbi0t64_0.2.42-2_arm64.deb ...
+2026-10-11T23:03:21.5777367Z Unpacking libzvbi0t64:arm64 (0.2.42-2) ...
+2026-10-11T23:03:21.5926823Z Selecting previously unselected package libavcodec60:arm64.
+2026-10-11T23:03:21.6041516Z Preparing to unpack .../057-libavcodec60_7%3a6.1.1-3ubuntu5_arm64.deb ...
+2026-10-11T23:03:21.6046279Z Unpacking libavcodec60:arm64 (7:6.1.1-3ubuntu5) ...
+2026-10-11T23:03:21.7266554Z Selecting previously unselected package libudfread0:arm64.
+2026-10-11T23:03:21.7391903Z Preparing to unpack .../058-libudfread0_1.1.2-1build1_arm64.deb ...
+2026-10-11T23:03:21.7396466Z Unpacking libudfread0:arm64 (1.1.2-1build1) ...
+2026-10-11T23:03:21.7518926Z Selecting previously unselected package libbluray2:arm64.
+2026-10-11T23:03:21.7641075Z Preparing to unpack .../059-libbluray2_1%3a1.3.4-1build1_arm64.deb ...
+2026-10-11T23:03:21.7646050Z Unpacking libbluray2:arm64 (1:1.3.4-1build1) ...
+2026-10-11T23:03:21.7783527Z Selecting previously unselected package libchromaprint1:arm64.
+2026-10-11T23:03:21.7901674Z Preparing to unpack .../060-libchromaprint1_1.5.1-5_arm64.deb ...
+2026-10-11T23:03:21.7906518Z Unpacking libchromaprint1:arm64 (1.5.1-5) ...
+2026-10-11T23:03:21.8029210Z Selecting previously unselected package libgme0:arm64.
+2026-10-11T23:03:21.8149870Z Preparing to unpack .../061-libgme0_0.6.3-7build1_arm64.deb ...
+2026-10-11T23:03:21.8154457Z Unpacking libgme0:arm64 (0.6.3-7build1) ...
+2026-10-11T23:03:21.8289798Z Selecting previously unselected package libmpg123-0t64:arm64.
+2026-10-11T23:03:21.8409212Z Preparing to unpack .../062-libmpg123-0t64_1.32.5-1ubuntu1.1_arm64.deb ...
+2026-10-11T23:03:21.8415232Z Unpacking libmpg123-0t64:arm64 (1.32.5-1ubuntu1.1) ...
+2026-10-11T23:03:21.8647807Z Selecting previously unselected package libopenmpt0t64:arm64.
+2026-10-11T23:03:21.8765708Z Preparing to unpack .../063-libopenmpt0t64_0.7.3-1.1build3_arm64.deb ...
+2026-10-11T23:03:21.8770355Z Unpacking libopenmpt0t64:arm64 (0.7.3-1.1build3) ...
+2026-10-11T23:03:21.8939866Z Selecting previously unselected package libcjson1:arm64.
+2026-10-11T23:03:21.9055270Z Preparing to unpack .../064-libcjson1_1.7.17-1_arm64.deb ...
+2026-10-11T23:03:21.9060319Z Unpacking libcjson1:arm64 (1.7.17-1) ...
+2026-10-11T23:03:21.9186124Z Selecting previously unselected package libmbedcrypto7t64:arm64.
+2026-10-11T23:03:21.9303774Z Preparing to unpack .../065-libmbedcrypto7t64_2.28.8-1_arm64.deb ...
+2026-10-11T23:03:21.9308731Z Unpacking libmbedcrypto7t64:arm64 (2.28.8-1) ...
+2026-10-11T23:03:21.9540130Z Selecting previously unselected package librist4:arm64.
+2026-10-11T23:03:21.9649687Z Preparing to unpack .../066-librist4_0.2.10+dfsg-2_arm64.deb ...
+2026-10-11T23:03:21.9655169Z Unpacking librist4:arm64 (0.2.10+dfsg-2) ...
+2026-10-11T23:03:21.9781358Z Selecting previously unselected package libsrt1.5-gnutls:arm64.
+2026-10-11T23:03:21.9900145Z Preparing to unpack .../067-libsrt1.5-gnutls_1.5.3-1build2_arm64.deb ...
+2026-10-11T23:03:21.9905477Z Unpacking libsrt1.5-gnutls:arm64 (1.5.3-1build2) ...
+2026-10-11T23:03:22.0054961Z Selecting previously unselected package libssh-gcrypt-4:arm64.
+2026-10-11T23:03:22.0174073Z Preparing to unpack .../068-libssh-gcrypt-4_0.10.6-2ubuntu0.5_arm64.deb ...
+2026-10-11T23:03:22.0179645Z Unpacking libssh-gcrypt-4:arm64 (0.10.6-2ubuntu0.5) ...
+2026-10-11T23:03:22.0319642Z Selecting previously unselected package libavformat60:arm64.
+2026-10-11T23:03:22.0437262Z Preparing to unpack .../069-libavformat60_7%3a6.1.1-3ubuntu5_arm64.deb ...
+2026-10-11T23:03:22.0441896Z Unpacking libavformat60:arm64 (7:6.1.1-3ubuntu5) ...
+2026-10-11T23:03:22.0747000Z Selecting previously unselected package libbs2b0:arm64.
+2026-10-11T23:03:22.0942979Z Preparing to unpack .../070-libbs2b0_3.1.0+dfsg-7build1_arm64.deb ...
+2026-10-11T23:03:22.0943387Z Unpacking libbs2b0:arm64 (3.1.0+dfsg-7build1) ...
+2026-10-11T23:03:22.1005882Z Selecting previously unselected package libflite1:arm64.
+2026-10-11T23:03:22.1116589Z Preparing to unpack .../071-libflite1_2.2-6build3_arm64.deb ...
+2026-10-11T23:03:22.1126317Z Unpacking libflite1:arm64 (2.2-6build3) ...
+2026-10-11T23:03:22.2286678Z Selecting previously unselected package libserd-0-0:arm64.
+2026-10-11T23:03:22.2428237Z Preparing to unpack .../072-libserd-0-0_0.32.2-1_arm64.deb ...
+2026-10-11T23:03:22.2433163Z Unpacking libserd-0-0:arm64 (0.32.2-1) ...
+2026-10-11T23:03:22.2566157Z Selecting previously unselected package libzix-0-0:arm64.
+2026-10-11T23:03:22.2691276Z Preparing to unpack .../073-libzix-0-0_0.4.2-2build1_arm64.deb ...
+2026-10-11T23:03:22.2696006Z Unpacking libzix-0-0:arm64 (0.4.2-2build1) ...
+2026-10-11T23:03:22.2823617Z Selecting previously unselected package libsord-0-0:arm64.
+2026-10-11T23:03:22.2944551Z Preparing to unpack .../074-libsord-0-0_0.16.16-2build1_arm64.deb ...
+2026-10-11T23:03:22.2949625Z Unpacking libsord-0-0:arm64 (0.16.16-2build1) ...
+2026-10-11T23:03:22.3084491Z Selecting previously unselected package libsratom-0-0:arm64.
+2026-10-11T23:03:22.3204621Z Preparing to unpack .../075-libsratom-0-0_0.6.16-1build1_arm64.deb ...
+2026-10-11T23:03:22.3211166Z Unpacking libsratom-0-0:arm64 (0.6.16-1build1) ...
+2026-10-11T23:03:22.3341072Z Selecting previously unselected package liblilv-0-0:arm64.
+2026-10-11T23:03:22.3459421Z Preparing to unpack .../076-liblilv-0-0_0.24.22-1build1_arm64.deb ...
+2026-10-11T23:03:22.3464091Z Unpacking liblilv-0-0:arm64 (0.24.22-1build1) ...
+2026-10-11T23:03:22.3605127Z Selecting previously unselected package libmysofa1:arm64.
+2026-10-11T23:03:22.3725848Z Preparing to unpack .../077-libmysofa1_1.3.2+dfsg-2ubuntu2_arm64.deb ...
+2026-10-11T23:03:22.3732178Z Unpacking libmysofa1:arm64 (1.3.2+dfsg-2ubuntu2) ...
+2026-10-11T23:03:22.3899164Z Selecting previously unselected package libplacebo338:arm64.
+2026-10-11T23:03:22.4019683Z Preparing to unpack .../078-libplacebo338_6.338.2-2build1_arm64.deb ...
+2026-10-11T23:03:22.4024401Z Unpacking libplacebo338:arm64 (6.338.2-2build1) ...
+2026-10-11T23:03:22.4670254Z Selecting previously unselected package libblas3:arm64.
+2026-10-11T23:03:22.4799664Z Preparing to unpack .../079-libblas3_3.12.0-3build1.1_arm64.deb ...
+2026-10-11T23:03:22.4820757Z Unpacking libblas3:arm64 (3.12.0-3build1.1) ...
+2026-10-11T23:03:22.5233996Z Selecting previously unselected package liblapack3:arm64.
+2026-10-11T23:03:22.5361184Z Preparing to unpack .../080-liblapack3_3.12.0-3build1.1_arm64.deb ...
+2026-10-11T23:03:22.5382191Z Unpacking liblapack3:arm64 (3.12.0-3build1.1) ...
+2026-10-11T23:03:22.5864419Z Selecting previously unselected package libflac12t64:arm64.
+2026-10-11T23:03:22.5986407Z Preparing to unpack .../081-libflac12t64_1.4.3+ds-2.1ubuntu2_arm64.deb ...
+2026-10-11T23:03:22.5991506Z Unpacking libflac12t64:arm64 (1.4.3+ds-2.1ubuntu2) ...
+2026-10-11T23:03:22.6129588Z Selecting previously unselected package libsndfile1:arm64.
+2026-10-11T23:03:22.6259443Z Preparing to unpack .../082-libsndfile1_1.2.2-1ubuntu5.24.04.1_arm64.deb ...
+2026-10-11T23:03:22.6264119Z Unpacking libsndfile1:arm64 (1.2.2-1ubuntu5.24.04.1) ...
+2026-10-11T23:03:22.6422324Z Selecting previously unselected package libpulse0:arm64.
+2026-10-11T23:03:22.6540944Z Preparing to unpack .../083-libpulse0_1%3a16.1+dfsg1-2ubuntu10.1_arm64.deb ...
+2026-10-11T23:03:22.6579800Z Unpacking libpulse0:arm64 (1:16.1+dfsg1-2ubuntu10.1) ...
+2026-10-11T23:03:22.6733589Z Selecting previously unselected package libsphinxbase3t64:arm64.
+2026-10-11T23:03:22.6851201Z Preparing to unpack .../084-libsphinxbase3t64_0.8+5prealpha+1-17build2_arm64.deb ...
+2026-10-11T23:03:22.6858661Z Unpacking libsphinxbase3t64:arm64 (0.8+5prealpha+1-17build2) ...
+2026-10-11T23:03:22.6999298Z Selecting previously unselected package libpocketsphinx3:arm64.
+2026-10-11T23:03:22.7122856Z Preparing to unpack .../085-libpocketsphinx3_0.8.0+real5prealpha+1-15ubuntu5_arm64.deb ...
+2026-10-11T23:03:22.7127737Z Unpacking libpocketsphinx3:arm64 (0.8.0+real5prealpha+1-15ubuntu5) ...
+2026-10-11T23:03:22.7266569Z Selecting previously unselected package libpostproc57:arm64.
+2026-10-11T23:03:22.7386024Z Preparing to unpack .../086-libpostproc57_7%3a6.1.1-3ubuntu5_arm64.deb ...
+2026-10-11T23:03:22.7391629Z Unpacking libpostproc57:arm64 (7:6.1.1-3ubuntu5) ...
+2026-10-11T23:03:22.7526341Z Selecting previously unselected package libsamplerate0:arm64.
+2026-10-11T23:03:22.7641826Z Preparing to unpack .../087-libsamplerate0_0.2.2-4build1_arm64.deb ...
+2026-10-11T23:03:22.7646416Z Unpacking libsamplerate0:arm64 (0.2.2-4build1) ...
+2026-10-11T23:03:22.7819471Z Selecting previously unselected package librubberband2:arm64.
+2026-10-11T23:03:22.7940475Z Preparing to unpack .../088-librubberband2_3.3.0+dfsg-2build1_arm64.deb ...
+2026-10-11T23:03:22.7945414Z Unpacking librubberband2:arm64 (3.3.0+dfsg-2build1) ...
+2026-10-11T23:03:22.8086576Z Selecting previously unselected package libswscale7:arm64.
+2026-10-11T23:03:22.8202174Z Preparing to unpack .../089-libswscale7_7%3a6.1.1-3ubuntu5_arm64.deb ...
+2026-10-11T23:03:22.8207393Z Unpacking libswscale7:arm64 (7:6.1.1-3ubuntu5) ...
+2026-10-11T23:03:22.8354393Z Selecting previously unselected package libvidstab1.1:arm64.
+2026-10-11T23:03:22.8481087Z Preparing to unpack .../090-libvidstab1.1_1.1.0-2build1_arm64.deb ...
+2026-10-11T23:03:22.8488630Z Unpacking libvidstab1.1:arm64 (1.1.0-2build1) ...
+2026-10-11T23:03:22.8621375Z Selecting previously unselected package libzimg2:arm64.
+2026-10-11T23:03:22.8742183Z Preparing to unpack .../091-libzimg2_3.0.5+ds1-1build1_arm64.deb ...
+2026-10-11T23:03:22.8747285Z Unpacking libzimg2:arm64 (3.0.5+ds1-1build1) ...
+2026-10-11T23:03:22.8881393Z Selecting previously unselected package libavfilter9:arm64.
+2026-10-11T23:03:22.9003101Z Preparing to unpack .../092-libavfilter9_7%3a6.1.1-3ubuntu5_arm64.deb ...
+2026-10-11T23:03:22.9008263Z Unpacking libavfilter9:arm64 (7:6.1.1-3ubuntu5) ...
+2026-10-11T23:03:22.9931660Z Selecting previously unselected package libbrotli-dev:arm64.
+2026-10-11T23:03:23.0060833Z Preparing to unpack .../093-libbrotli-dev_1.1.0-2build2_arm64.deb ...
+2026-10-11T23:03:23.0065087Z Unpacking libbrotli-dev:arm64 (1.1.0-2build2) ...
+2026-10-11T23:03:23.0225678Z Selecting previously unselected package libbz2-dev:arm64.
+2026-10-11T23:03:23.0353212Z Preparing to unpack .../094-libbz2-dev_1.0.8-5.1ubuntu0.1_arm64.deb ...
+2026-10-11T23:03:23.0357698Z Unpacking libbz2-dev:arm64 (1.0.8-5.1ubuntu0.1) ...
+2026-10-11T23:03:23.0480134Z Selecting previously unselected package libpng-dev:arm64.
+2026-10-11T23:03:23.0606395Z Preparing to unpack .../095-libpng-dev_1.6.43-5ubuntu0.7_arm64.deb ...
+2026-10-11T23:03:23.0614002Z Unpacking libpng-dev:arm64 (1.6.43-5ubuntu0.7) ...
+2026-10-11T23:03:23.0847297Z Selecting previously unselected package libfreetype-dev:arm64.
+2026-10-11T23:03:23.0975324Z Preparing to unpack .../096-libfreetype-dev_2.13.2+dfsg-1ubuntu0.2_arm64.deb ...
+2026-10-11T23:03:23.0981969Z Unpacking libfreetype-dev:arm64 (2.13.2+dfsg-1ubuntu0.2) ...
+2026-10-11T23:03:23.1175653Z Selecting previously unselected package uuid-dev:arm64.
+2026-10-11T23:03:23.1303677Z Preparing to unpack .../097-uuid-dev_2.39.3-9ubuntu6.6_arm64.deb ...
+2026-10-11T23:03:23.1310753Z Unpacking uuid-dev:arm64 (2.39.3-9ubuntu6.6) ...
+2026-10-11T23:03:23.1451910Z Selecting previously unselected package libfontconfig-dev:arm64.
+2026-10-11T23:03:23.1578727Z Preparing to unpack .../098-libfontconfig-dev_2.15.0-1.1ubuntu2_arm64.deb ...
+2026-10-11T23:03:23.1584741Z Unpacking libfontconfig-dev:arm64 (2.15.0-1.1ubuntu2) ...
+2026-10-11T23:03:23.1730046Z Selecting previously unselected package libglib2.0-dev-bin.
+2026-10-11T23:03:23.1849178Z Preparing to unpack .../099-libglib2.0-dev-bin_2.80.0-6ubuntu3.9_arm64.deb ...
+2026-10-11T23:03:23.1856829Z Unpacking libglib2.0-dev-bin (2.80.0-6ubuntu3.9) ...
+2026-10-11T23:03:23.2042218Z Selecting previously unselected package libblkid-dev:arm64.
+2026-10-11T23:03:23.2159630Z Preparing to unpack .../100-libblkid-dev_2.39.3-9ubuntu6.6_arm64.deb ...
+2026-10-11T23:03:23.2163740Z Unpacking libblkid-dev:arm64 (2.39.3-9ubuntu6.6) ...
+2026-10-11T23:03:23.2307458Z Selecting previously unselected package libsepol-dev:arm64.
+2026-10-11T23:03:23.2427530Z Preparing to unpack .../101-libsepol-dev_3.5-2build1_arm64.deb ...
+2026-10-11T23:03:23.2431772Z Unpacking libsepol-dev:arm64 (3.5-2build1) ...
+2026-10-11T23:03:23.2619968Z Selecting previously unselected package libselinux1-dev:arm64.
+2026-10-11T23:03:23.2734396Z Preparing to unpack .../102-libselinux1-dev_3.5-2ubuntu2.1_arm64.deb ...
+2026-10-11T23:03:23.2740924Z Unpacking libselinux1-dev:arm64 (3.5-2ubuntu2.1) ...
+2026-10-11T23:03:23.2960629Z Selecting previously unselected package libmount-dev:arm64.
+2026-10-11T23:03:23.3079785Z Preparing to unpack .../103-libmount-dev_2.39.3-9ubuntu6.6_arm64.deb ...
+2026-10-11T23:03:23.3087156Z Unpacking libmount-dev:arm64 (2.39.3-9ubuntu6.6) ...
+2026-10-11T23:03:23.3218834Z Selecting previously unselected package libgirepository-2.0-0:arm64.
+2026-10-11T23:03:23.3344627Z Preparing to unpack .../104-libgirepository-2.0-0_2.80.0-6ubuntu3.9_arm64.deb ...
+2026-10-11T23:03:23.3350841Z Unpacking libgirepository-2.0-0:arm64 (2.80.0-6ubuntu3.9) ...
+2026-10-11T23:03:23.3483291Z Selecting previously unselected package libglib2.0-dev:arm64.
+2026-10-11T23:03:23.3608918Z Preparing to unpack .../105-libglib2.0-dev_2.80.0-6ubuntu3.9_arm64.deb ...
+2026-10-11T23:03:23.3614342Z Unpacking libglib2.0-dev:arm64 (2.80.0-6ubuntu3.9) ...
+2026-10-11T23:03:23.4502910Z Selecting previously unselected package libpixman-1-dev:arm64.
+2026-10-11T23:03:23.4633775Z Preparing to unpack .../106-libpixman-1-dev_0.42.2-1build1_arm64.deb ...
+2026-10-11T23:03:23.4640935Z Unpacking libpixman-1-dev:arm64 (0.42.2-1build1) ...
+2026-10-11T23:03:23.4792550Z Selecting previously unselected package xorg-sgml-doctools.
+2026-10-11T23:03:23.4913900Z Preparing to unpack .../107-xorg-sgml-doctools_1%3a1.11-1.1_all.deb ...
+2026-10-11T23:03:23.4917972Z Unpacking xorg-sgml-doctools (1:1.11-1.1) ...
+2026-10-11T23:03:23.5066246Z Selecting previously unselected package x11proto-dev.
+2026-10-11T23:03:23.5182653Z Preparing to unpack .../108-x11proto-dev_2023.2-1_all.deb ...
+2026-10-11T23:03:23.5186822Z Unpacking x11proto-dev (2023.2-1) ...
+2026-10-11T23:03:23.5482125Z Selecting previously unselected package x11proto-core-dev.
+2026-10-11T23:03:23.5597095Z Preparing to unpack .../109-x11proto-core-dev_2023.2-1_all.deb ...
+2026-10-11T23:03:23.5603885Z Unpacking x11proto-core-dev (2023.2-1) ...
+2026-10-11T23:03:23.5730433Z Selecting previously unselected package libice-dev:arm64.
+2026-10-11T23:03:23.5844034Z Preparing to unpack .../110-libice-dev_2%3a1.0.10-1build3_arm64.deb ...
+2026-10-11T23:03:23.5848618Z Unpacking libice-dev:arm64 (2:1.0.10-1build3) ...
+2026-10-11T23:03:23.5976428Z Selecting previously unselected package libsm-dev:arm64.
+2026-10-11T23:03:23.6089430Z Preparing to unpack .../111-libsm-dev_2%3a1.2.3-1build3_arm64.deb ...
+2026-10-11T23:03:23.6096171Z Unpacking libsm-dev:arm64 (2:1.2.3-1build3) ...
+2026-10-11T23:03:23.6225358Z Selecting previously unselected package libxau-dev:arm64.
+2026-10-11T23:03:23.6348983Z Preparing to unpack .../112-libxau-dev_1%3a1.0.9-1build6_arm64.deb ...
+2026-10-11T23:03:23.6353697Z Unpacking libxau-dev:arm64 (1:1.0.9-1build6) ...
+2026-10-11T23:03:23.6480213Z Selecting previously unselected package libxdmcp-dev:arm64.
+2026-10-11T23:03:23.6592317Z Preparing to unpack .../113-libxdmcp-dev_1%3a1.1.3-0ubuntu6_arm64.deb ...
+2026-10-11T23:03:23.6596689Z Unpacking libxdmcp-dev:arm64 (1:1.1.3-0ubuntu6) ...
+2026-10-11T23:03:23.6717874Z Selecting previously unselected package xtrans-dev.
+2026-10-11T23:03:23.6838069Z Preparing to unpack .../114-xtrans-dev_1.4.0-1_all.deb ...
+2026-10-11T23:03:23.6844541Z Unpacking xtrans-dev (1.4.0-1) ...
+2026-10-11T23:03:23.6994736Z Selecting previously unselected package libpthread-stubs0-dev:arm64.
+2026-10-11T23:03:23.7107862Z Preparing to unpack .../115-libpthread-stubs0-dev_0.4-1build3_arm64.deb ...
+2026-10-11T23:03:23.7114412Z Unpacking libpthread-stubs0-dev:arm64 (0.4-1build3) ...
+2026-10-11T23:03:23.7233103Z Selecting previously unselected package libxcb1-dev:arm64.
+2026-10-11T23:03:23.7346542Z Preparing to unpack .../116-libxcb1-dev_1.15-1ubuntu2_arm64.deb ...
+2026-10-11T23:03:23.7353011Z Unpacking libxcb1-dev:arm64 (1.15-1ubuntu2) ...
+2026-10-11T23:03:23.7501413Z Selecting previously unselected package libx11-dev:arm64.
+2026-10-11T23:03:23.7618999Z Preparing to unpack .../117-libx11-dev_2%3a1.8.7-1build1_arm64.deb ...
+2026-10-11T23:03:23.7626097Z Unpacking libx11-dev:arm64 (2:1.8.7-1build1) ...
+2026-10-11T23:03:23.7847178Z Selecting previously unselected package libxcb-render0-dev:arm64.
+2026-10-11T23:03:23.7962512Z Preparing to unpack .../118-libxcb-render0-dev_1.15-1ubuntu2_arm64.deb ...
+2026-10-11T23:03:23.7966693Z Unpacking libxcb-render0-dev:arm64 (1.15-1ubuntu2) ...
+2026-10-11T23:03:23.8094352Z Selecting previously unselected package libxcb-shm0-dev:arm64.
+2026-10-11T23:03:23.8211885Z Preparing to unpack .../119-libxcb-shm0-dev_1.15-1ubuntu2_arm64.deb ...
+2026-10-11T23:03:23.8216227Z Unpacking libxcb-shm0-dev:arm64 (1.15-1ubuntu2) ...
+2026-10-11T23:03:23.8337392Z Selecting previously unselected package libxext-dev:arm64.
+2026-10-11T23:03:23.8458408Z Preparing to unpack .../120-libxext-dev_2%3a1.3.4-1build2_arm64.deb ...
+2026-10-11T23:03:23.8464622Z Unpacking libxext-dev:arm64 (2:1.3.4-1build2) ...
+2026-10-11T23:03:23.8622089Z Selecting previously unselected package libxrender-dev:arm64.
+2026-10-11T23:03:23.8740558Z Preparing to unpack .../121-libxrender-dev_1%3a0.9.10-1.1build1_arm64.deb ...
+2026-10-11T23:03:23.8745308Z Unpacking libxrender-dev:arm64 (1:0.9.10-1.1build1) ...
+2026-10-11T23:03:23.8868889Z Selecting previously unselected package libcairo2-dev:arm64.
+2026-10-11T23:03:23.8987407Z Preparing to unpack .../122-libcairo2-dev_1.18.0-3build1_arm64.deb ...
+2026-10-11T23:03:23.8991772Z Unpacking libcairo2-dev:arm64 (1.18.0-3build1) ...
+2026-10-11T23:03:23.9133512Z Selecting previously unselected package libdatrie-dev:arm64.
+2026-10-11T23:03:23.9253643Z Preparing to unpack .../123-libdatrie-dev_0.2.13-3build1_arm64.deb ...
+2026-10-11T23:03:23.9258389Z Unpacking libdatrie-dev:arm64 (0.2.13-3build1) ...
+2026-10-11T23:03:23.9383423Z Selecting previously unselected package libdeflate-dev:arm64.
+2026-10-11T23:03:23.9504621Z Preparing to unpack .../124-libdeflate-dev_1.19-1build1.1_arm64.deb ...
+2026-10-11T23:03:23.9513144Z Unpacking libdeflate-dev:arm64 (1.19-1build1.1) ...
+2026-10-11T23:03:23.9648317Z Selecting previously unselected package libegl-mesa0:arm64.
+2026-10-11T23:03:23.9759960Z Preparing to unpack .../125-libegl-mesa0_25.2.8-0ubuntu0.24.04.4_arm64.deb ...
+2026-10-11T23:03:23.9764944Z Unpacking libegl-mesa0:arm64 (25.2.8-0ubuntu0.24.04.4) ...
+2026-10-11T23:03:23.9908186Z Selecting previously unselected package libegl1:arm64.
+2026-10-11T23:03:24.0027868Z Preparing to unpack .../126-libegl1_1.7.0-1build1_arm64.deb ...
+2026-10-11T23:03:24.0033387Z Unpacking libegl1:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:24.0158429Z Selecting previously unselected package libglx-dev:arm64.
+2026-10-11T23:03:24.0278981Z Preparing to unpack .../127-libglx-dev_1.7.0-1build1_arm64.deb ...
+2026-10-11T23:03:24.0284201Z Unpacking libglx-dev:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:24.0405190Z Selecting previously unselected package libgl-dev:arm64.
+2026-10-11T23:03:24.0523349Z Preparing to unpack .../128-libgl-dev_1.7.0-1build1_arm64.deb ...
+2026-10-11T23:03:24.0528176Z Unpacking libgl-dev:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:24.0687135Z Selecting previously unselected package libegl-dev:arm64.
+2026-10-11T23:03:24.0808690Z Preparing to unpack .../129-libegl-dev_1.7.0-1build1_arm64.deb ...
+2026-10-11T23:03:24.0813949Z Unpacking libegl-dev:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:24.0936657Z Selecting previously unselected package libglvnd-core-dev:arm64.
+2026-10-11T23:03:24.1052452Z Preparing to unpack .../130-libglvnd-core-dev_1.7.0-1build1_arm64.deb ...
+2026-10-11T23:03:24.1057705Z Unpacking libglvnd-core-dev:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:24.1187458Z Selecting previously unselected package libgles1:arm64.
+2026-10-11T23:03:24.1308065Z Preparing to unpack .../131-libgles1_1.7.0-1build1_arm64.deb ...
+2026-10-11T23:03:24.1314402Z Unpacking libgles1:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:24.1439824Z Selecting previously unselected package libgles-dev:arm64.
+2026-10-11T23:03:24.1576435Z Preparing to unpack .../132-libgles-dev_1.7.0-1build1_arm64.deb ...
+2026-10-11T23:03:24.1581747Z Unpacking libgles-dev:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:24.1732089Z Selecting previously unselected package libopengl0:arm64.
+2026-10-11T23:03:24.1852420Z Preparing to unpack .../133-libopengl0_1.7.0-1build1_arm64.deb ...
+2026-10-11T23:03:24.1860357Z Unpacking libopengl0:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:24.1989782Z Selecting previously unselected package libopengl-dev:arm64.
+2026-10-11T23:03:24.2107961Z Preparing to unpack .../134-libopengl-dev_1.7.0-1build1_arm64.deb ...
+2026-10-11T23:03:24.2113414Z Unpacking libopengl-dev:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:24.2227447Z Selecting previously unselected package libglvnd-dev:arm64.
+2026-10-11T23:03:24.2341225Z Preparing to unpack .../135-libglvnd-dev_1.7.0-1build1_arm64.deb ...
+2026-10-11T23:03:24.2347531Z Unpacking libglvnd-dev:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:24.2462672Z Selecting previously unselected package libegl1-mesa-dev:arm64.
+2026-10-11T23:03:24.2582284Z Preparing to unpack .../136-libegl1-mesa-dev_25.2.8-0ubuntu0.24.04.4_arm64.deb ...
+2026-10-11T23:03:24.2587292Z Unpacking libegl1-mesa-dev:arm64 (25.2.8-0ubuntu0.24.04.4) ...
+2026-10-11T23:03:24.2710871Z Selecting previously unselected package libepoxy-dev:arm64.
+2026-10-11T23:03:24.2830790Z Preparing to unpack .../137-libepoxy-dev_1.5.10-1build1_arm64.deb ...
+2026-10-11T23:03:24.2836071Z Unpacking libepoxy-dev:arm64 (1.5.10-1build1) ...
+2026-10-11T23:03:24.3002742Z Selecting previously unselected package libevent-2.1-7t64:arm64.
+2026-10-11T23:03:24.3121523Z Preparing to unpack .../138-libevent-2.1-7t64_2.1.12-stable-9ubuntu2.2_arm64.deb ...
+2026-10-11T23:03:24.3125960Z Unpacking libevent-2.1-7t64:arm64 (2.1.12-stable-9ubuntu2.2) ...
+2026-10-11T23:03:24.3275164Z Selecting previously unselected package libwinpr2-2t64:arm64.
+2026-10-11T23:03:24.3395515Z Preparing to unpack .../139-libwinpr2-2t64_2.11.5+dfsg1-1build2_arm64.deb ...
+2026-10-11T23:03:24.3401047Z Unpacking libwinpr2-2t64:arm64 (2.11.5+dfsg1-1build2) ...
+2026-10-11T23:03:24.3566745Z Selecting previously unselected package libfreerdp2-2t64:arm64.
+2026-10-11T23:03:24.3686703Z Preparing to unpack .../140-libfreerdp2-2t64_2.11.5+dfsg1-1build2_arm64.deb ...
+2026-10-11T23:03:24.3691678Z Unpacking libfreerdp2-2t64:arm64 (2.11.5+dfsg1-1build2) ...
+2026-10-11T23:03:24.3867348Z Selecting previously unselected package libfreerdp-server2-2t64:arm64.
+2026-10-11T23:03:24.3983185Z Preparing to unpack .../141-libfreerdp-server2-2t64_2.11.5+dfsg1-1build2_arm64.deb ...
+2026-10-11T23:03:24.3987905Z Unpacking libfreerdp-server2-2t64:arm64 (2.11.5+dfsg1-1build2) ...
+2026-10-11T23:03:24.4119062Z Selecting previously unselected package libfribidi-dev:arm64.
+2026-10-11T23:03:24.4248871Z Preparing to unpack .../142-libfribidi-dev_1.0.13-3build1_arm64.deb ...
+2026-10-11T23:03:24.4253849Z Unpacking libfribidi-dev:arm64 (1.0.13-3build1) ...
+2026-10-11T23:03:24.4405796Z Selecting previously unselected package libjpeg-turbo8-dev:arm64.
+2026-10-11T23:03:24.4526065Z Preparing to unpack .../143-libjpeg-turbo8-dev_2.1.5-2ubuntu2_arm64.deb ...
+2026-10-11T23:03:24.4530552Z Unpacking libjpeg-turbo8-dev:arm64 (2.1.5-2ubuntu2) ...
+2026-10-11T23:03:24.4683200Z Selecting previously unselected package libjpeg8-dev:arm64.
+2026-10-11T23:03:24.4801742Z Preparing to unpack .../144-libjpeg8-dev_8c-2ubuntu11_arm64.deb ...
+2026-10-11T23:03:24.4806329Z Unpacking libjpeg8-dev:arm64 (8c-2ubuntu11) ...
+2026-10-11T23:03:24.4922108Z Selecting previously unselected package libjpeg-dev:arm64.
+2026-10-11T23:03:24.5044755Z Preparing to unpack .../145-libjpeg-dev_8c-2ubuntu11_arm64.deb ...
+2026-10-11T23:03:24.5049583Z Unpacking libjpeg-dev:arm64 (8c-2ubuntu11) ...
+2026-10-11T23:03:24.5166188Z Selecting previously unselected package libjbig-dev:arm64.
+2026-10-11T23:03:24.5284159Z Preparing to unpack .../146-libjbig-dev_2.1-6.1ubuntu2_arm64.deb ...
+2026-10-11T23:03:24.5289065Z Unpacking libjbig-dev:arm64 (2.1-6.1ubuntu2) ...
+2026-10-11T23:03:24.5411992Z Selecting previously unselected package liblzma-dev:arm64.
+2026-10-11T23:03:24.5535162Z Preparing to unpack .../147-liblzma-dev_5.6.1+really5.4.5-1ubuntu0.3_arm64.deb ...
+2026-10-11T23:03:24.5543036Z Unpacking liblzma-dev:arm64 (5.6.1+really5.4.5-1ubuntu0.3) ...
+2026-10-11T23:03:24.5699001Z Selecting previously unselected package libwebpdecoder3:arm64.
+2026-10-11T23:03:24.5815988Z Preparing to unpack .../148-libwebpdecoder3_1.3.2-0.4build3_arm64.deb ...
+2026-10-11T23:03:24.5831198Z Unpacking libwebpdecoder3:arm64 (1.3.2-0.4build3) ...
+2026-10-11T23:03:24.5954572Z Selecting previously unselected package libsharpyuv-dev:arm64.
+2026-10-11T23:03:24.6069635Z Preparing to unpack .../149-libsharpyuv-dev_1.3.2-0.4build3_arm64.deb ...
+2026-10-11T23:03:24.6073990Z Unpacking libsharpyuv-dev:arm64 (1.3.2-0.4build3) ...
+2026-10-11T23:03:24.6196487Z Selecting previously unselected package libwebp-dev:arm64.
+2026-10-11T23:03:24.6313046Z Preparing to unpack .../150-libwebp-dev_1.3.2-0.4build3_arm64.deb ...
+2026-10-11T23:03:24.6318309Z Unpacking libwebp-dev:arm64 (1.3.2-0.4build3) ...
+2026-10-11T23:03:24.6495344Z Selecting previously unselected package libtiffxx6:arm64.
+2026-10-11T23:03:24.6614842Z Preparing to unpack .../151-libtiffxx6_4.5.1+git230720-4ubuntu2.5_arm64.deb ...
+2026-10-11T23:03:24.6620357Z Unpacking libtiffxx6:arm64 (4.5.1+git230720-4ubuntu2.5) ...
+2026-10-11T23:03:24.6738694Z Selecting previously unselected package liblerc-dev:arm64.
+2026-10-11T23:03:24.6858864Z Preparing to unpack .../152-liblerc-dev_4.0.0+ds-4ubuntu2_arm64.deb ...
+2026-10-11T23:03:24.6863806Z Unpacking liblerc-dev:arm64 (4.0.0+ds-4ubuntu2) ...
+2026-10-11T23:03:24.7012579Z Selecting previously unselected package libtiff-dev:arm64.
+2026-10-11T23:03:24.7136372Z Preparing to unpack .../153-libtiff-dev_4.5.1+git230720-4ubuntu2.5_arm64.deb ...
+2026-10-11T23:03:24.7141348Z Unpacking libtiff-dev:arm64 (4.5.1+git230720-4ubuntu2.5) ...
+2026-10-11T23:03:24.7329978Z Selecting previously unselected package libgdk-pixbuf-2.0-dev:arm64.
+2026-10-11T23:03:24.7450816Z Preparing to unpack .../154-libgdk-pixbuf-2.0-dev_2.42.10+dfsg-3ubuntu3.3_arm64.deb ...
+2026-10-11T23:03:24.7455026Z Unpacking libgdk-pixbuf-2.0-dev:arm64 (2.42.10+dfsg-3ubuntu3.3) ...
+2026-10-11T23:03:24.7599241Z Selecting previously unselected package libunbound8:arm64.
+2026-10-11T23:03:24.7732105Z Preparing to unpack .../155-libunbound8_1.19.2-1ubuntu3.10_arm64.deb ...
+2026-10-11T23:03:24.7737496Z Unpacking libunbound8:arm64 (1.19.2-1ubuntu3.10) ...
+2026-10-11T23:03:24.7902449Z Selecting previously unselected package libgnutls-dane0t64:arm64.
+2026-10-11T23:03:24.8023722Z Preparing to unpack .../156-libgnutls-dane0t64_3.8.3-1.1ubuntu3.6_arm64.deb ...
+2026-10-11T23:03:24.8028816Z Unpacking libgnutls-dane0t64:arm64 (3.8.3-1.1ubuntu3.6) ...
+2026-10-11T23:03:24.8157957Z Selecting previously unselected package libgnutls-openssl27t64:arm64.
+2026-10-11T23:03:24.8277326Z Preparing to unpack .../157-libgnutls-openssl27t64_3.8.3-1.1ubuntu3.6_arm64.deb ...
+2026-10-11T23:03:24.8282889Z Unpacking libgnutls-openssl27t64:arm64 (3.8.3-1.1ubuntu3.6) ...
+2026-10-11T23:03:24.8408849Z Selecting previously unselected package libidn2-dev:arm64.
+2026-10-11T23:03:24.8527985Z Preparing to unpack .../158-libidn2-dev_2.3.7-2build1.1_arm64.deb ...
+2026-10-11T23:03:24.8532550Z Unpacking libidn2-dev:arm64 (2.3.7-2build1.1) ...
+2026-10-11T23:03:24.8672200Z Selecting previously unselected package libp11-kit-dev:arm64.
+2026-10-11T23:03:24.8788982Z Preparing to unpack .../159-libp11-kit-dev_0.25.3-4ubuntu2.2_arm64.deb ...
+2026-10-11T23:03:24.8793158Z Unpacking libp11-kit-dev:arm64 (0.25.3-4ubuntu2.2) ...
+2026-10-11T23:03:24.8919099Z Selecting previously unselected package libtasn1-6-dev:arm64.
+2026-10-11T23:03:24.9037236Z Preparing to unpack .../160-libtasn1-6-dev_4.19.0-3ubuntu0.24.04.2_arm64.deb ...
+2026-10-11T23:03:24.9043683Z Unpacking libtasn1-6-dev:arm64 (4.19.0-3ubuntu0.24.04.2) ...
+2026-10-11T23:03:24.9210280Z Selecting previously unselected package nettle-dev:arm64.
+2026-10-11T23:03:24.9330198Z Preparing to unpack .../161-nettle-dev_3.9.1-2.2build1.1_arm64.deb ...
+2026-10-11T23:03:24.9334944Z Unpacking nettle-dev:arm64 (3.9.1-2.2build1.1) ...
+2026-10-11T23:03:24.9613098Z Selecting previously unselected package libgnutls28-dev:arm64.
+2026-10-11T23:03:24.9734152Z Preparing to unpack .../162-libgnutls28-dev_3.8.3-1.1ubuntu3.6_arm64.deb ...
+2026-10-11T23:03:24.9998532Z Unpacking libgnutls28-dev:arm64 (3.8.3-1.1ubuntu3.6) ...
+2026-10-11T23:03:25.0679086Z Selecting previously unselected package libgraphene-1.0-dev.
+2026-10-11T23:03:25.0808586Z Preparing to unpack .../163-libgraphene-1.0-dev_1.10.8-3build2_arm64.deb ...
+2026-10-11T23:03:25.0813853Z Unpacking libgraphene-1.0-dev (1.10.8-3build2) ...
+2026-10-11T23:03:25.0968243Z Selecting previously unselected package libgraphite2-dev:arm64.
+2026-10-11T23:03:25.1097120Z Preparing to unpack .../164-libgraphite2-dev_1.3.14-2ubuntu0.24.04.1_arm64.deb ...
+2026-10-11T23:03:25.1101964Z Unpacking libgraphite2-dev:arm64 (1.3.14-2ubuntu0.24.04.1) ...
+2026-10-11T23:03:25.1229673Z Selecting previously unselected package liborc-0.4-0t64:arm64.
+2026-10-11T23:03:25.1352802Z Preparing to unpack .../165-liborc-0.4-0t64_1%3a0.4.38-1ubuntu0.1_arm64.deb ...
+2026-10-11T23:03:25.1357683Z Unpacking liborc-0.4-0t64:arm64 (1:0.4.38-1ubuntu0.1) ...
+2026-10-11T23:03:25.1513121Z Selecting previously unselected package libgstreamer-plugins-base1.0-0:arm64.
+2026-10-11T23:03:25.1643000Z Preparing to unpack .../166-libgstreamer-plugins-base1.0-0_1.24.2-1ubuntu0.5_arm64.deb ...
+2026-10-11T23:03:25.1647637Z Unpacking libgstreamer-plugins-base1.0-0:arm64 (1.24.2-1ubuntu0.5) ...
+2026-10-11T23:03:25.1868713Z Selecting previously unselected package libharfbuzz-icu0:arm64.
+2026-10-11T23:03:25.1994443Z Preparing to unpack .../167-libharfbuzz-icu0_8.3.0-2build2_arm64.deb ...
+2026-10-11T23:03:25.1999564Z Unpacking libharfbuzz-icu0:arm64 (8.3.0-2build2) ...
+2026-10-11T23:03:25.2129257Z Selecting previously unselected package libharfbuzz-subset0:arm64.
+2026-10-11T23:03:25.2251964Z Preparing to unpack .../168-libharfbuzz-subset0_8.3.0-2build2_arm64.deb ...
+2026-10-11T23:03:25.2256958Z Unpacking libharfbuzz-subset0:arm64 (8.3.0-2build2) ...
+2026-10-11T23:03:25.2414599Z Selecting previously unselected package libharfbuzz-cairo0:arm64.
+2026-10-11T23:03:25.2542827Z Preparing to unpack .../169-libharfbuzz-cairo0_8.3.0-2build2_arm64.deb ...
+2026-10-11T23:03:25.2547651Z Unpacking libharfbuzz-cairo0:arm64 (8.3.0-2build2) ...
+2026-10-11T23:03:25.2667902Z Selecting previously unselected package libharfbuzz-dev:arm64.
+2026-10-11T23:03:25.2784427Z Preparing to unpack .../170-libharfbuzz-dev_8.3.0-2build2_arm64.deb ...
+2026-10-11T23:03:25.2788651Z Unpacking libharfbuzz-dev:arm64 (8.3.0-2build2) ...
+2026-10-11T23:03:25.2970139Z Selecting previously unselected package libthai-dev:arm64.
+2026-10-11T23:03:25.3096604Z Preparing to unpack .../171-libthai-dev_0.1.29-2build1_arm64.deb ...
+2026-10-11T23:03:25.3100774Z Unpacking libthai-dev:arm64 (0.1.29-2build1) ...
+2026-10-11T23:03:25.3224156Z Selecting previously unselected package libxft-dev:arm64.
+2026-10-11T23:03:25.3340124Z Preparing to unpack .../172-libxft-dev_2.3.6-1build1_arm64.deb ...
+2026-10-11T23:03:25.3344605Z Unpacking libxft-dev:arm64 (2.3.6-1build1) ...
+2026-10-11T23:03:25.3494207Z Selecting previously unselected package pango1.0-tools.
+2026-10-11T23:03:25.3622192Z Preparing to unpack .../173-pango1.0-tools_1.52.1+ds-1build1_arm64.deb ...
+2026-10-11T23:03:25.3627888Z Unpacking pango1.0-tools (1.52.1+ds-1build1) ...
+2026-10-11T23:03:25.3757593Z Selecting previously unselected package libpango1.0-dev:arm64.
+2026-10-11T23:03:25.3881899Z Preparing to unpack .../174-libpango1.0-dev_1.52.1+ds-1build1_arm64.deb ...
+2026-10-11T23:03:25.3887498Z Unpacking libpango1.0-dev:arm64 (1.52.1+ds-1build1) ...
+2026-10-11T23:03:25.4074852Z Selecting previously unselected package libwayland-server0:arm64.
+2026-10-11T23:03:25.4198079Z Preparing to unpack .../175-libwayland-server0_1.22.0-2.1build1_arm64.deb ...
+2026-10-11T23:03:25.4202954Z Unpacking libwayland-server0:arm64 (1.22.0-2.1build1) ...
+2026-10-11T23:03:25.4328033Z Selecting previously unselected package libwayland-bin.
+2026-10-11T23:03:25.4452570Z Preparing to unpack .../176-libwayland-bin_1.22.0-2.1build1_arm64.deb ...
+2026-10-11T23:03:25.4457069Z Unpacking libwayland-bin (1.22.0-2.1build1) ...
+2026-10-11T23:03:25.4576639Z Selecting previously unselected package libwayland-dev:arm64.
+2026-10-11T23:03:25.4711084Z Preparing to unpack .../177-libwayland-dev_1.22.0-2.1build1_arm64.deb ...
+2026-10-11T23:03:25.4716962Z Unpacking libwayland-dev:arm64 (1.22.0-2.1build1) ...
+2026-10-11T23:03:25.4858761Z Selecting previously unselected package libxfixes-dev:arm64.
+2026-10-11T23:03:25.4978034Z Preparing to unpack .../178-libxfixes-dev_1%3a6.0.0-2build1_arm64.deb ...
+2026-10-11T23:03:25.4983296Z Unpacking libxfixes-dev:arm64 (1:6.0.0-2build1) ...
+2026-10-11T23:03:25.5104044Z Selecting previously unselected package libxcomposite-dev:arm64.
+2026-10-11T23:03:25.5217881Z Preparing to unpack .../179-libxcomposite-dev_1%3a0.4.5-1build3_arm64.deb ...
+2026-10-11T23:03:25.5222358Z Unpacking libxcomposite-dev:arm64 (1:0.4.5-1build3) ...
+2026-10-11T23:03:25.5344910Z Selecting previously unselected package libxcursor-dev:arm64.
+2026-10-11T23:03:25.5463051Z Preparing to unpack .../180-libxcursor-dev_1%3a1.2.1-1build1_arm64.deb ...
+2026-10-11T23:03:25.5467455Z Unpacking libxcursor-dev:arm64 (1:1.2.1-1build1) ...
+2026-10-11T23:03:25.5607286Z Selecting previously unselected package libxdamage-dev:arm64.
+2026-10-11T23:03:25.5733072Z Preparing to unpack .../181-libxdamage-dev_1%3a1.1.6-1build1_arm64.deb ...
+2026-10-11T23:03:25.5738340Z Unpacking libxdamage-dev:arm64 (1:1.1.6-1build1) ...
+2026-10-11T23:03:25.5854322Z Selecting previously unselected package libxi-dev:arm64.
+2026-10-11T23:03:25.5970441Z Preparing to unpack .../182-libxi-dev_2%3a1.8.1-1build1_arm64.deb ...
+2026-10-11T23:03:25.5975915Z Unpacking libxi-dev:arm64 (2:1.8.1-1build1) ...
+2026-10-11T23:03:25.6143174Z Selecting previously unselected package libxinerama-dev:arm64.
+2026-10-11T23:03:25.6270037Z Preparing to unpack .../183-libxinerama-dev_2%3a1.1.4-3build1_arm64.deb ...
+2026-10-11T23:03:25.6274414Z Unpacking libxinerama-dev:arm64 (2:1.1.4-3build1) ...
+2026-10-11T23:03:25.6393583Z Selecting previously unselected package libxkbcommon-dev:arm64.
+2026-10-11T23:03:25.6512824Z Preparing to unpack .../184-libxkbcommon-dev_1.6.0-1build1_arm64.deb ...
+2026-10-11T23:03:25.6517135Z Unpacking libxkbcommon-dev:arm64 (1.6.0-1build1) ...
+2026-10-11T23:03:25.6644540Z Selecting previously unselected package libxrandr-dev:arm64.
+2026-10-11T23:03:25.6761481Z Preparing to unpack .../185-libxrandr-dev_2%3a1.5.2-2build1_arm64.deb ...
+2026-10-11T23:03:25.6766791Z Unpacking libxrandr-dev:arm64 (2:1.5.2-2build1) ...
+2026-10-11T23:03:25.6898072Z Selecting previously unselected package libvulkan-dev:arm64.
+2026-10-11T23:03:25.7025729Z Preparing to unpack .../186-libvulkan-dev_1.3.275.0-1build1_arm64.deb ...
+2026-10-11T23:03:25.7030308Z Unpacking libvulkan-dev:arm64 (1.3.275.0-1build1) ...
+2026-10-11T23:03:25.8254607Z Selecting previously unselected package wayland-protocols.
+2026-10-11T23:03:25.8383810Z Preparing to unpack .../187-wayland-protocols_1.45-1~ubuntu0.24.04.2_all.deb ...
+2026-10-11T23:03:25.8389179Z Unpacking wayland-protocols (1.45-1~ubuntu0.24.04.2) ...
+2026-10-11T23:03:25.8574456Z Selecting previously unselected package libgtk-4-dev:arm64.
+2026-10-11T23:03:25.8701232Z Preparing to unpack .../188-libgtk-4-dev_4.14.5+ds-0ubuntu0.10_arm64.deb ...
+2026-10-11T23:03:25.8705840Z Unpacking libgtk-4-dev:arm64 (4.14.5+ds-0ubuntu0.10) ...
+2026-10-11T23:03:25.9581948Z Selecting previously unselected package libwacom-common.
+2026-10-11T23:03:25.9716668Z Preparing to unpack .../189-libwacom-common_2.10.0-2_all.deb ...
+2026-10-11T23:03:25.9721632Z Unpacking libwacom-common (2.10.0-2) ...
+2026-10-11T23:03:26.0114472Z Selecting previously unselected package libwacom9:arm64.
+2026-10-11T23:03:26.0253506Z Preparing to unpack .../190-libwacom9_2.10.0-2_arm64.deb ...
+2026-10-11T23:03:26.0258937Z Unpacking libwacom9:arm64 (2.10.0-2) ...
+2026-10-11T23:03:26.0382351Z Selecting previously unselected package libinput-bin.
+2026-10-11T23:03:26.0519709Z Preparing to unpack .../191-libinput-bin_1.25.0-1ubuntu3.7_arm64.deb ...
+2026-10-11T23:03:26.0524723Z Unpacking libinput-bin (1.25.0-1ubuntu3.7) ...
+2026-10-11T23:03:26.0742532Z Selecting previously unselected package libmtdev1t64:arm64.
+2026-10-11T23:03:26.0873601Z Preparing to unpack .../192-libmtdev1t64_1.1.6-1.1build1_arm64.deb ...
+2026-10-11T23:03:26.0878947Z Unpacking libmtdev1t64:arm64 (1.1.6-1.1build1) ...
+2026-10-11T23:03:26.1014974Z Selecting previously unselected package libinput10:arm64.
+2026-10-11T23:03:26.1143491Z Preparing to unpack .../193-libinput10_1.25.0-1ubuntu3.7_arm64.deb ...
+2026-10-11T23:03:26.1148894Z Unpacking libinput10:arm64 (1.25.0-1ubuntu3.7) ...
+2026-10-11T23:03:26.1289175Z Selecting previously unselected package libturbojpeg:arm64.
+2026-10-11T23:03:26.1427656Z Preparing to unpack .../194-libturbojpeg_1%3a2.1.5-2ubuntu2_arm64.deb ...
+2026-10-11T23:03:26.1433747Z Unpacking libturbojpeg:arm64 (1:2.1.5-2ubuntu2) ...
+2026-10-11T23:03:26.1577410Z Selecting previously unselected package libneatvnc0:arm64.
+2026-10-11T23:03:26.1713850Z Preparing to unpack .../195-libneatvnc0_0.7.1+dfsg-2build3_arm64.deb ...
+2026-10-11T23:03:26.1720107Z Unpacking libneatvnc0:arm64 (0.7.1+dfsg-2build3) ...
+2026-10-11T23:03:26.1848941Z Selecting previously unselected package libwebrtc-audio-processing1:arm64.
+2026-10-11T23:03:26.1976338Z Preparing to unpack .../196-libwebrtc-audio-processing1_0.3.1-0ubuntu6_arm64.deb ...
+2026-10-11T23:03:26.1981424Z Unpacking libwebrtc-audio-processing1:arm64 (0.3.1-0ubuntu6) ...
+2026-10-11T23:03:26.2123643Z Selecting previously unselected package libspa-0.2-modules:arm64.
+2026-10-11T23:03:26.2252118Z Preparing to unpack .../197-libspa-0.2-modules_1.0.5-1ubuntu3.3_arm64.deb ...
+2026-10-11T23:03:26.2257111Z Unpacking libspa-0.2-modules:arm64 (1.0.5-1ubuntu3.3) ...
+2026-10-11T23:03:26.2489198Z Selecting previously unselected package libpipewire-0.3-0t64:arm64.
+2026-10-11T23:03:26.2619227Z Preparing to unpack .../198-libpipewire-0.3-0t64_1.0.5-1ubuntu3.3_arm64.deb ...
+2026-10-11T23:03:26.2623895Z Unpacking libpipewire-0.3-0t64:arm64 (1.0.5-1ubuntu3.3) ...
+2026-10-11T23:03:26.2780245Z Selecting previously unselected package libseat1:arm64.
+2026-10-11T23:03:26.2911088Z Preparing to unpack .../199-libseat1_0.8.0-1_arm64.deb ...
+2026-10-11T23:03:26.2916302Z Unpacking libseat1:arm64 (0.8.0-1) ...
+2026-10-11T23:03:26.3039686Z Selecting previously unselected package libvte-2.91-gtk4-dev:arm64.
+2026-10-11T23:03:26.3170843Z Preparing to unpack .../200-libvte-2.91-gtk4-dev_0.76.0-1ubuntu0.1_arm64.deb ...
+2026-10-11T23:03:26.3175448Z Unpacking libvte-2.91-gtk4-dev:arm64 (0.76.0-1ubuntu0.1) ...
+2026-10-11T23:03:26.3321487Z Selecting previously unselected package libxcb-composite0:arm64.
+2026-10-11T23:03:26.3457511Z Preparing to unpack .../201-libxcb-composite0_1.15-1ubuntu2_arm64.deb ...
+2026-10-11T23:03:26.3462462Z Unpacking libxcb-composite0:arm64 (1.15-1ubuntu2) ...
+2026-10-11T23:03:26.3594852Z Selecting previously unselected package libxcb-xkb1:arm64.
+2026-10-11T23:03:26.3724346Z Preparing to unpack .../202-libxcb-xkb1_1.15-1ubuntu2_arm64.deb ...
+2026-10-11T23:03:26.3729211Z Unpacking libxcb-xkb1:arm64 (1.15-1ubuntu2) ...
+2026-10-11T23:03:26.3866119Z Selecting previously unselected package libweston-13-0:arm64.
+2026-10-11T23:03:26.3993007Z Preparing to unpack .../203-libweston-13-0_13.0.0-4build3_arm64.deb ...
+2026-10-11T23:03:26.3998514Z Unpacking libweston-13-0:arm64 (13.0.0-4build3) ...
+2026-10-11T23:03:26.4176966Z Selecting previously unselected package python3-pyatspi.
+2026-10-11T23:03:26.4305948Z Preparing to unpack .../204-python3-pyatspi_2.46.1-1_all.deb ...
+2026-10-11T23:03:26.4310522Z Unpacking python3-pyatspi (2.46.1-1) ...
+2026-10-11T23:03:26.4455134Z Selecting previously unselected package weston.
+2026-10-11T23:03:26.4578737Z Preparing to unpack .../205-weston_13.0.0-4build3_arm64.deb ...
+2026-10-11T23:03:26.4584400Z Unpacking weston (13.0.0-4build3) ...
+2026-10-11T23:03:26.5287273Z Setting up libgme0:arm64 (0.6.3-7build1) ...
+2026-10-11T23:03:26.5305697Z Setting up libchromaprint1:arm64 (1.5.1-5) ...
+2026-10-11T23:03:26.5318202Z Setting up libssh-gcrypt-4:arm64 (0.10.6-2ubuntu0.5) ...
+2026-10-11T23:03:26.5329979Z Setting up libhwy1t64:arm64 (1.0.7-8.1build1) ...
+2026-10-11T23:03:26.5342566Z Setting up libgnutls-openssl27t64:arm64 (3.8.3-1.1ubuntu3.6) ...
+2026-10-11T23:03:26.5353632Z Setting up libglib2.0-dev-bin (2.80.0-6ubuntu3.9) ...
+2026-10-11T23:03:26.6785950Z Setting up libudfread0:arm64 (1.1.2-1build1) ...
+2026-10-11T23:03:26.7083781Z Setting up libwayland-server0:arm64 (1.22.0-2.1build1) ...
+2026-10-11T23:03:26.7283761Z Setting up libjpeg-turbo8-dev:arm64 (2.1.5-2ubuntu2) ...
+2026-10-11T23:03:26.7487320Z Setting up libvulkan-dev:arm64 (1.3.275.0-1build1) ...
+2026-10-11T23:03:26.7778292Z Setting up gir1.2-freedesktop:arm64 (1.80.1-1) ...
+2026-10-11T23:03:26.7883924Z Setting up libharfbuzz-icu0:arm64 (8.3.0-2build2) ...
+2026-10-11T23:03:26.8081408Z Setting up libpixman-1-dev:arm64 (0.42.2-1build1) ...
+2026-10-11T23:03:26.8478656Z Setting up libspeex1:arm64 (1.2.1-2ubuntu2.24.04.1) ...
+2026-10-11T23:03:26.8778262Z Setting up libshine3:arm64 (3.1.1-2build1) ...
+2026-10-11T23:03:26.8790058Z Setting up libpangoxft-1.0-0:arm64 (1.52.1+ds-1build1) ...
+2026-10-11T23:03:26.8801992Z Setting up libglvnd-core-dev:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:26.8813976Z Setting up libx264-164:arm64 (2:0.164.3108+git31e19f9-1) ...
+2026-10-11T23:03:26.8879614Z Setting up libtwolame0:arm64 (0.4.0-2build3) ...
+2026-10-11T23:03:26.8891213Z Setting up libmbedcrypto7t64:arm64 (2.28.8-1) ...
+2026-10-11T23:03:26.8902439Z Setting up nettle-dev:arm64 (3.9.1-2.2build1.1) ...
+2026-10-11T23:03:26.8913653Z Setting up libvte-2.91-common (0.76.0-1ubuntu0.1) ...
+2026-10-11T23:03:26.8932396Z Setting up gir1.2-gdkpixbuf-2.0:arm64 (2.42.10+dfsg-3ubuntu3.3) ...
+2026-10-11T23:03:26.8943959Z Setting up libgsm1:arm64 (1.0.22-1build1) ...
+2026-10-11T23:03:26.8955574Z Setting up libgirepository-2.0-0:arm64 (2.80.0-6ubuntu3.9) ...
+2026-10-11T23:03:26.8966977Z Setting up libaml0t64:arm64 (0.3.0-1.1build1) ...
+2026-10-11T23:03:26.8977655Z Setting up libsoxr0:arm64 (0.1.3-4build3) ...
+2026-10-11T23:03:26.8989129Z Setting up libzix-0-0:arm64 (0.4.2-2build1) ...
+2026-10-11T23:03:26.8999941Z Setting up libcodec2-1.2:arm64 (1.2.0-2build1) ...
+2026-10-11T23:03:26.9010955Z Setting up libwinpr2-2t64:arm64 (2.11.5+dfsg1-1build2) ...
+2026-10-11T23:03:26.9022429Z Setting up libfribidi-dev:arm64 (1.0.13-3build1) ...
+2026-10-11T23:03:26.9034420Z Setting up libxkbcommon-dev:arm64 (1.6.0-1build1) ...
+2026-10-11T23:03:26.9045755Z Setting up fonts-noto-cjk (1:20230817+repack1-3) ...
+2026-10-11T23:03:26.9086746Z Setting up pango1.0-tools (1.52.1+ds-1build1) ...
+2026-10-11T23:03:26.9097914Z Setting up libmysofa1:arm64 (1.3.2+dfsg-2ubuntu2) ...
+2026-10-11T23:03:26.9109237Z Setting up libjbig-dev:arm64 (2.1-6.1ubuntu2) ...
+2026-10-11T23:03:26.9121106Z Setting up libwebrtc-audio-processing1:arm64 (0.3.1-0ubuntu6) ...
+2026-10-11T23:03:26.9133015Z Setting up libwebpdecoder3:arm64 (1.3.2-0.4build3) ...
+2026-10-11T23:03:26.9144073Z Setting up libevent-2.1-7t64:arm64 (2.1.12-stable-9ubuntu2.2) ...
+2026-10-11T23:03:26.9155084Z Setting up libsvtav1enc1d1:arm64 (1.7.0+dfsg-2build1) ...
+2026-10-11T23:03:26.9165958Z Setting up libharfbuzz-gobject0:arm64 (8.3.0-2build2) ...
+2026-10-11T23:03:26.9177024Z Setting up gir1.2-atspi-2.0:arm64 (2.52.0-1build1) ...
+2026-10-11T23:03:26.9188552Z Setting up libmpg123-0t64:arm64 (1.32.5-1ubuntu1.1) ...
+2026-10-11T23:03:26.9199503Z Setting up libcjson1:arm64 (1.7.17-1) ...
+2026-10-11T23:03:26.9211288Z Setting up libxvidcore4:arm64 (2:1.3.7-1build1) ...
+2026-10-11T23:03:26.9223207Z Setting up gir1.2-harfbuzz-0.0:arm64 (8.3.0-2build2) ...
+2026-10-11T23:03:26.9234081Z Setting up libpthread-stubs0-dev:arm64 (0.4-1build3) ...
+2026-10-11T23:03:26.9245323Z Setting up librav1e0:arm64 (0.7.1-2) ...
+2026-10-11T23:03:26.9256762Z Setting up libopengl0:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:26.9268285Z Setting up liborc-0.4-0t64:arm64 (1:0.4.38-1ubuntu0.1) ...
+2026-10-11T23:03:26.9279434Z Setting up libxcb-xkb1:arm64 (1.15-1ubuntu2) ...
+2026-10-11T23:03:26.9290987Z Setting up librist4:arm64 (0.2.10+dfsg-2) ...
+2026-10-11T23:03:26.9302201Z Setting up xtrans-dev (1.4.0-1) ...
+2026-10-11T23:03:26.9313143Z Setting up libwayland-bin (1.22.0-2.1build1) ...
+2026-10-11T23:03:26.9323948Z Setting up libgraphite2-dev:arm64 (1.3.14-2ubuntu0.24.04.1) ...
+2026-10-11T23:03:26.9335225Z Setting up gir1.2-pango-1.0:arm64 (1.52.1+ds-1build1) ...
+2026-10-11T23:03:26.9346233Z Setting up libblas3:arm64 (3.12.0-3build1.1) ...
+2026-10-11T23:03:26.9382214Z update-alternatives: using /usr/lib/aarch64-linux-gnu/blas/libblas.so.3 to provide /usr/lib/aarch64-linux-gnu/libblas.so.3 (libblas.so.3-aarch64-linux-gnu) in auto mode
+2026-10-11T23:03:26.9391279Z Setting up libegl-mesa0:arm64 (25.2.8-0ubuntu0.24.04.4) ...
+2026-10-11T23:03:26.9403190Z Setting up libunbound8:arm64 (1.19.2-1ubuntu3.10) ...
+2026-10-11T23:03:26.9414713Z Setting up libplacebo338:arm64 (6.338.2-2build1) ...
+2026-10-11T23:03:26.9426606Z Setting up libgles2:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:26.9438014Z Setting up libgnutls-dane0t64:arm64 (3.8.3-1.1ubuntu3.6) ...
+2026-10-11T23:03:26.9449297Z Setting up libva2:arm64 (2.20.0-2ubuntu0.2) ...
+2026-10-11T23:03:26.9460551Z Setting up libharfbuzz-cairo0:arm64 (8.3.0-2build2) ...
+2026-10-11T23:03:26.9471613Z Setting up libspa-0.2-modules:arm64 (1.0.5-1ubuntu3.3) ...
+2026-10-11T23:03:26.9482449Z Setting up uuid-dev:arm64 (2.39.3-9ubuntu6.6) ...
+2026-10-11T23:03:26.9495764Z Setting up libgles1:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:26.9507207Z Setting up libopus0:arm64 (1.4-1build1) ...
+2026-10-11T23:03:26.9518544Z Setting up libpng16-16t64:arm64 (1.6.43-5ubuntu0.7) ...
+2026-10-11T23:03:26.9529549Z Setting up fonts-inter (4.0+ds-1) ...
+2026-10-11T23:03:26.9540233Z Setting up libunibreak5:arm64 (5.1-2build1) ...
+2026-10-11T23:03:26.9551329Z Setting up libsepol-dev:arm64 (3.5-2build1) ...
+2026-10-11T23:03:26.9562696Z Setting up liblerc-dev:arm64 (4.0.0+ds-4ubuntu2) ...
+2026-10-11T23:03:26.9574288Z Setting up libjxl0.7:arm64 (0.7.0-10.2ubuntu6.1) ...
+2026-10-11T23:03:26.9584971Z Setting up libidn2-dev:arm64 (2.3.7-2build1.1) ...
+2026-10-11T23:03:26.9596147Z Setting up libx265-199:arm64 (3.5-2build1) ...
+2026-10-11T23:03:26.9607603Z Setting up liblzma-dev:arm64 (5.6.1+really5.4.5-1ubuntu0.3) ...
+2026-10-11T23:03:26.9618827Z Setting up libturbojpeg:arm64 (1:2.1.5-2ubuntu2) ...
+2026-10-11T23:03:26.9630757Z Setting up libvidstab1.1:arm64 (1.1.0-2build1) ...
+2026-10-11T23:03:26.9641900Z Setting up libvpx9:arm64 (1.14.0-1ubuntu2.3) ...
+2026-10-11T23:03:26.9653318Z Setting up libsrt1.5-gnutls:arm64 (1.5.3-1build2) ...
+2026-10-11T23:03:26.9664871Z Setting up wayland-protocols (1.45-1~ubuntu0.24.04.2) ...
+2026-10-11T23:03:26.9676885Z Setting up libxcb-composite0:arm64 (1.15-1ubuntu2) ...
+2026-10-11T23:03:26.9946684Z Setting up libflite1:arm64 (2.2-6build3) ...
+2026-10-11T23:03:26.9958893Z Setting up libdav1d7:arm64 (1.4.1-1build1) ...
+2026-10-11T23:03:26.9970436Z Setting up libdatrie-dev:arm64 (0.2.13-3build1) ...
+2026-10-11T23:03:26.9981186Z Setting up libmtdev1t64:arm64 (1.1.6-1.1build1) ...
+2026-10-11T23:03:26.9992062Z Setting up libva-drm2:arm64 (2.20.0-2ubuntu0.2) ...
+2026-10-11T23:03:27.0003367Z Setting up ocl-icd-libopencl1:arm64 (2.3.2-1build1) ...
+2026-10-11T23:03:27.0014231Z Setting up gir1.2-glib-2.0-dev:arm64 (2.80.0-6ubuntu3.9) ...
+2026-10-11T23:03:27.0024886Z Setting up libasyncns0:arm64 (0.8-6build4) ...
+2026-10-11T23:03:27.0035887Z Setting up libvdpau1:arm64 (1.5-2build1) ...
+2026-10-11T23:03:27.0053183Z Setting up dbus-x11 (1.14.10-4ubuntu4.1) ...
+2026-10-11T23:03:27.0076284Z Setting up libbs2b0:arm64 (3.1.0+dfsg-7build1) ...
+2026-10-11T23:03:27.0090615Z Setting up libtheora0:arm64 (1.1.1+dfsg.1-16.1build3) ...
+2026-10-11T23:03:27.0101810Z Setting up libegl1:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:27.0112386Z Setting up libfreerdp2-2t64:arm64 (2.11.5+dfsg1-1build2) ...
+2026-10-11T23:03:27.0127877Z Setting up libharfbuzz-subset0:arm64 (8.3.0-2build2) ...
+2026-10-11T23:03:27.0142021Z Setting up libzimg2:arm64 (3.0.5+ds1-1build1) ...
+2026-10-11T23:03:27.0153057Z Setting up xorg-sgml-doctools (1:1.11-1.1) ...
+2026-10-11T23:03:27.0166236Z Setting up libflac12t64:arm64 (1.4.3+ds-2.1ubuntu2) ...
+2026-10-11T23:03:27.0177813Z Setting up libseat1:arm64 (0.8.0-1) ...
+2026-10-11T23:03:27.0190119Z Setting up libgtk-4-common (4.14.5+ds-0ubuntu0.10) ...
+2026-10-11T23:03:27.0204826Z Setting up libopengl-dev:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:27.0217120Z Setting up libjpeg8-dev:arm64 (8c-2ubuntu11) ...
+2026-10-11T23:03:27.0228914Z Setting up libsharpyuv-dev:arm64 (1.3.2-0.4build3) ...
+2026-10-11T23:03:27.0242941Z Setting up libsamplerate0:arm64 (0.2.2-4build1) ...
+2026-10-11T23:03:27.0255997Z Setting up libva-x11-2:arm64 (2.20.0-2ubuntu0.2) ...
+2026-10-11T23:03:27.0269385Z Setting up libtasn1-6-dev:arm64 (4.19.0-3ubuntu0.24.04.2) ...
+2026-10-11T23:03:27.0281850Z Setting up libtiffxx6:arm64 (4.5.1+git230720-4ubuntu2.5) ...
+2026-10-11T23:03:27.0295180Z Setting up libdeflate-dev:arm64 (1.19-1build1.1) ...
+2026-10-11T23:03:27.0308570Z Setting up libpipewire-0.3-0t64:arm64 (1.0.5-1ubuntu3.3) ...
+2026-10-11T23:03:27.0321632Z Setting up libopenmpt0t64:arm64 (0.7.3-1.1build3) ...
+2026-10-11T23:03:27.0334263Z Setting up libbrotli-dev:arm64 (1.1.0-2build2) ...
+2026-10-11T23:03:27.0348166Z Setting up libzvbi-common (0.2.42-2) ...
+2026-10-11T23:03:27.0360828Z Setting up libp11-kit-dev:arm64 (0.25.3-4ubuntu2.2) ...
+2026-10-11T23:03:27.0372005Z Setting up libmp3lame0:arm64 (3.100-6build1) ...
+2026-10-11T23:03:27.0382974Z Setting up libgraphene-1.0-0:arm64 (1.10.8-3build2) ...
+2026-10-11T23:03:27.0396354Z Setting up libvorbisenc2:arm64 (1.3.7-1build3) ...
+2026-10-11T23:03:27.0408830Z Setting up libserd-0-0:arm64 (0.32.2-1) ...
+2026-10-11T23:03:27.0421750Z Setting up libwacom-common (2.10.0-2) ...
+2026-10-11T23:03:27.0434054Z Setting up libatk-adaptor:arm64 (2.52.0-1build1) ...
+2026-10-11T23:03:27.0454852Z Setting up libbz2-dev:arm64 (1.0.8-5.1ubuntu0.1) ...
+2026-10-11T23:03:27.0467913Z Setting up gir1.2-graphene-1.0:arm64 (1.10.8-3build2) ...
+2026-10-11T23:03:27.0478916Z Setting up libgnutls28-dev:arm64 (3.8.3-1.1ubuntu3.6) ...
+2026-10-11T23:03:27.0491454Z Setting up libblkid-dev:arm64 (2.39.3-9ubuntu6.6) ...
+2026-10-11T23:03:27.0504048Z Setting up liblapack3:arm64 (3.12.0-3build1.1) ...
+2026-10-11T23:03:27.0541078Z update-alternatives: using /usr/lib/aarch64-linux-gnu/lapack/liblapack.so.3 to provide /usr/lib/aarch64-linux-gnu/liblapack.so.3 (liblapack.so.3-aarch64-linux-gnu) in auto mode
+2026-10-11T23:03:27.0552374Z Setting up libzvbi0t64:arm64 (0.2.42-2) ...
+2026-10-11T23:03:27.0564061Z Setting up libwacom9:arm64 (2.10.0-2) ...
+2026-10-11T23:03:27.0577145Z Setting up libselinux1-dev:arm64 (3.5-2ubuntu2.1) ...
+2026-10-11T23:03:27.0588197Z Setting up libpng-dev:arm64 (1.6.43-5ubuntu0.7) ...
+2026-10-11T23:03:27.0599515Z Setting up libjpeg-dev:arm64 (8c-2ubuntu11) ...
+2026-10-11T23:03:27.0612502Z Setting up libgstreamer-plugins-base1.0-0:arm64 (1.24.2-1ubuntu0.5) ...
+2026-10-11T23:03:27.0627820Z Setting up libavutil58:arm64 (7:6.1.1-3ubuntu5) ...
+2026-10-11T23:03:27.0642542Z Setting up libwayland-dev:arm64 (1.22.0-2.1build1) ...
+2026-10-11T23:03:27.0653720Z Setting up libinput-bin (1.25.0-1ubuntu3.7) ...
+2026-10-11T23:03:27.0664632Z Setting up libwebp-dev:arm64 (1.3.2-0.4build3) ...
+2026-10-11T23:03:27.0702530Z Setting up libfreetype6:arm64 (2.13.2+dfsg-1ubuntu0.2) ...
+2026-10-11T23:03:27.0714759Z Setting up libtiff-dev:arm64 (4.5.1+git230720-4ubuntu2.5) ...
+2026-10-11T23:03:27.0728261Z Setting up libswresample4:arm64 (7:6.1.1-3ubuntu5) ...
+2026-10-11T23:03:27.0741511Z Setting up python3-pyatspi (2.46.1-1) ...
+2026-10-11T23:03:27.1459707Z Setting up gir1.2-freedesktop-dev:arm64 (1.80.1-1) ...
+2026-10-11T23:03:27.1475329Z Setting up libfreerdp-server2-2t64:arm64 (2.11.5+dfsg1-1build2) ...
+2026-10-11T23:03:27.1488162Z Setting up libavcodec60:arm64 (7:6.1.1-3ubuntu5) ...
+2026-10-11T23:03:27.1501301Z Setting up librubberband2:arm64 (3.3.0+dfsg-2build1) ...
+2026-10-11T23:03:27.1514366Z Setting up libthai-dev:arm64 (0.1.29-2build1) ...
+2026-10-11T23:03:27.1528214Z Setting up libsord-0-0:arm64 (0.16.16-2build1) ...
+2026-10-11T23:03:27.1541490Z Setting up libpostproc57:arm64 (7:6.1.1-3ubuntu5) ...
+2026-10-11T23:03:27.1557474Z Setting up libsratom-0-0:arm64 (0.6.16-1build1) ...
+2026-10-11T23:03:27.1570750Z Setting up libsndfile1:arm64 (1.2.2-1ubuntu5.24.04.1) ...
+2026-10-11T23:03:27.1585862Z Setting up libbluray2:arm64 (1:1.3.4-1build1) ...
+2026-10-11T23:03:27.1641123Z Setting up liblilv-0-0:arm64 (0.24.22-1build1) ...
+2026-10-11T23:03:27.1653552Z Setting up libmount-dev:arm64 (2.39.3-9ubuntu6.6) ...
+2026-10-11T23:03:27.1668796Z Setting up libswscale7:arm64 (7:6.1.1-3ubuntu5) ...
+2026-10-11T23:03:27.1695492Z Setting up libcairo-script-interpreter2:arm64 (1.18.0-3build1) ...
+2026-10-11T23:03:27.1699538Z Setting up libinput10:arm64 (1.25.0-1ubuntu3.7) ...
+2026-10-11T23:03:27.1711585Z Setting up libpulse0:arm64 (1:16.1+dfsg1-2ubuntu10.1) ...
+2026-10-11T23:03:27.1758597Z Setting up libavformat60:arm64 (7:6.1.1-3ubuntu5) ...
+2026-10-11T23:03:27.1776500Z Setting up libfreetype-dev:arm64 (2.13.2+dfsg-1ubuntu0.2) ...
+2026-10-11T23:03:27.1791066Z Setting up libsphinxbase3t64:arm64 (0.8+5prealpha+1-17build2) ...
+2026-10-11T23:03:27.1802317Z Setting up libass9:arm64 (1:0.17.1-2build1) ...
+2026-10-11T23:03:27.1816136Z Setting up libglib2.0-dev:arm64 (2.80.0-6ubuntu3.9) ...
+2026-10-11T23:03:27.1829404Z Setting up libfontconfig-dev:arm64 (2.15.0-1.1ubuntu2) ...
+2026-10-11T23:03:27.1840579Z Setting up libpocketsphinx3:arm64 (0.8.0+real5prealpha+1-15ubuntu5) ...
+2026-10-11T23:03:27.1857980Z Setting up libavfilter9:arm64 (7:6.1.1-3ubuntu5) ...
+2026-10-11T23:03:27.2165980Z Setting up libneatvnc0:arm64 (0.7.1+dfsg-2build3) ...
+2026-10-11T23:03:27.2177858Z Setting up libweston-13-0:arm64 (13.0.0-4build3) ...
+2026-10-11T23:03:27.2190728Z Setting up weston (13.0.0-4build3) ...
+2026-10-11T23:03:27.2401125Z Processing triggers for libc-bin (2.39-0ubuntu8.9) ...
+2026-10-11T23:03:27.3859422Z Processing triggers for man-db (2.12.0-4build2) ...
+2026-10-11T23:03:27.3877826Z Not building database; man-db/auto-update is not 'true'.
+2026-10-11T23:03:27.3887460Z Processing triggers for libglib2.0-0t64:arm64 (2.80.0-6ubuntu3.9) ...
+2026-10-11T23:03:27.4022047Z Processing triggers for udev (255.4-1ubuntu8.17) ...
+2026-10-11T23:03:27.7953529Z Setting up libgraphene-1.0-dev (1.10.8-3build2) ...
+2026-10-11T23:03:27.7971431Z Setting up libgtk-4-1:arm64 (4.14.5+ds-0ubuntu0.10) ...
+2026-10-11T23:03:27.9075349Z Processing triggers for sgml-base (1.31) ...
+2026-10-11T23:03:27.9145505Z Processing triggers for install-info (7.1-3build2) ...
+2026-10-11T23:03:27.9811897Z Setting up x11proto-dev (2023.2-1) ...
+2026-10-11T23:03:27.9829961Z Setting up gir1.2-gtk-4.0:arm64 (4.14.5+ds-0ubuntu0.10) ...
+2026-10-11T23:03:27.9843562Z Setting up libgdk-pixbuf-2.0-dev:arm64 (2.42.10+dfsg-3ubuntu3.3) ...
+2026-10-11T23:03:27.9863975Z Processing triggers for fontconfig (2.15.0-1.1ubuntu2) ...
+2026-10-11T23:03:28.1410911Z Setting up libharfbuzz-dev:arm64 (8.3.0-2build2) ...
+2026-10-11T23:03:28.1427668Z Setting up libxau-dev:arm64 (1:1.0.9-1build6) ...
+2026-10-11T23:03:28.1443353Z Setting up libice-dev:arm64 (2:1.0.10-1build3) ...
+2026-10-11T23:03:28.1458016Z Setting up libsm-dev:arm64 (2:1.2.3-1build3) ...
+2026-10-11T23:03:28.1488759Z Setting up libxdmcp-dev:arm64 (1:1.1.3-0ubuntu6) ...
+2026-10-11T23:03:28.1501957Z Setting up x11proto-core-dev (2023.2-1) ...
+2026-10-11T23:03:28.1524457Z Setting up libvte-2.91-gtk4-0:arm64 (0.76.0-1ubuntu0.1) ...
+2026-10-11T23:03:28.1559527Z Setting up libxcb1-dev:arm64 (1.15-1ubuntu2) ...
+2026-10-11T23:03:28.1579547Z Setting up gir1.2-vte-3.91:arm64 (0.76.0-1ubuntu0.1) ...
+2026-10-11T23:03:28.1604418Z Setting up libx11-dev:arm64 (2:1.8.7-1build1) ...
+2026-10-11T23:03:28.1622093Z Setting up libxfixes-dev:arm64 (1:6.0.0-2build1) ...
+2026-10-11T23:03:28.1634367Z Setting up libxcb-shm0-dev:arm64 (1.15-1ubuntu2) ...
+2026-10-11T23:03:28.1653053Z Setting up libxcb-render0-dev:arm64 (1.15-1ubuntu2) ...
+2026-10-11T23:03:28.1666935Z Setting up libxext-dev:arm64 (2:1.3.4-1build2) ...
+2026-10-11T23:03:28.1683424Z Setting up libglx-dev:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:28.1700718Z Setting up libxi-dev:arm64 (2:1.8.1-1build1) ...
+2026-10-11T23:03:28.1712503Z Setting up libxrender-dev:arm64 (1:0.9.10-1.1build1) ...
+2026-10-11T23:03:28.1730273Z Setting up libgl-dev:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:28.1744864Z Setting up libxft-dev:arm64 (2.3.6-1build1) ...
+2026-10-11T23:03:28.1762020Z Setting up libxdamage-dev:arm64 (1:1.1.6-1build1) ...
+2026-10-11T23:03:28.1774794Z Setting up libegl-dev:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:28.1789706Z Setting up libxcomposite-dev:arm64 (1:0.4.5-1build3) ...
+2026-10-11T23:03:28.1803535Z Setting up libxcursor-dev:arm64 (1:1.2.1-1build1) ...
+2026-10-11T23:03:28.1825277Z Setting up libepoxy-dev:arm64 (1.5.10-1build1) ...
+2026-10-11T23:03:28.1840604Z Setting up libxrandr-dev:arm64 (2:1.5.2-2build1) ...
+2026-10-11T23:03:28.1858057Z Setting up libxinerama-dev:arm64 (2:1.1.4-3build1) ...
+2026-10-11T23:03:28.1877601Z Setting up libcairo2-dev:arm64 (1.18.0-3build1) ...
+2026-10-11T23:03:28.1892803Z Setting up libgles-dev:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:28.1921822Z Setting up libglvnd-dev:arm64 (1.7.0-1build1) ...
+2026-10-11T23:03:28.1938747Z Setting up libpango1.0-dev:arm64 (1.52.1+ds-1build1) ...
+2026-10-11T23:03:28.1961804Z Setting up libegl1-mesa-dev:arm64 (25.2.8-0ubuntu0.24.04.4) ...
+2026-10-11T23:03:28.1980766Z Setting up libgtk-4-dev:arm64 (4.14.5+ds-0ubuntu0.10) ...
+2026-10-11T23:03:28.1998356Z Setting up libvte-2.91-gtk4-dev:arm64 (0.76.0-1ubuntu0.1) ...
+2026-10-11T23:03:28.2015731Z Processing triggers for libc-bin (2.39-0ubuntu8.9) ...
+2026-10-11T23:03:30.2947384Z 
+2026-10-11T23:03:30.2947942Z Running kernel seems to be up-to-date.
+2026-10-11T23:03:30.2948179Z 
+2026-10-11T23:03:30.2948240Z Restarting services...
+2026-10-11T23:03:30.2997108Z  systemctl restart php8.3-fpm.service
+2026-10-11T23:03:30.3641442Z 
+2026-10-11T23:03:30.3642399Z No containers need to be restarted.
+2026-10-11T23:03:30.3642577Z 
+2026-10-11T23:03:30.3642956Z No user sessions are running outdated binaries.
+2026-10-11T23:03:30.3643113Z 
+2026-10-11T23:03:30.3646869Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+2026-10-11T23:03:31.4748590Z info: syncing channel updates for 1.85.1-aarch64-unknown-linux-gnu
+2026-10-11T23:03:31.7601584Z info: latest update on 2025-03-18 for version 1.85.1 (4eb161250 2025-03-15)
+2026-10-11T23:03:31.7601928Z info: downloading 3 components
+2026-10-11T23:03:37.4904939Z 
+2026-10-11T23:03:37.4995622Z   1.85.1-aarch64-unknown-linux-gnu installed - rustc 1.85.1 (4eb161250 2025-03-15)
+2026-10-11T23:03:37.4995914Z 
+2026-10-11T23:03:37.5489650Z ##[group]Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+2026-10-11T23:03:37.5489919Z with:
+2026-10-11T23:03:37.5490135Z   path: ~/.cargo/registry
+~/.cargo/git
+outputs/native-shell/target
+
+2026-10-11T23:03:37.5490551Z   key: desktop-arm64-rust185-74efb33bb91bd3ac85cb86c76a542ff874aa8b4d715456ce42d8d68c3a83f6b6
+2026-10-11T23:03:37.5490908Z   enableCrossOsArchive: false
+2026-10-11T23:03:37.5491082Z   fail-on-cache-miss: false
+2026-10-11T23:03:37.5491247Z   lookup-only: false
+2026-10-11T23:03:37.5491391Z   save-always: false
+2026-10-11T23:03:37.5491525Z env:
+2026-10-11T23:03:37.5491653Z   RUSTUP_TOOLCHAIN: 1.85.1
+2026-10-11T23:03:37.5491805Z ##[endgroup]
+2026-10-11T23:03:37.6139469Z (node:4727) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-11T23:03:37.6139962Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-11T23:03:37.7286703Z Cache hit for: desktop-arm64-rust185-74efb33bb91bd3ac85cb86c76a542ff874aa8b4d715456ce42d8d68c3a83f6b6
+2026-10-11T23:03:37.7340024Z (node:4727) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-11T23:03:38.9380929Z Received 134217728 of 199581494 (67.2%), 121.2 MBs/sec
+2026-10-11T23:03:39.2350534Z Received 199581494 of 199581494 (100.0%), 140.7 MBs/sec
+2026-10-11T23:03:39.2351299Z Cache Size: ~190 MB (199581494 B)
+2026-10-11T23:03:39.2416493Z [command]/usr/bin/tar -xf /home/runner/work/_temp/d8db6114-d6be-441f-b95a-2f3b14a9d8be/cache.tzst -P -C /home/runner/work/agentOS/agentOS --use-compress-program unzstd
+2026-10-11T23:03:39.8718443Z Cache restored successfully
+2026-10-11T23:03:39.8859686Z Cache restored from key: desktop-arm64-rust185-74efb33bb91bd3ac85cb86c76a542ff874aa8b4d715456ce42d8d68c3a83f6b6
+2026-10-11T23:03:39.9259464Z ##[group]Run cargo +1.85.1 test --locked --manifest-path outputs/native-shell/Cargo.toml
+2026-10-11T23:03:39.9259930Z [36;1mcargo +1.85.1 test --locked --manifest-path outputs/native-shell/Cargo.toml[0m
+2026-10-11T23:03:39.9260447Z [36;1mcargo +1.85.1 build --locked --manifest-path outputs/native-shell/Cargo.toml[0m
+2026-10-11T23:03:39.9260860Z [36;1mcargo +1.85.1 build --release --locked --manifest-path outputs/agent-shell/Cargo.toml[0m
+2026-10-11T23:03:39.9292190Z shell: /usr/bin/bash -e {0}
+2026-10-11T23:03:39.9292363Z env:
+2026-10-11T23:03:39.9292513Z   RUSTUP_TOOLCHAIN: 1.85.1
+2026-10-11T23:03:39.9292683Z ##[endgroup]
+2026-10-11T23:03:40.1118624Z    Compiling agent-os-desktop v0.1.0-alpha.1 (/home/runner/work/agentOS/agentOS/outputs/native-shell)
+2026-10-11T23:03:40.3646454Z warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+2026-10-11T23:03:40.3646979Z  --> src/document_dialog.rs:8:11
+2026-10-11T23:03:40.3647470Z   |
+2026-10-11T23:03:40.3647759Z 8 | ) -> gtk::FileChooserNative {
+2026-10-11T23:03:40.3647969Z   |           ^^^^^^^^^^^^^^^^^
+2026-10-11T23:03:40.3648130Z   |
+2026-10-11T23:03:40.3648275Z   = note: `#[warn(deprecated)]` on by default
+2026-10-11T23:03:40.3648442Z 
+2026-10-11T23:03:40.3648599Z warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+2026-10-11T23:03:40.3648893Z   --> src/document_dialog.rs:10:23
+2026-10-11T23:03:40.3649063Z    |
+2026-10-11T23:03:40.3649260Z 10 |     let dialog = gtk::FileChooserNative::builder()
+2026-10-11T23:03:40.3649488Z    |                       ^^^^^^^^^^^^^^^^^
+2026-10-11T23:03:40.3649614Z 
+2026-10-11T23:03:40.3649761Z warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+2026-10-11T23:03:40.3650041Z   --> src/document_dialog.rs:61:23
+2026-10-11T23:03:40.3650208Z    |
+2026-10-11T23:03:40.3650379Z 61 |     let dialog = gtk::FileChooserNative::builder()
+2026-10-11T23:03:40.3650593Z    |                       ^^^^^^^^^^^^^^^^^
+2026-10-11T23:03:40.3650721Z 
+2026-10-11T23:03:40.4093453Z warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+2026-10-11T23:03:40.4093813Z   --> src/document_dialog.rs:10:42
+2026-10-11T23:03:40.4093992Z    |
+2026-10-11T23:03:40.4094189Z 10 |     let dialog = gtk::FileChooserNative::builder()
+2026-10-11T23:03:40.4094407Z    |                                          ^^^^^^^
+2026-10-11T23:03:40.4094543Z 
+2026-10-11T23:03:40.4094754Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+2026-10-11T23:03:40.4095136Z   --> src/document_dialog.rs:11:10
+2026-10-11T23:03:40.4095303Z    |
+2026-10-11T23:03:40.4095429Z 11 |         .title(if save {
+2026-10-11T23:03:40.4095590Z    |          ^^^^^
+2026-10-11T23:03:40.4095673Z 
+2026-10-11T23:03:40.4095880Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+2026-10-11T23:03:40.4096217Z   --> src/document_dialog.rs:16:10
+2026-10-11T23:03:40.4096381Z    |
+2026-10-11T23:03:40.4096524Z 16 |         .action(if save {
+2026-10-11T23:03:40.4096683Z    |          ^^^^^^
+2026-10-11T23:03:40.4096771Z 
+2026-10-11T23:03:40.4097029Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+2026-10-11T23:03:40.4097386Z   --> src/document_dialog.rs:21:10
+2026-10-11T23:03:40.4097545Z    |
+2026-10-11T23:03:40.4097709Z 21 |         .accept_label(if save { "Export" } else { "Import" })
+2026-10-11T23:03:40.4097933Z    |          ^^^^^^^^^^^^
+2026-10-11T23:03:40.4098030Z 
+2026-10-11T23:03:40.4098250Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+2026-10-11T23:03:40.4098600Z   --> src/document_dialog.rs:22:10
+2026-10-11T23:03:40.4098765Z    |
+2026-10-11T23:03:40.4098891Z 22 |         .cancel_label("Cancel")
+2026-10-11T23:03:40.4099068Z    |          ^^^^^^^^^^^^
+2026-10-11T23:03:40.4099162Z 
+2026-10-11T23:03:40.4099521Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+2026-10-11T23:03:40.4099857Z   --> src/document_dialog.rs:23:10
+2026-10-11T23:03:40.4100021Z    |
+2026-10-11T23:03:40.4100145Z 23 |         .modal(true)
+2026-10-11T23:03:40.4100401Z    |          ^^^^^
+2026-10-11T23:03:40.4100486Z 
+2026-10-11T23:03:40.4100688Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+2026-10-11T23:03:40.4101015Z   --> src/document_dialog.rs:24:10
+2026-10-11T23:03:40.4101180Z    |
+2026-10-11T23:03:40.4101297Z 24 |         .build();
+2026-10-11T23:03:40.4101458Z    |          ^^^^^
+2026-10-11T23:03:40.4101540Z 
+2026-10-11T23:03:40.4101704Z warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+2026-10-11T23:03:40.4102000Z   --> src/document_dialog.rs:27:16
+2026-10-11T23:03:40.4102159Z    |
+2026-10-11T23:03:40.4102307Z 27 |         dialog.set_current_name("document.txt");
+2026-10-11T23:03:40.4102508Z    |                ^^^^^^^^^^^^^^^^
+2026-10-11T23:03:40.4102626Z 
+2026-10-11T23:03:40.4102765Z warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+2026-10-11T23:03:40.4103037Z   --> src/document_dialog.rs:31:40
+2026-10-11T23:03:40.4103201Z    |
+2026-10-11T23:03:40.4103404Z 31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+2026-10-11T23:03:40.4103667Z    |                                        ^^^^
+2026-10-11T23:03:40.4103798Z 
+2026-10-11T23:03:40.4104000Z warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+2026-10-11T23:03:40.4104330Z   --> src/document_dialog.rs:61:42
+2026-10-11T23:03:40.4104489Z    |
+2026-10-11T23:03:40.4104644Z 61 |     let dialog = gtk::FileChooserNative::builder()
+2026-10-11T23:03:40.4104863Z    |                                          ^^^^^^^
+2026-10-11T23:03:40.4105026Z 
+2026-10-11T23:03:40.4105228Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+2026-10-11T23:03:40.4105561Z   --> src/document_dialog.rs:62:10
+2026-10-11T23:03:40.4105722Z    |
+2026-10-11T23:03:40.4105873Z 62 |         .title("Choose existing text file to review")
+2026-10-11T23:03:40.4106082Z    |          ^^^^^
+2026-10-11T23:03:40.4106164Z 
+2026-10-11T23:03:40.4106365Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+2026-10-11T23:03:40.4106695Z   --> src/document_dialog.rs:63:10
+2026-10-11T23:03:40.4106859Z    |
+2026-10-11T23:03:40.4107003Z 63 |         .action(gtk::FileChooserAction::Open)
+2026-10-11T23:03:40.4107199Z    |          ^^^^^^
+2026-10-11T23:03:40.4107287Z 
+2026-10-11T23:03:40.4107501Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+2026-10-11T23:03:40.4107847Z   --> src/document_dialog.rs:64:10
+2026-10-11T23:03:40.4108007Z    |
+2026-10-11T23:03:40.4108147Z 64 |         .accept_label("Review replacement")
+2026-10-11T23:03:40.4108340Z    |          ^^^^^^^^^^^^
+2026-10-11T23:03:40.4108436Z 
+2026-10-11T23:03:40.4108651Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+2026-10-11T23:03:40.4108994Z   --> src/document_dialog.rs:65:10
+2026-10-11T23:03:40.4109159Z    |
+2026-10-11T23:03:40.4109280Z 65 |         .cancel_label("Cancel")
+2026-10-11T23:03:40.4109452Z    |          ^^^^^^^^^^^^
+2026-10-11T23:03:40.4109549Z 
+2026-10-11T23:03:40.4109763Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+2026-10-11T23:03:40.4110088Z   --> src/document_dialog.rs:66:10
+2026-10-11T23:03:40.4110249Z    |
+2026-10-11T23:03:40.4110369Z 66 |         .modal(true)
+2026-10-11T23:03:40.4110519Z    |          ^^^^^
+2026-10-11T23:03:40.4110601Z 
+2026-10-11T23:03:40.4110798Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+2026-10-11T23:03:40.4111122Z   --> src/document_dialog.rs:67:10
+2026-10-11T23:03:40.4111283Z    |
+2026-10-11T23:03:40.4111461Z 67 |         .build();
+2026-10-11T23:03:40.4111599Z    |          ^^^^^
+2026-10-11T23:03:40.4111682Z 
+2026-10-11T23:03:40.4111820Z warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+2026-10-11T23:03:40.4112150Z   --> src/document_dialog.rs:72:40
+2026-10-11T23:03:40.4112308Z    |
+2026-10-11T23:03:40.4112498Z 72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+2026-10-11T23:03:40.4112754Z    |                                        ^^^^
+2026-10-11T23:03:40.4112881Z 
+2026-10-11T23:03:40.4113029Z warning: use of deprecated method `vte4::FileChooserExt::set_file`: Since 4.10
+2026-10-11T23:03:40.4113304Z    --> src/document_dialog.rs:308:20
+2026-10-11T23:03:40.4113470Z     |
+2026-10-11T23:03:40.4113664Z 308 |             dialog.set_file(&gtk::gio::File::for_path(&path)).unwrap();
+2026-10-11T23:03:40.4113911Z     |                    ^^^^^^^^
+2026-10-11T23:03:40.4114016Z 
+2026-10-11T23:03:40.4114154Z warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+2026-10-11T23:03:40.4114423Z    --> src/document_dialog.rs:310:26
+2026-10-11T23:03:40.4114588Z     |
+2026-10-11T23:03:40.4114812Z 310 |             while dialog.file().and_then(|file| file.path()).as_ref() != Some(&path) {
+2026-10-11T23:03:40.4115176Z     |                          ^^^^
+2026-10-11T23:03:40.4115286Z 
+2026-10-11T23:03:42.1440617Z warning: `agent-os-desktop` (bin "agent-os-desktop" test) generated 22 warnings
+2026-10-11T23:03:42.1441027Z     Finished `test` profile [unoptimized] target(s) in 2.12s
+2026-10-11T23:03:42.1501973Z      Running unittests src/main.rs (outputs/native-shell/target/debug/deps/agent_os_desktop-fae75ff4acf22e50)
+2026-10-11T23:03:42.1576249Z 
+2026-10-11T23:03:42.1576330Z running 41 tests
+2026-10-11T23:03:42.1580015Z test action_parameters::tests::edited_parameters_are_bounded_data_and_cannot_select_a_command_or_target ... ok
+2026-10-11T23:03:42.1580762Z test broker_controls::tests::continuation_is_a_typed_existing_job_reference_without_command_text ... ok
+2026-10-11T23:03:42.1581290Z test broker_controls::tests::stored_input_preview_matches_the_frozen_proposal_and_byte_count ... ok
+2026-10-11T23:03:42.1581740Z test broker_controls::tests::stale_review_cannot_authorize_changed_command_or_input ... ok
+2026-10-11T23:03:42.1582249Z test document_dialog::initial_import_tests::accepted_file_selection_keeps_its_optional_activity_context ... ignored
+2026-10-11T23:03:42.1582838Z test feedback_metrics::tests::key_clock_wrap_and_millisecond_quantization_are_preserved ... ok
+2026-10-11T23:03:42.1583290Z test broker_pages::tests::pages_scope_and_epoch_restarts_preserve_one_consistent_history ... ok
+2026-10-11T23:03:42.1583779Z test feedback_metrics::tests::unknown_clock_future_input_and_invalid_receipts_do_not_become_fast_samples ... ok
+2026-10-11T23:03:42.1584312Z test input_context::tests::application_context_uses_authenticated_workspace_identity_never_a_title_match ... ok
+2026-10-11T23:03:42.1584844Z test input_context::tests::real_core_application_context_rechecks_registered_revision_and_connection ... ignored
+2026-10-11T23:03:42.1585443Z test input_context::tests::revoked_voice_and_cross_activity_context_stop_before_source_lookup ... ok
+2026-10-11T23:03:42.1585963Z test input_context::tests::selected_object_context_keeps_original_content_and_rejects_removed_or_moved_targets ... ok
+2026-10-11T23:03:42.1588767Z test input_context::tests::application_context_rejects_changed_disconnected_moved_or_forged_referents ... ok
+2026-10-11T23:03:42.1597847Z test log_view::tests::live_follow_refreshes_the_tail_and_selection_can_freeze_its_page ... ok
+2026-10-11T23:03:42.1598424Z test presentation_pages::cache_tests::errors_keep_the_previous_consistent_cache_and_cancellation_sends_nothing ... ok
+2026-10-11T23:03:42.1599162Z test presentation_pages::cache_tests::unchanged_documents_are_not_refetched_and_tombstones_remove_old_views ... ok
+2026-10-11T23:03:42.1599674Z test presentation_pages::tests::cancellation_and_nonprogressing_cursors_stop_reads ... ok
+2026-10-11T23:03:42.1600317Z test presentation_pages::tests::retries_from_scratch_after_interleaved_edits ... ok
+2026-10-11T23:03:42.1602184Z test log_view::tests::pages_keep_identity_and_retry_the_same_offset_after_disconnect ... ok
+2026-10-11T23:03:42.1602777Z test pty_transport::tests::real_broker_terminal_round_trip_and_reattach ... ignored, requires isolated Linux tmux broker fixture
+2026-10-11T23:03:42.1606304Z test draft_cache::tests::corrupt_or_oversized_fields_do_not_become_recovered_edits ... ok
+2026-10-11T23:03:42.1606781Z test pty_view::tests::manual_detach_restores_attach_without_a_source_refresh ... ignored
+2026-10-11T23:03:42.1607293Z test pty_transport::tests::terminal_pages_preserve_raw_bytes_and_require_exact_cursor_boundaries ... ok
+2026-10-11T23:03:42.1607824Z test reconcile::tests::confirmed_local_values_advance_without_granting_other_mutations ... ok
+2026-10-11T23:03:42.1608383Z test reconcile::tests::unrelated_text_can_advance_but_fields_structure_and_authority_stay_frozen ... ok
+2026-10-11T23:03:42.1609043Z test state_pages::tests::cancellation_and_invalid_cursors_stop_paging ... ok
+2026-10-11T23:03:42.1609851Z test draft_cache::tests::private_recovery_roundtrip_preserves_revision_and_unicode ... ok
+2026-10-11T23:03:42.1610318Z test timings::tests::disabled_diagnostics_do_not_collect_stages_or_files ... ok
+2026-10-11T23:03:42.1611375Z test timings::tests::percentiles_are_bounded_recent_samples_and_cumulative_mean_is_explicit ... ok
+2026-10-11T23:03:42.1612084Z test transport::action_field_tests::callbacks_use_local_then_recovered_then_committed_editable_values ... ok
+2026-10-11T23:03:42.1617028Z test reconcile::tests::feedback_can_change_without_authorizing_text_structure_or_actions ... ok
+2026-10-11T23:03:42.1617614Z test state_pages::tests::scopes_jobs_and_restarts_after_interleaved_changes ... ok
+2026-10-11T23:03:42.1619010Z test transport::draft_revision_tests::save_refuses_a_revision_the_user_has_not_seen_and_retains_the_local_draft ... ok
+2026-10-11T23:03:42.1619671Z test transport::draft_revision_tests::unfocused_edit_uses_a_temporary_lease_and_preserves_conflicting_drafts ... ok
+2026-10-11T23:03:42.1620326Z test transport::draft_revision_tests::reviewed_save_rejects_a_changed_draft_without_committing_and_ends_its_lease ... ok
+2026-10-11T23:03:42.1620972Z test transport::initial_document_tests::import_into_an_empty_core_validates_before_creating_an_activity ... ignored
+2026-10-11T23:03:42.1621649Z test transport::initial_document_tests::initial_typed_requests_validate_before_creating_and_never_launch_on_broker_failure ... ignored
+2026-10-11T23:03:42.1622296Z test transport::initial_document_tests::queued_new_documents_reuse_the_confirmed_activity ... ignored
+2026-10-11T23:03:42.1622874Z test transport::initial_document_tests::an_implicit_document_activity_is_created_once_and_reused ... ok
+2026-10-11T23:03:42.1623440Z test transport::initial_document_tests::an_unconfirmed_activity_creation_is_not_retried_or_used ... ok
+2026-10-11T23:03:42.9825975Z test pty_transport::tests::attachment_retries_only_unwritten_input_and_detaches_on_drop ... ok
+2026-10-11T23:03:42.9826316Z 
+2026-10-11T23:03:42.9826499Z test result: ok. 34 passed; 0 failed; 7 ignored; 0 measured; 0 filtered out; finished in 0.82s
+2026-10-11T23:03:42.9826743Z 
+2026-10-11T23:03:43.0260229Z    Compiling agent-os-desktop v0.1.0-alpha.1 (/home/runner/work/agentOS/agentOS/outputs/native-shell)
+2026-10-11T23:03:43.2389699Z warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+2026-10-11T23:03:43.2390039Z  --> src/document_dialog.rs:8:11
+2026-10-11T23:03:43.2390213Z   |
+2026-10-11T23:03:43.2390348Z 8 | ) -> gtk::FileChooserNative {
+2026-10-11T23:03:43.2390525Z   |           ^^^^^^^^^^^^^^^^^
+2026-10-11T23:03:43.2390678Z   |
+2026-10-11T23:03:43.2390821Z   = note: `#[warn(deprecated)]` on by default
+2026-10-11T23:03:43.2390964Z 
+2026-10-11T23:03:43.2391445Z warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+2026-10-11T23:03:43.2391731Z   --> src/document_dialog.rs:10:23
+2026-10-11T23:03:43.2391902Z    |
+2026-10-11T23:03:43.2392350Z 10 |     let dialog = gtk::FileChooserNative::builder()
+2026-10-11T23:03:43.2392575Z    |                       ^^^^^^^^^^^^^^^^^
+2026-10-11T23:03:43.2392698Z 
+2026-10-11T23:03:43.2392841Z warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+2026-10-11T23:03:43.2393256Z   --> src/document_dialog.rs:61:23
+2026-10-11T23:03:43.2393424Z    |
+2026-10-11T23:03:43.2393578Z 61 |     let dialog = gtk::FileChooserNative::builder()
+2026-10-11T23:03:43.2393787Z    |                       ^^^^^^^^^^^^^^^^^
+2026-10-11T23:03:43.2393909Z 
+2026-10-11T23:03:43.2783184Z warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+2026-10-11T23:03:43.2784035Z   --> src/document_dialog.rs:10:42
+2026-10-11T23:03:43.2784253Z    |
+2026-10-11T23:03:43.2784446Z 10 |     let dialog = gtk::FileChooserNative::builder()
+2026-10-11T23:03:43.2784692Z    |                                          ^^^^^^^
+2026-10-11T23:03:43.2784830Z 
+2026-10-11T23:03:43.2785195Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+2026-10-11T23:03:43.2785550Z   --> src/document_dialog.rs:11:10
+2026-10-11T23:03:43.2785721Z    |
+2026-10-11T23:03:43.2785849Z 11 |         .title(if save {
+2026-10-11T23:03:43.2786018Z    |          ^^^^^
+2026-10-11T23:03:43.2786102Z 
+2026-10-11T23:03:43.2786313Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+2026-10-11T23:03:43.2786650Z   --> src/document_dialog.rs:16:10
+2026-10-11T23:03:43.2786841Z    |
+2026-10-11T23:03:43.2786966Z 16 |         .action(if save {
+2026-10-11T23:03:43.2787121Z    |          ^^^^^^
+2026-10-11T23:03:43.2787208Z 
+2026-10-11T23:03:43.2787427Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+2026-10-11T23:03:43.2787782Z   --> src/document_dialog.rs:21:10
+2026-10-11T23:03:43.2787944Z    |
+2026-10-11T23:03:43.2788108Z 21 |         .accept_label(if save { "Export" } else { "Import" })
+2026-10-11T23:03:43.2788336Z    |          ^^^^^^^^^^^^
+2026-10-11T23:03:43.2788432Z 
+2026-10-11T23:03:43.2788650Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+2026-10-11T23:03:43.2788997Z   --> src/document_dialog.rs:22:10
+2026-10-11T23:03:43.2789160Z    |
+2026-10-11T23:03:43.2789282Z 22 |         .cancel_label("Cancel")
+2026-10-11T23:03:43.2789456Z    |          ^^^^^^^^^^^^
+2026-10-11T23:03:43.2789550Z 
+2026-10-11T23:03:43.2789753Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+2026-10-11T23:03:43.2790078Z   --> src/document_dialog.rs:23:10
+2026-10-11T23:03:43.2790239Z    |
+2026-10-11T23:03:43.2790360Z 23 |         .modal(true)
+2026-10-11T23:03:43.2790505Z    |          ^^^^^
+2026-10-11T23:03:43.2790585Z 
+2026-10-11T23:03:43.2790780Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+2026-10-11T23:03:43.2791109Z   --> src/document_dialog.rs:24:10
+2026-10-11T23:03:43.2791274Z    |
+2026-10-11T23:03:43.2791418Z 24 |         .build();
+2026-10-11T23:03:43.2791556Z    |          ^^^^^
+2026-10-11T23:03:43.2791638Z 
+2026-10-11T23:03:43.2791801Z warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+2026-10-11T23:03:43.2792103Z   --> src/document_dialog.rs:27:16
+2026-10-11T23:03:43.2792261Z    |
+2026-10-11T23:03:43.2792406Z 27 |         dialog.set_current_name("document.txt");
+2026-10-11T23:03:43.2792605Z    |                ^^^^^^^^^^^^^^^^
+2026-10-11T23:03:43.2792718Z 
+2026-10-11T23:03:43.2792858Z warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+2026-10-11T23:03:43.2793125Z   --> src/document_dialog.rs:31:40
+2026-10-11T23:03:43.2793282Z    |
+2026-10-11T23:03:43.2793477Z 31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+2026-10-11T23:03:43.2793738Z    |                                        ^^^^
+2026-10-11T23:03:43.2793865Z 
+2026-10-11T23:03:43.2794260Z warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+2026-10-11T23:03:43.2794597Z   --> src/document_dialog.rs:61:42
+2026-10-11T23:03:43.2794759Z    |
+2026-10-11T23:03:43.2794918Z 61 |     let dialog = gtk::FileChooserNative::builder()
+2026-10-11T23:03:43.2795274Z    |                                          ^^^^^^^
+2026-10-11T23:03:43.2795404Z 
+2026-10-11T23:03:43.2795691Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+2026-10-11T23:03:43.2796015Z   --> src/document_dialog.rs:62:10
+2026-10-11T23:03:43.2796176Z    |
+2026-10-11T23:03:43.2796325Z 62 |         .title("Choose existing text file to review")
+2026-10-11T23:03:43.2796529Z    |          ^^^^^
+2026-10-11T23:03:43.2796611Z 
+2026-10-11T23:03:43.2796811Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+2026-10-11T23:03:43.2797147Z   --> src/document_dialog.rs:63:10
+2026-10-11T23:03:43.2797306Z    |
+2026-10-11T23:03:43.2797455Z 63 |         .action(gtk::FileChooserAction::Open)
+2026-10-11T23:03:43.2797651Z    |          ^^^^^^
+2026-10-11T23:03:43.2797738Z 
+2026-10-11T23:03:43.2797953Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+2026-10-11T23:03:43.2798299Z   --> src/document_dialog.rs:64:10
+2026-10-11T23:03:43.2798458Z    |
+2026-10-11T23:03:43.2798596Z 64 |         .accept_label("Review replacement")
+2026-10-11T23:03:43.2798789Z    |          ^^^^^^^^^^^^
+2026-10-11T23:03:43.2798882Z 
+2026-10-11T23:03:43.2799097Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+2026-10-11T23:03:43.2799437Z   --> src/document_dialog.rs:65:10
+2026-10-11T23:03:43.2799597Z    |
+2026-10-11T23:03:43.2799721Z 65 |         .cancel_label("Cancel")
+2026-10-11T23:03:43.2799890Z    |          ^^^^^^^^^^^^
+2026-10-11T23:03:43.2799982Z 
+2026-10-11T23:03:43.2800179Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+2026-10-11T23:03:43.2800505Z   --> src/document_dialog.rs:66:10
+2026-10-11T23:03:43.2800667Z    |
+2026-10-11T23:03:43.2800784Z 66 |         .modal(true)
+2026-10-11T23:03:43.2800930Z    |          ^^^^^
+2026-10-11T23:03:43.2801014Z 
+2026-10-11T23:03:43.2801204Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+2026-10-11T23:03:43.2801530Z   --> src/document_dialog.rs:67:10
+2026-10-11T23:03:43.2801688Z    |
+2026-10-11T23:03:43.2801802Z 67 |         .build();
+2026-10-11T23:03:43.2801935Z    |          ^^^^^
+2026-10-11T23:03:43.2802015Z 
+2026-10-11T23:03:43.2802149Z warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+2026-10-11T23:03:43.2802422Z   --> src/document_dialog.rs:72:40
+2026-10-11T23:03:43.2802578Z    |
+2026-10-11T23:03:43.2802763Z 72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+2026-10-11T23:03:43.2803016Z    |                                        ^^^^
+2026-10-11T23:03:43.2803150Z 
+2026-10-11T23:03:45.0967840Z warning: `agent-os-desktop` (bin "agent-os-desktop") generated 20 warnings
+2026-10-11T23:03:45.0968244Z     Finished `dev` profile [unoptimized] target(s) in 2.10s
+2026-10-11T23:03:45.1528831Z    Compiling proc-macro2 v1.0.107
+2026-10-11T23:03:45.1529153Z    Compiling quote v1.0.47
+2026-10-11T23:03:45.1529487Z    Compiling version_check v0.9.5
+2026-10-11T23:03:45.1529747Z    Compiling unicode-ident v1.0.26
+2026-10-11T23:03:45.1955995Z    Compiling zerocopy v0.8.62
+2026-10-11T23:03:45.2624144Z    Compiling shlex v2.0.1
+2026-10-11T23:03:45.2911486Z    Compiling ahash v0.8.12
+2026-10-11T23:03:45.3471201Z    Compiling serde_core v1.0.229
+2026-10-11T23:03:45.3746223Z    Compiling find-msvc-tools v0.1.14
+2026-10-11T23:03:45.4668367Z    Compiling cc v1.7.0
+2026-10-11T23:03:45.4815735Z    Compiling pkg-config v0.3.34
+2026-10-11T23:03:45.7727004Z    Compiling once_cell v1.21.4
+2026-10-11T23:03:45.8426074Z    Compiling cfg-if v1.0.5
+2026-10-11T23:03:45.8557032Z    Compiling vcpkg v0.2.15
+2026-10-11T23:03:45.8615569Z    Compiling zmij v1.0.23
+2026-10-11T23:03:45.9735870Z    Compiling syn v3.0.7
+2026-10-11T23:03:46.4735979Z    Compiling libsqlite3-sys v0.30.1
+2026-10-11T23:03:46.6598893Z    Compiling serde v1.0.229
+2026-10-11T23:03:46.7786169Z    Compiling serde_json v1.0.151
+2026-10-11T23:03:47.3977468Z    Compiling serde_derive v1.0.229
+2026-10-11T23:03:47.8855919Z    Compiling itoa v1.0.18
+2026-10-11T23:03:48.0138570Z    Compiling memchr v2.8.3
+2026-10-11T23:03:48.0816358Z    Compiling hashbrown v0.14.5
+2026-10-11T23:03:48.4777584Z    Compiling libc v0.2.190
+2026-10-11T23:03:48.4973903Z    Compiling hashlink v0.9.1
+2026-10-11T23:03:48.7049269Z    Compiling smallvec v1.16.3
+2026-10-11T23:03:48.8266018Z    Compiling fallible-streaming-iterator v0.1.9
+2026-10-11T23:03:48.8876064Z    Compiling fallible-iterator v0.3.0
+2026-10-11T23:03:49.0785883Z    Compiling bitflags v2.13.2
+2026-10-11T23:03:49.5726361Z    Compiling seven-sixteen-ui v0.1.0-alpha.41 (https://github.com/716-Ventures/716-ui?rev=1ffb447f3d3a099b22eeb2e5c4e104e5d22bd46a#1ffb447f)
+2026-10-11T23:04:23.5994710Z    Compiling rusqlite v0.32.1
+2026-10-11T23:04:24.4166870Z    Compiling agent-os-core v0.5.0 (/home/runner/work/agentOS/agentOS/outputs/agent-shell)
+2026-10-11T23:04:31.9516647Z     Finished `release` profile [optimized] target(s) in 46.84s
+2026-10-11T23:04:31.9584246Z ##[group]Run sudo apt-get install -y --no-install-recommends tmux
+2026-10-11T23:04:31.9584596Z [36;1msudo apt-get install -y --no-install-recommends tmux[0m
+2026-10-11T23:04:31.9584886Z [36;1mpython3 outputs/native-shell/tests/pty_broker.py[0m
+2026-10-11T23:04:31.9613749Z shell: /usr/bin/bash -e {0}
+2026-10-11T23:04:31.9613919Z env:
+2026-10-11T23:04:31.9614054Z   RUSTUP_TOOLCHAIN: 1.85.1
+2026-10-11T23:04:31.9614215Z ##[endgroup]
+2026-10-11T23:04:31.9764122Z Reading package lists...
+2026-10-11T23:04:32.1155626Z Building dependency tree...
+2026-10-11T23:04:32.1162580Z Reading state information...
+2026-10-11T23:04:32.2738209Z tmux is already the newest version (3.4-1ubuntu0.1).
+2026-10-11T23:04:32.2738451Z tmux set to manually installed.
+2026-10-11T23:04:32.2738683Z 0 upgraded, 0 newly installed, 0 to remove and 24 not upgraded.
+2026-10-11T23:04:32.4853995Z warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+2026-10-11T23:04:32.4854685Z  --> src/document_dialog.rs:8:11
+2026-10-11T23:04:32.4854868Z   |
+2026-10-11T23:04:32.4855072Z 8 | ) -> gtk::FileChooserNative {
+2026-10-11T23:04:32.4855250Z   |           ^^^^^^^^^^^^^^^^^
+2026-10-11T23:04:32.4855411Z   |
+2026-10-11T23:04:32.4855556Z   = note: `#[warn(deprecated)]` on by default
+2026-10-11T23:04:32.4855701Z 
+2026-10-11T23:04:32.4855845Z warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+2026-10-11T23:04:32.4856128Z   --> src/document_dialog.rs:10:23
+2026-10-11T23:04:32.4856299Z    |
+2026-10-11T23:04:32.4856461Z 10 |     let dialog = gtk::FileChooserNative::builder()
+2026-10-11T23:04:32.4856678Z    |                       ^^^^^^^^^^^^^^^^^
+2026-10-11T23:04:32.4856804Z 
+2026-10-11T23:04:32.4856944Z warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+2026-10-11T23:04:32.4857221Z   --> src/document_dialog.rs:61:23
+2026-10-11T23:04:32.4857398Z    |
+2026-10-11T23:04:32.4857551Z 61 |     let dialog = gtk::FileChooserNative::builder()
+2026-10-11T23:04:32.4857762Z    |                       ^^^^^^^^^^^^^^^^^
+2026-10-11T23:04:32.4857886Z 
+2026-10-11T23:04:32.4858093Z warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+2026-10-11T23:04:32.4858428Z   --> src/document_dialog.rs:10:42
+2026-10-11T23:04:32.4858590Z    |
+2026-10-11T23:04:32.4858738Z 10 |     let dialog = gtk::FileChooserNative::builder()
+2026-10-11T23:04:32.4858960Z    |                                          ^^^^^^^
+2026-10-11T23:04:32.4859093Z 
+2026-10-11T23:04:32.4859301Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+2026-10-11T23:04:32.4859632Z   --> src/document_dialog.rs:11:10
+2026-10-11T23:04:32.4859794Z    |
+2026-10-11T23:04:32.4859920Z 11 |         .title(if save {
+2026-10-11T23:04:32.4860078Z    |          ^^^^^
+2026-10-11T23:04:32.4860165Z 
+2026-10-11T23:04:32.4860367Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+2026-10-11T23:04:32.4860919Z   --> src/document_dialog.rs:16:10
+2026-10-11T23:04:32.4861086Z    |
+2026-10-11T23:04:32.4861209Z 16 |         .action(if save {
+2026-10-11T23:04:32.4861366Z    |          ^^^^^^
+2026-10-11T23:04:32.4861453Z 
+2026-10-11T23:04:32.4861672Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+2026-10-11T23:04:32.4862021Z   --> src/document_dialog.rs:21:10
+2026-10-11T23:04:32.4862182Z    |
+2026-10-11T23:04:32.4862345Z 21 |         .accept_label(if save { "Export" } else { "Import" })
+2026-10-11T23:04:32.4862567Z    |          ^^^^^^^^^^^^
+2026-10-11T23:04:32.4862667Z 
+2026-10-11T23:04:32.4862882Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+2026-10-11T23:04:32.4863229Z   --> src/document_dialog.rs:22:10
+2026-10-11T23:04:32.4863386Z    |
+2026-10-11T23:04:32.4863510Z 22 |         .cancel_label("Cancel")
+2026-10-11T23:04:32.4863688Z    |          ^^^^^^^^^^^^
+2026-10-11T23:04:32.4863780Z 
+2026-10-11T23:04:32.4864125Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+2026-10-11T23:04:32.4864459Z   --> src/document_dialog.rs:23:10
+2026-10-11T23:04:32.4864620Z    |
+2026-10-11T23:04:32.4864748Z 23 |         .modal(true)
+2026-10-11T23:04:32.4864892Z    |          ^^^^^
+2026-10-11T23:04:32.4864973Z 
+2026-10-11T23:04:32.4865222Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+2026-10-11T23:04:32.4865549Z   --> src/document_dialog.rs:24:10
+2026-10-11T23:04:32.4865711Z    |
+2026-10-11T23:04:32.4865827Z 24 |         .build();
+2026-10-11T23:04:32.4865965Z    |          ^^^^^
+2026-10-11T23:04:32.4866048Z 
+2026-10-11T23:04:32.4866208Z warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+2026-10-11T23:04:32.4866506Z   --> src/document_dialog.rs:27:16
+2026-10-11T23:04:32.4866669Z    |
+2026-10-11T23:04:32.4866819Z 27 |         dialog.set_current_name("document.txt");
+2026-10-11T23:04:32.4867020Z    |                ^^^^^^^^^^^^^^^^
+2026-10-11T23:04:32.4867134Z 
+2026-10-11T23:04:32.4867273Z warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+2026-10-11T23:04:32.4867542Z   --> src/document_dialog.rs:31:40
+2026-10-11T23:04:32.4867706Z    |
+2026-10-11T23:04:32.4867902Z 31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+2026-10-11T23:04:32.4868166Z    |                                        ^^^^
+2026-10-11T23:04:32.4868296Z 
+2026-10-11T23:04:32.4868501Z warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+2026-10-11T23:04:32.4868832Z   --> src/document_dialog.rs:61:42
+2026-10-11T23:04:32.4868992Z    |
+2026-10-11T23:04:32.4869147Z 61 |     let dialog = gtk::FileChooserNative::builder()
+2026-10-11T23:04:32.4869363Z    |                                          ^^^^^^^
+2026-10-11T23:04:32.4869493Z 
+2026-10-11T23:04:32.4869694Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+2026-10-11T23:04:32.4870021Z   --> src/document_dialog.rs:62:10
+2026-10-11T23:04:32.4870183Z    |
+2026-10-11T23:04:32.4870333Z 62 |         .title("Choose existing text file to review")
+2026-10-11T23:04:32.4870535Z    |          ^^^^^
+2026-10-11T23:04:32.4870617Z 
+2026-10-11T23:04:32.4870812Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+2026-10-11T23:04:32.4871145Z   --> src/document_dialog.rs:63:10
+2026-10-11T23:04:32.4871304Z    |
+2026-10-11T23:04:32.4871445Z 63 |         .action(gtk::FileChooserAction::Open)
+2026-10-11T23:04:32.4871638Z    |          ^^^^^^
+2026-10-11T23:04:32.4871725Z 
+2026-10-11T23:04:32.4871938Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+2026-10-11T23:04:32.4872283Z   --> src/document_dialog.rs:64:10
+2026-10-11T23:04:32.4872502Z    |
+2026-10-11T23:04:32.4872642Z 64 |         .accept_label("Review replacement")
+2026-10-11T23:04:32.4872841Z    |          ^^^^^^^^^^^^
+2026-10-11T23:04:32.4872935Z 
+2026-10-11T23:04:32.4873150Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+2026-10-11T23:04:32.4873493Z   --> src/document_dialog.rs:65:10
+2026-10-11T23:04:32.4873652Z    |
+2026-10-11T23:04:32.4873776Z 65 |         .cancel_label("Cancel")
+2026-10-11T23:04:32.4873949Z    |          ^^^^^^^^^^^^
+2026-10-11T23:04:32.4874040Z 
+2026-10-11T23:04:32.4874253Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+2026-10-11T23:04:32.4874576Z   --> src/document_dialog.rs:66:10
+2026-10-11T23:04:32.4874739Z    |
+2026-10-11T23:04:32.4874855Z 66 |         .modal(true)
+2026-10-11T23:04:32.4875125Z    |          ^^^^^
+2026-10-11T23:04:32.4875205Z 
+2026-10-11T23:04:32.4875400Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+2026-10-11T23:04:32.4875725Z   --> src/document_dialog.rs:67:10
+2026-10-11T23:04:32.4875957Z    |
+2026-10-11T23:04:32.4876078Z 67 |         .build();
+2026-10-11T23:04:32.4876215Z    |          ^^^^^
+2026-10-11T23:04:32.4876296Z 
+2026-10-11T23:04:32.4876432Z warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+2026-10-11T23:04:32.4876704Z   --> src/document_dialog.rs:72:40
+2026-10-11T23:04:32.4876867Z    |
+2026-10-11T23:04:32.4877055Z 72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+2026-10-11T23:04:32.4877314Z    |                                        ^^^^
+2026-10-11T23:04:32.4877441Z 
+2026-10-11T23:04:32.4877585Z warning: use of deprecated method `vte4::FileChooserExt::set_file`: Since 4.10
+2026-10-11T23:04:32.4877857Z    --> src/document_dialog.rs:308:20
+2026-10-11T23:04:32.4878030Z     |
+2026-10-11T23:04:32.4878220Z 308 |             dialog.set_file(&gtk::gio::File::for_path(&path)).unwrap();
+2026-10-11T23:04:32.4878466Z     |                    ^^^^^^^^
+2026-10-11T23:04:32.4878576Z 
+2026-10-11T23:04:32.4878716Z warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+2026-10-11T23:04:32.4878981Z    --> src/document_dialog.rs:310:26
+2026-10-11T23:04:32.4879148Z     |
+2026-10-11T23:04:32.4879367Z 310 |             while dialog.file().and_then(|file| file.path()).as_ref() != Some(&path) {
+2026-10-11T23:04:32.4879647Z     |                          ^^^^
+2026-10-11T23:04:32.4879757Z 
+2026-10-11T23:04:32.4879917Z warning: `agent-os-desktop` (bin "agent-os-desktop" test) generated 22 warnings
+2026-10-11T23:04:32.4880242Z     Finished `test` profile [unoptimized] target(s) in 0.03s
+2026-10-11T23:04:32.4882464Z      Running unittests src/main.rs (outputs/native-shell/target/debug/deps/agent_os_desktop-fae75ff4acf22e50)
+2026-10-11T23:04:32.4952338Z 
+2026-10-11T23:04:32.4952653Z running 1 test
+2026-10-11T23:04:32.8332815Z test pty_transport::tests::real_broker_terminal_round_trip_and_reattach ... ok
+2026-10-11T23:04:32.8333091Z 
+2026-10-11T23:04:32.8333290Z test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 40 filtered out; finished in 0.34s
+2026-10-11T23:04:32.8333545Z 
+2026-10-11T23:04:32.9506936Z warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+2026-10-11T23:04:32.9507282Z  --> src/document_dialog.rs:8:11
+2026-10-11T23:04:32.9507452Z   |
+2026-10-11T23:04:32.9507589Z 8 | ) -> gtk::FileChooserNative {
+2026-10-11T23:04:32.9507771Z   |           ^^^^^^^^^^^^^^^^^
+2026-10-11T23:04:32.9507929Z   |
+2026-10-11T23:04:32.9508073Z   = note: `#[warn(deprecated)]` on by default
+2026-10-11T23:04:32.9508218Z 
+2026-10-11T23:04:32.9508362Z warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+2026-10-11T23:04:32.9508686Z   --> src/document_dialog.rs:10:23
+2026-10-11T23:04:32.9508853Z    |
+2026-10-11T23:04:32.9509018Z 10 |     let dialog = gtk::FileChooserNative::builder()
+2026-10-11T23:04:32.9509241Z    |                       ^^^^^^^^^^^^^^^^^
+2026-10-11T23:04:32.9509602Z 
+2026-10-11T23:04:32.9509756Z warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+2026-10-11T23:04:32.9510031Z   --> src/document_dialog.rs:61:23
+2026-10-11T23:04:32.9510193Z    |
+2026-10-11T23:04:32.9510350Z 61 |     let dialog = gtk::FileChooserNative::builder()
+2026-10-11T23:04:32.9510564Z    |                       ^^^^^^^^^^^^^^^^^
+2026-10-11T23:04:32.9510684Z 
+2026-10-11T23:04:32.9510891Z warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+2026-10-11T23:04:32.9511228Z   --> src/document_dialog.rs:10:42
+2026-10-11T23:04:32.9511390Z    |
+2026-10-11T23:04:32.9511546Z 10 |     let dialog = gtk::FileChooserNative::builder()
+2026-10-11T23:04:32.9511764Z    |                                          ^^^^^^^
+2026-10-11T23:04:32.9511898Z 
+2026-10-11T23:04:32.9512104Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+2026-10-11T23:04:32.9512436Z   --> src/document_dialog.rs:11:10
+2026-10-11T23:04:32.9512606Z    |
+2026-10-11T23:04:32.9512730Z 11 |         .title(if save {
+2026-10-11T23:04:32.9513001Z    |          ^^^^^
+2026-10-11T23:04:32.9513087Z 
+2026-10-11T23:04:32.9513291Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+2026-10-11T23:04:32.9513631Z   --> src/document_dialog.rs:16:10
+2026-10-11T23:04:32.9513793Z    |
+2026-10-11T23:04:32.9513914Z 16 |         .action(if save {
+2026-10-11T23:04:32.9514071Z    |          ^^^^^^
+2026-10-11T23:04:32.9514160Z 
+2026-10-11T23:04:32.9514381Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+2026-10-11T23:04:32.9514727Z   --> src/document_dialog.rs:21:10
+2026-10-11T23:04:32.9514888Z    |
+2026-10-11T23:04:32.9515142Z 21 |         .accept_label(if save { "Export" } else { "Import" })
+2026-10-11T23:04:32.9515376Z    |          ^^^^^^^^^^^^
+2026-10-11T23:04:32.9515472Z 
+2026-10-11T23:04:32.9515692Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+2026-10-11T23:04:32.9516043Z   --> src/document_dialog.rs:22:10
+2026-10-11T23:04:32.9516205Z    |
+2026-10-11T23:04:32.9516331Z 22 |         .cancel_label("Cancel")
+2026-10-11T23:04:32.9516502Z    |          ^^^^^^^^^^^^
+2026-10-11T23:04:32.9516595Z 
+2026-10-11T23:04:32.9516795Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+2026-10-11T23:04:32.9517123Z   --> src/document_dialog.rs:23:10
+2026-10-11T23:04:32.9517287Z    |
+2026-10-11T23:04:32.9517402Z 23 |         .modal(true)
+2026-10-11T23:04:32.9517548Z    |          ^^^^^
+2026-10-11T23:04:32.9517633Z 
+2026-10-11T23:04:32.9517858Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+2026-10-11T23:04:32.9518181Z   --> src/document_dialog.rs:24:10
+2026-10-11T23:04:32.9518339Z    |
+2026-10-11T23:04:32.9518453Z 24 |         .build();
+2026-10-11T23:04:32.9518594Z    |          ^^^^^
+2026-10-11T23:04:32.9518677Z 
+2026-10-11T23:04:32.9518842Z warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+2026-10-11T23:04:32.9519136Z   --> src/document_dialog.rs:27:16
+2026-10-11T23:04:32.9519294Z    |
+2026-10-11T23:04:32.9519443Z 27 |         dialog.set_current_name("document.txt");
+2026-10-11T23:04:32.9519640Z    |                ^^^^^^^^^^^^^^^^
+2026-10-11T23:04:32.9519754Z 
+2026-10-11T23:04:32.9519894Z warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+2026-10-11T23:04:32.9520160Z   --> src/document_dialog.rs:31:40
+2026-10-11T23:04:32.9520323Z    |
+2026-10-11T23:04:32.9520519Z 31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+2026-10-11T23:04:32.9520783Z    |                                        ^^^^
+2026-10-11T23:04:32.9520914Z 
+2026-10-11T23:04:32.9521116Z warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+2026-10-11T23:04:32.9521447Z   --> src/document_dialog.rs:61:42
+2026-10-11T23:04:32.9521666Z    |
+2026-10-11T23:04:32.9521822Z 61 |     let dialog = gtk::FileChooserNative::builder()
+2026-10-11T23:04:32.9522041Z    |                                          ^^^^^^^
+2026-10-11T23:04:32.9522173Z 
+2026-10-11T23:04:32.9522371Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+2026-10-11T23:04:32.9522698Z   --> src/document_dialog.rs:62:10
+2026-10-11T23:04:32.9522859Z    |
+2026-10-11T23:04:32.9523008Z 62 |         .title("Choose existing text file to review")
+2026-10-11T23:04:32.9523217Z    |          ^^^^^
+2026-10-11T23:04:32.9523295Z 
+2026-10-11T23:04:32.9523497Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+2026-10-11T23:04:32.9523827Z   --> src/document_dialog.rs:63:10
+2026-10-11T23:04:32.9523987Z    |
+2026-10-11T23:04:32.9524132Z 63 |         .action(gtk::FileChooserAction::Open)
+2026-10-11T23:04:32.9524328Z    |          ^^^^^^
+2026-10-11T23:04:32.9524414Z 
+2026-10-11T23:04:32.9524675Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+2026-10-11T23:04:32.9525061Z   --> src/document_dialog.rs:64:10
+2026-10-11T23:04:32.9525226Z    |
+2026-10-11T23:04:32.9525368Z 64 |         .accept_label("Review replacement")
+2026-10-11T23:04:32.9525561Z    |          ^^^^^^^^^^^^
+2026-10-11T23:04:32.9525658Z 
+2026-10-11T23:04:32.9525871Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+2026-10-11T23:04:32.9526222Z   --> src/document_dialog.rs:65:10
+2026-10-11T23:04:32.9526381Z    |
+2026-10-11T23:04:32.9526502Z 65 |         .cancel_label("Cancel")
+2026-10-11T23:04:32.9526673Z    |          ^^^^^^^^^^^^
+2026-10-11T23:04:32.9526768Z 
+2026-10-11T23:04:32.9526965Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+2026-10-11T23:04:32.9527292Z   --> src/document_dialog.rs:66:10
+2026-10-11T23:04:32.9527456Z    |
+2026-10-11T23:04:32.9527573Z 66 |         .modal(true)
+2026-10-11T23:04:32.9527719Z    |          ^^^^^
+2026-10-11T23:04:32.9527801Z 
+2026-10-11T23:04:32.9527997Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+2026-10-11T23:04:32.9528320Z   --> src/document_dialog.rs:67:10
+2026-10-11T23:04:32.9528478Z    |
+2026-10-11T23:04:32.9528595Z 67 |         .build();
+2026-10-11T23:04:32.9528734Z    |          ^^^^^
+2026-10-11T23:04:32.9528812Z 
+2026-10-11T23:04:32.9528953Z warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+2026-10-11T23:04:32.9529219Z   --> src/document_dialog.rs:72:40
+2026-10-11T23:04:32.9529381Z    |
+2026-10-11T23:04:32.9529569Z 72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+2026-10-11T23:04:32.9529826Z    |                                        ^^^^
+2026-10-11T23:04:32.9529955Z 
+2026-10-11T23:04:32.9530099Z warning: use of deprecated method `vte4::FileChooserExt::set_file`: Since 4.10
+2026-10-11T23:04:32.9530380Z    --> src/document_dialog.rs:308:20
+2026-10-11T23:04:32.9530549Z     |
+2026-10-11T23:04:32.9530744Z 308 |             dialog.set_file(&gtk::gio::File::for_path(&path)).unwrap();
+2026-10-11T23:04:32.9530987Z     |                    ^^^^^^^^
+2026-10-11T23:04:32.9531096Z 
+2026-10-11T23:04:32.9531237Z warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+2026-10-11T23:04:32.9531501Z    --> src/document_dialog.rs:310:26
+2026-10-11T23:04:32.9531669Z     |
+2026-10-11T23:04:32.9531892Z 310 |             while dialog.file().and_then(|file| file.path()).as_ref() != Some(&path) {
+2026-10-11T23:04:32.9532174Z     |                          ^^^^
+2026-10-11T23:04:32.9532285Z 
+2026-10-11T23:04:32.9532442Z warning: `agent-os-desktop` (bin "agent-os-desktop" test) generated 22 warnings
+2026-10-11T23:04:32.9532769Z     Finished `test` profile [unoptimized] target(s) in 0.03s
+2026-10-11T23:04:32.9534776Z      Running unittests src/main.rs (outputs/native-shell/target/debug/deps/agent_os_desktop-fae75ff4acf22e50)
+2026-10-11T23:04:32.9602748Z 
+2026-10-11T23:04:32.9603035Z running 1 test
+2026-10-11T23:04:33.5903451Z PASS: real broker native attach/detach/reattach, unavailable-source controls and reader cleanup
+2026-10-11T23:04:33.5904130Z test pty_view::tests::manual_detach_restores_attach_without_a_source_refresh ... ok
+2026-10-11T23:04:33.5904465Z 
+2026-10-11T23:04:33.5905952Z test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 40 filtered out; finished in 0.63s
+2026-10-11T23:04:33.5906645Z 
+2026-10-11T23:04:33.6311509Z PASS: native transport / real broker / Unicode PTY input / SIGWINCH / detach / restored screen / reader cleanup
+2026-10-11T23:04:33.6384925Z ##[group]Run for appearance in light dark; do
+2026-10-11T23:04:33.6385264Z [36;1mfor appearance in light dark; do[0m
+2026-10-11T23:04:33.6385553Z [36;1m  for scale in 1 2; do[0m
+2026-10-11T23:04:33.6385972Z [36;1m    dbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py --appearance "$appearance" --text-scale "$scale"[0m
+2026-10-11T23:04:33.6386407Z [36;1m  done[0m
+2026-10-11T23:04:33.6386542Z [36;1mdone[0m
+2026-10-11T23:04:33.6386805Z [36;1mdbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py --load[0m
+2026-10-11T23:04:33.6387269Z [36;1mdbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py --small --text-scale 2[0m
+2026-10-11T23:04:33.6415336Z shell: /usr/bin/bash -e {0}
+2026-10-11T23:04:33.6415515Z env:
+2026-10-11T23:04:33.6415657Z   RUSTUP_TOOLCHAIN: 1.85.1
+2026-10-11T23:04:33.6415816Z ##[endgroup]
+2026-10-11T23:04:33.8658202Z dbus-daemon[6085]: [session uid=1001 pid=6085] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1001 pid=6104 comm="/home/runner/work/agentOS/agentOS/outputs/native-s" label="unconfined")
+2026-10-11T23:04:33.8793947Z dbus-daemon[6085]: [session uid=1001 pid=6085] Successfully activated service 'org.a11y.Bus'
+2026-10-11T23:04:33.8964880Z CHECK: recovered toggle correction and final native control/notice/draft-owner release
+2026-10-11T23:04:33.8965782Z CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+2026-10-11T23:04:33.9163018Z CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+2026-10-11T23:04:33.9267882Z CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+2026-10-11T23:04:33.9283322Z CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+2026-10-11T23:04:33.9303372Z CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+2026-10-11T23:04:33.9318949Z CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+2026-10-11T23:04:33.9649873Z CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+2026-10-11T23:04:33.9650422Z CHECK: typed request preserves immutable selected context; reopening captures the new selection
+2026-10-11T23:04:34.1052935Z dbus-daemon[6123]: Activating service name='org.a11y.atspi.Registry' requested by ':1.0' (uid=1001 pid=6104 comm="/home/runner/work/agentOS/agentOS/outputs/native-s" label="unconfined")
+2026-10-11T23:04:34.1205315Z CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+2026-10-11T23:04:34.1217285Z dbus-daemon[6123]: Successfully activated service 'org.a11y.atspi.Registry'
+2026-10-11T23:04:34.1218660Z SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+2026-10-11T23:04:34.2361245Z CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+2026-10-11T23:04:34.9385620Z CHECK: mapped native surface
+2026-10-11T23:04:34.9385920Z CHECK: authenticated immutable image resource and native texture
+2026-10-11T23:04:34.9417434Z CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+2026-10-11T23:04:34.9418260Z CHECK: native PTY renderer remains detached without running authorized work
+2026-10-11T23:04:34.9467466Z CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+2026-10-11T23:04:34.9486475Z CHECK: reference intent, revision and target disappearance/reappearance
+2026-10-11T23:04:35.5120431Z CHECK: virtualized work history with stable identities and recycled controls
+2026-10-11T23:04:35.5144498Z CHECK: selection and live binding preserved
+2026-10-11T23:04:35.5190031Z CHECK: typed numeric progress and invalid-range availability
+2026-10-11T23:04:35.5216695Z CHECK: local edit preserved
+2026-10-11T23:04:35.5306911Z CHECK: reordered retained widgets
+2026-10-11T23:04:35.5381678Z CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+2026-10-11T23:04:35.7328674Z PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+2026-10-11T23:04:35.7539796Z PASS: native test core and private display cleaned up
+2026-10-11T23:04:35.7540186Z PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+2026-10-11T23:04:35.9804005Z dbus-daemon[6132]: [session uid=1001 pid=6132] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1001 pid=6151 comm="/home/runner/work/agentOS/agentOS/outputs/native-s" label="unconfined")
+2026-10-11T23:04:35.9830453Z dbus-daemon[6132]: [session uid=1001 pid=6132] Successfully activated service 'org.a11y.Bus'
+2026-10-11T23:04:35.9902723Z CHECK: recovered toggle correction and final native control/notice/draft-owner release
+2026-10-11T23:04:35.9903233Z CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+2026-10-11T23:04:36.0069266Z CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+2026-10-11T23:04:36.0175144Z CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+2026-10-11T23:04:36.0190558Z CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+2026-10-11T23:04:36.0211202Z CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+2026-10-11T23:04:36.0226896Z CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+2026-10-11T23:04:36.0561221Z CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+2026-10-11T23:04:36.0561788Z CHECK: typed request preserves immutable selected context; reopening captures the new selection
+2026-10-11T23:04:36.1777237Z dbus-daemon[6170]: Activating service name='org.a11y.atspi.Registry' requested by ':1.0' (uid=1001 pid=6151 comm="/home/runner/work/agentOS/agentOS/outputs/native-s" label="unconfined")
+2026-10-11T23:04:36.1804637Z dbus-daemon[6170]: Successfully activated service 'org.a11y.atspi.Registry'
+2026-10-11T23:04:36.1806476Z SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+2026-10-11T23:04:36.1986846Z CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+2026-10-11T23:04:36.3144624Z CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+2026-10-11T23:04:37.0165209Z CHECK: mapped native surface
+2026-10-11T23:04:37.0165514Z CHECK: authenticated immutable image resource and native texture
+2026-10-11T23:04:37.0196583Z CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+2026-10-11T23:04:37.0197090Z CHECK: native PTY renderer remains detached without running authorized work
+2026-10-11T23:04:37.0247159Z CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+2026-10-11T23:04:37.0267120Z CHECK: reference intent, revision and target disappearance/reappearance
+2026-10-11T23:04:37.5865113Z CHECK: virtualized work history with stable identities and recycled controls
+2026-10-11T23:04:37.5889566Z CHECK: selection and live binding preserved
+2026-10-11T23:04:37.5932980Z CHECK: typed numeric progress and invalid-range availability
+2026-10-11T23:04:37.5961565Z CHECK: local edit preserved
+2026-10-11T23:04:37.6053694Z CHECK: reordered retained widgets
+2026-10-11T23:04:37.6128845Z CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+2026-10-11T23:04:37.8093041Z PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+2026-10-11T23:04:37.8228248Z PASS: native test core and private display cleaned up
+2026-10-11T23:04:37.8228729Z PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+2026-10-11T23:04:38.0496738Z dbus-daemon[6177]: [session uid=1001 pid=6177] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1001 pid=6196 comm="/home/runner/work/agentOS/agentOS/outputs/native-s" label="unconfined")
+2026-10-11T23:04:38.0524697Z dbus-daemon[6177]: [session uid=1001 pid=6177] Successfully activated service 'org.a11y.Bus'
+2026-10-11T23:04:38.0605644Z CHECK: recovered toggle correction and final native control/notice/draft-owner release
+2026-10-11T23:04:38.0610851Z CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+2026-10-11T23:04:38.0762015Z CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+2026-10-11T23:04:38.0866716Z CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+2026-10-11T23:04:38.0882126Z CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+2026-10-11T23:04:38.0902369Z CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+2026-10-11T23:04:38.0917884Z CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+2026-10-11T23:04:38.1252620Z CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+2026-10-11T23:04:38.1253195Z CHECK: typed request preserves immutable selected context; reopening captures the new selection
+2026-10-11T23:04:38.2424103Z dbus-daemon[6215]: Activating service name='org.a11y.atspi.Registry' requested by ':1.0' (uid=1001 pid=6196 comm="/home/runner/work/agentOS/agentOS/outputs/native-s" label="unconfined")
+2026-10-11T23:04:38.2451962Z dbus-daemon[6215]: Successfully activated service 'org.a11y.atspi.Registry'
+2026-10-11T23:04:38.2452447Z SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+2026-10-11T23:04:38.2683664Z CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+2026-10-11T23:04:38.3841150Z CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+2026-10-11T23:04:39.0853899Z CHECK: mapped native surface
+2026-10-11T23:04:39.0854260Z CHECK: authenticated immutable image resource and native texture
+2026-10-11T23:04:39.0886113Z CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+2026-10-11T23:04:39.0886554Z CHECK: native PTY renderer remains detached without running authorized work
+2026-10-11T23:04:39.0936979Z CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+2026-10-11T23:04:39.0955706Z CHECK: reference intent, revision and target disappearance/reappearance
+2026-10-11T23:04:39.6605839Z CHECK: virtualized work history with stable identities and recycled controls
+2026-10-11T23:04:39.6629672Z CHECK: selection and live binding preserved
+2026-10-11T23:04:39.6673482Z CHECK: typed numeric progress and invalid-range availability
+2026-10-11T23:04:39.6701116Z CHECK: local edit preserved
+2026-10-11T23:04:39.6793444Z CHECK: reordered retained widgets
+2026-10-11T23:04:39.6868369Z CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+2026-10-11T23:04:39.8824462Z PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+2026-10-11T23:04:39.9433092Z PASS: native test core and private display cleaned up
+2026-10-11T23:04:39.9433495Z PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+2026-10-11T23:04:40.1711538Z dbus-daemon[6222]: [session uid=1001 pid=6222] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1001 pid=6241 comm="/home/runner/work/agentOS/agentOS/outputs/native-s" label="unconfined")
+2026-10-11T23:04:40.1741797Z dbus-daemon[6222]: [session uid=1001 pid=6222] Successfully activated service 'org.a11y.Bus'
+2026-10-11T23:04:40.1816410Z CHECK: recovered toggle correction and final native control/notice/draft-owner release
+2026-10-11T23:04:40.1817081Z CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+2026-10-11T23:04:40.1983218Z CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+2026-10-11T23:04:40.2087875Z CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+2026-10-11T23:04:40.2102882Z CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+2026-10-11T23:04:40.2123273Z CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+2026-10-11T23:04:40.2138827Z CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+2026-10-11T23:04:40.2473063Z CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+2026-10-11T23:04:40.2473627Z CHECK: typed request preserves immutable selected context; reopening captures the new selection
+2026-10-11T23:04:40.5191336Z Traceback (most recent call last):
+2026-10-11T23:04:40.5191854Z   File "/home/runner/work/agentOS/agentOS/outputs/native-shell/tests/native_desktop.py", line 108, in <module>
+2026-10-11T23:04:40.5192367Z     if '--compositor' not in sys.argv:subprocess.run(command,env=env,check=True,timeout=30)
+2026-10-11T23:04:40.5192714Z                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-10-11T23:04:40.5193975Z   File "/usr/lib/python3.12/subprocess.py", line 571, in run
+2026-10-11T23:04:40.5196497Z     raise CalledProcessError(retcode, process.args,
+2026-10-11T23:04:40.5206235Z subprocess.CalledProcessError: Command '['/home/runner/work/agentOS/agentOS/outputs/native-shell/target/debug/agent-os-desktop', '--self-test', '--socket', '/tmp/agentos-native-v3jf5lgr/core.sock', '--capture', '/home/runner/work/agentOS/agentOS/outputs/native-shell/test-output/dark-2/desktop.png']' died with <Signals.SIGSEGV: 11>.
+2026-10-11T23:04:40.5316001Z ##[error]Process completed with exit code 1.
+2026-10-11T23:04:40.5372996Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+2026-10-11T23:04:40.5373282Z with:
+2026-10-11T23:04:40.5373423Z   name: native-desktop-arm64
+2026-10-11T23:04:40.5373610Z   path: outputs/native-shell/test-output/
+2026-10-11T23:04:40.5373813Z   if-no-files-found: warn
+2026-10-11T23:04:40.5373973Z   compression-level: 6
+2026-10-11T23:04:40.5374122Z   overwrite: false
+2026-10-11T23:04:40.5374268Z   include-hidden-files: false
+2026-10-11T23:04:40.5374451Z env:
+2026-10-11T23:04:40.5374584Z   RUSTUP_TOOLCHAIN: 1.85.1
+2026-10-11T23:04:40.5374740Z ##[endgroup]
+2026-10-11T23:04:40.6457047Z (node:6273) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-11T23:04:40.6457562Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-11T23:04:40.6473211Z With the provided path, there will be 17 files uploaded
+2026-10-11T23:04:40.6476056Z Artifact name is valid!
+2026-10-11T23:04:40.6476457Z Root directory input is valid!
+2026-10-11T23:04:40.9150332Z Beginning upload of artifact content to blob storage
+2026-10-11T23:04:40.9365263Z (node:6273) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-11T23:04:41.1121651Z Uploaded bytes 90810
+2026-10-11T23:04:41.1468136Z Finished uploading artifact content to blob storage!
+2026-10-11T23:04:41.1468612Z SHA256 digest of uploaded artifact zip is 62c71116dd7b8c39b337c2f29b7c1ebbbf5ca8da6848e167118bcfb08c0977b9
+2026-10-11T23:04:41.1469545Z Finalizing artifact upload
+2026-10-11T23:04:41.3910016Z Artifact native-desktop-arm64.zip successfully finalized. Artifact ID 11718187789
+2026-10-11T23:04:41.3910586Z Artifact native-desktop-arm64 has been successfully uploaded! Final size is 90810 bytes. Artifact ID is 11718187789
+2026-10-11T23:04:41.3913496Z Artifact download URL: https://github.com/716-Ventures/agentOS/actions/runs/38182590228/artifacts/11718187789
+2026-10-11T23:04:41.4063788Z Post job cleanup.
+2026-10-11T23:04:41.4581411Z [command]/usr/bin/git version
+2026-10-11T23:04:41.4607382Z git version 2.55.0
+2026-10-11T23:04:41.4626081Z Temporarily overriding HOME='/home/runner/work/_temp/7e769e0b-5b23-4554-9583-103690b28272' before making global git config changes
+2026-10-11T23:04:41.4626705Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-11T23:04:41.4629075Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/agentOS/agentOS
+2026-10-11T23:04:41.4651247Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-11T23:04:41.4669457Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-11T23:04:41.4805539Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-11T23:04:41.4828777Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-11T23:04:41.4953935Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T23:04:41.4978743Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-11T23:04:41.5223196Z Cleaning up orphan processes
+2026-10-11T23:04:41.5429056Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830, actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

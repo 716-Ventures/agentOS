@@ -265,6 +265,12 @@ pub fn verify(
         } else {
             assert_eq!(captured["selection_kind"], "selected_text");
         }
+        if let Some(status) = &surfaces["context-fixture"].elements["root"].status {
+            // This fixture never realizes its window. Release PRIMARY while
+            // its label is alive; GTK 4.14 otherwise retains a stale provider.
+            status.value.select_region(0, 0);
+            assert!(status.value.selection_bounds().is_none());
+        }
         surfaces["context-fixture"].window.destroy();
     }
     let unicode = "日本語λ".repeat(3000);

@@ -1,0 +1,1 @@
+{"result": "pass", "checks": ["ASCII: exact write, hash and backup", "emoji: exact write, hash and backup", "NUL: exact write, hash and backup", "empty: exact write, hash and backup", "Mismatched and oversized input rejected without a write", "Output-before-input completes without a pipe deadlock"], "provider_calls": "fixtures; no live inference"}

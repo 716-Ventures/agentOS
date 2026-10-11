@@ -1,0 +1,289 @@
+native	Real native rendering and interaction	﻿2026-10-11T23:04:33.6384917Z ##[group]Run for appearance in light dark; do
+native	Real native rendering and interaction	2026-10-11T23:04:33.6385261Z ^[[36;1mfor appearance in light dark; do^[[0m
+native	Real native rendering and interaction	2026-10-11T23:04:33.6385551Z ^[[36;1m  for scale in 1 2; do^[[0m
+native	Real native rendering and interaction	2026-10-11T23:04:33.6385970Z ^[[36;1m    dbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py --appearance "$appearance" --text-scale "$scale"^[[0m
+native	Real native rendering and interaction	2026-10-11T23:04:33.6386405Z ^[[36;1m  done^[[0m
+native	Real native rendering and interaction	2026-10-11T23:04:33.6386541Z ^[[36;1mdone^[[0m
+native	Real native rendering and interaction	2026-10-11T23:04:33.6386803Z ^[[36;1mdbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py --load^[[0m
+native	Real native rendering and interaction	2026-10-11T23:04:33.6387267Z ^[[36;1mdbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py --small --text-scale 2^[[0m
+native	Real native rendering and interaction	2026-10-11T23:04:33.6415332Z shell: /usr/bin/bash -e {0}
+native	Real native rendering and interaction	2026-10-11T23:04:33.6415512Z env:
+native	Real native rendering and interaction	2026-10-11T23:04:33.6415655Z   RUSTUP_TOOLCHAIN: 1.85.1
+native	Real native rendering and interaction	2026-10-11T23:04:33.6415815Z ##[endgroup]
+native	Real native rendering and interaction	2026-10-11T23:04:33.8658029Z dbus-daemon[6085]: [session uid=1001 pid=6085] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1001 pid=6104 comm="/home/runner/work/agentOS/agentOS/outputs/native-s" label="unconfined")
+native	Real native rendering and interaction	2026-10-11T23:04:33.8793925Z dbus-daemon[6085]: [session uid=1001 pid=6085] Successfully activated service 'org.a11y.Bus'
+native	Real native rendering and interaction	2026-10-11T23:04:33.8964871Z CHECK: recovered toggle correction and final native control/notice/draft-owner release
+native	Real native rendering and interaction	2026-10-11T23:04:33.8965758Z CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+native	Real native rendering and interaction	2026-10-11T23:04:33.9163012Z CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+native	Real native rendering and interaction	2026-10-11T23:04:33.9267876Z CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+native	Real native rendering and interaction	2026-10-11T23:04:33.9283298Z CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+native	Real native rendering and interaction	2026-10-11T23:04:33.9303370Z CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+native	Real native rendering and interaction	2026-10-11T23:04:33.9318947Z CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+native	Real native rendering and interaction	2026-10-11T23:04:33.9649862Z CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+native	Real native rendering and interaction	2026-10-11T23:04:33.9650420Z CHECK: typed request preserves immutable selected context; reopening captures the new selection
+native	Real native rendering and interaction	2026-10-11T23:04:34.1052905Z dbus-daemon[6123]: Activating service name='org.a11y.atspi.Registry' requested by ':1.0' (uid=1001 pid=6104 comm="/home/runner/work/agentOS/agentOS/outputs/native-s" label="unconfined")
+native	Real native rendering and interaction	2026-10-11T23:04:34.1205281Z CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+native	Real native rendering and interaction	2026-10-11T23:04:34.1217278Z dbus-daemon[6123]: Successfully activated service 'org.a11y.atspi.Registry'
+native	Real native rendering and interaction	2026-10-11T23:04:34.1218655Z SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+native	Real native rendering and interaction	2026-10-11T23:04:34.2361224Z CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+native	Real native rendering and interaction	2026-10-11T23:04:34.9385584Z CHECK: mapped native surface
+native	Real native rendering and interaction	2026-10-11T23:04:34.9385918Z CHECK: authenticated immutable image resource and native texture
+native	Real native rendering and interaction	2026-10-11T23:04:34.9417415Z CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+native	Real native rendering and interaction	2026-10-11T23:04:34.9418241Z CHECK: native PTY renderer remains detached without running authorized work
+native	Real native rendering and interaction	2026-10-11T23:04:34.9467451Z CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+native	Real native rendering and interaction	2026-10-11T23:04:34.9486009Z CHECK: reference intent, revision and target disappearance/reappearance
+native	Real native rendering and interaction	2026-10-11T23:04:35.5120394Z CHECK: virtualized work history with stable identities and recycled controls
+native	Real native rendering and interaction	2026-10-11T23:04:35.5144496Z CHECK: selection and live binding preserved
+native	Real native rendering and interaction	2026-10-11T23:04:35.5190013Z CHECK: typed numeric progress and invalid-range availability
+native	Real native rendering and interaction	2026-10-11T23:04:35.5216693Z CHECK: local edit preserved
+native	Real native rendering and interaction	2026-10-11T23:04:35.5306909Z CHECK: reordered retained widgets
+native	Real native rendering and interaction	2026-10-11T23:04:35.5381676Z CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+native	Real native rendering and interaction	2026-10-11T23:04:35.7328647Z PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+native	Real native rendering and interaction	2026-10-11T23:04:35.7539768Z PASS: native test core and private display cleaned up
+native	Real native rendering and interaction	2026-10-11T23:04:35.7540183Z PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+native	Real native rendering and interaction	2026-10-11T23:04:35.9803929Z dbus-daemon[6132]: [session uid=1001 pid=6132] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1001 pid=6151 comm="/home/runner/work/agentOS/agentOS/outputs/native-s" label="unconfined")
+native	Real native rendering and interaction	2026-10-11T23:04:35.9830440Z dbus-daemon[6132]: [session uid=1001 pid=6132] Successfully activated service 'org.a11y.Bus'
+native	Real native rendering and interaction	2026-10-11T23:04:35.9902716Z CHECK: recovered toggle correction and final native control/notice/draft-owner release
+native	Real native rendering and interaction	2026-10-11T23:04:35.9903231Z CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+native	Real native rendering and interaction	2026-10-11T23:04:36.0069240Z CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+native	Real native rendering and interaction	2026-10-11T23:04:36.0175133Z CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+native	Real native rendering and interaction	2026-10-11T23:04:36.0190540Z CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+native	Real native rendering and interaction	2026-10-11T23:04:36.0211199Z CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+native	Real native rendering and interaction	2026-10-11T23:04:36.0226893Z CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+native	Real native rendering and interaction	2026-10-11T23:04:36.0561209Z CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+native	Real native rendering and interaction	2026-10-11T23:04:36.0561785Z CHECK: typed request preserves immutable selected context; reopening captures the new selection
+native	Real native rendering and interaction	2026-10-11T23:04:36.1777221Z dbus-daemon[6170]: Activating service name='org.a11y.atspi.Registry' requested by ':1.0' (uid=1001 pid=6151 comm="/home/runner/work/agentOS/agentOS/outputs/native-s" label="unconfined")
+native	Real native rendering and interaction	2026-10-11T23:04:36.1804617Z dbus-daemon[6170]: Successfully activated service 'org.a11y.atspi.Registry'
+native	Real native rendering and interaction	2026-10-11T23:04:36.1806451Z SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+native	Real native rendering and interaction	2026-10-11T23:04:36.1986840Z CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+native	Real native rendering and interaction	2026-10-11T23:04:36.3144598Z CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+native	Real native rendering and interaction	2026-10-11T23:04:37.0165174Z CHECK: mapped native surface
+native	Real native rendering and interaction	2026-10-11T23:04:37.0165512Z CHECK: authenticated immutable image resource and native texture
+native	Real native rendering and interaction	2026-10-11T23:04:37.0196580Z CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+native	Real native rendering and interaction	2026-10-11T23:04:37.0197087Z CHECK: native PTY renderer remains detached without running authorized work
+native	Real native rendering and interaction	2026-10-11T23:04:37.0247157Z CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+native	Real native rendering and interaction	2026-10-11T23:04:37.0266708Z CHECK: reference intent, revision and target disappearance/reappearance
+native	Real native rendering and interaction	2026-10-11T23:04:37.5864961Z CHECK: virtualized work history with stable identities and recycled controls
+native	Real native rendering and interaction	2026-10-11T23:04:37.5889564Z CHECK: selection and live binding preserved
+native	Real native rendering and interaction	2026-10-11T23:04:37.5932978Z CHECK: typed numeric progress and invalid-range availability
+native	Real native rendering and interaction	2026-10-11T23:04:37.5961548Z CHECK: local edit preserved
+native	Real native rendering and interaction	2026-10-11T23:04:37.6053691Z CHECK: reordered retained widgets
+native	Real native rendering and interaction	2026-10-11T23:04:37.6128842Z CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+native	Real native rendering and interaction	2026-10-11T23:04:37.8093006Z PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+native	Real native rendering and interaction	2026-10-11T23:04:37.8228220Z PASS: native test core and private display cleaned up
+native	Real native rendering and interaction	2026-10-11T23:04:37.8228726Z PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+native	Real native rendering and interaction	2026-10-11T23:04:38.0496664Z dbus-daemon[6177]: [session uid=1001 pid=6177] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1001 pid=6196 comm="/home/runner/work/agentOS/agentOS/outputs/native-s" label="unconfined")
+native	Real native rendering and interaction	2026-10-11T23:04:38.0524675Z dbus-daemon[6177]: [session uid=1001 pid=6177] Successfully activated service 'org.a11y.Bus'
+native	Real native rendering and interaction	2026-10-11T23:04:38.0605635Z CHECK: recovered toggle correction and final native control/notice/draft-owner release
+native	Real native rendering and interaction	2026-10-11T23:04:38.0610849Z CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+native	Real native rendering and interaction	2026-10-11T23:04:38.0762012Z CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+native	Real native rendering and interaction	2026-10-11T23:04:38.0866712Z CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+native	Real native rendering and interaction	2026-10-11T23:04:38.0882108Z CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+native	Real native rendering and interaction	2026-10-11T23:04:38.0902366Z CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+native	Real native rendering and interaction	2026-10-11T23:04:38.0917880Z CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+native	Real native rendering and interaction	2026-10-11T23:04:38.1252606Z CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+native	Real native rendering and interaction	2026-10-11T23:04:38.1253192Z CHECK: typed request preserves immutable selected context; reopening captures the new selection
+native	Real native rendering and interaction	2026-10-11T23:04:38.2424065Z dbus-daemon[6215]: Activating service name='org.a11y.atspi.Registry' requested by ':1.0' (uid=1001 pid=6196 comm="/home/runner/work/agentOS/agentOS/outputs/native-s" label="unconfined")
+native	Real native rendering and interaction	2026-10-11T23:04:38.2451959Z dbus-daemon[6215]: Successfully activated service 'org.a11y.atspi.Registry'
+native	Real native rendering and interaction	2026-10-11T23:04:38.2452445Z SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+native	Real native rendering and interaction	2026-10-11T23:04:38.2683649Z CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+native	Real native rendering and interaction	2026-10-11T23:04:38.3841124Z CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+native	Real native rendering and interaction	2026-10-11T23:04:39.0853858Z CHECK: mapped native surface
+native	Real native rendering and interaction	2026-10-11T23:04:39.0854256Z CHECK: authenticated immutable image resource and native texture
+native	Real native rendering and interaction	2026-10-11T23:04:39.0886111Z CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+native	Real native rendering and interaction	2026-10-11T23:04:39.0886550Z CHECK: native PTY renderer remains detached without running authorized work
+native	Real native rendering and interaction	2026-10-11T23:04:39.0936461Z CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+native	Real native rendering and interaction	2026-10-11T23:04:39.0955704Z CHECK: reference intent, revision and target disappearance/reappearance
+native	Real native rendering and interaction	2026-10-11T23:04:39.6605801Z CHECK: virtualized work history with stable identities and recycled controls
+native	Real native rendering and interaction	2026-10-11T23:04:39.6629657Z CHECK: selection and live binding preserved
+native	Real native rendering and interaction	2026-10-11T23:04:39.6673480Z CHECK: typed numeric progress and invalid-range availability
+native	Real native rendering and interaction	2026-10-11T23:04:39.6701110Z CHECK: local edit preserved
+native	Real native rendering and interaction	2026-10-11T23:04:39.6793441Z CHECK: reordered retained widgets
+native	Real native rendering and interaction	2026-10-11T23:04:39.6868366Z CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+native	Real native rendering and interaction	2026-10-11T23:04:39.8824425Z PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+native	Real native rendering and interaction	2026-10-11T23:04:39.9433051Z PASS: native test core and private display cleaned up
+native	Real native rendering and interaction	2026-10-11T23:04:39.9433469Z PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+native	Real native rendering and interaction	2026-10-11T23:04:40.1711491Z dbus-daemon[6222]: [session uid=1001 pid=6222] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1001 pid=6241 comm="/home/runner/work/agentOS/agentOS/outputs/native-s" label="unconfined")
+native	Real native rendering and interaction	2026-10-11T23:04:40.1741773Z dbus-daemon[6222]: [session uid=1001 pid=6222] Successfully activated service 'org.a11y.Bus'
+native	Real native rendering and interaction	2026-10-11T23:04:40.1816401Z CHECK: recovered toggle correction and final native control/notice/draft-owner release
+native	Real native rendering and interaction	2026-10-11T23:04:40.1817068Z CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+native	Real native rendering and interaction	2026-10-11T23:04:40.1983206Z CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+native	Real native rendering and interaction	2026-10-11T23:04:40.2087848Z CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+native	Real native rendering and interaction	2026-10-11T23:04:40.2102878Z CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+native	Real native rendering and interaction	2026-10-11T23:04:40.2123265Z CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+native	Real native rendering and interaction	2026-10-11T23:04:40.2138824Z CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+native	Real native rendering and interaction	2026-10-11T23:04:40.2473054Z CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+native	Real native rendering and interaction	2026-10-11T23:04:40.2473620Z CHECK: typed request preserves immutable selected context; reopening captures the new selection
+native	Real native rendering and interaction	2026-10-11T23:04:40.5191292Z Traceback (most recent call last):
+native	Real native rendering and interaction	2026-10-11T23:04:40.5191821Z   File "/home/runner/work/agentOS/agentOS/outputs/native-shell/tests/native_desktop.py", line 108, in <module>
+native	Real native rendering and interaction	2026-10-11T23:04:40.5192365Z     if '--compositor' not in sys.argv:subprocess.run(command,env=env,check=True,timeout=30)
+native	Real native rendering and interaction	2026-10-11T23:04:40.5192713Z                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+native	Real native rendering and interaction	2026-10-11T23:04:40.5193973Z   File "/usr/lib/python3.12/subprocess.py", line 571, in run
+native	Real native rendering and interaction	2026-10-11T23:04:40.5196495Z     raise CalledProcessError(retcode, process.args,
+native	Real native rendering and interaction	2026-10-11T23:04:40.5206232Z subprocess.CalledProcessError: Command '['/home/runner/work/agentOS/agentOS/outputs/native-shell/target/debug/agent-os-desktop', '--self-test', '--socket', '/tmp/agentos-native-v3jf5lgr/core.sock', '--capture', '/home/runner/work/agentOS/agentOS/outputs/native-shell/test-output/dark-2/desktop.png']' died with <Signals.SIGSEGV: 11>.
+native	Real native rendering and interaction	2026-10-11T23:04:40.5315985Z ##[error]Process completed with exit code 1.
+compositor	Native and conventional clients in agentOS compositor	﻿2026-10-11T23:04:33.4355289Z ##[group]Run cargo +1.85.1 build --locked --manifest-path outputs/native-shell/Cargo.toml
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:33.4355957Z ^[[36;1mcargo +1.85.1 build --locked --manifest-path outputs/native-shell/Cargo.toml^[[0m
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:33.4356563Z ^[[36;1mcargo +1.85.1 build --locked --manifest-path outputs/native-shell/Cargo.toml --example minimum_client^[[0m
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:33.4357193Z ^[[36;1mcargo +1.85.1 build --release --locked --manifest-path outputs/agent-shell/Cargo.toml^[[0m
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:33.4357808Z ^[[36;1mdbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py --compositor^[[0m
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:33.4358443Z ^[[36;1mdbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py --compositor --shared^[[0m
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:33.4358976Z ^[[36;1mpython3 outputs/native-shell/tests/initial_request.py^[[0m
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:33.4359734Z ^[[36;1mdbus-run-session -- python3 outputs/native-shell/tests/first_document.py^[[0m
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:33.4360285Z ^[[36;1mdbus-run-session -- python3 outputs/native-shell/tests/first_document.py --queued^[[0m
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:33.4398658Z shell: /usr/bin/bash -e {0}
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:33.4398912Z env:
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:33.4399100Z   RUSTUP_TOOLCHAIN: 1.85.1
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:33.4399522Z ##[endgroup]
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:33.4854603Z     Updating git repository `https://github.com/716-Ventures/716-ui`
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:33.8414192Z    Compiling seven-sixteen-ui v0.1.0-alpha.42 (https://github.com/716-Ventures/716-ui?rev=7997f4d800d7169d2bcdc51bea0431f618968d81#7997f4d8)
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.2032821Z    Compiling agent-os-desktop v0.1.0-alpha.1 (/home/runner/work/agentOS/agentOS/outputs/native-shell)
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5626154Z warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5626681Z  --> src/document_dialog.rs:8:11
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5626908Z   |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5627121Z 8 | ) -> gtk::FileChooserNative {
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5627348Z   |           ^^^^^^^^^^^^^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5627548Z   |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5627734Z   = note: `#[warn(deprecated)]` on by default
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5627961Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5628164Z warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5628541Z   --> src/document_dialog.rs:10:23
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5628763Z    |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5628973Z 10 |     let dialog = gtk::FileChooserNative::builder()
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5629475Z    |                       ^^^^^^^^^^^^^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5629642Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5629861Z warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5630234Z   --> src/document_dialog.rs:61:23
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5630454Z    |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5630664Z 61 |     let dialog = gtk::FileChooserNative::builder()
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5630950Z    |                       ^^^^^^^^^^^^^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.5631113Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8112867Z warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8113655Z   --> src/document_dialog.rs:10:42
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8113946Z    |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8114279Z 10 |     let dialog = gtk::FileChooserNative::builder()
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8114668Z    |                                          ^^^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8114926Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8115537Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8115996Z   --> src/document_dialog.rs:11:10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8116216Z    |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8116705Z 11 |         .title(if save {
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8116912Z    |          ^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8117024Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8117300Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8117755Z   --> src/document_dialog.rs:16:10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8117976Z    |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8118139Z 16 |         .action(if save {
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8118345Z    |          ^^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8118460Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8120906Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8121737Z   --> src/document_dialog.rs:21:10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8121958Z    |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8122184Z 21 |         .accept_label(if save { "Export" } else { "Import" })
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8122484Z    |          ^^^^^^^^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8122613Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8122912Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8123389Z   --> src/document_dialog.rs:22:10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8123613Z    |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8123781Z 22 |         .cancel_label("Cancel")
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8124005Z    |          ^^^^^^^^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8124136Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8124629Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8125087Z   --> src/document_dialog.rs:23:10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8125411Z    |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8125596Z 23 |         .modal(true)
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8125788Z    |          ^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8126610Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8127016Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8127492Z   --> src/document_dialog.rs:24:10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8127715Z    |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8127872Z 24 |         .build();
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8128062Z    |          ^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8128172Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8128742Z warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8129289Z   --> src/document_dialog.rs:27:16
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8129691Z    |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8129906Z 27 |         dialog.set_current_name("document.txt");
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8130277Z    |                ^^^^^^^^^^^^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8130444Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8138692Z warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8139087Z   --> src/document_dialog.rs:31:40
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8139416Z    |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8139676Z 31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8140349Z    |                                        ^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8140526Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8161639Z warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8162331Z   --> src/document_dialog.rs:61:42
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8162698Z    |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8162961Z 61 |     let dialog = gtk::FileChooserNative::builder()
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8163429Z    |                                          ^^^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8163691Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8164502Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8164962Z   --> src/document_dialog.rs:62:10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8165189Z    |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8165397Z 62 |         .title("Choose existing text file to review")
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8165686Z    |          ^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8165799Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8166073Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8166525Z   --> src/document_dialog.rs:63:10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8166746Z    |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8166939Z 63 |         .action(gtk::FileChooserAction::Open)
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8167201Z    |          ^^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8167319Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8167798Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8168741Z   --> src/document_dialog.rs:64:10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8169467Z    |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8169681Z 64 |         .accept_label("Review replacement")
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8169941Z    |          ^^^^^^^^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8170072Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8170516Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8170993Z   --> src/document_dialog.rs:65:10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8171616Z    |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8171816Z 65 |         .cancel_label("Cancel")
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8172049Z    |          ^^^^^^^^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8172176Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8172579Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8173134Z   --> src/document_dialog.rs:66:10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8173372Z    |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8173604Z 66 |         .modal(true)
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8173886Z    |          ^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8174010Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8174299Z warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8174756Z   --> src/document_dialog.rs:67:10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8175081Z    |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8175254Z 67 |         .build();
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8175518Z    |          ^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8175641Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8176041Z warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8178973Z   --> src/document_dialog.rs:72:40
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8179467Z    |
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8179737Z 72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:35.8180082Z    |                                        ^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:42.0537448Z 
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:42.0538128Z warning: `agent-os-desktop` (bin "agent-os-desktop") generated 20 warnings
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:42.0538625Z     Finished `dev` profile [unoptimized] target(s) in 8.60s
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:42.1218311Z    Compiling agent-os-desktop v0.1.0-alpha.1 (/home/runner/work/agentOS/agentOS/outputs/native-shell)
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:43.2880135Z     Finished `dev` profile [unoptimized] target(s) in 1.21s
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:43.4151073Z    Compiling seven-sixteen-ui v0.1.0-alpha.41 (https://github.com/716-Ventures/716-ui?rev=1ffb447f3d3a099b22eeb2e5c4e104e5d22bd46a#1ffb447f)
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:44.7374609Z    Compiling agent-os-core v0.5.0 (/home/runner/work/agentOS/agentOS/outputs/agent-shell)
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:04:57.6107852Z     Finished `release` profile [optimized] target(s) in 14.30s
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:01.1823843Z dbus-daemon[6593]: [session uid=1001 pid=6593] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1001 pid=6625 comm="/home/runner/work/agentOS/agentOS/outputs/native-s" label="unconfined")
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:01.1953986Z dbus-daemon[6593]: [session uid=1001 pid=6593] Successfully activated service 'org.a11y.Bus'
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:01.2180626Z CHECK: recovered toggle correction and final native control/notice/draft-owner release
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:01.2181516Z CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:01.2889831Z CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:01.3058426Z CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:01.3083378Z CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:01.3115852Z CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:01.3139406Z CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:01.3725007Z CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:01.3726116Z CHECK: typed request preserves immutable selected context; reopening captures the new selection
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:11.2684664Z Traceback (most recent call last):
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:11.2685789Z   File "/home/runner/work/agentOS/agentOS/outputs/native-shell/tests/native_desktop.py", line 187, in <module>
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:11.2686450Z     state=wait_windows(3);assert state['layout']['focus']==ident,'A new native surface stole focus'
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:11.2686882Z           ^^^^^^^^^^^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:11.2687332Z   File "/home/runner/work/agentOS/agentOS/outputs/native-shell/tests/native_desktop.py", line 139, in wait_windows
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:11.2687847Z     assert time.monotonic()<deadline,state
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:11.2688120Z            ^^^^^^^^^^^^^^^^^^^^^^^^^
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:11.2697987Z AssertionError: {'direct_active': None, 'direct_frames_presented': 0, 'direct_resume_error': None, 'display_zoom': 1.0, 'drag_icon': False, 'drag_icon_render_submissions': 0, 'input_frame_wakeups': 0, 'keyboard_pressed_count': 0, 'launcher_requests': 0, 'layout': {'focus': 'ObjectId(wl_surface@3[0], 9)', 'order': ['ObjectId(wl_surface@3[0], 9)'], 'placements': {'ObjectId(wl_surface@3[0], 9)': {'mode': 'tiled'}}, 'revision': 16}, 'outputs': [{'height': 800, 'name': 'winit', 'scale': 1.0, 'transform': 'Flipped180', 'width': 1280, 'x': 0, 'y': 0}], 'pointer_location': [0.0, 0.0], 'pointer_routing': {'active_launcher': None, 'focus': None, 'grab': None, 'layer_under': None, 'under': 'ObjectId(wl_surface@3[0], 9)', 'window_under': 'ObjectId(wl_surface@3[0], 9)'}, 'reader': None, 'seat_focus': 'ObjectId(wl_surface@3[0], 9)', 'shared': None, 'system_layers': [], 'windows': [{'app_id': 'org.freedesktop.weston.simple-shm', 'geometry': {'height': 800, 'width': 1280, 'x': 0, 'y': 0}, 'id': 'ObjectId(wl_surface@3[0], 9)', 'title': 'simple-shm', 'xdg': {'acked_serial': 62, 'acked_size': [1280, 800], 'client_geometry': None, 'client_max_size': [0, 0], 'client_min_size': [0, 0], 'committed_serial': 62, 'committed_size': [1280, 800], 'configured': True, 'pending_configures': [], 'pending_count': 0, 'server_pending_size': [1280, 800]}}]}
+compositor	Native and conventional clients in agentOS compositor	2026-10-11T23:05:11.2904230Z ##[error]Process completed with exit code 1.

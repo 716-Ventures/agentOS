@@ -1,0 +1,15 @@
+{
+  "started_at": "2026-10-11T23:05:22.478434+00:00",
+  "source_revision": "237cdeae7d046e9077a23d48cd53eda8aa568bdb",
+  "source_changes": [
+    " M outputs/native-shell/src/input_context.rs"
+  ],
+  "source_archive_sha256": "d27fc75410dec4bf318488344d8ef69bb5b892e4d7df97704a687bf319359c2d",
+  "passed": true,
+  "owned_utm_identity": [
+    51592,
+    "Sun Oct 11 19:05:22 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T23:06:13.165911+00:00"
+}

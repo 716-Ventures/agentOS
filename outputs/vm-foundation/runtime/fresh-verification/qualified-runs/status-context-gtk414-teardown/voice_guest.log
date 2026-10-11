@@ -1,0 +1,3 @@
+{"check": "real offline English recognition", "result": {"text": "And so my fellow Americans ask not what your country can do for you. Ask what you can do for your country.", "status": "transcribed", "rms": 0.14789111644117206, "duration_seconds": 10.0, "recognition_seconds": 1.1528214459999901, "engine": "whisper.cpp/1.9.5 tiny.en", "requires_review": true}, "wall_seconds": 1.1668250419999993}
+PASS: zero-signal rejection, explicit capture, owner-bound token, cancellation, no recorder leak
+NOT QUALIFIED: actual host microphone speech, speaker output, accents, background-noise accuracy, hardware

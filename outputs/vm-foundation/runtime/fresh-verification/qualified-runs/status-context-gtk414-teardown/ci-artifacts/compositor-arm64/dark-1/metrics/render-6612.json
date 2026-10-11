@@ -1,0 +1,1 @@
+{"format":1,"meaning":"CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence","pid":6612,"sample_limit_per_stage":256,"stages":{"compositor.nested_render_submit":{"discarded":0,"max_recent_ms":8.797697,"mean_all_ms":7.244279379844962,"p50_recent_ms":5.923513,"p95_recent_ms":7.113439,"retained":256,"samples_total":258}}}
