@@ -1,0 +1,71 @@
+dbus-daemon[10264]: [session uid=1000 pid=10264 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=10284 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[10264]: [session uid=1000 pid=10264 pidfd=5] Successfully activated service 'org.a11y.Bus'
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+CHECK: actual native field/editor and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+dbus-daemon[10303]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=10284 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[10303]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+CHECK: mapped native surface
+CHECK: authenticated immutable image resource and native texture
+CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+CHECK: native PTY renderer remains detached without running authorized work
+CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+CHECK: reference intent, revision and target disappearance/reappearance
+CHECK: virtualized work history with stable identities and recycled controls
+
+thread 'main' panicked at src/verification.rs:545:66:
+called `Option::unwrap()` on a `None` value
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'main' panicked at library/core/src/panicking.rs:218:5:
+panic in a function that cannot unwind
+stack backtrace:
+   0:     0xaaaadb9da5b0 - <std::sys::backtrace::BacktraceLock::print::DisplayBacktrace as core::fmt::Display>::fmt::hdb6f6d042b491751
+   1:     0xaaaadba154a8 - core::fmt::write::h6d72b50863dc4fa0
+   2:     0xaaaadb9fd43c - std::io::Write::write_fmt::hd2f963b87cdd5023
+   3:     0xaaaadb9da464 - std::sys::backtrace::BacktraceLock::print::h435d5ca8e4e67cf2
+   4:     0xaaaadb9e975c - std::panicking::default_hook::{{closure}}::h19a0ec54d5eb587c
+   5:     0xaaaadb9e95d0 - std::panicking::default_hook::h1242a7d680affcc5
+   6:     0xaaaadb9e9d14 - std::panicking::rust_panic_with_hook::hbdc292c9fdd02555
+   7:     0xaaaadb9dad40 - std::panicking::begin_panic_handler::{{closure}}::hfe80fb29e0038c40
+   8:     0xaaaadb9da818 - std::sys::backtrace::__rust_end_short_backtrace::ha2a0318cc297b45e
+   9:     0xaaaadb9e9880 - rust_begin_unwind
+  10:     0xaaaadb69cd30 - core::panicking::panic_nounwind_fmt::h4574a6bdf9fe1159
+  11:     0xaaaadb69cda8 - core::panicking::panic_nounwind::h28ad1a13bfa41d0f
+  12:     0xaaaadb69cf20 - core::panicking::panic_cannot_unwind::hf4bd0b5abce28105
+  13:     0xaaaadb6e9f38 - glib::source::trampoline_local::h2afbf7f3c15ebf61
+  14:     0xffff91fd1a70 - <unknown>
+  15:     0xffff91fce454 - <unknown>
+  16:     0xffff91fd091c - <unknown>
+  17:     0xffff91fd11c4 - g_main_context_iteration
+  18:     0xffff9228f7ac - g_application_run
+  19:     0xaaaadb6d6984 - gio::application::ApplicationExtManual::run_with_args::hf50ca3ed210ce125
+  20:     0xaaaadb7d933c - agent_os_desktop::verification::run::h02606fa83fcf22a1
+  21:     0xaaaadb75c308 - agent_os_desktop::main::h1154d31c1cc5ebae
+  22:     0xaaaadb6f8ffc - core::ops::function::FnOnce::call_once::hbf7b422ab63ecc6d
+  23:     0xaaaadb747f54 - std::sys::backtrace::__rust_begin_short_backtrace::he518991cdf5c81ee
+  24:     0xaaaadb7b3920 - std::rt::lang_start::{{closure}}::h99263bdd633b4269
+  25:     0xaaaadb9fcaa4 - std::rt::lang_start_internal::hdd95299bbc4bc65d
+  26:     0xaaaadb7b3900 - std::rt::lang_start::h2c2ce8b9ed4b2999
+  27:     0xaaaadb75c360 - main
+  28:     0xffff91d6225c - <unknown>
+  29:     0xffff91d6233c - __libc_start_main
+  30:     0xaaaadb69d4b0 - _start
+  31:                0x0 - <unknown>
+thread caused non-unwinding panic. aborting.
+Traceback (most recent call last):
+  File "/home/developer/agent-os-source/native-shell/tests/native_desktop.py", line 108, in <module>
+    if '--compositor' not in sys.argv:subprocess.run(command,env=env,check=True,timeout=30)
+                                      ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['/home/developer/agent-os-source/native-shell/target/debug/agent-os-desktop', '--self-test', '--socket', '/tmp/agentos-native-1yj0_90f/core.sock', '--capture', '/home/developer/agent-os-source/native-shell/test-output/light-1/desktop.png']' died with <Signals.SIGABRT: 6>.

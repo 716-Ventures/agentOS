@@ -1,0 +1,15 @@
+{
+  "started_at": "2026-10-11T22:33:04.435783+00:00",
+  "source_revision": "b8a7f4ad75f5036285af7d8efd89cd41af945c7d",
+  "source_changes": [
+    " M outputs/native-shell/src/verification.rs"
+  ],
+  "source_archive_sha256": "0db7dbbaacf7ed75142fafe0bae91a2b1b570a634727482d575baa8512e71a05",
+  "passed": true,
+  "owned_utm_identity": [
+    23830,
+    "Sun Oct 11 18:33:04 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T22:33:32.422258+00:00"
+}

@@ -1,0 +1,6 @@
+{
+  "failure": "The Rust self-test still unwraps the former generic Element.label for Status@1. Status now has its dedicated StatusView field.",
+  "correction": "Observe StatusView.value in the existing selection/live-binding assertion.",
+  "passed_checks_before_failure": 23,
+  "production_renderer_changed_for_correction": false
+}

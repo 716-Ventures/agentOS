@@ -542,7 +542,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             frame.bindings.insert("native-fixture".into(),json!({"bindings":{"work":{"availability":"available","value":"running"}}}));
             surface.update("native-fixture",&doc,&frame,&commands,&drafts);
             assert_eq!(reading.text(),"Native café · 日本語 · select this text");
-            assert_eq!(surface.elements["status"].label.as_ref().unwrap().text(),"running");
+            assert_eq!(surface.elements["status"].status.as_ref().unwrap().value.text(),"running");
             println!("CHECK: selection and live binding preserved");
             frame.bindings.get_mut("native-fixture").unwrap()["bindings"]["numeric"]=json!({"availability":"available","value":2});
             surface.update("native-fixture",&doc,&frame,&commands,&drafts);
