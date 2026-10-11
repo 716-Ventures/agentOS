@@ -69,3 +69,38 @@ class Sources(unittest.TestCase):
                 if ignored:BrokerSources('/unused').request(payload)
                 else:
                     with self.assertRaises(RuntimeError):BrokerSources('/unused').request(payload)
+
+    def test_rejected_observation_does_not_block_unrelated_live_sources(self):
+        sources=BrokerSources('/unused');sources.mark(self.job())
+        good={**self.job(),'id':'b'*32};sources.mark(good)
+        delivered=[]
+        def request(payload):
+            if payload.get('source')=='broker:'+'a'*32:raise RuntimeError('One observation was rejected')
+            delivered.append(payload['source']);sources.stop.set()
+        with patch.object(sources,'request',side_effect=request):
+            sources.start();sources.worker.join(timeout=1);sources.close()
+        self.assertEqual(delivered,['broker:'+'b'*32])
+        self.assertEqual(set(sources.pending),{'broker:'+'a'*32})
+
+    def test_pending_rejection_does_not_suppress_owner_heartbeat(self):
+        sources=BrokerSources('/unused');sources.mark(self.job());heartbeats=[]
+        def request(payload):
+            if payload['op']=='source.publish':raise RuntimeError('Rejected record')
+            heartbeats.append(payload)
+        with patch.object(sources,'request',side_effect=request),patch.object(sources.stop,'wait',side_effect=lambda _:sources.stop.set()):
+            # A clock that advances after the initial heartbeat deadline.
+            with patch('source_publisher.time.monotonic',side_effect=[0,6,6]):sources.run()
+        self.assertEqual(heartbeats,[{'op':'source.heartbeat'}])
+        self.assertEqual(len(sources.pending),1)
+
+    def test_rejected_backfill_is_retained_without_restarting_the_entire_replay(self):
+        bad=BrokerSources.job_payload(self.job())
+        good=BrokerSources.job_payload({**self.job(),'id':'b'*32})
+        sources=BrokerSources('/unused',replay=lambda:iter([bad,good]));sources.needs_replay=True
+        delivered=[]
+        def request(payload):
+            if payload.get('source')==bad['source']:raise RuntimeError('Rejected replay record')
+            delivered.append(payload['source']);sources.stop.set()
+        with patch.object(sources,'request',side_effect=request):sources.run()
+        self.assertEqual(delivered,[good['source']])
+        self.assertEqual(sources.pending,{bad['source']:bad})

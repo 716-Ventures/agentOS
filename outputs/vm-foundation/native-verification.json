@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-10-10T23:39:29.951512+00:00",
+  "started_at": "2026-10-11T00:25:03.244620+00:00",
   "result": "pass",
   "vm_uuid": "27176EA2-E994-4165-9BBA-70FEED59E66B",
   "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -31,6 +31,9 @@
     "native-light-2",
     "native-dark-1",
     "native-dark-2",
+    "native-first-document",
+    "native-queued-documents",
+    "native-first-import",
     "native-small-display",
     "native-cpu-contention",
     "native-compositor",
@@ -41,6 +44,7 @@
     "native-session-host-loss",
     "native-session-compositor-loss",
     "direct-display-input-vt",
+    "direct-display-terminal",
     "conventional-browser-links",
     "signed-graphical-release",
     "terminal",
@@ -59,24 +63,34 @@
     "microphone/speaker signal",
     "physical graphical input",
     "physical hardware",
-    "OS update rollback"
+    "OS update rollback",
+    "VTE IME"
   ],
   "deployment": {
-    "created_at": "2026-10-10T23:39:43.398778+00:00",
-    "source_archive_sha256": "4fd54107dbab992d7a14876ccae5192ca503148f312f4f697df77144d18f5560",
-    "repository_revision": "bc8d0a6b479bb0ffad59804e62f06ec2b24ce1ce",
+    "created_at": "2026-10-11T00:25:16.541513+00:00",
+    "source_archive_sha256": "1a9d58d951373f0263d85088aae5e1ca9e6aa0e47385a294cb01c9f548cf5428",
+    "repository_revision": "4d9b93d96d28803b34ad5883c016e88eafa0eb10",
     "source_changes": [
-      " M outputs/agent-shell/Cargo.lock",
-      " M outputs/agent-shell/Cargo.toml",
-      " M outputs/native-shell/Cargo.lock",
-      " M outputs/native-shell/Cargo.toml",
-      " M outputs/native-shell/README.md",
-      " M outputs/native-shell/src/pty_view.rs",
-      " M outputs/native-shell/tests/pty_broker.py"
+      "M  outputs/agent-shell/Cargo.lock",
+      "M  outputs/agent-shell/Cargo.toml",
+      "M  outputs/agent-shell/services/source_publisher.py",
+      "M  outputs/agent-shell/tests/broker_sources_guest.py",
+      "M  outputs/agent-shell/tests/direct_display_guest.py",
+      "M  outputs/agent-shell/tests/direct_input_probe.py",
+      "A  outputs/agent-shell/tests/direct_terminal_probe.py",
+      "M  outputs/agent-shell/tests/source_publisher_test.py",
+      "M  outputs/native-shell/Cargo.lock",
+      "M  outputs/native-shell/Cargo.toml",
+      "M  outputs/native-shell/README.md",
+      "M  outputs/native-shell/src/controls.rs",
+      "M  outputs/native-shell/src/document_dialog.rs",
+      "M  outputs/native-shell/src/pty_view.rs",
+      "M  outputs/native-shell/src/transport.rs",
+      "A  outputs/native-shell/tests/first_document.py"
     ],
     "installed": true
   },
-  "runtime_release": "119249be71f34a88e608c8280277f0f3203a2b9040040ad172a61114b98fa007",
+  "runtime_release": "578d6321b34ac360508d12954deb324f715c67acb8e86d71fc4216f1a1d3483c",
   "dependency_manifest": {
     "packages": {
       "adduser": "3.152",
@@ -866,18 +880,35 @@
     "python": "Python 3.9.6"
   },
   "guest_stopped": true,
-  "finished_at": "2026-10-10T23:43:58.254092+00:00",
+  "finished_at": "2026-10-11T00:29:39.612809+00:00",
   "public_ui_release": {
-    "tag": "v0.1.0-alpha.24",
-    "revision": "b2340208c4d88ff0eafe49f740b18fedcd223053",
-    "public_ci_run": 38095534340
+    "tag": "v0.1.0-alpha.25",
+    "revision": "7b7bac9c252e759fafb4f6c1d50af5ef056d0677",
+    "public_ci_run": 38096178175
   },
   "additional_targeted_regressions": {
-    "pty_control_baseline": "manual detach left Attach disabled without a source refresh",
-    "pty_owner_baseline": "strong input-signal capture retained the closed terminal owner",
-    "corrected_real_gtk_broker_probe": "pass",
-    "source_sha256": "b01e9f2083a211d842e630ebc504580c78dc49f0858a49e6c543de1897465147",
-    "fixture_sha256": "1bf9b9dc5e07aafdf2f0251f7ba946f9eb9e4f63cdbc97041a3e8ebf4d909645"
+    "queued_initial_documents": {
+      "baseline": "Two queued initial document requests created two activities",
+      "corrected": "Two documents reuse one confirmed activity",
+      "source_sha256": "3d919e88156d925c057cc47d8a367f8abf9f7d9bda61a16d4379dadf3d323542",
+      "fixture_sha256": "fee00ed55208be9aa18ce474830cdfc1df6d7260a627f3c47651706d9f1f4145"
+    },
+    "source_publication": {
+      "baseline": [
+        "Rejected observations starved unrelated live records",
+        "Pending failures suppressed source-owner heartbeats"
+      ],
+      "corrected": "Rejected records remain pending; unrelated delivery, backfill and heartbeat regressions pass",
+      "source_sha256": "bd9a127b18de5545c529f3b52e4ac6a51cc4b03875132fe8b62db26797fb5f60",
+      "fixture_sha256": "9f97be75e284e2beb3483822200018975c4acfad7dce8a40cd39b880618fb296"
+    },
+    "installed_vte": {
+      "baseline": "Ctrl+Shift+V was forwarded as raw control input rather than clipboard paste",
+      "corrected": "Kernel typing/pointer focus, Unicode clipboard-to-PTY, explicit detach/reattach and detached-input rejection pass",
+      "source_sha256": "54884753c8bd25a7e164b2c1901193880c86d0174a2c847b602c0632a745c3df",
+      "fixture_sha256": "32bce32a63936c521fbfc6105310da0980d39ddf0c721c8b873349183bc4230d",
+      "boundary": "Synthetic kernel input; physical input and VTE IME remain unqualified"
+    }
   },
   "owned_utm_app_closed": true
 }

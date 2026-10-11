@@ -56,13 +56,20 @@ class BrokerSources:
         if self.worker is not None:return
         self.worker=threading.Thread(target=self.run,name='broker-source-observations',daemon=True);self.worker.start()
     def run(self):
-        heartbeat=0;replaying=None
+        heartbeat=time.monotonic();replaying=None
         while not self.stop.is_set():
             with self.lock:batch=list(self.pending.items())[:16]
             for source,payload in batch:
                 if self.stop.is_set():break
                 try:self.request(payload)
-                except (OSError,RuntimeError,ValueError):break
+                except OSError:break
+                except (RuntimeError,ValueError):
+                    # Preserve rejected observations, but rotate them so one
+                    # record cannot starve unrelated current work indefinitely.
+                    with self.lock:
+                        if self.pending.get(source)==payload:
+                            self.pending.pop(source);self.pending[source]=payload
+                    continue
                 with self.lock:
                     if self.pending.get(source)==payload:self.pending.pop(source,None)
             with self.lock:
@@ -74,12 +81,13 @@ class BrokerSources:
                     except StopIteration:replaying=None;break
                     if self.stop.is_set():break
                     try:self.request(payload)
-                    except (OSError,RuntimeError,ValueError):
+                    except (RuntimeError,ValueError):
+                        self.enqueue(payload)
+                    except OSError:
                         replaying=None
                         with self.lock:self.needs_replay=True
                         break
-            with self.lock:pending=bool(self.pending) or replaying is not None or (self.needs_replay and self.replay is not None)
-            if not pending and time.monotonic()-heartbeat>=5:
+            if time.monotonic()-heartbeat>=5:
                 try:self.request({'op':'source.heartbeat'});heartbeat=time.monotonic()
                 except (OSError,RuntimeError,ValueError):pass
             self.stop.wait(.25 if batch else .5)

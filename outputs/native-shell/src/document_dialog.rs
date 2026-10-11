@@ -5,7 +5,7 @@ pub fn choose(
     exporting: Option<(String, u64)>,
     activity: Option<String>,
     commands: Sender<Command>,
-) {
+) -> gtk::FileChooserNative {
     let save = exporting.is_some();
     let dialog = gtk::FileChooserNative::builder()
         .title(if save {
@@ -36,8 +36,8 @@ pub fn choose(
                         path,
                     })
                 } else {
-                    activity.as_ref().map(|id| Command::ImportDocument {
-                        activity: id.clone(),
+                    Some(Command::ImportDocument {
+                        activity: activity.clone(),
                         path,
                     })
                 };
@@ -49,6 +49,7 @@ pub fn choose(
         dialog.destroy();
     });
     dialog.show();
+    dialog
 }
 
 pub fn choose_replacement(
@@ -285,5 +286,54 @@ pub(super) fn panel(
         previews,
         save,
         cancel,
+    }
+}
+
+#[cfg(test)]
+mod initial_import_tests {
+    use super::*;
+    use glib::translate::IntoGlib;
+    #[test]
+    #[ignore]
+    fn accepted_file_selection_keeps_its_optional_activity_context() {
+        gtk::init().unwrap();
+        let path = std::env::temp_dir().join(format!(
+            "agentos-initial-import-{}.txt",
+            super::super::nonce()
+        ));
+        std::fs::write(&path, "Selected document λ 日本語").unwrap();
+        for activity in [None, Some("7".to_string())] {
+            let (sender, receive) = std::sync::mpsc::channel();
+            let dialog = choose(None, None, activity.clone(), sender);
+            dialog.set_file(&gtk::gio::File::for_path(&path)).unwrap();
+            let deadline = std::time::Instant::now() + Duration::from_secs(5);
+            while dialog.file().and_then(|file| file.path()).as_ref() != Some(&path) {
+                assert!(
+                    std::time::Instant::now() < deadline,
+                    "Native chooser did not retain the selected file"
+                );
+                glib::MainContext::default().iteration(false);
+                std::thread::sleep(Duration::from_millis(10));
+            }
+            dialog.emit_by_name::<()>("response", &[&gtk::ResponseType::Accept.into_glib()]);
+            match receive.recv_timeout(Duration::from_secs(2)).unwrap() {
+                Command::ImportDocument {
+                    activity: captured,
+                    path: chosen,
+                } => {
+                    assert_eq!(captured, activity);
+                    assert_eq!(chosen, path);
+                }
+                _ => panic!("Native import dispatched the wrong operation"),
+            }
+        }
+        let (sender, receive) = std::sync::mpsc::channel();
+        let dialog = choose(None, None, None, sender);
+        dialog.emit_by_name::<()>("response", &[&gtk::ResponseType::Cancel.into_glib()]);
+        assert!(
+            receive.try_recv().is_err(),
+            "Cancelling the chooser dispatched an operation"
+        );
+        std::fs::remove_file(path).unwrap();
     }
 }

@@ -108,7 +108,7 @@ pub enum Command {
     },
     OpenTerminal,
     ImportDocument {
-        activity: String,
+        activity: Option<String>,
         path: PathBuf,
     },
     ReviewDocumentFile {
@@ -355,9 +355,12 @@ fn run(
                     Command::Setup=>std::process::Command::new("weston-terminal").args(["--shell","/usr/local/bin/agent-os-setup"]).spawn().map(|mut child|{std::thread::spawn(move||{let _=child.wait();});json!({"status":"Setup opened"})}).map_err(|e|e.to_string()),
                     Command::SelectActivity(id)=>{activity=Some(id);Ok(json!({"status":"Activity selected"}))},
                     Command::ImportDocument{activity:id,path}=>{
-                        let current=frame.lock().unwrap().clone();
-                        if current.activity.as_deref()!=Some(id.as_str()){Err("Activity changed; choose the file again".into())}else{
+                        let mut current=frame.lock().unwrap().clone();
+                        if activity!=id || current.activity!=id {Err("Activity changed; choose the file again".into())}else{
                             path.to_str().ok_or("File path must be UTF-8".into()).and_then(|path|super::broker_controls::run_helper("/usr/local/bin/agent-os", &["document","read",path],stop.clone())).and_then(|loaded|{
+                                // Validate/read the selected file before creating an implicit activity.
+                                let id=ensure_document_activity(&socket,&mut current)?;
+                                activity=Some(id.clone());
                                 let surface=format!("document-{}",super::nonce());
                                 let doc=json!({"protocol":"agentos.presentation/1","catalog_revision":"native-core/1","surface_id":surface,"activity_id":id,"revision":0,"title":loaded["title"],"root":"editor","elements":{"editor":{"type":"DocumentEditor@1","props":{"label":loaded["title"],"value":loaded["content"]}}},"bindings":{},"actions":{}});
                                 open_surface(&socket,&current,doc)
@@ -383,7 +386,14 @@ fn run(
                             path.to_str().ok_or("File path must be UTF-8".into()).and_then(|path|super::broker_controls::run_helper("/usr/local/bin/agent-os", &["document","export",&surface,path,"--revision",&revision.to_string()],stop.clone()))
                         }
                     },
-                    Command::CreateDocument=>{let current=frame.lock().unwrap().clone();create_document(&socket,&current)},
+                    Command::CreateDocument=>{
+                        let mut current=frame.lock().unwrap().clone();
+                        // Queued clicks may precede the next UI snapshot; use
+                        // the worker's confirmed selection, not a stale frame.
+                        current.activity=activity.clone();
+                        let result=ensure_document_activity(&socket,&mut current).and_then(|_|create_document(&socket,&current));
+                        activity=current.activity.clone();result
+                    },
                     Command::CreateActivity(name)=>request(&socket,&json!({"op":"create","name":name})).map(|created|{activity=Some(created["id"].to_string());created}),
                     Command::Ask{activity,prompt,grounding}=>{
                         if prompt.trim().is_empty() || prompt.len()>16000 {Err("Enter a request up to 16 KiB".into())}
@@ -1139,6 +1149,21 @@ fn embed_terminal(socket: &PathBuf, frame: &Frame, job: &Value) -> Result<Value,
     let document = json!({"protocol":"agentos.presentation/1","catalog_revision":"native-core/1","surface_id":surface,"activity_id":activity,"revision":0,"title":"Interactive terminal","root":"terminal","elements":{"terminal":{"type":"PtySession@1","props":{"label":"Interactive terminal","source":format!("broker:{id}")}}},"bindings":{},"actions":{}});
     open_surface(socket, frame, document)
 }
+// Activities organize documents internally; creating/opening one must not require
+// a separate activity-creation task. No mutation is automatically retried.
+fn ensure_document_activity(socket: &PathBuf, frame: &mut Frame) -> Result<String, String> {
+    if let Some(activity) = &frame.activity {
+        return Ok(activity.clone());
+    }
+    let created = request(socket, &json!({"op":"create","name":"Personal"}))?;
+    let id = created["id"]
+        .as_i64()
+        .filter(|id| *id > 0)
+        .ok_or("The document activity was not confirmed; refresh before trying again")?
+        .to_string();
+    frame.activity = Some(id.clone());
+    Ok(id)
+}
 fn create_document(socket: &PathBuf, frame: &Frame) -> Result<Value, String> {
     let activity = frame
         .activity
@@ -1340,6 +1365,154 @@ mod draft_revision_tests {
             drafts.lock().unwrap()[&("surface".into(), "editor".into())].text,
             "Local user document"
         );
+        server.join().unwrap();
+        std::fs::remove_file(path).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod initial_document_tests {
+    #[test]
+    #[ignore]
+    fn queued_new_documents_reuse_the_confirmed_activity() {
+        let socket = PathBuf::from(std::env::var("AGENT_OS_SOCKET").unwrap());
+        let mut backend = Backend::start(socket.clone(), None);
+        let deadline = std::time::Instant::now() + Duration::from_secs(10);
+        while !backend.frame.lock().unwrap().connected {
+            assert!(std::time::Instant::now() < deadline);
+            thread::sleep(Duration::from_millis(10));
+        }
+        backend.commands.send(Command::CreateDocument).unwrap();
+        backend.commands.send(Command::CreateDocument).unwrap();
+        loop {
+            let state = request(&socket, &json!({"op":"presentation.snapshot"})).unwrap();
+            if state["documents"]
+                .as_object()
+                .unwrap()
+                .values()
+                .filter(|doc| doc["root"] == "editor")
+                .count()
+                == 2
+            {
+                break;
+            }
+            assert!(
+                std::time::Instant::now() < deadline,
+                "Two queued documents were not created"
+            );
+            thread::sleep(Duration::from_millis(10));
+        }
+        let state = request(&socket, &json!({"op":"snapshot"})).unwrap();
+        assert_eq!(
+            state["activities"].as_array().unwrap().len(),
+            1,
+            "Queued documents created a duplicate activity"
+        );
+        backend.close();
+    }
+
+    #[test]
+    #[ignore]
+    fn import_into_an_empty_core_validates_before_creating_an_activity() {
+        let socket = PathBuf::from(std::env::var("AGENT_OS_SOCKET").unwrap());
+        let path = PathBuf::from(std::env::var("AGENT_OS_INITIAL_IMPORT").unwrap());
+        let mut backend = Backend::start(socket.clone(), None);
+        fn wait(backend: &Backend, predicate: impl Fn(&Frame) -> bool) {
+            let deadline = std::time::Instant::now() + Duration::from_secs(10);
+            loop {
+                let frame = backend.frame.lock().unwrap().clone();
+                if predicate(&frame) {
+                    return;
+                }
+                assert!(
+                    std::time::Instant::now() < deadline,
+                    "Import state did not settle: {:?}",
+                    frame.error
+                );
+                thread::sleep(Duration::from_millis(20));
+            }
+        }
+        wait(&backend, |frame| frame.connected);
+        backend
+            .commands
+            .send(Command::ImportDocument {
+                activity: None,
+                path: path.with_extension("absent"),
+            })
+            .unwrap();
+        wait(&backend, |frame| frame.error.is_some());
+        assert!(backend.frame.lock().unwrap().activity.is_none());
+        assert_eq!(
+            request(&socket, &json!({"op":"snapshot"})).unwrap()["activities"],
+            json!([])
+        );
+        backend
+            .commands
+            .send(Command::ImportDocument {
+                activity: None,
+                path: path.clone(),
+            })
+            .unwrap();
+        wait(&backend, |frame| {
+            frame.documents.values().any(|doc| {
+                doc["elements"]["editor"]["props"]["value"] == "Selected document λ 日本語"
+            })
+        });
+        assert!(backend.frame.lock().unwrap().activity.is_some());
+        backend.close();
+    }
+
+    use super::*;
+    #[test]
+    fn an_implicit_document_activity_is_created_once_and_reused() {
+        use std::os::unix::net::UnixListener;
+        let path = std::env::temp_dir().join(format!(
+            "agentos-initial-document-{}.sock",
+            super::super::nonce()
+        ));
+        let listener = UnixListener::bind(&path).unwrap();
+        let server = thread::spawn(move || {
+            let (mut conn, _) = listener.accept().unwrap();
+            let mut line = String::new();
+            BufReader::new(conn.try_clone().unwrap())
+                .read_line(&mut line)
+                .unwrap();
+            assert_eq!(
+                serde_json::from_str::<Value>(&line).unwrap(),
+                json!({"op":"create","name":"Personal"})
+            );
+            writeln!(conn, "{}", json!({"ok":true,"result":{"id":11}})).unwrap();
+        });
+        let mut frame = Frame::default();
+        assert_eq!(ensure_document_activity(&path, &mut frame).unwrap(), "11");
+        server.join().unwrap();
+        std::fs::remove_file(&path).unwrap();
+        // A second document needs no connection or duplicate activity mutation.
+        assert_eq!(ensure_document_activity(&path, &mut frame).unwrap(), "11");
+    }
+    #[test]
+    fn an_unconfirmed_activity_creation_is_not_retried_or_used() {
+        use std::os::unix::net::UnixListener;
+        let path = std::env::temp_dir().join(format!(
+            "agentos-unconfirmed-document-{}.sock",
+            super::super::nonce()
+        ));
+        let listener = UnixListener::bind(&path).unwrap();
+        let server = thread::spawn(move || {
+            let (mut conn, _) = listener.accept().unwrap();
+            let mut line = String::new();
+            BufReader::new(conn.try_clone().unwrap())
+                .read_line(&mut line)
+                .unwrap();
+            assert_eq!(
+                serde_json::from_str::<Value>(&line).unwrap()["op"],
+                "create"
+            );
+            writeln!(conn, "{}", json!({"ok":true,"result":{}})).unwrap();
+        });
+        let mut frame = Frame::default();
+        assert!(ensure_document_activity(&path, &mut frame).is_err());
+        assert!(frame.activity.is_none());
         server.join().unwrap();
         std::fs::remove_file(path).unwrap();
     }

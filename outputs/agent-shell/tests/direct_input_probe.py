@@ -69,7 +69,7 @@ def transfer_source():
     gi.require_version('Gtk','4.0');gi.require_version('Gdk','4.0')
     from gi.repository import Gtk,Gdk,GLib
     receipts=Path(sys.argv[sys.argv.index('--transfer-source')+1])
-    state={'begun':0,'ended':0,'primary':0}
+    state={'begun':0,'ended':0,'primary':0,'clipboard':0}
     def record():
         temporary=receipts.with_suffix('.tmp');temporary.write_text(json.dumps(state));temporary.replace(receipts)
     app=Gtk.Application(application_id='com.agentos.TransferFixture')
@@ -89,7 +89,13 @@ def transfer_source():
             state['primary']+=1;record()
         primary.connect('clicked',publish)
         box.append(primary)
-        window=Gtk.ApplicationWindow(application=app,title='Direct transfer source',default_width=300,default_height=180,child=box)
+        if '--terminal-clipboard' in sys.argv:
+            clipboard=Gtk.Button(label='Publish terminal clipboard')
+            def publish_clipboard(*_):
+                Gdk.Display.get_default().get_clipboard().set_content(Gdk.ContentProvider.new_for_bytes('text/plain;charset=utf-8',GLib.Bytes.new(' λ 日本語'.encode())))
+                state['clipboard']+=1;record()
+            clipboard.connect('clicked',publish_clipboard);box.append(clipboard)
+        window=Gtk.ApplicationWindow(application=app,title='Direct transfer source',default_width=300,default_height=220 if '--terminal-clipboard' in sys.argv else 180,child=box)
         record();window.present()
     app.connect('activate',activate);app.run([])
 
@@ -104,7 +110,7 @@ def assistive():
             node=queue.popleft()
             try:
                 observed.append((node.name,node.getRoleName()))
-                if node.name==name and (node.getRole()==role or role is None and node.queryAction().nActions):return node
+                if node.name==name and (node.getRole()==role or role==-1 or role is None and node.queryAction().nActions):return node
                 queue.extend(node[index] for index in range(min(node.childCount,128)))
             except (RuntimeError,LookupError,NotImplementedError):pass
         errors=[row for row in observed if any(word in row[0].lower() for word in ('stale','diverg','conflict','undo','lease'))]
@@ -116,6 +122,20 @@ def assistive():
                 control=find('Agent Monitor' if request=='open-monitor' else 'Arrange workspace',pyatspi.ROLE_PUSH_BUTTON if request=='open-monitor' else None)
                 response={'expanded':control.getState().contains(pyatspi.STATE_EXPANDED)}
                 if request!='arrange-status':response['requested']=control.queryAction().doAction(0)
+                print(json.dumps(response),flush=True);continue
+            if request.startswith('terminal:'):
+                action=request.split(':',1)[1]
+                if action in ('attach','detach','attach-state'):
+                    control=find('Detach terminal' if action=='detach' else 'Attach terminal',pyatspi.ROLE_PUSH_BUTTON)
+                    response={'sensitive':control.getState().contains(pyatspi.STATE_SENSITIVE)}
+                    if action!='attach-state':response['requested']=control.queryAction().doAction(0)
+                elif action=='status':
+                    find('Attached · input goes directly to this running terminal',-1)
+                    response={'attached':True}
+                else:
+                    terminal=find('Kernel terminal fixture',pyatspi.ROLE_TERMINAL)
+                    r=terminal.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
+                    response={'point':[r.x+r.width/2,r.y+r.height/2],'focused':terminal.getState().contains(pyatspi.STATE_FOCUSED)}
                 print(json.dumps(response),flush=True);continue
             if request.startswith('transfer:'):
                 button=find(request.split(':',1)[1],pyatspi.ROLE_PUSH_BUTTON)
@@ -155,7 +175,7 @@ def assistive():
         print(json.dumps(response),flush=True)
 
 
-def verify(metrics,output,core,scene,target,login_user,presentation):
+def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False):
     subprocess.run(['modprobe','uinput'],check=True)
     # Join only this test session's accessibility bus; never inspect other users.
     bus=None;observer_runtime=None;wayland=None;deadline=time.monotonic()+10
@@ -215,6 +235,32 @@ def verify(metrics,output,core,scene,target,login_user,presentation):
             except OSError:pass
         time.sleep(.5) # bounded kernel/udev/libinput hotplug discovery
         width,height=output['width'],output['height']
+        if terminal_input:
+            receipts=metrics/'transfer-receipts.json'
+            with (metrics/'transfer-source.log').open('w') as log:
+                source_client=subprocess.Popen(['runuser','-u',login_user,'--','python3',str(Path(__file__).resolve()),'--transfer-source',str(receipts),'--terminal-clipboard'],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+            deadline=time.monotonic()+10
+            while True:
+                observed=scene();source=next((row for row in observed['windows'] if row['title']=='Direct transfer source'),None)
+                logical=observed['shared']['identities'].get(source['id']) if source else None
+                if logical:break
+                if source_client.poll() is not None:raise RuntimeError('Terminal clipboard source exited')
+                if time.monotonic()>deadline:raise RuntimeError('Terminal clipboard source did not register')
+                time.sleep(.05)
+            while True:
+                workspace=next(doc for doc in scene()['shared']['workspaces'].values() if doc['activity_id']==core('presentation.get')['activity_id'])
+                try:
+                    presentation({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':'terminal-source-'+str(time.time_ns()),'expected_revisions':{workspace['workspace_id']:workspace['revision']},'operations':[{'op':'workspace.edit','workspace_id':workspace['workspace_id'],'edit':{'kind':'float','surface_id':logical,'output_id':next(iter(workspace['outputs'])),'x':980,'y':0,'width':300,'height':220}}]})
+                    break
+                except RuntimeError as exc:
+                    if '"code":"stale_revision"' not in str(exc) or time.monotonic()>deadline:raise
+                    time.sleep(.05)
+            while next(row for row in scene()['windows'] if row['id']==source['id'])['geometry']!={'x':980,'y':0,'width':300,'height':220}:
+                if time.monotonic()>deadline:raise RuntimeError('Terminal clipboard source geometry did not settle')
+                time.sleep(.05)
+            import direct_terminal_probe
+            direct_terminal_probe.verify(metrics,output,core,scene,login_user,presentation,snapshot,keyboard,pointer)
+            return
         def click(point):
             geometry=next(row['geometry'] for row in scene()['windows'] if row['id']==target)
             x,y=point[0]+geometry['x'],point[1]+geometry['y']

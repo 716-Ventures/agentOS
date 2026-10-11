@@ -12,6 +12,30 @@ pub struct PtyView {
 impl PtyView {
     pub fn new(label: &str, source: &str, activity: &str) -> Self {
         let view = Rc::new(ui::TerminalView::new(label).unwrap());
+        // Terminal application shortcuts are host policy; VTE otherwise forwards
+        // Ctrl+Shift+V as program input. Keep ordinary Ctrl+C available to the PTY.
+        let keys = gtk::EventControllerKey::new();
+        keys.set_propagation_phase(gtk::PropagationPhase::Capture);
+        let terminal = Rc::downgrade(&view);
+        keys.connect_key_pressed(move |_, key, _, modifiers| {
+            use gtk::gdk::{Key, ModifierType as M};
+            let relevant = M::CONTROL_MASK | M::SHIFT_MASK | M::ALT_MASK | M::SUPER_MASK | M::META_MASK | M::HYPER_MASK;
+            if modifiers & relevant != (M::CONTROL_MASK | M::SHIFT_MASK) {
+                return glib::Propagation::Proceed;
+            }
+            let Some(terminal) = terminal.upgrade() else { return glib::Propagation::Proceed; };
+            if matches!(key, Key::c | Key::C) {
+                terminal.terminal.emit_by_name::<()>("copy-clipboard", &[]);
+            } else if matches!(key, Key::v | Key::V) {
+                if terminal.input_enabled() {
+                    terminal.terminal.emit_by_name::<()>("paste-clipboard", &[]);
+                }
+            } else { return glib::Propagation::Proceed; }
+            glib::Propagation::Stop
+        });
+        view.terminal.add_controller(keys);
+        view.terminal.set_tooltip_text(Some("Copy: Ctrl+Shift+C · Paste: Ctrl+Shift+V (attached only)"));
+        view.terminal.update_property(&[gtk::accessible::Property::Description("Ctrl+Shift+C copies selected terminal text. Ctrl+Shift+V pastes only while attached. Ctrl+C remains program input.")]);
         let widget = ui::column(8);
         widget.append(&view.widget);
         let notice = ui::text("Detached · attach explicitly to send keyboard input", false);

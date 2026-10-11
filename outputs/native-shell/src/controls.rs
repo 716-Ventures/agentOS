@@ -465,10 +465,8 @@ impl Controls {
     }
     pub fn update(&mut self, frame: &Frame, _commands: &Sender<Command>) {
         self.images.update(frame);
-        self.import_document
-            .set_sensitive(frame.connected && frame.activity.is_some());
-        self.new_document
-            .set_sensitive(frame.connected && frame.activity.is_some());
+        self.import_document.set_sensitive(frame.connected);
+        self.new_document.set_sensitive(frame.connected);
         *self.activity.borrow_mut() = frame.activity.clone();
         self.workspace.update(frame);
         let voice = self.voice.state.lock().unwrap().clone();

@@ -67,6 +67,8 @@ def serve():
             except ValueError as exc:response={'ok':False,'error':str(exc)}
             conn.sendall(json.dumps(response).encode()+b'\n')
 threading.Thread(target=serve,daemon=True).start()
+# A rejected durable observation must not block this unrelated live job.
+publisher.mark({**job,'id':'d'*32,'activity':2147483647})
 publisher.mark(job);publisher.start();print(source,flush=True)
 try:
     for line in sys.stdin:
