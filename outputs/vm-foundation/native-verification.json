@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-10-11T03:34:46.759771+00:00",
+  "started_at": "2026-10-11T04:04:37.468880+00:00",
   "result": "pass",
   "vm_uuid": "27176EA2-E994-4165-9BBA-70FEED59E66B",
   "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -75,22 +75,21 @@
     "native control latency outside the measured editor profile; physical display and live inference-load latency"
   ],
   "deployment": {
-    "created_at": "2026-10-11T03:35:00.105622+00:00",
-    "source_archive_sha256": "e2666a11f9e5e08832908b6c06a9fd0b78486be64ae5d16981653723ddaa9170",
-    "repository_revision": "f7fa6553b0b03902603ca0cc282c1d429d323978",
+    "created_at": "2026-10-11T04:04:50.870464+00:00",
+    "source_archive_sha256": "6583c292e637ec2fe1ed8012cef58a87afcbf49b9e1db78a9681fc4896e1a192",
+    "repository_revision": "cf5466688f792c25203d58435f50c2992cb23961",
     "source_changes": [
       " M outputs/agent-shell/Cargo.lock",
       " M outputs/agent-shell/Cargo.toml",
-      " M outputs/agent-shell/tests/direct_display_guest.py",
-      " M outputs/agent-shell/tests/direct_input_probe.py",
-      "AM outputs/agent-shell/tests/direct_table_probe.py",
       " M outputs/native-shell/Cargo.lock",
       " M outputs/native-shell/Cargo.toml",
-      " M outputs/native-shell/README.md"
+      " M outputs/native-shell/README.md",
+      " M outputs/native-shell/src/main.rs",
+      " M outputs/native-shell/src/verification.rs"
     ],
     "installed": true
   },
-  "runtime_release": "ec5787f4a0439dc50befb946d8db214a0c804f06dd9054a572d01a586958dafc",
+  "runtime_release": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
   "dependency_manifest": {
     "packages": {
       "adduser": "3.152",
@@ -880,11 +879,11 @@
     "python": "Python 3.9.6"
   },
   "guest_stopped": true,
-  "finished_at": "2026-10-11T03:41:48.711966+00:00",
+  "finished_at": "2026-10-11T04:11:56.123185+00:00",
   "public_ui_release": {
-    "tag": "v0.1.0-alpha.30",
-    "revision": "0e6b8d261b3f6cba29c320fd1fdea18a5f23dd41",
-    "public_ci_run": 38108258811
+    "tag": "v0.1.0-alpha.31",
+    "revision": "800e8733bbcd7dafdbfc560d3a13c2677a4f4de6",
+    "public_ci_run": 38110039741
   },
   "additional_targeted_regressions": {
     "queued_initial_documents": {
@@ -1016,16 +1015,16 @@
       "collector_sha256": "847cfb831aa9982543abf8841d240f2d3c64fc191795fa2564d582b2cc23305a"
     },
     "native_gtk_presentation_feedback": {
-      "runtime_release": "ec5787f4a0439dc50befb946d8db214a0c804f06dd9054a572d01a586958dafc",
+      "runtime_release": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
       "measurement": {
         "clock_id": 1,
         "discarded": 0,
         "format": 1,
         "invalid": 0,
-        "max_ms": 48,
+        "max_ms": 49,
         "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-        "p50_ms": 37,
-        "p95_ms": 48,
+        "p50_ms": 39,
+        "p95_ms": 49,
         "pending": 0,
         "presented": 20,
         "requested": 20,
@@ -1040,11 +1039,11 @@
         "Existing editor, arrangement, transfer, VTE clipboard/menu/IME, VT and lifecycle journeys pass in the full reproduction"
       ],
       "collector_sha256": "03ca158ae7254431d6e5d632bcd099136f9a80712142cb5796303a1fc6db8739",
-      "probe_sha256": "fc25954f26948023a060b71ff434b1d1138e907971ae25405351753877adb599",
+      "probe_sha256": "07741bf3e654f0c214ca1c9488e4a6bf1ef8a4341d7a408418add99ffefbc62e",
       "baseline_log_sha256": "5e3eceeeae3550f67cab15076a031cf5d9adeda13e4ccdb0ab58112df6baa60b",
       "targeted_log_sha256": "654add5b529532736165de1b254979b802250e408df5a71fcfa1fef88164c2b6",
       "full_reproduction_log_sha256": "ebe66b465b537f99cf731d45541c4a6bb5df2a9599c5c35df48e9d332091e6e7",
-      "display_log_sha256": "7a39c734148757b05b28079314c8f1f23e399784ce753e485b03747f384b784d",
+      "display_log_sha256": "ae304f746993dd596b69d5a67ef34a0d165d023f0cdc6a02eb0e82d02c6e3788",
       "boundary": "Opt-in diagnostics with at most 256 key-triggered requests per window. No key codes, text or document identity recorded. Event millisecond quantization contributes less than 1ms. This native editor/UTM profile does not qualify every control, physical display, subjective responsiveness or live inference load.",
       "typing_fixture_sha256": "01f8bc588e4dd90583824479172861d03ed6000ac1dd16393225f318ec15982c",
       "cpu_job_profile": {
@@ -1053,21 +1052,21 @@
           "discarded": 0,
           "format": 1,
           "invalid": 0,
-          "max_ms": 46,
+          "max_ms": 48,
           "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-          "p50_ms": 35,
-          "p95_ms": 46,
+          "p50_ms": 36,
+          "p95_ms": 47,
           "pending": 0,
           "presented": 20,
           "requested": 20,
           "sample_limit": 256,
           "profile": "two concurrent broker CPU jobs",
           "job_cpu_usage_usec": [
-            2775431,
-            2818897
+            2361990,
+            2363975
           ]
         },
-        "log_sha256": "69e271690f1ba99284a53a007c02d1bc81342cb3862d3908177b1045a8051b84",
+        "log_sha256": "49532a5aa8b06b36fa1db5f8d90d00e14744655a2224ff270b7db7b842d0430f",
         "targeted_log_sha256": "0755068a7baae888347be14f2d749bc50e230c3fc8e3f67dae8b7ad1e7b78dc1",
         "qualified": [
           "Two distinct real broker jobs consumed CPU throughout measurement",
@@ -1136,10 +1135,39 @@
         "Owned peer/device/session/VM/app cleanup"
       ],
       "boundary": "Synthetic kernel/virtual-display and selected native control profiles. Physical input, complete screen-reader use, exact upstream motion/geometry and live model inference remain unqualified."
+    },
+    "native_form_owner_release": {
+      "runtime_release": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
+      "public_ui_release": {
+        "tag": "v0.1.0-alpha.31",
+        "revision": "800e8733bbcd7dafdbfc560d3a13c2677a4f4de6",
+        "public_ci_run": 38110039741
+      },
+      "baseline_log_sha256": {
+        "multiline": "dfbe3fec7e2939f8c02ddf119a051333791e99bf017648fec557c50d935a8703",
+        "toggle": "485ee1a0a080ff6a6f8785a139faaca6c2e68d1eec73aa73b2557d4f93619209"
+      },
+      "qualified_log_sha256": {
+        "standalone_gallery": "6add1f29eaa362fded239a26087c849ccd1c9e4319a269b4353dd2aa6ff15cff",
+        "native_forms": "026a69bf9b815b4bc2f06e2400ab2a592ec93b670fe3d8e54d8c084cd5d7a7ce",
+        "full_reproduction": "ebe66b465b537f99cf731d45541c4a6bb5df2a9599c5c35df48e9d332091e6e7"
+      },
+      "native_fixture_sha256": "24933bf6c73cf61871f10298f2861eeac8356b564ff7e50b4f6d76c759214b8d",
+      "public_fixture_sha256": "c3d8c26f7ec96bd5098a5756091c1b00fb396015fe9ced0beca485fa1eafcd75",
+      "qualified": [
+        "Exact Unicode multiline change and Ctrl+Enter submit callbacks; plain Return does not submit",
+        "Remaining host clones retain the editor; final close releases view, buffer and host callback captures",
+        "Unavailable recovered Toggle draft correction clears its notice/inconsistent state and retains the exact human draft",
+        "Toggle control and notice release after closure; Choice, single-line TextField, multiline TextField and DocumentEditor release native containers and shared draft captures",
+        "Complete standalone gallery, Linux CI and all 60 installed UTM reproduction checks",
+        "Owned displays, native clients, guest and UTM app closed"
+      ],
+      "boundary": "Native callback/ownership and synthetic kernel/virtual-output evidence; complete physical input, speech, screen-reader use and live inference remain unqualified."
     }
   },
   "observations": [
-    "The earlier intermittent Close/Undo stress failure recorded a later empty conventional window placement. Unbuffered-toplevel publication was reproduced and corrected; ten consecutive installed journeys then passed. Later genuine placement changes intentionally still reject Undo."
+    "The earlier intermittent Close/Undo stress failure recorded a later empty conventional window placement. Unbuffered-toplevel publication was reproduced and corrected; ten consecutive installed journeys then passed. Later genuine placement changes intentionally still reject Undo.",
+    "Clean v9 qualification exposed one primary-transfer destination focus failure; an instrumented repeat and complete fresh-copy run passed without a runtime change. The observation remains open; the kernel fixture now records the last click, actual pointer location and full workspace/error state on focus failure."
   ],
   "owned_utm_app_closed": true
 }

@@ -458,10 +458,12 @@ fn construct(
                     .set_inconsistent(value != "true" && value != "false");
                 toggle.widget.append(&notice);
                 let warning = notice.clone();
-                let control = toggle.control.clone();
+                let control = toggle.control.downgrade();
                 toggle.on_changed(move |value| {
                     warning.set_visible(false);
-                    control.set_inconsistent(false);
+                    if let Some(control) = control.upgrade() {
+                        control.set_inconsistent(false);
+                    }
                     changed(value.to_string());
                 });
                 result.selection_notice = Some(notice);

@@ -1,6 +1,43 @@
 //! Explicit --self-test and opt-in private IME fixture setup.
 use super::*;
 use std::sync::mpsc;
+fn verify_form_owners(frame: &Frame, commands: &Sender<Command>) {
+    let drafts = Arc::new(Mutex::new(BTreeMap::new()));
+    let baseline = Arc::strong_count(&drafts);
+    let mut recovered = frame.clone();
+    recovered.drafts.insert(("form-owners".into(), "toggle".into()), json!({"draft_revision":7,"draft":"unavailable"}));
+    let element = construct("form-owners", "1", "toggle", &json!({"type":"Toggle@1","props":{"label":"Recover toggle","value":false}}), &recovered, commands, &drafts);
+    let toggle = element.toggle.as_ref().unwrap();
+    let notice = element.selection_notice.as_ref().unwrap();
+    assert!(toggle.control.is_inconsistent() && notice.is_visible());
+    toggle.control.set_active(true);
+    assert!(!toggle.control.is_inconsistent() && !notice.is_visible());
+    assert_eq!(drafts.lock().unwrap()[&("form-owners".into(), "toggle".into())].text, "true");
+    let weak = toggle.control.downgrade();
+    let warning = notice.downgrade();
+    drop(element);
+    assert!(weak.upgrade().is_none(), "Closed toggle retained its own change callback");
+    assert!(warning.upgrade().is_none(), "Closed toggle retained its recovery notice");
+    assert_eq!(Arc::strong_count(&drafts), baseline, "Closed toggle retained shared drafts");
+    for (id, node) in [
+        ("choice", json!({"type":"Choice@1","props":{"label":"Choice","options":["First","Second"],"value":"First"}})),
+        ("field", json!({"type":"TextField@1","props":{"label":"Field","value":"Original"}})),
+        ("multiline", json!({"type":"TextField@1","props":{"label":"Multiline","multiline":true,"value":"Original"}})),
+        ("editor", json!({"type":"DocumentEditor@1","props":{"label":"Editor","value":"Original"}})),
+    ] {
+        let element = construct("form-owners", "1", id, &node, frame, commands, &drafts);
+        let weak = element.widget.downgrade();
+        if let Some(area) = &element.area {
+            area.view.buffer().set_text("Edited λ\n日本語");
+            assert_eq!(drafts.lock().unwrap()[&("form-owners".into(), id.into())].text, "Edited λ\n日本語");
+        }
+        drop(element);
+        assert!(weak.upgrade().is_none(), "Closed {id} retained its native container");
+        assert_eq!(Arc::strong_count(&drafts), baseline, "Closed {id} retained shared drafts");
+    }
+    println!("CHECK: recovered toggle correction and final native control/notice/draft-owner release");
+    println!("CHECK: choice, text field, multiline and document editor release native owners and shared drafts");
+}
 fn verify_container_replacement(
     app: &gtk::Application,
     frame: &Frame,
@@ -257,6 +294,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         frame.resources.insert(reference.into(),Arc::new(ui::content::image_hex(image["png_hex"].as_str().unwrap()).unwrap()));
         let (commands,rx)=mpsc::channel();let drafts=Arc::new(Mutex::new(BTreeMap::new()));
         frame.core=transport::request(&socket,&json!({"op":"snapshot"})).unwrap();frame.activity=doc["activity_id"].as_str().map(String::from);frame.usage=json!({"unavailable":true});frame.broker=json!([]);
+        verify_form_owners(&frame,&commands);
         verify_container_replacement(app,&frame,&commands,&drafts);
         image_controls::verify();
         let mut controls=controls::Controls::new(app,commands.clone());controls.verify_controls(&frame,&commands);
