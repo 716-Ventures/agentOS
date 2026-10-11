@@ -38,7 +38,7 @@ pub fn text_only(before: &Value, after: &Value) -> bool {
         if previous == node {
             continue;
         }
-        if matches!(node["type"].as_str(), Some("TextField@1" | "DocumentEditor@1")) {
+        if matches!(node["type"].as_str(), Some("TextField@1" | "DocumentEditor@1" | "Choice@1" | "Toggle@1")) {
             let mut comparable = previous.clone();
             if let Some(message) = node["props"].get("validation_message") {
                 comparable["props"]["validation_message"] = message.clone();
@@ -65,7 +65,7 @@ mod tests {
     use serde_json::json;
     #[test]
     fn feedback_can_change_without_authorizing_text_structure_or_actions() {
-        for kind in ["TextField@1", "DocumentEditor@1"] {
+        for kind in ["TextField@1", "DocumentEditor@1", "Choice@1", "Toggle@1"] {
             let mut before=json!({"revision":0,"root":"field","elements":{"field":{"type":kind,"props":{"label":"Draft","value":"Saved"}}},"actions":{},"bindings":{}});
             for message in [Some("Choose a saved workspace."),Some("Readable 日本語 λ"),None] {
                 let mut after=before.clone();after["revision"]=json!(before["revision"].as_u64().unwrap()+1);

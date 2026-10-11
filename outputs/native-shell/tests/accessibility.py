@@ -17,10 +17,10 @@ def wait(predicate,description):
     raise AssertionError(description)
 
 
-def find(name,role):
+def find(name,role,root=None):
     found=[]
     def search():
-        queue=deque([pyatspi.Registry.getDesktop(0)])
+        queue=deque([root if root is not None else pyatspi.Registry.getDesktop(0)])
         visited=0
         while queue and visited<4096:
             node=queue.popleft();visited+=1
@@ -172,3 +172,49 @@ def verify_validation(call):
     activate(find('Discard draft',pyatspi.ROLE_PUSH_BUTTON))
     wait(lambda:draft() is None and text(field)==props['value'],'Explicit Discard did not restore the validation draft')
     print('PASS: independent AT-SPI inline validation exposes literal error relation, preserves durable Unicode draft, rejects invalid transactions and clears without implicit Save')
+
+
+def verify_toggle_validation(call):
+    ident='toggle-validation-session-fixture'
+    activity=call({'op':'presentation.get','document_id':'session-fixture'})['activity_id']
+    props={'label':'Accessible validation toggle','value':False}
+    document={'protocol':'agentos.presentation/1','catalog_revision':'native-core/1','surface_id':ident,'activity_id':activity,'revision':0,'title':'Toggle validation fixture','root':'toggle','elements':{'toggle':{'type':'Toggle@1','props':props}},'actions':{},'bindings':{}}
+    def current():return call({'op':'presentation.get','document_id':ident})
+    def apply(operations,revision,expected=None):
+        return call({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':'toggle-validation-'+str(time.monotonic_ns()),'expected_revisions':expected if expected is not None else {ident:revision},'operations':operations})
+    assert apply([{'op':'surface.create','document':document}],None)['status']=='committed'
+    control=find(props['label'],pyatspi.ROLE_CHECK_BOX)
+    assert not control.getState().contains(pyatspi.STATE_CHECKED)
+    activate(control)
+    def draft():return call({'op':'draft.get','surface_id':ident,'element_id':'toggle'}).get('draft')
+    wait(lambda:draft()=='true','Accessible toggle did not retain a boolean draft')
+    message='Confirm this form requirement λ'
+    assert apply([{'op':'element.set_props','surface_id':ident,'element_id':'toggle','props':{**props,'validation_message':message}}],current()['revision'])['status']=='committed'
+    wait(lambda:control.getState().contains(pyatspi.STATE_INVALID_ENTRY),'Toggle invalid state is missing')
+    def related():
+        relations=[r for r in control.getRelationSet() if r.getRelationType()==ERROR_RELATION]
+        return len(relations)==1 and relations[0].getNTargets()==1 and text(relations[0].getTarget(0))==message
+    wait(related,'Toggle readable error is missing')
+    assert control.getState().contains(pyatspi.STATE_CHECKED) and draft()=='true'
+    assert current()['elements']['toggle']['props']['value'] is False
+    assert apply([{'op':'element.set_props','surface_id':ident,'element_id':'toggle','props':props}],current()['revision'])['status']=='committed'
+    wait(lambda:not control.getState().contains(pyatspi.STATE_INVALID_ENTRY),'Toggle invalid state did not clear')
+    wait(lambda:not any(r.getRelationType()==ERROR_RELATION for r in control.getRelationSet()),'Toggle error relation did not clear')
+    assert control.getState().contains(pyatspi.STATE_CHECKED) and draft()=='true'
+    frame=find('Agent view · Toggle validation fixture',pyatspi.ROLE_FRAME)
+    activate(find('Discard draft',pyatspi.ROLE_PUSH_BUTTON,root=frame))
+    wait(lambda:draft() is None and not control.getState().contains(pyatspi.STATE_CHECKED),'Explicit Discard did not restore the saved toggle')
+    assert current()['elements']['toggle']['props']['value'] is False
+    # The compositor has placed this view. Remove its workspace reference and
+    # document in one revision-guarded transaction, as the native Close path does.
+    expected={ident:current()['revision']};operations=[]
+    def contains(value):
+        if isinstance(value,dict):return value.get('surface_id')==ident or any(contains(v) for v in value.values())
+        return isinstance(value,list) and any(contains(v) for v in value)
+    for workspace in call({'op':'presentation.snapshot'})['documents'].values():
+        if 'workspace_id' in workspace and contains(workspace['outputs']):
+            expected[workspace['workspace_id']]=workspace['revision']
+            operations.append({'op':'workspace.edit','workspace_id':workspace['workspace_id'],'edit':{'kind':'remove','surface_id':ident}})
+    operations.append({'op':'surface.close','surface_id':ident})
+    assert apply(operations,expected[ident],expected)['status']=='committed'
+    print('PASS: independent AT-SPI toggle activation reaches the real durable draft; feedback and clearing retain the boolean without Save; scoped Discard restores committed state')

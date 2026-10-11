@@ -450,6 +450,7 @@ fn construct(
                     changed(value);
                 });
                 result.selection_notice = Some(notice);
+                result.validation = Some(choice.validation.clone());
                 lease(&choice.control.clone().upcast(), surface, id, commands);
                 draft_controls(&choice.widget, surface, id, commands, &events);
                 result.widget = choice.widget.clone().upcast();
@@ -474,6 +475,7 @@ fn construct(
                     changed(value.to_string());
                 });
                 result.selection_notice = Some(notice);
+                result.validation = Some(toggle.validation.clone());
                 lease(&toggle.control.clone().upcast(), surface, id, commands);
                 draft_controls(&toggle.widget, surface, id, commands, &events);
                 result.widget = toggle.widget.clone().upcast();

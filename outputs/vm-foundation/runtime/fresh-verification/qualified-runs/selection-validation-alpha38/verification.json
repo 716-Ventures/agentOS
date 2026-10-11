@@ -1,0 +1,76 @@
+{
+  "started_at": "2026-10-11T17:34:12.186560+00:00",
+  "source_revision": "d3676620ca5539275927dac024a9585dc21657d8",
+  "source_changes": [
+    " M outputs/agent-shell/Cargo.lock",
+    " M outputs/agent-shell/Cargo.toml",
+    " M outputs/agent-shell/release-contract.json",
+    " M outputs/agent-shell/src/presentation.rs",
+    " M outputs/agent-shell/tests/installation_guest.py",
+    " M outputs/agent-shell/tests/presentation_view_test.py",
+    " M outputs/native-shell/Cargo.lock",
+    " M outputs/native-shell/Cargo.toml",
+    " M outputs/native-shell/README.md",
+    " M outputs/native-shell/src/main.rs",
+    " M outputs/native-shell/src/reconcile.rs",
+    " M outputs/native-shell/src/verification.rs",
+    " M outputs/native-shell/tests/accessibility.py",
+    " M outputs/native-shell/tests/ime_accessibility.py",
+    " M outputs/native-shell/tests/native_session.py"
+  ],
+  "source_archive_sha256": "02d0c4b9acaa5fcdb775c18699a93f0f060fc2dfe79a415035dd158881e04935",
+  "passed": true,
+  "owned_utm_identity": [
+    78918,
+    "Sun Oct 11 13:34:12 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T17:36:21.473847+00:00",
+  "public_revision": "8d024b4d35968514a39319f78db754df29bc5b04",
+  "public_ci": 38159271662,
+  "host_core_tests": 63,
+  "linux_core_tests": 65,
+  "native_unit_tests": 33,
+  "fixture_only_ignored": 7,
+  "python_tests": 281,
+  "python_skips": 3,
+  "mapped_profiles": 4,
+  "independent_sessions": [
+    "normal",
+    "screen-keyboard",
+    "display-zoom",
+    "ime-editor"
+  ],
+  "installed_checks": [
+    "saved text/choice/toggle validation property preflight",
+    "compatible rollback",
+    "SIGKILL activation and rollback recovery",
+    "signed nested-notice graphical bundle staging",
+    "probe cleanup"
+  ],
+  "initial_failure": "New independent Toggle journey passed validation/draft/Discard assertions, then test cleanup tried to close a placed surface without removing its workspace reference. Corrected fixture removes workspace placement and document atomically with exact revisions; production guards unchanged. A second attempt passed all native sessions but rejected the new rollback test request IDs containing the component version separator @. Fixture request IDs now use the component name within the existing allowed identity syntax. A third attempt exposed an absent AT-SPI child during the newly closed view teardown; the rendered-text observer now skips None children just as the existing named-control observer does, keeping the same deadline and exact text requirement.",
+  "changes_after_qualification": [
+    "Documentation, evidence and trailing whitespace only"
+  ],
+  "not_tested": [
+    "complete installed-system reproduction (next)",
+    "live providers",
+    "physical input/audio/GPU/multi-output",
+    "screen-reader validation announcements",
+    "complete shadcn Select/Checkbox appearance/motion"
+  ],
+  "evidence_sha256": {
+    "host-core.log": "bd956b10d9cbc49090c417a598f9579e514f115d5e4149110ee4205339684f90",
+    "staging-interrupted-verification.json": "6c99bbd568e627fb1c702523e596648c29eec5a0cbcbfe322f5340d6b1e5859a",
+    "tree-observer-regression.log": "653a2de867af36ab212162d2c8a193bc97490d2cd27fe253ed993edc92268e8a",
+    "rollback-initial-driver.log": "aba9ad5621c1d8fbb2cbba0ef61d2cbaa07624dcc87cf864797d06c3bb06c375",
+    "initial-driver.log": "316afba0d209017e238e90ffb248f6d7104696558cb7a49476afbde2fad6a670",
+    "staging-interrupted-driver.log": "ba7fe0c6f469bfab7919b3d1dae3cafb59b3ffa0a37f4acd5b215da9fec7e805",
+    "driver.log": "7de0910fbe659e964dd2d152a47b89d89f9d60fb6ff442046b58b2b3199d0049",
+    "tree-initial-driver.log": "743613d55e247d54d20b077239d63b36f2c77ecef66fbccd5248c79d250c2f41",
+    "tree-initial-verification.json": "4d86776a54d3ff5484ab98179739c96cf76e070c01f2821077edd92b5a062733",
+    "host-python.log": "b5adbca5c9a077b0ab2ccf2d47c317aa36c5cc23d65a356874895d84cab0b878",
+    "rollback-initial-verification.json": "9ecd32163d0ac8feb0f22ea09874774de7ac6dc5161c616461a199815ac8253e",
+    "initial-verification.json": "f1c5836c9794ae09628effb2961d2728da61e2b6b72cb5fa1104a42ebc1a6802"
+  }
+}

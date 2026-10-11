@@ -1,0 +1,846 @@
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+   Compiling agent-os-core v0.5.0 (/home/developer/agent-os-source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.64s
+     Running unittests src/main.rs (target/debug/deps/agent_os_core-25c4ae0c4bc8d66c)
+
+running 65 tests
+test presentation::tests::adversarial_update_cannot_recurse_through_an_editing_lease ... ok
+test presentation::tests::broker_observations_are_scoped_monotonic_and_unwritable_by_presentation_clients ... ok
+test presentation::tests::atomic_rejection_stale_and_deduplicated_receipts ... ok
+test presentation::tests::closed_identities_cannot_be_recycled_and_undo_keeps_revisions_monotonic ... ok
+test presentation::tests::button_choices_and_dependent_icons_validate_atomically ... ok
+test presentation::tests::closed_view_undo_does_not_resurrect_input_but_preserves_draft_protection ... ok
+test presentation::tests::committing_a_native_draft_is_atomic_scoped_and_idempotent ... ok
+test presentation::tests::choice_and_toggle_drafts_are_typed_atomic_and_user_owned ... ok
+test presentation::tests::closing_a_placed_view_keeps_its_draft_and_undo_restores_it ... ok
+test presentation::tests::conventional_reconnect_never_adopts_another_live_compositors_window ... ok
+test presentation::tests::conventional_reconnect_requires_an_unambiguous_authenticated_process_and_dead_host ... ok
+test presentation::tests::conventional_surface_registration_is_host_scoped_and_placeholders_are_durable ... ok
+test presentation::tests::conventional_window_metadata_is_typed_scoped_and_host_observed ... ok
+test presentation::tests::dead_host_connections_do_not_exhaust_capacity_or_inflate_live_snapshots ... ok
+test presentation::tests::document_pages_are_bounded_scoped_and_refuse_mixed_revisions ... ok
+test presentation::tests::direct_workspace_edits_are_atomic_revisioned_and_undoable ... ok
+test presentation::tests::embedded_terminals_only_reference_registered_same_activity_broker_work ... ok
+test presentation::tests::file_metadata_is_typed_private_scoped_and_monotonic ... ok
+test presentation::tests::focused_user_geometry_preserves_another_process_input_and_draft ... ok
+test presentation::tests::human_reconnect_preserves_logical_identity_and_durable_receipt ... ok
+test presentation::tests::image_resources_are_immutable_scoped_human_owned_and_metadata_only_for_models ... ok
+test presentation::tests::inactive_activities_do_not_block_other_views ... ok
+test presentation::tests::labeled_sections_and_scroll_regions_validate_complete_nested_trees ... ok
+test presentation::tests::lists_and_key_value_groups_enforce_exact_cells_and_accessible_labels ... ok
+test presentation::tests::compact_change_pages_preserve_tombstones_and_guard_document_reads ... ok
+test presentation::tests::native_input_and_recovered_drafts_survive_agent_updates ... ok
+test presentation::tests::numeric_bindings_use_the_released_catalog_number_type ... ok
+test presentation::tests::malformed_trees_unknown_fields_and_executable_links_are_rejected ... ok
+test presentation::tests::ordered_subscription_and_reopen_preserve_receipts ... ok
+test presentation::tests::output_resize_disconnect_and_restore_preserve_preferred_work ... ok
+test presentation::tests::renderer_restart_can_recover_a_dead_process_draft_without_waiting_for_timeout ... ok
+test presentation::tests::references_are_scoped_guarded_and_survive_target_closure ... ok
+test presentation::tests::repeated_image_references_share_an_aggregate_decoded_pixel_budget ... ok
+test presentation::tests::result_and_error_content_is_bounded_typed_and_source_bindable ... ok
+test presentation::tests::shared_document_edits_persist_only_through_guarded_human_draft_commit ... ok
+test presentation::tests::rich_text_and_chart_literals_reject_unbounded_or_executable_shapes ... ok
+test presentation::tests::table_documents_validate_keyed_rows_before_native_allocation ... ok
+test presentation::tests::typed_source_bindings_are_live_and_cross_activity_access_is_rejected ... ok
+test presentation::tests::tabs_and_splits_require_complete_bounded_labeled_children ... ok
+test presentation::tests::undo_is_compensating_idempotent_and_rejects_divergence ... ok
+test presentation::tests::unused_image_release_is_human_owned_in_use_guarded_and_never_rebinds_an_identity ... ok
+test presentation::tests::workspace_enforces_outputs_placements_sizes_focus_and_provenance ... ok
+test presentation::tests::workspace_undo_preserves_new_focus_but_refuses_new_placement ... ok
+test presentation_actions::tests::defaults_are_stable_user_scoped_discoverable_and_keep_revocation ... ok
+test presentation_actions::tests::interrupted_callback_stays_unknown_until_observed_and_is_never_replayed ... ok
+test presentation_actions::tests::only_core_issued_scoped_callbacks_are_available ... ok
+test presentation_actions::tests::output_parameters_are_typed_bounded_and_cannot_change_the_target ... ok
+test presentation_actions::tests::retries_never_execute_a_callback_twice_and_changed_payloads_fail ... ok
+test presentation_actions::tests::stale_or_revoked_callbacks_do_not_allocate_execution_receipts ... ok
+test presentation_external_actions::tests::broker_adapter_sends_fixed_target_revision_and_activity_only ... ok
+test presentation_external_actions::tests::fixed_adapters_are_scoped_user_owned_revocable_and_receipted ... ok
+test tests::activities_and_history_survive_reopen ... ok
+test presentation::tests::document_page_byte_budget_keeps_large_collections_bounded ... ok
+test presentation::tests::validation_feedback_is_atomic_bounded_and_never_resolves_a_draft ... ok
+test tests::cancellation_is_idempotent_and_finishes_the_job ... ok
+test tests::invalid_commands_create_no_jobs ... ok
+test tests::log_pages_preserve_unicode_across_every_byte_boundary ... ok
+test tests::packaged_component_capabilities_match_the_validator ... ok
+test tests::removing_an_activity_preserves_files_and_can_be_reversed ... ok
+test tests::restart_marks_unfinished_jobs_without_replaying_them ... ok
+test tests::execution_records_real_exit_output_and_spawn_failure ... ok
+test tests::stale_mutations_leave_state_unchanged ... ok
+test presentation::tests::legacy_snapshot_and_subscription_require_bounded_reads_without_skipping_events ... ok
+test tests::event_history_pages_are_complete_scoped_and_byte_bounded ... ok
+test tests::runtime_pages_bound_bytes_preserve_history_and_reject_mixed_revisions ... ok
+
+test result: ok. 65 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.25s
+
+Dependency profile and installed versions unchanged.
+Verified offline speech assets: 9f796231bf027914973e24315967f66a2698220f2e40420d87155963793be634
+     Removed 253 files, 134.4MiB total
+     Removed 8 files, 9.1MiB total
+   Compiling agent-os-core v0.5.0 (/home/developer/agent-os-source)
+    Finished `release` profile [optimized] target(s) in 7.73s
+     Removed 587 files, 107.1MiB total
+     Removed 9 files, 7.1MiB total
+   Compiling agent-os-desktop v0.1.0-alpha.1 (/home/developer/agent-os-source/native-shell)
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+ --> src/document_dialog.rs:8:11
+  |
+8 | ) -> gtk::FileChooserNative {
+  |           ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:10:23
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:61:23
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:10:42
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:11:10
+   |
+11 |         .title(if save {
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:16:10
+   |
+16 |         .action(if save {
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:21:10
+   |
+21 |         .accept_label(if save { "Export" } else { "Import" })
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:22:10
+   |
+22 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:23:10
+   |
+23 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:24:10
+   |
+24 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+  --> src/document_dialog.rs:27:16
+   |
+27 |         dialog.set_current_name("document.txt");
+   |                ^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:31:40
+   |
+31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:61:42
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:62:10
+   |
+62 |         .title("Choose existing text file to review")
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:63:10
+   |
+63 |         .action(gtk::FileChooserAction::Open)
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:64:10
+   |
+64 |         .accept_label("Review replacement")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:65:10
+   |
+65 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:66:10
+   |
+66 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:67:10
+   |
+67 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:72:40
+   |
+72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: `agent-os-desktop` (bin "agent-os-desktop") generated 20 warnings
+    Finished `release` profile [optimized] target(s) in 8.77s
+     Removed 572 files, 148.7MiB total
+     Removed 9 files, 22.0MiB total
+   Compiling agent-os-compositor v0.1.0 (/home/developer/agent-os-source/native-compositor)
+warning: function `project` is never used
+ --> src/pressure.rs:5:8
+  |
+5 | pub fn project(
+  |        ^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: `agent-os-compositor` (bin "agent-os-compositor") generated 1 warning
+    Finished `release` profile [optimized] target(s) in 13.78s
+Collected dependency notices: 187
+Installed and healthy: 26486fa38bd1de7034f34baa5256b75f7b668259feae05e7d041eb84037a97f1
+Installed. Reconnect your login session for group membership, then run agent-os.
+   Compiling agent-os-desktop v0.1.0-alpha.1 (/home/developer/agent-os-source/native-shell)
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+ --> src/document_dialog.rs:8:11
+  |
+8 | ) -> gtk::FileChooserNative {
+  |           ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:10:23
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:61:23
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:10:42
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:11:10
+   |
+11 |         .title(if save {
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:16:10
+   |
+16 |         .action(if save {
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:21:10
+   |
+21 |         .accept_label(if save { "Export" } else { "Import" })
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:22:10
+   |
+22 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:23:10
+   |
+23 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:24:10
+   |
+24 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+  --> src/document_dialog.rs:27:16
+   |
+27 |         dialog.set_current_name("document.txt");
+   |                ^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:31:40
+   |
+31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:61:42
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:62:10
+   |
+62 |         .title("Choose existing text file to review")
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:63:10
+   |
+63 |         .action(gtk::FileChooserAction::Open)
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:64:10
+   |
+64 |         .accept_label("Review replacement")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:65:10
+   |
+65 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:66:10
+   |
+66 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:67:10
+   |
+67 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:72:40
+   |
+72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_file`: Since 4.10
+   --> src/document_dialog.rs:308:20
+    |
+308 |             dialog.set_file(&gtk::gio::File::for_path(&path)).unwrap();
+    |                    ^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+   --> src/document_dialog.rs:310:26
+    |
+310 |             while dialog.file().and_then(|file| file.path()).as_ref() != Some(&path) {
+    |                          ^^^^
+
+warning: `agent-os-desktop` (bin "agent-os-desktop" test) generated 22 warnings
+    Finished `test` profile [unoptimized] target(s) in 3.83s
+     Running unittests src/main.rs (native-shell/target/debug/deps/agent_os_desktop-aad9e5a2c9b7ce26)
+
+running 40 tests
+test broker_controls::tests::stored_input_preview_matches_the_frozen_proposal_and_byte_count ... ok
+test broker_controls::tests::stale_review_cannot_authorize_changed_command_or_input ... ok
+test document_dialog::initial_import_tests::accepted_file_selection_keeps_its_optional_activity_context ... ignored
+test action_parameters::tests::edited_parameters_are_bounded_data_and_cannot_select_a_command_or_target ... ok
+test broker_controls::tests::continuation_is_a_typed_existing_job_reference_without_command_text ... ok
+test broker_pages::tests::pages_scope_and_epoch_restarts_preserve_one_consistent_history ... ok
+test feedback_metrics::tests::key_clock_wrap_and_millisecond_quantization_are_preserved ... ok
+test feedback_metrics::tests::unknown_clock_future_input_and_invalid_receipts_do_not_become_fast_samples ... ok
+test input_context::tests::application_context_rejects_changed_disconnected_moved_or_forged_referents ... ok
+test input_context::tests::application_context_uses_authenticated_workspace_identity_never_a_title_match ... ok
+test input_context::tests::real_core_application_context_rechecks_registered_revision_and_connection ... ignored
+test input_context::tests::revoked_voice_and_cross_activity_context_stop_before_source_lookup ... ok
+test draft_cache::tests::private_recovery_roundtrip_preserves_revision_and_unicode ... ok
+test draft_cache::tests::corrupt_or_oversized_fields_do_not_become_recovered_edits ... ok
+test input_context::tests::selected_object_context_keeps_original_content_and_rejects_removed_or_moved_targets ... ok
+test presentation_pages::cache_tests::errors_keep_the_previous_consistent_cache_and_cancellation_sends_nothing ... ok
+test presentation_pages::cache_tests::unchanged_documents_are_not_refetched_and_tombstones_remove_old_views ... ok
+test presentation_pages::tests::cancellation_and_nonprogressing_cursors_stop_reads ... ok
+test presentation_pages::tests::retries_from_scratch_after_interleaved_edits ... ok
+test pty_transport::tests::real_broker_terminal_round_trip_and_reattach ... ignored, requires isolated Linux tmux broker fixture
+test log_view::tests::live_follow_refreshes_the_tail_and_selection_can_freeze_its_page ... ok
+test log_view::tests::pages_keep_identity_and_retry_the_same_offset_after_disconnect ... ok
+test pty_view::tests::manual_detach_restores_attach_without_a_source_refresh ... ignored
+test pty_transport::tests::terminal_pages_preserve_raw_bytes_and_require_exact_cursor_boundaries ... ok
+test reconcile::tests::confirmed_local_values_advance_without_granting_other_mutations ... ok
+test state_pages::tests::cancellation_and_invalid_cursors_stop_paging ... ok
+test reconcile::tests::unrelated_text_can_advance_but_fields_structure_and_authority_stay_frozen ... ok
+test timings::tests::disabled_diagnostics_do_not_collect_stages_or_files ... ok
+test state_pages::tests::scopes_jobs_and_restarts_after_interleaved_changes ... ok
+test timings::tests::percentiles_are_bounded_recent_samples_and_cumulative_mean_is_explicit ... ok
+test reconcile::tests::feedback_can_change_without_authorizing_text_structure_or_actions ... ok
+test transport::draft_revision_tests::save_refuses_a_revision_the_user_has_not_seen_and_retains_the_local_draft ... ok
+test transport::initial_document_tests::an_implicit_document_activity_is_created_once_and_reused ... ok
+test transport::draft_revision_tests::reviewed_save_rejects_a_changed_draft_without_committing_and_ends_its_lease ... ok
+test transport::initial_document_tests::import_into_an_empty_core_validates_before_creating_an_activity ... ignored
+test transport::initial_document_tests::initial_typed_requests_validate_before_creating_and_never_launch_on_broker_failure ... ignored
+test transport::initial_document_tests::queued_new_documents_reuse_the_confirmed_activity ... ignored
+test transport::draft_revision_tests::unfocused_edit_uses_a_temporary_lease_and_preserves_conflicting_drafts ... ok
+test transport::initial_document_tests::an_unconfirmed_activity_creation_is_not_retried_or_used ... ok
+test pty_transport::tests::attachment_retries_only_unwritten_input_and_detaches_on_drop ... ok
+
+test result: ok. 33 passed; 0 failed; 7 ignored; 0 measured; 0 filtered out; finished in 0.84s
+
+    Finished `dev` profile [unoptimized] target(s) in 0.03s
+   Compiling agent-os-desktop v0.1.0-alpha.1 (/home/developer/agent-os-source/native-shell)
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+ --> src/document_dialog.rs:8:11
+  |
+8 | ) -> gtk::FileChooserNative {
+  |           ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:10:23
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:61:23
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:10:42
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:11:10
+   |
+11 |         .title(if save {
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:16:10
+   |
+16 |         .action(if save {
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:21:10
+   |
+21 |         .accept_label(if save { "Export" } else { "Import" })
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:22:10
+   |
+22 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:23:10
+   |
+23 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:24:10
+   |
+24 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+  --> src/document_dialog.rs:27:16
+   |
+27 |         dialog.set_current_name("document.txt");
+   |                ^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:31:40
+   |
+31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:61:42
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:62:10
+   |
+62 |         .title("Choose existing text file to review")
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:63:10
+   |
+63 |         .action(gtk::FileChooserAction::Open)
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:64:10
+   |
+64 |         .accept_label("Review replacement")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:65:10
+   |
+65 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:66:10
+   |
+66 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:67:10
+   |
+67 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:72:40
+   |
+72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: `agent-os-desktop` (bin "agent-os-desktop") generated 20 warnings
+    Finished `dev` profile [unoptimized] target(s) in 3.86s
+   Compiling agent-os-compositor v0.1.0 (/home/developer/agent-os-source/native-compositor)
+    Finished `dev` profile [unoptimized] target(s) in 0.70s
+   Compiling agent-os-compositor v0.1.0 (/home/developer/agent-os-source/native-compositor)
+warning: function `project` is never used
+ --> src/pressure.rs:5:8
+  |
+5 | pub fn project(
+  |        ^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: `agent-os-compositor` (bin "agent-os-compositor") generated 1 warning
+    Finished `dev` profile [unoptimized] target(s) in 5.80s
+.....................................     Removed 18 files, 22.3MiB total
+     Removed 8 files, 1.0MiB total
+   Compiling agentos-cache-fixture v0.1.0 (/tmp/agentos-cache-regression-63468kn4)
+    Finished `release` profile [optimized] target(s) in 0.07s
+........................................................................./usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8ea13f10>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8e914220>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8e914310>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8e914400>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.........../usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8ec7eb60>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8e9149a0>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8e914b80>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8e914e50>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.../usr/lib/python3.13/pathlib/_local.py:277: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8ec7e3e0>
+  @property
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/pathlib/_local.py:277: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8e914e50>
+  @property
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/pathlib/_local.py:277: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8ec7eb60>
+  @property
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/pathlib/_local.py:277: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8e914310>
+  @property
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/pathlib/_local.py:277: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8e914f40>
+  @property
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8ec7e3e0>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.../usr/lib/python3.13/unittest/mock.py:799: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8ec7eb60>
+  def __setattr__(self, name, value):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:799: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8e914f40>
+  def __setattr__(self, name, value):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:799: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8e915210>
+  def __setattr__(self, name, value):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:799: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8e914e50>
+  def __setattr__(self, name, value):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:799: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8e914310>
+  def __setattr__(self, name, value):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:799: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffff8e9158a0>
+  def __setattr__(self, name, value):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+...................................................................................Session-owned screen reader started.
+Screen reader stopped (exit 1); desktop controls remain available.
+.Session-owned screen reader started.
+.....................................................................
+----------------------------------------------------------------------
+Ran 281 tests in 1.253s
+
+OK
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: f54377b28d9b78332a38ad8d3e727e06b020c79116c35dda146d944591127058
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: 053d91f750b495b78a6e505c06cd3aeb86c8492f20ae6edf78d9a8266671d99f
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: f9290cca929587683a2f29e1469b48f760cef71f724a90d6a04e4eec0007739a
+Installed and healthy: 0a1ca4afc8b7d7e3133a768f90bca3adaa047f2ef36f484dadbe91a4b47e5649
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: fe9db2e8e50d0b9e9e369546dd2e253cff8724d06c30f61bf097b0d5f441eb7a
+Installed and healthy: fe9db2e8e50d0b9e9e369546dd2e253cff8724d06c30f61bf097b0d5f441eb7a
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: 9bda9c7be8901f916db65412888ced3a379135f2e77fe635db33850fe98c2314
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: 559a66ce8a5e0197635bbb547d694831f3b7d69468fc33378493bdd53bee096a
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: accfd4660901b81066d7f384aea05ba2357acd14d257edad75191e6c6b5c641c
+Installed and healthy: f4d2a338b90f0edd1fe43e371c9f00c21d37053e025f80e29d48d4acb198dc7f
+Installed and healthy: 8ccf27552d9942597ed671107f2113b14e302fdc10d8b6034c97306568d3899f
+Installed and healthy: eefb3748c5db358172b9aa421f2153464b080ca51eb6e331b8624daf71c317a8
+Installed and healthy: 1b2a5a9792bda21d1560ae99ecc8da3ca7661e108a5466715b11efbd1fad79c3
+Installed and healthy: 01b92b015f2f11e6a9601b31aa837043feaeac3af2498eb58d6f413b8c6ed5af
+Installed and healthy: 17a81e3e33a855b2d3593b46e4952634da4ea4216894e8288fdbe3ad11de4af9
+Installed and healthy: 74ea2d209e7c7e49f5bc3f59d347a8dddef876a31d4461db620402e50238976d
+dbus-daemon[4548]: [session uid=1000 pid=4548 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=4569 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[4548]: [session uid=1000 pid=4548 pidfd=5] Successfully activated service 'org.a11y.Bus'
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: actual native field/editor and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+dbus-daemon[4588]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=4569 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[4588]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+CHECK: mapped native surface
+CHECK: authenticated immutable image resource and native texture
+CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+CHECK: native PTY renderer remains detached without running authorized work
+CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+CHECK: reference intent, revision and target disappearance/reappearance
+CHECK: virtualized work history with stable identities and recycled controls
+CHECK: selection and live binding preserved
+CHECK: typed numeric progress and invalid-range availability
+CHECK: local edit preserved
+CHECK: reordered retained widgets
+CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+PASS: native test core and private display cleaned up
+PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+dbus-daemon[4672]: [session uid=1000 pid=4672 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=4693 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[4672]: [session uid=1000 pid=4672 pidfd=5] Successfully activated service 'org.a11y.Bus'
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: actual native field/editor and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+dbus-daemon[4712]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=4693 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[4712]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+CHECK: mapped native surface
+CHECK: authenticated immutable image resource and native texture
+CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+CHECK: native PTY renderer remains detached without running authorized work
+CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+CHECK: reference intent, revision and target disappearance/reappearance
+CHECK: virtualized work history with stable identities and recycled controls
+CHECK: selection and live binding preserved
+CHECK: typed numeric progress and invalid-range availability
+CHECK: local edit preserved
+CHECK: reordered retained widgets
+CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+PASS: native test core and private display cleaned up
+PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+dbus-daemon[4797]: [session uid=1000 pid=4797 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=4833 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[4797]: [session uid=1000 pid=4797 pidfd=5] Successfully activated service 'org.a11y.Bus'
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: actual native field/editor and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+dbus-daemon[4852]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=4833 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[4852]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+CHECK: mapped native surface
+CHECK: authenticated immutable image resource and native texture
+CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+CHECK: native PTY renderer remains detached without running authorized work
+CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+CHECK: reference intent, revision and target disappearance/reappearance
+CHECK: virtualized work history with stable identities and recycled controls
+CHECK: selection and live binding preserved
+CHECK: typed numeric progress and invalid-range availability
+CHECK: local edit preserved
+CHECK: reordered retained widgets
+CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+PASS: native test core and private display cleaned up
+PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+dbus-daemon[4936]: [session uid=1000 pid=4936 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=4957 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[4936]: [session uid=1000 pid=4936 pidfd=5] Successfully activated service 'org.a11y.Bus'
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: actual native field/editor and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+dbus-daemon[4976]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=4957 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[4976]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+CHECK: mapped native surface
+CHECK: authenticated immutable image resource and native texture
+CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+CHECK: native PTY renderer remains detached without running authorized work
+CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+CHECK: reference intent, revision and target disappearance/reappearance
+CHECK: virtualized work history with stable identities and recycled controls
+CHECK: selection and live binding preserved
+CHECK: typed numeric progress and invalid-range availability
+CHECK: local edit preserved
+CHECK: reordered retained widgets
+CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+PASS: native test core and private display cleaned up
+PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+dbus-daemon[5060]: [session uid=1000 pid=5060 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=5079 comm="/tmp/agentos-session-test-5hbnbcxa/bin/agent-os-de")
+dbus-daemon[5060]: [session uid=1000 pid=5060 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[5097]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=5079 comm="/tmp/agentos-session-test-5hbnbcxa/bin/agent-os-de")
+dbus-daemon[5097]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI inline validation exposes literal error relation, preserves durable Unicode draft, rejects invalid transactions and clears without implicit Save
+PASS: independent AT-SPI toggle activation reaches the real durable draft; feedback and clearing retain the boolean without Save; scoped Discard restores committed state
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+dbus-daemon[5835]: [session uid=1000 pid=5835 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=5854 comm="/tmp/agentos-session-test-_9tdjkeo/bin/agent-os-de")
+dbus-daemon[5835]: [session uid=1000 pid=5835 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[5880]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=5854 comm="/tmp/agentos-session-test-_9tdjkeo/bin/agent-os-de")
+dbus-daemon[5880]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI inline validation exposes literal error relation, preserves durable Unicode draft, rejects invalid transactions and clears without implicit Save
+PASS: independent AT-SPI toggle activation reaches the real durable draft; feedback and clearing retain the boolean without Save; scoped Discard restores committed state
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+dbus-daemon[7788]: [session uid=1000 pid=7788 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=7807 comm="/tmp/agentos-session-test-yk5507dh/bin/agent-os-de")
+dbus-daemon[7788]: [session uid=1000 pid=7788 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[7833]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=7807 comm="/tmp/agentos-session-test-yk5507dh/bin/agent-os-de")
+dbus-daemon[7833]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: trusted display zoom changes real output/workspace geometry; doubled zoom preserves keyboard dismissal, local typing and exact reset; same-login control denied
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI inline validation exposes literal error relation, preserves durable Unicode draft, rejects invalid transactions and clears without implicit Save
+PASS: independent AT-SPI toggle activation reaches the real durable draft; feedback and clearing retain the boolean without Save; scoped Discard restores committed state
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+dbus-daemon[9808]: [session uid=1000 pid=9808 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=9828 comm="/tmp/agentos-session-test-_4ibib_x/bin/agent-os-de")
+dbus-daemon[9808]: [session uid=1000 pid=9808 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[9854]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=9828 comm="/tmp/agentos-session-test-_4ibib_x/bin/agent-os-de")
+dbus-daemon[9854]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: actual GTK text-input-v3 editor overflow preserves selected text, exact durable draft and committed value
+PASS: GTK text-input-v3 Unicode preedit/commit survives unrelated rendering; draft and Save remain distinct
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+Installed and healthy: 26486fa38bd1de7034f34baa5256b75f7b668259feae05e7d041eb84037a97f1
+Warning: The unit file, source configuration file or drop-ins of agent-os-core.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-layout.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-disk.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-broker.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-ai.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-voice.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Installed and healthy: 26486fa38bd1de7034f34baa5256b75f7b668259feae05e7d041eb84037a97f1
+Agent OS: {"code":"resource_limit","detail":"Invalid request identity or operation count"}
+Installed and healthy: bc1cb52d5c60acea73d931a3306834669878f7c3623efec451ba7cdc9ccac437
+Installed and healthy: 26486fa38bd1de7034f34baa5256b75f7b668259feae05e7d041eb84037a97f1
+Installed and healthy: bc1cb52d5c60acea73d931a3306834669878f7c3623efec451ba7cdc9ccac437
+Installed and healthy: bc1cb52d5c60acea73d931a3306834669878f7c3623efec451ba7cdc9ccac437
+Traceback (most recent call last):
+  File "/home/developer/agent-os-source/tests/installation_guest.py", line 174, in <module>
+    checks=interrupts() if operation=='interrupts' else rollbacks() if operation=='rollbacks' else [operation]
+                                                        ~~~~~~~~~^^
+  File "/home/developer/agent-os-source/tests/installation_guest.py", line 159, in rollbacks
+    property_rollback_guard(installer,source)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/developer/agent-os-source/tests/installation_guest.py", line 119, in property_rollback_guard
+    apply('validation-'+kind,current_doc['revision'],[{'op':'element.put','surface_id':ident,'element_id':'button','element':field}])
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/developer/agent-os-source/tests/installation_guest.py", line 91, in apply
+    return present({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
+                    'request_id':ident+'-'+request,'expected_revisions':{ident:expected},'operations':operations})
+  File "/home/developer/agent-os-source/tests/installation_guest.py", line 89, in present
+    return json.loads(subprocess.check_output(['agent-os','presentation','-'],input=json.dumps(value).encode()))
+                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 472, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+               **kwargs).stdout
+               ^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['agent-os', 'presentation', '-']' returned non-zero exit status 1.
+Requested orderly guest shutdown. Check status before restarting.
+{"started_at": "2026-10-11T17:29:25.054800+00:00", "source_revision": "d3676620ca5539275927dac024a9585dc21657d8", "source_changes": [" M outputs/agent-shell/Cargo.lock", " M outputs/agent-shell/Cargo.toml", " M outputs/agent-shell/release-contract.json", " M outputs/agent-shell/src/presentation.rs", " M outputs/agent-shell/tests/installation_guest.py", " M outputs/agent-shell/tests/presentation_view_test.py", " M outputs/native-shell/Cargo.lock", " M outputs/native-shell/Cargo.toml", " M outputs/native-shell/README.md", " M outputs/native-shell/src/main.rs", " M outputs/native-shell/src/reconcile.rs", " M outputs/native-shell/src/verification.rs", " M outputs/native-shell/tests/accessibility.py", " M outputs/native-shell/tests/native_session.py"], "source_archive_sha256": "c16ec960c575302865ca9727b177735686589f6ba582f5f502e719b7ca109633", "passed": false, "owned_utm_identity": [74726, "Sun Oct 11 13:29:25 2026"], "owned_utm_closed": true, "finished_at": "2026-10-11T17:31:32.354603+00:00"}
+Traceback (most recent call last):
+  File "/tmp/agentos-selection-validation-integration.py", line 31, in <module>
+    vm.ssh('cd /home/developer/agent-os-source && sudo -n python3 tests/installation_guest.py rollbacks && sudo -n python3 tests/installation_guest.py interrupts && python3 tests/graphical_release.py && sudo -n python3 tests/installation_guest.py cleanup',check=True)
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/vm.py", line 309, in ssh
+    return subprocess.run(ssh_args() + [command], **kwargs)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ssh', '-p', '22221', '-i', '/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/id_ed25519', '-o', 'IdentitiesOnly=yes', '-o', 'StrictHostKeyChecking=accept-new', '-o', 'UserKnownHostsFile=/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/known_hosts', '-o', 'ConnectTimeout=3', '-o', 'BatchMode=yes', '-o', 'LogLevel=ERROR', 'developer@127.0.0.1', 'cd /home/developer/agent-os-source && sudo -n python3 tests/installation_guest.py rollbacks && sudo -n python3 tests/installation_guest.py interrupts && python3 tests/graphical_release.py && sudo -n python3 tests/installation_guest.py cleanup']' returned non-zero exit status 1.

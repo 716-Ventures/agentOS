@@ -99,7 +99,8 @@
       "props": {
         "label": "string",
         "options": "stringlist",
-        "value": "string"
+        "value": "string",
+        "validation_message": "string"
       },
       "bindable": [],
       "events": [],
@@ -369,7 +370,8 @@
     "Toggle@1": {
       "props": {
         "label": "string",
-        "value": "boolean"
+        "value": "boolean",
+        "validation_message": "string"
       },
       "bindable": [],
       "events": [],

@@ -24,7 +24,7 @@ class Projection(unittest.TestCase):
         props['disabled']=True
         lines,controls=view.project(doc);self.assertIn('[button] Next 日本語 (disabled)','\n'.join(lines));self.assertNotIn('button',controls)
     def test_validation_feedback_is_literal_sanitized_and_keeps_the_edit_control(self):
-        for kind in ('TextField@1','DocumentEditor@1'):
+        for kind in ('TextField@1','DocumentEditor@1','Choice@1','Toggle@1'):
             doc=document();doc['elements']['field']['type']=kind
             doc['elements']['field']['props']['validation_message']='Choose <b>日本語</b> λ\x1b]52;c;evil\x07'
             lines,controls=view.project(doc,width=80);text='\n'.join(lines)

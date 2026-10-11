@@ -1,0 +1,1 @@
+PASS: absent AT-SPI children during teardown are skipped; exact Unicode marker still required and missing text still fails

@@ -57,15 +57,19 @@ fn verify_focused_draft_resolution(app: &gtk::Application, frame: &Frame, comman
 }
 
 fn verify_validation_feedback(app: &gtk::Application, frame: &Frame, commands: &Sender<Command>) {
-    for (kind,multiline) in [("TextField@1",false),("TextField@1",true),("DocumentEditor@1",false)] {
+    for (kind,multiline) in [("TextField@1",false),("TextField@1",true),("DocumentEditor@1",false),("Choice@1",false),("Toggle@1",false)] {
         let id="validation-resolution"; let key=(id.into(),"control".into());
         let drafts=Arc::new(Mutex::new(BTreeMap::new()));
         let mut doc=json!({"surface_id":id,"activity_id":"1","revision":0,"title":"Validation feedback","root":"control","elements":{"control":{"type":kind,"props":{"label":"Stable editor","value":"Saved","multiline":multiline}}},"actions":{},"bindings":{}});
-        if kind=="DocumentEditor@1" {doc["elements"]["control"]["props"].as_object_mut().unwrap().remove("multiline");}
+        if kind!="TextField@1" {doc["elements"]["control"]["props"].as_object_mut().unwrap().remove("multiline");}
+        if kind=="Choice@1" {doc["elements"]["control"]["props"]["options"]=json!(["Saved","Unsaved λ 日本語"]);}
+        if kind=="Toggle@1" {doc["elements"]["control"]["props"]["value"]=json!(false);}
         let mut surface=Surface::new(app,id,commands);surface.update(id,&doc,frame,commands,&drafts);
         let element=&surface.elements["control"];let original=element.widget.clone();
         if let Some(field)=&element.field {assert!(field.entry.grab_focus());field.entry.set_text("Unsaved λ 日本語");field.entry.select_region(0,3);}
         if let Some(area)=&element.area {assert!(area.view.grab_focus());area.view.buffer().set_text("Unsaved λ 日本語");area.view.buffer().select_range(&area.view.buffer().start_iter(),&area.view.buffer().iter_at_offset(3));}
+        if let Some(choice)=&element.choice {assert!(choice.control.grab_focus());choice.control.set_selected(1);}
+        if let Some(toggle)=&element.toggle {assert!(toggle.control.grab_focus());toggle.control.set_active(true);}
         let focus=gtk::prelude::RootExt::focus(&surface.window);let draft=drafts.lock().unwrap()[&key].clone();
         for (revision,message) in [(1,Some("Literal <b>日本語</b> λ")),(2,Some("Choose another name.")),(3,None),(4,Some("Keep selected error"))] {
             doc["revision"]=json!(revision);
@@ -76,6 +80,8 @@ fn verify_validation_feedback(app: &gtk::Application, frame: &Frame, commands: &
             let feedback=element.validation.as_ref().unwrap();assert_eq!(feedback.label.is_visible(),message.is_some());assert_eq!(feedback.label.text(),message.unwrap_or(""));
             if let Some(field)=&element.field {assert_eq!(field.entry.text(),"Unsaved λ 日本語");assert_eq!(field.entry.selection_bounds(),Some((0,3)));}
             if let Some(area)=&element.area {assert_eq!(area.value(),"Unsaved λ 日本語");assert_eq!(area.view.buffer().selection_bounds().map(|(a,b)|(a.offset(),b.offset())),Some((0,3)));}
+            if let Some(choice)=&element.choice {assert_eq!(choice.value().as_deref(),Some("Unsaved λ 日本語"));}
+            if let Some(toggle)=&element.toggle {assert!(toggle.control.is_active());assert!(!toggle.control.is_inconsistent());}
             let current=drafts.lock().unwrap()[&key].clone();assert_eq!((current.text,current.expected,current.dirty,current.resolved,current.acknowledged),(draft.text.clone(),draft.expected,draft.dirty,draft.resolved,draft.acknowledged.clone()));
         }
         let label=surface.elements["control"].validation.as_ref().unwrap().label.clone();label.select_region(0,4);
@@ -85,7 +91,7 @@ fn verify_validation_feedback(app: &gtk::Application, frame: &Frame, commands: &
         for prop in ["value","label"] {let mut unsafe_doc=doc.clone();unsafe_doc["revision"]=json!(6);unsafe_doc["elements"]["control"]["props"][prop]=json!("Background replacement");surface.update(id,&unsafe_doc,frame,commands,&drafts);assert_eq!(surface.revision,Some(5));assert_eq!(surface.elements["control"].widget,original);}
         surface.window.destroy();
     }
-    println!("CHECK: inline validation preserves focused editor identity, logical focus, draft and selection; selected error text defers replacement and unrelated changes remain blocked");
+    println!("CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked");
 }
 
 fn verify_form_owners(frame: &Frame, commands: &Sender<Command>) {

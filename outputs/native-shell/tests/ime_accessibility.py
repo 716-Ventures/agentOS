@@ -11,6 +11,7 @@ def rendered_text(value):
     for _ in range(2048):
         if not queue:break
         node=queue.popleft()
+        if node is None:continue # GTK may expose an absent child during view teardown.
         try:
             if accessibility.text(node)==value:return True
         except (NotImplementedError,RuntimeError,LookupError):pass

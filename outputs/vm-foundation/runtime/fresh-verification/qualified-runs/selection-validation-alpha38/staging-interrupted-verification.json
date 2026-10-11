@@ -1,0 +1,28 @@
+{
+  "started_at": "2026-10-11T17:33:42.075820+00:00",
+  "source_revision": "d3676620ca5539275927dac024a9585dc21657d8",
+  "source_changes": [
+    " M outputs/agent-shell/Cargo.lock",
+    " M outputs/agent-shell/Cargo.toml",
+    " M outputs/agent-shell/release-contract.json",
+    " M outputs/agent-shell/src/presentation.rs",
+    " M outputs/agent-shell/tests/installation_guest.py",
+    " M outputs/agent-shell/tests/presentation_view_test.py",
+    " M outputs/native-shell/Cargo.lock",
+    " M outputs/native-shell/Cargo.toml",
+    " M outputs/native-shell/README.md",
+    " M outputs/native-shell/src/main.rs",
+    " M outputs/native-shell/src/reconcile.rs",
+    " M outputs/native-shell/src/verification.rs",
+    " M outputs/native-shell/tests/accessibility.py",
+    " M outputs/native-shell/tests/native_session.py"
+  ],
+  "source_archive_sha256": "e7eb7d6fd16be12bdadef6313f02d3acfe8a080c6eda199a3be85a43350a08b9",
+  "passed": false,
+  "owned_utm_identity": [
+    78430,
+    "Sun Oct 11 13:33:42 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T17:34:00.760260+00:00"
+}
