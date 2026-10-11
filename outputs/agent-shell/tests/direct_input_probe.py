@@ -141,6 +141,16 @@ def assistive():
                 button=find(request.split(':',1)[1],pyatspi.ROLE_PUSH_BUTTON)
                 rect=button.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
                 print(json.dumps({'point':[rect.x+rect.width/2,rect.y+rect.height/2]}),flush=True);continue
+            if request=='notices':
+                queue=deque([pyatspi.Registry.getDesktop(0)]);messages=[];visited=0
+                while queue and visited<4096:
+                    node=queue.popleft();visited+=1
+                    try:
+                        if node.getRole()==pyatspi.ROLE_STATUS_BAR:
+                            text=node.queryText();messages.append(text.getText(0,min(text.characterCount,4096)))
+                        queue.extend(node[index] for index in range(min(node.childCount,128)))
+                    except (RuntimeError,LookupError,NotImplementedError):pass
+                print(json.dumps({'messages':messages}),flush=True);continue
             if request in ('undo-status','undo-close'):
                 undo=find('Undo last arrangement',pyatspi.ROLE_PUSH_BUTTON)
                 sensitive=undo.getState().contains(pyatspi.STATE_SENSITIVE)
@@ -217,6 +227,7 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
                 if time.monotonic()>deadline:raise RuntimeError('Direct input did not reach the expected GTK state: '+repr(last))
                 time.sleep(.05)
         initial=wait(lambda value:value['text']=='')
+        initial_cursor=presentation({'op':'presentation.changes','limit':1})['latest_cursor']
         def motion_ready(x,y):
             deadline=time.monotonic()+5
             while True:
@@ -423,7 +434,11 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
             if time.monotonic()>deadline:raise RuntimeError('Native close did not expose an undo control')
             time.sleep(.05)
         assert snapshot('undo-close')['requested'],'Native assistive close undo was not accepted'
-        wait(lambda value:value['text']=='agentos')
+        try:wait(lambda value:value['text']=='agentos')
+        except RuntimeError:
+            print('Native close undo notices:',snapshot('notices'),flush=True)
+            print('Native close undo journal:',presentation({'op':'presentation.changes','after_cursor':initial_cursor,'limit':128}),flush=True)
+            raise
         assert core('presentation.get')['elements']['editor']['props']['value']=='agentos'
         assert core('draft.get')['draft'] is None
         print('PASS: direct kernel titlebar drag, focus cycling, VT shortcut/resume and close-view; native assistive undo restores exact saved document')

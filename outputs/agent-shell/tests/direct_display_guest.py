@@ -58,7 +58,14 @@ def main():
                 conn.settimeout(6)
                 conn.connect(str(path))
                 conn.sendall(json.dumps({'op': op}).encode() + b'\n')
-                result = json.loads(conn.makefile('rb').readline(65537))
+                # Snapshots include workspaces from earlier qualification runs;
+                # the request's 64 KiB limit is not a response-size limit.
+                limit = 16 * 1024 * 1024
+                with conn.makefile('rb') as reader:
+                    response = reader.readline(limit + 1)
+                if len(response) > limit or not response.endswith(b'\n'):
+                    raise RuntimeError('Incomplete or oversized display control response')
+                result = json.loads(response)
                 if not result.get('ok'):
                     raise RuntimeError(result.get('error', 'Display control unavailable'))
                 return result.get('result')

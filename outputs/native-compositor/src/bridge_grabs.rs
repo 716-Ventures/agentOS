@@ -107,11 +107,26 @@ impl Grabs {
                     &json!({"op":"interaction.begin","surface_id":workspace}),
                 )?;
                 if response["surface_revision"] != doc["revision"] {
-                    let _ = call(
+                    // Acquire once, then inspect under that lease. Renderer
+                    // element-focus bookkeeping must not invalidate a drag
+                    // when every placement and policy field is unchanged.
+                    let refreshed = call(
                         socket,
-                        &json!({"op":"interaction.end","surface_id":workspace}),
+                        &json!({"op":"presentation.get","document_id":workspace}),
                     );
-                    return Err("Workspace changed before pointer interaction began".into());
+                    let acceptable = refreshed.as_ref().is_ok_and(|current| {
+                        current["revision"] == response["surface_revision"]
+                            && crate::input_revision::only_element_focus_changed(doc, current)
+                    });
+                    if !acceptable {
+                        let _ = call(
+                            socket,
+                            &json!({"op":"interaction.end","surface_id":workspace}),
+                        );
+                        return Err(refreshed.err().unwrap_or_else(|| {
+                            "Workspace changed before pointer interaction began".into()
+                        }));
+                    }
                 }
                 self.leases.insert(
                     runtime.into(),
@@ -161,7 +176,10 @@ impl Grabs {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::{io::{BufRead, BufReader, Write}, os::unix::net::UnixListener};
+    use std::{
+        io::{BufRead, BufReader, Write},
+        os::unix::net::UnixListener,
+    };
     #[test]
     fn release_commits_frozen_revision_and_always_releases_lease() {
         for reject in [false, true] {
@@ -232,6 +250,111 @@ mod tests {
             assert_eq!(requests[1]["operations"][0]["edit"]["x"], 20);
             assert_eq!(requests[2]["op"], "interaction.end");
             std::fs::remove_file(path).unwrap();
+        }
+    }
+    #[test]
+    fn pointer_begin_reconciles_only_element_focus_and_never_replays_its_lease() {
+        for mutation in [
+            json!({}),
+            json!({"constraints":[{"surface_id":"surface"}]}),
+            json!({"activity_id":"2"}),
+            json!({"focus":{"surface_id":"other","element_id":null}}),
+            json!({"future_policy":true}),
+            json!({"outputs":{}}),
+            json!({"revision":5}),
+        ] {
+            let allowed = mutation == json!({});
+            let baseline = json!({"protocol":"agentos.presentation/1","workspace_id":"w","activity_id":"1","revision":3,"outputs":{"display":{"tiles":{"kind":"leaf","surface_id":"surface"},"floating":[],"maximized":null}},"constraints":[],"focus":{"surface_id":"surface","element_id":"editor"}});
+            let mut current = baseline.clone();
+            current["revision"] = json!(4);
+            current["focus"]["element_id"] = Value::Null;
+            for (key, value) in mutation.as_object().unwrap() {
+                current[key] = value.clone();
+            }
+            let path = std::env::temp_dir().join(format!(
+                "grab-focus-{}-{}.sock",
+                std::process::id(),
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_nanos()
+            ));
+            let listener = UnixListener::bind(&path).unwrap();
+            let worker = thread::spawn(move || {
+                let mut requests = vec![];
+                loop {
+                    let (mut stream, _) = listener.accept().unwrap();
+                    let mut line = String::new();
+                    BufReader::new(&mut stream).read_line(&mut line).unwrap();
+                    let value: Value = serde_json::from_str(&line).unwrap();
+                    let result = if value["op"] == "presentation.get" {
+                        current.clone()
+                    } else {
+                        json!({"surface_revision":4})
+                    };
+                    writeln!(stream, "{}", json!({"ok":true,"result":result})).unwrap();
+                    let ended = value["op"] == "interaction.end";
+                    requests.push(value);
+                    if ended {
+                        break;
+                    }
+                }
+                requests
+            });
+            let previews = Arc::new(Mutex::new(BTreeMap::from([(
+                "runtime".into(),
+                Preview {
+                    rect: Rect {
+                        x: 0,
+                        y: 0,
+                        width: 320,
+                        height: 240,
+                    },
+                    active: false,
+                },
+            )])));
+            let mut grabs = Grabs::new(previews.clone());
+            let scene = Scene {
+                identities: BTreeMap::from([("runtime".into(), "surface".into())]),
+                workspaces: json!({"w":baseline}),
+                ..Scene::default()
+            };
+            let result = grabs
+                .handle(
+                    &path,
+                    &scene,
+                    &json!({"op":"workspace.grab.begin","runtime":"runtime"}),
+                )
+                .unwrap();
+            let leased = grabs
+                .leases
+                .get("runtime")
+                .map(|lease| lease.revision.clone());
+            let active = previews
+                .lock()
+                .unwrap()
+                .get("runtime")
+                .is_some_and(|preview| preview.active);
+            grabs.stop(&path);
+            let requests = worker.join().unwrap();
+            std::fs::remove_file(&path).unwrap();
+            assert_eq!(
+                requests
+                    .iter()
+                    .filter(|request| request["op"] == "interaction.begin")
+                    .count(),
+                1,
+                "A pointer lease was replayed"
+            );
+            assert_eq!(requests.last().unwrap()["op"], "interaction.end");
+            assert!(grabs.leases.is_empty() && previews.lock().unwrap().is_empty());
+            assert_eq!(
+                result.is_ok(),
+                allowed,
+                "Pointer begin must accept only element-focus bookkeeping: {mutation}; {result:?}"
+            );
+            assert_eq!(active, allowed);
+            assert_eq!(leased, allowed.then(|| json!(4)));
         }
     }
 }

@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-10-11T00:25:03.244620+00:00",
+  "started_at": "2026-10-11T00:44:36.027542+00:00",
   "result": "pass",
   "vm_uuid": "27176EA2-E994-4165-9BBA-70FEED59E66B",
   "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -67,30 +67,19 @@
     "VTE IME"
   ],
   "deployment": {
-    "created_at": "2026-10-11T00:25:16.541513+00:00",
-    "source_archive_sha256": "1a9d58d951373f0263d85088aae5e1ca9e6aa0e47385a294cb01c9f548cf5428",
-    "repository_revision": "4d9b93d96d28803b34ad5883c016e88eafa0eb10",
+    "created_at": "2026-10-11T00:44:49.494349+00:00",
+    "source_archive_sha256": "9c3177aca8a58a4ac69ad72381ed09aeb15e19fe82de9dc734e163c82acfb507",
+    "repository_revision": "932ffade4b5b561ccec435e958954736bceb248f",
     "source_changes": [
-      "M  outputs/agent-shell/Cargo.lock",
-      "M  outputs/agent-shell/Cargo.toml",
-      "M  outputs/agent-shell/services/source_publisher.py",
-      "M  outputs/agent-shell/tests/broker_sources_guest.py",
       "M  outputs/agent-shell/tests/direct_display_guest.py",
       "M  outputs/agent-shell/tests/direct_input_probe.py",
-      "A  outputs/agent-shell/tests/direct_terminal_probe.py",
-      "M  outputs/agent-shell/tests/source_publisher_test.py",
-      "M  outputs/native-shell/Cargo.lock",
-      "M  outputs/native-shell/Cargo.toml",
-      "M  outputs/native-shell/README.md",
-      "M  outputs/native-shell/src/controls.rs",
-      "M  outputs/native-shell/src/document_dialog.rs",
-      "M  outputs/native-shell/src/pty_view.rs",
-      "M  outputs/native-shell/src/transport.rs",
-      "A  outputs/native-shell/tests/first_document.py"
+      "M  outputs/native-compositor/src/bridge_grabs.rs",
+      "M  outputs/native-compositor/src/input_revision.rs",
+      "M  outputs/native-shell/README.md"
     ],
     "installed": true
   },
-  "runtime_release": "578d6321b34ac360508d12954deb324f715c67acb8e86d71fc4216f1a1d3483c",
+  "runtime_release": "b3f42df34221509414654f5b3957e41b875987acf977ddf2bb8513aacf4947be",
   "dependency_manifest": {
     "packages": {
       "adduser": "3.152",
@@ -880,7 +869,7 @@
     "python": "Python 3.9.6"
   },
   "guest_stopped": true,
-  "finished_at": "2026-10-11T00:29:39.612809+00:00",
+  "finished_at": "2026-10-11T00:49:06.026277+00:00",
   "public_ui_release": {
     "tag": "v0.1.0-alpha.25",
     "revision": "7b7bac9c252e759fafb4f6c1d50af5ef056d0677",
@@ -908,7 +897,24 @@
       "source_sha256": "54884753c8bd25a7e164b2c1901193880c86d0174a2c847b602c0632a745c3df",
       "fixture_sha256": "32bce32a63936c521fbfc6105310da0980d39ddf0c721c8b873349183bc4230d",
       "boundary": "Synthetic kernel input; physical input and VTE IME remain unqualified"
+    },
+    "pointer_lease_focus": {
+      "baseline": "Actual prior Grabs.begin rejected a lease solely because renderer element focus advanced",
+      "corrected": "Acquire once, inspect under the lease, accept only the exact leased revision and element-focus bookkeeping; policy, geometry, activity, other-surface focus and future-field changes reject",
+      "source_sha256": "9fc866d791eac6ae4780f30d56772f1d5fdf525cf99f5e5492dd8a306bc665da",
+      "revision_guard_sha256": "3d473763169d3b2280c98562401b8888d0d003f2ed1b15420059287df0d6f5d7",
+      "compositor_tests": 36,
+      "installed_repeat_journeys": 3,
+      "baseline_log_sha256": "469427da02ab238fcfeb4342e017c6fab378fa197e7b5e0c65b23865e0300497"
+    },
+    "control_snapshot_reader": {
+      "baseline": "Snapshot response exceeded 64 KiB and was parsed after truncation",
+      "corrected": "Reader accepts complete snapshots up to 16 MiB and explicitly rejects oversized or incomplete responses",
+      "fixture_sha256": "76314a4c175db44057ec7e7e60b38fc35fe6f5454bad186d67680d0674769b1b"
     }
   },
+  "observations": [
+    "An earlier intermittent installed close/undo failure remains unresolved. Bounded accessible-status and journal diagnostics are retained; three consecutive installed editor journeys and the complete reproduction subsequently passed without a new delay immediately before Close."
+  ],
   "owned_utm_app_closed": true
 }

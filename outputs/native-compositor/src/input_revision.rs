@@ -5,12 +5,8 @@ pub fn refresh(mut transaction: Value, baseline: &Value, current: &Value) -> Val
     let Some(id) = baseline["workspace_id"].as_str() else {
         return transaction;
     };
-    let (Some(before), Some(after)) = (baseline["revision"].as_u64(), current["revision"].as_u64())
-    else {
-        return transaction;
-    };
     let operations = transaction["operations"].as_array();
-    if after <= before
+    if !only_element_focus_changed(baseline, current)
         || transaction["expected_revisions"][id] != baseline["revision"]
         || !operations.is_some_and(|ops| {
             ops.len() == 1
@@ -21,28 +17,36 @@ pub fn refresh(mut transaction: Value, baseline: &Value, current: &Value) -> Val
                     Some("float" | "maximize" | "restore" | "focus")
                 )
         })
-        || baseline["focus"]["surface_id"] != current["focus"]["surface_id"]
     {
         return transaction;
+    }
+    transaction["expected_revisions"][id] = current["revision"].clone();
+    transaction
+}
+
+/// Revision advancement is safe only when all placement and policy data match.
+/// Compare future fields too; only the renderer's element-level focus can differ.
+pub fn only_element_focus_changed(baseline: &Value, current: &Value) -> bool {
+    let (Some(before), Some(after)) = (baseline["revision"].as_u64(), current["revision"].as_u64())
+    else {
+        return false;
+    };
+    if after <= before || baseline["focus"]["surface_id"] != current["focus"]["surface_id"] {
+        return false;
     }
     let (Some(mut old), Some(mut new)) =
         (baseline.as_object().cloned(), current.as_object().cloned())
     else {
-        return transaction;
+        return false;
     };
     old.remove("revision");
     new.remove("revision");
-    // Only element-level focus can differ. Keep every other document field,
-    // including future fields, in the equality check.
     for document in [&mut old, &mut new] {
         if let Some(focus) = document.get_mut("focus").and_then(Value::as_object_mut) {
             focus.remove("element_id");
         }
     }
-    if old == new {
-        transaction["expected_revisions"][id] = current["revision"].clone();
-    }
-    transaction
+    old == new
 }
 
 #[cfg(test)]
