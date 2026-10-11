@@ -28,6 +28,17 @@ def verify(metrics,env,login_user,keyboard,snapshot,wait,core,scene):
         raise RuntimeError('Keyboard reading order did not reach '+name+'; '+repr(snapshot('focused')))
     try:
         await_speech(lambda text:'Using speech server factory:' in text,'Session-owned Orca did not initialize speech')
+        baseline=len(speech());keyboard.chord(29,56,57) # Open launcher without model work.
+        deadline=time.monotonic()+8
+        while not any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in scene()['system_layers']):
+            if time.monotonic()>deadline:raise RuntimeError('Reader-guided launcher did not open')
+            time.sleep(.05)
+        await_speech(lambda text:'Ask Agent' in text[baseline:],'Orca did not announce the launcher request control')
+        keyboard.chord(1)
+        deadline=time.monotonic()+8
+        while any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in scene()['system_layers']):
+            if time.monotonic()>deadline:raise RuntimeError('Reader-guided launcher did not close')
+            time.sleep(.05)
         # An unrelated bus client must not gain keyboard observation or grabs.
         denied=subprocess.run(['runuser','-u',login_user,'--','gdbus','call','--session',
             '--dest','org.freedesktop.a11y.Manager','--object-path','/org/freedesktop/a11y/Manager',
@@ -104,7 +115,7 @@ else:raise AssertionError('Spoofed reader gained keyboard access')
 print('PASS: a same-user process claiming the Orca monitor name cannot access keyboard input')
 """
         subprocess.run(['runuser','-u',login_user,'--','python3','-c',spoof],env=env,check=True,timeout=5)
-        print('PASS: session-owned Orca announces editor/Save/Discard; kernel learn-mode enter/exit isolates grabs, restores typing and completes edit/save/correction/discard; rescue VT remains reachable during a full grab; reader stop releases active grabs and preserves typing; unrelated and spoofed monitor access denied',flush=True)
+        print('PASS: session-owned Orca announces launcher/editor/Save/Discard; kernel learn-mode enter/exit isolates grabs, restores typing and completes edit/save/correction/discard; rescue VT remains reachable during a full grab; reader stop releases active grabs and preserves typing; unrelated and spoofed monitor access denied',flush=True)
     finally:
         if log.exists():
             destination=output/'orca-kernel-speech.log';destination.write_bytes(log.read_bytes());destination.chmod(0o600)

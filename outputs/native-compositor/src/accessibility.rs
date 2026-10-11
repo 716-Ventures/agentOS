@@ -33,6 +33,11 @@ struct Rules {
     last_tap: Option<(u32, Instant)>,
 }
 impl Rules {
+    fn event_destination(&self, consumed: bool) -> Option<&str> {
+        (self.verified && (self.watch || consumed))
+            .then_some(self.owner.as_deref())
+            .flatten()
+    }
     fn clear_owner(&mut self) {
         self.owner = None;
         self.verified = false;
@@ -374,23 +379,21 @@ impl Service {
             .key(code.raw(), sym, mask, released, Instant::now());
         let unicode = self.state.key_get_utf32(code);
         let rules = self.rules.borrow();
-        if rules.watch || consume {
-            if let Some(owner) = &rules.owner {
-                if self
-                    .connection
-                    .emit_signal(
-                        Some(owner),
-                        PATH,
-                        INTERFACE,
-                        "KeyEvent",
-                        Some(&(released, mask, sym, unicode, code.raw() as u16).to_variant()),
-                    )
-                    .is_err()
-                {
-                    drop(rules);
-                    self.rules.borrow_mut().clear_owner();
-                    return consume;
-                }
+        if let Some(owner) = rules.event_destination(consume) {
+            if self
+                .connection
+                .emit_signal(
+                    Some(owner),
+                    PATH,
+                    INTERFACE,
+                    "KeyEvent",
+                    Some(&(released, mask, sym, unicode, code.raw() as u16).to_variant()),
+                )
+                .is_err()
+            {
+                drop(rules);
+                self.rules.borrow_mut().clear_owner();
+                return consume;
             }
         }
         // Grabbed locks never change the application keyboard state. Still track
@@ -436,6 +439,7 @@ mod tests {
     fn reader() -> Rules {
         Rules {
             owner: Some(":1.5".into()),
+            verified: true,
             modifiers: BTreeSet::from([0xff63]),
             ..Rules::default()
         }
@@ -451,6 +455,22 @@ mod tests {
         assert!(r.key(118, 0xff63, 0, true, now));
         assert!(!r.key(38, 97, 0, false, now));
         assert!(!r.key(38, 97, 0, true, now));
+    }
+    #[test]
+    fn replacement_bus_owner_cannot_receive_a_previous_readers_pending_key_release() {
+        let mut r = reader();
+        r.grab = true;
+        let now = Instant::now();
+        assert!(r.key(38, 97, 0, false, now));
+        assert_eq!(r.event_destination(true), Some(":1.5"));
+        r.clear_owner();
+        r.owner = Some(":1.9".into()); // Name appearance precedes PID authentication.
+        let consumed = r.key(38, 97, 0, true, now);
+        assert!(
+            consumed,
+            "Never forward an orphan release into application input"
+        );
+        assert_eq!(r.event_destination(consumed), None);
     }
     #[test]
     fn grab_does_not_orphan_a_previously_forwarded_key_release() {
