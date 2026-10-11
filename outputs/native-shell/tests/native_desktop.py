@@ -157,6 +157,13 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                                 assert not any(row.get('app_id')=='com.agentos.UnmappedFixture' for row in hosts.values()),'Unbuffered toplevel changed the durable workspace'
                                 time.sleep(.03)
                         finally:reap(unmapped)
+                        # Process exit precedes Smithay's dead-resource refresh.
+                        # Do not select the fixture's stale Space entry as the
+                        # following conventional client's identity.
+                        deadline=time.monotonic()+5
+                        while snapshot()['windows']:
+                            assert time.monotonic()<deadline,'Unmapped fixture was not removed'
+                            time.sleep(.02)
                         print('PASS: configured unbuffered Wayland toplevel never enters durable placement')
                     simple=subprocess.Popen(['weston-simple-shm'],env=childenv,stdout=nestedlog,stderr=subprocess.STDOUT,start_new_session=True);applications.append(simple)
                     state=wait_windows(1);ident=state['windows'][0]['id']
