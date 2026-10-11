@@ -158,13 +158,13 @@ impl Device {
             let position = (preference.x.unwrap_or(x), preference.y.unwrap_or(0));
             output.change_current_state(
                 Some(wl_mode),
-                Some(Transform::Normal),
+                Some(preference.transform.native()),
                 Some(Scale::Fractional(preference.scale)),
                 Some(position.into()),
             );
             output.set_preferred(wl_mode);
             data.state.space.map_output(&output, position);
-            x = position.0 + (f64::from(mode.size().0) / preference.scale).ceil() as i32;
+            x = position.0 + preference.logical_size(wl_mode.size).w;
             let damage = OutputDamageTracker::from_output(&output);
             self.heads.insert(
                 crtc,

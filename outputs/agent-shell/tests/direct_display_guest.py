@@ -25,6 +25,7 @@ def main():
     parser.add_argument('--hold-seconds', type=int, default=0, choices=range(31),
                         help='Keep the verified desktop visible briefly for console inspection (0–30 seconds)')
     parser.add_argument('--input',action='store_true',help='Exercise temporary kernel input devices in this dedicated VM')
+    parser.add_argument('--output-transform',choices=['normal','90','180','270','flipped','flipped-90','flipped-180','flipped-270'],help='Use isolated output preferences on the dedicated single-output virtual KMS guest')
     modes=parser.add_mutually_exclusive_group()
     modes.add_argument('--list-input',action='store_true',help='Qualify installed List selection and copying through kernel input')
     modes.add_argument('--keyvalue-input',action='store_true',help='Qualify installed KeyValue selection and copying through kernel input')
@@ -65,6 +66,18 @@ def main():
     with tempfile.TemporaryDirectory(prefix='agentos-display-metrics-') as directory:
         metrics = Path(directory)
         os.chown(metrics, user.pw_uid, user.pw_gid)
+        output_config = None
+        if args.output_transform:
+            connectors = [path.parent.name.split('-',1)[1] for path in Path('/sys/class/drm').glob('card*-*/status') if path.read_text().strip() == 'connected']
+            assert connectors == ['Virtual-1'], 'Rotation qualification requires the dedicated single-output virtual KMS guest'
+            output_config = metrics/'config'
+            preference_dir = output_config/'agentos'
+            preference_dir.mkdir(parents=True)
+            preference = preference_dir/'outputs.json'
+            preference.write_text(json.dumps({'outputs': {'Virtual-1': {'transform': args.output_transform}}}))
+            for path in (output_config,preference_dir,preference):
+                os.chown(path,user.pw_uid,user.pw_gid)
+
         def control(path, op):
             with socket.socket(socket.AF_UNIX) as conn:
                 # The server bounds queued control work at five seconds. This
@@ -99,6 +112,7 @@ def main():
                     '--setenv=XDG_SESSION_TYPE=wayland', '--setenv=XDG_SESSION_CLASS=user',
                     '--setenv=XDG_SEAT=seat0', '--setenv=XDG_VTNR=7',
                     '--setenv=LIBSEAT_BACKEND=logind', '--setenv=AGENT_OS_METRICS_DIR=' + directory,
+                    *(['--setenv=XDG_CONFIG_HOME='+str(output_config)] if output_config else []),
                     *(['--setenv=GTK_A11Y=atspi'] if args.input else []),
                     *(['--setenv=AGENT_OS_FEEDBACK_METRICS=1'] if args.native_feedback else []),
                     *(['--setenv=GTK_IM_MODULE=wayland', '--setenv=AGENT_OS_INPUT_METHOD_ARGV='+json.dumps([str(Path(__file__).resolve().parents[1]/'native-compositor/target/debug/examples/ime_fixture'),str(metrics/'ime-test.sock')])] if args.terminal_ime else []),
@@ -124,6 +138,11 @@ def main():
             if endpoint is None:
                 raise RuntimeError('Direct display did not expose a native window and output within 30 seconds')
             assert all(row['width'] > 0 and row['height'] > 0 for row in snapshot['outputs']), snapshot
+            if args.output_transform:
+                expected = {'normal':'Normal','90':'_90','180':'_180','270':'_270','flipped':'Flipped','flipped-90':'Flipped90','flipped-180':'Flipped180','flipped-270':'Flipped270'}[args.output_transform]
+                assert len(snapshot['outputs']) == 1 and snapshot['outputs'][0]['transform'] == expected, snapshot
+                print('PASS: configured virtual KMS output transform '+expected,flush=True)
+
             assert snapshot['shared'] and not snapshot['shared']['error'], snapshot
             command('chvt', original.removeprefix('tty'))
             time.sleep(.5)
@@ -245,6 +264,7 @@ def main():
                           'presentation_feedback_qualified': args.presentation_feedback,
                           'native_feedback_qualified': args.native_feedback,
                           'native_feedback_load_qualified': args.native_feedback_load,
+                          'output_transform_qualified': args.output_transform,
                           'not_tested': ['physical input', 'hotplug', 'physical GPU presentation']}))
 
 
