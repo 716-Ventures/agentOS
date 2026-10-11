@@ -1,5 +1,6 @@
 """Independent AT-SPI journey through the running desktop and real core."""
 from collections import deque
+import json
 import time
 import pyatspi
 
@@ -61,6 +62,22 @@ def verify(call):
     assert field.queryEditableText().setTextContents('Discard this accessible edit')
     wait(lambda:draft()=='Discard this accessible edit','Second edit was not retained')
     activate(find('Discard draft',pyatspi.ROLE_PUSH_BUTTON))
-    wait(lambda:draft() is None and text(field)==value,'Accessible Discard did not restore committed text')
+    observed={}
+    def discarded():
+        observed.update(draft=call({'op':'draft.get','surface_id':'session-fixture','element_id':'field'}),saved=saved(),visible=text(field))
+        return observed['draft'].get('draft') is None and observed['visible']==value
+    try:
+        wait(discarded,'Accessible Discard did not restore committed text')
+    except AssertionError:
+        queue=deque([pyatspi.Registry.getDesktop(0)]);labels=[];visited=0
+        while queue and visited<256 and len(labels)<64:
+            node=queue.popleft();visited+=1
+            if node is None:continue
+            try:
+                if node.name:labels.append({'role':node.getRoleName(),'name':node.name[:512]})
+                queue.extend(node[index] for index in range(min(node.childCount,64)))
+            except (RuntimeError,LookupError):pass
+        print('Accessible Discard diagnostics: '+json.dumps({**observed,'accessible_labels':labels}),flush=True)
+        raise
     assert saved()==value
     print('PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state')

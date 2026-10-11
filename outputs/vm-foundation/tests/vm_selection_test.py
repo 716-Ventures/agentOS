@@ -137,3 +137,30 @@ class VMSelection(unittest.TestCase):
                 with patch.object(vm,'call',return_value=subprocess.CompletedProcess([],0,stdout='')) as call:
                     with self.assertRaisesRegex(RuntimeError,'state is unknown'):vm.status()
                     self.assertEqual(call.call_count,1)
+
+
+class UTMApplicationCleanup(unittest.TestCase):
+    def test_executable_identity_does_not_depend_on_command_arguments(self):
+        listing='41 Sun Oct 11 03:24:36 2026 /Applications/UTM.app/Contents/MacOS/UTM\n42 Sun Oct 11 03:24:36 2026 /bin/sh\n'
+        with patch.object(vm.subprocess,'check_output',return_value=listing) as ps:
+            self.assertEqual(vm.utm_application_identity(),(41,'Sun Oct 11 03:24:36 2026'))
+            self.assertIn('comm=',ps.call_args.args[0][-1])
+
+    def test_closes_only_the_same_owned_app_after_all_saved_guests_stop(self):
+        identity=(41,'start')
+        listing='UUID Status Name\n27176EA2-E994-4165-9BBA-70FEED59E66B stopped Verification\n4A6AFE90-531B-47F5-8109-8CF67234EB14 stopped Original\n'
+        with patch.object(vm,'utm_application_identity',side_effect=[identity,identity,None]), \
+             patch.object(vm,'call',return_value=subprocess.CompletedProcess([],0,listing)), \
+             patch.object(vm,'controller',return_value='utmctl'),patch.object(vm.os,'kill') as kill:
+            self.assertTrue(vm.close_owned_utm_application(identity))
+            kill.assert_called_once_with(41,vm.signal.SIGTERM)
+
+    def test_never_closes_replacement_app_active_guest_or_unknown_library(self):
+        identity=(41,'start')
+        with patch.object(vm,'utm_application_identity',return_value=(41,'replacement')),patch.object(vm.os,'kill') as kill:
+            self.assertFalse(vm.close_owned_utm_application(identity));kill.assert_not_called()
+        for listing in ('UUID Status Name\n','invalid response','27176EA2-E994-4165-9BBA-70FEED59E66B started Verification'):
+            with self.subTest(listing=listing),patch.object(vm,'utm_application_identity',return_value=identity), \
+                 patch.object(vm,'controller',return_value='utmctl'),patch.object(vm,'call',return_value=subprocess.CompletedProcess([],0,listing)),patch.object(vm.os,'kill') as kill:
+                with self.assertRaises(RuntimeError):vm.close_owned_utm_application(identity)
+                kill.assert_not_called()

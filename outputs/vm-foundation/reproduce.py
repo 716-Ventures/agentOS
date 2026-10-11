@@ -68,6 +68,7 @@ def main():
         vm.prepare(args.base)
         print('Register the printed bundle once in UTM, then repeat this command without --prepare-only.')
         return
+    app_before=vm.utm_application_identity()
     machine=vm.machine()
     report={'started_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'result':'running',
             'vm_uuid':machine['uuid'],'base_sha512':vm.LOCK['sha512'],'checks':[],
@@ -117,6 +118,11 @@ def main():
             while vm.alive() and time.monotonic()<deadline:time.sleep(1)
             if vm.alive():raise RuntimeError('Guest did not complete orderly shutdown')
             report['guest_stopped']=True
+            if app_before is None:
+                owned_app=vm.utm_application_identity()
+                report['owned_utm_app_closed']=owned_app is None or vm.close_owned_utm_application(owned_app)
+            else:
+                report['preexisting_utm_app_preserved']=True
         except Exception as exc:
             report.update(result='failed',error='Shutdown failed: '+str(exc));raise
         finally:

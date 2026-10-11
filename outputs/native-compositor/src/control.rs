@@ -105,6 +105,25 @@ impl Drop for Control {
         let _ = std::fs::remove_file(&self.path);
     }
 }
+fn xdg_diagnostics(surface: &smithay::reexports::wayland_server::protocol::wl_surface::WlSurface) -> Value {
+    use smithay::wayland::shell::xdg::{SurfaceCachedState, XdgToplevelSurfaceData};
+    smithay::wayland::compositor::with_states(surface, |states| {
+        let data = states.data_map.get::<XdgToplevelSurfaceData>().unwrap().lock().unwrap();
+        let size = |value: Option<smithay::utils::Size<i32, smithay::utils::Logical>>| value.map(|value| json!([value.w, value.h]));
+        let client = *states.cached_state.get::<SurfaceCachedState>().current();
+        let pending = data.pending_configures().iter().rev().take(8).map(|configure| {
+            json!({"serial":u32::from(configure.serial),"size":size(configure.state.size)})
+        }).collect::<Vec<_>>();
+        json!({"configured":data.configured,"acked_serial":data.configure_serial.map(u32::from),
+            "committed_serial":data.current_serial.map(u32::from),"committed_size":size(data.current.size),
+            "acked_size":data.last_acked.as_ref().and_then(|state|size(state.size)),
+            "server_pending_size":data.server_pending.as_ref().and_then(|state|size(state.size)),
+            "pending_configures":pending,"pending_count":data.pending_configures().len(),
+            "client_min_size":[client.min_size.w,client.min_size.h],"client_max_size":[client.max_size.w,client.max_size.h],
+            "client_geometry":client.geometry.map(|rect|json!({"x":rect.loc.x,"y":rect.loc.y,"width":rect.size.w,"height":rect.size.h}))})
+    })
+}
+
 pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
     use smithay::reexports::wayland_server::Resource;
     let result = (|| -> Result<Value, String> {
@@ -112,7 +131,7 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
             Some("launcher.state") => Ok(json!({"sequence":state.launcher_requests})),
             Some("snapshot") => {
                 state.arrange();
-                let windows=state.space.elements().map(|w|{let surface=w.toplevel().unwrap().wl_surface();let (title,app_id)=smithay::wayland::compositor::with_states(surface,|states|{let data=states.data_map.get::<smithay::wayland::shell::xdg::XdgToplevelSurfaceData>().unwrap().lock().unwrap();(data.title.clone(),data.app_id.clone())});let geometry=state.space.element_geometry(w);json!({"id":format!("{:?}",surface.id()),"title":title,"app_id":app_id,"geometry":geometry.map(|r|json!({"x":r.loc.x,"y":r.loc.y,"width":r.size.w,"height":r.size.h}))})}).collect::<Vec<_>>();
+                let windows=state.space.elements().map(|w|{let surface=w.toplevel().unwrap().wl_surface();let (title,app_id)=smithay::wayland::compositor::with_states(surface,|states|{let data=states.data_map.get::<smithay::wayland::shell::xdg::XdgToplevelSurfaceData>().unwrap().lock().unwrap();(data.title.clone(),data.app_id.clone())});let geometry=state.space.element_geometry(w);json!({"id":format!("{:?}",surface.id()),"title":title,"app_id":app_id,"xdg":xdg_diagnostics(surface),"geometry":geometry.map(|r|json!({"x":r.loc.x,"y":r.loc.y,"width":r.size.w,"height":r.size.h}))})}).collect::<Vec<_>>();
                 let outputs=state.space.outputs().filter_map(|output|state.space.output_geometry(output).map(|geometry|json!({"name":output.name(),"x":geometry.loc.x,"y":geometry.loc.y,"width":geometry.size.w,"height":geometry.size.h,"scale":output.current_scale().fractional_scale(),"transform":format!("{:?}",output.current_transform())}))).collect::<Vec<_>>();
                 let scene = state
                     .bridge

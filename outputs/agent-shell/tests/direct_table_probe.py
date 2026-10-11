@@ -55,7 +55,7 @@ def verify(metrics, output, core, scene, login_user, presentation, observe, keyb
         def placed():
             current=scene()
             row=next((row for row in current['windows'] if current['shared']['identities'].get(row['id'])==logical),None)
-            sample={'geometry':row['geometry'] if row else None,'work_areas':[layer['work_area'] for layer in current['system_layers'] if layer['namespace']=='agentos-system-bar' and layer['mapped']]}
+            sample={'geometry':row['geometry'] if row else None,'xdg':row.get('xdg') if row else None,'work_areas':[layer['work_area'] for layer in current['system_layers'] if layer['namespace']=='agentos-system-bar' and layer['mapped']]}
             if not observed or observed[-1]!=sample:
                 observed.append(sample)
                 if len(observed)>8:observed.pop(0)

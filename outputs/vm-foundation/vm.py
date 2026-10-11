@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import secrets
 import select
+import signal
 import termios
 import tty
 import shutil
@@ -29,6 +30,41 @@ if not 1024 <= LOCK['ssh_port'] <= 65535:
 
 def call(args, **kwargs):
     return subprocess.run([str(a) for a in args], check=True, **kwargs)
+
+
+def utm_application_identity():
+    """Identify the app executable and start time independently of launch arguments."""
+    rows=subprocess.check_output(['/bin/ps','-axo','pid=,lstart=,comm='],text=True).splitlines()
+    matches=[]
+    for row in rows:
+        fields=row.split(None,6)
+        if len(fields)==7 and fields[6]=='/Applications/UTM.app/Contents/MacOS/UTM':
+            matches.append((int(fields[0]),' '.join(fields[1:6])))
+    if len(matches)>1:raise RuntimeError('Multiple UTM applications; ownership is ambiguous')
+    return matches[0] if matches else None
+
+
+def close_owned_utm_application(identity):
+    """Close a caller-owned app only after every registered guest is stopped."""
+    if identity is None or utm_application_identity()!=identity:return False
+    listing=call([controller(),'list'],capture_output=True,text=True,timeout=10).stdout
+    count=0
+    for row in listing.splitlines():
+        fields=row.split(None,2)
+        if not fields or fields[0]=='UUID':continue
+        if len(fields)<2:raise RuntimeError('Cannot verify UTM guest states before app cleanup')
+        try:uuid.UUID(fields[0])
+        except ValueError:raise RuntimeError('Cannot verify UTM guest states before app cleanup') from None
+        if fields[1]!='stopped':raise RuntimeError('UTM app retained because a registered guest is not stopped')
+        count+=1
+    if not count:raise RuntimeError('UTM app retained because its saved guest library is unavailable')
+    if utm_application_identity()!=identity:return False
+    os.kill(identity[0],signal.SIGTERM)
+    deadline=time.monotonic()+10
+    while utm_application_identity()==identity:
+        if time.monotonic()>=deadline:raise RuntimeError('Owned UTM application did not exit')
+        time.sleep(.1)
+    return True
 
 
 def digest(path):
