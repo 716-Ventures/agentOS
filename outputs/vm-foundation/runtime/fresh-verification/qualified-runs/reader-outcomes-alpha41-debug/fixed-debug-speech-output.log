@@ -1,0 +1,37 @@
+20:31:01.412031 - SPEECH OUTPUT: 'Screen reader on.'{'established': 'False'}
+20:31:01.517461 - SPEECH OUTPUT: 'Agent view · Session lifecycle'{'established': 'False', 'voice-type': 'default'}
+20:31:01.736398 - SPEECH OUTPUT: 'Accessible session draft text'{'established': 'False', 'voice-type': 'system'}
+20:31:01.737662 - SPEECH OUTPUT: 'Original accessible value selected'{'established': 'False', 'voice-type': 'system'}
+20:31:01.885452 - SPEECH OUTPUT: 'Use a saved workspace name.'{'established': 'False'}
+20:31:02.098299 - SPEECH OUTPUT: 'Entry valid.'{'established': 'False'}
+20:31:03.344038 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:31:03.385419 - SPEECH OUTPUT: 'Save draft button'{'established': 'False', 'voice-type': 'system'}
+20:31:04.129713 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:31:04.169541 - SPEECH OUTPUT: 'Discard draft button'{'established': 'False', 'voice-type': 'system'}
+20:31:04.916583 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:31:04.954039 - SPEECH OUTPUT: 'Review latest version… button'{'established': 'False', 'voice-type': 'system'}
+20:31:05.701472 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:31:05.748350 - SPEECH OUTPUT: 'status bar'{'established': 'False', 'voice-type': 'system'}
+20:31:05.750024 - SPEECH OUTPUT: 'Reader result outcome heading 1 opens popup'{'established': 'False', 'voice-type': 'system'}
+20:31:06.158710 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:31:06.200220 - SPEECH OUTPUT: 'running selected opens popup'{'established': 'False', 'voice-type': 'system'}
+20:31:07.217828 - SPEECH OUTPUT: 'left control'{'established': 'False',
+20:31:07.578083 - SPEECH OUTPUT: 'Reader result outcome: failed'{'established': 'False'}
+20:31:08.094472 - SPEECH OUTPUT: 'Text unselected.'{'established': 'False'}
+20:31:08.105788 - SPEECH OUTPUT: 'blank'{'established': 'False'}
+20:31:08.174586 - SPEECH OUTPUT: 'failed'{'established': 'False', 'voice-type': 'default'}
+20:31:08.231794 - SPEECH OUTPUT: 'f'{'established': 'False',
+20:31:09.427567 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:31:09.467371 - SPEECH OUTPUT: 'alert'{'established': 'False', 'voice-type': 'system'}
+20:31:09.468760 - SPEECH OUTPUT: 'Reader failure outcome heading 1 opens popup'{'established': 'False', 'voice-type': 'system'}
+20:31:10.206975 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:31:10.249052 - SPEECH OUTPUT: 'running selected opens popup'{'established': 'False', 'voice-type': 'system'}
+20:31:11.233756 - SPEECH OUTPUT: 'left control'{'established': 'False',
+20:31:11.907921 - SPEECH OUTPUT: 'Reader failure outcome: failed'{'established': 'False'}
+20:31:12.426114 - SPEECH OUTPUT: 'Text unselected.'{'established': 'False'}
+20:31:12.437938 - SPEECH OUTPUT: 'blank'{'established': 'False'}
+20:31:12.479170 - SPEECH OUTPUT: 'failed'{'established': 'False', 'voice-type': 'default'}
+20:31:12.502307 - SPEECH OUTPUT: 'f'{'established': 'False',
+20:31:13.688726 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:31:13.737809 - SPEECH OUTPUT: 'Accessible session draft text'{'established': 'False', 'voice-type': 'system'}
+20:31:13.738786 - SPEECH OUTPUT: 'Original accessible value selected'{'established': 'False', 'voice-type': 'system'}

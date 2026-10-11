@@ -420,6 +420,69 @@ def verify_reader_controls(call, speech_log):
     if control_modifier:activate(find('Ctrl on',pyatspi.ROLE_PUSH_BUTTON))
     activate(find('Hide keyboard',pyatspi.ROLE_PUSH_BUTTON))
 
+def verify_reader_outcomes(call, speech_log, outcomes):
+    """Real job transitions must remain perceivable beside a selected snapshot."""
+    import ime_accessibility
+    frame=find('Agent view · Session lifecycle',pyatspi.ROLE_FRAME)
+    field=find('Accessible session draft',pyatspi.ROLE_TEXT,root=frame)
+    draft=call({'op':'draft.get','surface_id':'session-fixture','element_id':'field'})
+    activate(find('Agent Monitor',pyatspi.ROLE_PUSH_BUTTON))
+    activate(find('Keyboard',pyatspi.ROLE_PUSH_BUTTON))
+    def stroke(name):
+        activate(find(name,pyatspi.ROLE_PUSH_BUTTON))
+        wait(lambda:ime_accessibility.rendered_text('Keyboard ready'),'Reader outcome keyboard stroke did not finish')
+    def navigate(target):
+        for _ in range(32):
+            if target.getState().contains(pyatspi.STATE_FOCUSED):return
+            stroke('Tab')
+        raise AssertionError('Reader outcome keyboard did not reach '+target.name)
+    for key,(job,latch) in outcomes.items():
+        label='Reader '+key+' outcome'
+        heading=find(label,pyatspi.ROLE_HEADING,root=frame)
+        group=heading.parent
+        message=find('running',pyatspi.ROLE_LABEL,root=group)
+        value=message.queryText()
+        navigate(message)
+        stroke('Ctrl');stroke('a');stroke('Ctrl on')
+        wait(lambda:value.getNSelections()==1,'Reader outcome keyboard did not select the snapshot')
+        baseline=len(speech_log.read_text(errors='replace'))
+        latch.touch()
+        wait(lambda:next(row for row in call({'op':'snapshot'})['jobs'] if row['id']==job)['status']=='failed','Reader outcome job did not fail')
+        expected='Current value:\n'+label+'\nfailed'
+        observed=[]
+        def current_notice():
+            queue=deque([group]);observed.clear()
+            while queue and len(observed)<128:
+                node=queue.popleft()
+                if node is None:continue
+                try:content=text(node)
+                except (RuntimeError,NotImplementedError):content=None
+                observed.append({'name':node.name,'role':node.getRoleName(),'text':content})
+                if content==expected:
+                    print('Reader current notice: '+json.dumps(observed[-1]),flush=True)
+                    return node
+                queue.extend(node[i] for i in range(min(node.childCount,32)))
+            return False
+        try:wait(current_notice,'Selected outcome did not expose its exact current notice')
+        except AssertionError:
+            print('Reader outcome diagnostics: '+json.dumps({'accessible':observed,'binding':call({'op':'binding.snapshot','surface_id':'session-fixture'}),'selected':value.getNSelections(),'message':text(message)}),flush=True)
+            raise
+        assert text(message)=='running' and value.getNSelections()==1
+        assert message.getState().contains(pyatspi.STATE_FOCUSED)
+        assert call({'op':'draft.get','surface_id':'session-fixture','element_id':'field'})==draft
+        announcement=label+': failed'
+        def announcements():
+            return [line for line in speech_log.read_text(errors='replace')[baseline:].splitlines() if 'SPEECH OUTPUT:' in line and announcement in line]
+        wait(lambda:announcements(),'Orca did not announce changed selected '+key+' outcome')
+        stroke('Right')
+        wait(lambda:text(message)=='failed','Reader outcome did not reconcile after deselection')
+        time.sleep(.8) # Observe several normal reconciliation polls after deselection.
+        assert len(announcements())==1,'Unchanged outcome refresh or deselection repeated speech'
+        print('PASS: actual Orca announces changed '+key+' job outcome once while selected snapshot, focus and exact field draft persist',flush=True)
+    navigate(field)
+    activate(find('Hide keyboard',pyatspi.ROLE_PUSH_BUTTON))
+
+
 def verify_local_form(call, database):
     import accessibility as a
     import pyatspi,json,time,sqlite3,ime_accessibility

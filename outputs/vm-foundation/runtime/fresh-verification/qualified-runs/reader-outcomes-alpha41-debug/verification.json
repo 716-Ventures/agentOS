@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "public_revision": "1ffb447f3d3a099b22eeb2e5c4e104e5d22bd46a",
+  "public_version": "0.1.0-alpha.41",
+  "profile": "Debug native renderer with existing alpha.40 core fixture; installed alpha.41 and complete runtime qualification remain separate",
+  "regression": "Real core jobs transition from running to failed. Trusted guest keyboard selects the older snapshot. Actual Orca speaks each label and failed outcome exactly once while native selection, focus and exact unrelated field draft persist. Deselection reveals failed without repeated speech.",
+  "baseline": "Actual current status text was present; no changed outcome speech was emitted. Earlier AT-SPI selection/role/name fixture failures are retained separately.",
+  "speech_sha256": {
+    "fixed-debug": "c8b2450d4717936b21cce06719baaa22590bae5466c3ccc24fb34921879bf1c7",
+    "baseline": "cb1b7b6db100e04a622fabc68391b2bde506a277957f8fb375860594a4436968"
+  },
+  "cleanup": true,
+  "limits": [
+    "ALSA null sink proves speech requests, not audible quality or braille.",
+    "Physical input/GPU/multi-output and live providers remain unqualified.",
+    "This targeted debug proof does not replace signed v16 or the alpha.40 full70 runtime identity."
+  ]
+}

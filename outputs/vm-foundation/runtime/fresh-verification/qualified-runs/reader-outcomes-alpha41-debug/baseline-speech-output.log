@@ -1,0 +1,18 @@
+20:28:16.114770 - SPEECH OUTPUT: 'Screen reader on.'{'established': 'False'}
+20:28:16.217985 - SPEECH OUTPUT: 'Agent view · Session lifecycle'{'established': 'False', 'voice-type': 'default'}
+20:28:16.433156 - SPEECH OUTPUT: 'Accessible session draft text'{'established': 'False', 'voice-type': 'system'}
+20:28:16.433843 - SPEECH OUTPUT: 'Original accessible value selected'{'established': 'False', 'voice-type': 'system'}
+20:28:16.644197 - SPEECH OUTPUT: 'Use a saved workspace name.'{'established': 'False'}
+20:28:16.938672 - SPEECH OUTPUT: 'Entry valid.'{'established': 'False'}
+20:28:18.139907 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:28:18.180158 - SPEECH OUTPUT: 'Save draft button'{'established': 'False', 'voice-type': 'system'}
+20:28:18.933453 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:28:18.963561 - SPEECH OUTPUT: 'Discard draft button'{'established': 'False', 'voice-type': 'system'}
+20:28:19.694509 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:28:19.735015 - SPEECH OUTPUT: 'Review latest version… button'{'established': 'False', 'voice-type': 'system'}
+20:28:20.482296 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:28:20.520715 - SPEECH OUTPUT: 'status bar'{'established': 'False', 'voice-type': 'system'}
+20:28:20.522464 - SPEECH OUTPUT: 'Reader result outcome heading 1 opens popup'{'established': 'False', 'voice-type': 'system'}
+20:28:21.279214 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:28:21.313934 - SPEECH OUTPUT: 'running selected opens popup'{'established': 'False', 'voice-type': 'system'}
+20:28:22.315576 - SPEECH OUTPUT: 'left control'{'established': 'False',
