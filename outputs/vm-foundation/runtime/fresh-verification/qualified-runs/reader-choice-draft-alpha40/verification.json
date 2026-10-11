@@ -1,0 +1,68 @@
+{
+  "result": "pass",
+  "source": {
+    "started_at": "2026-10-11T20:15:08.425739+00:00",
+    "source_revision": "83a0e1465bce90652b14929ae0fe4eacd01dbde4",
+    "source_changes": [
+      " M outputs/native-shell/tests/accessibility.py"
+    ],
+    "source_archive_sha256": "f9c05c7658bb2022f571247aae53d21dbb2b3115c7609d6e909daf7c8e249a10",
+    "passed": true,
+    "owned_utm_identity": [
+      11244,
+      "Sun Oct 11 16:15:08 2026"
+    ],
+    "owned_utm_closed": true,
+    "finished_at": "2026-10-11T20:16:35.831514+00:00"
+  },
+  "runtime_code_unchanged_from_complete70": "360b99df0b98dc6bb3178bd5b292a7e9e09d4689",
+  "comparison_scopes": [
+    "outputs/agent-shell",
+    "outputs/native-shell/src",
+    "outputs/native-shell/Cargo.toml",
+    "outputs/native-shell/Cargo.lock",
+    "outputs/native-compositor"
+  ],
+  "test_file_sha256": "f995aac21ce0ce0ea5e8ed57d1f7945548bd639777bd3fd7cb9fd171602da8ba",
+  "scope": [
+    "trusted keyboard Space/Down/Enter selects Second from First in actual Choice popup",
+    "exact pending Choice draft and field-plus-option accessible name survive error and clear",
+    "actual Orca error and cleared-valid speech",
+    "scoped explicit Discard restores visible saved document, First option and unchecked toggle",
+    "subsequent callback/Save/Discard journeys and owned cleanup"
+  ],
+  "limitations": [
+    "Additional targeted test coverage; previous full70 source and image first-boot evidence keep their exact source identities",
+    "Physical audio, braille and live providers remain unqualified"
+  ],
+  "profiles": {
+    "debug": {
+      "raw_speech_sha256": "a2a6f865908245bf57140532fcc1b9adc50d4d1e946f4d4bd07ed25db4cd1fb3",
+      "raw_speech_bytes": 2377802
+    },
+    "installed": {
+      "raw_speech_sha256": "1dbd69865758d84fff7ed38ff770c0527a1a57c9b12d718caa27e394c6ff6c5f",
+      "raw_speech_bytes": 2399368
+    }
+  },
+  "runtime_release": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
+  "tested_packages": {
+    "espeak-ng-data:arm64": "1.52.0+dfsg-5",
+    "libespeak-ng1:arm64": "1.52.0+dfsg-5",
+    "libgtk-4-1:arm64": "4.18.6+ds-2",
+    "orca": "51.0-4~bpo13+1",
+    "speech-dispatcher": "0.12.1-5~bpo13+1",
+    "speech-dispatcher-espeak-ng": "0.12.1-5~bpo13+1"
+  },
+  "evidence_sha256": {
+    "debug-speech-output.log": "d17ff01712757a6271b1395f43d4d37a339cc253432589cf41512a54bed0a661",
+    "installed-orca-speech.log.gz": "013385ba34b6d665b80603176e981a336719167ef195b6b43d732adf0a6963ba",
+    "initial-log-copy-failure.json": "0a122d683a056b2ea6b7d5f88203c2d7fdfa9361bde66aadfd010b0c7f8d5a86",
+    "integration.log": "55dcc6c9334bd1e5c7cae512e03b734875d343062f95295ffcbd511207350c91",
+    "debug-orca-speech.log.gz": "10d6b9d6bfb6f88486b5c3ee090564ececdd90ad5324bf05e5c67cbf2ad43bde",
+    "installed-speech-output.log": "c1e9d2af04a31e084a03a31a0f6416aa43eb3f3dcf7af4dc6e29fcd79084a791",
+    "integration.json": "8b6b4982cae39d229638913d1e972e91c6f035f7b12e664bf881ee8860f1d4bb",
+    "driver.py": "2fbf3d981d13bff787f04f7f2657ce0c04878530559a75ef176627e56ae2ff57",
+    "initial-log-copy-failure.log": "8133fa820c741173cf48a37ec1c1275d5f187d68bc0b757d8c79f61580e1b412"
+  }
+}

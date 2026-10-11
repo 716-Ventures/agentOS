@@ -379,6 +379,16 @@ def verify_reader_controls(call, speech_log):
         if key=='editor':
             assert control.queryEditableText().setTextContents('Unsaved document λ 日本語')
             wait(lambda:call({'op':'draft.get','surface_id':surface,'element_id':key}).get('draft')=='Unsaved document λ 日本語','Reader editor draft did not reach core')
+        elif key=='choice':
+            assert not control_modifier
+            activate(find('Space',pyatspi.ROLE_PUSH_BUTTON))
+            wait(lambda:ime_accessibility.rendered_text('Keyboard ready'),'Choice open stroke did not finish')
+            wait(lambda:control.getState().contains(pyatspi.STATE_EXPANDED),'Choice popup did not open')
+            activate(find('Down',pyatspi.ROLE_PUSH_BUTTON))
+            wait(lambda:ime_accessibility.rendered_text('Keyboard ready'),'Choice navigation stroke did not finish')
+            activate(find('Enter',pyatspi.ROLE_PUSH_BUTTON))
+            wait(lambda:call({'op':'draft.get','surface_id':surface,'element_id':key}).get('draft')=='Second','Keyboard Choice did not retain the pending option')
+            wait(lambda:control.name==props[key]['label']+': Second' and not control.getState().contains(pyatspi.STATE_EXPANDED),'Selected Choice name/popup state did not reconcile')
         elif key=='toggle':
             activate(control)
             wait(lambda:call({'op':'draft.get','surface_id':surface,'element_id':key}).get('draft')=='true','Reader toggle draft did not reach core')
@@ -400,6 +410,11 @@ def verify_reader_controls(call, speech_log):
         if before.get('draft') is not None:
             activate(scoped_discard(control))
             wait(lambda:call({'op':'draft.get','surface_id':surface,'element_id':key}).get('draft') is None,'Reader fixture draft did not explicitly discard')
+            def restored():
+                if key=='editor':return text(control)==props[key]['value']
+                if key=='choice':return control.name==props[key]['label']+': '+props[key]['value']
+                return not control.getState().contains(pyatspi.STATE_CHECKED)
+            wait(restored,'Explicit reader Discard did not restore the visible saved value')
         print('PASS: real Orca error/clear speech retains '+kind+' focus, value and exact draft without Save',flush=True)
     navigate(find('Accessible session draft',pyatspi.ROLE_TEXT))
     if control_modifier:activate(find('Ctrl on',pyatspi.ROLE_PUSH_BUTTON))

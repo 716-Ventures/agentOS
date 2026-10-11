@@ -1,0 +1,13 @@
+cat: /home/developer/agent-os-source/native-shell/test-output/session-orca-speech.log: No such file or directory
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+Requested orderly guest shutdown. Check status before restarting.
+{"started_at": "2026-10-11T20:13:05.445652+00:00", "source_revision": "83a0e1465bce90652b14929ae0fe4eacd01dbde4", "source_changes": [" M outputs/native-shell/tests/accessibility.py"], "source_archive_sha256": "f9c05c7658bb2022f571247aae53d21dbb2b3115c7609d6e909daf7c8e249a10", "passed": false, "owned_utm_identity": [9665, "Sun Oct 11 16:13:05 2026"], "owned_utm_closed": true, "finished_at": "2026-10-11T20:13:21.904982+00:00"}
+Traceback (most recent call last):
+  File "/tmp/agentos-reader-choice-draft.py", line 17, in <module>
+    vm.ssh('cat /home/developer/agent-os-source/native-shell/test-output/session-orca-speech.log',stdout=out,check=True)
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/vm.py", line 309, in ssh
+    return subprocess.run(ssh_args() + [command], **kwargs)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ssh', '-p', '22221', '-i', '/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/id_ed25519', '-o', 'IdentitiesOnly=yes', '-o', 'StrictHostKeyChecking=accept-new', '-o', 'UserKnownHostsFile=/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/known_hosts', '-o', 'ConnectTimeout=3', '-o', 'BatchMode=yes', '-o', 'LogLevel=ERROR', 'developer@127.0.0.1', 'cat /home/developer/agent-os-source/native-shell/test-output/session-orca-speech.log']' returned non-zero exit status 1.
