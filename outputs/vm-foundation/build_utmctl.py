@@ -11,7 +11,7 @@ import tempfile
 import urllib.request
 
 ROOT=Path(__file__).resolve().parent
-OUTPUT=ROOT/'runtime/utmctl-control'
+OUTPUT=ROOT/'runtime/utmctl-control-v2'
 REVISION='048ca7498ea3a374439149d51739d94c5300bcda' # official UTM v4.7.5
 ARGUMENT_PARSER='8f4d2753f0e4778c76d5f05ad16c74f707390531'
 SOURCES={
@@ -19,7 +19,7 @@ SOURCES={
     'Scripting/UTMScripting.swift':'40b64b2e8997d310c8f2ee55a05c38440c0374fec60e57fff81b43507d68a0cd',
     'LICENSE':'cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30',
 }
-POLICY='foreground-launch/1'
+POLICY='foreground-no-restoration/2'
 
 
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -49,7 +49,13 @@ def fetch(name):
 def patch_launch(source):
     before='app.launchFlags = [.defaults, .andHide]'
     if source.count(before)!=1:raise ValueError('UTM launch patch no longer matches the pinned source')
-    return source.replace(before,'app.launchFlags = [.defaults]')
+    return source.replace(before,'''app.launchFlags = [.defaults]
+        // Restoring a previously closed library can leave the scripting delegate
+        // uninitialized. Only a cold app launch needs this per-process setting.
+        if !app.isRunning {
+            _ = try NSWorkspace.shared.launchApplication(at: utmAppUrl, options: [],
+                configuration: [.arguments: ["-ApplePersistenceIgnoreState", "YES"]])
+        }''')
 
 
 def build(output=OUTPUT):

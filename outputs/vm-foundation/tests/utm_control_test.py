@@ -29,5 +29,7 @@ class ControlIntegrity(unittest.TestCase):
         self.assertIn('app.launchFlags = [.defaults]',patched)
         self.assertIn('if environment.hide { library.close() }',patched)
         self.assertNotIn('.andHide',patched)
+        self.assertIn('if !app.isRunning {',patched)
+        self.assertIn('configuration: [.arguments: ["-ApplePersistenceIgnoreState", "YES"]]',patched)
         for invalid in ('changed upstream',source+'\n'+source):
             with self.assertRaises(ValueError):control.patch_launch(invalid)
