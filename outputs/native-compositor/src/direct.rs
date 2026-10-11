@@ -397,6 +397,7 @@ pub fn init(
             let mut device = session_device.borrow_mut();
             match event {
                 SessionEvent::PauseSession => {
+                    if let Some(service)=data.state.accessibility.as_mut(){service.pause();}
                     device.active = false;
                     data.state.direct_active = Some(false);
                     input.suspend();

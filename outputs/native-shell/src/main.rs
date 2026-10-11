@@ -674,7 +674,7 @@ fn draft_controls(
     commands: &Sender<Command>,
     events: &Rc<RefCell<Value>>,
 ) {
-    let row = gtk::FlowBox::new();
+    let row = gtk::FlowBox::builder().accessible_role(gtk::AccessibleRole::Group).focusable(false).build();
     row.set_selection_mode(gtk::SelectionMode::None);
     row.set_min_children_per_line(1);
     row.set_max_children_per_line(3);
@@ -692,7 +692,8 @@ fn draft_controls(
                 revision: state.borrow()["revision"].as_u64().unwrap_or(0),
             });
         });
-        row.insert(&button, -1);
+        let child=gtk::FlowBoxChild::builder().child(&button).focusable(false).accessible_role(gtk::AccessibleRole::Group).build();
+        row.insert(&child, -1);
     }
     let review = ui::button("Review latest version…", ButtonVariant::Outline, false);
     let (sender, s, e) = (commands.clone(), surface.to_string(), element.to_string());
@@ -702,7 +703,8 @@ fn draft_controls(
             .and_then(|root| root.downcast::<gtk::Window>().ok());
         draft_dialog::review(parent.as_ref(), s.clone(), e.clone(), sender.clone());
     });
-    row.insert(&review, -1);
+    let child=gtk::FlowBoxChild::builder().child(&review).focusable(false).accessible_role(gtk::AccessibleRole::Group).build();
+    row.insert(&child, -1);
     widget.append(&row);
 }
 fn literal_editor_value(props: &Value) -> String {

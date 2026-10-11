@@ -149,6 +149,17 @@ class Installation(unittest.TestCase):
         for bad in ('../private','2026;command'):
             with self.assertRaises(ValueError):bootstrap.sources({**profile,'snapshot':bad})
 
+    def test_backports_stay_authenticated_and_only_named_packages_receive_version_pins(self):
+        profile=json.loads((root/'dependencies.json').read_text())
+        text=bootstrap.sources(profile);self.assertIn('trixie-backports',text)
+        arguments=bootstrap.package_arguments(profile)
+        self.assertIn('orca=51.0-4~bpo13+1',arguments);self.assertIn('libgtk-4-dev',arguments)
+        self.assertNotIn('-t',arguments)
+        for versions in ({'unlisted':'1.0'},{'orca':'51 --allow-unauthenticated'},{'orca':True}):
+            with self.assertRaises(ValueError):bootstrap.package_arguments({**profile,'package_versions':versions})
+        for name,suite in [('debian-security','trixie-backports'),('debian','unstable')]:
+            with self.assertRaises(ValueError):bootstrap.sources({**profile,'archives':[{'name':name,'suites':[suite]}]})
+
     def test_invalid_source_or_host_binary_never_replaces_a_live_release(self):
         with tempfile.TemporaryDirectory() as tmp:
             instance,source=self.fixture(tmp)

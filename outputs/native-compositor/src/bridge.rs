@@ -487,7 +487,7 @@ impl Bridge {
             .unwrap_or_default()
             .as_nanos();
         let (reply, _) = mpsc::sync_channel(1);
-        if self.commands.try_send(Request {value:json!({"op":"workspace.undo","event_cursor":cursor,"request_id":format!("keyboard-undo-{}-{stamp}",std::process::id())}),reply,deadline:None}).is_err() {
+        if self.commands.try_send(Request {peer_pid:None,value:json!({"op":"workspace.undo","event_cursor":cursor,"request_id":format!("keyboard-undo-{}-{stamp}",std::process::id())}),reply,deadline:None}).is_err() {
             self.scene.lock().unwrap().error=Some("Workspace input queue busy".into());
         }
     }
@@ -517,6 +517,7 @@ impl Bridge {
         if self
             .commands
             .try_send(Request {
+                peer_pid:None,
                 value: json!({"op":format!("workspace.grab.{operation}"),"runtime":runtime}),
                 reply,
                 deadline: None,
@@ -560,6 +561,7 @@ impl Bridge {
         if self
             .commands
             .try_send(Request {
+                peer_pid:None,
                 value: json!({"op":"workspace.transaction","transaction":transaction,"input_baseline":document}),
                 reply,
                 deadline: None,

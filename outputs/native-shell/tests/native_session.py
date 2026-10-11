@@ -58,6 +58,13 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
         (config/'desktop.json').write_text(json.dumps({'appearance':appearance,'text_scale':scale,'reduced_motion':True}))
         env['AGENT_OS_SYSTEM_BAR_CAPTURE']=str(OUTPUT/f'system-bar-{appearance}-{scale:g}.png')
         env['AGENT_OS_LAUNCHER_CAPTURE']=str(OUTPUT/f'launcher-{appearance}-{scale:g}.png')
+    screen_reader='--screen-reader' in sys.argv
+    if screen_reader:
+        env.update(GSETTINGS_BACKEND='keyfile',XDG_DATA_HOME=str(root/'data'),
+                   XDG_SESSION_TYPE='wayland',XDG_CURRENT_DESKTOP='agentOS',LANG='C.UTF-8',
+                   AGENT_OS_SCREEN_READER_VERIFY='1',AGENT_OS_NATIVE_IME_FIXTURE='1')
+        speech=root/'config/speech-dispatcher';speech.mkdir(parents=True)
+        (speech/'speechd.conf').write_text('AddModule "espeak-ng" "sd_espeak-ng" "/etc/speech-dispatcher/modules/espeak-ng.conf"\nDefaultModule espeak-ng\nAudioOutputMethod "alsa"\nAudioALSADevice "null"\n')
     ime_editor='--ime-editor' in sys.argv
     ime='--ime' in sys.argv or ime_editor
     if ime:
@@ -67,7 +74,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
         if ime_editor:env['AGENT_OS_NATIVE_IME_OBSERVATION']=str(runtime/'ime-observation.json')
     host_failure='--host-failure' in sys.argv
     compositor_failure='--compositor-failure' in sys.argv
-    with (OUTPUT/('session-compositor-failure.log' if compositor_failure else 'session-host-failure.log' if host_failure else 'session-ime-editor.log' if ime_editor else 'session-ime.log' if ime else 'session.log')).open('w') as log:
+    with (OUTPUT/('session-compositor-failure.log' if compositor_failure else 'session-host-failure.log' if host_failure else 'session-ime-editor.log' if ime_editor else 'session-ime.log' if ime else 'session-reader.log' if screen_reader else 'session.log')).open('w') as log:
         core=subprocess.Popen([str(SHELL/'target/release/agent-os-core')],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
         session=None;owned=[]
         try:
@@ -75,7 +82,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
             activity=call(endpoint,{'op':'create','name':'Full desktop session'})['id']
             document={'protocol':'agentos.presentation/1','catalog_revision':'native-core/1','surface_id':'session-fixture','activity_id':str(activity),'revision':0,'title':'Session lifecycle','root':'root','elements':{'root':{'type':'Stack@1','props':{'spacing':'normal'},'slots':{'children':['reading','field']}},'reading':{'type':'Status@1','props':{'value':'Authenticated session fixture'}},'field':{'type':'DocumentEditor@1' if ime_editor else 'TextField@1','props':{'label':'Accessible session draft','value':'Original accessible value'}}},'bindings':{},'actions':{}}
             call(endpoint,{'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':'session-fixture','expected_revisions':{'session-fixture':None},'operations':[{'op':'surface.create','document':document}]})
-            session=subprocess.Popen(['python3',str(SHELL/'services/desktop_session.py'),'--backend','headless','--pixman','--bin-dir',str(bins),'--socket',str(endpoint)],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+            session=subprocess.Popen(['python3',str(SHELL/'services/desktop_session.py'),'--backend','headless','--pixman','--bin-dir',str(bins),'--socket',str(endpoint)]+(['--screen-reader'] if screen_reader else []),env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
             pidfile=wait_for(lambda:next(runtime.glob('agentos-session-*/compositor.pid'),None),[core,session])
             compositor=int(wait_for(lambda:pidfile.read_text().strip(),[core,session]));owned.append(compositor)
             control=pidfile.parent/f'agentos-compositor-{compositor}.sock'
@@ -89,6 +96,21 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
             assert bar['work_area']['y']==output['y']+bar['geometry']['height'],bar
             assert bar['work_area']['height']==output['height']-bar['geometry']['height'],bar
             assert not any(w['title'] in ('agentOS','agentOS system bar','Agent launcher') for w in layers['windows']),layers
+            if screen_reader:
+                import accessibility,pyatspi
+                workspace=call(endpoint,{'op':'presentation.snapshot'})['documents'][f'desktop-{activity}']
+                call(endpoint,{'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
+                    'request_id':'reader-fixture-focus','expected_revisions':{workspace['workspace_id']:workspace['revision']},
+                    'operations':[{'op':'workspace.edit','workspace_id':workspace['workspace_id'],
+                        'edit':{'kind':'focus','surface_id':'session-fixture','element_id':'field'}}]})
+                field=accessibility.find('Accessible session draft',pyatspi.ROLE_TEXT)
+                wait_for(lambda:field.getState().contains(pyatspi.STATE_FOCUSED),[core,session])
+                reader_log=pidfile.parent/'orca-speech.log'
+                def announced():
+                    text=reader_log.read_text() if reader_log.exists() else ''
+                    return 'Using speech server factory:' in text and 'SPEECH OUTPUT:' in text and 'Accessible session draft' in text
+                wait_for(announced,[core,session],timeout=30)
+                print('PASS: session-owned Orca initializes speech and announces the focused native field',flush=True)
             if system_bar:
                 import accessibility,pyatspi
                 accessibility.activate(accessibility.find('Agent Monitor',pyatspi.ROLE_PUSH_BUTTON))
@@ -156,6 +178,23 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 try:values=(proc/'environ').read_bytes().split(b'\0')
                 except (PermissionError,FileNotFoundError,ProcessLookupError):continue
                 if any(value==('XDG_RUNTIME_DIR='+str(runtime)).encode() or value.startswith(('XDG_RUNTIME_DIR='+str(runtime)+'/agentos-session-').encode()) for value in values):owned.append(int(proc.name))
+            # Orca's process-title support rewrites its initial environment.
+            # Include actual descendants of our exact session process as well as
+            # the private-runtime scan, including adopted speech children.
+            if screen_reader:
+                parents={}
+                for proc in Path('/proc').iterdir():
+                    if not proc.name.isdigit():continue
+                    try:parents[int(proc.name)]=int((proc/'stat').read_text().rsplit(') ',1)[1].split()[1])
+                    except (PermissionError,FileNotFoundError,ProcessLookupError):continue
+                descendants={session.pid}
+                while True:
+                    expanded=descendants|{pid for pid,parent in parents.items() if parent in descendants}
+                    if expanded==descendants:break
+                    descendants=expanded
+                owned.extend(descendants-{session.pid})
+            if screen_reader:
+                assert any(Path(f'/proc/{pid}/comm').read_text().strip()=='orca' for pid in owned if alive(pid)), 'Owned reader missing before teardown'
             if compositor_failure:
                 os.kill(compositor,signal.SIGKILL)
             elif host_failure:
@@ -168,6 +207,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
             remaining=lambda:[pid for pid in owned if alive(pid)]
             try:wait_for(lambda:not remaining(),[core] if core.poll() is None else [],timeout=5)
             except AssertionError:raise AssertionError('Session processes survived shutdown: '+str({pid:Path(f'/proc/{pid}/cmdline').read_bytes().replace(bytes([0]),b' ') for pid in remaining()}))
+            if screen_reader:print('PASS: owned reader and speech processes reaped after '+('compositor failure' if compositor_failure else 'normal logout'),flush=True)
             assert not control.exists(),'Compositor socket leaked'
             assert not list(runtime.glob('agentos-session-*')),'Session directory leaked'
             print('PASS: '+('abrupt compositor loss' if compositor_failure else 'display-host loss' if host_failure else 'normal session')+' maps authenticated surfaces and reaps display host, compositor and renderer')

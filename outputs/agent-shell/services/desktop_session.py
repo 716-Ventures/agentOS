@@ -108,7 +108,7 @@ def reap_session_children():
         except (ChildProcessError,ProcessLookupError):pass
 
 
-def direct_session(command,env,runtime,stopped):
+def direct_session(command,env,runtime,stopped,reader=None):
     """Own the direct compositor; its renderer remains the compositor's child."""
     proc=None;owned=None
     try:
@@ -116,7 +116,9 @@ def direct_session(command,env,runtime,stopped):
         identity=process_identity(proc.pid)
         if identity and identity[1]==os.getpid() and identity[2]==os.getuid() and identity[3]==Path(command[0]).resolve():
             owned=(proc.pid,identity)
-        while proc.poll() is None and not stopped():time.sleep(.05)
+        while proc.poll() is None and not stopped():
+            if reader and owned:reader.poll(runtime,env,owned[0])
+            time.sleep(.05)
         stop_compositor(runtime,owned)
         try:return proc.wait(timeout=5)
         except subprocess.TimeoutExpired:
@@ -124,13 +126,15 @@ def direct_session(command,env,runtime,stopped):
             try:return proc.wait(timeout=5)
             except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);return proc.wait(timeout=5)
     finally:
-        try:stop_compositor(runtime,owned)
+        try:
+            if reader:reader.close()
         finally:
-            if proc and proc.poll() is None:
-                os.killpg(proc.pid,signal.SIGTERM)
-                try:proc.wait(timeout=5)
-                except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait(timeout=5)
-
+            try:stop_compositor(runtime,owned)
+            finally:
+                if proc and proc.poll() is None:
+                    os.killpg(proc.pid,signal.SIGTERM)
+                    try:proc.wait(timeout=5)
+                    except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait(timeout=5)
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
@@ -139,12 +143,18 @@ def main():
     parser.add_argument('--socket',type=Path,default=Path('/run/agent-os/runtime.sock'))
     parser.add_argument('--activity',type=int,help='Open this existing activity in the graphical session')
     parser.add_argument('--pixman',action='store_true')
+    parser.add_argument('--screen-reader',action='store_true',help='Start an owned Orca reader with Wayland keyboard commands; requires Orca 51+')
     args=parser.parse_args()
     if args.backend=='direct' and args.pixman:raise ValueError('The direct backend requires GBM/GLES; pixman is a Weston host option')
     runtime=runtime_directory();command=child_command(args.bin_dir,args.socket,args.activity)
+    reader=None
+    if args.screen_reader:
+        from screen_reader import Reader,require_reader
+        reader=Reader(require_reader())
     enable_subreaper()
     env={**os.environ,'XDG_SESSION_TYPE':'wayland','XDG_CURRENT_DESKTOP':'agentOS','DESKTOP_SESSION':'agent-os',
          'AGENT_OS_COMPOSITOR_CORE':str(args.socket),'AGENT_OS_COMPOSITOR_BACKEND':'winit','WINIT_UNIX_BACKEND':'wayland','GDK_BACKEND':'wayland'}
+    if reader:env.update(AGENT_OS_SCREEN_READER="1",GTK_A11Y="atspi",AGENT_OS_SESSION_OWNER_PID=str(os.getpid()),AGENT_OS_SESSION_OWNER_START=process_identity(os.getpid())[0])
     stopped=False
     def stop(_signum,_frame):
         nonlocal stopped
@@ -154,7 +164,7 @@ def main():
     try:
         with tempfile.TemporaryDirectory(prefix='agentos-session-',dir=runtime) as directory:
             root=Path(directory);display_runtime=root;env['XDG_RUNTIME_DIR']=str(root)
-            if args.backend=='direct':return direct_session(command,env,root,lambda:stopped)
+            if args.backend=='direct':return direct_session(command,env,root,lambda:stopped,reader)
             child=root/'desktop-child';pidfile=root/'compositor.pid'
             script = "#!/bin/sh\nprintf '%s\\n' \"$$\" > " + shlex.quote(str(pidfile)) + "\nexec " + shlex.join(command) + "\n"
             child.write_text(script);child.chmod(0o700)
@@ -169,7 +179,9 @@ def main():
                         ident=int(pidfile.read_text().strip());identity=process_identity(ident)
                         if identity and identity[1]==proc.pid and identity[2]==os.getuid() and identity[3]==Path(command[0]).resolve():owned=(ident,identity)
                     except (OSError,ValueError):pass
+                if reader and owned:reader.poll(root,env,owned[0])
                 time.sleep(.05)
+            if reader:reader.close()
             # Weston starts autolaunched clients in separate process groups. Bind
             # ownership to its direct child and Linux start identity, not its pgid.
             stop_compositor(display_runtime,owned)
@@ -179,15 +191,17 @@ def main():
             try:return proc.wait(timeout=5)
             except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);return proc.wait(timeout=5)
     finally:
-        try:stop_compositor(display_runtime,owned)
+        try:
+            if reader:reader.close()
         finally:
-            if proc and proc.poll() is None:
-                os.killpg(proc.pid,signal.SIGTERM)
-                try:proc.wait(timeout=5)
-                except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait(timeout=5)
-            reap_session_children()
-            for sig,handler in previous.items():signal.signal(sig,handler)
-
+            try:stop_compositor(display_runtime,owned)
+            finally:
+                if proc and proc.poll() is None:
+                    os.killpg(proc.pid,signal.SIGTERM)
+                    try:proc.wait(timeout=5)
+                    except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait(timeout=5)
+                reap_session_children()
+                for sig,handler in previous.items():signal.signal(sig,handler)
 
 
 if __name__=='__main__':

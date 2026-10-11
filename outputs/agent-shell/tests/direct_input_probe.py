@@ -210,6 +210,16 @@ def assistive():
                     assert sensitive
                     response['requested']=undo.queryAction().doAction(0)
                 print(json.dumps(response),flush=True);continue
+            if request=='focused':
+                node=find('Direct input fixture',pyatspi.ROLE_TEXT)
+                while node.parent is not None and node.getRole()!=pyatspi.ROLE_FRAME:node=node.parent
+                queue=[node];focused=None
+                for _ in range(256):
+                    if not queue:break
+                    current=queue.pop()
+                    if current.getState().contains(pyatspi.STATE_FOCUSED):focused=current;break
+                    queue.extend(current[index] for index in range(min(current.childCount,64)))
+                print(json.dumps({'name':focused.name if focused else None,'role':focused.getRoleName() if focused else None,'button':focused.getRole()==pyatspi.ROLE_PUSH_BUTTON if focused else False}),flush=True);continue
             assert request=='snapshot'
             field=find('Direct input fixture',pyatspi.ROLE_TEXT)
             ancestor=field
@@ -236,7 +246,7 @@ def assistive():
         print(json.dumps(response),flush=True)
 
 
-def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False,presentation_feedback=False,native_feedback=False,native_feedback_load=False,table_input=False,focus_transfers=1):
+def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False,presentation_feedback=False,native_feedback=False,native_feedback_load=False,table_input=False,focus_transfers=1,screen_reader=False):
     subprocess.run(['modprobe','uinput'],check=True)
     # Join only this test session's accessibility bus; never inspect other users.
     bus=None;observer_runtime=None;wayland=None;deadline=time.monotonic()+10
@@ -401,6 +411,10 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
         except RuntimeError:
             print('Initial kernel focus observation:',json.dumps({'before':initial,'after':snapshot(),'scene':scene()}),flush=True)
             raise
+        if screen_reader:
+            import direct_screen_reader_probe
+            direct_screen_reader_probe.verify(metrics,env,login_user,keyboard,snapshot,wait,core,scene)
+            return
         if native_feedback:
             import direct_native_feedback
             direct_native_feedback.verify(metrics,core,login_user,keyboard,wait,load=native_feedback_load)

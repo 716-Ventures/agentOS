@@ -12,8 +12,19 @@ use std::{
     thread,
     time::{Duration, Instant},
 };
+fn peer_pid(stream:&std::os::unix::net::UnixStream)->Option<u32> {
+    #[cfg(target_os="linux")] {
+        use std::os::fd::AsRawFd;
+        let mut credentials=libc::ucred{pid:0,uid:0,gid:0};
+        let mut size=std::mem::size_of::<libc::ucred>() as libc::socklen_t;
+        let result=unsafe {libc::getsockopt(stream.as_raw_fd(),libc::SOL_SOCKET,libc::SO_PEERCRED,(&mut credentials as *mut libc::ucred).cast(),&mut size)};
+        if result==0 && credentials.uid==unsafe{libc::getuid()} && credentials.pid>0 {return Some(credentials.pid as u32);}
+    }
+    None
+}
 pub struct Request {
     pub value: Value,
+    pub peer_pid: Option<u32>,
     pub reply: SyncSender<Value>,
     pub deadline: Option<Instant>,
 }
@@ -49,6 +60,7 @@ impl Control {
             while !stopping.load(Ordering::Relaxed) {
                 match listener.accept() {
                     Ok((mut stream, _)) => {
+                        let peer_pid=peer_pid(&stream);
                         let _ = stream.set_read_timeout(Some(Duration::from_millis(200)));
                         let _ = stream.set_write_timeout(Some(Duration::from_millis(200)));
                         let mut line = String::new();
@@ -63,6 +75,7 @@ impl Control {
                             if sender
                                 .try_send(Request {
                                     value,
+                                    peer_pid,
                                     reply,
                                     // The bridge may wait up to two seconds for one core reply.
                                     // Queueing remains bounded and expired mutations are skipped.

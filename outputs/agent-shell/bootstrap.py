@@ -17,11 +17,20 @@ def sources(profile):
     entries=[]
     for archive in profile['archives']:
         if archive['name'] not in ('debian','debian-security'):raise ValueError('Invalid archive')
-        if any(s not in ('trixie','trixie-updates','trixie-security') for s in archive['suites']):raise ValueError('Invalid suite')
+        allowed={'debian':('trixie','trixie-updates','trixie-backports'),'debian-security':('trixie-security',)}
+        if any(s not in allowed[archive['name']] for s in archive['suites']):raise ValueError('Invalid suite')
         entries.append('Types: deb\nURIs: https://snapshot.debian.org/archive/'+archive['name']+'/'+profile['snapshot']+
                        '/\nSuites: '+' '.join(archive['suites'])+'\nComponents: main\n'+
                        'Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg\nCheck-Valid-Until: no\n')
     return '\n'.join(entries)
+
+
+def package_arguments(profile):
+    names=profile['packages'];versions=profile.get('package_versions',{})
+    if not isinstance(names,list) or any(not isinstance(p,str) or not re.fullmatch(r'[a-z0-9][a-z0-9+.-]*',p) for p in names):raise ValueError('Invalid package')
+    if not isinstance(versions,dict) or set(versions)-set(names):raise ValueError('Version pin must name an included package')
+    if any(not isinstance(v,str) or not re.fullmatch(r'[0-9][A-Za-z0-9.+:~-]*',v) for v in versions.values()):raise ValueError('Invalid package version')
+    return [name+'='+versions[name] if name in versions else name for name in names]
 
 
 def manifest(profile_hash):
@@ -36,7 +45,7 @@ def main():
     if 'VERSION_ID="13"' not in os_release or subprocess.check_output(['dpkg','--print-architecture'],text=True).strip()!='arm64':
         raise SystemExit('This dependency recipe requires Debian 13 arm64')
     raw=(ROOT/'dependencies.json').read_bytes();profile=json.loads(raw)
-    if any(not re.fullmatch(r'[a-z0-9][a-z0-9+.-]*',p) for p in profile['packages']):raise ValueError('Invalid package')
+    packages=package_arguments(profile)
     profile_hash=hashlib.sha256(raw).hexdigest()
     STATE.mkdir(mode=0o700,parents=True,exist_ok=True);STATE.chmod(0o700)
     report=STATE/'dependencies.json'
@@ -51,10 +60,12 @@ def main():
                  '-o','Dir::State::lists='+str(lists),'-o','Acquire::Retries=3']
         env={**os.environ,'DEBIAN_FRONTEND':'noninteractive'}
         subprocess.run(['apt-get',*options,'update'],env=env,check=True)
-        subprocess.run(['apt-get',*options,'install','-y','--no-install-recommends',*profile['packages']],env=env,check=True)
+        subprocess.run(['apt-get',*options,'install','-y','--no-install-recommends',*packages],env=env,check=True)
     result=manifest(profile_hash)
     missing=set(profile['packages'])-{name.split(':')[0] for name in result['packages']}
     if missing:raise RuntimeError('Missing dependencies: '+', '.join(sorted(missing)))
+    installed={name.split(':')[0]:version for name,version in result['packages'].items()}
+    if any(installed.get(name)!=version for name,version in profile.get('package_versions',{}).items()):raise RuntimeError('Installed dependency version differs from the explicit pin')
     tmp=report.with_suffix('.tmp');tmp.write_text(json.dumps(result,indent=2,sort_keys=True)+'\n');tmp.replace(report)
     print('Installed locked-snapshot dependency profile; versions recorded in',report)
 

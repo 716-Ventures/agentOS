@@ -17,6 +17,7 @@ mod timings;
 mod direct;
 #[cfg(feature = "direct-display")]
 mod presentation_feedback;
+mod accessibility;
 mod grabs;
 mod input;
 mod input_revision;
@@ -74,6 +75,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         _ => return Err("Unsupported compositor backend".into()),
     }
 
+    if std::env::var("AGENT_OS_SCREEN_READER").as_deref()==Ok("1") {
+        let keyboard=data.state.seat.get_keyboard().unwrap();
+        let keymap=keyboard.with_xkb_state(&mut data.state,|context| {
+            let xkb=context.xkb().lock().unwrap();
+            // Only serialize while borrowed under the keyboard lock; retain no reference.
+            unsafe {xkb.keymap().get_as_string(smithay::input::keyboard::xkb::KEYMAP_FORMAT_TEXT_V1)}
+        });
+        data.state.accessibility=Some(accessibility::Service::start(keymap)?);
+    }
     let input_method = input_method::Service::start(&mut data.state)?;
     let control = control::Control::start()?;
     std::env::set_var("AGENT_OS_COMPOSITOR_SOCKET", &control.path);
@@ -100,6 +110,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Some(std::time::Duration::from_millis(16)),
         &mut data,
         |data| {
+            if let Some(service)=&data.state.accessibility {service.dispatch();}
             // Core/seat reconciliation must progress when the outer compositor
             // throttles frame callbacks (for example an occluded nested window).
             if backend == "winit" {
@@ -117,6 +128,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             for req in control.requests.try_iter().take(8) {
                 if req.expired() {
                     continue;
+                }
+                if req.value["op"].as_str()==Some("screen_reader.register") {
+                    let result=data.state.accessibility.as_mut().ok_or("Screen reader is disabled").and_then(|service|service.register(req.peer_pid,req.value["pid"].as_u64(),req.value["start"].as_str()));
+                    let response=match result {Ok(())=>serde_json::json!({"ok":true,"result":{}}),Err(error)=>serde_json::json!({"ok":false,"error":error})};
+                    let _=req.reply.try_send(response);continue;
                 }
                 if req.value["op"]
                     .as_str()

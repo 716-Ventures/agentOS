@@ -62,6 +62,18 @@ impl Smallvil {
     pub fn process_input_event<I: InputBackend>(&mut self, event: InputEvent<I>) {
         match event {
             InputEvent::Keyboard { event, .. } => {
+                #[cfg(feature="direct-display")]
+                if event.state()==KeyState::Pressed {
+                    if let Some(vt)=self.accessibility.as_ref().and_then(|service|service.reserved_vt(event.key_code())) {
+                        if let Some(session)=self.direct_session.as_mut() {
+                            use smithay::backend::session::Session;
+                            if let Err(error)=session.change_vt(vt) {eprintln!("VT switch failed: {error}");}
+                            self.suppressed_keys.insert(event.key_code().raw());
+                            return;
+                        }
+                    }
+                }
+                if self.accessibility.as_mut().is_some_and(|service| service.key(event.key_code(), event.state()==KeyState::Released)) {return;}
                 let serial = SERIAL_COUNTER.next_serial();
                 let time = Event::time_msec(&event);
 

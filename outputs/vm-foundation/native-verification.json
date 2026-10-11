@@ -1563,6 +1563,43 @@
         "Owned guest/app cleanup verified"
       ],
       "boundary": "Diagnostic does not explain or resolve the prior full-run 700x500 List/Table sizing observations; no geometry runtime behavior changed. Override harness footer is not evidence of the ordinary collection clipboard journey."
+    },
+    "session_owned_orca": {
+      "result": "verified_targeted",
+      "installed_runtime_release": "a664ef2bbe4fbabdda3233e1da9dfbf1a325c7b67c8ecf9bddb4d48ea68711a2",
+      "packages": {
+        "orca": "51.0-4~bpo13+1",
+        "speech-dispatcher": "0.12.1-5~bpo13+1",
+        "speech-dispatcher-espeak-ng": "0.12.1-5~bpo13+1"
+      },
+      "source_sha256": {
+        "outputs/agent-shell/services/screen_reader.py": "b655cabbc0f8c51f8efc67012a452576512c7c569111bd2eb84f4b478ecba140",
+        "outputs/agent-shell/services/desktop_session.py": "bd553c5200bb00f5b4e188e1295f3e5ca5ec7eaadac75c3a9182cef9b9d2c0d2",
+        "outputs/native-compositor/src/accessibility.rs": "2201ec7099d22307a2c1c7039f433353833ead1b7b219178c945230e3aa5eef0",
+        "outputs/native-shell/src/main.rs": "2675137867cf4cc3bb573cac95f140fda8662429dd43b606e972c189ebfd0fd5"
+      },
+      "logs_sha256": {
+        "agentos-orca-semantic-button-session-probe.log": "94a9ac3272b0c58b7ef214b7152a4de9d3fea6b7b22c2e7341b1fdc9159386af",
+        "agentos-orca-installed-profile.log": "2226b31e188c3edf57eed922094870b0e1777c0e171bf17162ed15b4f1674dce",
+        "agentos-orca-lifecycle-fixed.log": "06003468fd38a751ae28360a72130d127fa835669cdfb7c7fc5fd6f8316cb251",
+        "agentos-orca-vt.log": "ca4f46c148371c2caae15f47623f42474b7cb8b6372d4914cb168acc831c0ba2",
+        "agentos-orca-captures-occluded.log": "64de7d8b7375fc99a8113eee291f968897bc09ef2fd22f6689f583b6866bbb6b"
+      },
+      "captures_sha256": {
+        "agentos-draft-actions-dark-1.png": "9fa22f158575ed3a3077e70c809c86c8b29ddfa1bbe445f9f12e1914714885f2",
+        "agentos-draft-actions-light-2-small.png": "35feacc95b4fafd069e6448bdaf53eca5db3fe5e36574f2f19811b3fb6c84805"
+      },
+      "qualified": [
+        "271 Linux Python tests, 31 native tests and 42 compositor tests pass; seven explicitly ignored native scenarios remain ignored",
+        "Installed Orca initializes speech and announces editor, Save and Discard; kernel navigation/activation completes edit/save/correction/discard",
+        "Source-built final reader journey also verifies rescue VT access during a full grab, resumed typing, reader loss and same-user registration/name-spoof denial",
+        "Session-owned reader and speech processes reaped after normal logout and abrupt compositor failure; unrelated readers are never replaced",
+        "Draft action containers delegate actual keyboard focus and button roles; normal dark and doubled-text small light captures visually inspected",
+        "Authenticated snapshot dependency bootstrap passes on existing guest with exact pinned reader/speech versions",
+        "20 occluded List/float/close geometry cycles pass without changing geometry behavior",
+        "Exact owned guest/session and UTM application exit verified"
+      ],
+      "boundary": "Private null speech sink; audible quality, braille, pointer location, physical input and complete reader/reference parity unqualified. Installed-profile wrapper failed only when retrieving an obsolete dark capture after both reader and light-large-text journeys passed; corrected capture/geometry wrapper passed. Original dependency packages were already installed before authenticated bootstrap. No fresh image or complete expanded reproduction claim. Earlier sizing and v9 PRIMARY observations remain unresolved."
     }
   },
   "observations": [
@@ -1572,7 +1609,8 @@
     "A second contextual-request full run passed 45 checks including Table, then failed terminal peer geometry. Diagnostics proved the fixture exhausted its ten-second deadline by performing a core CLI lookup per historical workspace (38.25 seconds). Corrected activity lookup and independent convergence deadline reduced placement to 0.71 seconds. An immediate cold broker probe separately reproduced missing live source publication behind more than 2000 historical jobs. Streamed historical backfill corrected the ordering; the installed terminal journey then passed after broker restart. These targeted fixes do not erase the earlier unresolved Table or PRIMARY focus observations.",
     "The temporary verification wrappers incorrectly reported closing UTM when its process had launch arguments. That app-cleanup claim is withdrawn for the affected post-cold-launch probes. Guest shutdown evidence remains valid. The lingering owned app was subsequently closed after both saved guests were verified stopped. Durable cleanup now checks executable/start identity, every guest state and actual process exit; a cold launch/close probe and 24 tooling tests pass.",
     "Current CI observed one accessible Discard convergence failure; 50 instrumented rapid cycles then passed without a runtime fix. The third full reproduction stopped after 44 successful checks at List geometry; the committed 900x400 placement remained rendered at 700x500. One instrumented full List journey then passed without a geometry fix. Both observations remain open with exact log hashes and bounded diagnostics; neither passing repeat is treated as a correction.",
-    "The accessible Discard failure was reproduced under Orca 51 with a focused field: core draft was null at revision 4, saved Unicode text was correct, but the widget retained the discarded edit. The component background-focus guard had blocked the explicit human resolution while the renderer retired its resolution marker. Source-built correction and focused TextField/multiline/DocumentEditor/Choice/Toggle regressions pass; callbacks also retain the current baseline revision for subsequent edits. This explains the focused Discard defect without resolving the independent List geometry observation."
+    "The accessible Discard failure was reproduced under Orca 51 with a focused field: core draft was null at revision 4, saved Unicode text was correct, but the widget retained the discarded edit. The component background-focus guard had blocked the explicit human resolution while the renderer retired its resolution marker. Source-built correction and focused TextField/multiline/DocumentEditor/Choice/Toggle regressions pass; callbacks also retain the current baseline revision for subsequent edits. This explains the focused Discard defect without resolving the independent List geometry observation.",
+    "Session-owned Orca 51 integration and modern compositor keyboard monitoring now pass targeted installed/source-built journeys and lifecycle cleanup. Native keyboard navigation exposed focus stopping on a FlowBox wrapper instead of Save/Discard buttons; nonfocusable group wrappers now delegate to the actual button. Full-grab rescue VT escape and same-user monitor/registration denial pass. Twenty occluded List cycles pass without explaining the earlier sizing failure. Historical complete-run identities remain unchanged."
   ],
   "owned_utm_app_closed": true
 }

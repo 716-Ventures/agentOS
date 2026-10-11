@@ -26,6 +26,7 @@ use smithay::{
 use crate::CalloopData;
 
 pub struct Smallvil {
+    pub accessibility: Option<crate::accessibility::Service>,
     pub policy: crate::policy::Policy,
     pub bridge: Option<crate::bridge::Bridge>,
     pub applied_focus: Option<String>,
@@ -105,6 +106,7 @@ impl Smallvil {
         let loop_signal = event_loop.get_signal();
 
         Self {
+            accessibility: None,
             policy: crate::policy::Policy::default(),
             bridge: std::env::var_os("AGENT_OS_COMPOSITOR_CORE")
                 .map(|p| crate::bridge::Bridge::start(p.into())),

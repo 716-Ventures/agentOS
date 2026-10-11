@@ -7,7 +7,8 @@
       "name": "debian",
       "suites": [
         "trixie",
-        "trixie-updates"
+        "trixie-updates",
+        "trixie-backports"
       ]
     },
     {
@@ -59,6 +60,14 @@
     "libvte-2.91-gtk4-dev",
     "firefox-esr",
     "xdg-utils",
-    "desktop-file-utils"
-  ]
+    "desktop-file-utils",
+    "orca",
+    "speech-dispatcher",
+    "speech-dispatcher-espeak-ng"
+  ],
+  "package_versions": {
+    "orca": "51.0-4~bpo13+1",
+    "speech-dispatcher": "0.12.1-5~bpo13+1",
+    "speech-dispatcher-espeak-ng": "0.12.1-5~bpo13+1"
+  }
 }

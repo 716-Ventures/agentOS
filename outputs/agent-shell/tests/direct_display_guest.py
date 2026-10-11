@@ -28,6 +28,7 @@ def main():
     parser.add_argument('--focus-transfers',type=int,choices=range(1,51),default=1,help='Repeat real source publication/destination focus/primary paste/undo cycles (dedicated VM only)')
     parser.add_argument('--output-transform',choices=['normal','90','180','270','flipped','flipped-90','flipped-180','flipped-270'],help='Use isolated output preferences on the dedicated single-output virtual KMS guest')
     modes=parser.add_mutually_exclusive_group()
+    modes.add_argument('--screen-reader-input',action='store_true',help='Qualify session-owned Orca focus announcements and kernel keyboard commands with a private null audio sink')
     modes.add_argument('--list-input',action='store_true',help='Qualify installed List selection and copying through kernel input')
     modes.add_argument('--keyvalue-input',action='store_true',help='Qualify installed KeyValue selection and copying through kernel input')
     modes.add_argument('--table-input',action='store_true',help='Qualify installed Table selection and copying through kernel input')
@@ -39,9 +40,9 @@ def main():
     args = parser.parse_args()
     if args.focus_transfers > 1:args.input=True
     collection_kind = "List@1" if args.list_input else "KeyValue@1" if args.keyvalue_input else "Table@1" if args.table_input else None
-    if args.focus_transfers > 1 and (collection_kind or args.terminal_input or args.terminal_ime or args.presentation_feedback or args.native_feedback or args.native_feedback_load or args.output_transform not in (None, 'normal')):
+    if args.focus_transfers > 1 and (collection_kind or args.terminal_input or args.terminal_ime or args.presentation_feedback or args.native_feedback or args.native_feedback_load or args.screen_reader_input or args.output_transform not in (None, 'normal')):
         parser.error('Focus transfer stress requires the ordinary editor input journey')
-    if collection_kind:args.input=True
+    if collection_kind or args.screen_reader_input:args.input=True
     if args.native_feedback_load:args.native_feedback=True
     if args.native_feedback:args.input=True
     if args.presentation_feedback:args.input=True
@@ -82,6 +83,12 @@ def main():
             for path in (output_config,preference_dir,preference):
                 os.chown(path,user.pw_uid,user.pw_gid)
 
+        reader_config=None
+        if args.screen_reader_input:
+            reader_config=metrics/'reader-home';speech=reader_config/'.config/speech-dispatcher';speech.mkdir(parents=True)
+            (speech/'speechd.conf').write_text('AddModule "espeak-ng" "sd_espeak-ng" "/etc/speech-dispatcher/modules/espeak-ng.conf"\nDefaultModule espeak-ng\nAudioOutputMethod "alsa"\nAudioALSADevice "null"\n')
+            for path in [reader_config,*reader_config.rglob('*')]:os.chown(path,user.pw_uid,user.pw_gid)
+
         def control(path, op):
             with socket.socket(socket.AF_UNIX) as conn:
                 # The server bounds queued control work at five seconds. This
@@ -111,17 +118,19 @@ def main():
                     '--property=StandardInput=tty', '--property=TTYReset=yes',
                     '--property=TTYVHangup=yes', '--property=KillMode=control-group',
                     '--property=StandardOutput=journal', '--property=StandardError=journal',
-                    '--property=TimeoutStopSec=15', '--property=RuntimeMaxSec='+('180' if args.focus_transfers > 1 else '120' if args.terminal_input or collection_kind else '90'),
+                    '--property=TimeoutStopSec=15', '--property=RuntimeMaxSec='+('180' if args.focus_transfers > 1 else '150' if args.screen_reader_input else '120' if args.terminal_input or collection_kind else '90'),
                     '--setenv=XDG_RUNTIME_DIR=' + str(runtime),
                     '--setenv=XDG_SESSION_TYPE=wayland', '--setenv=XDG_SESSION_CLASS=user',
                     '--setenv=XDG_SEAT=seat0', '--setenv=XDG_VTNR=7',
                     '--setenv=LIBSEAT_BACKEND=logind', '--setenv=AGENT_OS_METRICS_DIR=' + directory,
                     *(['--setenv=XDG_CONFIG_HOME='+str(output_config)] if output_config else []),
                     *(['--setenv=GTK_A11Y=atspi'] if args.input else []),
+                    *(['--setenv=HOME='+str(reader_config),'--setenv=XDG_CONFIG_HOME='+str(reader_config/'.config'),'--setenv=XDG_DATA_HOME='+str(reader_config/'.local/share'),'--setenv=XDG_STATE_HOME='+str(reader_config/'.local/state'),'--setenv=GSETTINGS_BACKEND=keyfile','--setenv=LANG=C.UTF-8','--setenv=AGENT_OS_SCREEN_READER_VERIFY=1'] if reader_config else []),
                     *(['--setenv=AGENT_OS_FEEDBACK_METRICS=1'] if args.native_feedback else []),
                     *(['--setenv=GTK_IM_MODULE=wayland', '--setenv=AGENT_OS_INPUT_METHOD_ARGV='+json.dumps([str(Path(__file__).resolve().parents[1]/'native-compositor/target/debug/examples/ime_fixture'),str(metrics/'ime-test.sock')])] if args.terminal_ime else []),
                     '/usr/bin/dbus-run-session', '--', '/usr/local/bin/agent-os-session', '--backend', 'direct',
-                    *(['--activity',str(activity)] if activity else []))
+                    *(['--activity',str(activity)] if activity else []),
+                    *(['--screen-reader'] if args.screen_reader_input else []))
             leader = int(subprocess.check_output(['systemctl', 'show', unit, '--property=MainPID', '--value'], text=True))
             assert leader > 0, 'Local login wrapper did not start'
             deadline = time.monotonic() + 30
@@ -201,7 +210,7 @@ def main():
                     if target is not None and observed.get('seat_focus')==target:break
                     if time.monotonic()>deadline:raise RuntimeError('Direct input fixture did not receive seat focus')
                     time.sleep(.05)
-                direct_input_probe.verify(metrics,snapshot['outputs'][0],core,lambda:control(endpoint,'snapshot'),target,user.pw_name,presentation,terminal_input=args.terminal_input,terminal_ime=args.terminal_ime,presentation_feedback=args.presentation_feedback,native_feedback=args.native_feedback,native_feedback_load=args.native_feedback_load,table_input=collection_kind,focus_transfers=args.focus_transfers)
+                direct_input_probe.verify(metrics,snapshot['outputs'][0],core,lambda:control(endpoint,'snapshot'),target,user.pw_name,presentation,terminal_input=args.terminal_input,terminal_ime=args.terminal_ime,presentation_feedback=args.presentation_feedback,native_feedback=args.native_feedback,native_feedback_load=args.native_feedback_load,screen_reader=args.screen_reader_input,table_input=collection_kind,focus_transfers=args.focus_transfers)
             if args.hold_seconds:
                 print('Direct desktop ready for console inspection', flush=True)
                 time.sleep(args.hold_seconds)
@@ -260,7 +269,8 @@ def main():
                           'frames_before_vt': snapshot['direct_frames_presented'],
                           'frames_after_vt': resumed['direct_frames_presented'],
                           'checks': ['private native system bar', 'KMS output discovery', 'shared core connection',
-                                     'VT switch and resume', 'orderly shutdown', 'session directory cleanup', 'owned login scope cleanup'] + (['kernel '+collection_kind+' pointer and keyboard row selection','Ctrl+C and accessible Shift+F10/secondary clipboard menus','separate-client exact Unicode row text','focused refresh rejection and key-based selection across background reorder/update','empty-selection Copy rejection, row removal and local menu focus restoration'] if collection_kind else ['native GTK editor kernel key-to-presentation receipts, 20 sequential samples']+(['two distinct concurrent broker CPU jobs with measured CPU consumption','owned CPU work cancellation and unit cleanup'] if args.native_feedback_load else []) if args.native_feedback else ['Wayland presentation timestamps from completed virtual KMS frames','kernel key-triggered content feedback','superseded frame discard and unmap'] if args.presentation_feedback else ['kernel keyboard and absolute pointer','clipboard copy/paste','undo/redo','retained draft','deliberate pointer Save','kernel workspace move/resize/maximize/restore/undo','native titlebar drag with durable placement','kernel focus cycling','kernel VT shortcut and acknowledged resume','kernel close and native assistive undo','focused primary middle-paste across Wayland clients','Unicode COPY drag/drop and grouped undo','oversized drop rejection','drag icon rendering and release cleanup'] if args.input and not args.terminal_input else ['kernel keyboard and absolute pointer in VTE','trusted Wayland IME preedit and Unicode commit','concurrent native rendering during VTE composition','detached IME commit rejected without reattach replay'] if args.terminal_ime else ['kernel keyboard and absolute pointer in VTE','Unicode Wayland clipboard to PTY','explicit native detach and reattach','kernel pointer selection and exact Unicode line copy','accessible secondary-click and Shift+F10 clipboard menus','closed-popup seat focus and first absolute pointer motion','detached menu Paste disabled and input rejected','ordinary Ctrl+C program interruption'] if args.terminal_input else []),
+                                     'VT switch and resume', 'orderly shutdown', 'session directory cleanup', 'owned login scope cleanup'] + (['kernel '+collection_kind+' pointer and keyboard row selection','Ctrl+C and accessible Shift+F10/secondary clipboard menus','separate-client exact Unicode row text','focused refresh rejection and key-based selection across background reorder/update','empty-selection Copy rejection, row removal and local menu focus restoration'] if collection_kind else ['native GTK editor kernel key-to-presentation receipts, 20 sequential samples']+(['two distinct concurrent broker CPU jobs with measured CPU consumption','owned CPU work cancellation and unit cleanup'] if args.native_feedback_load else []) if args.native_feedback else ['Wayland presentation timestamps from completed virtual KMS frames','kernel key-triggered content feedback','superseded frame discard and unmap'] if args.presentation_feedback else ['session-owned Orca field announcement','kernel Orca learn-mode enter/exit','assistive grab isolation and ordinary typing restoration' ] if args.screen_reader_input else ['kernel keyboard and absolute pointer','clipboard copy/paste','undo/redo','retained draft','deliberate pointer Save','kernel workspace move/resize/maximize/restore/undo','native titlebar drag with durable placement','kernel focus cycling','kernel VT shortcut and acknowledged resume','kernel close and native assistive undo','focused primary middle-paste across Wayland clients','Unicode COPY drag/drop and grouped undo','oversized drop rejection','drag icon rendering and release cleanup'] if args.input and not args.terminal_input else ['kernel keyboard and absolute pointer in VTE','trusted Wayland IME preedit and Unicode commit','concurrent native rendering during VTE composition','detached IME commit rejected without reattach replay'] if args.terminal_ime else ['kernel keyboard and absolute pointer in VTE','Unicode Wayland clipboard to PTY','explicit native detach and reattach','kernel pointer selection and exact Unicode line copy','accessible secondary-click and Shift+F10 clipboard menus','closed-popup seat focus and first absolute pointer motion','detached menu Paste disabled and input rejected','ordinary Ctrl+C program interruption'] if args.terminal_input else []),
+                          'screen_reader_input_qualified': args.screen_reader_input,
                           'table_input_qualified': args.table_input,
                           'collection_input_qualified': collection_kind,
                           'terminal_input_qualified': args.terminal_input,
@@ -270,7 +280,7 @@ def main():
                           'native_feedback_load_qualified': args.native_feedback_load,
                           'output_transform_qualified': args.output_transform,
                           'focus_transfer_cycles': args.focus_transfers if args.input and not args.terminal_input and not collection_kind and not args.native_feedback and not args.presentation_feedback else None,
-                          'not_tested': ['physical input', 'hotplug', 'physical GPU presentation']}))
+                          'not_tested': ['physical input', 'hotplug', 'physical GPU presentation']+(['audible speech quality','braille hardware','screen-reader pointer location'] if args.screen_reader_input else [])}))
 
 
 if __name__ == '__main__':
