@@ -1,0 +1,20 @@
+Save-render-barrier-probe-1
+Traceback (most recent call last):
+  File "/home/developer/agent-os-source/native-shell/tests/native_session.py", line 96, in <module>
+    pidfile=wait_for(lambda:next(runtime.glob('agentos-session-*/compositor.pid'),None),[core,session])
+  File "/home/developer/agent-os-source/native-shell/tests/native_session.py", line 22, in wait_for
+    assert all(p.poll() is None for p in children),'A session process exited; inspect session.log'
+           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: A session process exited; inspect session.log
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+Requested orderly guest shutdown. Check status before restarting.
+{"started_at": "2026-10-11T16:07:16.354370+00:00", "source_revision": "f94e9f7a9c1f8511518a00d1b8b6ffce04a9d91b", "source_changes": [" M outputs/implementation-status.md", " M outputs/native-shell/tests/accessibility.py", " M outputs/vm-foundation/README.md", " M outputs/vm-foundation/image-verification.json", " M outputs/vm-foundation/native-verification.json"], "source_archive_sha256": "bfb6c730ffab4af8446dae3b3a3d4dbae11bdd256412262ee3f9f22d27caec79", "passed": false, "owned_utm_identity": [8237, "Sun Oct 11 12:07:16 2026"], "owned_utm_closed": true, "finished_at": "2026-10-11T16:07:33.254931+00:00"}
+Traceback (most recent call last):
+  File "/tmp/agentos-save-render-barrier.py", line 25, in <module>
+    vm.ssh('cd /home/developer/agent-os-source && for probe in 1 2 3 4 5; do echo Save-render-barrier-probe-$probe; dbus-run-session -- python3 native-shell/tests/native_session.py --screen-keyboard || exit; dbus-run-session -- python3 native-shell/tests/native_session.py --display-zoom || exit; done',check=True)
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/vm.py", line 309, in ssh
+    return subprocess.run(ssh_args() + [command], **kwargs)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ssh', '-p', '22221', '-i', '/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/id_ed25519', '-o', 'IdentitiesOnly=yes', '-o', 'StrictHostKeyChecking=accept-new', '-o', 'UserKnownHostsFile=/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/known_hosts', '-o', 'ConnectTimeout=3', '-o', 'BatchMode=yes', '-o', 'LogLevel=ERROR', 'developer@127.0.0.1', 'cd /home/developer/agent-os-source && for probe in 1 2 3 4 5; do echo Save-render-barrier-probe-$probe; dbus-run-session -- python3 native-shell/tests/native_session.py --screen-keyboard || exit; dbus-run-session -- python3 native-shell/tests/native_session.py --display-zoom || exit; done']' returned non-zero exit status 1.

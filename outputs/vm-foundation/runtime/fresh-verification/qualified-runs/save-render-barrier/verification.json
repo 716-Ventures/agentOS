@@ -1,0 +1,25 @@
+{
+  "started_at": "2026-10-11T16:08:03.474825+00:00",
+  "source_revision": "d9ed8aa424f262bdaf2ae54fc63f4c22675a9e1e",
+  "source_changes": [
+    " M outputs/native-shell/tests/accessibility.py"
+  ],
+  "source_archive_sha256": "bfb6c730ffab4af8446dae3b3a3d4dbae11bdd256412262ee3f9f22d27caec79",
+  "passed": true,
+  "owned_utm_identity": [
+    9091,
+    "Sun Oct 11 12:08:03 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T16:10:32.586960+00:00",
+  "keyboard_profiles": 5,
+  "zoom_profiles": 5,
+  "stale_view_rejection_test": "pass",
+  "failed_ci_runs": [
+    38149092789,
+    38153193074
+  ],
+  "fixture_sha256": "0bc543e21fbb8b9510e53c002e7b94d17d62de3907d87438b8a02f1400c737cc",
+  "production_code_changed": false,
+  "historical_cause": "not conclusively established; fixture now observes actual same-surface renderer progress after prior core commits"
+}

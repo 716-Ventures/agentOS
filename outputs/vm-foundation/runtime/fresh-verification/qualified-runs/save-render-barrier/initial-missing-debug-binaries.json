@@ -1,0 +1,19 @@
+{
+  "started_at": "2026-10-11T16:07:16.354370+00:00",
+  "source_revision": "f94e9f7a9c1f8511518a00d1b8b6ffce04a9d91b",
+  "source_changes": [
+    " M outputs/implementation-status.md",
+    " M outputs/native-shell/tests/accessibility.py",
+    " M outputs/vm-foundation/README.md",
+    " M outputs/vm-foundation/image-verification.json",
+    " M outputs/vm-foundation/native-verification.json"
+  ],
+  "source_archive_sha256": "bfb6c730ffab4af8446dae3b3a3d4dbae11bdd256412262ee3f9f22d27caec79",
+  "passed": false,
+  "owned_utm_identity": [
+    8237,
+    "Sun Oct 11 12:07:16 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T16:07:33.254931+00:00"
+}

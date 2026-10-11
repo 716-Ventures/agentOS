@@ -47,6 +47,18 @@ def activate(node):
 
 
 def verify(call):
+    # A preceding journey can commit in core before GTK has reconciled the
+    # receipt. Observe a fresh status in this same surface before beginning
+    # another Save against the renderer's displayed revision.
+    import ime_accessibility
+    document=call({'op':'presentation.get','document_id':'session-fixture'})
+    marker='Accessible editing ready '+str(time.monotonic_ns())
+    receipt=call({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
+                  'request_id':'accessible-render-barrier-'+str(time.monotonic_ns()),
+                  'expected_revisions':{'session-fixture':document['revision']},
+                  'operations':[{'op':'element.set_props','surface_id':'session-fixture','element_id':'reading','props':{'value':marker}}]})
+    assert receipt['status']=='committed',receipt
+    wait(lambda:ime_accessibility.rendered_text(marker),'Accessible editing fixture did not render the current revision')
     field=find('Accessible session draft',pyatspi.ROLE_TEXT)
     assert text(field)=='Original accessible value'
     def saved():

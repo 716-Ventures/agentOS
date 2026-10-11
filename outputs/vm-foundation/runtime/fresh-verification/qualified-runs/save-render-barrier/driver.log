@@ -1,0 +1,386 @@
+Agent OS core 0.5.0 listening on /tmp/agentos-session-test-pnpc3og2/core.sock
+Desktop session: The graphical runtime is not installed
+   Compiling agent-os-desktop v0.1.0-alpha.1 (/home/developer/agent-os-source/native-shell)
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+ --> src/document_dialog.rs:8:11
+  |
+8 | ) -> gtk::FileChooserNative {
+  |           ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:10:23
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:61:23
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:10:42
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:11:10
+   |
+11 |         .title(if save {
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:16:10
+   |
+16 |         .action(if save {
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:21:10
+   |
+21 |         .accept_label(if save { "Export" } else { "Import" })
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:22:10
+   |
+22 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:23:10
+   |
+23 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:24:10
+   |
+24 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+  --> src/document_dialog.rs:27:16
+   |
+27 |         dialog.set_current_name("document.txt");
+   |                ^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:31:40
+   |
+31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:61:42
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:62:10
+   |
+62 |         .title("Choose existing text file to review")
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:63:10
+   |
+63 |         .action(gtk::FileChooserAction::Open)
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:64:10
+   |
+64 |         .accept_label("Review replacement")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:65:10
+   |
+65 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:66:10
+   |
+66 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:67:10
+   |
+67 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:72:40
+   |
+72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: `agent-os-desktop` (bin "agent-os-desktop") generated 20 warnings
+    Finished `dev` profile [unoptimized] target(s) in 4.62s
+   Compiling agent-os-compositor v0.1.0 (/home/developer/agent-os-source/native-compositor)
+warning: function `project` is never used
+ --> src/pressure.rs:5:8
+  |
+5 | pub fn project(
+  |        ^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: `agent-os-compositor` (bin "agent-os-compositor") generated 1 warning
+    Finished `dev` profile [unoptimized] target(s) in 5.93s
+Save-render-barrier-probe-1
+dbus-daemon[1721]: [session uid=1000 pid=1721 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=1740 comm="/tmp/agentos-session-test-znvvtuex/bin/agent-os-de")
+dbus-daemon[1721]: [session uid=1000 pid=1721 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[1760]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=1740 comm="/tmp/agentos-session-test-znvvtuex/bin/agent-os-de")
+dbus-daemon[1760]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+dbus-daemon[2888]: [session uid=1000 pid=2888 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=2923 comm="/tmp/agentos-session-test-8d8a7o4p/bin/agent-os-de")
+dbus-daemon[2888]: [session uid=1000 pid=2888 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[2947]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=2923 comm="/tmp/agentos-session-test-8d8a7o4p/bin/agent-os-de")
+dbus-daemon[2947]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: trusted display zoom changes real output/workspace geometry; doubled zoom preserves keyboard dismissal, local typing and exact reset; same-login control denied
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+Save-render-barrier-probe-2
+dbus-daemon[4503]: [session uid=1000 pid=4503 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=4522 comm="/tmp/agentos-session-test-0svexmr_/bin/agent-os-de")
+dbus-daemon[4503]: [session uid=1000 pid=4503 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[4548]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=4522 comm="/tmp/agentos-session-test-0svexmr_/bin/agent-os-de")
+dbus-daemon[4548]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+dbus-daemon[6038]: [session uid=1000 pid=6038 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=6073 comm="/tmp/agentos-session-test-a4166_0x/bin/agent-os-de")
+dbus-daemon[6038]: [session uid=1000 pid=6038 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[6097]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=6073 comm="/tmp/agentos-session-test-a4166_0x/bin/agent-os-de")
+dbus-daemon[6097]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: trusted display zoom changes real output/workspace geometry; doubled zoom preserves keyboard dismissal, local typing and exact reset; same-login control denied
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+Save-render-barrier-probe-3
+dbus-daemon[7651]: [session uid=1000 pid=7651 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=7670 comm="/tmp/agentos-session-test-1ensu2ht/bin/agent-os-de")
+dbus-daemon[7651]: [session uid=1000 pid=7651 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[7696]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=7670 comm="/tmp/agentos-session-test-1ensu2ht/bin/agent-os-de")
+dbus-daemon[7696]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+dbus-daemon[8815]: [session uid=1000 pid=8815 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=8834 comm="/tmp/agentos-session-test-ux2371mg/bin/agent-os-de")
+dbus-daemon[8815]: [session uid=1000 pid=8815 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[8858]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=8834 comm="/tmp/agentos-session-test-ux2371mg/bin/agent-os-de")
+dbus-daemon[8858]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: trusted display zoom changes real output/workspace geometry; doubled zoom preserves keyboard dismissal, local typing and exact reset; same-login control denied
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+Save-render-barrier-probe-4
+dbus-daemon[10433]: [session uid=1000 pid=10433 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=10452 comm="/tmp/agentos-session-test-9nkgnbgh/bin/agent-os-de")
+dbus-daemon[10433]: [session uid=1000 pid=10433 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[10476]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=10452 comm="/tmp/agentos-session-test-9nkgnbgh/bin/agent-os-de")
+dbus-daemon[10476]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+dbus-daemon[11716]: [session uid=1000 pid=11716 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=11735 comm="/tmp/agentos-session-test-pfzdjm96/bin/agent-os-de")
+dbus-daemon[11716]: [session uid=1000 pid=11716 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[11761]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=11735 comm="/tmp/agentos-session-test-pfzdjm96/bin/agent-os-de")
+dbus-daemon[11761]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: trusted display zoom changes real output/workspace geometry; doubled zoom preserves keyboard dismissal, local typing and exact reset; same-login control denied
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+Save-render-barrier-probe-5
+dbus-daemon[13483]: [session uid=1000 pid=13483 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=13502 comm="/tmp/agentos-session-test-wy66fe9w/bin/agent-os-de")
+dbus-daemon[13483]: [session uid=1000 pid=13483 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[13526]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=13502 comm="/tmp/agentos-session-test-wy66fe9w/bin/agent-os-de")
+dbus-daemon[13526]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+dbus-daemon[14415]: [session uid=1000 pid=14415 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=14434 comm="/tmp/agentos-session-test-yesd0_mt/bin/agent-os-de")
+dbus-daemon[14415]: [session uid=1000 pid=14415 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[14460]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=14434 comm="/tmp/agentos-session-test-yesd0_mt/bin/agent-os-de")
+dbus-daemon[14460]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: trusted display zoom changes real output/workspace geometry; doubled zoom preserves keyboard dismissal, local typing and exact reset; same-login control denied
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+   Compiling agent-os-desktop v0.1.0-alpha.1 (/home/developer/agent-os-source/native-shell)
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+ --> src/document_dialog.rs:8:11
+  |
+8 | ) -> gtk::FileChooserNative {
+  |           ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:10:23
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:61:23
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:10:42
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:11:10
+   |
+11 |         .title(if save {
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:16:10
+   |
+16 |         .action(if save {
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:21:10
+   |
+21 |         .accept_label(if save { "Export" } else { "Import" })
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:22:10
+   |
+22 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:23:10
+   |
+23 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:24:10
+   |
+24 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+  --> src/document_dialog.rs:27:16
+   |
+27 |         dialog.set_current_name("document.txt");
+   |                ^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:31:40
+   |
+31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:61:42
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:62:10
+   |
+62 |         .title("Choose existing text file to review")
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:63:10
+   |
+63 |         .action(gtk::FileChooserAction::Open)
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:64:10
+   |
+64 |         .accept_label("Review replacement")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:65:10
+   |
+65 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:66:10
+   |
+66 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:67:10
+   |
+67 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:72:40
+   |
+72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_file`: Since 4.10
+   --> src/document_dialog.rs:308:20
+    |
+308 |             dialog.set_file(&gtk::gio::File::for_path(&path)).unwrap();
+    |                    ^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+   --> src/document_dialog.rs:310:26
+    |
+310 |             while dialog.file().and_then(|file| file.path()).as_ref() != Some(&path) {
+    |                          ^^^^
+
+warning: `agent-os-desktop` (bin "agent-os-desktop" test) generated 22 warnings
+    Finished `test` profile [unoptimized] target(s) in 3.61s
+     Running unittests src/main.rs (target/debug/deps/agent_os_desktop-09c67c0c7b2eab6b)
+
+running 1 test
+test transport::draft_revision_tests::save_refuses_a_revision_the_user_has_not_seen_and_retains_the_local_draft ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 38 filtered out; finished in 0.00s
+
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+Requested orderly guest shutdown. Check status before restarting.
+{"started_at": "2026-10-11T16:08:03.474825+00:00", "source_revision": "d9ed8aa424f262bdaf2ae54fc63f4c22675a9e1e", "source_changes": [" M outputs/native-shell/tests/accessibility.py"], "source_archive_sha256": "bfb6c730ffab4af8446dae3b3a3d4dbae11bdd256412262ee3f9f22d27caec79", "passed": true, "owned_utm_identity": [9091, "Sun Oct 11 12:08:03 2026"], "owned_utm_closed": true, "finished_at": "2026-10-11T16:10:32.586960+00:00"}
