@@ -26,7 +26,9 @@ def main():
                         help='Keep the verified desktop visible briefly for console inspection (0–30 seconds)')
     parser.add_argument('--input',action='store_true',help='Exercise temporary kernel input devices in this dedicated VM')
     parser.add_argument('--terminal-input',action='store_true',help='Qualify kernel input and clipboard in a separate installed native VTE terminal journey')
+    parser.add_argument('--terminal-ime',action='store_true',help='Qualify the installed VTE through the private trusted Wayland input-method fixture')
     args = parser.parse_args()
+    if args.terminal_ime:args.terminal_input=True
     if args.terminal_input:args.input=True
     if os.geteuid() != 0:
         raise SystemExit('Run this dedicated-VM display qualification with sudo')
@@ -86,6 +88,7 @@ def main():
                     '--setenv=XDG_SEAT=seat0', '--setenv=XDG_VTNR=7',
                     '--setenv=LIBSEAT_BACKEND=logind', '--setenv=AGENT_OS_METRICS_DIR=' + directory,
                     *(['--setenv=GTK_A11Y=atspi'] if args.input else []),
+                    *(['--setenv=GTK_IM_MODULE=wayland', '--setenv=AGENT_OS_INPUT_METHOD_ARGV='+json.dumps([str(Path(__file__).resolve().parents[1]/'native-compositor/target/debug/examples/ime_fixture'),str(metrics/'ime-test.sock')])] if args.terminal_ime else []),
                     '/usr/bin/dbus-run-session', '--', '/usr/local/bin/agent-os-session', '--backend', 'direct',
                     *(['--activity',str(activity)] if activity else []))
             leader = int(subprocess.check_output(['systemctl', 'show', unit, '--property=MainPID', '--value'], text=True))
@@ -162,7 +165,7 @@ def main():
                     if target is not None and observed.get('seat_focus')==target:break
                     if time.monotonic()>deadline:raise RuntimeError('Direct input fixture did not receive seat focus')
                     time.sleep(.05)
-                direct_input_probe.verify(metrics,snapshot['outputs'][0],core,lambda:control(endpoint,'snapshot'),target,user.pw_name,presentation,terminal_input=args.terminal_input)
+                direct_input_probe.verify(metrics,snapshot['outputs'][0],core,lambda:control(endpoint,'snapshot'),target,user.pw_name,presentation,terminal_input=args.terminal_input,terminal_ime=args.terminal_ime)
             if args.hold_seconds:
                 print('Direct desktop ready for console inspection', flush=True)
                 time.sleep(args.hold_seconds)
@@ -220,8 +223,9 @@ def main():
                           'frames_before_vt': snapshot['direct_frames_presented'],
                           'frames_after_vt': resumed['direct_frames_presented'],
                           'checks': ['direct native window', 'KMS output discovery', 'shared core connection',
-                                     'VT switch and resume', 'orderly shutdown', 'session directory cleanup', 'owned login scope cleanup'] + (['kernel keyboard and absolute pointer','clipboard copy/paste','undo/redo','retained draft','deliberate pointer Save','kernel workspace move/resize/maximize/restore/undo','native titlebar drag with durable placement','kernel focus cycling','kernel VT shortcut and acknowledged resume','kernel close and native assistive undo','focused primary middle-paste across Wayland clients','Unicode COPY drag/drop and grouped undo','oversized drop rejection','drag icon rendering and release cleanup'] if args.input and not args.terminal_input else ['kernel keyboard and absolute pointer in VTE','Unicode Wayland clipboard to PTY','explicit native detach and reattach','kernel pointer selection and exact Unicode line copy','accessible secondary-click and Shift+F10 clipboard menus','closed-popup seat focus and first absolute pointer motion','detached menu Paste disabled and input rejected','ordinary Ctrl+C program interruption'] if args.terminal_input else []),
+                                     'VT switch and resume', 'orderly shutdown', 'session directory cleanup', 'owned login scope cleanup'] + (['kernel keyboard and absolute pointer','clipboard copy/paste','undo/redo','retained draft','deliberate pointer Save','kernel workspace move/resize/maximize/restore/undo','native titlebar drag with durable placement','kernel focus cycling','kernel VT shortcut and acknowledged resume','kernel close and native assistive undo','focused primary middle-paste across Wayland clients','Unicode COPY drag/drop and grouped undo','oversized drop rejection','drag icon rendering and release cleanup'] if args.input and not args.terminal_input else ['kernel keyboard and absolute pointer in VTE','trusted Wayland IME preedit and Unicode commit','concurrent native rendering during VTE composition','detached IME commit rejected without reattach replay'] if args.terminal_ime else ['kernel keyboard and absolute pointer in VTE','Unicode Wayland clipboard to PTY','explicit native detach and reattach','kernel pointer selection and exact Unicode line copy','accessible secondary-click and Shift+F10 clipboard menus','closed-popup seat focus and first absolute pointer motion','detached menu Paste disabled and input rejected','ordinary Ctrl+C program interruption'] if args.terminal_input else []),
                           'terminal_input_qualified': args.terminal_input,
+                          'terminal_ime_qualified': args.terminal_ime,
                           'not_tested': ['physical input', 'hotplug', 'physical GPU presentation']}))
 
 

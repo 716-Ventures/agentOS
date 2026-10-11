@@ -7,7 +7,7 @@ import time
 import uuid
 
 
-def verify(metrics, output, core, scene, login_user, presentation, observe, keyboard, pointer):
+def verify(metrics, output, core, scene, login_user, presentation, observe, keyboard, pointer, ime_endpoint=None):
     activity = int(core('presentation.get')['activity_id'])
     def broker(op, **fields):
         query = json.dumps({'op':op, **fields})
@@ -35,6 +35,10 @@ def verify(metrics, output, core, scene, login_user, presentation, observe, keyb
         wait(lambda:broker('poll',job_id=job)['status']=='running','Owned terminal did not start')
         wait(lambda:any(row['source']=='broker:'+job and row['availability']=='available' for row in presentation({'op':'source.list','activity_id':str(activity),'limit':64})['sources']),'Owned broker source was not registered')
         document={'protocol':'agentos.presentation/1','catalog_revision':'native-core/1','surface_id':surface,'activity_id':str(activity),'revision':0,'title':'Kernel terminal fixture','root':'terminal','elements':{'terminal':{'type':'PtySession@1','props':{'label':'Kernel terminal fixture','source':'broker:'+job}}},'bindings':{},'actions':{}}
+        if ime_endpoint is not None:
+            document['root']='layout'
+            document['elements']['layout']={'type':'Stack@1','props':{'spacing':'normal'},'slots':{'children':['terminal','ime-status']}}
+            document['elements']['ime-status']={'type':'Text@1','props':{'text':'IME idle'}}
         result=presentation({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':surface+'-create','expected_revisions':{surface:None},'operations':[{'op':'surface.create','document':document}]})
         assert result['status']=='committed',result
         def terminal_window():
@@ -77,6 +81,10 @@ def verify(metrics, output, core, scene, login_user, presentation, observe, keyb
         for key in (20,18,19,50,23,49,30,38):keyboard.chord(key)
         keyboard.chord(28)
         wait(lambda:'KERNEL_VTE_ACK terminal' in broker('poll',job_id=job)['output'],'Kernel typing did not reach installed PTY')
+        if ime_endpoint is not None:
+            import direct_terminal_ime
+            direct_terminal_ime.verify(ime_endpoint,surface,lambda:broker('poll',job_id=job)['output'],presentation,observe,keyboard,wait)
+            return
         focus(False) # Expose the clipboard publisher beside the terminal.
         source=next(row for row in scene()['windows'] if row['title']=='Direct transfer source')
         value=observe('transfer:Publish terminal clipboard')['point']

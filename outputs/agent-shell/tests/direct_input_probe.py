@@ -152,6 +152,9 @@ def assistive():
                 elif action=='status':
                     find('Attached · input goes directly to this running terminal',-1)
                     response={'attached':True}
+                elif action.startswith('ime-status:'):
+                    control=find(action.split(':',1)[1],pyatspi.ROLE_LABEL)
+                    response={'rendered':control.getState().contains(pyatspi.STATE_SHOWING)}
                 else:
                     terminal=find('Kernel terminal fixture',pyatspi.ROLE_TERMINAL)
                     r=terminal.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
@@ -222,7 +225,7 @@ def assistive():
         print(json.dumps(response),flush=True)
 
 
-def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False):
+def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False):
     subprocess.run(['modprobe','uinput'],check=True)
     # Join only this test session's accessibility bus; never inspect other users.
     bus=None;observer_runtime=None;wayland=None;deadline=time.monotonic()+10
@@ -284,6 +287,10 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
         time.sleep(.5) # bounded kernel/udev/libinput hotplug discovery
         width,height=output['width'],output['height']
         if terminal_input:
+            if terminal_ime:
+                import direct_terminal_probe
+                direct_terminal_probe.verify(metrics,output,core,scene,login_user,presentation,snapshot,keyboard,pointer,ime_endpoint=metrics/'ime-test.sock')
+                return
             receipts=metrics/'transfer-receipts.json'
             with (metrics/'transfer-source.log').open('w') as log:
                 source_client=subprocess.Popen(['runuser','-u',login_user,'--','python3',str(Path(__file__).resolve()),'--transfer-source',str(receipts),'--terminal-clipboard'],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)

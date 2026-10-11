@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-10-11T01:15:55.479987+00:00",
+  "started_at": "2026-10-11T01:39:55.076792+00:00",
   "result": "pass",
   "vm_uuid": "27176EA2-E994-4165-9BBA-70FEED59E66B",
   "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -45,6 +45,7 @@
     "native-session-compositor-loss",
     "direct-display-input-vt",
     "direct-display-terminal",
+    "direct-display-terminal-ime",
     "conventional-browser-links",
     "signed-graphical-release",
     "terminal",
@@ -64,28 +65,22 @@
     "physical graphical input",
     "physical hardware",
     "OS update rollback",
-    "VTE IME"
+    "physical VTE IME, language-engine/candidate behavior and visual preedit quality"
   ],
   "deployment": {
-    "created_at": "2026-10-11T01:16:08.913624+00:00",
-    "source_archive_sha256": "880040fe28a9162edead00492d323207e37ac2618d2b0fb331fabdc706c45cd0",
-    "repository_revision": "8941a48e797aacd7a5d8fdaffc74db87dcdcba9a",
+    "created_at": "2026-10-11T01:40:08.487056+00:00",
+    "source_archive_sha256": "494f0d42f4f1899199d4e4fba74ba45156ded9f4ab4ea9e54e548421ddfffd00",
+    "repository_revision": "60e9c0d3620c33765e22d2a8667c2af600b5ba4e",
     "source_changes": [
-      "M  outputs/agent-shell/tests/direct_display_guest.py",
-      "M  outputs/agent-shell/tests/direct_input_probe.py",
-      "M  outputs/agent-shell/tests/direct_terminal_probe.py",
-      "M  outputs/native-compositor/src/input.rs",
-      "M  outputs/native-compositor/src/state.rs",
-      "M  outputs/native-shell/Cargo.lock",
-      "M  outputs/native-shell/Cargo.toml",
-      "M  outputs/native-shell/README.md",
-      "M  outputs/native-shell/src/main.rs",
-      "M  outputs/native-shell/src/pty_view.rs",
-      "A  outputs/native-shell/src/terminal_actions.rs"
+      " M outputs/agent-shell/tests/direct_display_guest.py",
+      " M outputs/agent-shell/tests/direct_input_probe.py",
+      "A  outputs/agent-shell/tests/direct_terminal_ime.py",
+      " M outputs/agent-shell/tests/direct_terminal_probe.py",
+      " M outputs/native-shell/README.md"
     ],
     "installed": true
   },
-  "runtime_release": "373f5f2a2c710d78ed130153814c625ec8e2cfc849762a055e39ab4a576a99cf",
+  "runtime_release": "59b2c1cf7303bd87a066aa0435bb952908d3fe9b92bec256af4547db7867493c",
   "dependency_manifest": {
     "packages": {
       "adduser": "3.152",
@@ -875,7 +870,7 @@
     "python": "Python 3.9.6"
   },
   "guest_stopped": true,
-  "finished_at": "2026-10-11T01:20:29.870621+00:00",
+  "finished_at": "2026-10-11T01:44:42.166616+00:00",
   "public_ui_release": {
     "tag": "v0.1.0-alpha.25",
     "revision": "7b7bac9c252e759fafb4f6c1d50af5ef056d0677",
@@ -938,7 +933,8 @@
       "compositor_input_sha256": "7844adc50c071f3741a8ce4a8918eef057c5c5764aa87af2e756f729e8b63002",
       "compositor_focus_sha256": "792b841a68fedc4feb89e0deb0342565d1bd51669ab970bb8bcf8fe988226f40",
       "fixture_sha256": "78e367ff7549c85ba455b28a12527d6c22e998118e1746de13d2b2833adbd55e",
-      "boundary": "Synthetic kernel input and private Wayland clipboard client; physical input, VTE IME and a complete screen-reader usability assessment remain unqualified"
+      "boundary": "Synthetic kernel input and private Wayland clipboard client; physical input, VTE IME and a complete screen-reader usability assessment remain unqualified",
+      "verified_revision": "7b1a417dad1cf218d65fc2dc1effbbf39901b277"
     },
     "unbuffered_toplevel_placement": {
       "runtime_release": "59b2c1cf7303bd87a066aa0435bb952908d3fe9b92bec256af4547db7867493c",
@@ -964,6 +960,22 @@
       "repeated_journey_log_sha256": "17ebd8a889ed975ade289801ab68dc0313caf97298cd536aa3923348b63c5f04",
       "compositor_state_sha256": "cf37f5946d0d5bd6292b76b4869b11770c02ff0e4cf061d3931e9feaafe04636",
       "boundary": "Historical empty surface buffer state was not recorded; the reproduced publication defect is fixed. Later real placement changes still reject Undo. The top-level 53-check reproduction remains the preceding terminal-menu runtime."
+    },
+    "installed_vte_ime": {
+      "qualified": [
+        "Actual trusted Wayland input-method protocol and installed VTE/broker PTY",
+        "Kernel input establishes local terminal focus and ordinary typing",
+        "Uncommitted Japanese preedit stays outside program input",
+        "Exact Japanese/Unicode commit reaches the program",
+        "Unrelated native status rendering preserves active text input",
+        "Detach rejects IME input and explicit reattach replays no pending commit",
+        "Owned fixture job/session/VM/application cleanup"
+      ],
+      "fixture_sha256": "e3eb80c5873ccd9210ca1c7e3ea18d4074717c402428272440155547c0e4460e",
+      "terminal_fixture_sha256": "e17773d3dfbd3260ebbd1ea7d10e7b60874ab84bdb01a073d847ac37e7df1175",
+      "trusted_helper_sha256": "da4fbf84204036c7387bc4fcbb0e8be260ea7075db439e3951f5c3463cc5c66c",
+      "targeted_log_sha256": "2dc4045b319bac23d93620de9a7443a8d714a521f0f960aa7d26b41cd3f29ccf",
+      "boundary": "Private protocol fixture, not an actual language engine. Physical IME input, candidate behavior and visual preedit quality remain unqualified."
     }
   },
   "observations": [
