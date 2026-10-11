@@ -1,0 +1,8 @@
+dbus-daemon[11336]: [session uid=1000 pid=11336 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=11337 comm="python3 native-shell/tests/first_document.py --imp")
+dbus-daemon[11336]: [session uid=1000 pid=11336 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[11381]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=11337 comm="python3 native-shell/tests/first_document.py --imp")
+dbus-daemon[11381]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+dbus-daemon[11336]: [session uid=1000 pid=11336 pidfd=5] Activating service name='ca.desrt.dconf' requested by ':1.6' (uid=1000 pid=11564 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[11336]: [session uid=1000 pid=11336 pidfd=5] Successfully activated service 'ca.desrt.dconf'
+PASS: empty native session creates editable documents without a separate activity task; Import enabled; one internal activity reused

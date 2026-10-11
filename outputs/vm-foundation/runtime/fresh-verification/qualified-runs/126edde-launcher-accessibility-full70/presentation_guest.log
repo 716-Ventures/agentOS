@@ -1,0 +1,10 @@
+PASS: incremental IPC fetches one edited document, tombstones close without bodies, and cache survives core restart
+PASS: real IPC collection paging, journal consistency, single-document reads and 70-view assembly
+PASS: host callback defaults, model discovery/composition, human-only invocation and retained revocation
+PASS: terminal shared projection, lease-owned edit/commit and actual opaque output callback
+PASS: typed edited callback parameters, actual bounded Unicode output, idempotency and stale-form rejection
+PASS: host-issued stop action, actual process cancellation, idempotent callback receipt, forged actor rejection, revocation
+PASS: strict UTF-8 document import, human edit/save, exclusive export and core restart persistence
+PASS: dead authenticated host reconciliation retains a unique conventional identity; model adoption denied
+PASS: trusted file-helper PNG preview, root-owned byte delivery to native humans, metadata-only model discovery
+PASS: presentation IPC principals, atomic receipts, two clients, draft recovery, ordered changes, undo

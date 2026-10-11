@@ -1,0 +1,6 @@
+dbus-daemon[29258]: [session uid=1000 pid=29258 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=29277 comm="/tmp/agentos-session-test-7to_fi51/bin/agent-os-de")
+dbus-daemon[29258]: [session uid=1000 pid=29258 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[29301]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=29277 comm="/tmp/agentos-session-test-7to_fi51/bin/agent-os-de")
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+dbus-daemon[29301]: Successfully activated service 'org.a11y.atspi.Registry'
+PASS: display-host loss maps authenticated surfaces and reaps display host, compositor and renderer

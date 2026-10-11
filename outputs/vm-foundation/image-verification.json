@@ -2006,7 +2006,16 @@
     "qualified_image_remains": "candidate-v16",
     "original_development_disk_and_efi_restored": true,
     "owned_utm_closed": true,
-    "failed_boot_copy_authority": "Only disposable failed copies retain temporary verification authority; these copies must be cleaned or removed after diagnostics.",
+    "failed_boot_copy_authority": "Disposable failed disk/EFI copies were deleted after collecting the original and repeated diagnostic speech logs. Unbooted signed candidate-v17 remains unchanged.",
+    "disposable_copy_cleanup": {
+      "removed": [
+        "outputs/vm-foundation/runtime/fresh-verification/candidate-v17-interrupted-1791752966724430000-disk.qcow2",
+        "outputs/vm-foundation/runtime/fresh-verification/candidate-v17-interrupted-1791752966724665000-efi_vars.fd"
+      ],
+      "completed_at": "2026-10-11T21:35:07.455838+00:00",
+      "development_disk_and_efi_untouched": true,
+      "unbooted_signed_v17_retained": true
+    },
     "evidence": "outputs/vm-foundation/runtime/fresh-verification/qualified-runs/signed-image-v17-failed-offline-reader"
   }
 }
