@@ -1,6 +1,7 @@
 {
-  "verified_at": "2026-10-11T09:27:10.816336+00:00",
+  "verified_at": "2026-10-11T12:57:47.690002+00:00",
   "result": "pass",
+  "candidate_name": "candidate-v13",
   "image": {
     "architecture": "arm64",
     "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -20,9 +21,9 @@
       "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
       "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
     },
-    "image_sha256": "90ac2bc6ec79a9680a9d98c55d06926937256f1ff5c1a64c9e2a7318e8942fc2",
+    "image_sha256": "4f6abf61f582fb3a1fcf7d179009bf58b865245717ab9cf41ca6531631574e0f",
     "name": "agentOS experimental native image",
-    "runtime_release": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+    "runtime_release": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
     "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
     "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
   },
@@ -50,7 +51,6 @@
     "qualification-only SSH key and sudo authority removed; development disk/config/EFI restored; VM stopped and owned UTM app closed",
     "original signed distribution remains unbooted",
     "HTTP/HTTPS Firefox defaults; native Link launches isolated real browser and shared conventional window online and on loopback-only boot",
-    "image publication reuses completed inode; 19 tooling tests pass including offline lifecycle UUID guards and no uncertain start replay",
     "separate installed native VTE kernel keyboard/selection, exact Unicode clipboard/menu Copy/Paste, popup focus/motion, detached-input rejection and program interruption",
     "original development disk and EFI inode identities and exact config restored after verification",
     "actual completed presentation receipts on the clean installed native GTK editor, idle and during two owned broker CPU jobs",
@@ -58,7 +58,11 @@
     "clean installed Table/List/KeyValue kernel pointer/keyboard row selection, Ctrl+C, visible Shift+F10/secondary menus, exact cross-client Unicode clipboard, protected refresh and key-preserved background updates, cleared selection/removal and restored focus",
     "session-owned Orca announces native controls; authenticated kernel commands, learn-mode grab/release, Save/Discard and rescue VT pass on the clean image",
     "reader and speech processes reaped after normal logout and abrupt compositor loss",
-    "loopback-only cold boot also passes the full installed reader/kernel/VT journey"
+    "loopback-only cold boot also passes the full installed reader/kernel/VT journey",
+    "trusted display zoom changes output geometry; kernel pointer typing, vertical/horizontal wheel key access, balanced modifiers and exact reset pass on first account and private fresh profile",
+    "visible keyboard stays within half of output at every zoom step; native capture matches final layer dimensions",
+    "offline cold boot passes display zoom, on-screen keyboard and session-owned reader without network or models",
+    "complete clean-source 70-check reproduction and CI passed before image construction"
   ],
   "not_tested": [
     "production signing/distribution authority",
@@ -68,18 +72,22 @@
     "live Gateway or Jev inference; no configured credentials",
     "incompatible future state-format migrations"
   ],
-  "runtime_source_revision": "ee370fb3047b61fe64c8c91589d5a6a8d5eea0ab",
+  "runtime_source_revision": "f2e54996d46594c9635383b850cae2776014d11a",
   "runtime_716_ui": "v0.1.0-alpha.32",
   "compatible_rollback_probe": {
-    "release": "3ebc478291575d588f89c5349397c930093233a51eb45c8892611cb38bebdc1f",
-    "signed_bundle_sha256": "ede34e9cebebf6f393383ef7933c134aa37e215afb2155717abb8a06d91b25ad"
+    "runtime_release": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
+    "bundle_sha256": "402e3392bbb5a9dba0dafacdb05f7c668c02f0115975c828e4877a37920159f3"
+  },
+  "rollback_fixture": {
+    "runtime_release": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
+    "bundle_sha256": "402e3392bbb5a9dba0dafacdb05f7c668c02f0115975c828e4877a37920159f3"
   },
   "lifecycle": {
     "result": "pass",
     "before": {
       "result": "pass",
-      "boot_id": "50fe8e18-a8a3-4818-a6c4-57ea075f423a",
-      "runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+      "boot_id": "24582a7a-d3d2-4e65-9a12-6ae63cbed2fb",
+      "runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
       "uid": 1000,
       "activity": 1,
       "file_persisted": true,
@@ -98,8 +106,8 @@
     },
     "reboot": {
       "result": "pass",
-      "boot_id": "65b53b95-4217-4cd7-87eb-5b7c61a10092",
-      "runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+      "boot_id": "d201665d-e8b3-4bc2-bee2-19eac1da7bcd",
+      "runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
       "uid": 1000,
       "activity": 1,
       "file_persisted": true,
@@ -118,8 +126,8 @@
     },
     "offline": {
       "result": "pass",
-      "boot_id": "20f2facd-fe9a-4cfe-b265-d9b5a3ef8994",
-      "runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+      "boot_id": "38aff408-5a72-45bf-9797-b23ecf5169a4",
+      "runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
       "uid": 1000,
       "activity": 1,
       "file_persisted": true,
@@ -167,11 +175,12 @@
       "cleanup_verified": true
     },
     "offline_screen_reader_qualified": true,
-    "final_offline_runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+    "offline_display_zoom_and_keyboard_qualified": true,
+    "final_offline_runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
     "development_disk_restored": true,
     "guest_stopped": true
   },
-  "factory_source_revision": "ee370fb3047b61fe64c8c91589d5a6a8d5eea0ab",
+  "factory_source_revision": "227697e0ec2412a6d633f4be84ae8b4b8359df8e",
   "browser": {
     "result": "pass",
     "checks": [
@@ -194,43 +203,49 @@
     "cleanup_verified": true
   },
   "qualification_observations": [
-    "Fresh v11 copy passes first-run, signed update/rollback, native editor/collections/VTE/IME, presentation, reader and speech, browser, reboot, network-free cold boot and failed-activation/account-preserving recovery.",
-    "The first attempt correctly rejected a legacy signed runtime requiring AT-SPI 2.56 on the pinned 2.62 image. A newly exported, host-signed compatible a879 runtime was used for rollback; the first attempt logs and booted copy remain preserved.",
-    "Current image runtime differs from the complete 66-check runtime only in package resolution/bootstrap payloads; the three executable hashes match exactly and the changed installation path passes 272 Linux Python tests plus an actual clean base build.",
-    "Prior v9 PRIMARY focus and intermittent collection geometry observations remain unresolved; successful repeats do not establish their causes.",
-    "Unbooted signed v10 and v11 distributions are retained separately from test copies. Physical input/audio/GPU, full reference parity, production authority and live providers remain unqualified."
+    "Fresh local account and password sudo passed before qualification-only SSH and sudo fixtures were installed.",
+    "Exact full70 runtime binaries reused; no development seed or additional disk attached.",
+    "Both installed keyboard/zoom journeys pass on unmodified image binaries.",
+    "Earlier v12 height failure is preserved; its artifact has not been relabeled as passing.",
+    "Historical PRIMARY destination-focus and collection geometry observations retain their own evidence; this passing run does not establish their causes."
   ],
-  "direct_input_test_sha256": "53a886d19ad4ad7ed3af9a507dc8b44b5ca3762a975e15c339ac84f64409c97a",
+  "direct_input_test_sha256": "ab0a97f9396350fe5cb5ca5458ea3db396f19acde318dd885f10f7b65f1cc9d1",
   "terminal_input_test_sha256": "704f7883530c72948e340ab04c9677436f2739c437bd38c1f003d3ce4b80cb2d",
-  "qualification_log_sha256": "15a88cc67c0107a17ab77c4b06bfc89e9f3192fffe60035247e91526c231f3a6",
-  "full_reproduction_runtime": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
-  "full_reproduction_check_count": 66,
+  "collection_input_test_sha256": "52c38d3ffb1d91dd8b3d3b3c478691106adbfceba46d747ac5ed32cee1d353ba",
+  "zoom_test_sha256": "faecc8013b71915ff93fd223c0e31ad59e782fd27949b6ee3ecb8da1452a7468",
+  "native_session_test_sha256": "2b049734c16fee139d3c912918366f74f505cb3a89f556d568fdb1ede5ab4ddb",
+  "qualification_log_sha256": "c62b353b1c32842957c59715c6598b20c4a72caaa9bbe3ee532fd67bb86bc795",
+  "driver_log_sha256": "7344dedcb99affb967166c7a6b9f006d2fb1315f7848cf0bf6bf65126d6880e8",
+  "build_log_sha256": "35e70240faf3aa7090e2ee1672364884b61468202200b6908027379e70997692",
+  "full_reproduction_runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
+  "full_reproduction_check_count": 70,
   "native_input_presentation_profiles": [
     {
       "clock_id": 1,
       "discarded": 0,
       "format": 1,
       "invalid": 0,
-      "max_ms": 39,
+      "max_ms": 43,
       "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-      "p50_ms": 28,
-      "p95_ms": 38,
+      "p50_ms": 27,
+      "p95_ms": 41,
       "pending": 0,
       "presented": 20,
       "requested": 20,
       "sample_limit": 256,
       "profile": "idle editor",
-      "measurement_seconds": 2.81,
-      "completed_frames_between_observer_snapshots": 192
+      "measurement_seconds": 2.848,
+      "completed_frames_between_observer_snapshots": 196,
+      "input_frame_wakeups_between_observer_snapshots": 20
     },
     {
       "clock_id": 1,
       "discarded": 0,
       "format": 1,
       "invalid": 0,
-      "max_ms": 38,
+      "max_ms": 40,
       "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-      "p50_ms": 29,
+      "p50_ms": 28,
       "p95_ms": 37,
       "pending": 0,
       "presented": 20,
@@ -238,16 +253,17 @@
       "sample_limit": 256,
       "profile": "two concurrent broker CPU jobs",
       "job_cpu_usage_usec": [
-        1475809,
-        1475717
+        1407331,
+        1419941
       ],
-      "measurement_seconds": 1.529,
-      "completed_frames_between_observer_snapshots": 99
+      "measurement_seconds": 1.473,
+      "completed_frames_between_observer_snapshots": 89,
+      "input_frame_wakeups_between_observer_snapshots": 19
     }
   ],
   "collection_input_profiles": [
     {
-      "component": "Table@1",
+      "collection_input_qualified": "Table@1",
       "outputs": [
         {
           "height": 800,
@@ -275,7 +291,7 @@
       ]
     },
     {
-      "component": "List@1",
+      "collection_input_qualified": "List@1",
       "outputs": [
         {
           "height": 800,
@@ -303,7 +319,7 @@
       ]
     },
     {
-      "component": "KeyValue@1",
+      "collection_input_qualified": "KeyValue@1",
       "outputs": [
         {
           "height": 800,
@@ -331,18 +347,28 @@
       ]
     }
   ],
-  "collection_input_test_sha256": "52c38d3ffb1d91dd8b3d3b3c478691106adbfceba46d747ac5ed32cee1d353ba",
-  "previous_v10_image": {
+  "binary_equivalence": {
+    "qualified_runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
+    "image_runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
+    "binaries": {
+      "agent-os-core": "2051ea36559b6aa9af596e2f7fba4672971fdb5b788c5fbc492886015263fcfe",
+      "native/agent-os-desktop": "b58b058732de1ed5f6d0e96b1fe639358cf123f3afe0cb5ddc276a9f28c8f5b9",
+      "native/agent-os-compositor": "19c1ecb75be374db254e16c591fcce2db5948e68e94239762db883ee2589be9f"
+    }
+  },
+  "previous_v11_image": {
+    "verified_at": "2026-10-11T09:27:10.816336+00:00",
+    "result": "pass",
     "image": {
       "architecture": "arm64",
       "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
-      "bootstrap_sha256": "e60ac4a8f76a106946ad3d91a392be97b7c0671587a75f4c5111d57dfb4c4879",
+      "bootstrap_sha256": "1df6e4efbc5e9facb674291a06b1eb0b7c47135fa464d29c6491196bff8a0ecd",
       "builder_sha256": "e1b8102fbd47b1313549445b6fd7792a086c2a883233bdfbf16ff56cfea7a184",
       "compression": "zlib",
       "contains_personal_account": false,
       "contains_provider_credentials": false,
-      "dependency_manifest_sha256": "d0812f2d560c26cdbc596d445dae73b3f3ec0098e01f7aec44869e7ba17d6b23",
-      "dependency_profile_sha256": "e76be92153567973abe0df91b2a9c27b3e58cfe306a41337020448471908e923",
+      "dependency_manifest_sha256": "54cc0a0188cf77cc8d9ae3be5d6735f21a0bf76a1c78815e5ba338a367ec41eb",
+      "dependency_profile_sha256": "dcbf1c74b06215516ef7135525c88ea00e9605f654e165c372125c535f9cd704",
       "disk_size": "20G",
       "first_run_sha256": "8dc0c5b4a0d212667000bb009905458de85125c7fad98e1d876fb2f766471b57",
       "first_run_unit_sha256": "c4d2376b281a0d5879ce71a15e192ede8598ebc531d58b7dff3203ca66986b09",
@@ -352,40 +378,404 @@
         "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
         "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
       },
-      "image_sha256": "9d86b2b1c3745669b43573fc4011cd8777f2727b982a717b5e55681732abfef4",
+      "image_sha256": "90ac2bc6ec79a9680a9d98c55d06926937256f1ff5c1a64c9e2a7318e8942fc2",
       "name": "agentOS experimental native image",
-      "runtime_release": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
+      "runtime_release": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
       "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
       "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
     },
-    "runtime_source_revision": "6b459ea4129524baa253854f07cfedac4d790a86",
-    "runtime_716_ui": "v0.1.0-alpha.31",
+    "signing_authority": "Development Ed25519 key; not a production release authority",
+    "checks": [
+      "new checksum-pinned base disk; no running development disk export",
+      "qemu-img integrity",
+      "signed image and exact UTM configuration verification",
+      "fresh EFI; actual guest block inventory confirms one disk and no development seed",
+      "local console account creation and password-protected sudo",
+      "baseline runtime activation and six healthy services",
+      "standalone DHCP and HTTPS",
+      "signed update staging leaves current release unchanged",
+      "signed compatible older-runtime activation and rollback restore image runtime and preserve activity and file",
+      "image runtime direct KMS, keyboard/pointer, VT, move/resize/undo, close/restore, primary paste and Unicode COPY/oversized DND",
+      "image runtime real CPU speech recognition, zero-signal rejection, owner-bound capture and recorder cleanup",
+      "image runtime account/activity/file/service persistence through reboot",
+      "actual no-network cold boot: only lo, six healthy services",
+      "real activation failure retains setup journal",
+      "TTY 2 rescue remains active",
+      "resume preserves account UID and password",
+      "ready only after healthy activation",
+      "all six services recover without models or network",
+      "latest signed runtime can reactivate offline after setup recovery",
+      "qualification-only SSH key and sudo authority removed; development disk/config/EFI restored; VM stopped and owned UTM app closed",
+      "original signed distribution remains unbooted",
+      "HTTP/HTTPS Firefox defaults; native Link launches isolated real browser and shared conventional window online and on loopback-only boot",
+      "image publication reuses completed inode; 19 tooling tests pass including offline lifecycle UUID guards and no uncertain start replay",
+      "separate installed native VTE kernel keyboard/selection, exact Unicode clipboard/menu Copy/Paste, popup focus/motion, detached-input rejection and program interruption",
+      "original development disk and EFI inode identities and exact config restored after verification",
+      "actual completed presentation receipts on the clean installed native GTK editor, idle and during two owned broker CPU jobs",
+      "clean installed VTE trusted IME protocol and separate synthetic Wayland presentation boundaries",
+      "clean installed Table/List/KeyValue kernel pointer/keyboard row selection, Ctrl+C, visible Shift+F10/secondary menus, exact cross-client Unicode clipboard, protected refresh and key-preserved background updates, cleared selection/removal and restored focus",
+      "session-owned Orca announces native controls; authenticated kernel commands, learn-mode grab/release, Save/Discard and rescue VT pass on the clean image",
+      "reader and speech processes reaped after normal logout and abrupt compositor loss",
+      "loopback-only cold boot also passes the full installed reader/kernel/VT journey"
+    ],
+    "not_tested": [
+      "production signing/distribution authority",
+      "physical host input or real IME engine",
+      "microphone/speaker acoustic signal",
+      "physical GPU/hotplug/multi-output hardware",
+      "live Gateway or Jev inference; no configured credentials",
+      "incompatible future state-format migrations"
+    ],
+    "runtime_source_revision": "ee370fb3047b61fe64c8c91589d5a6a8d5eea0ab",
+    "runtime_716_ui": "v0.1.0-alpha.32",
+    "compatible_rollback_probe": {
+      "release": "3ebc478291575d588f89c5349397c930093233a51eb45c8892611cb38bebdc1f",
+      "signed_bundle_sha256": "ede34e9cebebf6f393383ef7933c134aa37e215afb2155717abb8a06d91b25ad"
+    },
+    "lifecycle": {
+      "result": "pass",
+      "before": {
+        "result": "pass",
+        "boot_id": "50fe8e18-a8a3-4818-a6c4-57ea075f423a",
+        "runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+        "uid": 1000,
+        "activity": 1,
+        "file_persisted": true,
+        "healthy_services": [
+          "active",
+          "active",
+          "active",
+          "active",
+          "active",
+          "active"
+        ],
+        "network_interfaces": [
+          "lo",
+          "enp0s1"
+        ]
+      },
+      "reboot": {
+        "result": "pass",
+        "boot_id": "65b53b95-4217-4cd7-87eb-5b7c61a10092",
+        "runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+        "uid": 1000,
+        "activity": 1,
+        "file_persisted": true,
+        "healthy_services": [
+          "active",
+          "active",
+          "active",
+          "active",
+          "active",
+          "active"
+        ],
+        "network_interfaces": [
+          "lo",
+          "enp0s1"
+        ]
+      },
+      "offline": {
+        "result": "pass",
+        "boot_id": "20f2facd-fe9a-4cfe-b265-d9b5a3ef8994",
+        "runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+        "uid": 1000,
+        "activity": 1,
+        "file_persisted": true,
+        "healthy_services": [
+          "active",
+          "active",
+          "active",
+          "active",
+          "active",
+          "active"
+        ],
+        "network_interfaces": [
+          "lo"
+        ]
+      },
+      "activation_resume": {
+        "result": "pass",
+        "checks": [
+          "real activation failure retains setup journal",
+          "TTY 2 rescue remains active",
+          "resume preserves account UID and password",
+          "ready only after healthy activation",
+          "all six services recover without models or network"
+        ]
+      },
+      "offline_browser": {
+        "result": "pass",
+        "checks": [
+          "system HTTP/HTTPS handler",
+          "actual native Link action",
+          "GIO launch with isolated profile",
+          "real Firefox local page retrieval and title",
+          "conventional shared identity",
+          "durable focus/maximize",
+          "browser disconnect"
+        ],
+        "not_tested": [
+          "physical input",
+          "remote website compatibility",
+          "hardware acceleration",
+          "mailto account/client"
+        ],
+        "firefox_debian_version": "153.4.0esr-1~deb13u1",
+        "installed_executables": true,
+        "cleanup_verified": true
+      },
+      "offline_screen_reader_qualified": true,
+      "final_offline_runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+      "development_disk_restored": true,
+      "guest_stopped": true
+    },
+    "factory_source_revision": "ee370fb3047b61fe64c8c91589d5a6a8d5eea0ab",
+    "browser": {
+      "result": "pass",
+      "checks": [
+        "system HTTP/HTTPS handler",
+        "actual native Link action",
+        "GIO launch with isolated profile",
+        "real Firefox local page retrieval and title",
+        "conventional shared identity",
+        "durable focus/maximize",
+        "browser disconnect"
+      ],
+      "not_tested": [
+        "physical input",
+        "remote website compatibility",
+        "hardware acceleration",
+        "mailto account/client"
+      ],
+      "firefox_debian_version": "153.4.0esr-1~deb13u1",
+      "installed_executables": true,
+      "cleanup_verified": true
+    },
     "qualification_observations": [
-      "Clean v10 qualification includes the exact alpha.31 form-owner fixes and the immutable runtime from all 60 reproduction checks, plus installed collection/editor/VTE/IME, idle/two-broker-CPU-job presentation, browser, offline speech, reboot and failed activation/account-preserving recovery.",
-      "The prior v6\u2013v9 distributions remain untouched. Only the redundant guest v9 builder output was removed after fresh SHA-256 equality with the retained host distribution.",
-      "The prior v9 qualification exposed an intermittent primary-transfer destination focus failure. An unchanged instrumented repeat and complete v9 fresh-copy run passed; that observation remains open. Its helper identity/password failures and subsequent exact disk/config/EFI restoration are retained in repository history.",
-      "An initial compressed v10 conversion ran out of builder space, published no image and cleaned its private temporary directory. The builder now checks a conservative 41 GiB peak-capacity bound before disk/loop creation; all 21 tooling tests pass. The dedicated development test disk was enlarged from 20 to 80 GiB after an exact hash-verified APFS recovery clone; its ext4 filesystem, saved activities, UID and runtime were verified with more than 60 GiB available. The distributed image remains 20 GiB.",
-      "The new image uses supported zlib-compressed QCOW2 export. Its unbooted signed artifact remains separate from the verification copy."
-    ]
+      "Fresh v11 copy passes first-run, signed update/rollback, native editor/collections/VTE/IME, presentation, reader and speech, browser, reboot, network-free cold boot and failed-activation/account-preserving recovery.",
+      "The first attempt correctly rejected a legacy signed runtime requiring AT-SPI 2.56 on the pinned 2.62 image. A newly exported, host-signed compatible a879 runtime was used for rollback; the first attempt logs and booted copy remain preserved.",
+      "Current image runtime differs from the complete 66-check runtime only in package resolution/bootstrap payloads; the three executable hashes match exactly and the changed installation path passes 272 Linux Python tests plus an actual clean base build.",
+      "Prior v9 PRIMARY focus and intermittent collection geometry observations remain unresolved; successful repeats do not establish their causes.",
+      "Unbooted signed v10 and v11 distributions are retained separately from test copies. Physical input/audio/GPU, full reference parity, production authority and live providers remain unqualified."
+    ],
+    "direct_input_test_sha256": "53a886d19ad4ad7ed3af9a507dc8b44b5ca3762a975e15c339ac84f64409c97a",
+    "terminal_input_test_sha256": "704f7883530c72948e340ab04c9677436f2739c437bd38c1f003d3ce4b80cb2d",
+    "qualification_log_sha256": "15a88cc67c0107a17ab77c4b06bfc89e9f3192fffe60035247e91526c231f3a6",
+    "full_reproduction_runtime": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
+    "full_reproduction_check_count": 66,
+    "native_input_presentation_profiles": [
+      {
+        "clock_id": 1,
+        "discarded": 0,
+        "format": 1,
+        "invalid": 0,
+        "max_ms": 39,
+        "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+        "p50_ms": 28,
+        "p95_ms": 38,
+        "pending": 0,
+        "presented": 20,
+        "requested": 20,
+        "sample_limit": 256,
+        "profile": "idle editor",
+        "measurement_seconds": 2.81,
+        "completed_frames_between_observer_snapshots": 192
+      },
+      {
+        "clock_id": 1,
+        "discarded": 0,
+        "format": 1,
+        "invalid": 0,
+        "max_ms": 38,
+        "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+        "p50_ms": 29,
+        "p95_ms": 37,
+        "pending": 0,
+        "presented": 20,
+        "requested": 20,
+        "sample_limit": 256,
+        "profile": "two concurrent broker CPU jobs",
+        "job_cpu_usage_usec": [
+          1475809,
+          1475717
+        ],
+        "measurement_seconds": 1.529,
+        "completed_frames_between_observer_snapshots": 99
+      }
+    ],
+    "collection_input_profiles": [
+      {
+        "component": "Table@1",
+        "outputs": [
+          {
+            "height": 800,
+            "name": "Virtual-1",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1280,
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "checks": [
+          "private native system bar",
+          "KMS output discovery",
+          "shared core connection",
+          "VT switch and resume",
+          "orderly shutdown",
+          "session directory cleanup",
+          "owned login scope cleanup",
+          "kernel Table@1 pointer and keyboard row selection",
+          "Ctrl+C and accessible Shift+F10/secondary clipboard menus",
+          "separate-client exact Unicode row text",
+          "focused refresh rejection and key-based selection across background reorder/update",
+          "empty-selection Copy rejection, row removal and local menu focus restoration"
+        ]
+      },
+      {
+        "component": "List@1",
+        "outputs": [
+          {
+            "height": 800,
+            "name": "Virtual-1",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1280,
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "checks": [
+          "private native system bar",
+          "KMS output discovery",
+          "shared core connection",
+          "VT switch and resume",
+          "orderly shutdown",
+          "session directory cleanup",
+          "owned login scope cleanup",
+          "kernel List@1 pointer and keyboard row selection",
+          "Ctrl+C and accessible Shift+F10/secondary clipboard menus",
+          "separate-client exact Unicode row text",
+          "focused refresh rejection and key-based selection across background reorder/update",
+          "empty-selection Copy rejection, row removal and local menu focus restoration"
+        ]
+      },
+      {
+        "component": "KeyValue@1",
+        "outputs": [
+          {
+            "height": 800,
+            "name": "Virtual-1",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1280,
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "checks": [
+          "private native system bar",
+          "KMS output discovery",
+          "shared core connection",
+          "VT switch and resume",
+          "orderly shutdown",
+          "session directory cleanup",
+          "owned login scope cleanup",
+          "kernel KeyValue@1 pointer and keyboard row selection",
+          "Ctrl+C and accessible Shift+F10/secondary clipboard menus",
+          "separate-client exact Unicode row text",
+          "focused refresh rejection and key-based selection across background reorder/update",
+          "empty-selection Copy rejection, row removal and local menu focus restoration"
+        ]
+      }
+    ],
+    "collection_input_test_sha256": "52c38d3ffb1d91dd8b3d3b3c478691106adbfceba46d747ac5ed32cee1d353ba",
+    "previous_v10_image": {
+      "image": {
+        "architecture": "arm64",
+        "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
+        "bootstrap_sha256": "e60ac4a8f76a106946ad3d91a392be97b7c0671587a75f4c5111d57dfb4c4879",
+        "builder_sha256": "e1b8102fbd47b1313549445b6fd7792a086c2a883233bdfbf16ff56cfea7a184",
+        "compression": "zlib",
+        "contains_personal_account": false,
+        "contains_provider_credentials": false,
+        "dependency_manifest_sha256": "d0812f2d560c26cdbc596d445dae73b3f3ec0098e01f7aec44869e7ba17d6b23",
+        "dependency_profile_sha256": "e76be92153567973abe0df91b2a9c27b3e58cfe306a41337020448471908e923",
+        "disk_size": "20G",
+        "first_run_sha256": "8dc0c5b4a0d212667000bb009905458de85125c7fad98e1d876fb2f766471b57",
+        "first_run_unit_sha256": "c4d2376b281a0d5879ce71a15e192ede8598ebc531d58b7dff3203ca66986b09",
+        "format": 1,
+        "foundation_sources": {
+          "agent-os-foundation.service": "e5acc8fbfec78024dfd7fb27fafe615391c7b17672c1b56e235e12023e3b6bd2",
+          "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
+          "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
+        },
+        "image_sha256": "9d86b2b1c3745669b43573fc4011cd8777f2727b982a717b5e55681732abfef4",
+        "name": "agentOS experimental native image",
+        "runtime_release": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
+        "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
+        "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
+      },
+      "runtime_source_revision": "6b459ea4129524baa253854f07cfedac4d790a86",
+      "runtime_716_ui": "v0.1.0-alpha.31",
+      "qualification_observations": [
+        "Clean v10 qualification includes the exact alpha.31 form-owner fixes and the immutable runtime from all 60 reproduction checks, plus installed collection/editor/VTE/IME, idle/two-broker-CPU-job presentation, browser, offline speech, reboot and failed activation/account-preserving recovery.",
+        "The prior v6\u2013v9 distributions remain untouched. Only the redundant guest v9 builder output was removed after fresh SHA-256 equality with the retained host distribution.",
+        "The prior v9 qualification exposed an intermittent primary-transfer destination focus failure. An unchanged instrumented repeat and complete v9 fresh-copy run passed; that observation remains open. Its helper identity/password failures and subsequent exact disk/config/EFI restoration are retained in repository history.",
+        "An initial compressed v10 conversion ran out of builder space, published no image and cleaned its private temporary directory. The builder now checks a conservative 41 GiB peak-capacity bound before disk/loop creation; all 21 tooling tests pass. The dedicated development test disk was enlarged from 20 to 80 GiB after an exact hash-verified APFS recovery clone; its ext4 filesystem, saved activities, UID and runtime were verified with more than 60 GiB available. The distributed image remains 20 GiB.",
+        "The new image uses supported zlib-compressed QCOW2 export. Its unbooted signed artifact remains separate from the verification copy."
+      ]
+    },
+    "binary_equivalence": {
+      "qualified_runtime": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
+      "image_runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+      "binaries": {
+        "agent-os-core": "2051ea36559b6aa9af596e2f7fba4672971fdb5b788c5fbc492886015263fcfe",
+        "native/agent-os-desktop": "bc05d9da6fc66da62218ae386bb5232fbc2ae7ce67214031e44764e9162f6765",
+        "native/agent-os-compositor": "9c60346155ffda618d3d48c1d11c33b0cbda64b1b764882becb80350c8d09fc4"
+      }
+    },
+    "rollback_fixture": {
+      "runtime_release": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
+      "bundle_sha256": "402e3392bbb5a9dba0dafacdb05f7c668c02f0115975c828e4877a37920159f3"
+    },
+    "prior_incompatible_fixture_refusal": {
+      "log_sha256": "ebd5a59043443fb9120fb3b8c94959c4cdc160c8b2e4458e52ed9915b37d21c8",
+      "required_dependency": "at-spi2-core",
+      "result": "refused before staging or activation"
+    },
+    "driver_log_sha256": "ffb10af58f485d98b23933903a982a96f8ab1d652032a6eb065b17b3f1df9e71",
+    "build_log_sha256": "765518e6848008b119a88e0378e1fdb77c53aab83339a6ccbf9bad7976588b0a"
   },
-  "binary_equivalence": {
-    "qualified_runtime": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
-    "image_runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
-    "binaries": {
-      "agent-os-core": "2051ea36559b6aa9af596e2f7fba4672971fdb5b788c5fbc492886015263fcfe",
-      "native/agent-os-desktop": "bc05d9da6fc66da62218ae386bb5232fbc2ae7ce67214031e44764e9162f6765",
-      "native/agent-os-compositor": "9c60346155ffda618d3d48c1d11c33b0cbda64b1b764882becb80350c8d09fc4"
-    }
+  "retained_v12_failure": {
+    "candidate": "candidate-v12",
+    "source_revision": "6695be825f357b6950e2da48fbe612166708f646",
+    "runtime_release": "de02fdba74bc2e07cc08590a2e06bb2c36c16b4d71a0bdbbd8c096003e1a3a08",
+    "image_sha256": "d06f576190ca8c001980e8d93cb390500c2b439964933ed1bc3512c5faa27951",
+    "observed": {
+      "zoom": 2.0,
+      "output_logical_size": [
+        640,
+        400
+      ],
+      "keyboard_height": 266,
+      "maximum_expected_height": 200,
+      "remaining_work_area_height": 74,
+      "first_run_window_present": true
+    },
+    "root_cause": "not yet established",
+    "evidence": {
+      "/tmp/agentos-image-v12-retry-qualification.log": "921cfe04742de58bf19affd4c8da025808b08eb08b70b3be7cb6239b7539d761"
+    },
+    "qualification_complete": false
   },
-  "rollback_fixture": {
-    "runtime_release": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
-    "bundle_sha256": "402e3392bbb5a9dba0dafacdb05f7c668c02f0115975c828e4877a37920159f3"
-  },
-  "prior_incompatible_fixture_refusal": {
-    "log_sha256": "ebd5a59043443fb9120fb3b8c94959c4cdc160c8b2e4458e52ed9915b37d21c8",
-    "required_dependency": "at-spi2-core",
-    "result": "refused before staging or activation"
-  },
-  "driver_log_sha256": "ffb10af58f485d98b23933903a982a96f8ab1d652032a6eb065b17b3f1df9e71",
-  "build_log_sha256": "765518e6848008b119a88e0378e1fdb77c53aab83339a6ccbf9bad7976588b0a"
+  "cleanup": {
+    "original_development_disk_and_efi_inodes_restored": true,
+    "original_configuration_bytes_restored": true,
+    "qualification_ssh_key_and_sudo_fixture_removed": true,
+    "firstboot_password_file_removed": true,
+    "guest_stopped": true,
+    "owned_utm_app_closed": true,
+    "unbooted_signed_bundle_reverified": true
+  }
 }

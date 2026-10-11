@@ -2438,7 +2438,8 @@
     "Clean committed source 2e018ed passes all 67 checks at runtime 1889db878666b71ac8b9f0e377ec2d030dab4bb824bebd7ebe5493dc17bee8f2. Installed editor p95 is 41 ms idle, 40 ms under two broker CPU jobs, and 46 ms rotated; all 60 receipts complete without discard, invalid or pending. Exact guest/app cleanup passes. This qualifies the helper failure recovery, human Save reconciliation, cache invalidation and bounded input-frame preparation together; the signed v11 image retains its distinct earlier identity.",
     "Clean committed source 7b7fcb0 passes all 68 checks at runtime 212c0bb724b9696bf36024bc7462ee03b1f380194cf8708fdab65296c2e70742, including trusted on-screen keyboard pointer/typing/modifier isolation and session-owned Orca learn mode. Exact guest and owned UTM app exit pass. CI 38134725194 is green. Historical reader timeout remains recorded without an established root cause; signed v11 and earlier complete runs retain their distinct identities.",
     "Clean source 6695be8 passes all 69 checks at runtime de02fdba74bc2e07cc08590a2e06bb2c36c16b4d71a0bdbbd8c096003e1a3a08, including display zoom, scaled kernel pointer/wheel access, keyboard and reader. Editor p95 is 39 ms idle, 41 ms under two broker CPU jobs and 45 ms rotated, with 60 completed receipts and no discarded/invalid/pending samples. Exact guest/app exit and CI 38136072885 pass. Signed v11 and earlier complete runs retain their identities.",
-    "Clean source f2e5499 passes all 70 checks at runtime 30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42, including the compositor-owned keyboard height request, per-step zoom bounds, final native allocation capture, fresh-profile kernel input, scaled pointer/wheel access and reader. Editor p95 is 44 ms idle, 40 ms under two broker CPU jobs and 43 ms rotated, with 60 completed receipts and no discarded/invalid/pending samples. Exact guest/app exit and CI 38139410556 pass. Signed v11 and earlier complete runs retain their identities."
+    "Clean source f2e5499 passes all 70 checks at runtime 30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42, including the compositor-owned keyboard height request, per-step zoom bounds, final native allocation capture, fresh-profile kernel input, scaled pointer/wheel access and reader. Editor p95 is 44 ms idle, 40 ms under two broker CPU jobs and 43 ms rotated, with 60 completed receipts and no discarded/invalid/pending samples. Exact guest/app exit and CI 38139410556 pass. Signed v11 and earlier complete runs retain their identities.",
+    "Signed candidate-v13 passes fresh account/password sudo, compatible signed update/rollback, first-run kernel keyboard/zoom, collections/VTE/IME, presentation, browser, speech/reader, reboot, loopback-only cold boot and activation recovery at exact full70 runtime 30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42. Original disk/EFI inodes and config bytes restored; test authority/password file removed; owned guest/app stopped. Failed v12 and historical unresolved observations remain separate."
   ],
   "owned_utm_app_closed": true,
   "full_run_evidence": {
@@ -2905,7 +2906,7 @@
     }
   },
   "display_zoom": {
-    "status": "keyboard window allocation correction passes clean-source full 70 UTM reproduction and CI; v13 signed-image qualification pending",
+    "status": "keyboard allocation correction passes clean-source full70, CI and signed v13 fresh-image/offline qualification",
     "source": {
       "source_archive_sha256": "426f6e519760ddb4d23847743b63b8cbb6ac65fd28599d986f0baeb28c34cad5",
       "revision": "0f22ce6873d57f27f939de86df62127466ffc5eb",
@@ -3072,7 +3073,7 @@
         "image_copy_first_run_kernel_journeys_passed": 3,
         "image_copy_original_signed_runtime": "de02fdba74bc2e07cc08590a2e06bb2c36c16b4d71a0bdbbd8c096003e1a3a08",
         "image_copy_replacement_binaries_only": true,
-        "new_signed_image_qualified": false,
+        "new_signed_image_qualified": true,
         "evidence": {
           "/tmp/agentos-zoom-fixed-targeted-second.log": "c3373f15f6254a2c780936eb65f24518a2e9791c78c8de4de3b32a4f1d00b9c7",
           "/tmp/agentos-zoom-strict-profiles.log": "04def881ca204b1f7a4aa6a6538086509ce16697f19e7b0b394e7cf6ef1d196e",
@@ -3106,6 +3107,12 @@
             "/tmp/agentos-zoom-baseline-diagnostic-regression.log": "bda8ef831581b36085d309ab3f0e8e9c57cdd3d302237698175d2ac1ef7276fe"
           },
           "note": "An earlier baseline fixture used an incorrect binary path and failed startup; that attempt is not counted as a functional regression."
+        },
+        "qualified_image": {
+          "candidate": "candidate-v13",
+          "image_sha256": "4f6abf61f582fb3a1fcf7d179009bf58b865245717ab9cf41ca6531631574e0f",
+          "runtime_release": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
+          "record": "image-verification.json"
         }
       }
     },
