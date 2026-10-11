@@ -1,0 +1,16 @@
+{
+  "original_source_archive_sha256": "05ee5b0798030d7824a05db3f784fea3486e94d27651e9472473eecbc7a2c95a",
+  "qualification_source_archive_sha256": "628b45559ab3e274c92e63e89da7fb40003494b08e171649b87e8285e03bc47c",
+  "runtime_code_unchanged": true,
+  "changes": [
+    {
+      "member": "native-shell/tests/accessibility.py",
+      "original_sha256": "817eafc4c8e15c7fdfcc2d248b4dfb9d731fc4b9e6bc18187a3d7596a94f681f",
+      "patched_sha256": "eaf901955379323dbb3f4f79364dd76e79ef785bb349281489c09f7efec7c04d",
+      "change": "Keep Toggle fixture owned by temporary session until teardown; preserve workspace/input guard"
+    }
+  ],
+  "initial_failure": "Temporary Toggle close retiled an unrelated editor protected by active input; production interaction guard correctly rejected transaction",
+  "owned_cleanup": "Initial driver confirms original disk/EFI inodes and configuration restored; owned guest/app closed",
+  "image_qualified": false
+}

@@ -1,0 +1,25 @@
+{
+  "architecture": "arm64",
+  "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
+  "bootstrap_sha256": "1df6e4efbc5e9facb674291a06b1eb0b7c47135fa464d29c6491196bff8a0ecd",
+  "builder_sha256": "e1b8102fbd47b1313549445b6fd7792a086c2a883233bdfbf16ff56cfea7a184",
+  "compression": "zlib",
+  "contains_personal_account": false,
+  "contains_provider_credentials": false,
+  "dependency_manifest_sha256": "54cc0a0188cf77cc8d9ae3be5d6735f21a0bf76a1c78815e5ba338a367ec41eb",
+  "dependency_profile_sha256": "dcbf1c74b06215516ef7135525c88ea00e9605f654e165c372125c535f9cd704",
+  "disk_size": "20G",
+  "first_run_sha256": "8dc0c5b4a0d212667000bb009905458de85125c7fad98e1d876fb2f766471b57",
+  "first_run_unit_sha256": "c4d2376b281a0d5879ce71a15e192ede8598ebc531d58b7dff3203ca66986b09",
+  "format": 1,
+  "foundation_sources": {
+    "agent-os-foundation.service": "e5acc8fbfec78024dfd7fb27fafe615391c7b17672c1b56e235e12023e3b6bd2",
+    "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
+    "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
+  },
+  "image_sha256": "34b83941912b33ff19e859934e56d8207d2297f8477732b42a68b2ee5f73ba8f",
+  "name": "agentOS experimental native image",
+  "runtime_release": "2f0abf04f083455464a5e0fc505097524a6a0abae1370ff0cc4a7f4ff161a490",
+  "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
+  "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
+}

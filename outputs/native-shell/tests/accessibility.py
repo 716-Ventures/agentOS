@@ -230,18 +230,8 @@ def verify_toggle_validation(call):
     activate(find('Discard draft',pyatspi.ROLE_PUSH_BUTTON,root=frame))
     wait(lambda:draft() is None and not control.getState().contains(pyatspi.STATE_CHECKED),'Explicit Discard did not restore the saved toggle')
     assert current()['elements']['toggle']['props']['value'] is False
-    # The compositor has placed this view. Remove its workspace reference and
-    # document in one revision-guarded transaction, as the native Close path does.
-    expected={ident:current()['revision']};operations=[]
-    def contains(value):
-        if isinstance(value,dict):return value.get('surface_id')==ident or any(contains(v) for v in value.values())
-        return isinstance(value,list) and any(contains(v) for v in value)
-    for workspace in call({'op':'presentation.snapshot'})['documents'].values():
-        if 'workspace_id' in workspace and contains(workspace['outputs']):
-            expected[workspace['workspace_id']]=workspace['revision']
-            operations.append({'op':'workspace.edit','workspace_id':workspace['workspace_id'],'edit':{'kind':'remove','surface_id':ident}})
-    operations.append({'op':'surface.close','surface_id':ident})
-    assert apply(operations,expected[ident],expected)['status']=='committed'
+    # The session owns this temporary view until teardown. Closing it here
+    # would retile unrelated editors that can still hold active input.
     print('PASS: independent AT-SPI toggle activation reaches the real durable draft; feedback and clearing retain the boolean without Save; scoped Discard restores committed state')
 
 
