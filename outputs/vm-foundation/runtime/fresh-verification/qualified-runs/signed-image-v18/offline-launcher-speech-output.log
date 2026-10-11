@@ -1,0 +1,205 @@
+22:02:36.067760 - SPEECH OUTPUT: 'Screen reader on.'{'established': 'False'}
+22:02:37.084363 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:37.133692 - SPEECH OUTPUT: 'scroll pane'{'established': 'False', 'voice-type': 'system'}
+22:02:37.995610 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:38.136991 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:38.170528 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:38.192012 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:38.198281 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:38.224855 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:38.230854 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:38.320015 - SPEECH OUTPUT: 'Agent launcher'{'established': 'False', 'voice-type': 'default'}
+22:02:38.332100 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:38.380911 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:38.447732 - SPEECH OUTPUT: 'Direct input fixture text'{'established': 'False', 'voice-type': 'system'}
+22:02:38.718878 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:38.845585 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:38.865106 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:38.873072 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:38.945158 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:38.958233 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:38.963356 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:39.028457 - SPEECH OUTPUT: 'Direct input fixture text'{'established': 'False', 'voice-type': 'system'}
+22:02:39.051895 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:39.071582 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:39.133993 - SPEECH OUTPUT: 'Agent launcher'{'established': 'False', 'voice-type': 'default'}
+22:02:39.197133 - SPEECH OUTPUT: 'Ask Agent text'{'established': 'False', 'voice-type': 'system'}
+22:02:39.198436 - SPEECH OUTPUT: 'Describe the work you want done'{'established': 'False', 'voice-type': 'default'}
+22:02:39.360699 - SPEECH OUTPUT: 'a'{'established': 'False',
+22:02:39.529571 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:39.588886 - SPEECH OUTPUT: 'Agent view · Direct input fixture frame'{'established': 'False', 'voice-type': 'system'}
+22:02:39.601528 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:39.668969 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:39.674318 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:39.725894 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:39.798035 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:39.810223 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:39.815782 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:39.891372 - SPEECH OUTPUT: 'Direct input fixture text'{'established': 'False', 'voice-type': 'system'}
+22:02:39.911157 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:39.936078 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:40.049929 - SPEECH OUTPUT: 'Agent launcher'{'established': 'False', 'voice-type': 'default'}
+22:02:40.122305 - SPEECH OUTPUT: 'Ask Agent text'{'established': 'False', 'voice-type': 'system'}
+22:02:40.124139 - SPEECH OUTPUT: 'a selected'{'established': 'False', 'voice-type': 'system'}
+22:02:40.303351 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:40.349489 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:40.362712 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:40.442063 - SPEECH OUTPUT: 'Direct input fixture text'{'established': 'False', 'voice-type': 'system'}
+22:02:40.460835 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:40.466258 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:40.477286 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:40.483043 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:40.547365 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:40.609847 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:40.620358 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:40.687121 - SPEECH OUTPUT: 'Agent launcher'{'established': 'False', 'voice-type': 'default'}
+22:02:40.755245 - SPEECH OUTPUT: 'Ask Agent text'{'established': 'False', 'voice-type': 'system'}
+22:02:40.757343 - SPEECH OUTPUT: 'a selected'{'established': 'False', 'voice-type': 'system'}
+22:02:40.924913 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:40.966988 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:40.979382 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:41.038089 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:41.052405 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:41.057709 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:41.126468 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:41.192524 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:41.207166 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:41.213062 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:41.285917 - SPEECH OUTPUT: 'Agent launcher'{'established': 'False', 'voice-type': 'default'}
+22:02:41.350820 - SPEECH OUTPUT: 'Ask Agent text'{'established': 'False', 'voice-type': 'system'}
+22:02:41.352061 - SPEECH OUTPUT: 'a selected'{'established': 'False', 'voice-type': 'system'}
+22:02:41.512266 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:41.555629 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:41.572689 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:41.625792 - SPEECH OUTPUT: 'Direct input fixture text'{'established': 'False', 'voice-type': 'system'}
+22:02:41.649472 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:41.654726 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:41.734023 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:41.749716 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:41.755380 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:41.828948 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:41.845170 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:41.850851 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:41.903126 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:41.995230 - SPEECH OUTPUT: 'Agent launcher'{'established': 'False', 'voice-type': 'default'}
+22:02:42.058541 - SPEECH OUTPUT: 'Ask Agent text'{'established': 'False', 'voice-type': 'system'}
+22:02:42.059834 - SPEECH OUTPUT: 'a selected'{'established': 'False', 'voice-type': 'system'}
+22:02:42.259545 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:42.301370 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:42.398131 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:42.410877 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:42.415779 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:42.482343 - SPEECH OUTPUT: 'Direct input fixture text'{'established': 'False', 'voice-type': 'system'}
+22:02:42.507842 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:42.513776 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:42.658454 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:42.670003 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:42.675271 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:42.723581 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:42.805591 - SPEECH OUTPUT: 'Agent launcher'{'established': 'False', 'voice-type': 'default'}
+22:02:42.871689 - SPEECH OUTPUT: 'Ask Agent text'{'established': 'False', 'voice-type': 'system'}
+22:02:42.873007 - SPEECH OUTPUT: 'a selected'{'established': 'False', 'voice-type': 'system'}
+22:02:43.065532 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:43.071978 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:43.114115 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:43.180073 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:43.185506 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:43.273836 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:43.301103 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:43.313754 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:43.402580 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:43.417044 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:43.424153 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:43.493206 - SPEECH OUTPUT: 'Agent launcher'{'established': 'False', 'voice-type': 'default'}
+22:02:43.555866 - SPEECH OUTPUT: 'Ask Agent text'{'established': 'False', 'voice-type': 'system'}
+22:02:43.557589 - SPEECH OUTPUT: 'a selected'{'established': 'False', 'voice-type': 'system'}
+22:02:43.714144 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:43.720295 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:43.769384 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:43.809141 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:43.832962 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:43.894425 - SPEECH OUTPUT: 'Direct input fixture text'{'established': 'False', 'voice-type': 'system'}
+22:02:43.917398 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:43.921966 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:44.006631 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:44.058486 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:44.141397 - SPEECH OUTPUT: 'Agent launcher'{'established': 'False', 'voice-type': 'default'}
+22:02:44.212567 - SPEECH OUTPUT: 'Ask Agent text'{'established': 'False', 'voice-type': 'system'}
+22:02:44.214164 - SPEECH OUTPUT: 'a selected'{'established': 'False', 'voice-type': 'system'}
+22:02:44.377666 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:44.383281 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:44.427020 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:44.493598 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:44.506928 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:44.513106 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:44.569447 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:44.597360 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:44.622376 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:44.661741 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:44.714081 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:44.732605 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:44.789607 - SPEECH OUTPUT: 'Agent launcher'{'established': 'False', 'voice-type': 'default'}
+22:02:44.855051 - SPEECH OUTPUT: 'Ask Agent text'{'established': 'False', 'voice-type': 'system'}
+22:02:44.856952 - SPEECH OUTPUT: 'a selected'{'established': 'False', 'voice-type': 'system'}
+22:02:45.030124 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:45.070458 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:45.083910 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:45.153575 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:45.165494 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:45.170509 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:45.233254 - SPEECH OUTPUT: 'Direct input fixture text'{'established': 'False', 'voice-type': 'system'}
+22:02:45.300702 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:45.312555 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:45.322041 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:45.397868 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:45.403019 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:45.461183 - SPEECH OUTPUT: 'Direct input fixture text'{'established': 'False', 'voice-type': 'system'}
+22:02:45.547990 - SPEECH OUTPUT: 'Agent launcher'{'established': 'False', 'voice-type': 'default'}
+22:02:45.614398 - SPEECH OUTPUT: 'Ask Agent text'{'established': 'False', 'voice-type': 'system'}
+22:02:45.616724 - SPEECH OUTPUT: 'a selected'{'established': 'False', 'voice-type': 'system'}
+22:02:45.799613 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:45.806941 - SPEECH OUTPUT: 'backspace'{'established': 'False',
+22:02:45.949846 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:45.991322 - SPEECH OUTPUT: 'Agent view · Direct input fixture'{'established': 'False', 'voice-type': 'default'}
+22:02:46.004526 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:46.081898 - SPEECH OUTPUT: 'Edits remain local until saved by the host selected opens popup'{'established': 'False', 'voice-type': 'system'}
+22:02:46.211377 - SPEECH OUTPUT: 'left shift'{'established': 'False',
+22:02:46.255965 - SPEECH OUTPUT: 'Direct input fixture text'{'established': 'False', 'voice-type': 'system'}
+22:02:46.646969 - SPEECH OUTPUT: 'insert'{'established': 'False',
+22:02:46.651879 - SPEECH OUTPUT: 'Screen reader version 51.0.'{'established': 'False'}
+22:02:46.655975 - SPEECH OUTPUT: 'Entering learn mode.  Press any key to hear its function.  To view the screen reader's documentation, press F1. To get a list of the screen reader's shortcuts, press F2. To exit learn mode, press the escape key.'{'established': 'False'}
+22:02:46.721648 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:46.724695 - SPEECH OUTPUT: 'left alt'{'established': 'False',
+22:02:47.429748 - SPEECH OUTPUT: 'a'{'established': 'False',
+22:02:47.776568 - SPEECH OUTPUT: 'escape'{'established': 'False',
+22:02:47.778677 - SPEECH OUTPUT: 'Exiting learn mode.'{'established': 'False'}
+22:02:47.835925 - SPEECH OUTPUT: 'a'{'established': 'False',
+22:02:48.005744 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:48.048356 - SPEECH OUTPUT: 'Edits remain local until saved by the host selected opens popup'{'established': 'False', 'voice-type': 'system'}
+22:02:48.224417 - SPEECH OUTPUT: 'tab'{'established': 'False',
+22:02:48.255954 - SPEECH OUTPUT: 'Save draft button'{'established': 'False', 'voice-type': 'system'}
+22:02:48.489478 - SPEECH OUTPUT: 'return'{'established': 'False',
+22:02:48.667336 - SPEECH OUTPUT: 'left shift'{'established': 'False',
+22:02:48.717267 - SPEECH OUTPUT: 'Edits remain local until saved by the host selected opens popup'{'established': 'False', 'voice-type': 'system'}
+22:02:48.905694 - SPEECH OUTPUT: 'left shift'{'established': 'False',
+22:02:48.951572 - SPEECH OUTPUT: 'Direct input fixture text'{'established': 'False', 'voice-type': 'system'}
+22:02:48.953220 - SPEECH OUTPUT: 'a'{'established': 'False', 'voice-type': 'default'}
+22:02:49.319302 - SPEECH OUTPUT: 's'{'established': 'False',
+22:02:49.491473 - SPEECH OUTPUT: 'left control'{'established': 'False',
+22:02:49.539013 - SPEECH OUTPUT: 'Edits remain local until saved by the host selected opens popup'{'established': 'False', 'voice-type': 'system'}
+22:02:49.708472 - SPEECH OUTPUT: 'tab'{'established': 'False',
+22:02:49.739413 - SPEECH OUTPUT: 'Save draft button'{'established': 'False', 'voice-type': 'system'}
+22:02:49.968616 - SPEECH OUTPUT: 'tab'{'established': 'False',
+22:02:50.000198 - SPEECH OUTPUT: 'Discard draft button'{'established': 'False', 'voice-type': 'system'}
+22:02:50.212311 - SPEECH OUTPUT: 'return'{'established': 'False',
+22:02:50.502497 - SPEECH OUTPUT: 'left shift'{'established': 'False',
+22:02:50.535430 - SPEECH OUTPUT: 'Save draft button'{'established': 'False', 'voice-type': 'system'}
+22:02:50.739716 - SPEECH OUTPUT: 'left shift'{'established': 'False',
+22:02:50.780490 - SPEECH OUTPUT: 'Edits remain local until saved by the host selected opens popup'{'established': 'False', 'voice-type': 'system'}
+22:02:50.986467 - SPEECH OUTPUT: 'left shift'{'established': 'False',
+22:02:51.029646 - SPEECH OUTPUT: 'Direct input fixture text'{'established': 'False', 'voice-type': 'system'}
+22:02:51.030998 - SPEECH OUTPUT: 'a'{'established': 'False', 'voice-type': 'default'}
+22:02:51.419421 - SPEECH OUTPUT: 'insert'{'established': 'False',
+22:02:51.425186 - SPEECH OUTPUT: 'Screen reader version 51.0.'{'established': 'False'}
+22:02:51.428873 - SPEECH OUTPUT: 'Entering learn mode.  Press any key to hear its function.  To view the screen reader's documentation, press F1. To get a list of the screen reader's shortcuts, press F2. To exit learn mode, press the escape key.'{'established': 'False'}
+22:02:51.500500 - SPEECH OUTPUT: 'Screen reader off.'{'established': 'False'}

@@ -1,0 +1,100 @@
+{
+  "offline_launcher_request_announcements": 10,
+  "offline_launcher_raw_speech_sha256": "fb7d4dab3ea32ebc28cb94e91772829542c51b9b55f2cf98817dbb7b40818ca6",
+  "result": "pass",
+  "before": {
+    "result": "pass",
+    "boot_id": "853f6993-4a4f-4cf2-9c53-2d5cf90dc780",
+    "runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
+    "uid": 1000,
+    "activity": 1,
+    "file_persisted": true,
+    "healthy_services": [
+      "active",
+      "active",
+      "active",
+      "active",
+      "active",
+      "active"
+    ],
+    "network_interfaces": [
+      "lo",
+      "enp0s1"
+    ]
+  },
+  "reboot": {
+    "result": "pass",
+    "boot_id": "d8528920-2519-4b81-a3f9-50db59b4ef28",
+    "runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
+    "uid": 1000,
+    "activity": 1,
+    "file_persisted": true,
+    "healthy_services": [
+      "active",
+      "active",
+      "active",
+      "active",
+      "active",
+      "active"
+    ],
+    "network_interfaces": [
+      "lo",
+      "enp0s1"
+    ]
+  },
+  "offline": {
+    "result": "pass",
+    "boot_id": "fb4a98f4-821f-46ca-8f09-e2449eeccf59",
+    "runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
+    "uid": 1000,
+    "activity": 1,
+    "file_persisted": true,
+    "healthy_services": [
+      "active",
+      "active",
+      "active",
+      "active",
+      "active",
+      "active"
+    ],
+    "network_interfaces": [
+      "lo"
+    ]
+  },
+  "activation_resume": {
+    "result": "pass",
+    "checks": [
+      "real activation failure retains setup journal",
+      "TTY 2 rescue remains active",
+      "resume preserves account UID and password",
+      "ready only after healthy activation",
+      "all six services recover without models or network"
+    ]
+  },
+  "offline_browser": {
+    "result": "pass",
+    "checks": [
+      "system HTTP/HTTPS handler",
+      "actual native Link action",
+      "GIO launch with isolated profile",
+      "real Firefox local page retrieval and title",
+      "conventional shared identity",
+      "durable focus/maximize",
+      "browser disconnect"
+    ],
+    "not_tested": [
+      "physical input",
+      "remote website compatibility",
+      "hardware acceleration",
+      "mailto account/client"
+    ],
+    "firefox_debian_version": "153.4.0esr-1~deb13u1",
+    "installed_executables": true,
+    "cleanup_verified": true
+  },
+  "offline_screen_reader_qualified": true,
+  "offline_display_zoom_and_keyboard_qualified": true,
+  "final_offline_runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
+  "development_disk_restored": true,
+  "guest_stopped": true
+}

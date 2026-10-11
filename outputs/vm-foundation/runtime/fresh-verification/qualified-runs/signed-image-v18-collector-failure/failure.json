@@ -1,0 +1,24 @@
+{
+  "result": "incomplete_collector_failure",
+  "runtime_release": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
+  "image_sha256": "e8546385011f8ec91329ca34e24195436e16dda5a39d9b33ab724ed3d95392de",
+  "failure": "Collector rootrun appends an stdout redirection. The gzip command supplied its own stdout redirection, which was overridden; gzip bytes reached rootrun UTF-8 decoding.",
+  "passed_before_failure": [
+    "fresh account and password sudo",
+    "all eleven online direct profiles",
+    "actual installed validation/outcome and launcher speech",
+    "signed update/rollback",
+    "reboot and offline cold boot",
+    "offline Firefox handoff",
+    "offline reader commands, ten announced launcher reopens/draft retention and rescue VT"
+  ],
+  "not_completed": [
+    "offline zoom",
+    "activation recovery/resume",
+    "qualification authority removal"
+  ],
+  "development_disks_restored": true,
+  "owned_utm_closed": true,
+  "runtime_changes_for_retry": false,
+  "failed_copy_qualification_authority": "Removed by deleting only the disposable failed attempt1 disk/EFI after preserving logs; signed candidate-v18 and development disks untouched."
+}
