@@ -1,0 +1,6 @@
+{
+  "runtime_changed_for_correction": false,
+  "failure": "The fixture counted ordinary label/caret reading caused by the deliberate Right key as a repeated background announcement. Raw Orca dispatch contains one Status announcement speech event, followed by ordinary focused-text speech.",
+  "correction": "Count actual SPEECH OUTPUT only inside Orca OBJECT:ANNOUNCEMENT event dispatch; retain ordinary navigation speech in the raw trace.",
+  "raw_speech_sha256": "bd412e0dc1ab1ab016094114aa473ea3b0b6f831524aa775b03510591f435f32"
+}

@@ -1,0 +1,5 @@
+{
+  "runtime_changed_for_correction": false,
+  "failure": "Verification driver built debug binaries before installation, which deliberately clears both local build profiles. The debug session could not find its runtime.",
+  "correction": "Build debug binaries and compositor examples after installation before qualifying either profile."
+}

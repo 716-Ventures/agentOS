@@ -1,0 +1,23 @@
+   Compiling seven-sixteen-ui v0.1.0-alpha.42 (/Users/chrisjdavis/development/716-ui)
+    Finished `test` profile [unoptimized] target(s) in 0.95s
+     Running unittests src/lib.rs (target/debug/deps/seven_sixteen_ui-0fb70fcf50c5d9bd)
+
+running 9 tests
+test validation::tests::feedback_is_bounded_readable_literal_unicode ... ok
+test catalog::tests::table_literals_have_unique_keys_bounded_cells_and_no_extra_fields ... ok
+test content::tests::reading_literals_bound_keys_values_styles_and_unknown_fields ... ok
+test content::tests::chart_domain_preserves_fractional_and_tiny_values ... ok
+test content::image_tests::images_are_complete_crc_checked_and_bounded_before_decoding ... ok
+test catalog::tests::metadata_is_available_without_a_renderer ... ok
+test buttons::tests::invalid_names_enum_values_and_dependent_properties_are_rejected ... ok
+test buttons::tests::default_declaration_retains_text_action_and_schema_choices_parse ... ok
+test content::editor_tests::replacement_is_literal_unicode_exact_and_bounded_before_allocation ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests seven_sixteen_ui
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,0 +1,19 @@
+{
+  "started_at": "2026-10-11T22:18:29.071563+00:00",
+  "source_revision": "1ae50eeda25d9ededce1f58a57653fc7ad4da093",
+  "source_changes": [
+    " M outputs/native-shell/Cargo.lock",
+    " M outputs/native-shell/Cargo.toml",
+    " M outputs/native-shell/src/main.rs",
+    " M outputs/native-shell/tests/accessibility.py",
+    " M outputs/native-shell/tests/native_session.py"
+  ],
+  "source_archive_sha256": "3fda5752733ba03c1995bc7cec051b5fee78e85aa4e5f2f19bc0ae5b47ed4636",
+  "passed": false,
+  "owned_utm_identity": [
+    10994,
+    "Sun Oct 11 18:18:29 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T22:19:39.071537+00:00"
+}

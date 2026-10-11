@@ -65,6 +65,7 @@ struct Element {
     image: Option<ui::ImageView>,
     reference: Option<ui::ReferenceView>,
     outcome: Option<ui::OutcomeView>,
+    status: Option<ui::StatusView>,
     pty: Option<pty_view::PtyView>,
     image_attempted: bool,
     chart: Option<ui::BoundedChart>,
@@ -213,6 +214,7 @@ fn construct(
         image: None,
         reference: None,
         outcome: None,
+        status: None,
         pty: None,
         image_attempted: false,
         chart: None,
@@ -379,19 +381,18 @@ fn construct(
             result.widget = container.clone().upcast();
             result.container = Some(container);
         }
-        "Text@1" | "Status@1" => {
-            let label = if kind == "Status@1" {
-                ui::status("")
-            } else {
-                ui::text("", props["role"] == "heading")
-            };
+        "Status@1" => {
+            let value = bound(surface, &props["value"], frame);
+            let status = ui::StatusView::new(value.as_str().unwrap_or("Source unavailable")).unwrap();
+            lease(&status.value.clone().upcast(), surface, id, commands);
+            result.widget = status.widget.clone().upcast();
+            result.status = Some(status);
+        }
+        "Text@1" => {
+            let label = ui::text("", props["role"] == "heading");
             result.widget = label.clone().upcast();
             result.label = Some(label);
-            if kind == "Text@1" {
-                lease(&result.widget, surface, id, commands);
-            } else if let Some(label) = &result.label {
-                label.set_selectable(false);
-            }
+            lease(&result.widget, surface, id, commands);
         }
         "Choice@1" | "Toggle@1" => {
             let recovered = frame.drafts.get(&(surface.into(), id.into()));
@@ -1211,25 +1212,19 @@ impl Surface {
                         serde_json::from_value::<Vec<ui::RichRun>>(props["runs"].clone()).unwrap();
                     let _ = rich.reconcile(&runs);
                 }
+                if let Some(status) = &e.status {
+                    let value = bound(id, &props["value"], frame);
+                    let _ = status.reconcile(value.as_str().unwrap_or("Source unavailable"));
+                }
                 if let Some(label) = &e.label {
                     if e.rich.is_none()
                         && e.kind != "Image@1"
-                        && (e.kind == "Status@1"
-                            || (!label.has_focus() && label.selection_bounds().is_none()))
+                        && !label.has_focus()
+                        && label.selection_bounds().is_none()
                     {
-                        let text = if e.kind == "Status@1" {
-                            bound(id, &props["value"], frame)
-                                .as_str()
-                                .unwrap_or("Source unavailable")
-                                .to_string()
-                        } else {
-                            props["text"]
-                                .as_str()
-                                .unwrap_or("Unsupported component")
-                                .to_string()
-                        };
+                        let text = props["text"].as_str().unwrap_or("Unsupported component");
                         if label.text() != text {
-                            label.set_text(&text);
+                            label.set_text(text);
                         }
                     }
                 }

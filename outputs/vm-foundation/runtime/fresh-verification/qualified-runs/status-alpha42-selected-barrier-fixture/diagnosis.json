@@ -1,0 +1,6 @@
+{
+  "runtime_changed_for_correction": false,
+  "observed": "All four validation controls, three job outcomes, Status focus lease, and retained snapshot clipboard checks passed. Subsequent exact-text revision barrier failed despite actual speech of the new marker.",
+  "correction_under_test": "Recognize either exact current Status value or its exact Current value notice while an older snapshot stays selected.",
+  "raw_speech_sha256": "6b2ba30c008553256935a04847fc3375968143d01aaf6074eb4296bbb64a1d59"
+}

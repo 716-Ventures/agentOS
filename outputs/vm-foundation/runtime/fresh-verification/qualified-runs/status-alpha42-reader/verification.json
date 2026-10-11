@@ -1,0 +1,45 @@
+{
+  "started_at": "2026-10-11T22:25:26.974646+00:00",
+  "source_revision": "1ae50eeda25d9ededce1f58a57653fc7ad4da093",
+  "source_changes": [
+    " M outputs/native-shell/Cargo.lock",
+    " M outputs/native-shell/Cargo.toml",
+    " M outputs/native-shell/src/main.rs",
+    " M outputs/native-shell/tests/accessibility.py",
+    " M outputs/native-shell/tests/ime_accessibility.py",
+    " M outputs/native-shell/tests/native_session.py"
+  ],
+  "source_archive_sha256": "c3c81b36e2876aac7f195ce17f495d7efb3b80c4167bcc391ba6d2257f2fbb10",
+  "passed": true,
+  "owned_utm_identity": [
+    16781,
+    "Sun Oct 11 18:25:27 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T22:28:57.361556+00:00",
+  "debug": {
+    "raw_speech_sha256": "192623425d2902254c60ea54f1ff2566cfbc80b7e850a63e26cd0a1ee96ee334",
+    "status_announcement_speech": [
+      "22:27:02.159449 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
+    ],
+    "four_control_validation": true,
+    "result_error_and_status_real_job_changes": true,
+    "focus_lease_and_snapshot_retained": true,
+    "selected_status_clipboard_roundtrip": true,
+    "complete_session_save_discard_and_cleanup": true
+  },
+  "installed": {
+    "raw_speech_sha256": "fd767d83afda15a7832d20ab3123e8b9bb778378868042e3db5bee48a074c294",
+    "status_announcement_speech": [
+      "22:28:16.971426 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
+    ],
+    "four_control_validation": true,
+    "result_error_and_status_real_job_changes": true,
+    "focus_lease_and_snapshot_retained": true,
+    "selected_status_clipboard_roundtrip": true,
+    "complete_session_save_discard_and_cleanup": true
+  },
+  "public_revision": "7997f4d800d7169d2bcdc51bea0431f618968d81",
+  "public_ci_run": 38179779480,
+  "scope": "Targeted debug and installed sessions. Complete committed-source reproduction and signed-image qualification remain separate."
+}

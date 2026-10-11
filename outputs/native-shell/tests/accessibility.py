@@ -80,7 +80,7 @@ def verify(call):
                   'expected_revisions':{'session-fixture':document['revision']},
                   'operations':[{'op':'element.set_props','surface_id':'session-fixture','element_id':'reading','props':{'value':marker}}]})
     assert receipt['status']=='committed',receipt
-    wait(lambda:ime_accessibility.rendered_text(marker),'Accessible editing fixture did not render the current revision')
+    wait(lambda:ime_accessibility.rendered_status(marker),'Accessible editing fixture did not render the current revision')
     field=find('Accessible session draft',pyatspi.ROLE_TEXT)
     assert text(field)=='Original accessible value'
     def saved():
@@ -420,7 +420,7 @@ def verify_reader_controls(call, speech_log):
     if control_modifier:activate(find('Ctrl on',pyatspi.ROLE_PUSH_BUTTON))
     activate(find('Hide keyboard',pyatspi.ROLE_PUSH_BUTTON))
 
-def verify_reader_outcomes(call, speech_log, outcomes):
+def verify_reader_outcomes(call, speech_log, outcomes, database):
     """Real job transitions must remain perceivable beside a selected snapshot."""
     import ime_accessibility
     frame=find('Agent view · Session lifecycle',pyatspi.ROLE_FRAME)
@@ -451,17 +451,29 @@ def verify_reader_outcomes(call, speech_log, outcomes):
         raise AssertionError('Reader outcome keyboard did not reach '+target.name)
     for key,(job,latch) in outcomes.items():
         label='Reader '+key+' outcome'
-        heading=find(label,pyatspi.ROLE_HEADING,root=frame)
-        group=heading.parent
-        message=find('running',pyatspi.ROLE_LABEL,root=group)
+        if key=='status':
+            message=find('running',pyatspi.ROLE_LABEL,root=frame)
+            group=message.parent
+        else:
+            heading=find(label,pyatspi.ROLE_HEADING,root=frame)
+            group=heading.parent
+            message=find('running',pyatspi.ROLE_LABEL,root=group)
         value=message.queryText()
         navigate(message)
         stroke('Ctrl');stroke('a');stroke('Ctrl on')
         wait(lambda:value.getNSelections()==1,'Reader outcome keyboard did not select the snapshot')
+        # Observe the real host's lease independently of the accessibility tree.
+        import sqlite3
+        def leased():
+            with sqlite3.connect(database) as db:
+                row=db.execute("SELECT expires,session FROM presentation_leases WHERE document=? AND element=?",('session-fixture',key)).fetchone()
+            return row is not None and row[0]>=int(time.time()) and ':' in row[1]
+        wait(leased,'Selected reading text did not acquire the host focus lease')
+        assert value.getText(*value.getSelection(0))=='running'
         baseline=len(speech_log.read_text(errors='replace'))
         latch.touch()
         wait(lambda:next(row for row in call({'op':'snapshot'})['jobs'] if row['id']==job)['status']=='failed','Reader outcome job did not fail')
-        expected='Current value:\n'+label+'\nfailed'
+        expected='Current value:\n'+('' if key=='status' else label+'\n')+'failed'
         observed=[]
         def current_notice():
             queue=deque([group]);observed.clear()
@@ -482,16 +494,37 @@ def verify_reader_outcomes(call, speech_log, outcomes):
             raise
         assert text(message)=='running' and value.getNSelections()==1
         assert message.getState().contains(pyatspi.STATE_FOCUSED)
+        assert leased(),'Job observation displaced the human focus lease'
+        assert value.getText(*value.getSelection(0))=='running'
         assert call({'op':'draft.get','surface_id':'session-fixture','element_id':'field'})==draft
-        announcement=label+': failed'
+        announcement='failed' if key=='status' else label+': failed'
         def announcements():
-            return [line for line in speech_log.read_text(errors='replace')[baseline:].splitlines() if 'SPEECH OUTPUT:' in line and announcement in line]
+            # Orca also reads changed label text in response to the user's Right
+            # key. Count actual speech inside announcement event dispatch, not
+            # that ordinary caret/name reading. Preserve the complete raw trace.
+            active=False;spoken=[]
+            for line in speech_log.read_text(errors='replace')[baseline:].splitlines():
+                if 'START ' in line and 'OBJECT EVENT ' in line:
+                    active='OBJECT:ANNOUNCEMENT' in line
+                if active and 'SPEECH OUTPUT:' in line and announcement in line:
+                    spoken.append(line)
+                if 'END ' in line and 'OBJECT EVENT ' in line:active=False
+            return spoken
         wait(lambda:announcements(),'Orca did not announce changed selected '+key+' outcome')
+        if key=='status':
+            stroke('Ctrl');stroke('c');stroke('Ctrl on')
         stroke('Right')
         wait(lambda:text(message)=='failed','Reader outcome did not reconcile after deselection')
         time.sleep(.8) # Observe several normal reconciliation polls after deselection.
         assert len(announcements())==1,'Unchanged outcome refresh or deselection repeated speech'
         print('PASS: actual Orca announces changed '+key+' job outcome once while selected snapshot, focus and exact field draft persist',flush=True)
+        if key=='status':
+            copied=find('Status copy check',pyatspi.ROLE_TEXT,root=frame)
+            navigate(copied)
+            stroke('Ctrl');stroke('v');stroke('Ctrl on')
+            wait(lambda:text(copied)=='running','Ctrl+C did not preserve the selected old status in the Wayland clipboard')
+            assert call({'op':'draft.get','surface_id':'session-fixture','element_id':'field'})==draft
+            print('PASS: trusted Ctrl+C copies the selected old Status through the Wayland clipboard after its live job has failed',flush=True)
     navigate(field)
     activate(find('Hide keyboard',pyatspi.ROLE_PUSH_BUTTON))
 

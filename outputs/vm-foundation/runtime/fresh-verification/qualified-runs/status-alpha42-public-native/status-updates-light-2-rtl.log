@@ -1,0 +1,1 @@
+PASS: mapped selectable Status preserves Unicode selection, logical focus and unsent draft; current observations stay visible; invalid updates are atomic; deselection and empty state reconcile

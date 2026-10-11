@@ -1,0 +1,26 @@
+{
+  "started_at": "2026-10-11T22:04:56.690288+00:00",
+  "source_revision": "1ffb447f3d3a099b22eeb2e5c4e104e5d22bd46a",
+  "source_changes": [
+    " M CHANGELOG.md",
+    " M Cargo.lock",
+    " M Cargo.toml",
+    " M README.md",
+    " M docs/COMPONENT-CONTRACT.md",
+    " M src/announcement.rs",
+    " M src/bin/gallery.rs",
+    "AM src/bin/status_updates.rs",
+    " M src/lib.rs",
+    " M src/outcome.rs",
+    "AM src/status.rs",
+    " M tests/native_gallery.py"
+  ],
+  "source_archive_sha256": "73628cbb09ed978006e40f644a604cb1f592051c187ddc7a32eb567e65d6363d",
+  "passed": false,
+  "owned_utm_identity": [
+    99417,
+    "Sun Oct 11 18:04:56 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T22:05:47.930465+00:00"
+}

@@ -19,6 +19,12 @@ def rendered_text(value):
         except (RuntimeError,LookupError):pass
     return False
 
+def rendered_status(value):
+    # A keyboard-selected older Status snapshot remains copyable. The current
+    # observation beside it is still an exact rendered revision barrier.
+    return rendered_text(value) or rendered_text('Current value:\n'+value)
+
+
 def verify(call, endpoint, editor=False, observation=None):
     def method(op, text=None):
         request = {'op': op}
@@ -47,7 +53,7 @@ def verify(call, endpoint, editor=False, observation=None):
                           'props': {'value': 'Unrelated update during composition'}}]})
     assert updated['status']=='committed',updated
     # Wait for the actual renderer to consume the update, not just core acceptance.
-    try:accessibility.wait(lambda:rendered_text('Unrelated update during composition'),'Unrelated status was not rendered during composition')
+    try:accessibility.wait(lambda:rendered_status('Unrelated update during composition'),'Unrelated status was not rendered during composition')
     except AssertionError:
         print('Current composition document:',call({'op':'presentation.get','document_id':'session-fixture'}),flush=True)
         from collections import deque

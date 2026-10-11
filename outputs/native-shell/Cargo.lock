@@ -704,8 +704,8 @@ dependencies = [
 
 [[package]]
 name = "seven-sixteen-ui"
-version = "0.1.0-alpha.41"
-source = "git+https://github.com/716-Ventures/716-ui?rev=1ffb447f3d3a099b22eeb2e5c4e104e5d22bd46a#1ffb447f3d3a099b22eeb2e5c4e104e5d22bd46a"
+version = "0.1.0-alpha.42"
+source = "git+https://github.com/716-Ventures/716-ui?rev=7997f4d800d7169d2bcdc51bea0431f618968d81#7997f4d800d7169d2bcdc51bea0431f618968d81"
 dependencies = [
  "gtk4",
  "libloading",

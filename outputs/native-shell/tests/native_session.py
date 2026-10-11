@@ -95,13 +95,16 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
             document={'protocol':'agentos.presentation/1','catalog_revision':'native-core/1','surface_id':'session-fixture','activity_id':str(activity),'revision':0,'title':'Session lifecycle','root':'root','elements':{'root':{'type':'Stack@1','props':{'spacing':'normal'},'slots':{'children':['reading','field']}},'reading':{'type':'Status@1','props':{'value':'Authenticated session fixture'}},'field':{'type':'DocumentEditor@1' if ime_editor else 'TextField@1','props':{'label':'Accessible session draft','value':'Original accessible value'}}},'bindings':{},'actions':{}}
             reader_outcomes={}
             if '--reader-outcomes' in sys.argv:
-                for key,kind in [('result','Result@1'),('failure','Error@1')]:
+                for key,kind in [('result','Result@1'),('failure','Error@1'),('status','Status@1')]:
                     latch=root/('reader-'+key)
                     job=call(endpoint,{'op':'run','activity_id':activity,'argv':['/bin/sh','-c','while [ ! -e "$1" ]; do sleep .1; done; exit 7','reader-outcome',str(latch)]})['id']
                     reader_outcomes[key]=(job,latch)
-                    document['elements'][key]={'type':kind,'props':{'label':'Reader '+key+' outcome','message' if key=='failure' else 'value':{'binding':key}}}
+                    document['elements'][key]={'type':kind,'props':{'message' if key=='failure' else 'value':{'binding':key}}}
+                    if key!='status':document['elements'][key]['props']['label']='Reader '+key+' outcome'
                     document['bindings'][key]={'source':f'job:{job}','path':'/status','access':'read'}
                     document['elements']['root']['slots']['children'].append(key)
+                document['elements']['status-copy']={'type':'TextField@1','props':{'label':'Status copy check','value':''}}
+                document['elements']['root']['slots']['children'].append('status-copy')
             if '--reader-controls' in sys.argv:
                 document['elements'].update({'editor':{'type':'DocumentEditor@1','props':{'label':'Reader document draft','value':'Saved document'}},'choice':{'type':'Choice@1','props':{'label':'Reader workspace choice','options':['First','Second'],'value':'First'}},'toggle':{'type':'Toggle@1','props':{'label':'Reader confirmation','value':False}}})
                 document['elements']['root']['slots']['children'].extend(['editor','choice','toggle'])
@@ -249,7 +252,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 if '--reader-controls' in sys.argv:
                     accessibility.verify_reader_controls(lambda value:call(endpoint,value),reader_log)
                 if '--reader-outcomes' in sys.argv:
-                    accessibility.verify_reader_outcomes(lambda value:call(endpoint,value),reader_log,reader_outcomes)
+                    accessibility.verify_reader_outcomes(lambda value:call(endpoint,value),reader_log,reader_outcomes,root/"core-state/state.sqlite3")
                 # Normal logout removes the private session directory before finally.
                 # Capture tested speech while that owned directory is still alive.
                 (OUTPUT/'reader-validation-speech.log').write_bytes(reader_log.read_bytes())
@@ -340,7 +343,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                         # The previous Save's core receipt precedes renderer
                         # reconciliation. Observe a new rendered status before
                         # asking the editor to Save against its displayed view.
-                        accessibility.wait(lambda:ime_accessibility.rendered_text('Input method stopped; desktop available'),'Native desktop did not render after input-method loss')
+                        accessibility.wait(lambda:ime_accessibility.rendered_status('Input method stopped; desktop available'),'Native desktop did not render after input-method loss')
                         field=accessibility.find('Accessible session draft',pyatspi.ROLE_TEXT)
                         value='Recovered without input method λ'
                         assert field.queryEditableText().setTextContents(value)
