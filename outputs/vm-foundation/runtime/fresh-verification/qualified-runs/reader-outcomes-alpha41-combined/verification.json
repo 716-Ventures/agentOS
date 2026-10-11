@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "source_base": "c237a8c1a6128ca51b7bb1eaa091b74b9c65c96f",
+  "source_change": "tests/accessibility.py only; production byte-identical",
+  "installed_runtime": "12baac1fda411b918957f93a7fd78abc341e8d7c48f6418b1fab8153195f0de1",
+  "profiles": [
+    "debug",
+    "installed"
+  ],
+  "actual_orca": [
+    "TextField, DocumentEditor, Choice and Toggle error/clear",
+    "Result and Error real failed job updates while older text remains selected",
+    "Exactly one outcome announcement across refresh/deselection"
+  ],
+  "navigation": "Waits for actual accessible focus changes; Ctrl+Tab leaves DocumentEditor. Returns to original field without editing it.",
+  "speech_sha256": {
+    "debug": "87fa2d859578ff4439523cb668162f8dc3efea3c7b5d98ac7027ded470898716",
+    "installed": "3b5e21ca718b7c588ad960ddf34b513935b0f6cf8934ad4b59fadb1e1acc2a00"
+  },
+  "cleanup": true,
+  "private_ci": 38172683281,
+  "public_ci": 38172471731,
+  "prior_failure_evidence": "../reader-outcomes-alpha41-initial-full-run/",
+  "limits": [
+    "Targeted sessions do not replace complete70 qualification or the signed alpha.40 image16.",
+    "Speech uses a null sink. Physical audio/braille/input/GPU/multi-output and live providers remain unqualified."
+  ]
+}

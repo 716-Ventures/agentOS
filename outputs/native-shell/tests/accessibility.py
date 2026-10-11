@@ -431,10 +431,23 @@ def verify_reader_outcomes(call, speech_log, outcomes):
     def stroke(name):
         activate(find(name,pyatspi.ROLE_PUSH_BUTTON))
         wait(lambda:ime_accessibility.rendered_text('Keyboard ready'),'Reader outcome keyboard stroke did not finish')
+    def focused_path():
+        queue=deque([(frame,())]);visited=0
+        while queue and visited<512:
+            node,path=queue.popleft();visited+=1
+            if node is None:continue
+            if node.getState().contains(pyatspi.STATE_FOCUSED):return (path,node.name,node.getRole())
+            queue.extend((node[i],path+(i,)) for i in range(min(node.childCount,64)))
+        return None
     def navigate(target):
         for _ in range(32):
             if target.getState().contains(pyatspi.STATE_FOCUSED):return
+            previous=focused_path()
+            editor_focused=previous is not None and previous[1]=='Reader document draft'
+            if editor_focused:stroke('Ctrl')
             stroke('Tab')
+            wait(lambda:focused_path()!=previous,'Reader outcome Tab did not acknowledge changed focus')
+            if editor_focused:stroke('Ctrl on')
         raise AssertionError('Reader outcome keyboard did not reach '+target.name)
     for key,(job,latch) in outcomes.items():
         label='Reader '+key+' outcome'

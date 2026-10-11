@@ -1,0 +1,42 @@
+dbus-daemon[21615]: [session uid=1000 pid=21615 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.3' (uid=1000 pid=21664 comm="/tmp/agentos-session-test-j51is2kx/bin/agent-os-de")
+dbus-daemon[21615]: [session uid=1000 pid=21615 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[21690]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=21664 comm="/tmp/agentos-session-test-j51is2kx/bin/agent-os-de")
+dbus-daemon[21690]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+dbus-daemon[21615]: [session uid=1000 pid=21615 pidfd=5] Activating service name='ca.desrt.dconf' requested by ':1.4' (uid=1000 pid=21684 comm="/usr/libexec/at-spi-bus-launcher")
+dbus-daemon[21615]: [session uid=1000 pid=21615 pidfd=5] Successfully activated service 'ca.desrt.dconf'
+PASS: session-owned Orca initializes speech and announces the focused native field
+
+(process:21616): atspi-WARNING **: 20:37:02.578: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:21616): atspi-WARNING **: 20:37:02.834: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: session-owned Orca sends the focused field error and cleared-valid state to speech without changing input or drafts; physical audio and braille remain unqualified
+
+(process:21616): atspi-WARNING **: 20:37:12.540: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:21616): atspi-WARNING **: 20:37:12.755: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: real Orca error/clear speech retains DocumentEditor@1 focus, value and exact draft without Save
+
+(process:21616): atspi-WARNING **: 20:37:17.929: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:21616): atspi-WARNING **: 20:37:18.268: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: real Orca error/clear speech retains Choice@1 focus, value and exact draft without Save
+
+(process:21616): atspi-WARNING **: 20:37:20.946: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:21616): atspi-WARNING **: 20:37:21.241: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: real Orca error/clear speech retains Toggle@1 focus, value and exact draft without Save
+Reader current notice: {"name": "", "role": "status bar", "text": "Current value:\nReader result outcome\nfailed"}
+PASS: actual Orca announces changed result job outcome once while selected snapshot, focus and exact field draft persist
+Reader current notice: {"name": "", "role": "status bar", "text": "Current value:\nReader failure outcome\nfailed"}
+PASS: actual Orca announces changed failure job outcome once while selected snapshot, focus and exact field draft persist
+Traceback (most recent call last):
+  File "/home/developer/agent-os-source/native-shell/tests/native_session.py", line 252, in <module>
+    accessibility.verify_reader_outcomes(lambda value:call(endpoint,value),reader_log,reader_outcomes)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/developer/agent-os-source/native-shell/tests/accessibility.py", line 482, in verify_reader_outcomes
+    navigate(field)
+    ~~~~~~~~^^^^^^^
+  File "/home/developer/agent-os-source/native-shell/tests/accessibility.py", line 438, in navigate
+    raise AssertionError('Reader outcome keyboard did not reach '+target.name)
+AssertionError: Reader outcome keyboard did not reach Accessible session draft

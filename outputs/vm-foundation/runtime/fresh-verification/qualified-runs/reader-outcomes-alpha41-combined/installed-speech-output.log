@@ -1,0 +1,184 @@
+20:42:06.924889 - SPEECH OUTPUT: 'Screen reader on.'{'established': 'False'}
+20:42:07.018197 - SPEECH OUTPUT: 'Agent view · Session lifecycle'{'established': 'False', 'voice-type': 'default'}
+20:42:07.237464 - SPEECH OUTPUT: 'Accessible session draft text'{'established': 'False', 'voice-type': 'system'}
+20:42:07.238852 - SPEECH OUTPUT: 'Original accessible value selected'{'established': 'False', 'voice-type': 'system'}
+20:42:07.406175 - SPEECH OUTPUT: 'Use a saved workspace name.'{'established': 'False'}
+20:42:07.651362 - SPEECH OUTPUT: 'Entry valid.'{'established': 'False'}
+20:42:09.059452 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:09.099744 - SPEECH OUTPUT: 'Save draft button'{'established': 'False', 'voice-type': 'system'}
+20:42:09.521043 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:09.554771 - SPEECH OUTPUT: 'Discard draft button'{'established': 'False', 'voice-type': 'system'}
+20:42:09.990307 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:10.023766 - SPEECH OUTPUT: 'Review latest version… button'{'established': 'False', 'voice-type': 'system'}
+20:42:10.468319 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:10.506735 - SPEECH OUTPUT: 'status bar'{'established': 'False', 'voice-type': 'system'}
+20:42:10.508030 - SPEECH OUTPUT: 'Reader result outcome heading 1 opens popup'{'established': 'False', 'voice-type': 'system'}
+20:42:10.865276 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:10.902558 - SPEECH OUTPUT: 'running selected opens popup'{'established': 'False', 'voice-type': 'system'}
+20:42:11.245506 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:11.282582 - SPEECH OUTPUT: 'alert'{'established': 'False', 'voice-type': 'system'}
+20:42:11.283852 - SPEECH OUTPUT: 'Reader failure outcome heading 1 opens popup'{'established': 'False', 'voice-type': 'system'}
+20:42:11.643405 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:11.674784 - SPEECH OUTPUT: 'running selected opens popup'{'established': 'False', 'voice-type': 'system'}
+20:42:12.030353 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:12.066102 - SPEECH OUTPUT: 'Export saved document… button'{'established': 'False', 'voice-type': 'system'}
+20:42:12.437051 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:12.469722 - SPEECH OUTPUT: 'Review replacement of existing file… button'{'established': 'False', 'voice-type': 'system'}
+20:42:12.746251 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:12.770580 - SPEECH OUTPUT: 'Find in document.'{'established': 'False'}
+20:42:13.189252 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:13.240022 - SPEECH OUTPUT: 'Find in document text'{'established': 'False', 'voice-type': 'system'}
+20:42:13.241683 - SPEECH OUTPUT: 'Find literal text'{'established': 'False', 'voice-type': 'default'}
+20:42:13.632461 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:13.668406 - SPEECH OUTPUT: 'Replace with.'{'established': 'False'}
+20:42:14.001548 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:14.055838 - SPEECH OUTPUT: 'Replace with text'{'established': 'False', 'voice-type': 'system'}
+20:42:14.057191 - SPEECH OUTPUT: 'Replacement'{'established': 'False', 'voice-type': 'default'}
+20:42:14.445524 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:14.481102 - SPEECH OUTPUT: 'Find next.'{'established': 'False'}
+20:42:14.784204 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:14.826697 - SPEECH OUTPUT: 'Find next button'{'established': 'False', 'voice-type': 'system'}
+20:42:15.245767 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:15.278951 - SPEECH OUTPUT: 'Replace selection.'{'established': 'False'}
+20:42:15.619125 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:15.669694 - SPEECH OUTPUT: 'Replace selection button'{'established': 'False', 'voice-type': 'system'}
+20:42:16.083649 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:16.115752 - SPEECH OUTPUT: 'Replace all.'{'established': 'False'}
+20:42:16.517186 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:16.563859 - SPEECH OUTPUT: 'Replace all button'{'established': 'False', 'voice-type': 'system'}
+20:42:16.973604 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:17.020691 - SPEECH OUTPUT: 'Reader document draft text'{'established': 'False', 'voice-type': 'system'}
+20:42:17.022605 - SPEECH OUTPUT: 'Saved document'{'established': 'False', 'voice-type': 'default'}
+20:42:17.506305 - SPEECH OUTPUT: 'Review this document before saving.'{'established': 'False'}
+20:42:17.756314 - SPEECH OUTPUT: 'Entry valid.'{'established': 'False'}
+20:42:18.143235 - SPEECH OUTPUT: 'Saved document'{'established': 'False',
+20:42:18.781853 - SPEECH OUTPUT: 'left control'{'established': 'False',
+20:42:18.834385 - SPEECH OUTPUT: 'Edits remain local until saved by the host selected opens popup'{'established': 'False', 'voice-type': 'system'}
+20:42:19.424638 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:19.461060 - SPEECH OUTPUT: 'Save draft button'{'established': 'False', 'voice-type': 'system'}
+20:42:19.876220 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:19.909335 - SPEECH OUTPUT: 'Discard draft button'{'established': 'False', 'voice-type': 'system'}
+20:42:20.366813 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:20.403923 - SPEECH OUTPUT: 'Review latest version… button'{'established': 'False', 'voice-type': 'system'}
+20:42:20.847283 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:20.885676 - SPEECH OUTPUT: 'Reader workspace choice selected opens popup'{'established': 'False', 'voice-type': 'system'}
+20:42:21.196416 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:21.264356 - SPEECH OUTPUT: 'Reader workspace choice: First combo box'{'established': 'False', 'voice-type': 'system'}
+20:42:21.266380 - SPEECH OUTPUT: 'opens popup'{'established': 'False', 'voice-type': 'system'}
+20:42:21.824734 - SPEECH OUTPUT: 'space'{'established': 'False',
+20:42:21.902374 - SPEECH OUTPUT: 'List with 2 items'{'established': 'False', 'voice-type': 'system'}
+20:42:21.904080 - SPEECH OUTPUT: 'First'{'established': 'False', 'voice-type': 'default'}
+20:42:22.415702 - SPEECH OUTPUT: 'Second'{'established': 'False', 'voice-type': 'default'}
+20:42:22.595430 - SPEECH OUTPUT: 'return'{'established': 'False',
+20:42:22.675203 - SPEECH OUTPUT: 'Reader workspace choice: Second combo box'{'established': 'False', 'voice-type': 'system'}
+20:42:22.676732 - SPEECH OUTPUT: 'opens popup'{'established': 'False', 'voice-type': 'system'}
+20:42:22.989171 - SPEECH OUTPUT: 'Choose an available workspace.'{'established': 'False'}
+20:42:23.245791 - SPEECH OUTPUT: 'Entry valid.'{'established': 'False'}
+20:42:23.955629 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:23.994325 - SPEECH OUTPUT: 'Save draft button'{'established': 'False', 'voice-type': 'system'}
+20:42:24.432049 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:24.468926 - SPEECH OUTPUT: 'Discard draft button'{'established': 'False', 'voice-type': 'system'}
+20:42:24.809413 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:24.850471 - SPEECH OUTPUT: 'Review latest version… button'{'established': 'False', 'voice-type': 'system'}
+20:42:25.208551 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:25.248046 - SPEECH OUTPUT: 'Reader confirmation check box not checked'{'established': 'False', 'voice-type': 'system'}
+20:42:25.277357 - SPEECH OUTPUT: 'checked'{'established': 'False', 'voice-type': 'system'}
+20:42:25.709078 - SPEECH OUTPUT: 'Confirm this requirement before continuing.'{'established': 'False'}
+20:42:25.953413 - SPEECH OUTPUT: 'Entry valid.'{'established': 'False'}
+20:42:26.323258 - SPEECH OUTPUT: 'not checked'{'established': 'False', 'voice-type': 'system'}
+20:42:26.893108 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:26.925354 - SPEECH OUTPUT: 'Save draft button'{'established': 'False', 'voice-type': 'system'}
+20:42:27.350386 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:27.387166 - SPEECH OUTPUT: 'Discard draft button'{'established': 'False', 'voice-type': 'system'}
+20:42:27.725079 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:27.765864 - SPEECH OUTPUT: 'Review latest version… button'{'established': 'False', 'voice-type': 'system'}
+20:42:28.127650 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:28.171695 - SPEECH OUTPUT: 'Accessible session draft text'{'established': 'False', 'voice-type': 'system'}
+20:42:28.172963 - SPEECH OUTPUT: 'Original accessible value selected'{'established': 'False', 'voice-type': 'system'}
+20:42:29.268424 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:29.303095 - SPEECH OUTPUT: 'Save draft button'{'established': 'False', 'voice-type': 'system'}
+20:42:29.924422 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:29.948812 - SPEECH OUTPUT: 'Discard draft button'{'established': 'False', 'voice-type': 'system'}
+20:42:30.564252 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:30.598539 - SPEECH OUTPUT: 'Review latest version… button'{'established': 'False', 'voice-type': 'system'}
+20:42:31.227177 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:31.272762 - SPEECH OUTPUT: 'status bar'{'established': 'False', 'voice-type': 'system'}
+20:42:31.275126 - SPEECH OUTPUT: 'Reader result outcome heading 1 opens popup'{'established': 'False', 'voice-type': 'system'}
+20:42:31.858517 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:31.893391 - SPEECH OUTPUT: 'running selected opens popup'{'established': 'False', 'voice-type': 'system'}
+20:42:32.678064 - SPEECH OUTPUT: 'left control'{'established': 'False',
+20:42:33.004686 - SPEECH OUTPUT: 'Reader result outcome: failed'{'established': 'False'}
+20:42:33.570460 - SPEECH OUTPUT: 'Text unselected.'{'established': 'False'}
+20:42:33.580162 - SPEECH OUTPUT: 'blank'{'established': 'False'}
+20:42:33.642288 - SPEECH OUTPUT: 'failed'{'established': 'False', 'voice-type': 'default'}
+20:42:33.695317 - SPEECH OUTPUT: 'f'{'established': 'False',
+20:42:34.963614 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:34.999033 - SPEECH OUTPUT: 'alert'{'established': 'False', 'voice-type': 'system'}
+20:42:35.000357 - SPEECH OUTPUT: 'Reader failure outcome heading 1 opens popup'{'established': 'False', 'voice-type': 'system'}
+20:42:35.539442 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:35.574618 - SPEECH OUTPUT: 'running selected opens popup'{'established': 'False', 'voice-type': 'system'}
+20:42:36.314320 - SPEECH OUTPUT: 'left control'{'established': 'False',
+20:42:36.579062 - SPEECH OUTPUT: 'Reader failure outcome: failed'{'established': 'False'}
+20:42:37.136126 - SPEECH OUTPUT: 'Text unselected.'{'established': 'False'}
+20:42:37.143938 - SPEECH OUTPUT: 'blank'{'established': 'False'}
+20:42:37.183626 - SPEECH OUTPUT: 'failed'{'established': 'False', 'voice-type': 'default'}
+20:42:37.210803 - SPEECH OUTPUT: 'f'{'established': 'False',
+20:42:38.498944 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:38.532314 - SPEECH OUTPUT: 'Export saved document… button'{'established': 'False', 'voice-type': 'system'}
+20:42:39.063990 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:39.087597 - SPEECH OUTPUT: 'Review replacement of existing file… button'{'established': 'False', 'voice-type': 'system'}
+20:42:39.654831 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:39.686047 - SPEECH OUTPUT: 'Find in document.'{'established': 'False'}
+20:42:40.235141 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:40.282212 - SPEECH OUTPUT: 'Find in document text'{'established': 'False', 'voice-type': 'system'}
+20:42:40.284432 - SPEECH OUTPUT: 'Find literal text'{'established': 'False', 'voice-type': 'default'}
+20:42:40.892944 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:40.926504 - SPEECH OUTPUT: 'Replace with.'{'established': 'False'}
+20:42:41.439938 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:41.478209 - SPEECH OUTPUT: 'Replace with text'{'established': 'False', 'voice-type': 'system'}
+20:42:41.479819 - SPEECH OUTPUT: 'Replacement'{'established': 'False', 'voice-type': 'default'}
+20:42:42.104220 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:42.135761 - SPEECH OUTPUT: 'Find next.'{'established': 'False'}
+20:42:42.665670 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:42.700673 - SPEECH OUTPUT: 'Find next button'{'established': 'False', 'voice-type': 'system'}
+20:42:43.312689 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:43.345093 - SPEECH OUTPUT: 'Replace selection.'{'established': 'False'}
+20:42:43.940345 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:43.976079 - SPEECH OUTPUT: 'Replace selection button'{'established': 'False', 'voice-type': 'system'}
+20:42:44.585797 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:44.614353 - SPEECH OUTPUT: 'Replace all.'{'established': 'False'}
+20:42:45.157542 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:45.203340 - SPEECH OUTPUT: 'Replace all button'{'established': 'False', 'voice-type': 'system'}
+20:42:45.804449 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:45.843925 - SPEECH OUTPUT: 'Reader document draft text'{'established': 'False', 'voice-type': 'system'}
+20:42:45.849115 - SPEECH OUTPUT: 'Saved document'{'established': 'False', 'voice-type': 'default'}
+20:42:46.773734 - SPEECH OUTPUT: 'left control'{'established': 'False',
+20:42:46.818934 - SPEECH OUTPUT: 'Edits remain local until saved by the host selected opens popup'{'established': 'False', 'voice-type': 'system'}
+20:42:47.627377 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:47.666808 - SPEECH OUTPUT: 'Save draft button'{'established': 'False', 'voice-type': 'system'}
+20:42:48.259449 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:48.294258 - SPEECH OUTPUT: 'Discard draft button'{'established': 'False', 'voice-type': 'system'}
+20:42:48.830913 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:48.861586 - SPEECH OUTPUT: 'Review latest version… button'{'established': 'False', 'voice-type': 'system'}
+20:42:49.479116 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:49.512113 - SPEECH OUTPUT: 'Reader workspace choice selected opens popup'{'established': 'False', 'voice-type': 'system'}
+20:42:50.048304 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:50.105637 - SPEECH OUTPUT: 'Reader workspace choice: First combo box'{'established': 'False', 'voice-type': 'system'}
+20:42:50.106976 - SPEECH OUTPUT: 'opens popup'{'established': 'False', 'voice-type': 'system'}
+20:42:50.628176 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:50.665019 - SPEECH OUTPUT: 'Save draft button'{'established': 'False', 'voice-type': 'system'}
+20:42:51.287901 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:51.326191 - SPEECH OUTPUT: 'Discard draft button'{'established': 'False', 'voice-type': 'system'}
+20:42:51.836302 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:51.869544 - SPEECH OUTPUT: 'Review latest version… button'{'established': 'False', 'voice-type': 'system'}
+20:42:52.405089 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:52.434967 - SPEECH OUTPUT: 'Reader confirmation check box not checked'{'established': 'False', 'voice-type': 'system'}
+20:42:52.957790 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:52.994085 - SPEECH OUTPUT: 'Save draft button'{'established': 'False', 'voice-type': 'system'}
+20:42:53.600637 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:53.630188 - SPEECH OUTPUT: 'Discard draft button'{'established': 'False', 'voice-type': 'system'}
+20:42:54.151018 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:54.182857 - SPEECH OUTPUT: 'Review latest version… button'{'established': 'False', 'voice-type': 'system'}
+20:42:54.696998 - SPEECH OUTPUT: 'tab'{'established': 'False',
+20:42:54.735048 - SPEECH OUTPUT: 'Accessible session draft text'{'established': 'False', 'voice-type': 'system'}
+20:42:54.736388 - SPEECH OUTPUT: 'Original accessible value selected'{'established': 'False', 'voice-type': 'system'}

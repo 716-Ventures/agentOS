@@ -1,0 +1,9 @@
+{
+  "result": "failed",
+  "source_revision": "c237a8c1a6128ca51b7bb1eaa091b74b9c65c96f",
+  "public_ui_revision": "1ffb447f3d3a099b22eeb2e5c4e104e5d22bd46a",
+  "installed_runtime": "12baac1fda411b918957f93a7fd78abc341e8d7c48f6418b1fab8153195f0de1",
+  "failure": "After successful four-control validation and both outcome speech checks, fixture keyboard navigation used Tab inside DocumentEditor and failed to return to the original field. No production fix inferred.",
+  "raw_speech_sha256": "f241badba13389cafd56e7e6bd45b9df416760785a6ec648ec210dab2c7e5a0c",
+  "cleanup": "reproduction.json records guest_stopped and owned_utm_app_closed true"
+}
