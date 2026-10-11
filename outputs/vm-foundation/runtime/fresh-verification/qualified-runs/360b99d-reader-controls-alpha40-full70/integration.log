@@ -1,0 +1,25 @@
+PASS: persistent activity and workspace creation
+PASS: live output and job survival after submitting client exits
+PASS: nonzero exit and failed spawn are recorded accurately
+PASS: stale action rejected before execution
+PASS: cancellation escalates, terminates group, and is idempotent
+PASS: parent completion cleans up ordinary background descendants
+PASS: bounded output capture and terminal control sanitization
+PASS: system files protected and job privilege escalation denied
+PASS: service restart preserves activities/files/history and does not replay jobs
+{
+  "result": "pass",
+  "checks": [
+    "persistent activity and workspace creation",
+    "live output and job survival after submitting client exits",
+    "nonzero exit and failed spawn are recorded accurately",
+    "stale action rejected before execution",
+    "cancellation escalates, terminates group, and is idempotent",
+    "parent completion cleans up ordinary background descendants",
+    "bounded output capture and terminal control sanitization",
+    "system files protected and job privilege escalation denied",
+    "service restart preserves activities/files/history and does not replay jobs"
+  ],
+  "activity_id": 1569,
+  "tested_at": 1791747787.4212852
+}

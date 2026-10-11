@@ -67,5 +67,11 @@
     "monitor-focus-session.log": "579ae9ba83201e0dc439b5494d08642cb61a2796060700b5fcf08de140daa9b3",
     "active-input-failure.log": "a880ac304682cb8cb20b7a1df892e247a7586796ee7f04e56f3a199b17f20e0e",
     "unplaced-session.log": "610d8c0a7cd5c990d0f16ddddb4972bb8aa53ab8ce24e18c3b115dd4176765ee"
+  },
+  "full_source_reproduction": "../360b99d-reader-controls-alpha40-full70/reproduction.json",
+  "private_ci": {
+    "run": 38169121524,
+    "source": "360b99df0b98dc6bb3178bd5b292a7e9e09d4689",
+    "result": "success"
   }
 }
