@@ -131,6 +131,10 @@ def assistive():
     for line in sys.stdin:
         try:
             request=line.strip()
+            if request=='launcher-request':
+                node=find('Ask Agent',pyatspi.ROLE_TEXT)
+                text=node.queryText()
+                print(json.dumps({'text':text.getText(0,min(text.characterCount,65536)),'focused':node.getState().contains(pyatspi.STATE_FOCUSED)}),flush=True);continue
             if request=='tree':
                 queue=deque([pyatspi.Registry.getDesktop(0)]);rows=[];remaining=49152
                 while queue and len(rows)<1024:

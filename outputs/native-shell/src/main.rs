@@ -1528,7 +1528,18 @@ fn main() {
             scroll.set_vexpand(true);
             main.set_child(Some(&body));
             let closer = controls.clone();
-            main.connect_close_request(move |window| { closer.borrow().hide_launcher(); window.set_visible(false); glib::Propagation::Stop });
+            main.connect_close_request(move |window| {
+                closer.borrow().hide_launcher();
+                // GTK gives a remapped window a new AT-SPI identity. Unroot the
+                // retained controls before hiding so their accessibility contexts
+                // are renewed too; readers must not retain a defunct frame parent.
+                // Keep the widgets themselves, including unsent request drafts.
+                let body = window.child();
+                window.set_child(gtk::Widget::NONE);
+                window.set_visible(false);
+                window.set_child(body.as_ref());
+                glib::Propagation::Stop
+            });
             let key = gtk::EventControllerKey::new();
             let weak = main.downgrade();
             key.connect_key_pressed(move |_, key, _, _| {

@@ -1,0 +1,47 @@
+{
+  "started_at": "2026-10-11T21:24:24.027575+00:00",
+  "source_revision": "4752b12bfe5023635b025c7fe3fe988c20079e85",
+  "source_changes": [
+    " M outputs/agent-shell/tests/direct_input_probe.py",
+    " M outputs/agent-shell/tests/direct_screen_reader_probe.py",
+    " M outputs/native-shell/src/main.rs"
+  ],
+  "source_archive_sha256": "e69cf8be46a4c874d6553111fb7871dda8014b89f1fda01958d4db1b975efa04",
+  "passed": true,
+  "owned_utm_identity": [
+    66752,
+    "Sun Oct 11 17:24:24 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T21:27:29.289614+00:00",
+  "speech_runs": [
+    {
+      "attempt": 0,
+      "raw_sha256": "984437e94c5c805a98c57182b7ce89c73285ca9f2b134b6e46b65e7a5fa39132",
+      "request_announcements": 44,
+      "ten_announced_reopens_after_bursts": true,
+      "unsent_draft_preserved": true
+    },
+    {
+      "attempt": 1,
+      "raw_sha256": "8b326a14ee2e4a5c65b1f6f95eb061c9429894eab785448e1801d747bdadb202",
+      "request_announcements": 44,
+      "ten_announced_reopens_after_bursts": true,
+      "unsent_draft_preserved": true
+    },
+    {
+      "attempt": 2,
+      "raw_sha256": "3899ba6d7f792d4a9cd7d91d38dc6ef7033f1f2e629ad57b869561f36dd1ca70",
+      "request_announcements": 44,
+      "ten_announced_reopens_after_bursts": true,
+      "unsent_draft_preserved": true
+    }
+  ],
+  "scope": "Targeted Linux debug binaries on the development VM; installed release, complete70 and signed image qualification still pending.",
+  "historical_failure": "The failed v17 image and passing unchanged-runtime repeats are separately preserved. Historical event timing is unestablished; this change renews retained descendants when GTK invalidates the frame.",
+  "source_files_sha256": {
+    "outputs/native-shell/src/main.rs": "d90ece391f01cd59cb2c6fc25bfce47d0a81be1376ef42c4a507186577462e49",
+    "outputs/agent-shell/tests/direct_input_probe.py": "bfa28051ce4731d35853de9ead71578b2c7e82cf3a0c3964454cb9e865d1bc75",
+    "outputs/agent-shell/tests/direct_screen_reader_probe.py": "100f6bb9e43e33cc1b46fb93970dd74777aaee6444467712f3d187a97b99f089"
+  }
+}

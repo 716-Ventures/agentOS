@@ -1,0 +1,17 @@
+{
+  "started_at": "2026-10-11T21:22:47.366919+00:00",
+  "source_revision": "4752b12bfe5023635b025c7fe3fe988c20079e85",
+  "source_changes": [
+    " M outputs/agent-shell/tests/direct_input_probe.py",
+    " M outputs/agent-shell/tests/direct_screen_reader_probe.py",
+    " M outputs/native-shell/src/main.rs"
+  ],
+  "source_archive_sha256": "9db88fcf16440dfd3e276a7331390c770d225e0a77dfb6327990c8c223174a93",
+  "passed": false,
+  "owned_utm_identity": [
+    65480,
+    "Sun Oct 11 17:22:47 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T21:24:11.673086+00:00"
+}

@@ -1,0 +1,41 @@
+Input fixture device: event5 ['ID_INPUT=1', 'ID_INPUT_MOUSE=1']
+Input fixture device: event4 ['ID_INPUT=1', 'ID_INPUT_KEY=1', 'ID_INPUT_KEYBOARD=1']
+PASS: kernel Ctrl+Alt+Space opens temporary launcher; Escape and Ctrl+Alt+Delete close it, preserving work and restoring typing
+PASS: launcher speech cycle 0
+PASS: launcher speech cycle 1
+PASS: launcher speech cycle 2
+PASS: launcher speech cycle 3
+PASS: launcher speech cycle 4
+PASS: launcher speech cycle 5
+PASS: launcher speech cycle 6
+PASS: launcher speech cycle 7
+PASS: launcher speech cycle 8
+PASS: launcher speech cycle 9
+PASS: launcher speech cycle 10
+PASS: launcher speech cycle 11
+PASS: launcher speech cycle 12
+PASS: launcher speech cycle 13
+PASS: launcher speech cycle 14
+PASS: launcher speech cycle 15
+PASS: launcher speech cycle 16
+PASS: launcher speech cycle 17
+PASS: launcher speech cycle 18
+PASS: launcher speech cycle 19
+PASS: launcher speech cycle 20
+PASS: launcher speech cycle 21
+PASS: launcher speech cycle 22
+PASS: launcher speech cycle 23
+PASS: launcher speech cycle 24
+PASS: launcher speech cycle 25
+PASS: launcher speech cycle 26
+PASS: launcher speech cycle 27
+PASS: launcher speech cycle 28
+PASS: launcher speech cycle 29
+PASS: same-user control client cannot replace the registered reader
+PASS: a same-user process claiming the Orca monitor name cannot access keyboard input
+PASS: session-owned Orca announces launcher/editor/Save/Discard; kernel learn-mode enter/exit isolates grabs, restores typing and completes edit/save/correction/discard; rescue VT remains reachable during a full grab; reader stop releases active grabs and preserves typing; unrelated and spoofed monitor access denied
+Started agentos-display-test-1f45b87f733f4236aa81938eeb3725dc.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 14 --screen-reader.
+pam_unix(login:session): session opened for user verifier(uid=1000) by verifier(uid=0)
+agentos-display-test-1f45b87f733f4236aa81938eeb3725dc.service: Deactivated successfully.
+
+{"result": "pass", "fresh_profile_qualified": false, "binary_directory": "/usr/local/bin", "outputs": [{"height": 800, "name": "Virtual-1", "scale": 1.0, "transform": "Normal", "width": 1280, "x": 0, "y": 0}], "metrics": [{"format": 1, "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence", "pid": 670, "sample_limit_per_stage": 256, "stages": {"compositor.direct_render_attempt": {"discarded": 0, "max_recent_ms": 4.132791999999999, "mean_all_ms": 0.6424078622522944, "p50_recent_ms": 0.358792, "p95_recent_ms": 1.5560829999999999, "retained": 256, "samples_total": 2069}}}], "native_feedback": [], "frames_before_vt": 31, "frames_after_vt": 32, "checks": ["private native system bar", "KMS output discovery", "shared core connection", "VT switch and resume", "orderly shutdown", "session directory cleanup", "owned login scope cleanup", "session-owned Orca field announcement", "kernel Orca learn-mode enter/exit", "assistive grab isolation and ordinary typing restoration"], "screen_keyboard_input_qualified": false, "screen_reader_input_qualified": true, "table_input_qualified": false, "collection_input_qualified": null, "terminal_input_qualified": false, "terminal_ime_qualified": false, "presentation_feedback_qualified": false, "native_feedback_qualified": false, "native_feedback_load_qualified": false, "output_transform_qualified": null, "focus_transfer_cycles": 1, "not_tested": ["physical input", "hotplug", "physical GPU presentation", "audible speech quality", "braille hardware", "screen-reader pointer location"]}

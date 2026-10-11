@@ -28,17 +28,37 @@ def verify(metrics,env,login_user,keyboard,snapshot,wait,core,scene):
         raise RuntimeError('Keyboard reading order did not reach '+name+'; '+repr(snapshot('focused')))
     try:
         await_speech(lambda text:'Using speech server factory:' in text,'Session-owned Orca did not initialize speech')
-        baseline=len(speech());keyboard.chord(29,56,57) # Open launcher without model work.
-        deadline=time.monotonic()+8
-        while not any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in scene()['system_layers']):
-            if time.monotonic()>deadline:raise RuntimeError('Reader-guided launcher did not open')
-            time.sleep(.05)
-        await_speech(lambda text:'Ask Agent' in text[baseline:],'Orca did not announce the launcher request control')
-        keyboard.chord(1)
-        deadline=time.monotonic()+8
-        while any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in scene()['system_layers']):
-            if time.monotonic()>deadline:raise RuntimeError('Reader-guided launcher did not close')
-            time.sleep(.05)
+        def launcher(mapped):
+            deadline=time.monotonic()+8
+            while any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in scene()['system_layers'])!=mapped:
+                if time.monotonic()>deadline:raise RuntimeError('Reader-guided launcher map transition failed')
+                time.sleep(.02)
+        # Ordinary shortcut bursts must not leave Orca's retained controls
+        # attached to a defunct launcher frame. Observe speech before querying
+        # the accessibility tree, so observation cannot repair a stale cache.
+        for cycle in range(10):
+            for _ in range(3):
+                keyboard.chord(29,56,57);launcher(True)
+                keyboard.chord(1);launcher(False)
+            baseline=len(speech());keyboard.chord(29,56,57);launcher(True)
+            await_speech(lambda text:any('SPEECH OUTPUT:' in line and 'Ask Agent text' in line for line in text[baseline:].splitlines()),
+                         'Orca did not announce the reopened launcher request control at cycle '+str(cycle))
+            state=snapshot('launcher-request')
+            assert state=={'text':'' if cycle==0 else 'a','focused':True},state
+            if cycle==0:
+                keyboard.chord(30) # Keep an unsent draft across every remap.
+                deadline=time.monotonic()+8
+                while snapshot('launcher-request')['text']!='a':
+                    if time.monotonic()>deadline:raise RuntimeError('Launcher did not acknowledge the fixture draft')
+                    time.sleep(.02)
+            if cycle==9:
+                keyboard.chord(29,30);keyboard.chord(14) # Clear fixture draft.
+                deadline=time.monotonic()+8
+                while snapshot('launcher-request')['text']!='':
+                    if time.monotonic()>deadline:raise RuntimeError('Launcher did not clear the fixture draft')
+                    time.sleep(.02)
+            keyboard.chord(1);launcher(False)
+        print('PASS: ten reader-announced launcher reopens after shortcut bursts retain the focused unsent request draft',flush=True)
         # An unrelated bus client must not gain keyboard observation or grabs.
         denied=subprocess.run(['runuser','-u',login_user,'--','gdbus','call','--session',
             '--dest','org.freedesktop.a11y.Manager','--object-path','/org/freedesktop/a11y/Manager',
