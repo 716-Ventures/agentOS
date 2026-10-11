@@ -31,7 +31,15 @@ def collect(manifests,output):
         root=Path(directory);records=[]
         for package in sorted(packages.values(),key=lambda p:p['id']):
             source=Path(package['manifest_path']).parent
-            candidates=set(p for pattern in ('LICENSE*','LICENCE*','COPYING*','COPYRIGHT*','NOTICE*') for p in source.glob(pattern) if p.is_file())
+            candidates=set()
+            generated=(output.resolve(),root.resolve())
+            for path in source.rglob('*'):
+                if not path.name.upper().startswith(('LICENSE','LICENCE','COPYING','COPYRIGHT','NOTICE','THIRD_PARTY')):
+                    continue
+                if any(path.resolve().is_relative_to(directory) for directory in generated):
+                    continue
+                if path.is_symlink():raise ValueError('Dependency notice is a symlink: '+package['name'])
+                if path.is_file():candidates.add(path)
             if package.get('license_file'):
                 path=source/package['license_file']
                 if not path.is_file():raise ValueError('Missing dependency license: '+package['name'])

@@ -46,3 +46,29 @@ class LicenseCollection(unittest.TestCase):
                 if name.startswith('libseat'):
                     self.assertIn('Poly <marynczak.bartlomiej@gmail.com>',payload)
                     self.assertIn('license = "MIT"',payload)
+
+    def test_nested_third_party_notices_are_stable_and_retained_with_original_license(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);source=root/'crate';source.mkdir();reference=source/'reference';reference.mkdir()
+            (source/'LICENSE').write_text('Original work: Apache-2.0')
+            (reference/'LICENSE.lucide').write_text('Lucide ISC copyright and permission notice')
+            (reference/'license.shadcn').write_text('shadcn MIT copyright and permission notice')
+            (reference/'THIRD_PARTY.md').write_text('Upstream source identities and preserved licenses')
+            output=source/'generated-notices'
+            with patch.object(collector.subprocess,'check_output',return_value=self.metadata(source)):
+                records=collector.collect([source/'Cargo.toml'],output)
+                payload={(output/n['path']).read_text() for n in records[0]['notices']}
+                self.assertEqual(payload,{'Original work: Apache-2.0','Lucide ISC copyright and permission notice','shadcn MIT copyright and permission notice','Upstream source identities and preserved licenses'})
+                before=(output/'dependencies.json').read_bytes();collector.collect([source/'Cargo.toml'],output)
+                self.assertEqual((output/'dependencies.json').read_bytes(),before,'Generated output must not recursively collect itself')
+                self.assertEqual(records[0]['license'],'MIT','Do not relicense source packages while collecting additional notices')
+
+    def test_nested_symlink_notice_is_rejected_without_replacing_existing_payload(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);source=root/'crate';source.mkdir();(source/'LICENSE').write_text('Original upstream notice');output=root/'collected'
+            with patch.object(collector.subprocess,'check_output',return_value=self.metadata(source)):
+                collector.collect([source/'Cargo.toml'],output);before=(output/'dependencies.json').read_bytes()
+                secret=root/'outside';secret.write_text('Outside package boundary')
+                nested=source/'vendor';nested.mkdir();(nested/'LICENSE').symlink_to(secret)
+                with self.assertRaisesRegex(ValueError,'symlink'):collector.collect([source/'Cargo.toml'],output)
+                self.assertEqual((output/'dependencies.json').read_bytes(),before)

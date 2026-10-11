@@ -1,0 +1,28 @@
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.006s
+
+OK
+Traceback (most recent call last):
+  File "/home/developer/agent-os-source/tests/graphical_release.py", line 34, in <module>
+    shutil.copy2(upstream/'target/debug'/binary,tree/'target/release'/binary)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/shutil.py", line 468, in copy2
+    copyfile(src, dst, follow_symlinks=follow_symlinks)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/shutil.py", line 260, in copyfile
+    with open(src, 'rb') as fsrc:
+         ~~~~^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/developer/agent-os-source/native-shell/target/debug/agent-os-desktop'
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+Requested orderly guest shutdown. Check status before restarting.
+{"started_at": "2026-10-11T15:00:04.384879+00:00", "source_revision": "818b346693a7efe5a776a2262fec02a1b1f13de3", "source_changes": [" M outputs/agent-shell/collect_licenses.py", " M outputs/agent-shell/tests/graphical_release.py", " M outputs/agent-shell/tests/license_collection_test.py"], "source_archive_sha256": "f75c5106d26f24a052837d54501fdb77f3c5140c04ef1e542fb7fd7f679bb45b", "passed": false, "owned_utm_identity": [52495, "Sun Oct 11 11:00:04 2026"], "owned_utm_closed": true, "finished_at": "2026-10-11T15:00:20.564002+00:00"}
+Traceback (most recent call last):
+  File "/tmp/agentos-nested-notices.py", line 25, in <module>
+    vm.ssh('cd /home/developer/agent-os-source && python3 -m unittest discover -s tests -p license_collection_test.py && python3 tests/graphical_release.py',check=True)
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/vm.py", line 309, in ssh
+    return subprocess.run(ssh_args() + [command], **kwargs)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ssh', '-p', '22221', '-i', '/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/id_ed25519', '-o', 'IdentitiesOnly=yes', '-o', 'StrictHostKeyChecking=accept-new', '-o', 'UserKnownHostsFile=/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/known_hosts', '-o', 'ConnectTimeout=3', '-o', 'BatchMode=yes', '-o', 'LogLevel=ERROR', 'developer@127.0.0.1', 'cd /home/developer/agent-os-source && python3 -m unittest discover -s tests -p license_collection_test.py && python3 tests/graphical_release.py']' returned non-zero exit status 1.

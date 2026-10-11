@@ -34,6 +34,11 @@ with tempfile.TemporaryDirectory(prefix='agentos-graphical-release-') as directo
         shutil.copy2(upstream/'target/debug'/binary,tree/'target/release'/binary)
     records=licenses.collect([ROOT/'Cargo.toml',NATIVE/'native-shell/Cargo.toml',NATIVE/'native-compositor/Cargo.toml'],source/'third-party-licenses')
     assert records and all(record['notices'] for record in records)
+    ui_records=[record for record in records if record['name']=='seven-sixteen-ui']
+    assert ui_records, 'Pinned native UI dependency is missing from the notice collection'
+    for record in ui_records:
+        for required in ('LICENSE.lucide','LICENSE.shadcn','THIRD_PARTY.md'):
+            assert any(notice['path'].endswith('-'+required) for notice in record['notices']), 'Missing adapted UI notice: '+required
     inst=installer.Installer(root/'prefix');inst.state.mkdir(parents=True)
     # This packaging fixture uses the CI host's actual dependency versions.
     # It does not claim Ubuntu CI qualifies the Debian guest dependency profile.

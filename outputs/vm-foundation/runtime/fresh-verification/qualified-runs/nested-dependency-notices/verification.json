@@ -1,0 +1,17 @@
+{
+  "started_at": "2026-10-11T15:00:41.841189+00:00",
+  "source_revision": "818b346693a7efe5a776a2262fec02a1b1f13de3",
+  "source_changes": [
+    " M outputs/agent-shell/collect_licenses.py",
+    " M outputs/agent-shell/tests/graphical_release.py",
+    " M outputs/agent-shell/tests/license_collection_test.py"
+  ],
+  "source_archive_sha256": "f75c5106d26f24a052837d54501fdb77f3c5140c04ef1e542fb7fd7f679bb45b",
+  "passed": true,
+  "owned_utm_identity": [
+    52952,
+    "Sun Oct 11 11:00:42 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T15:01:14.507271+00:00"
+}
