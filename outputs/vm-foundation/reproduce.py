@@ -39,6 +39,9 @@ def graphical_checks():
     for name,option in [('logout',''),('ime','--ime'),('ime-editor','--ime-editor'),('host-loss','--host-failure'),('compositor-loss','--compositor-failure')]:
         checks.append(('native-session-'+name,'dbus-run-session -- python3 native-shell/tests/native_session.py '+option,120))
     checks.append(('direct-display-input-vt','sudo -n python3 tests/direct_display_guest.py --input',120))
+    checks.append(('direct-display-list','sudo -n python3 tests/direct_display_guest.py --list-input',150))
+    checks.append(('direct-display-keyvalue','sudo -n python3 tests/direct_display_guest.py --keyvalue-input',150))
+    checks.append(('direct-display-table','sudo -n python3 tests/direct_display_guest.py --table-input',150))
     checks.append(('direct-display-terminal','sudo -n python3 tests/direct_display_guest.py --terminal-input',150))
     checks.append(('direct-display-terminal-ime','sudo -n python3 tests/direct_display_guest.py --terminal-ime',150))
     checks.append(('direct-native-feedback-load','sudo -n python3 tests/direct_display_guest.py --native-feedback-load',150))

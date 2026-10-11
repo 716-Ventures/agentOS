@@ -26,12 +26,17 @@ def main():
                         help='Keep the verified desktop visible briefly for console inspection (0–30 seconds)')
     parser.add_argument('--input',action='store_true',help='Exercise temporary kernel input devices in this dedicated VM')
     modes=parser.add_mutually_exclusive_group()
+    modes.add_argument('--list-input',action='store_true',help='Qualify installed List selection and copying through kernel input')
+    modes.add_argument('--keyvalue-input',action='store_true',help='Qualify installed KeyValue selection and copying through kernel input')
+    modes.add_argument('--table-input',action='store_true',help='Qualify installed Table selection and copying through kernel input')
     modes.add_argument('--terminal-input',action='store_true',help='Qualify kernel input and clipboard in a separate installed native VTE terminal journey')
     modes.add_argument('--terminal-ime',action='store_true',help='Qualify the installed VTE through the private trusted Wayland input-method fixture')
     modes.add_argument('--presentation-feedback',action='store_true',help='Verify real Wayland feedback from completed virtual KMS frames')
     modes.add_argument('--native-feedback',action='store_true',help='Measure kernel typing to actual native GTK presentation receipts')
     modes.add_argument('--native-feedback-load',action='store_true',help='Measure native feedback during two bounded real broker CPU jobs')
     args = parser.parse_args()
+    collection_kind = "List@1" if args.list_input else "KeyValue@1" if args.keyvalue_input else "Table@1" if args.table_input else None
+    if collection_kind:args.input=True
     if args.native_feedback_load:args.native_feedback=True
     if args.native_feedback:args.input=True
     if args.presentation_feedback:args.input=True
@@ -89,7 +94,7 @@ def main():
                     '--property=StandardInput=tty', '--property=TTYReset=yes',
                     '--property=TTYVHangup=yes', '--property=KillMode=control-group',
                     '--property=StandardOutput=journal', '--property=StandardError=journal',
-                    '--property=TimeoutStopSec=15', '--property=RuntimeMaxSec='+('120' if args.terminal_input else '90'),
+                    '--property=TimeoutStopSec=15', '--property=RuntimeMaxSec='+('120' if args.terminal_input or collection_kind else '90'),
                     '--setenv=XDG_RUNTIME_DIR=' + str(runtime),
                     '--setenv=XDG_SESSION_TYPE=wayland', '--setenv=XDG_SESSION_CLASS=user',
                     '--setenv=XDG_SEAT=seat0', '--setenv=XDG_VTNR=7',
@@ -173,7 +178,7 @@ def main():
                     if target is not None and observed.get('seat_focus')==target:break
                     if time.monotonic()>deadline:raise RuntimeError('Direct input fixture did not receive seat focus')
                     time.sleep(.05)
-                direct_input_probe.verify(metrics,snapshot['outputs'][0],core,lambda:control(endpoint,'snapshot'),target,user.pw_name,presentation,terminal_input=args.terminal_input,terminal_ime=args.terminal_ime,presentation_feedback=args.presentation_feedback,native_feedback=args.native_feedback,native_feedback_load=args.native_feedback_load)
+                direct_input_probe.verify(metrics,snapshot['outputs'][0],core,lambda:control(endpoint,'snapshot'),target,user.pw_name,presentation,terminal_input=args.terminal_input,terminal_ime=args.terminal_ime,presentation_feedback=args.presentation_feedback,native_feedback=args.native_feedback,native_feedback_load=args.native_feedback_load,table_input=collection_kind)
             if args.hold_seconds:
                 print('Direct desktop ready for console inspection', flush=True)
                 time.sleep(args.hold_seconds)
@@ -232,7 +237,9 @@ def main():
                           'frames_before_vt': snapshot['direct_frames_presented'],
                           'frames_after_vt': resumed['direct_frames_presented'],
                           'checks': ['direct native window', 'KMS output discovery', 'shared core connection',
-                                     'VT switch and resume', 'orderly shutdown', 'session directory cleanup', 'owned login scope cleanup'] + (['native GTK editor kernel key-to-presentation receipts, 20 sequential samples']+(['two distinct concurrent broker CPU jobs with measured CPU consumption','owned CPU work cancellation and unit cleanup'] if args.native_feedback_load else []) if args.native_feedback else ['Wayland presentation timestamps from completed virtual KMS frames','kernel key-triggered content feedback','superseded frame discard and unmap'] if args.presentation_feedback else ['kernel keyboard and absolute pointer','clipboard copy/paste','undo/redo','retained draft','deliberate pointer Save','kernel workspace move/resize/maximize/restore/undo','native titlebar drag with durable placement','kernel focus cycling','kernel VT shortcut and acknowledged resume','kernel close and native assistive undo','focused primary middle-paste across Wayland clients','Unicode COPY drag/drop and grouped undo','oversized drop rejection','drag icon rendering and release cleanup'] if args.input and not args.terminal_input else ['kernel keyboard and absolute pointer in VTE','trusted Wayland IME preedit and Unicode commit','concurrent native rendering during VTE composition','detached IME commit rejected without reattach replay'] if args.terminal_ime else ['kernel keyboard and absolute pointer in VTE','Unicode Wayland clipboard to PTY','explicit native detach and reattach','kernel pointer selection and exact Unicode line copy','accessible secondary-click and Shift+F10 clipboard menus','closed-popup seat focus and first absolute pointer motion','detached menu Paste disabled and input rejected','ordinary Ctrl+C program interruption'] if args.terminal_input else []),
+                                     'VT switch and resume', 'orderly shutdown', 'session directory cleanup', 'owned login scope cleanup'] + (['kernel '+collection_kind+' pointer and keyboard row selection','Ctrl+C and accessible Shift+F10/secondary clipboard menus','separate-client exact Unicode row text','focused refresh rejection and key-based selection across background reorder/update','empty-selection Copy rejection, row removal and local menu focus restoration'] if collection_kind else ['native GTK editor kernel key-to-presentation receipts, 20 sequential samples']+(['two distinct concurrent broker CPU jobs with measured CPU consumption','owned CPU work cancellation and unit cleanup'] if args.native_feedback_load else []) if args.native_feedback else ['Wayland presentation timestamps from completed virtual KMS frames','kernel key-triggered content feedback','superseded frame discard and unmap'] if args.presentation_feedback else ['kernel keyboard and absolute pointer','clipboard copy/paste','undo/redo','retained draft','deliberate pointer Save','kernel workspace move/resize/maximize/restore/undo','native titlebar drag with durable placement','kernel focus cycling','kernel VT shortcut and acknowledged resume','kernel close and native assistive undo','focused primary middle-paste across Wayland clients','Unicode COPY drag/drop and grouped undo','oversized drop rejection','drag icon rendering and release cleanup'] if args.input and not args.terminal_input else ['kernel keyboard and absolute pointer in VTE','trusted Wayland IME preedit and Unicode commit','concurrent native rendering during VTE composition','detached IME commit rejected without reattach replay'] if args.terminal_ime else ['kernel keyboard and absolute pointer in VTE','Unicode Wayland clipboard to PTY','explicit native detach and reattach','kernel pointer selection and exact Unicode line copy','accessible secondary-click and Shift+F10 clipboard menus','closed-popup seat focus and first absolute pointer motion','detached menu Paste disabled and input rejected','ordinary Ctrl+C program interruption'] if args.terminal_input else []),
+                          'table_input_qualified': args.table_input,
+                          'collection_input_qualified': collection_kind,
                           'terminal_input_qualified': args.terminal_input,
                           'terminal_ime_qualified': args.terminal_ime,
                           'presentation_feedback_qualified': args.presentation_feedback,

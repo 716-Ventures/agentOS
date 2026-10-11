@@ -92,7 +92,7 @@ def transfer_source():
             def read_clipboard(*_):
                 clipboard=Gdk.Display.get_default().get_clipboard()
                 def read(sender,result):
-                    state['copied']=sender.read_text_finish(result);record()
+                    state['copied']=sender.read_text_finish(result);state['reads']=state.get('reads',0)+1;record()
                 clipboard.read_text_async(None,read)
             primary.connect('clicked',read_clipboard)
         else:primary.connect('clicked',publish)
@@ -171,10 +171,19 @@ def assistive():
                         # including VTE's selected line ending.
                         response.update({'start':[first[0]+1,first[1]+first[3]/2],'end':[first[0]+first[2]*(columns+2),first[1]+first[3]/2]})
                 print(json.dumps(response),flush=True);continue
+            if request.startswith('table-cell:'):
+                cell=find(request.split(':',1)[1],pyatspi.ROLE_LABEL)
+                rect=cell.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
+                selected=focused=False;ancestor=cell
+                for _ in range(12):
+                    state=ancestor.getState();selected=selected or state.contains(pyatspi.STATE_SELECTED);focused=focused or state.contains(pyatspi.STATE_FOCUSED)
+                    if ancestor.parent is None or ancestor.getRole()==pyatspi.ROLE_FRAME:break
+                    ancestor=ancestor.parent
+                print(json.dumps({'point':[rect.x+rect.width/2,rect.y+rect.height/2],'selected':selected,'focused':focused}),flush=True);continue
             if request.startswith('terminal-menu:'):
                 action=request.split(':',1)[1];name=action.removesuffix('-activate')
                 control=find(name,None)
-                response={'sensitive':control.getState().contains(pyatspi.STATE_SENSITIVE)}
+                response={'sensitive':control.getState().contains(pyatspi.STATE_SENSITIVE),'showing':control.getState().contains(pyatspi.STATE_SHOWING)}
                 if action.endswith('-activate'):response['requested']=control.queryAction().doAction(0)
                 print(json.dumps(response),flush=True);continue
             if request.startswith('transfer:'):
@@ -225,7 +234,7 @@ def assistive():
         print(json.dumps(response),flush=True)
 
 
-def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False,presentation_feedback=False,native_feedback=False,native_feedback_load=False):
+def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False,presentation_feedback=False,native_feedback=False,native_feedback_load=False,table_input=False):
     subprocess.run(['modprobe','uinput'],check=True)
     # Join only this test session's accessibility bus; never inspect other users.
     bus=None;observer_runtime=None;wayland=None;deadline=time.monotonic()+10
@@ -286,6 +295,10 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
             except OSError:pass
         time.sleep(.5) # bounded kernel/udev/libinput hotplug discovery
         width,height=output['width'],output['height']
+        if table_input:
+            import direct_table_probe
+            direct_table_probe.verify(metrics,output,core,scene,login_user,presentation,snapshot,keyboard,pointer,env,kind=table_input)
+            return
         if presentation_feedback:
             import direct_presentation_probe
             direct_presentation_probe.verify(env,metrics,core,scene,login_user,presentation,keyboard)
