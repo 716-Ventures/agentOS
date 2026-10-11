@@ -49,17 +49,25 @@ class Sources(unittest.TestCase):
              patch.object(broker,'SOURCES',sources),patch.object(broker,'JOBS',{}):
             for job in records:
                 (Path(directory)/(job['id']+'.json')).write_text(json.dumps(job))
-            broker.recover_jobs()
+            file_root=Path(directory)/'file-observations';file_root.mkdir()
+            files=[{'format':1,'source':'file:'+format(i,'032x'),'activity':1,'source_revision':1,
+                    'values':{'path':'/fixture/'+str(i),'kind':'missing','size_bytes':None,
+                              'modified_at':None,'mode':None,'measured_at':1}} for i in range(1100)]
+            for i,record in enumerate(files):(file_root/(str(i)+'.json')).write_text(json.dumps(record))
+            # Exercise the actual cold-start path, stopping before socket acceptance.
+            with patch.object(sources,'start'),patch.object(broker.threading,'Thread'), \
+                 patch.object(broker,'listen',side_effect=RuntimeError('startup observed')):
+                with self.assertRaisesRegex(RuntimeError,'startup observed'):broker.main()
             live={**self.job(), 'id':'f'*32}
             sources.mark(live)
             delivered=[]
             def deliver(payload):
                 if payload['op']=='source.publish':delivered.append(payload['source'])
-                if len(set(delivered))==len(records)+1 or len(delivered)>4096:sources.stop.set()
+                if len(set(delivered))==len(records)+len(files)+1 or len(delivered)>8192:sources.stop.set()
             with patch.object(sources,'request',side_effect=deliver),patch.object(sources.stop,'wait'):
                 sources.run()
             self.assertIn('broker:'+live['id'],delivered[:16])
-            self.assertEqual(set(delivered),{'broker:'+job['id'] for job in records+[live]})
+            self.assertEqual(set(delivered),{'broker:'+job['id'] for job in records+[live]}|{record['source'] for record in files})
             self.assertEqual(len(broker.JOBS),2019)
             self.assertLessEqual(len(sources.pending),1024)
 

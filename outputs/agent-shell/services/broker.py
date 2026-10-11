@@ -509,7 +509,8 @@ def source_backfill():
 def main():
     SOURCES.replay=source_backfill
     recover_jobs()
-    FileObservations(STATE/'file-observations',SOURCES).recover()
+    # Recovery schedules streamed job and file backfill; neither history belongs
+    # in the live queue before newly submitted observations.
     SOURCES.start()
     def reap_terminals():
         while True:

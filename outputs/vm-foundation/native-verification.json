@@ -1534,6 +1534,35 @@
         "boundary": "Isolated external reader probe only. Orca is not yet packaged or integrated into the session; reader keyboard commands and complete launch/navigation/stop journeys remain unqualified. Probe dependencies were installed from Debian/backports separately from the existing runtime dependency recipe."
       },
       "boundary": "Source-built targeted qualification; no current complete installed reproduction. The List/Table geometry and historical v9 PRIMARY focus observations remain unresolved."
+    },
+    "cold_file_history_live_publication": {
+      "result": "verified_targeted",
+      "runtime_release": "f357ae128eb3c55c913fa5c512ba3f95635eb034c04637bd2f1d7bd833d6acbc",
+      "source_sha256": {
+        "outputs/agent-shell/services/broker.py": "6ea2ac802d1a6eae7edad72b59b94d7d733b1ff5c5bb3af8df7bc5ace7c3a6dd",
+        "outputs/agent-shell/tests/source_publisher_test.py": "3364c2f85a206729114c2d2db95f8c976b2e28bb4bcdff16de7f7a479e6014ab"
+      },
+      "baseline_log_sha256": "978fbde51c76be1bd33530d02633733f9db03a1e4d73ce85b8e6ad2f99e72192",
+      "tests_log_sha256": "1305285e0e01120c8063956ebf505dae145ccdd849b366d5dd107bbbb4845b27",
+      "installed_log_sha256": "d6db23cfd4843d64405e81e5747362aefdcb7d8e6733876663bc6e36c26b9a06",
+      "qualified": [
+        "Actual broker startup regression with 2019 saved jobs and 1100 saved file metadata records failed live-first delivery before correction",
+        "Startup now schedules one streamed backfill for jobs and files; no historical file records prefill the bounded live queue",
+        "All 267 Python tests pass; combined startup regression delivers new work in its first 16 observations and eventually all durable job/file records",
+        "Installed virtual KMS VTE keyboard/Unicode clipboard/menu/interrupt/detach journey passes immediately after broker restart",
+        "Owned guest and exact owned UTM application shutdown verified"
+      ],
+      "boundary": "File-history pressure is covered by the real publisher/startup regression, not the installed VTE journey. No complete current reproduction claimed."
+    },
+    "atomic_initial_list_geometry_diagnostic": {
+      "result": "passed_without_geometry_fix",
+      "log_sha256": "6413f9f7c69934addd5da513fef258a9146bfe3c3861c0542ee066bb0d037fd6",
+      "qualified": [
+        "20 atomic surface.create plus workspace.float transactions before mapping, each followed by observed 900x400 configure acknowledgement/commit and atomic close",
+        "Both direct 900x400 first maps and initial 427x740 maps converging to 900x400 observed",
+        "Owned guest/app cleanup verified"
+      ],
+      "boundary": "Diagnostic does not explain or resolve the prior full-run 700x500 List/Table sizing observations; no geometry runtime behavior changed. Override harness footer is not evidence of the ordinary collection clipboard journey."
     }
   },
   "observations": [
