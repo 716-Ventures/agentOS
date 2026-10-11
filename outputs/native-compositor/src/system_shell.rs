@@ -53,6 +53,7 @@ pub fn spawn(
         .rsplit_once(')')
         .and_then(|(_, tail)| tail.split_whitespace().nth(19))
         .ok_or("Renderer start identity unavailable")?;
+    state.shell_identity = Some((pid, start.to_owned()));
     state.display_handle.insert_client(
         server,
         Arc::new(ClientState {
@@ -76,7 +77,7 @@ impl WlrLayerShellHandler for Smallvil {
     ) {
         if !matches!(
             (namespace.as_str(), layer),
-            ("agentos-system-bar", Layer::Top) | ("agentos-launcher", Layer::Overlay)
+            ("agentos-system-bar", Layer::Top) | ("agentos-launcher", Layer::Overlay) | ("agentos-keyboard", Layer::Overlay)
         ) {
             surface.send_close();
             return;
@@ -320,3 +321,9 @@ pub fn close_launcher(state: &Smallvil) {
         }
     }
 }
+
+fn has_namespace(state: &Smallvil, surface: &WlSurface, namespace: &str) -> bool {
+    state.space.outputs().any(|output| layer_map_for_output(output).layers().any(|layer| layer.namespace() == namespace && layer.wl_surface() == surface))
+}
+pub fn is_keyboard(state: &Smallvil, surface: &WlSurface) -> bool {has_namespace(state, surface, "agentos-keyboard")}
+pub fn is_bar(state: &Smallvil, surface: &WlSurface) -> bool {has_namespace(state, surface, "agentos-system-bar")}

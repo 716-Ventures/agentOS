@@ -2,6 +2,7 @@
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Shortcut {
     Launcher,
+    Keyboard,
     Cycle(bool),
     Maximize,
     Restore,
@@ -25,6 +26,7 @@ pub fn decode(ctrl: bool, alt: bool, shift: bool, key: u32) -> Option<Shortcut> 
         return None;
     }
     match function_key(key) {
+        0x6b | 0x4b => Some(Shortcut::Keyboard),
         0x20 => Some(Shortcut::Launcher), // Space
         0xff09 | 0xfe20 => Some(Shortcut::Cycle(shift || key == 0xfe20)), // Tab / ISO Left Tab
         0xffc7 => Some(Shortcut::Maximize),                               // F10
@@ -71,6 +73,9 @@ mod tests {
     #[test]
     fn shortcuts_require_both_modifiers_and_leave_typing_alone() {
         assert_eq!(decode(true, true, false, 0x20), Some(Shortcut::Launcher));
+        assert_eq!(decode(true, true, false, 0x6b), Some(Shortcut::Keyboard));
+        assert_eq!(decode(true, true, true, 0x4b), Some(Shortcut::Keyboard));
+        assert_eq!(decode(false, true, false, 0x6b), None);
         assert_eq!(decode(false, true, false, 0x20), None);
         assert_eq!(decode(true, false, false, 0x20), None);
         assert_eq!(decode(true, true, false, 0x1008fe08), Some(Shortcut::Float));

@@ -19,6 +19,7 @@ mod pty_view;
 mod reconcile;
 mod state_pages;
 mod system_bar;
+mod screen_keyboard;
 mod terminal_actions;
 mod timings;
 mod transport;
@@ -1457,6 +1458,7 @@ fn main() {
         }));
         let mut layer_library = None;
         let mut bar_window = None;
+        let mut screen_keyboard = None;
         let launcher_events = Rc::new(RefCell::new(if trusted { Some(system_bar::LauncherEvents::start()) } else { None }));
         let event_cleanup = launcher_events.clone();
         app.connect_shutdown(move |_| { event_cleanup.borrow_mut().take(); });
@@ -1497,6 +1499,16 @@ fn main() {
             let focus = controls.clone();
             open.connect_clicked(move |_| { if let Some(window) = weak.upgrade() { focus.borrow().open_launcher(); window.present(); } });
             controls.borrow().monitor_content.prepend(&open);
+            let keyboard = match screen_keyboard::Keyboard::new(app) {
+                Ok(keyboard) => Rc::new(keyboard),
+                Err(error) => {eprintln!("On-screen keyboard unavailable: {error}");app.quit();return;}
+            };
+            let cleanup = keyboard.clone();app.connect_shutdown(move |_|cleanup.close());
+            let toggle = ui::button("Keyboard",ButtonVariant::Ghost,false);
+            toggle.set_tooltip_text(Some("On-screen keyboard (Ctrl+Alt+K)"));
+            let keys = keyboard.clone();toggle.connect_clicked(move |_|keys.toggle());
+            controls.borrow().monitor_content.prepend(&toggle);
+            screen_keyboard = Some(keyboard);
             window.present();
             bar_window = Some(window);
         } else { main.present(); }
@@ -1512,11 +1524,12 @@ fn main() {
         let mut fixture_focused = false;
         let mut fixture_selected = false;
         let mut launcher_sequence = 0;
+        let mut keyboard_sequence = 0;
         let mut bar_captured = false;
         let mut launcher_captured = false;
         glib::timeout_add_local(Duration::from_millis(50), move || {
             // Keep the layer library and system window alive for this session.
-            let _ = (&layer_library, &bar_window);
+            let _ = (&layer_library, &bar_window, &screen_keyboard);
             if !bar_captured {
                 if let (Some(window), Ok(path)) = (&bar_window, std::env::var("AGENT_OS_SYSTEM_BAR_CAPTURE")) {
                     if window.width() > 0 && window.height() > 0 && frontend.borrow().frame.lock().unwrap().connected && !clock.text().is_empty() && status.label().as_deref() == Some("Agent Monitor") {
@@ -1533,6 +1546,11 @@ fn main() {
                 if let Ok(path) = std::env::var("AGENT_OS_LAUNCHER_CAPTURE") { launcher_captured = system_bar::capture(&main, &path); }
             }
             if let Some(events) = launcher_events.borrow().as_ref() {
+                let keyboard_current = events.keyboard_sequence.load(std::sync::atomic::Ordering::Relaxed);
+                if keyboard_current != keyboard_sequence {
+                    keyboard_sequence = keyboard_current;
+                    if let Some(keyboard) = &screen_keyboard {keyboard.toggle();}
+                }
                 let current = events.current();
                 if current != launcher_sequence {
                     launcher_sequence = current;

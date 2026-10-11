@@ -32,7 +32,11 @@ pub struct Smallvil {
     pub applied_focus: Option<String>,
     pub viewport_offsets: std::collections::BTreeMap<String, (i32, i32)>,
     pub launcher_requests: u64,
+    pub keyboard_requests: u64,
     pub active_launcher: Option<WlSurface>,
+    pub shell_identity: Option<(u32, String)>,
+    pub shell_return_focus: Option<WlSurface>,
+    pub physical_keys: std::collections::BTreeSet<u32>,
     pub suppressed_keys: std::collections::BTreeSet<u32>,
     pub start_time: std::time::Instant,
     pub socket_name: OsString,
@@ -116,7 +120,11 @@ impl Smallvil {
             applied_focus: None,
             viewport_offsets: Default::default(),
             launcher_requests: 0,
+            keyboard_requests: 0,
             active_launcher: None,
+            shell_identity: None,
+            shell_return_focus: None,
+            physical_keys: Default::default(),
             suppressed_keys: Default::default(),
             start_time,
             display_handle: dh,
@@ -242,6 +250,7 @@ impl Smallvil {
     }
     pub fn shortcut(&mut self, action: crate::shortcuts::Shortcut) {
         use crate::shortcuts::Shortcut;
+        if action == Shortcut::Keyboard {self.keyboard_requests = self.keyboard_requests.saturating_add(1);return;}
         if action == Shortcut::Launcher {
             if let Some(surface) = self.active_launcher.clone() {
                 if let Some(keyboard) = self.seat.get_keyboard() {

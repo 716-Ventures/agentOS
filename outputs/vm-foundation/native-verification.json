@@ -2321,5 +2321,78 @@
       "finished_at": "2026-10-11T10:15:04.175569+00:00",
       "owned_utm_app_closed": true
     }
+  },
+  "on_screen_keyboard": {
+    "status": "targeted current-source session qualification passes; expanded 68-check installed reproduction pending",
+    "source": {
+      "source_archive_sha256": "4ddf1cb7aa0142884d02a4da5d26b3893488fca41a8bc87bbaa9f6ca02d63cd7",
+      "revision": "80562c8b4df633f42018c41423d15514b619d985",
+      "changes": [
+        " M .github/workflows/contracts.yml",
+        " M outputs/agent-shell/tests/direct_input_probe.py",
+        " A outputs/agent-shell/tests/direct_screen_keyboard_probe.py",
+        " M outputs/native-compositor/src/control.rs",
+        " M outputs/native-compositor/src/input.rs",
+        " M outputs/native-compositor/src/main.rs",
+        " A outputs/native-compositor/src/shell_keyboard.rs",
+        " M outputs/native-compositor/src/shortcuts.rs",
+        " M outputs/native-compositor/src/state.rs",
+        " M outputs/native-compositor/src/system_shell.rs",
+        " M outputs/native-shell/README.md",
+        " M outputs/native-shell/src/main.rs",
+        " A outputs/native-shell/src/screen_keyboard.rs",
+        " M outputs/native-shell/src/system_bar.rs",
+        " M outputs/native-shell/tests/native_session.py",
+        " M outputs/vm-foundation/reproduce.py"
+      ]
+    },
+    "compositor_unit_tests": 49,
+    "native_unit_tests": {
+      "passed": 32,
+      "ignored": 7
+    },
+    "current_session_profiles": [
+      "dark with session-owned Orca",
+      "light with text scale 2 and independent system bar/launcher/core outage controls"
+    ],
+    "qualified": [
+      "private selected-renderer PID/start authentication and same-login rejection",
+      "bottom reservation and restored work area",
+      "retained application seat focus",
+      "live GDK keymap symbols and balanced atomic modifier chords",
+      "lowercase/Shift typing, Backspace and deliberate Save",
+      "Ctrl+Alt+Space invokes the existing launcher",
+      "on-screen Insert+H reaches Orca; learn-mode grabs isolate typing and Escape exits",
+      "rendered successful input status",
+      "always-visible dismissal at text scale 2",
+      "exact owned guest/app exit"
+    ],
+    "evidence": {
+      "/tmp/agentos-screen-keyboard-current-positive.log": "593e3ddcffdeb49931eb5ebea794974fbd0789eb1616d84b10350296585c313e",
+      "/tmp/agentos-screen-keyboard-current.log": "fcbafc896c82b5b6799ced53462af594a1279346a4f4c81ce4c518b1a0497ced",
+      "/tmp/agentos-screen-keyboard-current-reader.png": "cb3ab07f40698bd61a8939bc8b843cafd4489e0125be5130a4eae5614f68e1cd",
+      "/tmp/agentos-screen-keyboard-current-light-2.png": "474655b3f3e7206791431be251df3b3c751b4c92343ce3012b485c65fa86e755"
+    },
+    "retained_failures": [
+      {
+        "runtime_release": "c201bec49806b9f566d2f46866bfe05208c34cd79d255fb4f2775bcf6cbd0646",
+        "observation": "The installed pointer journey correctly refused a clipped Backspace at x=1434 on a 1280-wide output. Homogeneous letter rows expanded every key to the widest special-key minimum. Non-homogeneous expanding letter keys and a separately visible header replace this layout.",
+        "driver_log_sha256": "1fbb198a9d99fec82fff1698474a075e4836230369fe3b3ac6ec7ab642a40bb0",
+        "owned_resources_closed": true
+      },
+      {
+        "runtime_release": "a98271157ffe20121f8beddabbfb423c3ba4a650d312ce4adbd7bda7f593400b",
+        "observation": "The status fixture wrongly searched for status text as its accessible name. Current fixtures inspect the rendered AT-SPI Text interface, as existing status barriers do. Successful private IPC also previously double-unwrapped the transport response and displayed an erroneous unavailable status; that response handling is corrected.",
+        "driver_log_sha256": "d0c149235d733221649e5d5ad6da84aa71c7258b2df2a3abb67b2968928ac22c",
+        "owned_resources_closed": true
+      }
+    ],
+    "boundaries": [
+      "current installed kernel-pointer/modifier isolation and complete 68-check reproduction still pending",
+      "compact ASCII/navigation palette; no complete international layout picker",
+      "large text uses scrolling; header and dismissal remain visible",
+      "physical input, multi-output placement and audible speech remain unqualified",
+      "signed v11 distribution retains its earlier runtime identity"
+    ]
   }
 }

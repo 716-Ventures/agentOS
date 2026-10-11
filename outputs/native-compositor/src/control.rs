@@ -72,6 +72,9 @@ impl Control {
                             .and_then(|_| serde_json::from_str::<Value>(&line).ok());
                         let result = if let Some(value) = parsed {
                             let (reply, rx) = mpsc::sync_channel(1);
+                            let deadline = if matches!(value["op"].as_str(),Some("keyboard.stroke" | "keyboard.restore_focus")) {
+                                Duration::from_millis(150)
+                            } else {Duration::from_secs(5)};
                             if sender
                                 .try_send(Request {
                                     value,
@@ -79,7 +82,7 @@ impl Control {
                                     reply,
                                     // The bridge may wait up to two seconds for one core reply.
                                     // Queueing remains bounded and expired mutations are skipped.
-                                    deadline: Some(Instant::now() + Duration::from_secs(5)),
+                                    deadline: Some(Instant::now() + deadline),
                                 })
                                 .is_ok()
                             {
@@ -141,7 +144,7 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
     use smithay::reexports::wayland_server::Resource;
     let result = (|| -> Result<Value, String> {
         match v["op"].as_str() {
-            Some("launcher.state") => Ok(json!({"sequence":state.launcher_requests})),
+            Some("launcher.state") => Ok(json!({"sequence":state.launcher_requests,"keyboard_sequence":state.keyboard_requests})),
             Some("snapshot") => {
                 state.arrange();
                 let windows=state.space.elements().map(|w|{let surface=w.toplevel().unwrap().wl_surface();let (title,app_id)=smithay::wayland::compositor::with_states(surface,|states|{let data=states.data_map.get::<smithay::wayland::shell::xdg::XdgToplevelSurfaceData>().unwrap().lock().unwrap();(data.title.clone(),data.app_id.clone())});let geometry=state.space.element_geometry(w);json!({"id":format!("{:?}",surface.id()),"title":title,"app_id":app_id,"xdg":xdg_diagnostics(surface),"geometry":geometry.map(|r|json!({"x":r.loc.x,"y":r.loc.y,"width":r.size.w,"height":r.size.h}))})}).collect::<Vec<_>>();
@@ -156,7 +159,7 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
                     .and_then(|keyboard| keyboard.current_focus())
                     .map(|surface| format!("{:?}", surface.id()));
                 Ok(
-                    json!({"launcher_requests":state.launcher_requests,"system_layers":crate::system_shell::snapshot(state),"seat_focus":seat_focus,"pointer_location":state.seat.get_pointer().map(|pointer|{let point=pointer.current_location();json!([point.x,point.y])}),"layout":state.policy.current,"windows":windows,"outputs":outputs,"direct_frames_presented":state.direct_frames_presented,"input_frame_wakeups":state.input_frame_wakeups,"drag_icon":state.drag_icon.is_some(),"drag_icon_render_submissions":state.drag_icon_render_submissions,"direct_active":state.direct_active,"direct_resume_error":state.direct_resume_error,"shared":scene.map(|s|json!({"identities":s.identities,"workspaces":s.workspaces,"error":s.error,"overview":s.overview}))}),
+                    json!({"keyboard_pressed_count":state.seat.get_keyboard().map(|keyboard|keyboard.pressed_keys().len()),"launcher_requests":state.launcher_requests,"system_layers":crate::system_shell::snapshot(state),"seat_focus":seat_focus,"pointer_location":state.seat.get_pointer().map(|pointer|{let point=pointer.current_location();json!([point.x,point.y])}),"layout":state.policy.current,"windows":windows,"outputs":outputs,"direct_frames_presented":state.direct_frames_presented,"input_frame_wakeups":state.input_frame_wakeups,"drag_icon":state.drag_icon.is_some(),"drag_icon_render_submissions":state.drag_icon_render_submissions,"direct_active":state.direct_active,"direct_resume_error":state.direct_resume_error,"shared":scene.map(|s|json!({"identities":s.identities,"workspaces":s.workspaces,"error":s.error,"overview":s.overview}))}),
                 )
             }
             Some("viewport.pan") => {
@@ -237,6 +240,21 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
 #[cfg(test)]
 mod deadline_tests {
     use super::*;
+    #[test]
+    fn keyboard_requests_expire_before_late_input_and_carry_kernel_peer_identity() {
+        let path = std::env::temp_dir().join(format!("agentos-keyboard-deadline-{}.sock",std::process::id()));
+        let control = Control::start_at(path).unwrap();
+        let mut stream = std::os::unix::net::UnixStream::connect(&control.path).unwrap();
+        writeln!(stream,"{}",json!({"op":"keyboard.stroke","keycode":38,"modifiers":0})).unwrap();
+        let request = control.requests.recv_timeout(Duration::from_secs(1)).unwrap();
+        assert_eq!(request.peer_pid,Some(std::process::id()));
+        assert!(!request.expired());
+        thread::sleep(Duration::from_millis(180));
+        assert!(request.expired());
+        request.reply.send(json!({"ok":false,"error":"Input expired"})).unwrap();
+        let mut line = String::new();BufReader::new(stream).read_line(&mut line).unwrap();
+        assert_eq!(serde_json::from_str::<Value>(&line).unwrap()["error"],"Input expired");
+    }
     #[test]
     fn socket_timeout_expires_the_request_still_waiting_in_the_render_queue() {
         use std::os::unix::net::UnixStream;

@@ -9,6 +9,7 @@ mod policy;
 mod pressure;
 mod process;
 mod system_shell;
+mod shell_keyboard;
 mod shortcuts;
 #[path = "../../native-shell/src/timings.rs"]
 mod timings;
@@ -129,6 +130,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             for req in control.requests.try_iter().take(8) {
                 if req.expired() {
+                    let _ = req.reply.try_send(serde_json::json!({"ok":false,"error":"Input or command expired; try again"}));
+                    continue;
+                }
+                if matches!(req.value["op"].as_str(), Some("keyboard.stroke" | "keyboard.restore_focus")) {
+                    let response = shell_keyboard::handle(&mut data.state, req.peer_pid, &req.value);
+                    let _ = req.reply.try_send(response);
                     continue;
                 }
                 if req.value["op"].as_str()==Some("screen_reader.register") {

@@ -62,28 +62,71 @@ pub fn configure(
     }
 }
 
+/// Pointer-operated keyboard: reserve the bottom work area without taking the
+/// application's keyboard focus. It uses the same private layer capability.
+pub fn configure_keyboard(window: &gtk::ApplicationWindow) -> Result<libloading::Library, String> {
+    let library = configure(window, true)?;
+    unsafe {
+        let pointer = window.upcast_ref::<gtk::Window>().to_glib_none().0;
+        library
+            .get::<unsafe extern "C" fn(*mut gtk::ffi::GtkWindow, *const libc::c_char)>(
+                b"gtk_layer_set_namespace\0",
+            )
+            .map_err(|e| e.to_string())?(pointer, c"agentos-keyboard".as_ptr());
+        let anchor = library
+            .get::<unsafe extern "C" fn(*mut gtk::ffi::GtkWindow, i32, i32)>(
+                b"gtk_layer_set_anchor\0",
+            )
+            .map_err(|e| e.to_string())?;
+        for edge in [0, 1, 3] {
+            anchor(pointer, edge, 1);
+        }
+        library
+            .get::<unsafe extern "C" fn(*mut gtk::ffi::GtkWindow, i32)>(
+                b"gtk_layer_set_keyboard_mode\0",
+            )
+            .map_err(|e| e.to_string())?(pointer, 0);
+        library
+            .get::<unsafe extern "C" fn(*mut gtk::ffi::GtkWindow)>(
+                b"gtk_layer_auto_exclusive_zone_enable\0",
+            )
+            .map_err(|e| e.to_string())?(pointer);
+    }
+    Ok(library)
+}
+
 /// Independent of core connectivity: direct controls remain reachable offline.
 /// A fresh renderer establishes a baseline instead of replaying old invocations.
 pub struct LauncherEvents {
     pub sequence: Arc<AtomicU64>,
+    pub keyboard_sequence: Arc<AtomicU64>,
     stop: Arc<AtomicBool>,
     worker: Option<std::thread::JoinHandle<()>>,
 }
 impl LauncherEvents {
     pub fn start() -> Self {
         let sequence = Arc::new(AtomicU64::new(0));
+        let keyboard_sequence = Arc::new(AtomicU64::new(0));
+        let keyboard_events = keyboard_sequence.clone();
         let stop = Arc::new(AtomicBool::new(false));
         let (events, stopping) = (sequence.clone(), stop.clone());
         let path = std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET").map(PathBuf::from);
         let worker = path.map(|path| {
             std::thread::spawn(move || {
                 let mut prior = None;
+                let mut prior_keyboard = None;
                 while !stopping.load(Ordering::Relaxed) {
                     if let Ok(value) = transport::request_timeout(
                         &path,
                         &json!({"op":"launcher.state"}),
                         Duration::from_millis(300),
                     ) {
+                        if let Some(current) = value["keyboard_sequence"].as_u64() {
+                            if prior_keyboard.is_some_and(|old| current > old) {
+                                keyboard_events.fetch_add(1, Ordering::Relaxed);
+                            }
+                            prior_keyboard = Some(current);
+                        }
                         if let Some(current) = value["sequence"].as_u64() {
                             if prior.is_some_and(|old| current > old) {
                                 events.fetch_add(1, Ordering::Relaxed);
@@ -97,6 +140,7 @@ impl LauncherEvents {
         });
         Self {
             sequence,
+            keyboard_sequence,
             stop,
             worker,
         }

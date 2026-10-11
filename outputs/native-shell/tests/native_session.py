@@ -52,13 +52,17 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
          'AGENT_OS_BROKER_SOCKET':str(root/'unavailable-broker.sock'),
          'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','G_DEBUG':'fatal-criticals','GTK_A11Y':'atspi'}
     env.pop('WAYLAND_DISPLAY',None);env.pop('DISPLAY',None)
+    screen_keyboard='--screen-keyboard' in sys.argv
     system_bar='--system-bar' in sys.argv
-    if system_bar:
+    if system_bar or screen_keyboard:
         appearance=os.environ.get('AGENT_OS_BAR_TEST_APPEARANCE','dark');scale=float(os.environ.get('AGENT_OS_BAR_TEST_SCALE','1'))
         config=root/'config/agent-os';config.mkdir(parents=True)
         (config/'desktop.json').write_text(json.dumps({'appearance':appearance,'text_scale':scale,'reduced_motion':True}))
         env['AGENT_OS_SYSTEM_BAR_CAPTURE']=str(OUTPUT/f'system-bar-{appearance}-{scale:g}.png')
         env['AGENT_OS_LAUNCHER_CAPTURE']=str(OUTPUT/f'launcher-{appearance}-{scale:g}.png')
+    if screen_keyboard:
+        env['AGENT_OS_KEYBOARD_CAPTURE']=str(OUTPUT/'screen-keyboard.png')
+        env['AGENT_OS_NATIVE_IME_FIXTURE']='1'
     screen_reader='--screen-reader' in sys.argv
     if screen_reader:
         env.update(GSETTINGS_BACKEND='keyfile',XDG_DATA_HOME=str(root/'data'),
@@ -98,6 +102,63 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
             assert bar['work_area']['y']==output['y']+bar['geometry']['height'],bar
             assert bar['work_area']['height']==output['height']-bar['geometry']['height'],bar
             assert not any(w['title'] in ('agentOS','agentOS system bar','Agent launcher') for w in layers['windows']),layers
+            if screen_keyboard:
+                import accessibility,pyatspi
+                workspace=call(endpoint,{'op':'presentation.snapshot'})['documents'][f'desktop-{activity}']
+                call(endpoint,{'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
+                    'request_id':'keyboard-field-focus','expected_revisions':{workspace['workspace_id']:workspace['revision']},
+                    'operations':[{'op':'workspace.edit','workspace_id':workspace['workspace_id'],
+                        'edit':{'kind':'focus','surface_id':'session-fixture','element_id':'field'}}]})
+                field=accessibility.find('Accessible session draft',pyatspi.ROLE_TEXT)
+                wait_for(lambda:field.getState().contains(pyatspi.STATE_FOCUSED),[core,session])
+                original=call(control,{'op':'snapshot'})['seat_focus']
+                for operation in ('keyboard.stroke','keyboard.restore_focus'):
+                    with socket.socket(socket.AF_UNIX) as connection:
+                        connection.settimeout(3);connection.connect(str(control))
+                        connection.sendall(json.dumps({'op':operation,'keycode':38,'modifiers':0}).encode()+b'\n')
+                        with connection.makefile('rb') as stream:reply=json.loads(stream.readline())
+                    assert not reply['ok'] and 'Trusted renderer required' in reply['error'],reply
+                accessibility.activate(accessibility.find('Agent Monitor',pyatspi.ROLE_PUSH_BUTTON))
+                accessibility.activate(accessibility.find('Keyboard',pyatspi.ROLE_PUSH_BUTTON))
+                shown=wait_for(lambda:(lambda state:state if any(layer['namespace']=='agentos-keyboard' and layer['mapped'] for layer in state['system_layers']) else None)(call(control,{'op':'snapshot'})),[core,session])
+                keyboard=next(layer for layer in shown['system_layers'] if layer['namespace']=='agentos-keyboard')
+                assert shown['seat_focus']==original,shown
+                close=accessibility.find('Hide keyboard',pyatspi.ROLE_PUSH_BUTTON).queryComponent().getExtents(pyatspi.WINDOW_COORDS)
+                assert 0<=close.x and close.x+close.width<=keyboard['geometry']['width'],('Hide keyboard clipped',close,keyboard)
+                assert keyboard['work_area']['height'] < bar['work_area']['height'],keyboard
+                assert keyboard['geometry']['y']+keyboard['geometry']['height']==output['y']+output['height'],keyboard
+                assert field.queryEditableText().setTextContents('')
+                accessibility.activate(accessibility.find('a',pyatspi.ROLE_PUSH_BUTTON))
+                wait_for(lambda:accessibility.text(field)=='a',[core,session])
+                import ime_accessibility
+                wait_for(lambda:ime_accessibility.rendered_text('Keyboard ready'),[core,session])
+                accessibility.activate(accessibility.find('Shift',pyatspi.ROLE_PUSH_BUTTON))
+                accessibility.activate(accessibility.find('A',pyatspi.ROLE_PUSH_BUTTON))
+                wait_for(lambda:accessibility.text(field)=='aA',[core,session])
+                accessibility.activate(accessibility.find('Shift on',pyatspi.ROLE_PUSH_BUTTON))
+                accessibility.activate(accessibility.find('Backspace',pyatspi.ROLE_PUSH_BUTTON))
+                wait_for(lambda:accessibility.text(field)=='a',[core,session])
+                assert call(control,{'op':'snapshot'})['keyboard_pressed_count']==0
+                accessibility.activate(accessibility.find('Ctrl',pyatspi.ROLE_PUSH_BUTTON))
+                accessibility.activate(accessibility.find('Alt',pyatspi.ROLE_PUSH_BUTTON))
+                accessibility.activate(accessibility.find('Space',pyatspi.ROLE_PUSH_BUTTON))
+                wait_for(lambda:any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in call(control,{'op':'snapshot'})['system_layers']),[core,session])
+                assert call(control,{'op':'snapshot'})['keyboard_pressed_count']==0
+                accessibility.activate(accessibility.find('Ctrl on',pyatspi.ROLE_PUSH_BUTTON))
+                accessibility.activate(accessibility.find('Alt on',pyatspi.ROLE_PUSH_BUTTON))
+                accessibility.activate(accessibility.find('Close launcher',pyatspi.ROLE_PUSH_BUTTON))
+                wait_for(lambda:call(control,{'op':'snapshot'})['seat_focus']==original,[core,session])
+                accessibility.activate(accessibility.find('Save draft',pyatspi.ROLE_PUSH_BUTTON))
+                wait_for(lambda:call(endpoint,{'op':'presentation.get','document_id':'session-fixture'})['elements']['field']['props']['value']=='a',[core,session])
+                assert field.queryEditableText().setTextContents('Original accessible value')
+                accessibility.activate(accessibility.find('Save draft',pyatspi.ROLE_PUSH_BUTTON))
+                wait_for(lambda:call(endpoint,{'op':'presentation.get','document_id':'session-fixture'})['elements']['field']['props']['value']=='Original accessible value',[core,session])
+                accessibility.activate(accessibility.find('Hide keyboard',pyatspi.ROLE_PUSH_BUTTON))
+                restored=wait_for(lambda:(lambda state:state if not any(layer['namespace']=='agentos-keyboard' and layer['mapped'] for layer in state['system_layers']) else None)(call(control,{'op':'snapshot'})),[core,session])
+                assert restored['seat_focus']==original,restored
+                restored_bar=next(layer for layer in restored['system_layers'] if layer['namespace']=='agentos-system-bar')
+                assert restored_bar['work_area']==bar['work_area'],restored_bar
+                print('PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection',flush=True)
             if screen_reader:
                 import accessibility,pyatspi
                 workspace=call(endpoint,{'op':'presentation.snapshot'})['documents'][f'desktop-{activity}']
@@ -113,6 +174,25 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                     return 'Using speech server factory:' in text and 'SPEECH OUTPUT:' in text and 'Accessible session draft' in text
                 wait_for(announced,[core,session],timeout=30)
                 print('PASS: session-owned Orca initializes speech and announces the focused native field',flush=True)
+                if screen_keyboard:
+                    accessibility.activate(accessibility.find('Keyboard',pyatspi.ROLE_PUSH_BUTTON))
+                    wait_for(lambda:any(layer['namespace']=='agentos-keyboard' and layer['mapped'] for layer in call(control,{'op':'snapshot'})['system_layers']),[core,session])
+                    baseline=len(reader_log.read_text())
+                    accessibility.activate(accessibility.find('Insert',pyatspi.ROLE_PUSH_BUTTON))
+                    accessibility.activate(accessibility.find('h',pyatspi.ROLE_PUSH_BUTTON))
+                    wait_for(lambda:'Entering learn mode.' in reader_log.read_text()[baseline:],[core,session])
+                    accessibility.activate(accessibility.find('Insert on',pyatspi.ROLE_PUSH_BUTTON))
+                    accessibility.activate(accessibility.find('a',pyatspi.ROLE_PUSH_BUTTON))
+                    time.sleep(.2)
+                    assert accessibility.text(field)=='Original accessible value','Reader grab leaked virtual input'
+                    baseline=len(reader_log.read_text())
+                    accessibility.activate(accessibility.find('Escape',pyatspi.ROLE_PUSH_BUTTON))
+                    wait_for(lambda:'Exiting learn mode.' in reader_log.read_text()[baseline:],[core,session])
+                    assert call(control,{'op':'snapshot'})['keyboard_pressed_count']==0
+                    accessibility.activate(accessibility.find('Hide keyboard',pyatspi.ROLE_PUSH_BUTTON))
+                    wait_for(lambda:not any(layer['namespace']=='agentos-keyboard' and layer['mapped'] for layer in call(control,{'op':'snapshot'})['system_layers']),[core,session])
+                    print('PASS: on-screen Insert+H reaches Orca, learn-mode grab isolates typing and Escape releases it',flush=True)
+
             if system_bar:
                 import accessibility,pyatspi
                 accessibility.activate(accessibility.find('Agent Monitor',pyatspi.ROLE_PUSH_BUTTON))

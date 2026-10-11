@@ -59,80 +59,105 @@ impl Smallvil {
         pointer.frame(self);
     }
 
+    /// Shared by physical input and the authenticated shell's atomic key strokes.
+    pub fn process_keyboard(
+        &mut self,
+        code: smithay::backend::input::Keycode,
+        state: KeyState,
+        time: u32,
+    ) {
+        #[cfg(feature = "direct-display")]
+        if state == KeyState::Pressed {
+            if let Some(vt) = self
+                .accessibility
+                .as_ref()
+                .and_then(|service| service.reserved_vt(code))
+            {
+                if let Some(session) = self.direct_session.as_mut() {
+                    use smithay::backend::session::Session;
+                    if let Err(error) = session.change_vt(vt) {
+                        eprintln!("VT switch failed: {error}");
+                    }
+                    self.suppressed_keys.insert(code.raw());
+                    return;
+                }
+            }
+        }
+        if self
+            .accessibility
+            .as_mut()
+            .is_some_and(|service| service.key(code, state == KeyState::Released))
+        {
+            return;
+        }
+        let serial = SERIAL_COUNTER.next_serial();
+
+        let key = code.raw();
+
+        let mut forwarded = false;
+        let action = self
+            .seat
+            .get_keyboard()
+            .unwrap()
+            .input(
+                self,
+                code,
+                state,
+                serial,
+                time,
+                |data, modifiers, handle| {
+                    if state == KeyState::Released && data.suppressed_keys.remove(&key) {
+                        return FilterResult::Intercept(None);
+                    }
+                    #[cfg(feature = "direct-display")]
+                    if state == KeyState::Pressed && modifiers.ctrl && modifiers.alt {
+                        let symbol = crate::shortcuts::function_key(handle.modified_sym().raw());
+                        if (0xffbe..=0xffc3).contains(&symbol) {
+                            if let Some(session) = data.direct_session.as_mut() {
+                                use smithay::backend::session::Session;
+                                if let Err(error) = session.change_vt((symbol - 0xffbe + 1) as i32)
+                                {
+                                    eprintln!("VT switch failed: {error}");
+                                }
+                                data.suppressed_keys.insert(key);
+                                return FilterResult::Intercept(None);
+                            }
+                        }
+                    }
+                    if state == KeyState::Pressed && data.bridge.is_some() {
+                        if let Some(action) = crate::shortcuts::decode(
+                            modifiers.ctrl,
+                            modifiers.alt,
+                            modifiers.shift,
+                            handle.modified_sym().raw(),
+                        ) {
+                            data.suppressed_keys.insert(key);
+                            return FilterResult::Intercept(Some(action));
+                        }
+                    }
+                    forwarded = true;
+                    FilterResult::Forward
+                },
+            )
+            .flatten();
+        if let Some(action) = action {
+            self.shortcut(action)
+        }
+        if forwarded && state == KeyState::Pressed && self.direct_active == Some(true) {
+            self.request_input_frame();
+        }
+    }
+
     pub fn process_input_event<I: InputBackend>(&mut self, event: InputEvent<I>) {
         match event {
             InputEvent::Keyboard { event, .. } => {
-                #[cfg(feature="direct-display")]
-                if event.state()==KeyState::Pressed {
-                    if let Some(vt)=self.accessibility.as_ref().and_then(|service|service.reserved_vt(event.key_code())) {
-                        if let Some(session)=self.direct_session.as_mut() {
-                            use smithay::backend::session::Session;
-                            if let Err(error)=session.change_vt(vt) {eprintln!("VT switch failed: {error}");}
-                            self.suppressed_keys.insert(event.key_code().raw());
-                            return;
-                        }
-                    }
+                let code = event.key_code();
+                if event.state() == KeyState::Pressed {
+                    self.physical_keys.insert(code.raw());
+                } else {
+                    self.physical_keys.remove(&code.raw());
                 }
-                if self.accessibility.as_mut().is_some_and(|service| service.key(event.key_code(), event.state()==KeyState::Released)) {return;}
-                let serial = SERIAL_COUNTER.next_serial();
-                let time = Event::time_msec(&event);
-
-                let key = event.key_code().raw();
-                let state = event.state();
-                let mut forwarded = false;
-                let action = self
-                    .seat
-                    .get_keyboard()
-                    .unwrap()
-                    .input(
-                        self,
-                        event.key_code(),
-                        state,
-                        serial,
-                        time,
-                        |data, modifiers, handle| {
-                            if state == KeyState::Released && data.suppressed_keys.remove(&key) {
-                                return FilterResult::Intercept(None);
-                            }
-                            #[cfg(feature = "direct-display")]
-                            if state == KeyState::Pressed && modifiers.ctrl && modifiers.alt {
-                                let symbol =
-                                    crate::shortcuts::function_key(handle.modified_sym().raw());
-                                if (0xffbe..=0xffc3).contains(&symbol) {
-                                    if let Some(session) = data.direct_session.as_mut() {
-                                        use smithay::backend::session::Session;
-                                        if let Err(error) =
-                                            session.change_vt((symbol - 0xffbe + 1) as i32)
-                                        {
-                                            eprintln!("VT switch failed: {error}");
-                                        }
-                                        data.suppressed_keys.insert(key);
-                                        return FilterResult::Intercept(None);
-                                    }
-                                }
-                            }
-                            if state == KeyState::Pressed && data.bridge.is_some() {
-                                if let Some(action) = crate::shortcuts::decode(
-                                    modifiers.ctrl,
-                                    modifiers.alt,
-                                    modifiers.shift,
-                                    handle.modified_sym().raw(),
-                                ) {
-                                    data.suppressed_keys.insert(key);
-                                    return FilterResult::Intercept(Some(action));
-                                }
-                            }
-                            forwarded = true;
-                            FilterResult::Forward
-                        },
-                    )
-                    .flatten();
-                if let Some(action) = action {
-                    self.shortcut(action)
-                }
-                if forwarded && state == KeyState::Pressed && self.direct_active == Some(true) {
-                    self.request_input_frame();
-                }
+                self.process_keyboard(code, event.state(), Event::time_msec(&event));
             }
             InputEvent::PointerMotion { event, .. } => {
                 let Some(pointer) = self.seat.get_pointer() else {
@@ -186,8 +211,21 @@ impl Smallvil {
                 let button_state = event.state();
 
                 if ButtonState::Pressed == button_state && !pointer.is_grabbed() {
-                    if let Some((surface, _)) = crate::system_shell::surface_under(self, pointer.current_location()) {
-                        keyboard.set_focus(self, Some(surface), serial);
+                    if let Some((surface, _)) =
+                        crate::system_shell::surface_under(self, pointer.current_location())
+                    {
+                        if !crate::system_shell::is_keyboard(self, &surface) {
+                            if !crate::system_shell::is_bar(self, &surface) {
+                                self.shell_return_focus = None;
+                            } else if keyboard
+                                .current_focus()
+                                .as_ref()
+                                .is_some_and(|old| !crate::system_shell::is_bar(self, old))
+                            {
+                                self.shell_return_focus = keyboard.current_focus();
+                            }
+                            keyboard.set_focus(self, Some(surface), serial);
+                        }
                     } else if let Some((window, _loc)) = self
                         .space
                         .element_under(pointer.current_location())

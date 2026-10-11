@@ -145,6 +145,23 @@ def assistive():
                 response={'expanded':control.getState().contains(pyatspi.STATE_EXPANDED)}
                 if request!='arrange-status':response['requested']=control.queryAction().doAction(0)
                 print(json.dumps(response),flush=True);continue
+            if request=='keyboard-status':
+                queue=deque([find('On-screen keyboard',pyatspi.ROLE_FRAME)]);status=None
+                for _ in range(512):
+                    if not queue:break
+                    node=queue.popleft()
+                    try:
+                        text=node.queryText();value=text.getText(0,min(text.characterCount,4096))
+                        if value in ('Keyboard ready','Release physical keys before using the on-screen keyboard'):
+                            status=value;break
+                    except (NotImplementedError,RuntimeError,LookupError):pass
+                    try:queue.extend(node[index] for index in range(min(node.childCount,128)))
+                    except (RuntimeError,LookupError):pass
+                print(json.dumps({'text':status or ''}),flush=True);continue
+            if request.startswith('keyboard:'):
+                node=find(request.split(':',1)[1],pyatspi.ROLE_PUSH_BUTTON)
+                rect=node.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
+                print(json.dumps({'point':[rect.x+rect.width/2,rect.y+rect.height/2]}),flush=True);continue
             if request.startswith('terminal:'):
                 action=request.split(':',1)[1]
                 if action in ('attach','detach','attach-state'):
@@ -295,7 +312,7 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
                 observed=scene();point=observed.get('pointer_location')
                 if observed.get('direct_active') and point and abs(point[0]-x)<2 and abs(point[1]-y)<2:return
                 if time.monotonic()>deadline:
-                    raise RuntimeError('Kernel pointer motion was not acknowledged before click: '+json.dumps({'expected':[x,y],'scene':observed}))
+                    raise RuntimeError('Kernel pointer motion was not acknowledged before click: '+json.dumps({'expected':[x,y],'observed':{key:observed.get(key) for key in ('pointer_location','outputs','seat_focus','direct_active')}}))
                 time.sleep(.05)
         keyboard=Device(True);pointer=Device(False,motion_ready)
         subprocess.run(['udevadm','settle','--timeout=5'],check=True)
@@ -419,6 +436,8 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
             import direct_native_feedback
             direct_native_feedback.verify(metrics,core,login_user,keyboard,wait,load=native_feedback_load,scene=scene)
             return
+        import direct_screen_keyboard_probe
+        direct_screen_keyboard_probe.verify(output,scene,target,snapshot,keyboard,pointer,wait)
         for key in (30,34,18,49,20,24,31):keyboard.chord(key) # agentos
         wait(lambda value:value['text']=='agentos')
         # Include the separator in the copied span. GTK coalesces adjacent single-word inserts.
