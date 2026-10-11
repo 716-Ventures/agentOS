@@ -1,0 +1,13 @@
+Installed and healthy: ebc8f4be3fc669080c2a9a14481ceab4fbc4288afb78d4f9659b6d6df0039209
+Warning: The unit file, source configuration file or drop-ins of agent-os-core.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-layout.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-disk.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-broker.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-ai.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-voice.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Installed and healthy: ebc8f4be3fc669080c2a9a14481ceab4fbc4288afb78d4f9659b6d6df0039209
+Installed and healthy: cdfad898d71a600b21575348c5f3c02ce80ff3b2bbe8ef375f0a9677e1d71832
+Installed and healthy: ebc8f4be3fc669080c2a9a14481ceab4fbc4288afb78d4f9659b6d6df0039209
+Installed and healthy: cdfad898d71a600b21575348c5f3c02ce80ff3b2bbe8ef375f0a9677e1d71832
+Installed and healthy: cdfad898d71a600b21575348c5f3c02ce80ff3b2bbe8ef375f0a9677e1d71832
+{"result": "pass", "checks": ["Compatible update and rollback preserve activities, outputs, layouts, pending approvals, user files and provider configuration", "SIGKILL during rollback at stopped and activated phases recovers to the selected release without rewinding live state"], "provider_calls": "none"}
