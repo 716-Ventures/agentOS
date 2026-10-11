@@ -1,16 +1,16 @@
 {
-  "verified_at": "2026-10-11T04:34:44.892283+00:00",
+  "verified_at": "2026-10-11T09:27:10.816336+00:00",
   "result": "pass",
   "image": {
     "architecture": "arm64",
     "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
-    "bootstrap_sha256": "e60ac4a8f76a106946ad3d91a392be97b7c0671587a75f4c5111d57dfb4c4879",
+    "bootstrap_sha256": "1df6e4efbc5e9facb674291a06b1eb0b7c47135fa464d29c6491196bff8a0ecd",
     "builder_sha256": "e1b8102fbd47b1313549445b6fd7792a086c2a883233bdfbf16ff56cfea7a184",
     "compression": "zlib",
     "contains_personal_account": false,
     "contains_provider_credentials": false,
-    "dependency_manifest_sha256": "d0812f2d560c26cdbc596d445dae73b3f3ec0098e01f7aec44869e7ba17d6b23",
-    "dependency_profile_sha256": "e76be92153567973abe0df91b2a9c27b3e58cfe306a41337020448471908e923",
+    "dependency_manifest_sha256": "54cc0a0188cf77cc8d9ae3be5d6735f21a0bf76a1c78815e5ba338a367ec41eb",
+    "dependency_profile_sha256": "dcbf1c74b06215516ef7135525c88ea00e9605f654e165c372125c535f9cd704",
     "disk_size": "20G",
     "first_run_sha256": "8dc0c5b4a0d212667000bb009905458de85125c7fad98e1d876fb2f766471b57",
     "first_run_unit_sha256": "c4d2376b281a0d5879ce71a15e192ede8598ebc531d58b7dff3203ca66986b09",
@@ -20,9 +20,9 @@
       "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
       "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
     },
-    "image_sha256": "9d86b2b1c3745669b43573fc4011cd8777f2727b982a717b5e55681732abfef4",
+    "image_sha256": "90ac2bc6ec79a9680a9d98c55d06926937256f1ff5c1a64c9e2a7318e8942fc2",
     "name": "agentOS experimental native image",
-    "runtime_release": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
+    "runtime_release": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
     "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
     "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
   },
@@ -55,7 +55,10 @@
     "original development disk and EFI inode identities and exact config restored after verification",
     "actual completed presentation receipts on the clean installed native GTK editor, idle and during two owned broker CPU jobs",
     "clean installed VTE trusted IME protocol and separate synthetic Wayland presentation boundaries",
-    "clean installed Table/List/KeyValue kernel pointer/keyboard row selection, Ctrl+C, visible Shift+F10/secondary menus, exact cross-client Unicode clipboard, protected refresh and key-preserved background updates, cleared selection/removal and restored focus"
+    "clean installed Table/List/KeyValue kernel pointer/keyboard row selection, Ctrl+C, visible Shift+F10/secondary menus, exact cross-client Unicode clipboard, protected refresh and key-preserved background updates, cleared selection/removal and restored focus",
+    "session-owned Orca announces native controls; authenticated kernel commands, learn-mode grab/release, Save/Discard and rescue VT pass on the clean image",
+    "reader and speech processes reaped after normal logout and abrupt compositor loss",
+    "loopback-only cold boot also passes the full installed reader/kernel/VT journey"
   ],
   "not_tested": [
     "production signing/distribution authority",
@@ -65,8 +68,8 @@
     "live Gateway or Jev inference; no configured credentials",
     "incompatible future state-format migrations"
   ],
-  "runtime_source_revision": "6b459ea4129524baa253854f07cfedac4d790a86",
-  "runtime_716_ui": "v0.1.0-alpha.31",
+  "runtime_source_revision": "ee370fb3047b61fe64c8c91589d5a6a8d5eea0ab",
+  "runtime_716_ui": "v0.1.0-alpha.32",
   "compatible_rollback_probe": {
     "release": "3ebc478291575d588f89c5349397c930093233a51eb45c8892611cb38bebdc1f",
     "signed_bundle_sha256": "ede34e9cebebf6f393383ef7933c134aa37e215afb2155717abb8a06d91b25ad"
@@ -75,8 +78,8 @@
     "result": "pass",
     "before": {
       "result": "pass",
-      "boot_id": "4d0106bd-704d-4f90-85bf-7d1671f5ab5e",
-      "runtime": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
+      "boot_id": "50fe8e18-a8a3-4818-a6c4-57ea075f423a",
+      "runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
       "uid": 1000,
       "activity": 1,
       "file_persisted": true,
@@ -95,8 +98,8 @@
     },
     "reboot": {
       "result": "pass",
-      "boot_id": "a38b2508-df2b-4fc4-b012-30b12b5045e3",
-      "runtime": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
+      "boot_id": "65b53b95-4217-4cd7-87eb-5b7c61a10092",
+      "runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
       "uid": 1000,
       "activity": 1,
       "file_persisted": true,
@@ -115,8 +118,8 @@
     },
     "offline": {
       "result": "pass",
-      "boot_id": "b8dcc99f-d300-49e3-b4d7-16ec95ec05a1",
-      "runtime": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
+      "boot_id": "20f2facd-fe9a-4cfe-b265-d9b5a3ef8994",
+      "runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
       "uid": 1000,
       "activity": 1,
       "file_persisted": true,
@@ -163,11 +166,12 @@
       "installed_executables": true,
       "cleanup_verified": true
     },
-    "final_offline_runtime": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
+    "offline_screen_reader_qualified": true,
+    "final_offline_runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
     "development_disk_restored": true,
     "guest_stopped": true
   },
-  "factory_source_revision": "6b459ea4129524baa253854f07cfedac4d790a86",
+  "factory_source_revision": "ee370fb3047b61fe64c8c91589d5a6a8d5eea0ab",
   "browser": {
     "result": "pass",
     "checks": [
@@ -190,51 +194,55 @@
     "cleanup_verified": true
   },
   "qualification_observations": [
-    "Clean v10 qualification includes the exact alpha.31 form-owner fixes and the immutable runtime from all 60 reproduction checks, plus installed collection/editor/VTE/IME, idle/two-broker-CPU-job presentation, browser, offline speech, reboot and failed activation/account-preserving recovery.",
-    "The prior v6\u2013v9 distributions remain untouched. Only the redundant guest v9 builder output was removed after fresh SHA-256 equality with the retained host distribution.",
-    "The prior v9 qualification exposed an intermittent primary-transfer destination focus failure. An unchanged instrumented repeat and complete v9 fresh-copy run passed; that observation remains open. Its helper identity/password failures and subsequent exact disk/config/EFI restoration are retained in repository history.",
-    "An initial compressed v10 conversion ran out of builder space, published no image and cleaned its private temporary directory. The builder now checks a conservative 41 GiB peak-capacity bound before disk/loop creation; all 21 tooling tests pass. The dedicated development test disk was enlarged from 20 to 80 GiB after an exact hash-verified APFS recovery clone; its ext4 filesystem, saved activities, UID and runtime were verified with more than 60 GiB available. The distributed image remains 20 GiB.",
-    "The new image uses supported zlib-compressed QCOW2 export. Its unbooted signed artifact remains separate from the verification copy."
+    "Fresh v11 copy passes first-run, signed update/rollback, native editor/collections/VTE/IME, presentation, reader and speech, browser, reboot, network-free cold boot and failed-activation/account-preserving recovery.",
+    "The first attempt correctly rejected a legacy signed runtime requiring AT-SPI 2.56 on the pinned 2.62 image. A newly exported, host-signed compatible a879 runtime was used for rollback; the first attempt logs and booted copy remain preserved.",
+    "Current image runtime differs from the complete 66-check runtime only in package resolution/bootstrap payloads; the three executable hashes match exactly and the changed installation path passes 272 Linux Python tests plus an actual clean base build.",
+    "Prior v9 PRIMARY focus and intermittent collection geometry observations remain unresolved; successful repeats do not establish their causes.",
+    "Unbooted signed v10 and v11 distributions are retained separately from test copies. Physical input/audio/GPU, full reference parity, production authority and live providers remain unqualified."
   ],
-  "direct_input_test_sha256": "07741bf3e654f0c214ca1c9488e4a6bf1ef8a4341d7a408418add99ffefbc62e",
-  "terminal_input_test_sha256": "e17773d3dfbd3260ebbd1ea7d10e7b60874ab84bdb01a073d847ac37e7df1175",
-  "qualification_log_sha256": "dfa92c040a105e3ea100280a74a5e2992484357db2c099de65edfeec68dcf0c4",
-  "full_reproduction_runtime": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
-  "full_reproduction_check_count": 60,
+  "direct_input_test_sha256": "53a886d19ad4ad7ed3af9a507dc8b44b5ca3762a975e15c339ac84f64409c97a",
+  "terminal_input_test_sha256": "704f7883530c72948e340ab04c9677436f2739c437bd38c1f003d3ce4b80cb2d",
+  "qualification_log_sha256": "15a88cc67c0107a17ab77c4b06bfc89e9f3192fffe60035247e91526c231f3a6",
+  "full_reproduction_runtime": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
+  "full_reproduction_check_count": 66,
   "native_input_presentation_profiles": [
     {
       "clock_id": 1,
       "discarded": 0,
       "format": 1,
       "invalid": 0,
-      "max_ms": 41,
+      "max_ms": 39,
       "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-      "p50_ms": 35,
-      "p95_ms": 40,
+      "p50_ms": 28,
+      "p95_ms": 38,
       "pending": 0,
       "presented": 20,
       "requested": 20,
       "sample_limit": 256,
-      "profile": "idle editor"
+      "profile": "idle editor",
+      "measurement_seconds": 2.81,
+      "completed_frames_between_observer_snapshots": 192
     },
     {
       "clock_id": 1,
       "discarded": 0,
       "format": 1,
       "invalid": 0,
-      "max_ms": 43,
+      "max_ms": 38,
       "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-      "p50_ms": 36,
-      "p95_ms": 42,
+      "p50_ms": 29,
+      "p95_ms": 37,
       "pending": 0,
       "presented": 20,
       "requested": 20,
       "sample_limit": 256,
       "profile": "two concurrent broker CPU jobs",
       "job_cpu_usage_usec": [
-        3006334,
-        3007536
-      ]
+        1475809,
+        1475717
+      ],
+      "measurement_seconds": 1.529,
+      "completed_frames_between_observer_snapshots": 99
     }
   ],
   "collection_input_profiles": [
@@ -252,7 +260,7 @@
         }
       ],
       "checks": [
-        "direct native window",
+        "private native system bar",
         "KMS output discovery",
         "shared core connection",
         "VT switch and resume",
@@ -280,7 +288,7 @@
         }
       ],
       "checks": [
-        "direct native window",
+        "private native system bar",
         "KMS output discovery",
         "shared core connection",
         "VT switch and resume",
@@ -308,7 +316,7 @@
         }
       ],
       "checks": [
-        "direct native window",
+        "private native system bar",
         "KMS output discovery",
         "shared core connection",
         "VT switch and resume",
@@ -323,5 +331,61 @@
       ]
     }
   ],
-  "collection_input_test_sha256": "a3732de8e185cf78efdefd9a30c4591e345d9208fa78dfd3d34e30622bd78749"
+  "collection_input_test_sha256": "52c38d3ffb1d91dd8b3d3b3c478691106adbfceba46d747ac5ed32cee1d353ba",
+  "previous_v10_image": {
+    "image": {
+      "architecture": "arm64",
+      "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
+      "bootstrap_sha256": "e60ac4a8f76a106946ad3d91a392be97b7c0671587a75f4c5111d57dfb4c4879",
+      "builder_sha256": "e1b8102fbd47b1313549445b6fd7792a086c2a883233bdfbf16ff56cfea7a184",
+      "compression": "zlib",
+      "contains_personal_account": false,
+      "contains_provider_credentials": false,
+      "dependency_manifest_sha256": "d0812f2d560c26cdbc596d445dae73b3f3ec0098e01f7aec44869e7ba17d6b23",
+      "dependency_profile_sha256": "e76be92153567973abe0df91b2a9c27b3e58cfe306a41337020448471908e923",
+      "disk_size": "20G",
+      "first_run_sha256": "8dc0c5b4a0d212667000bb009905458de85125c7fad98e1d876fb2f766471b57",
+      "first_run_unit_sha256": "c4d2376b281a0d5879ce71a15e192ede8598ebc531d58b7dff3203ca66986b09",
+      "format": 1,
+      "foundation_sources": {
+        "agent-os-foundation.service": "e5acc8fbfec78024dfd7fb27fafe615391c7b17672c1b56e235e12023e3b6bd2",
+        "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
+        "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
+      },
+      "image_sha256": "9d86b2b1c3745669b43573fc4011cd8777f2727b982a717b5e55681732abfef4",
+      "name": "agentOS experimental native image",
+      "runtime_release": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
+      "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
+      "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
+    },
+    "runtime_source_revision": "6b459ea4129524baa253854f07cfedac4d790a86",
+    "runtime_716_ui": "v0.1.0-alpha.31",
+    "qualification_observations": [
+      "Clean v10 qualification includes the exact alpha.31 form-owner fixes and the immutable runtime from all 60 reproduction checks, plus installed collection/editor/VTE/IME, idle/two-broker-CPU-job presentation, browser, offline speech, reboot and failed activation/account-preserving recovery.",
+      "The prior v6\u2013v9 distributions remain untouched. Only the redundant guest v9 builder output was removed after fresh SHA-256 equality with the retained host distribution.",
+      "The prior v9 qualification exposed an intermittent primary-transfer destination focus failure. An unchanged instrumented repeat and complete v9 fresh-copy run passed; that observation remains open. Its helper identity/password failures and subsequent exact disk/config/EFI restoration are retained in repository history.",
+      "An initial compressed v10 conversion ran out of builder space, published no image and cleaned its private temporary directory. The builder now checks a conservative 41 GiB peak-capacity bound before disk/loop creation; all 21 tooling tests pass. The dedicated development test disk was enlarged from 20 to 80 GiB after an exact hash-verified APFS recovery clone; its ext4 filesystem, saved activities, UID and runtime were verified with more than 60 GiB available. The distributed image remains 20 GiB.",
+      "The new image uses supported zlib-compressed QCOW2 export. Its unbooted signed artifact remains separate from the verification copy."
+    ]
+  },
+  "binary_equivalence": {
+    "qualified_runtime": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
+    "image_runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+    "binaries": {
+      "agent-os-core": "2051ea36559b6aa9af596e2f7fba4672971fdb5b788c5fbc492886015263fcfe",
+      "native/agent-os-desktop": "bc05d9da6fc66da62218ae386bb5232fbc2ae7ce67214031e44764e9162f6765",
+      "native/agent-os-compositor": "9c60346155ffda618d3d48c1d11c33b0cbda64b1b764882becb80350c8d09fc4"
+    }
+  },
+  "rollback_fixture": {
+    "runtime_release": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
+    "bundle_sha256": "402e3392bbb5a9dba0dafacdb05f7c668c02f0115975c828e4877a37920159f3"
+  },
+  "prior_incompatible_fixture_refusal": {
+    "log_sha256": "ebd5a59043443fb9120fb3b8c94959c4cdc160c8b2e4458e52ed9915b37d21c8",
+    "required_dependency": "at-spi2-core",
+    "result": "refused before staging or activation"
+  },
+  "driver_log_sha256": "ffb10af58f485d98b23933903a982a96f8ab1d652032a6eb065b17b3f1df9e71",
+  "build_log_sha256": "765518e6848008b119a88e0378e1fdb77c53aab83339a6ccbf9bad7976588b0a"
 }
