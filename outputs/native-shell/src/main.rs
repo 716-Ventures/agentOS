@@ -84,6 +84,7 @@ struct Element {
     link: Option<gtk::LinkButton>,
     events: Rc<RefCell<Value>>,
     applying: Rc<Cell<bool>>,
+    draft_revision: Rc<Cell<u64>>,
     children: Vec<String>,
 }
 impl Element {
@@ -201,6 +202,7 @@ fn construct(
     let props = &node["props"];
     let events = Rc::new(RefCell::new(node["events"].clone()));
     let applying = Rc::new(Cell::new(false));
+    let draft_revision = Rc::new(Cell::new(frame.drafts.get(&(surface.into(),id.into())).and_then(|draft|draft["draft_revision"].as_u64()).unwrap_or(0)));
     let mut result = Element {
         kind: kind.clone(),
         widget: gtk::Box::new(gtk::Orientation::Vertical, 0).upcast(),
@@ -229,6 +231,7 @@ fn construct(
         link: None,
         events: events.clone(),
         applying: applying.clone(),
+        draft_revision: draft_revision.clone(),
         children: Vec::new(),
     };
     match kind.as_str() {
@@ -389,9 +392,7 @@ fn construct(
         }
         "Choice@1" | "Toggle@1" => {
             let recovered = frame.drafts.get(&(surface.into(), id.into()));
-            let expected = recovered
-                .and_then(|d| d["draft_revision"].as_u64())
-                .unwrap_or(0);
+            let expected = draft_revision.clone();
             let value = recovered
                 .and_then(|d| d["draft"].as_str())
                 .map(String::from)
@@ -409,7 +410,7 @@ fn construct(
                 let mut drafts = edits.lock().unwrap();
                 let draft = drafts.entry((s.clone(), e.clone())).or_insert(Draft {
                     text: String::new(),
-                    expected,
+                    expected: expected.get(),
                     dirty: false,
                     resolved: None,
                 });
@@ -497,9 +498,7 @@ fn construct(
                     drafts.clone(),
                     applying.clone(),
                 );
-                let expected = recovered
-                    .and_then(|d| d["draft_revision"].as_u64())
-                    .unwrap_or(0);
+                let expected = draft_revision.clone();
                 let submit_events = events.clone();
                 let submit_commands = commands.clone();
                 area.on_event(move |event| {
@@ -513,7 +512,7 @@ fn construct(
                         let mut drafts = edits.lock().unwrap();
                         let draft = drafts.entry((s.clone(), e.clone())).or_insert(Draft {
                             text: String::new(),
-                            expected,
+                            expected: expected.get(),
                             dirty: false,
                             resolved: None,
                         });
@@ -581,9 +580,7 @@ fn construct(
                 drafts.clone(),
                 applying.clone(),
             );
-            let expected = recovered
-                .and_then(|d| d["draft_revision"].as_u64())
-                .unwrap_or(0);
+            let expected = draft_revision.clone();
             let submit_events = events.clone();
             let submit_commands = commands.clone();
             field.on_event(move |event| {
@@ -597,7 +594,7 @@ fn construct(
                     let mut drafts = edits.lock().unwrap();
                     let draft = drafts.entry((s.clone(), e.clone())).or_insert(Draft {
                         text: String::new(),
-                        expected,
+                        expected: expected.get(),
                         dirty: false,
                         resolved: None,
                     });
@@ -726,7 +723,7 @@ fn editor_value(
     props: &Value,
     frame: &Frame,
     drafts: &Arc<Mutex<BTreeMap<(String, String), Draft>>>,
-) -> Option<String> {
+) -> Option<(String, bool)> {
     let key = (surface.to_string(), element.to_string());
     let mut edits = drafts.lock().unwrap();
     if let Some(local) = edits.get(&key) {
@@ -739,19 +736,20 @@ fn editor_value(
             if revision >= resolved && observed.map(|v| v >= local.expected).unwrap_or(false) {
                 edits.remove(&key);
             }
-            return Some(text);
+            return Some((text, true));
         } else {
             return None;
         }
     }
-    Some(
+    Some((
         frame
             .drafts
             .get(&key)
             .and_then(|v| v["draft"].as_str())
             .map(String::from)
             .unwrap_or_else(|| literal_editor_value(props)),
-    )
+        false,
+    ))
 }
 fn bound(surface: &str, value: &Value, frame: &Frame) -> Value {
     if let Some(binding) = value["binding"].as_str() {
@@ -1090,6 +1088,7 @@ impl Surface {
         for (element, node) in nodes {
             if let Some(e) = self.elements.get_mut(element) {
                 let props = &node["props"];
+                if let Some(revision) = frame.drafts.get(&(id.into(),element.clone())).and_then(|draft|draft["draft_revision"].as_u64()) { e.draft_revision.set(revision); }
                 if let Some(split) = &e.split {
                     split
                         .widget
@@ -1196,7 +1195,7 @@ impl Surface {
                 }
                 if e.field.is_some() || e.area.is_some() || e.choice.is_some() || e.toggle.is_some()
                 {
-                    if let Some(text) = editor_value(
+                    if let Some((text, resolved)) = editor_value(
                         id,
                         element,
                         doc["revision"].as_u64().unwrap_or(0),
@@ -1210,7 +1209,7 @@ impl Surface {
                                 notice.set_visible(!valid);
                             }
                             if valid {
-                                choice.reconcile(&text);
+                                if resolved { choice.control.set_selected(choice.options().iter().position(|value|value==&text).unwrap() as u32); } else { choice.reconcile(&text); }
                             } else {
                                 choice.control.set_selected(gtk::INVALID_LIST_POSITION);
                             }
@@ -1221,15 +1220,17 @@ impl Surface {
                                 notice.set_visible(!valid);
                             }
                             if valid {
-                                toggle.reconcile(text == "true");
+                                if resolved { toggle.control.set_active(text == "true"); } else { toggle.reconcile(text == "true"); }
                             }
                             toggle.control.set_inconsistent(!valid);
                         }
                         if let Some(field) = &e.field {
-                            field.reconcile(&text);
+                            // A deliberate human Save/Discard resolution applies even while focused.
+                            // Ordinary observed updates retain the component focus guard.
+                            if resolved { if field.entry.text()!=text { field.entry.set_text(&text); } } else { field.reconcile(&text); }
                         }
                         if let Some(area) = &e.area {
-                            area.reconcile(&text);
+                            if resolved { if area.value()!=text { area.view.buffer().set_text(&text); } } else { area.reconcile(&text); }
                         }
                     }
                 }

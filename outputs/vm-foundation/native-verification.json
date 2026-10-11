@@ -1507,7 +1507,33 @@
         "50 rapid real-core accessible Unicode Save/Discard cycles passed without a runtime fix; the failing assertion now retains core draft, saved and visible text and bounded accessible labels",
         "38 compositor tests pass; installed diagnostics runtime 97fb259312b6ca3bf6972b5024cfce817e318ebcec3e2ecf46549c094f9d918c"
       ],
-      "boundary": "Passing diagnostic journeys do not explain or erase either intermittent failure. No complete current-source 63-check or physical qualification is claimed. The first stress harness stopped on an incorrect repeated-cycle initial-value assertion and is not runtime-failure evidence."
+      "boundary": "Passing diagnostic journeys do not explain or erase either intermittent failure. No complete current-source 63-check or physical qualification is claimed. The first stress harness stopped on an incorrect repeated-cycle initial-value assertion and is not runtime-failure evidence.",
+      "accessible_discard_followup": "Focused Discard was reproduced with core draft null/revision 4 and stale visible text during the actual Orca 51 probe. Source-built correction and focused-control regressions now pass; see focused_human_draft_resolution. List geometry remains unresolved."
+    },
+    "focused_human_draft_resolution": {
+      "result": "verified_source_built",
+      "source_sha256": {
+        "outputs/native-shell/src/main.rs": "52218389c5deac621297c15e00c97cb339a5722bbf831d20ddccafc3135cb233",
+        "outputs/native-shell/src/verification.rs": "6cc8cb5c35e4daa5f455f17622c58251a8b30e8f1fd4f5c811ca19fdd9fd1edb"
+      },
+      "baseline_log_sha256": "1035ee9276c0f2272be34de404e59b080800acfcf2e90675185949f3613d5cea",
+      "fixed_log_sha256": "f1ca3c212081e7dabcdd384bea08a5fac5170b54e8c7fc3159ad85cd4c74aed4",
+      "qualified": [
+        "Focused text field reproduced Discard clearing the core draft to null at revision 4 while leaving edited text visible",
+        "Explicit human resolution now bypasses component background-focus reconciliation guards; ordinary observed changes retain them",
+        "Real GTK focused resolution, subsequent edit revision and background-input preservation across TextField, multiline, DocumentEditor, Choice and Toggle",
+        "31 native unit tests and full dark native self-test pass; actual private-core Orca 51 field announcement and Unicode Save/Discard journey pass",
+        "Owned reader/session/guest cleanup and exact owned UTM app exit verified"
+      ],
+      "cause": "The renderer retired its resolved marker while TextField/TextArea/Choice/Toggle reconciliation refused to replace focused content. New edits could also reuse the draft revision captured at widget construction; callbacks now read the current observed baseline when creating a new local draft.",
+      "orca_probe": {
+        "version": "51.0-4~bpo13+1",
+        "speech_dispatcher": "0.12.1-5~bpo13+1",
+        "output": "Private ALSA null sink; speech requests and focus announcement observed, no audible quality claim",
+        "speech_log_sha256": "9cc029fa8dd2552dfa146edc27a9fbba008f0afe773799061e37f7e819b8ee40",
+        "boundary": "Isolated external reader probe only. Orca is not yet packaged or integrated into the session; reader keyboard commands and complete launch/navigation/stop journeys remain unqualified. Probe dependencies were installed from Debian/backports separately from the existing runtime dependency recipe."
+      },
+      "boundary": "Source-built targeted qualification; no current complete installed reproduction. The List/Table geometry and historical v9 PRIMARY focus observations remain unresolved."
     }
   },
   "observations": [
@@ -1516,7 +1542,8 @@
     "The contextual-request installed reproduction stopped before completing at Table fixture placement: the requested 900x400 geometry was not observed within ten seconds. The following diagnostic probe passed without a runtime change and recorded normal asynchronous geometry convergence. The original failure remains unresolved; no retry is treated as a correction. Exact failed reproduction and diagnostic log hashes are retained separately.",
     "A second contextual-request full run passed 45 checks including Table, then failed terminal peer geometry. Diagnostics proved the fixture exhausted its ten-second deadline by performing a core CLI lookup per historical workspace (38.25 seconds). Corrected activity lookup and independent convergence deadline reduced placement to 0.71 seconds. An immediate cold broker probe separately reproduced missing live source publication behind more than 2000 historical jobs. Streamed historical backfill corrected the ordering; the installed terminal journey then passed after broker restart. These targeted fixes do not erase the earlier unresolved Table or PRIMARY focus observations.",
     "The temporary verification wrappers incorrectly reported closing UTM when its process had launch arguments. That app-cleanup claim is withdrawn for the affected post-cold-launch probes. Guest shutdown evidence remains valid. The lingering owned app was subsequently closed after both saved guests were verified stopped. Durable cleanup now checks executable/start identity, every guest state and actual process exit; a cold launch/close probe and 24 tooling tests pass.",
-    "Current CI observed one accessible Discard convergence failure; 50 instrumented rapid cycles then passed without a runtime fix. The third full reproduction stopped after 44 successful checks at List geometry; the committed 900x400 placement remained rendered at 700x500. One instrumented full List journey then passed without a geometry fix. Both observations remain open with exact log hashes and bounded diagnostics; neither passing repeat is treated as a correction."
+    "Current CI observed one accessible Discard convergence failure; 50 instrumented rapid cycles then passed without a runtime fix. The third full reproduction stopped after 44 successful checks at List geometry; the committed 900x400 placement remained rendered at 700x500. One instrumented full List journey then passed without a geometry fix. Both observations remain open with exact log hashes and bounded diagnostics; neither passing repeat is treated as a correction.",
+    "The accessible Discard failure was reproduced under Orca 51 with a focused field: core draft was null at revision 4, saved Unicode text was correct, but the widget retained the discarded edit. The component background-focus guard had blocked the explicit human resolution while the renderer retired its resolution marker. Source-built correction and focused TextField/multiline/DocumentEditor/Choice/Toggle regressions pass; callbacks also retain the current baseline revision for subsequent edits. This explains the focused Discard defect without resolving the independent List geometry observation."
   ],
   "owned_utm_app_closed": true
 }

@@ -1,6 +1,50 @@
 //! Explicit --self-test and opt-in private IME fixture setup.
 use super::*;
 use std::sync::mpsc;
+fn verify_focused_draft_resolution(app: &gtk::Application, frame: &Frame, commands: &Sender<Command>) {
+    fn edit(element: &Element, value: &str) {
+        if let Some(field)=&element.field { field.entry.set_text(value); }
+        if let Some(area)=&element.area { area.view.buffer().set_text(value); }
+        if let Some(choice)=&element.choice { choice.control.set_selected(if value=="First" {0} else {1}); }
+        if let Some(toggle)=&element.toggle { toggle.control.set_active(value=="true"); }
+    }
+    fn value(element: &Element) -> String {
+        if let Some(field)=&element.field { return field.entry.text().into(); }
+        if let Some(area)=&element.area { return area.value(); }
+        if let Some(choice)=&element.choice { return choice.options()[choice.control.selected() as usize].clone(); }
+        if let Some(toggle)=&element.toggle { return toggle.control.is_active().to_string(); }
+        unreachable!()
+    }
+    for (kind,mut props,saved,edited) in [
+        ("TextField@1",json!({"label":"Focused field","value":"Saved λ 日本語"}),"Saved λ 日本語","Next λ 日本語"),
+        ("TextField@1",json!({"label":"Focused multiline","multiline":true,"value":"Saved λ 日本語"}),"Saved λ 日本語","Next λ 日本語"),
+        ("DocumentEditor@1",json!({"label":"Focused document","value":"Saved λ 日本語"}),"Saved λ 日本語","Next λ 日本語"),
+        ("Choice@1",json!({"label":"Focused choice","options":["First","Second"],"value":"First"}),"First","Second"),
+        ("Toggle@1",json!({"label":"Focused toggle","value":false}),"false","true"),
+    ] {
+        let id="focused-resolution";let key=(id.into(),"control".into());
+        let mut frame=frame.clone();let drafts=Arc::new(Mutex::new(BTreeMap::new()));
+        let mut doc=json!({"surface_id":id,"activity_id":"1","revision":0,"title":"Focused human resolution","root":"control","elements":{"control":{"type":kind,"props":props}},"actions":{},"bindings":{}});
+        let mut surface=Surface::new(app,id,commands);surface.update(id,&doc,&frame,commands,&drafts);
+        let element=&surface.elements["control"];
+        let focused=if let Some(field)=&element.field {field.entry.grab_focus()} else if let Some(area)=&element.area {area.view.grab_focus()} else if let Some(choice)=&element.choice {choice.control.grab_focus()} else {element.toggle.as_ref().unwrap().control.grab_focus()};
+        assert!(focused,"{kind} did not accept widget focus");
+        edit(element,edited);assert_eq!(value(element),edited);
+        surface.update(id,&doc,&frame,commands,&drafts);assert_eq!(value(&surface.elements["control"]),edited,"Background reconciliation replaced focused input");
+        drafts.lock().unwrap().insert(key.clone(),Draft{text:saved.into(),expected:4,dirty:false,resolved:Some(0)});
+        frame.drafts.insert(key.clone(),json!({"draft_revision":4,"draft":null}));
+        surface.update(id,&doc,&frame,commands,&drafts);
+        assert_eq!(value(&surface.elements["control"]),saved,"Human resolution did not replace focused {kind}");
+        assert!(!drafts.lock().unwrap().contains_key(&key),"Resolved marker did not retire");
+        edit(&surface.elements["control"],edited);
+        let next=drafts.lock().unwrap()[&key].clone();assert!(next.dirty);assert_eq!(next.expected,4,"Next edit reused an obsolete construction-time draft revision");
+        props["value"]=if kind=="Toggle@1" {json!(true)} else {json!(edited)};doc["elements"]["control"]["props"]=props;
+        surface.update(id,&doc,&frame,commands,&drafts);assert_eq!(value(&surface.elements["control"]),edited);
+        surface.window.destroy();
+    }
+    println!("CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input");
+}
+
 fn verify_form_owners(frame: &Frame, commands: &Sender<Command>) {
     let drafts = Arc::new(Mutex::new(BTreeMap::new()));
     let baseline = Arc::strong_count(&drafts);
@@ -295,6 +339,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         let (commands,rx)=mpsc::channel();let drafts=Arc::new(Mutex::new(BTreeMap::new()));
         frame.core=transport::request(&socket,&json!({"op":"snapshot"})).unwrap();frame.activity=doc["activity_id"].as_str().map(String::from);frame.usage=json!({"unavailable":true});frame.broker=json!([]);
         verify_form_owners(&frame,&commands);
+        verify_focused_draft_resolution(app,&frame,&commands);
         verify_container_replacement(app,&frame,&commands,&drafts);
         image_controls::verify();
         let mut controls=controls::Controls::new(app,commands.clone());controls.verify_controls(&frame,&commands);
