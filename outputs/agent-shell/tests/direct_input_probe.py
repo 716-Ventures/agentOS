@@ -525,11 +525,18 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
             if time.monotonic()>deadline:raise RuntimeError('Pointer preview was not committed to the durable workspace')
             time.sleep(.05)
         def await_focus(predicate):
-            deadline=time.monotonic()+8
-            while not predicate(scene()['seat_focus']):
+            from collections import deque
+            started=time.monotonic();deadline=started+8
+            observations=deque(maxlen=32);previous=None
+            while True:
+                current=scene()
+                if predicate(current['seat_focus']):return
+                observation={'focus':current['seat_focus'],'shared_focus':current['shared'].get('focus'),'pointer_routing':current.get('pointer_routing'),'workspace_error':current['shared']['error']}
+                if observation!=previous:
+                    observations.append({'elapsed_ms':round((time.monotonic()-started)*1000),**observation})
+                    previous=observation
                 if time.monotonic()>deadline:
-                    current=scene()
-                    raise RuntimeError('Kernel focus did not reach its target: '+repr({'focus':current['seat_focus'],'pointer_location':current['pointer_location'],'last_click':pointer.last_click,'overview':current['shared']['overview'],'workspace_error':current['shared']['error'],'workspaces':current['shared']['workspaces'],'windows':current['windows']}))
+                    raise RuntimeError('Kernel focus did not reach its target: '+repr({'focus':current['seat_focus'],'pointer_location':current['pointer_location'],'pointer_routing':current.get('pointer_routing'),'focus_observations':list(observations),'system_layers':current['system_layers'],'last_click':pointer.last_click,'overview':current['shared']['overview'],'workspace_error':current['shared']['error'],'workspaces':current['shared']['workspaces'],'windows':current['windows']}))
                 time.sleep(.05)
         keyboard.chord(29,56,15)
         await_focus(lambda focus:focus is not None and focus!=target)

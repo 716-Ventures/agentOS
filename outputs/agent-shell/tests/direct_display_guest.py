@@ -131,7 +131,10 @@ def main():
                     '--property=StandardInput=tty', '--property=TTYReset=yes',
                     '--property=TTYVHangup=yes', '--property=KillMode=control-group',
                     '--property=StandardOutput=journal', '--property=StandardError=journal',
-                    '--property=TimeoutStopSec=15', '--property=RuntimeMaxSec='+('180' if args.focus_transfers > 1 else '150' if args.screen_reader_input else '120' if args.terminal_input or collection_kind else '90'),
+                    # The stress profile repeats acknowledged publication, focus,
+                    # paste and undo; preserve time for the final drag/drop checks.
+                    # Individual convergence deadlines remain unchanged.
+                    '--property=TimeoutStopSec=15', '--property=RuntimeMaxSec='+(str(max(180,90+8*(args.focus_transfers-1))) if args.focus_transfers > 1 else '150' if args.screen_reader_input else '120' if args.terminal_input or collection_kind else '90'),
                     '--setenv=XDG_RUNTIME_DIR=' + str(runtime),
                     '--setenv=XDG_SESSION_TYPE=wayland', '--setenv=XDG_SESSION_CLASS=user',
                     '--setenv=XDG_SEAT=seat0', '--setenv=XDG_VTNR=7',

@@ -3126,5 +3126,116 @@
       "ci_run": 38139410556,
       "ci_result": "success"
     }
+  },
+  "primary_focus_routing_diagnostics": {
+    "scope": "Read-only focus routing diagnostics and stress fixture lifetime correction; no runtime focus fix",
+    "source": {
+      "revision": "7120bdd3eed514d1e152142a2c469d1be625b861",
+      "source_archive_sha256": "083e1e6f32e7dca5aab18e8f6b3b86711869035b692d225274777e6bc66cfd85",
+      "changes": [
+        " M outputs/agent-shell/tests/direct_display_guest.py",
+        " M outputs/agent-shell/tests/direct_input_probe.py",
+        " M outputs/native-compositor/src/control.rs"
+      ]
+    },
+    "installed_runtime_unchanged": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
+    "debug_compositor_sha256": "75d06c0fb76722d6049602675f21d0f322d7ad4e522b3da81fa48af658f4d425",
+    "installed_native_sha256": "b58b058732de1ed5f6d0e96b1fe639358cf123f3afe0cb5ddc276a9f28c8f5b9",
+    "compositor_tests_passed": 51,
+    "ordinary_input_journeys_passed": 5,
+    "initial_stress_result": "50 focus/PRIMARY cycles passed, then fixed 180-second systemd runtime limit terminated session during drag/drop; not a complete pass",
+    "corrected_stress": {
+      "result": "pass",
+      "fresh_profile_qualified": false,
+      "binary_directory": "/home/developer/input-routing-bins",
+      "outputs": [
+        {
+          "height": 800,
+          "name": "Virtual-1",
+          "scale": 1.0,
+          "transform": "Normal",
+          "width": 1280,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "metrics": [
+        {
+          "format": 1,
+          "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence",
+          "pid": 2275,
+          "sample_limit_per_stage": 256,
+          "stages": {
+            "compositor.direct_render_attempt": {
+              "discarded": 0,
+              "max_recent_ms": 12.072795000000001,
+              "mean_all_ms": 3.4641149378672687,
+              "p50_recent_ms": 2.893917,
+              "p95_recent_ms": 3.598834,
+              "retained": 256,
+              "samples_total": 12763
+            }
+          }
+        }
+      ],
+      "native_feedback": [],
+      "frames_before_vt": 33,
+      "frames_after_vt": 41,
+      "checks": [
+        "private native system bar",
+        "KMS output discovery",
+        "shared core connection",
+        "VT switch and resume",
+        "orderly shutdown",
+        "session directory cleanup",
+        "owned login scope cleanup",
+        "session-local display zoom and exact reset",
+        "scaled kernel pointer typing and keyboard dismissal",
+        "scaled kernel wheel access to modifier and editing keys",
+        "trusted on-screen keyboard pointer typing and editing",
+        "physical held-key isolation and balanced virtual chords",
+        "keyboard seat focus retention and workspace restoration",
+        "kernel keyboard and absolute pointer",
+        "clipboard copy/paste",
+        "undo/redo",
+        "retained draft",
+        "deliberate pointer Save",
+        "kernel workspace move/resize/maximize/restore/undo",
+        "native titlebar drag with durable placement",
+        "kernel focus cycling",
+        "kernel VT shortcut and acknowledged resume",
+        "kernel close and native assistive undo",
+        "focused primary middle-paste across Wayland clients",
+        "Unicode COPY drag/drop and grouped undo",
+        "oversized drop rejection",
+        "drag icon rendering and release cleanup"
+      ],
+      "screen_keyboard_input_qualified": true,
+      "screen_reader_input_qualified": false,
+      "table_input_qualified": false,
+      "collection_input_qualified": null,
+      "terminal_input_qualified": false,
+      "terminal_ime_qualified": false,
+      "presentation_feedback_qualified": false,
+      "native_feedback_qualified": false,
+      "native_feedback_load_qualified": false,
+      "output_transform_qualified": null,
+      "focus_transfer_cycles": 50,
+      "not_tested": [
+        "physical input",
+        "hotplug",
+        "physical GPU presentation"
+      ]
+    },
+    "individual_focus_deadline_seconds": 8,
+    "stress_session_runtime_limit_seconds": 482,
+    "guest_stopped": true,
+    "exact_owned_utm_application_closed": true,
+    "historical_primary_focus_failure_resolved": false,
+    "not_qualified": [
+      "physical input",
+      "physical GPU presentation",
+      "root cause of historical PRIMARY focus failure"
+    ]
   }
 }

@@ -140,6 +140,30 @@ fn xdg_diagnostics(surface: &smithay::reexports::wayland_server::protocol::wl_su
     })
 }
 
+/// Read-only routing evidence for kernel pointer/focus failures. Inspecting a
+/// snapshot must not synthesize motion, release a grab or reassign focus.
+fn pointer_diagnostics(state: &crate::Smallvil) -> Option<Value> {
+    use smithay::reexports::wayland_server::Resource;
+    let pointer = state.seat.get_pointer()?;
+    let location = pointer.current_location();
+    let grab = pointer.with_grab(|serial, grab| {
+        let kind = if grab.is::<smithay::input::pointer::ClickGrab<crate::Smallvil>>() {"click"}
+            else if grab.is::<crate::grabs::MoveSurfaceGrab>() {"move"}
+            else if grab.is::<crate::grabs::ResizeSurfaceGrab>() {"resize"}
+            else if grab.is::<smithay::desktop::PopupPointerGrab<crate::Smallvil>>() {"popup"}
+            else {"other"};
+        let start = grab.start_data();
+        json!({"kind":kind,"serial":u32::from(serial),"button":start.button,
+            "focus":start.focus.as_ref().map(|(surface,_)|format!("{:?}",surface.id())),
+            "location":[start.location.x,start.location.y]})
+    });
+    Some(json!({"focus":pointer.current_focus().map(|surface|format!("{:?}",surface.id())),
+        "under":state.surface_under(location).map(|(surface,_)|format!("{:?}",surface.id())),
+        "window_under":state.space.element_under(location).map(|(window,_)|format!("{:?}",window.toplevel().unwrap().wl_surface().id())),
+        "layer_under":crate::system_shell::surface_under(state,location).map(|(surface,_)|format!("{:?}",surface.id())),
+        "grab":grab,"active_launcher":state.active_launcher.as_ref().map(|surface|format!("{:?}",surface.id()))}))
+}
+
 pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
     use smithay::reexports::wayland_server::Resource;
     let result = (|| -> Result<Value, String> {
@@ -159,7 +183,7 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
                     .and_then(|keyboard| keyboard.current_focus())
                     .map(|surface| format!("{:?}", surface.id()));
                 Ok(
-                    json!({"display_zoom":state.output_zoom.factor(),"reader":state.accessibility.as_ref().map(|reader|reader.status()),"keyboard_pressed_count":state.seat.get_keyboard().map(|keyboard|keyboard.pressed_keys().len()),"launcher_requests":state.launcher_requests,"system_layers":crate::system_shell::snapshot(state),"seat_focus":seat_focus,"pointer_location":state.seat.get_pointer().map(|pointer|{let point=pointer.current_location();json!([point.x,point.y])}),"layout":state.policy.current,"windows":windows,"outputs":outputs,"direct_frames_presented":state.direct_frames_presented,"input_frame_wakeups":state.input_frame_wakeups,"drag_icon":state.drag_icon.is_some(),"drag_icon_render_submissions":state.drag_icon_render_submissions,"direct_active":state.direct_active,"direct_resume_error":state.direct_resume_error,"shared":scene.map(|s|json!({"identities":s.identities,"workspaces":s.workspaces,"error":s.error,"overview":s.overview}))}),
+                    json!({"display_zoom":state.output_zoom.factor(),"reader":state.accessibility.as_ref().map(|reader|reader.status()),"keyboard_pressed_count":state.seat.get_keyboard().map(|keyboard|keyboard.pressed_keys().len()),"launcher_requests":state.launcher_requests,"system_layers":crate::system_shell::snapshot(state),"seat_focus":seat_focus,"pointer_routing":pointer_diagnostics(state),"pointer_location":state.seat.get_pointer().map(|pointer|{let point=pointer.current_location();json!([point.x,point.y])}),"layout":state.policy.current,"windows":windows,"outputs":outputs,"direct_frames_presented":state.direct_frames_presented,"input_frame_wakeups":state.input_frame_wakeups,"drag_icon":state.drag_icon.is_some(),"drag_icon_render_submissions":state.drag_icon_render_submissions,"direct_active":state.direct_active,"direct_resume_error":state.direct_resume_error,"shared":scene.map(|s|json!({"focus":s.focus,"identities":s.identities,"workspaces":s.workspaces,"error":s.error,"overview":s.overview}))}),
                 )
             }
             Some("viewport.pan") => {
