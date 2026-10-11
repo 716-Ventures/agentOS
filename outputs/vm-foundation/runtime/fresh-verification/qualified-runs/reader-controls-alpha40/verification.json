@@ -73,5 +73,13 @@
     "run": 38169121524,
     "source": "360b99df0b98dc6bb3178bd5b292a7e9e09d4689",
     "result": "success"
+  },
+  "tested_packages": {
+    "espeak-ng-data:arm64": "1.52.0+dfsg-5",
+    "libespeak-ng1:arm64": "1.52.0+dfsg-5",
+    "libgtk-4-1:arm64": "4.18.6+ds-2",
+    "orca": "51.0-4~bpo13+1",
+    "speech-dispatcher": "0.12.1-5~bpo13+1",
+    "speech-dispatcher-espeak-ng": "0.12.1-5~bpo13+1"
   }
 }
