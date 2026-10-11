@@ -340,6 +340,10 @@ def verify_local_form(call, database):
     a.wait(lambda:draft()==' 0 ','Corrected form draft was not retained')
     a.activate(button)
     a.wait(lambda:len(receipts())==len(initial)+1,'Corrected local form did not dispatch exactly once')
+    # Acceptance is durable before execution finishes; observe the same receipt,
+    # never replay the action or mistake an accepted job snapshot for its output.
+    a.wait(lambda:receipts()[-1][1]['status'] not in ('accepted','running'),'Corrected callback did not finish')
+    assert len(receipts())==len(initial)+1,'Corrected callback dispatched more than once'
     result=receipts()[-1][1]
     assert result['status']=='succeeded' and result['observed_target']['text']==content+'\n',result
     a.activate(a.find('Agent Monitor',pyatspi.ROLE_PUSH_BUTTON))
