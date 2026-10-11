@@ -1,0 +1,7 @@
+{
+  "runtime_checks": "70 pass",
+  "ci_run": 38160375315,
+  "ci_result": "failure: fixture focus rejected stale workspace revision",
+  "promoted": false,
+  "next_source": "21b5180 plus validation Discard diagnostics"
+}

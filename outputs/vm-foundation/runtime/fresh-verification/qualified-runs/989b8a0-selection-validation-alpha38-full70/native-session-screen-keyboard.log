@@ -1,0 +1,24 @@
+dbus-daemon[15910]: [session uid=1000 pid=15910 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.3' (uid=1000 pid=15943 comm="/tmp/agentos-session-test-x1h3yn7a/bin/agent-os-de")
+dbus-daemon[15910]: [session uid=1000 pid=15910 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[15967]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=15943 comm="/tmp/agentos-session-test-x1h3yn7a/bin/agent-os-de")
+dbus-daemon[15967]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+dbus-daemon[15910]: [session uid=1000 pid=15910 pidfd=5] Activating service name='ca.desrt.dconf' requested by ':1.4' (uid=1000 pid=15961 comm="/usr/libexec/at-spi-bus-launcher")
+dbus-daemon[15910]: [session uid=1000 pid=15910 pidfd=5] Successfully activated service 'ca.desrt.dconf'
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: session-owned Orca initializes speech and announces the focused native field
+PASS: on-screen Insert+H reaches Orca, learn-mode grab isolates typing and Escape releases it
+
+(process:15911): atspi-WARNING **: 17:39:59.248: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:15911): atspi-WARNING **: 17:39:59.467: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:15911): atspi-WARNING **: 17:40:00.581: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:15911): atspi-WARNING **: 17:40:00.837: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI inline validation exposes literal error relation, preserves durable Unicode draft, rejects invalid transactions and clears without implicit Save
+PASS: independent AT-SPI toggle activation reaches the real durable draft; feedback and clearing retain the boolean without Save; scoped Discard restores committed state
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: owned reader and speech processes reaped after normal logout
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer

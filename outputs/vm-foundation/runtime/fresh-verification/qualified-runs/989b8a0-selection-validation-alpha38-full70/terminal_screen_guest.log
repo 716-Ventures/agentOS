@@ -1,0 +1,1 @@
+{"result": "pass", "checks": ["static screen survives >256 KiB", "normal and alternate screens", "Unicode and color restoration", "cursor position and visibility", "continued keyboard input", "lost connection lease recovery", "detached resize and reattach", "real command exit status", "raw logs remain exact", "vi unsaved buffer, insert mode and saved file"]}

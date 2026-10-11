@@ -129,6 +129,10 @@ jobs:
           dbus-run-session -- python3 outputs/native-shell/tests/native_session.py --ime-failure
           dbus-run-session -- python3 outputs/native-shell/tests/native_session.py --host-failure
           dbus-run-session -- python3 outputs/native-shell/tests/native_session.py --compositor-failure
+          # Retain diagnostics for the intermittent accessible Discard observation.
+          for attempt in 1 2 3 4 5; do
+            dbus-run-session -- python3 outputs/native-shell/tests/native_session.py --screen-keyboard
+          done
           python3 outputs/agent-shell/tests/graphical_release.py
           python3 outputs/agent-shell/tests/deployed_graphics.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

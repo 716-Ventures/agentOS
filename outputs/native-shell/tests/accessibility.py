@@ -50,6 +50,24 @@ def activate(node):
     assert action.doAction(0)
 
 
+def draft_action(call,label):
+    document=call({'op':'presentation.get','document_id':'session-fixture'})
+    frame=find('Agent view · '+document['title'],pyatspi.ROLE_FRAME)
+    activate(find(label,pyatspi.ROLE_PUSH_BUTTON,root=frame))
+
+
+def accessible_labels():
+    queue=deque([pyatspi.Registry.getDesktop(0)]);labels=[];visited=0
+    while queue and visited<256 and len(labels)<64:
+        node=queue.popleft();visited+=1
+        if node is None:continue
+        try:
+            if node.name:labels.append({'role':node.getRoleName(),'name':node.name[:512]})
+            queue.extend(node[index] for index in range(min(node.childCount,64)))
+        except (RuntimeError,LookupError):pass
+    return labels
+
+
 def verify(call):
     # A preceding journey can commit in core before GTK has reconciled the
     # receipt. Observe a fresh status in this same surface before beginning
@@ -73,7 +91,7 @@ def verify(call):
     assert field.queryEditableText().setTextContents(value)
     wait(lambda:draft()==value,'Accessible edit was not retained by core')
     assert saved()=='Original accessible value','Editing committed without deliberate save'
-    activate(find('Save draft',pyatspi.ROLE_PUSH_BUTTON))
+    draft_action(call,'Save draft')
     try:
         wait(lambda:saved()==value,'Accessible Save did not commit the exact Unicode draft')
     except AssertionError:
@@ -89,7 +107,7 @@ def verify(call):
         raise
     assert field.queryEditableText().setTextContents('Discard this accessible edit')
     wait(lambda:draft()=='Discard this accessible edit','Second edit was not retained')
-    activate(find('Discard draft',pyatspi.ROLE_PUSH_BUTTON))
+    draft_action(call,'Discard draft')
     observed={}
     def discarded():
         observed.update(draft=call({'op':'draft.get','surface_id':'session-fixture','element_id':'field'}),saved=saved(),visible=text(field))
@@ -169,8 +187,15 @@ def verify_validation(call):
     wait(lambda:not field.getState().contains(pyatspi.STATE_INVALID_ENTRY),'Accessible invalid state did not clear')
     wait(lambda:not any(r.getRelationType()==ERROR_RELATION for r in field.getRelationSet()),'Accessible error relation did not clear')
     assert draft()==value and text(field)==value
-    activate(find('Discard draft',pyatspi.ROLE_PUSH_BUTTON))
-    wait(lambda:draft() is None and text(field)==props['value'],'Explicit Discard did not restore the validation draft')
+    draft_action(call,'Discard draft')
+    observed={}
+    def discarded():
+        observed.update(draft=call({'op':'draft.get','surface_id':'session-fixture','element_id':'field'}),visible=text(field))
+        return observed['draft'].get('draft') is None and observed['visible']==props['value']
+    try:wait(discarded,'Explicit Discard did not restore the validation draft')
+    except AssertionError:
+        print('Validation Discard diagnostics: '+json.dumps({**observed,'document':document(),'accessible_labels':accessible_labels()}),flush=True)
+        raise
     print('PASS: independent AT-SPI inline validation exposes literal error relation, preserves durable Unicode draft, rejects invalid transactions and clears without implicit Save')
 
 

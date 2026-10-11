@@ -1,0 +1,6 @@
+dbus-daemon[20421]: [session uid=1000 pid=20421 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=20441 comm="/tmp/agentos-session-test-z8nez8os/bin/agent-os-de")
+dbus-daemon[20421]: [session uid=1000 pid=20421 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[20467]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=20441 comm="/tmp/agentos-session-test-z8nez8os/bin/agent-os-de")
+dbus-daemon[20467]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: abrupt compositor loss maps authenticated surfaces and reaps display host, compositor and renderer

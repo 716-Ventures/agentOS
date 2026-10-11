@@ -1,0 +1,10 @@
+{
+  "second_ci": 38160848061,
+  "failure": "Validation Discard timed out after keyboard fixture; exact draft/visible/core state not captured by that attempt",
+  "cause": "unestablished",
+  "scope": "test Save/Discard uses its exact named session frame; validation Discard failure captures exact core/draft/visible state and bounded accessible labels",
+  "targeted_result": "pass",
+  "linux_python_tests": 286,
+  "compositor_focus_guard": "unchanged",
+  "ci_repeat_sessions": 5
+}
