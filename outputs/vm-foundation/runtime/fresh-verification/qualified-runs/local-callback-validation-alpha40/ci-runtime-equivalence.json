@@ -1,0 +1,15 @@
+{
+  "full_run_source": "6a4eef89da09bba71c3637a0688c183d35a4d032",
+  "green_ci_source": "acb269810ce6d954ef9ee28cee82580e329fe857",
+  "green_ci_run": 38167605417,
+  "comparison_scopes": [
+    "outputs/agent-shell",
+    "outputs/native-shell/src",
+    "outputs/native-shell/Cargo.toml",
+    "outputs/native-shell/Cargo.lock",
+    "outputs/native-compositor"
+  ],
+  "differences": [],
+  "other_changes": "Independent native callback test waits for the existing accepted receipt to finish; initial CI failure log retained.",
+  "ci_log_sha256": "e21d9b30136b6191d858520b95c66b7aec2e747476d992cc2033d8fa64246dbd"
+}

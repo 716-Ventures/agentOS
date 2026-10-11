@@ -1,0 +1,1 @@
+{"result": "pass", "checks": ["Foreground and background requests have distinct real units", "Different lifetimes have distinct real units and matching systemd deadlines", "Identical background retry retains its ID without launching another unit"]}

@@ -1,0 +1,1 @@
+{"result": "pass", "checks": ["controlling PTY", "prompt and Unicode input", "SIGWINCH dimensions", "detach/reconnect", "Ctrl-C foreground signal", "input/output beyond saved log cap", "activity cancellation", "broker restart stops terminal without replay"]}

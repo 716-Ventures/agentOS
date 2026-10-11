@@ -39,9 +39,33 @@
     "exact owned guest and UTM app cleanup"
   ],
   "limitations": [
-    "full committed-source reproduction pending",
     "physical audio and braille unqualified",
     "live providers unqualified"
   ],
-  "prior_failures_retained": true
+  "prior_failures_retained": true,
+  "full_run_evidence": "../6a4eef8-local-callback-alpha40-full70/reproduction.json",
+  "private_ci": {
+    "run": 38167605417,
+    "source": "acb269810ce6d954ef9ee28cee82580e329fe857",
+    "result": "success",
+    "runtime_equivalence": "ci-runtime-equivalence.json",
+    "initial_failure": "ci-initial-failure.log"
+  },
+  "evidence_sha256": {
+    "second-orca.log": "958bccbf6ac612d420e09a7330aff760e70a8017256e3298e4a6bb26514b255b",
+    "host-core.log": "3944ca79f7fc179bd11d75c279886d45e3651d8a0df4e486b5c1e91f43ea0ea9",
+    "second-failed.log": "5af7e403c78b61f92e2ef763830a15b8ecac6f8a7cdbfcac4fb5e6949295da49",
+    "host-feedback-unit.log": "de239ca6c822e220cf36f066c2e02f301ec833d2090429d22312e8bd1c620891",
+    "integration.log": "0351e9aa0fdf1a9045be2111bf14707e43ba13b70ee25609f67dc6dc84bf62d3",
+    "initial-reader-session.log": "7f9f9fb2921cf7ed1639bfb63790234ea7f87b080b870540398f63180a474836",
+    "second-reader-session.log": "9043cad5ddfb619730ee2965d5cda10a9b2ff270c395cd025f6830b1bd84d523",
+    "initial-failed.json": "135cd6fc4827e88825fdce248f19f8dac189e83b214840ff1f8600674d891c1d",
+    "ci-initial-failure.log": "38b4bb4bb32b4ac9b9273349eceb590510612e7c86f9d38232aedc611be82703",
+    "initial-orca.log": "d449317f06737d3ea05df86666f05cd48fd1c563801fa87f8b50f84f1305419f",
+    "initial-failed.log": "f79d8eb8ecbf1376c0a83c41ba32f23c8f7d70474ae251dad2ebbb2ff3d9f4d0",
+    "ci-runtime-equivalence.json": "515493510c40c9501f8c2243e73c01bc510f54b5e7556f5076ca8250f148e4cd",
+    "integration.json": "05dc8944424194ca754b7ff7b9018a141e9142c53e7c883cb63f9e0f745b1131",
+    "driver.py": "7306c4661286241cf6b3b57f60843d81ede8ca9af126afaac8ffa30631308b44",
+    "second-failed.json": "8f41e8d0abc34980b33167a35e94dc74d66965c8cfe8a506e5d96ee183470e0d"
+  }
 }
