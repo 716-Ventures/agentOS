@@ -33,6 +33,15 @@ def package_arguments(profile):
     return [name+'='+versions[name] if name in versions else name for name in names]
 
 
+def install_packages(options,packages,env,root):
+    # Existing backports can hide an incomplete recipe. Resolve the same named
+    # packages against an empty dpkg status before changing the real system.
+    empty_status=Path(root)/'empty-status';empty_status.write_text('')
+    subprocess.run(['apt-get',*options,'-o','Dir::State::status='+str(empty_status),
+                    '--simulate','install','--no-install-recommends',*packages],env=env,check=True)
+    subprocess.run(['apt-get',*options,'install','-y','--no-install-recommends',*packages],env=env,check=True)
+
+
 def manifest(profile_hash):
     rows=subprocess.check_output(['dpkg-query','-W','-f=${binary:Package}\t${Version}\t${db:Status-Status}\n'],text=True)
     return {'profile_sha256':profile_hash,'packages':dict((name,version) for name,version,status in
@@ -60,7 +69,7 @@ def main():
                  '-o','Dir::State::lists='+str(lists),'-o','Acquire::Retries=3']
         env={**os.environ,'DEBIAN_FRONTEND':'noninteractive'}
         subprocess.run(['apt-get',*options,'update'],env=env,check=True)
-        subprocess.run(['apt-get',*options,'install','-y','--no-install-recommends',*packages],env=env,check=True)
+        install_packages(options,packages,env,root)
     result=manifest(profile_hash)
     missing=set(profile['packages'])-{name.split(':')[0] for name in result['packages']}
     if missing:raise RuntimeError('Missing dependencies: '+', '.join(sorted(missing)))

@@ -63,11 +63,35 @@
     "desktop-file-utils",
     "orca",
     "speech-dispatcher",
-    "speech-dispatcher-espeak-ng"
+    "speech-dispatcher-espeak-ng",
+    "at-spi2-common",
+    "gir1.2-atk-1.0",
+    "gir1.2-atspi-2.0",
+    "libatk-adaptor",
+    "libatk-bridge2.0-0t64",
+    "libatk1.0-0t64",
+    "libatspi2.0-0t64",
+    "libspeechd-module0",
+    "libspeechd2",
+    "python3-speechd",
+    "speech-dispatcher-audio-plugins"
   ],
   "package_versions": {
+    "at-spi2-common": "2.62.0-2~bpo13+1",
+    "at-spi2-core": "2.62.0-2~bpo13+1",
+    "gir1.2-atk-1.0": "2.62.0-2~bpo13+1",
+    "gir1.2-atspi-2.0": "2.62.0-2~bpo13+1",
+    "libatk-adaptor": "2.62.0-2~bpo13+1",
+    "libatk-bridge2.0-0t64": "2.62.0-2~bpo13+1",
+    "libatk1.0-0t64": "2.62.0-2~bpo13+1",
+    "libatspi2.0-0t64": "2.62.0-2~bpo13+1",
+    "libspeechd-module0": "0.12.1-5~bpo13+1",
+    "libspeechd2": "0.12.1-5~bpo13+1",
     "orca": "51.0-4~bpo13+1",
+    "python3-pyatspi": "2.58.2-1~bpo13+1",
+    "python3-speechd": "0.12.1-5~bpo13+1",
     "speech-dispatcher": "0.12.1-5~bpo13+1",
+    "speech-dispatcher-audio-plugins": "0.12.1-5~bpo13+1",
     "speech-dispatcher-espeak-ng": "0.12.1-5~bpo13+1"
   }
 }

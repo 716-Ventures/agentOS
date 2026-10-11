@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import subprocess
 from pathlib import Path
 import tempfile
 import socket
@@ -159,6 +160,24 @@ class Installation(unittest.TestCase):
             with self.assertRaises(ValueError):bootstrap.package_arguments({**profile,'package_versions':versions})
         for name,suite in [('debian-security','trixie-backports'),('debian','unstable')]:
             with self.assertRaises(ValueError):bootstrap.sources({**profile,'archives':[{'name':name,'suites':[suite]}]})
+
+    def test_failed_empty_status_resolution_cannot_install_packages_on_an_existing_guest(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            options=['-o','Dir::Etc::sourcelist=/private/snapshot.sources']
+            packages=['orca=51.0-4~bpo13+1']
+            failure=subprocess.CalledProcessError(100,['apt-get'])
+            with patch.object(bootstrap.subprocess,'run',side_effect=failure) as run:
+                with self.assertRaises(subprocess.CalledProcessError):bootstrap.install_packages(options,packages,{},Path(tmp))
+                self.assertEqual(run.call_count,1)
+                self.assertIn('--simulate',run.call_args.args[0])
+                self.assertIn('Dir::State::status='+str(Path(tmp)/'empty-status'),run.call_args.args[0])
+                self.assertEqual((Path(tmp)/'empty-status').read_bytes(),b'')
+            with patch.object(bootstrap.subprocess,'run') as run:
+                bootstrap.install_packages(options,packages,{},Path(tmp))
+                self.assertEqual(run.call_count,2)
+                self.assertIn('--simulate',run.call_args_list[0].args[0])
+                self.assertNotIn('--simulate',run.call_args_list[1].args[0])
+                self.assertTrue(all('orca=51.0-4~bpo13+1' in call.args[0] for call in run.call_args_list))
 
     def test_invalid_source_or_host_binary_never_replaces_a_live_release(self):
         with tempfile.TemporaryDirectory() as tmp:
