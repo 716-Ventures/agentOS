@@ -519,6 +519,7 @@ fn construct(
                         dispatch_action(&submit_events, &submit_commands);
                     }
                     if let InputEvent::Changed(text) = event {
+                        let _ = submit_commands.send(Command::ClearFieldFeedback { surface: s.clone(), element: e.clone() });
                         let mut drafts = edits.lock().unwrap();
                         let draft = drafts.entry((s.clone(), e.clone())).or_insert(Draft {
                             text: String::new(),
@@ -602,6 +603,7 @@ fn construct(
                     dispatch_action(&submit_events, &submit_commands);
                 }
                 if let InputEvent::Changed(text) = event {
+                    let _ = submit_commands.send(Command::ClearFieldFeedback { surface: s.clone(), element: e.clone() });
                     let mut drafts = edits.lock().unwrap();
                     let draft = drafts.entry((s.clone(), e.clone())).or_insert(Draft {
                         text: String::new(),
@@ -1232,7 +1234,17 @@ impl Surface {
                     }
                 }
                 if let Some(feedback) = &e.validation {
-                    let _ = feedback.set_message(props["validation_message"].as_str());
+                    let local = frame.local_validation.as_ref().and_then(|feedback| {
+                        let value = drafts.lock().unwrap().get(&(id.into(), element.clone()))
+                            .map(|draft| draft.text.clone())
+                            .or_else(|| frame.drafts.get(&(id.into(), element.clone())).and_then(|draft| draft["draft"].as_str().map(String::from)))
+                            .unwrap_or_else(|| literal_editor_value(props));
+                        feedback.message(id, element, doc["revision"].as_u64().unwrap_or(0), &value).map(String::from)
+                    });
+                    let message = local.as_deref().or_else(|| props["validation_message"].as_str());
+                    if feedback.label.selection_bounds().is_none() || feedback.label.text().as_str() == message.unwrap_or("") {
+                        let _ = feedback.set_message(message);
+                    }
                 }
                 if e.field.is_some() || e.area.is_some() || e.choice.is_some() || e.toggle.is_some()
                 {

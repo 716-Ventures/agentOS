@@ -270,3 +270,80 @@ def verify_choice_name(call):
         assert control.name==label+': First','Retained Choice reconciliation replaced its field-plus-option accessible name'
         assert observed['committed']=='First'
     print('PASS: independent agentOS Choice retains its field-plus-option name across three rendered feedback revisions',flush=True)
+
+
+def verify_reader_validation(call, speech_log):
+    field=find('Accessible session draft',pyatspi.ROLE_TEXT)
+    assert field.getState().contains(pyatspi.STATE_FOCUSED)
+    before=call({'op':'presentation.get','document_id':'session-fixture'})
+    original=before['elements']['field']['props'].copy()
+    visible=text(field)
+    draft=call({'op':'draft.get','surface_id':'session-fixture','element_id':'field'})
+    message='Use a saved workspace name.'
+    def apply(props):
+        document=call({'op':'presentation.get','document_id':'session-fixture'})
+        return call({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
+                     'request_id':'reader-validation-'+str(time.monotonic_ns()),'expected_revisions':{'session-fixture':document['revision']},
+                     'operations':[{'op':'element.set_props','surface_id':'session-fixture','element_id':'field','props':props}]})
+    def speech_since(offset, expected):
+        return any('SPEECH OUTPUT:' in line and expected in line for line in speech_log.read_text(errors='replace')[offset:].splitlines())
+    baseline=len(speech_log.read_text(errors='replace'))
+    assert apply({**original,'validation_message':message})['status']=='committed'
+    wait(lambda:speech_since(baseline,message),'Orca did not send the focused field error message to speech')
+    assert field.getState().contains(pyatspi.STATE_INVALID_ENTRY)
+    assert text(field)==visible and call({'op':'draft.get','surface_id':'session-fixture','element_id':'field'})==draft
+    baseline=len(speech_log.read_text(errors='replace'))
+    assert apply(original)['status']=='committed'
+    wait(lambda:speech_since(baseline,'Entry valid.'),'Orca did not announce cleared field validation')
+    assert not field.getState().contains(pyatspi.STATE_INVALID_ENTRY)
+    assert field.getState().contains(pyatspi.STATE_FOCUSED) and text(field)==visible
+    assert call({'op':'presentation.get','document_id':'session-fixture'})['elements']['field']['props']==original
+    assert call({'op':'draft.get','surface_id':'session-fixture','element_id':'field'})==draft
+    print('PASS: session-owned Orca sends the focused field error and cleared-valid state to speech without changing input or drafts; physical audio and braille remain unqualified',flush=True)
+
+
+def verify_local_form(call, database):
+    import accessibility as a
+    import pyatspi,json,time,sqlite3,ime_accessibility
+    activity=call({'op':'presentation.get','document_id':'session-fixture'})['activity_id']
+    content='Local callback output λ 日本語'
+    job=call({'op':'run','activity_id':int(activity),'argv':['/bin/echo',content]})['id']
+    a.wait(lambda:next(j for j in call({'op':'snapshot'})['jobs'] if j['id']==job)['status']=='succeeded','Local callback job did not finish')
+    actions=call({'op':'action.ensure','activity_id':int(activity),'job_ids':[job]})['actions']
+    reference=next(action['reference'] for action in actions if action['operation']=='job.read_output')
+    surface='local-callback-form'
+    document={'protocol':'agentos.presentation/1','catalog_revision':'native-core/1','surface_id':surface,'activity_id':activity,'revision':0,'title':'Local callback form','root':'root','elements':{'root':{'type':'Stack@1','slots':{'children':['offset','read']}},'offset':{'type':'TextField@1','props':{'label':'Local byte offset','value':'0'},'events':{'submit':{'action':'read'}}},'read':{'type':'Button@1','props':{'label':'Read local callback output'},'events':{'activate':{'action':'read'}}}},'bindings':{},'actions':{'read':{'ref':reference,'parameters':{'offset':{'kind':'field','element_id':'offset'}}}}}
+    assert call({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':'local-form-create','expected_revisions':{surface:None},'operations':[{'op':'surface.create','document':document}]})['status']=='committed'
+    frame=a.find('Agent view · Local callback form',pyatspi.ROLE_FRAME)
+    field=a.find('Local byte offset',pyatspi.ROLE_TEXT,root=frame)
+    button=a.find('Read local callback output',pyatspi.ROLE_PUSH_BUTTON,root=frame)
+    a.wait(lambda:button.getState().contains(pyatspi.STATE_SENSITIVE),'Local form action unavailable')
+    def receipts():
+        with sqlite3.connect('file:'+str(database)+'?mode=ro',uri=True) as db:
+            return [(request,json.loads(receipt)) for request,receipt in db.execute('SELECT request,receipt FROM presentation_action_invocations WHERE reference=?',(reference,))]
+    def draft():return call({'op':'draft.get','surface_id':surface,'element_id':'offset'}).get('draft')
+    def saved():return call({'op':'presentation.get','document_id':surface})['elements']['offset']['props']['value']
+    def related(message):
+        return any(relation.getRelationType()==a.ERROR_RELATION and any(a.text(relation.getTarget(index))==message for index in range(relation.getNTargets())) for relation in field.getRelationSet())
+    initial=receipts()
+    for invalid,message in [('日本語 $(id)','offset: enter a nonnegative whole number'),('18446744073709551615','offset: enter a whole number from 0 to 1048576')]:
+        assert field.queryEditableText().setTextContents(invalid)
+        a.wait(lambda:draft()==invalid,'Invalid local field was not retained')
+        a.activate(button)
+        a.wait(lambda:related(message),'Local callback error was not related to its exact field')
+        assert field.getState().contains(pyatspi.STATE_INVALID_ENTRY)
+        assert a.text(field)==invalid and draft()==invalid and saved()=='0'
+        assert receipts()==initial,'Invalid local parameter dispatched an action'
+        assert field.queryEditableText().setTextContents(' 0 ')
+        a.wait(lambda:not field.getState().contains(pyatspi.STATE_INVALID_ENTRY),'Editing did not clear the local callback error')
+        assert not any(relation.getRelationType()==a.ERROR_RELATION for relation in field.getRelationSet())
+    a.wait(lambda:draft()==' 0 ','Corrected form draft was not retained')
+    a.activate(button)
+    a.wait(lambda:len(receipts())==len(initial)+1,'Corrected local form did not dispatch exactly once')
+    result=receipts()[-1][1]
+    assert result['status']=='succeeded' and result['observed_target']['text']==content+'\n',result
+    a.activate(a.find('Agent Monitor',pyatspi.ROLE_PUSH_BUTTON))
+    a.wait(lambda:ime_accessibility.rendered_text(content+'\n'),'Corrected callback output was not displayed')
+    assert saved()=='0' and draft()==' 0 ' and a.text(field)==' 0 ','Callback implicitly saved or replaced the local form draft'
+    assert call({'op':'presentation.get','document_id':surface})['revision']==0
+    print('PASS: local callback parse/range errors relate to the exact retained field, never dispatch or Save, clear on edit and retry once with registered typed values',flush=True)

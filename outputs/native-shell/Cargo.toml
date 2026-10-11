@@ -6,7 +6,7 @@ rust-version = "1.85"
 license = "Apache-2.0"
 
 [dependencies]
-seven-sixteen-ui = { git = "https://github.com/716-Ventures/716-ui", rev = "1a3b412ee3e5b19a42f6358c709d4c82e6b919a3", features=["terminal"] }
+seven-sixteen-ui = { git = "https://github.com/716-Ventures/716-ui", rev = "4a816cc289e5a7649fb83678532c3ed536757bbb", features=["terminal"] }
 serde_json = "1"
 base64 = "=0.22.1"
 libc = "0.2"

@@ -82,6 +82,7 @@ pub struct Frame {
     pub notice: Option<String>,
     pub connected: bool,
     pub error: Option<String>,
+    pub local_validation: Option<super::action_parameters::LocalFeedback>,
 }
 #[derive(Debug)]
 pub enum Command {
@@ -181,6 +182,7 @@ pub enum Command {
         element: String,
         begin: bool,
     },
+    ClearFieldFeedback { surface: String, element: String },
     Action {
         reference: String,
         key: String,
@@ -288,6 +290,13 @@ fn run(
                 break;
             }
             Ok(command) => {
+                if let Command::ClearFieldFeedback { surface, element } = &command {
+                    let mut view = frame.lock().unwrap();
+                    if view.local_validation.as_ref().is_some_and(|feedback| &feedback.surface == surface && &feedback.element == element) {
+                        if view.local_validation.as_ref().is_some_and(|feedback| view.error.as_deref() == Some(feedback.message.as_str())) { view.error=None; }
+                        view.local_validation = None;
+                    }
+                }
                 if let Command::ReviewInput { proposal, reply } = command {
                     if approvals.len() >= 4 {
                         let _ = reply.send(Err("Four broker review requests are pending".into()));
@@ -335,8 +344,10 @@ fn run(
                     }));
                     continue;
                 }
+                let feedback_only=matches!(&command,Command::ClearFieldFeedback{..});
                 let result=match command {
                     Command::Approve(_)|Command::ReviewInput{..}=>unreachable!(),
+                    Command::ClearFieldFeedback{..}=>Ok(Value::Null),
                     Command::Resume(job)=>super::broker_controls::job_id(&job).and_then(|id|request(&broker_socket(),&json!({"op":"poll","job_id":id}))).and_then(|current|super::broker_controls::continuation_request(&current).ok_or("No approved agent request is associated with this work".into())).and_then(|query|request(&socket,&query)),
                     Command::Attach(job)=>super::broker_controls::attach(&job),
                     Command::EmbedTerminal(job)=>{let current=frame.lock().unwrap().clone();embed_terminal(&socket,&current,&job)},
@@ -440,10 +451,13 @@ fn run(
                         if begin {leases.insert(key,Instant::now());}else{leases.remove(&key);}
                         request(&socket,&json!({"op":if begin{"interaction.begin"}else{"interaction.end"},"surface_id":surface,"element_id":element}))
                     }
-                    Command::Action{reference,key,surface,revision,action,parameters}=>request(&socket,&json!({"op":"action.metadata","reference":reference})).and_then(|info|{
+                    Command::Action{reference,key,surface,revision,action,parameters}=>{frame.lock().unwrap().local_validation=None;request(&socket,&json!({"op":"action.metadata","reference":reference})).and_then(|info|{
                         let current=frame.lock().unwrap().clone();
                         let edits=drafts.lock().unwrap();
-                        let values=super::action_parameters::resolve(&parameters,&info["parameter_schema"],|element|edits.get(&(surface.clone(),element.into())).map(|d|d.text.clone()).or_else(||current.documents.get(&surface).and_then(|doc|doc["elements"][element]["props"]["value"].as_str().map(String::from))))?;
+                        let values=super::action_parameters::resolve(&parameters,&info["parameter_schema"],|element|action_field_value(&current,&edits,&surface,element)).map_err(|failure| {
+                            frame.lock().unwrap().local_validation=super::action_parameters::LocalFeedback::from_failure(&surface,revision,&failure);
+                            failure.message
+                        })?;
                         drop(edits);
                         let receipt=match request(&socket,&json!({"op":"action.invoke","reference":reference,"request_id":key,"expected_source_revision":info["source_revision"],"surface_id":surface,"expected_surface_revision":revision,"action_id":action,"parameters":values})) {
                             Ok(receipt)=>receipt,
@@ -456,12 +470,12 @@ fn run(
                             frame.lock().unwrap().inspection=Some(view.read(&socket,0)?);output_view=Some(view);
                         }
                         Ok(receipt)
-                    }),
+                    })},
                     Command::Close{surface}=>{flush(&socket,&drafts,&frame,&stop,&leases);if drafts.lock().unwrap().iter().any(|((id,_),draft)|id==&surface && draft.dirty){Err("The view remains open because its latest draft could not be saved".into())}else{close_surface(&socket,&surface).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt})}},
                     Command::Quit=>unreachable!(),
                 };
                 let mut view = frame.lock().unwrap();
-                match result {
+                if !feedback_only { match result {
                     Err(e) => view.error = Some(e),
                     Ok(value) => {
                         view.error = None;
@@ -491,7 +505,7 @@ fn run(
                             },
                         );
                     }
-                }
+                }}
             }
             Err(mpsc::RecvTimeoutError::Disconnected) => break,
             Err(mpsc::RecvTimeoutError::Timeout) => {}
@@ -766,6 +780,17 @@ fn run(
                         && next.resources.contains_key(reference)
                 });
                 let mut old = frame.lock().unwrap();
+                let local_error = old.local_validation.as_ref().map(|feedback| feedback.message.clone());
+                next.local_validation = old.local_validation.take().filter(|feedback| {
+                    next.documents.get(&feedback.surface).is_some_and(|doc| {
+                        doc["revision"].as_u64() == Some(feedback.revision)
+                            && doc["elements"][&feedback.element]["type"] == "TextField@1"
+                            && action_field_value(&next, &drafts.lock().unwrap(), &feedback.surface, &feedback.element).as_deref() == Some(feedback.value.as_str())
+                    })
+                });
+                if local_error.is_some() && next.local_validation.is_none() && old.error == local_error {
+                    old.error = None;
+                }
                 next.workspace_undo = old.workspace_undo;
                 if next.error.is_none() {
                     next.error = old.error.take();
@@ -785,6 +810,35 @@ fn run(
         let _ = approval.join();
     }
 }
+fn action_field_value(frame: &Frame, edits: &BTreeMap<(String, String), Draft>, surface: &str, element: &str) -> Option<String> {
+    let node = &frame.documents.get(surface)?["elements"][element];
+    if node["type"] != "TextField@1" { return None; }
+    let key = (surface.into(), element.into());
+    edits.get(&key).map(|draft| draft.text.clone())
+        .or_else(|| frame.drafts.get(&key).and_then(|draft| draft["draft"].as_str().map(String::from)))
+        .or_else(|| node["props"]["value"].as_str().map(String::from))
+}
+
+#[cfg(test)]
+mod action_field_tests {
+    use super::*;
+    #[test]
+    fn callbacks_use_local_then_recovered_then_committed_editable_values() {
+        let mut frame = Frame::default();
+        frame.documents.insert("view".into(), json!({"elements":{"field":{"type":"TextField@1","props":{"value":"0"}},"label":{"type":"Text@1","props":{"value":"42"}}}}));
+        let key = ("view".into(), "field".into());
+        let mut edits = BTreeMap::new();
+        assert_eq!(action_field_value(&frame,&edits,"view","field").as_deref(),Some("0"));
+        frame.drafts.insert(key.clone(), json!({"draft":"Recovered invalid 日本語"}));
+        assert_eq!(action_field_value(&frame,&edits,"view","field").as_deref(),Some("Recovered invalid 日本語"));
+        edits.insert(key, Draft {text:" 42 ".into(),expected:1,dirty:true,resolved:None,acknowledged:None});
+        assert_eq!(action_field_value(&frame,&edits,"view","field").as_deref(),Some(" 42 "));
+        assert!(action_field_value(&frame,&edits,"view","label").is_none());
+        assert!(action_field_value(&frame,&edits,"view","missing").is_none());
+        assert!(action_field_value(&frame,&edits,"missing","field").is_none());
+    }
+}
+
 fn flush(
     socket: &PathBuf,
     drafts: &Arc<Mutex<BTreeMap<(String, String), Draft>>>,

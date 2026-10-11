@@ -1,10 +1,57 @@
-//! Resolve only declared literals and local text fields; strings are never evaluated.
+//! Resolve declared literals and local fields into typed data; never evaluate strings.
 use serde_json::{Map, Value};
+#[derive(Clone, Debug, PartialEq)]
+pub struct Failure {
+    pub message: String,
+    // Present only when an existing editable value failed parse/range validation.
+    pub field: Option<(String, String)>,
+}
+impl From<&str> for Failure {
+    fn from(message: &str) -> Self {
+        Self {
+            message: message.into(),
+            field: None,
+        }
+    }
+}
+#[derive(Clone, Debug)]
+pub struct LocalFeedback {
+    pub surface: String,
+    pub element: String,
+    pub revision: u64,
+    pub value: String,
+    pub message: String,
+}
+impl LocalFeedback {
+    pub fn from_failure(surface: &str, revision: u64, failure: &Failure) -> Option<Self> {
+        let (element, value) = failure.field.as_ref()?;
+        Some(Self {
+            surface: surface.into(),
+            element: element.clone(),
+            revision,
+            value: value.clone(),
+            message: failure.message.clone(),
+        })
+    }
+    pub fn message(
+        &self,
+        surface: &str,
+        element: &str,
+        revision: u64,
+        value: &str,
+    ) -> Option<&str> {
+        (self.surface == surface
+            && self.element == element
+            && self.revision == revision
+            && self.value == value)
+            .then_some(self.message.as_str())
+    }
+}
 pub fn resolve(
     definitions: &Value,
     schema: &Value,
     mut field: impl FnMut(&str) -> Option<String>,
-) -> Result<Value, String> {
+) -> Result<Value, Failure> {
     let mut values = Map::new();
     if definitions.is_null() {
         return Ok(Value::Object(values));
@@ -18,21 +65,35 @@ pub fn resolve(
     for (key, definition) in definitions {
         let rule = &schema[key];
         if rule["type"] != "integer" {
-            return Err(format!("Unsupported action parameter: {key}"));
+            return Err(Failure {
+                message: format!("Unsupported action parameter: {key}"),
+                field: None,
+            });
         }
-        let value = match definition["kind"].as_str() {
-            Some("literal") => definition["value"].as_u64(),
+        let submitted = match definition["kind"].as_str() {
             Some("field") => definition["element_id"]
                 .as_str()
-                .and_then(&mut field)
-                .and_then(|text| text.trim().parse::<u64>().ok()),
+                .and_then(|id| field(id).map(|value| (id.to_string(), value))),
+            _ => None,
+        };
+        let failure = |message| Failure {
+            message,
+            field: submitted.clone(),
+        };
+        let value = match definition["kind"].as_str() {
+            Some("literal") => definition["value"].as_u64(),
+            Some("field") => submitted
+                .as_ref()
+                .and_then(|(_, text)| text.trim().parse::<u64>().ok()),
             _ => None,
         }
-        .ok_or_else(|| format!("{key}: enter a nonnegative whole number"))?;
-        if value < rule["minimum"].as_u64().unwrap_or(0)
-            || value > rule["maximum"].as_u64().unwrap_or(0)
-        {
-            return Err(format!("{key}: value is outside its supported range"));
+        .ok_or_else(|| failure(format!("{key}: enter a nonnegative whole number")))?;
+        let minimum = rule["minimum"].as_u64().unwrap_or(0);
+        let maximum = rule["maximum"].as_u64().unwrap_or(0);
+        if value < minimum || value > maximum {
+            return Err(failure(format!(
+                "{key}: enter a whole number from {minimum} to {maximum}"
+            )));
         }
         values.insert(key.clone(), Value::from(value));
     }
@@ -50,15 +111,42 @@ mod tests {
             resolve(&fields, &schema, |_| Some(" 42 ".into())).unwrap(),
             json!({"offset":42})
         );
-        for text in ["-1", "2.5", "$(id)", "1048677"] {
-            assert!(resolve(&fields, &schema, |_| Some(text.into())).is_err())
-        }
-        assert!(resolve(
-            &json!({"argv":{"kind":"literal","value":42}}),
-            &schema,
-            |_| None
+        let bounded = resolve(
+            &fields,
+            &json!({"offset":{"type":"integer","minimum":5,"maximum":10}}),
+            |_| Some("3".into()),
         )
-        .is_err());
-        assert!(resolve(&fields, &schema, |_| None).is_err());
+        .unwrap_err();
+        assert_eq!(bounded.message, "offset: enter a whole number from 5 to 10");
+        for text in ["-1", "2.5", "$(id)", "1048677", "日本語"] {
+            let failure = resolve(&fields, &schema, |_| Some(text.into())).unwrap_err();
+            assert_eq!(failure.field, Some(("position".into(), text.into())));
+            let feedback = LocalFeedback::from_failure("view", 4, &failure).unwrap();
+            assert_eq!(
+                feedback.message("view", "position", 4, text),
+                Some(failure.message.as_str())
+            );
+            for (surface, element, revision, value) in [
+                ("other", "position", 4, text),
+                ("view", "other", 4, text),
+                ("view", "position", 5, text),
+                ("view", "position", 4, "42"),
+            ] {
+                assert!(feedback
+                    .message(surface, element, revision, value)
+                    .is_none());
+            }
+        }
+        for definitions in [
+            json!({"argv":{"kind":"literal","value":42}}),
+            json!({"offset":{"kind":"literal","value":-1}}),
+            fields.clone(),
+        ] {
+            let failure = resolve(&definitions, &schema, |_| None).unwrap_err();
+            assert!(
+                failure.field.is_none(),
+                "Missing fields/literals/schema errors must not attach to an unrelated input"
+            );
+        }
     }
 }

@@ -1,0 +1,26 @@
+{
+  "started_at": "2026-10-11T19:07:58.642927+00:00",
+  "source_revision": "9b4cf5ad477b6de2c55a9fa1a4ccd23ad6e60efe",
+  "source_changes": [
+    " M outputs/agent-shell/Cargo.lock",
+    " M outputs/agent-shell/Cargo.toml",
+    " M outputs/native-shell/Cargo.lock",
+    " M outputs/native-shell/Cargo.toml",
+    " M outputs/native-shell/README.md",
+    " M outputs/native-shell/src/action_parameters.rs",
+    " M outputs/native-shell/src/main.rs",
+    " M outputs/native-shell/src/transport.rs",
+    " M outputs/native-shell/src/verification.rs",
+    " M outputs/native-shell/tests/accessibility.py",
+    " M outputs/native-shell/tests/native_session.py",
+    " M outputs/vm-foundation/reproduce.py"
+  ],
+  "source_archive_sha256": "10b42888911cf3c4b5e524cdc389c11739ac055d1ae1e0b85fe2e937aa525cbc",
+  "passed": true,
+  "owned_utm_identity": [
+    56451,
+    "Sun Oct 11 15:07:58 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T19:11:10.343400+00:00"
+}

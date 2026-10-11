@@ -94,6 +94,39 @@ fn verify_validation_feedback(app: &gtk::Application, frame: &Frame, commands: &
     println!("CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked");
 }
 
+fn verify_local_form_feedback(app: &gtk::Application, frame: &Frame, commands: &Sender<Command>) {
+    let id="local-form-feedback"; let key=(id.into(),"offset".into());
+    let drafts=Arc::new(Mutex::new(BTreeMap::new()));
+    let doc=json!({"surface_id":id,"activity_id":"1","revision":0,"title":"Local form feedback","root":"offset","elements":{"offset":{"type":"TextField@1","props":{"label":"Byte offset","value":"0","validation_message":"Declared feedback"}}},"actions":{},"bindings":{}});
+    let (sender, receiver)=mpsc::channel();
+    let mut frame=frame.clone();let mut surface=Surface::new(app,id,&sender);
+    surface.update(id,&doc,&frame,&sender,&drafts);
+    let field=surface.elements["offset"].field.as_ref().unwrap();let widget=field.entry.clone();
+    assert!(widget.grab_focus());widget.set_text("Invalid λ 日本語");widget.select_region(0,7);
+    let focus=gtk::prelude::RootExt::focus(&surface.window);let before=drafts.lock().unwrap()[&key].clone();
+    frame.local_validation=Some(action_parameters::LocalFeedback {surface:id.into(),element:"offset".into(),revision:0,value:before.text.clone(),message:"Enter a nonnegative whole number".into()});
+    surface.update(id,&doc,&frame,&sender,&drafts);
+    let feedback=surface.elements["offset"].validation.as_ref().unwrap().label.clone();
+    assert_eq!(feedback.text(),"Enter a nonnegative whole number");
+    assert_eq!(surface.elements["offset"].field.as_ref().unwrap().entry,widget);
+    assert_eq!(gtk::prelude::RootExt::focus(&surface.window),focus);
+    assert_eq!(widget.selection_bounds(),Some((0,7)));assert_eq!(widget.text(),before.text);
+    feedback.select_region(0,5);frame.local_validation=None;
+    surface.update(id,&doc,&frame,&sender,&drafts);
+    assert_eq!(feedback.text(),"Enter a nonnegative whole number","Selected local error was overwritten");
+    feedback.select_region(0,0);surface.update(id,&doc,&frame,&sender,&drafts);
+    assert_eq!(feedback.text(),"Declared feedback");
+    frame.local_validation=Some(action_parameters::LocalFeedback {surface:id.into(),element:"offset".into(),revision:1,value:before.text.clone(),message:"Wrong revision".into()});
+    surface.update(id,&doc,&frame,&sender,&drafts);assert_eq!(feedback.text(),"Declared feedback");
+    frame.local_validation.as_mut().unwrap().revision=0;frame.local_validation.as_mut().unwrap().value="Other value".into();
+    surface.update(id,&doc,&frame,&sender,&drafts);assert_eq!(feedback.text(),"Declared feedback");
+    let after=drafts.lock().unwrap()[&key].clone();
+    assert_eq!((after.text,after.expected,after.dirty,after.resolved,after.acknowledged),(before.text,before.expected,before.dirty,before.resolved,before.acknowledged));
+    assert!(receiver.try_iter().all(|command| !matches!(command,Command::Action{..}|Command::ResolveDraft{..})),"Feedback dispatched or saved");
+    surface.window.destroy();let _=commands;
+    println!("CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden");
+}
+
 fn verify_choice_heading(app: &gtk::Application, frame: &Frame, commands: &Sender<Command>) {
     let id="choice-heading";let drafts=Arc::new(Mutex::new(BTreeMap::new()));
     let mut doc=json!({"surface_id":id,"activity_id":"1","revision":0,"title":"Choice heading","root":"choice","elements":{"choice":{"type":"Choice@1","props":{"label":"Stable heading λ","options":["First","Second"],"value":"First"}}},"actions":{},"bindings":{}});
@@ -413,6 +446,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         verify_form_owners(&frame,&commands);
         verify_focused_draft_resolution(app,&frame,&commands);
         verify_validation_feedback(app,&frame,&commands);
+        verify_local_form_feedback(app,&frame,&commands);
         verify_choice_heading(app,&frame,&commands);
         verify_container_replacement(app,&frame,&commands,&drafts);
         image_controls::verify();

@@ -46,7 +46,8 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
     root=Path(directory);runtime=root/'runtime';runtime.mkdir(mode=0o700)
     endpoint=root/'core.sock';bins=root/'bin';bins.mkdir()
     for crate,name in [('native-shell','agent-os-desktop'),('native-compositor','agent-os-compositor')]:
-        (bins/name).symlink_to(ROOT.parent/crate/'target/debug'/name)
+        binary=Path('/usr/local/bin')/name if '--installed' in sys.argv else ROOT.parent/crate/'target/debug'/name
+        (bins/name).symlink_to(binary)
     env={**os.environ,'HOME':str(root),'XDG_RUNTIME_DIR':str(runtime),'XDG_CONFIG_HOME':str(root/'config'),
          'XDG_STATE_HOME':str(root/'user-state'),'AGENT_OS_STATE':str(root/'core-state'),
          'AGENT_OS_SOCKET':str(endpoint),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),
@@ -232,6 +233,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                     return 'Using speech server factory:' in text and 'SPEECH OUTPUT:' in text and 'Accessible session draft' in text
                 wait_for(announced,[core,session],timeout=30)
                 print('PASS: session-owned Orca initializes speech and announces the focused native field',flush=True)
+                accessibility.verify_reader_validation(lambda value:call(endpoint,value),reader_log)
                 if screen_keyboard:
                     accessibility.activate(accessibility.find('Keyboard',pyatspi.ROLE_PUSH_BUTTON))
                     wait_for(lambda:any(layer['namespace']=='agentos-keyboard' and layer['mapped'] for layer in call(control,{'op':'snapshot'})['system_layers']),[core,session])
@@ -337,6 +339,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                     accessibility.verify_validation(lambda value:call(endpoint,value))
                     accessibility.verify_toggle_validation(lambda value:call(endpoint,value))
                     accessibility.verify_choice_name(lambda value:call(endpoint,value))
+                    accessibility.verify_local_form(lambda value:call(endpoint,value),root/"core-state/state.sqlite3")
                     accessibility.verify(lambda value:call(endpoint,value))
             if system_bar:
                 core.terminate();assert core.wait(timeout=5) in (0,-signal.SIGTERM)

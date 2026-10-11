@@ -1,0 +1,1698 @@
+18:52:18.512609 - INFO: Preparing to launch.
+18:52:18.512972 - ORCA: Attempt to load orca-customizations from /tmp/agentos-session-test-1e0p7qit/data/orca/orca-customizations.py succeeded.
+18:52:18.513038 - GSETTINGS REGISTRY: Schema org.gnome.Orca.Extensions loaded
+18:52:18.513124 - GSETTINGS SCHEMA HANDLE: extensions / approved-user-extensions no dict values set
+18:52:18.513161 - GSETTINGS REGISTRY: extensions/approved-user-extensions using default value = {}
+18:52:18.513213 - GSETTINGS SCHEMA HANDLE: extensions / disabled-extensions not set [profile:default]
+18:52:18.513240 - GSETTINGS REGISTRY: extensions/disabled-extensions using default value = []
+18:52:18.517159 - INFO: About to launch Orca.
+18:52:18.518393 - ORCA: Accessibility enabled: false
+18:52:18.518409 - ORCA: Enabling accessibility.
+18:52:18.558341 - ORCA: Loading User Settings
+18:52:18.558437 - EVENT MANAGER: Pause queueing: True. Clear queue: True. Loading user settings.
+18:52:18.558487 - INPUT EVENT MANAGER: Pause queueing: True. Loading user settings.
+18:52:18.558813 - DEFAULT: Setting up commands for None
+18:52:18.558837 - COMMAND MANAGER: Commands set up.
+18:52:18.558909 - GSETTINGS REGISTRY: extensions/disabled-extensions using default value = []
+18:52:18.558928 - EXTENSION LOADER: Loading built-in extension BraillePresenter
+18:52:18.558990 - EXTENSION: BraillePresenter 11 command(s) registered.
+18:52:18.559111 - EXTENSION LOADER: Loading built-in extension NotificationPresenter
+18:52:18.559173 - EXTENSION: NotificationPresenter 4 command(s) registered.
+18:52:18.559192 - EXTENSION LOADER: Loading built-in extension ClipboardPresenter
+18:52:18.559219 - EXTENSION: ClipboardPresenter 1 command(s) registered.
+18:52:18.559233 - EXTENSION LOADER: Loading built-in extension SayAllPresenter
+18:52:18.559505 - EXTENSION: SayAllPresenter 1 command(s) registered.
+18:52:18.559522 - EXTENSION LOADER: Loading built-in extension TypingEchoPresenter
+18:52:18.559548 - EXTENSION: TypingEchoPresenter 1 command(s) registered.
+18:52:18.559562 - EXTENSION LOADER: Loading built-in extension SpeechManager
+18:52:18.559851 - SPEECH MANAGER: Available voice sets: [primary].
+18:52:18.559909 - EXTENSION: SpeechManager 14 command(s) registered.
+18:52:18.559924 - EXTENSION LOADER: Loading built-in extension SpeechPresenter
+18:52:18.559998 - EXTENSION: SpeechPresenter 6 command(s) registered.
+18:52:18.560013 - EXTENSION LOADER: Loading built-in extension BypassModeManager
+18:52:18.560051 - EXTENSION: BypassModeManager 1 command(s) registered.
+18:52:18.560065 - EXTENSION LOADER: Loading built-in extension SleepModeManager
+18:52:18.560102 - EXTENSION: SleepModeManager 1 command(s) registered.
+18:52:18.560115 - EXTENSION LOADER: Loading built-in extension SystemInformationPresenter
+18:52:18.560157 - EXTENSION: SystemInformationPresenter 5 command(s) registered.
+18:52:18.560170 - EXTENSION LOADER: Loading built-in extension ObjectNavigator
+18:52:18.560258 - EXTENSION: ObjectNavigator 6 command(s) registered.
+18:52:18.560273 - EXTENSION LOADER: Loading built-in extension CaretNavigator
+18:52:18.560317 - GSETTINGS REGISTRY: Schema org.gnome.Orca.CaretNavigation loaded
+18:52:18.560378 - GSETTINGS SCHEMA HANDLE: caret-navigation / enabled not set [profile:default]
+18:52:18.560406 - GSETTINGS REGISTRY: caret-navigation/enabled using default value = True
+18:52:18.560450 - GSETTINGS SCHEMA HANDLE: caret-navigation / selection-enabled not set [profile:default]
+18:52:18.560472 - GSETTINGS REGISTRY: caret-navigation/selection-enabled using default value = False
+18:52:18.560554 - EXTENSION: CaretNavigator 22 command(s) registered.
+18:52:18.560568 - EXTENSION LOADER: Loading built-in extension StructuralNavigator
+18:52:18.560989 - EXTENSION: StructuralNavigator 92 command(s) registered.
+18:52:18.561005 - EXTENSION LOADER: Loading built-in extension TableNavigator
+18:52:18.561246 - EXTENSION: TableNavigator 15 command(s) registered.
+18:52:18.561260 - EXTENSION LOADER: Loading built-in extension MathNavigator
+18:52:18.561278 - EXTENSION: MathNavigator MathCAT not available. Skipping command setup.
+18:52:18.561291 - EXTENSION LOADER: Loading built-in extension DocumentPresenter
+18:52:18.561323 - EXTENSION: DocumentPresenter 3 command(s) registered.
+18:52:18.561339 - EXTENSION LOADER: Loading built-in extension LiveRegionPresenter
+18:52:18.561388 - EXTENSION: LiveRegionPresenter 5 command(s) registered.
+18:52:18.561401 - EXTENSION LOADER: Loading built-in extension LearnModePresenter
+18:52:18.561424 - EXTENSION: LearnModePresenter 1 command(s) registered.
+18:52:18.561437 - EXTENSION LOADER: Loading built-in extension MousePresenter
+18:52:18.561523 - EXTENSION: MousePresenter 4 command(s) registered.
+18:52:18.561537 - EXTENSION LOADER: Loading built-in extension ActionPresenter
+18:52:18.561559 - EXTENSION: ActionPresenter 1 command(s) registered.
+18:52:18.561572 - EXTENSION LOADER: Loading built-in extension FlatReviewPresenter
+18:52:18.561772 - EXTENSION: FlatReviewPresenter 35 command(s) registered.
+18:52:18.561786 - EXTENSION LOADER: Loading built-in extension FlatReviewFinder
+18:52:18.561832 - EXTENSION: FlatReviewFinder 3 command(s) registered.
+18:52:18.561857 - EXTENSION LOADER: Loading built-in extension WhereAmIPresenter
+18:52:18.561924 - EXTENSION: WhereAmIPresenter 11 command(s) registered.
+18:52:18.561937 - EXTENSION LOADER: Loading built-in extension DebuggingToolsManager
+18:52:18.561958 - EXTENSION: DebuggingToolsManager 2 command(s) registered.
+18:52:18.561971 - EXTENSION LOADER: Loading built-in extension ChatPresenter
+18:52:18.562013 - EXTENSION: ChatPresenter 5 command(s) registered.
+18:52:18.562026 - EXTENSION LOADER: Loading built-in extension ProfileManager
+18:52:18.562049 - EXTENSION: ProfileManager 2 command(s) registered.
+18:52:18.562062 - EXTENSION LOADER: Loading built-in extension ScreenReaderManager
+18:52:18.562115 - EXTENSION: ScreenReaderManager 3 command(s) registered.
+18:52:18.562148 - GSETTINGS REGISTRY: extensions/disabled-extensions using default value = []
+18:52:18.562158 - BRAILLE: Setting up key ranges.
+18:52:18.562173 - BRAILLE: Initializing. Callback: None
+18:52:18.562188 - BRAILLE: WINDOWPATH=None
+18:52:18.562200 - BRAILLE: XDG_VTNR=None
+18:52:18.562218 - BRAILLE: Attempting connection with BrlAPI.
+18:52:18.562539 - BRAILLE: Not setting up key ranges: BrlAPI not running.
+18:52:18.562609 - DEFAULT: Commands set up: 244 keyboard commands
+18:52:18.562635 - SCRIPT: default (module=orca.scripts.default) initialized
+18:52:18.562685 - GSETTINGS REGISTRY: Schema org.gnome.Orca.Keybindings loaded
+18:52:18.562761 - GSETTINGS SCHEMA HANDLE: keybindings / keyboard-layout not set [profile:default]
+18:52:18.562792 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:18.562813 - COMMAND MANAGER: Setting keyboard layout is_desktop to True.
+18:52:18.562971 - GSETTINGS SCHEMA HANDLE: keybindings / entries no dict values set
+18:52:18.563071 - GSETTINGS REGISTRY: keybindings/entries using default value = {}
+18:52:18.563090 - COMMAND MANAGER: No user overrides to apply
+18:52:18.563345 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:18.563422 - GSETTINGS SCHEMA HANDLE: keybindings / desktop-modifier-keys not set [profile:default]
+18:52:18.563465 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:18.563756 - BRAILLE: BrlAPI Connection is unavailable (ConnectionError): couldn't connect to b':0' with key b'keyfile:/etc/brlapi.key+polkit': connect: No such file or directory
+                  (brlerrno 11, libcerrno 2, gaierrno 0)
+                  Is BRLTTY really running?
+18:52:18.564347 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: t mods=256 clicks=2 grab ids=[] keysym=116 keycode=0 modifiers=32768
+18:52:18.564410 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: t mods=256 clicks=2 grab ids=[] keysym=116 keycode=0 modifiers=65536
+18:52:18.566891 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=114 keycode=0 modifiers=32769
+18:52:18.566960 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=114 keycode=0 modifiers=65537
+18:52:18.567111 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=82 keycode=0 modifiers=32769
+18:52:18.567196 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=82 keycode=0 modifiers=65537
+18:52:18.567403 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=99 keycode=0 modifiers=32769
+18:52:18.567462 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=99 keycode=0 modifiers=65537
+18:52:18.567513 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=67 keycode=0 modifiers=32769
+18:52:18.567564 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=67 keycode=0 modifiers=65537
+18:52:18.567679 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=2 grab ids=[] keysym=97 keycode=0 modifiers=32768
+18:52:18.567729 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=2 grab ids=[] keysym=97 keycode=0 modifiers=65536
+18:52:18.567800 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=3 grab ids=[] keysym=97 keycode=0 modifiers=32768
+18:52:18.567849 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=3 grab ids=[] keysym=97 keycode=0 modifiers=65536
+18:52:18.568267 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Up mods=0 clicks=2 grab ids=[] keysym=65431 keycode=0 modifiers=0
+18:52:18.568322 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Up mods=0 clicks=3 grab ids=[] keysym=65431 keycode=0 modifiers=0
+18:52:18.568455 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Begin mods=0 clicks=2 grab ids=[] keysym=65437 keycode=0 modifiers=0
+18:52:18.568508 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Begin mods=0 clicks=3 grab ids=[] keysym=65437 keycode=0 modifiers=0
+18:52:18.568588 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Down mods=0 clicks=2 grab ids=[] keysym=65433 keycode=0 modifiers=0
+18:52:18.568641 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Down mods=0 clicks=3 grab ids=[] keysym=65433 keycode=0 modifiers=0
+18:52:18.568827 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Add mods=0 clicks=2 grab ids=[] keysym=65451 keycode=0 modifiers=0
+18:52:18.569036 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: f mods=256 clicks=2 grab ids=[] keysym=102 keycode=0 modifiers=32768
+18:52:18.569086 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: f mods=256 clicks=2 grab ids=[] keysym=102 keycode=0 modifiers=65536
+18:52:18.569200 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=256 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=32768
+18:52:18.569250 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=256 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=65536
+18:52:18.569401 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=0 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=0
+
+vvvvv COMMAND MANAGER: Grab diff: keyboard layout change (old: 170, new: 170) vvvvv
+18:52:18.569600 -   Added (155):
+18:52:18.569625 -     KP_Add: sayAllHandler
+18:52:18.569654 -     Orca+s: toggleSilenceSpeechHandler
+18:52:18.569678 -     Orca+v: toggleSpeechVerbosityHandler
+18:52:18.569700 -     Orca+F11: toggleTableCellReadModeHandler
+18:52:18.569723 -     Orca+Shift+d: toggle_speech_monitor
+18:52:18.569745 -     Alt+BackSpace: bypass_mode_toggle
+18:52:18.569775 -     Alt+Control+Shift+q: toggle_sleep_mode
+18:52:18.569797 -     Orca+t: presentTimeHandler
+18:52:18.569819 -     Orca+Control+Up: object_navigator_up
+18:52:18.569840 -     Orca+Control+Down: object_navigator_down
+18:52:18.569862 -     Orca+Control+Right: object_navigator_next
+18:52:18.569883 -     Orca+Control+Left: object_navigator_previous
+18:52:18.569905 -     Orca+Control+Return: object_navigator_perform_action
+18:52:18.569926 -     Orca+Control+s: object_navigator_toggle_simplify
+18:52:18.569947 -     Orca+F12: toggle_enabled
+18:52:18.569970 -     Right: next_character
+18:52:18.569992 -     Left: previous_character
+18:52:18.570013 -     Control+Right: next_word
+18:52:18.570034 -     Control+Left: previous_word
+18:52:18.570054 -     Down: next_line
+18:52:18.570075 -     Up: previous_line
+18:52:18.570097 -     Control+Home: start_of_file
+18:52:18.570118 -     Control+End: end_of_file
+18:52:18.570138 -     Home: start_of_line
+18:52:18.570158 -     End: end_of_line
+18:52:18.570179 -     Orca+z: structural_navigator_mode_cycle
+18:52:18.570201 -     Shift+q: previous_blockquote
+18:52:18.570221 -     q: next_blockquote
+18:52:18.570242 -     Alt+Shift+q: list_blockquotes
+18:52:18.570263 -     Shift+b: previous_button
+18:52:18.570283 -     b: next_button
+18:52:18.570304 -     Alt+Shift+b: list_buttons
+18:52:18.570325 -     Shift+x: previous_checkbox
+18:52:18.570345 -     x: next_checkbox
+18:52:18.570366 -     Alt+Shift+x: list_checkboxes
+18:52:18.570386 -     Shift+c: previous_combobox
+18:52:18.570406 -     c: next_combobox
+18:52:18.570427 -     Alt+Shift+c: list_comboboxes
+18:52:18.570448 -     Shift+e: previous_entry
+18:52:18.570467 -     e: next_entry
+18:52:18.570488 -     Alt+Shift+e: list_entries
+18:52:18.570513 -     Shift+f: previous_form_field
+18:52:18.570533 -     f: next_form_field
+18:52:18.570553 -     Alt+Shift+f: list_form_fields
+18:52:18.570574 -     Shift+h: previous_heading
+18:52:18.570594 -     h: next_heading
+18:52:18.570615 -     Alt+Shift+h: list_headings
+18:52:18.570635 -     Shift+g: previous_image
+18:52:18.570655 -     g: next_image
+18:52:18.570676 -     Alt+Shift+g: list_images
+18:52:18.570696 -     Shift+m: previous_landmark
+18:52:18.570721 -     m: next_landmark
+18:52:18.570745 -     Alt+Shift+m: list_landmarks
+18:52:18.570771 -     Shift+l: previous_list
+18:52:18.570791 -     l: next_list
+18:52:18.570812 -     Alt+Shift+l: list_lists
+18:52:18.570832 -     Shift+i: previous_list_item
+18:52:18.570852 -     i: next_list_item
+18:52:18.570873 -     Alt+Shift+i: list_list_items
+18:52:18.570894 -     Shift+d: previous_live_region
+18:52:18.570914 -     d: next_live_region
+18:52:18.570933 -     y: last_live_region
+18:52:18.570954 -     Shift+p: previous_paragraph
+18:52:18.570973 -     p: next_paragraph
+18:52:18.570994 -     Alt+Shift+p: list_paragraphs
+18:52:18.571043 -     Shift+r: previous_radio_button
+18:52:18.571066 -     r: next_radio_button
+18:52:18.571087 -     Alt+Shift+r: list_radio_buttons
+18:52:18.571109 -     Shift+s: previous_separator
+18:52:18.571129 -     s: next_separator
+18:52:18.571149 -     Shift+t: previous_table
+18:52:18.571169 -     t: next_table
+18:52:18.571190 -     Alt+Shift+t: list_tables
+18:52:18.571211 -     Shift+k: previous_link
+18:52:18.571231 -     k: next_link
+18:52:18.571252 -     Alt+Shift+k: list_links
+18:52:18.571272 -     Shift+u: previous_unvisited_link
+18:52:18.571293 -     u: next_unvisited_link
+18:52:18.571314 -     Alt+Shift+u: list_unvisited_links
+18:52:18.571335 -     Shift+v: previous_visited_link
+18:52:18.571355 -     v: next_visited_link
+18:52:18.571376 -     Alt+Shift+v: list_visited_links
+18:52:18.571396 -     Shift+o: previous_large_object
+18:52:18.571416 -     o: next_large_object
+18:52:18.571437 -     Alt+Shift+o: list_large_objects
+18:52:18.571458 -     Shift+a: previous_clickable
+18:52:18.571479 -     a: next_clickable
+18:52:18.571499 -     Alt+Shift+a: list_clickables
+18:52:18.571520 -     Shift+comma: container_start
+18:52:18.571540 -     comma: container_end
+18:52:18.571561 -     Shift+1: previous_heading_level_1
+18:52:18.571582 -     1: next_heading_level_1
+18:52:18.571603 -     Alt+Shift+1: list_headings_level_1
+18:52:18.571623 -     Shift+2: previous_heading_level_2
+18:52:18.571644 -     2: next_heading_level_2
+18:52:18.571665 -     Alt+Shift+2: list_headings_level_2
+18:52:18.571685 -     Shift+3: previous_heading_level_3
+18:52:18.571706 -     3: next_heading_level_3
+18:52:18.571726 -     Alt+Shift+3: list_headings_level_3
+18:52:18.571747 -     Shift+4: previous_heading_level_4
+18:52:18.571767 -     4: next_heading_level_4
+18:52:18.571788 -     Alt+Shift+4: list_headings_level_4
+18:52:18.571811 -     Shift+5: previous_heading_level_5
+18:52:18.571831 -     5: next_heading_level_5
+18:52:18.571852 -     Alt+Shift+5: list_headings_level_5
+18:52:18.571873 -     Shift+6: previous_heading_level_6
+18:52:18.571893 -     6: next_heading_level_6
+18:52:18.571914 -     Alt+Shift+6: list_headings_level_6
+18:52:18.571935 -     Orca+Shift+t: table_navigator_toggle_enabled
+18:52:18.571956 -     Alt+Shift+Left: table_cell_left
+18:52:18.571977 -     Alt+Shift+Right: table_cell_right
+18:52:18.571997 -     Alt+Shift+Up: table_cell_up
+18:52:18.572018 -     Alt+Shift+Down: table_cell_down
+18:52:18.572039 -     Alt+Shift+Home: table_cell_first
+18:52:18.572059 -     Alt+Shift+End: table_cell_last
+18:52:18.572080 -     Orca+Alt+Shift+Left: table_cell_beginning_of_row
+18:52:18.572101 -     Orca+Alt+Shift+Right: table_cell_end_of_row
+18:52:18.572123 -     Orca+Alt+Shift+Up: table_cell_top_of_column
+18:52:18.572143 -     Orca+Alt+Shift+Down: table_cell_bottom_of_column
+18:52:18.572164 -     Orca+Shift+r: set_dynamic_column_headers_row
+18:52:18.572185 -     Orca+Shift+c: set_dynamic_row_headers_column
+18:52:18.572205 -     Orca+a: toggle_presentation_mode
+18:52:18.572226 -     Orca+backslash: toggle_live_region_support
+18:52:18.572248 -     Orca+h: enterLearnModeHandler
+18:52:18.572270 -     Orca+KP_Divide: routePointerToItemHandler
+18:52:18.572293 -     KP_Divide: leftClickReviewItemHandler
+18:52:18.572314 -     KP_Multiply: rightClickReviewItemHandler
+18:52:18.572335 -     Orca+Shift+a: show_actions_list
+18:52:18.572355 -     KP_Subtract: toggleFlatReviewModeHandler
+18:52:18.572375 -     Orca+KP_Home: reviewHomeHandler
+18:52:18.572396 -     Orca+KP_Page_Up: reviewEndHandler
+18:52:18.572416 -     KP_Home: reviewPreviousLineHandler
+18:52:18.572436 -     KP_Up: reviewCurrentLineHandler
+18:52:18.572456 -     KP_Page_Up: reviewNextLineHandler
+18:52:18.572477 -     Orca+KP_End: reviewEndOfLineHandler
+18:52:18.572497 -     KP_Left: reviewPreviousItemHandler
+18:52:18.572517 -     KP_Begin: reviewCurrentItemHandler
+18:52:18.572537 -     KP_Right: reviewNextItemHandler
+18:52:18.572557 -     KP_End: reviewPreviousCharacterHandler
+18:52:18.572576 -     KP_Down: reviewCurrentCharacterHandler
+18:52:18.572597 -     KP_Page_Down: reviewNextCharacterHandler
+18:52:18.572617 -     Orca+KP_Begin: reviewCurrentAccessibleHandler
+18:52:18.572638 -     Orca+KP_Left: reviewAboveHandler
+18:52:18.572658 -     Orca+KP_Right: reviewBelowHandler
+18:52:18.572678 -     KP_Delete: findHandler
+18:52:18.572699 -     Orca+KP_Delete: findNextHandler
+18:52:18.572720 -     Orca+Shift+KP_Delete: findPreviousHandler
+18:52:18.572741 -     Orca+f: readCharAttributesHandler
+18:52:18.572762 -     Orca+KP_Enter: getTitleHandler
+18:52:18.572782 -     Orca+e: present_default_button
+18:52:18.572803 -     Orca+equal: present_cell_formula
+18:52:18.572823 -     KP_Enter: whereAmIBasicHandler
+18:52:18.572850 -     Orca+Shift+Up: whereAmISelectionHandler
+18:52:18.572875 -     Orca+space: preferencesSettingsHandler
+18:52:18.572899 -     Orca+Control+space: appPreferencesSettingsHandler
+^^^^^ COMMAND MANAGER: Diff completed in 0.0094 s. Removed 0, added 155, transferred 0 ^^^^^
+
+18:52:18.572985 - COMMAND MANAGER: Keyboard layout set to desktop.
+18:52:18.572998 - PRESENTATION MANAGER: Starting presenters
+18:52:18.573031 - SPEECH MANAGER: start_speech. Script: None Event: None notify_user: False
+18:52:18.573035 - SPEECH MANAGER: Initializing server
+18:52:18.573091 - GSETTINGS REGISTRY: Schema org.gnome.Orca.Speech loaded
+18:52:18.573166 - GSETTINGS SCHEMA HANDLE: speech / speech-server-factory not set [profile:default]
+18:52:18.573198 - GSETTINGS REGISTRY: speech/speech-server-factory using default value = 'speechdispatcherfactory'
+18:52:18.973090 - SPEECH MANAGER: Using speech server factory: speechdispatcherfactory
+18:52:18.973224 - GSETTINGS SCHEMA HANDLE: speech / synthesizer not set [profile:default]
+18:52:18.973261 - GSETTINGS REGISTRY: speech/synthesizer using default value = ''
+18:52:18.973312 - GSETTINGS REGISTRY: Schema org.gnome.Orca.Voice loaded
+18:52:18.973400 - GSETTINGS SCHEMA HANDLE: voice / established not set [profile:default]
+18:52:18.973467 - GSETTINGS SCHEMA HANDLE: voice / rate not set [profile:default]
+18:52:18.973526 - GSETTINGS SCHEMA HANDLE: voice / pitch not set [profile:default]
+18:52:18.973576 - GSETTINGS SCHEMA HANDLE: voice / pitch-range not set [profile:default]
+18:52:18.973626 - GSETTINGS SCHEMA HANDLE: voice / volume not set [profile:default]
+18:52:18.973674 - GSETTINGS SCHEMA HANDLE: voice / family-name not set [profile:default]
+18:52:18.973757 - GSETTINGS SCHEMA HANDLE: voice / family-lang not set [profile:default]
+18:52:18.973869 - GSETTINGS SCHEMA HANDLE: voice / family-dialect not set [profile:default]
+18:52:18.973917 - GSETTINGS SCHEMA HANDLE: voice / family-gender not set [profile:default]
+18:52:18.973958 - GSETTINGS SCHEMA HANDLE: voice / family-variant not set [profile:default]
+18:52:18.974011 - GSETTINGS SCHEMA HANDLE: speech / punctuation-level not set [profile:default]
+18:52:18.974038 - GSETTINGS REGISTRY: speech/punctuation-level using default value = 'most'
+18:52:18.974288 - GSETTINGS SCHEMA HANDLE: speech / capitalization-style not set [profile:default]
+18:52:18.974335 - GSETTINGS REGISTRY: speech/capitalization-style using default value = 'none'
+18:52:18.974439 - SPEECH MANAGER: Server initialized
+18:52:18.974517 - GSETTINGS REGISTRY: Schema org.gnome.Orca.Braille loaded
+18:52:18.974593 - GSETTINGS SCHEMA HANDLE: braille / enabled not set [profile:default]
+18:52:18.974624 - GSETTINGS REGISTRY: braille/enabled using default value = True
+18:52:18.974647 - BRAILLE: Initializing. Callback: input_event_manager.InputEventManager.process_braille_event
+18:52:18.974654 - BRAILLE: BrlAPI connection already in progress.
+18:52:18.974702 - GSETTINGS SCHEMA HANDLE: braille / contracted-braille not set [profile:default]
+18:52:18.974728 - GSETTINGS REGISTRY: braille/contracted-braille using default value = False
+18:52:18.974775 - GSETTINGS SCHEMA HANDLE: braille / contraction-table not set [profile:default]
+18:52:18.974801 - GSETTINGS REGISTRY: braille/contraction-table using default value = ''
+18:52:18.974852 - GSETTINGS SCHEMA HANDLE: braille / computer-braille-at-cursor not set [profile:default]
+18:52:18.974876 - GSETTINGS REGISTRY: braille/computer-braille-at-cursor using default value = True
+18:52:18.974917 - GSETTINGS SCHEMA HANDLE: braille / end-of-line-indicator not set [profile:default]
+18:52:18.974939 - GSETTINGS REGISTRY: braille/end-of-line-indicator using default value = True
+18:52:18.974979 - GSETTINGS SCHEMA HANDLE: braille / word-wrap not set [profile:default]
+18:52:18.975067 - GSETTINGS REGISTRY: braille/word-wrap using default value = False
+18:52:18.975116 - GSETTINGS SCHEMA HANDLE: braille / selector-indicator not set [profile:default]
+18:52:18.975138 - GSETTINGS REGISTRY: braille/selector-indicator using default value = 'dots78'
+18:52:18.975159 - BRAILLE PRESENTER: Getting selector indicator: 192.
+18:52:18.975199 - GSETTINGS SCHEMA HANDLE: braille / link-indicator not set [profile:default]
+18:52:18.975221 - GSETTINGS REGISTRY: braille/link-indicator using default value = 'dots78'
+18:52:18.975238 - BRAILLE PRESENTER: Getting link indicator: 192.
+18:52:18.975276 - GSETTINGS SCHEMA HANDLE: braille / text-attributes-indicator not set [profile:default]
+18:52:18.975297 - GSETTINGS REGISTRY: braille/text-attributes-indicator using default value = 'none'
+18:52:18.975314 - BRAILLE PRESENTER: Getting text attributes indicator: 0.
+18:52:18.975342 - GSETTINGS REGISTRY: Schema org.gnome.Orca.Sound loaded
+18:52:18.975386 - GSETTINGS SCHEMA HANDLE: sound / enabled not set [profile:default]
+18:52:18.975407 - GSETTINGS REGISTRY: sound/enabled using default value = True
+18:52:19.070680 - GSETTINGS REGISTRY: Schema org.gnome.Orca.MouseReview loaded
+18:52:19.070817 - GSETTINGS SCHEMA HANDLE: mouse-review / enabled not set [profile:default]
+18:52:19.070866 - GSETTINGS REGISTRY: mouse-review/enabled using default value = False
+18:52:19.070902 - ORCA MODIFIER MANAGER: Refreshing Orca modifiers: Loading user settings.
+18:52:19.070942 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.070974 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.071091 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.071137 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.074099 - AXDeviceManager: Grab id for Insert: 247
+18:52:19.074180 - AXDeviceManager: Grab id for KP_Insert: 248
+18:52:19.074203 - ORCA MODIFIER MANAGER: DISPLAY not set, skipping xkbcomp operations
+18:52:19.074246 - EVENT MANAGER: Pause queueing: False. Clear queue: False. User settings loaded.
+18:52:19.074283 - INPUT EVENT MANAGER: Pause queueing: False. User settings loaded.
+18:52:19.074289 - ORCA: User Settings Loaded
+18:52:19.074336 - DEBUGGING TOOLS MANAGER: Orca version 51.0, AT-SPI2 version: 2.62.0, Session: wayland
+18:52:19.075865 - AXUtilitiesApplication: mutter-x11-frames not found on this desktop
+18:52:19.075898 - DEBUGGING TOOLS MANAGER: Desktop has 1 app(s):
+18:52:19.076699 -   1. pid: 11763      agent-os-desktop         /tmp/agentos-session-test-1e0p7qit/bin/agent-os-desktop --socket /tmp/agentos-session-test-1e0p7qit/core.sock 
+18:52:19.076736 - ORCA: Running under systemd: False
+18:52:19.076751 - REMOTE CONTROLLER: Attempting to start D-Bus service.
+18:52:19.076842 - REMOTE CONTROLLER: SessionMessageBus acquired::1.7
+18:52:19.078164 - REMOTE CONTROLLER: Service started name=org.gnome.Orca1.Service path=/org/gnome/Orca1/Service.
+18:52:19.078196 - REMOTE CONTROLLER: Processing 33 pending module registrations.
+18:52:19.079489 - REMOTE CONTROLLER: Registered 16 member(s) for MathPresenter at /org/gnome/Orca1/Service/MathPresenter.
+18:52:19.079961 - REMOTE CONTROLLER: Registered 4 member(s) for TextAttributeManager at /org/gnome/Orca1/Service/TextAttributeManager.
+18:52:19.082087 - REMOTE CONTROLLER: Registered 61 member(s) for SpeechManager at /org/gnome/Orca1/Service/SpeechManager.
+18:52:19.084386 - REMOTE CONTROLLER: Registered 82 member(s) for SpeechPresenter at /org/gnome/Orca1/Service/SpeechPresenter.
+18:52:19.087364 - REMOTE CONTROLLER: Registered 101 member(s) for StructuralNavigator at /org/gnome/Orca1/Service/StructuralNavigator.
+18:52:19.088336 - REMOTE CONTROLLER: Registered 33 member(s) for SayAllPresenter at /org/gnome/Orca1/Service/SayAllPresenter.
+18:52:19.089118 - REMOTE CONTROLLER: Registered 18 member(s) for CaretNavigator at /org/gnome/Orca1/Service/CaretNavigator.
+18:52:19.089411 - REMOTE CONTROLLER: Registered 1 member(s) for ClipboardPresenter at /org/gnome/Orca1/Service/ClipboardPresenter.
+18:52:19.089932 - REMOTE CONTROLLER: Registered 6 member(s) for MathNavigator at /org/gnome/Orca1/Service/MathNavigator.
+18:52:19.090698 - REMOTE CONTROLLER: Registered 19 member(s) for TableNavigator at /org/gnome/Orca1/Service/TableNavigator.
+18:52:19.091463 - REMOTE CONTROLLER: Registered 20 member(s) for DocumentPresenter at /org/gnome/Orca1/Service/DocumentPresenter.
+18:52:19.091914 - REMOTE CONTROLLER: Registered 10 member(s) for SoundPresenter at /org/gnome/Orca1/Service/SoundPresenter.
+18:52:19.092932 - REMOTE CONTROLLER: Registered 29 member(s) for TypingEchoPresenter at /org/gnome/Orca1/Service/TypingEchoPresenter.
+18:52:19.093461 - REMOTE CONTROLLER: Registered 7 member(s) for CommandManager at /org/gnome/Orca1/Service/CommandManager.
+18:52:19.093800 - REMOTE CONTROLLER: Registered 3 member(s) for SleepModeManager at /org/gnome/Orca1/Service/SleepModeManager.
+18:52:19.094051 - REMOTE CONTROLLER: Registered 1 member(s) for ActionPresenter at /org/gnome/Orca1/Service/ActionPresenter.
+18:52:19.094748 - REMOTE CONTROLLER: Registered 15 member(s) for ChatPresenter at /org/gnome/Orca1/Service/ChatPresenter.
+18:52:19.096308 - REMOTE CONTROLLER: Registered 42 member(s) for FlatReviewPresenter at /org/gnome/Orca1/Service/FlatReviewPresenter.
+18:52:19.096928 - REMOTE CONTROLLER: Registered 8 member(s) for MousePresenter at /org/gnome/Orca1/Service/MousePresenter.
+18:52:19.097290 - REMOTE CONTROLLER: Registered 4 member(s) for NotificationPresenter at /org/gnome/Orca1/Service/NotificationPresenter.
+18:52:19.097703 - REMOTE CONTROLLER: Registered 6 member(s) for ObjectNavigator at /org/gnome/Orca1/Service/ObjectNavigator.
+18:52:19.098183 - REMOTE CONTROLLER: Registered 7 member(s) for ProfileManager at /org/gnome/Orca1/Service/ProfileManager.
+18:52:19.098581 - REMOTE CONTROLLER: Registered 6 member(s) for SpellCheckPresenter at /org/gnome/Orca1/Service/SpellCheckPresenter.
+18:52:19.099186 - REMOTE CONTROLLER: Registered 11 member(s) for SystemInformationPresenter at /org/gnome/Orca1/Service/SystemInformationPresenter.
+18:52:19.102189 - REMOTE CONTROLLER: Registered 12 member(s) for WhereAmIPresenter at /org/gnome/Orca1/Service/WhereAmIPresenter.
+18:52:19.104234 - REMOTE CONTROLLER: Registered 52 member(s) for BraillePresenter at /org/gnome/Orca1/Service/BraillePresenter.
+18:52:19.104368 - REMOTE CONTROLLER: Registration summary: 26 modules, 231 commands, 178 getters, 165 setters.
+18:52:19.104471 - GSETTINGS SCHEMA HANDLE: speech / messages-are-detailed not set [profile:default]
+18:52:19.104510 - GSETTINGS REGISTRY: speech/messages-are-detailed using default value = True
+18:52:19.104566 - GSETTINGS SCHEMA HANDLE: speech / enable not set [profile:default]
+18:52:19.104593 - GSETTINGS REGISTRY: speech/enable using default value = True
+18:52:19.104643 - GSETTINGS SCHEMA HANDLE: speech / only-speak-displayed-text not set [profile:default]
+18:52:19.104667 - GSETTINGS REGISTRY: speech/only-speak-displayed-text using default value = False
+18:52:19.104748 - GSETTINGS SCHEMA HANDLE: voice / established not set [profile:default]
+18:52:19.104795 - GSETTINGS SCHEMA HANDLE: voice / rate not set [profile:default]
+18:52:19.104837 - GSETTINGS SCHEMA HANDLE: voice / pitch not set [profile:default]
+18:52:19.104878 - GSETTINGS SCHEMA HANDLE: voice / pitch-range not set [profile:default]
+18:52:19.104920 - GSETTINGS SCHEMA HANDLE: voice / volume not set [profile:default]
+18:52:19.104968 - GSETTINGS SCHEMA HANDLE: voice / family-name not set [profile:default]
+18:52:19.105008 - GSETTINGS SCHEMA HANDLE: voice / family-lang not set [profile:default]
+18:52:19.105049 - GSETTINGS SCHEMA HANDLE: voice / family-dialect not set [profile:default]
+18:52:19.105089 - GSETTINGS SCHEMA HANDLE: voice / family-gender not set [profile:default]
+18:52:19.105128 - GSETTINGS SCHEMA HANDLE: voice / family-variant not set [profile:default]
+18:52:19.105318 - GSETTINGS REGISTRY: speech/punctuation-level using default value = 'most'
+18:52:19.105489 - SPEECH PRESENTER: Adjusting 'Screen reader on.' from None start_offset: None
+18:52:19.105560 - GSETTINGS SCHEMA HANDLE: speech / repeated-character-limit not set [profile:default]
+18:52:19.105590 - GSETTINGS REGISTRY: speech/repeated-character-limit using default value = 4
+18:52:19.105770 - GSETTINGS SCHEMA HANDLE: speech / use-pronunciation-dictionary not set [profile:default]
+18:52:19.105798 - GSETTINGS REGISTRY: speech/use-pronunciation-dictionary using default value = True
+18:52:19.105873 - GSETTINGS REGISTRY: Schema org.gnome.Orca.Pronunciations loaded
+18:52:19.105922 - GSETTINGS SCHEMA HANDLE: pronunciations / entries no dict values set
+18:52:19.105948 - GSETTINGS REGISTRY: pronunciations/entries using default value = {}
+18:52:19.105972 - SPEECH PRESENTER: Adjusted text: 'Screen reader on.'
+18:52:19.106038 - SPEECH: Speak 'Screen reader on.' acss: {'established': 'False'}
+18:52:19.106086 - SPEECH OUTPUT: 'Screen reader on.'{'established': 'False'}
+18:52:19.106106 - SPEECH DISPATCHER: Speaking 'Screen reader on.' as string
+18:52:19.107313 - SPEECH DISPATCHER: Speaking '<speak><mark name="0:6"/>Screen <mark name="7:13"/>reader <mark name="14:17"/>on.</speak>' 
+                  ORCA rate 50, pitch 5.0, pitch-range 5.0, volume 10.0, language, punctuation: SOME
+                  SD rate 0, pitch 0, volume 100, language en-US
+18:52:19.109235 - SPEECH MANAGER: Speech server is <orca.speechdispatcherfactory.SpeechServer object at 0xffff73730ec0>
+18:52:19.109271 - GSETTINGS REGISTRY: speech/capitalization-style using default value = 'none'
+18:52:19.109566 - SPEECH MANAGER: Speech server is <orca.speechdispatcherfactory.SpeechServer object at 0xffff73730ec0>
+18:52:19.109600 - GSETTINGS REGISTRY: speech/punctuation-level using default value = 'most'
+18:52:19.109715 - GSETTINGS REGISTRY: braille/enabled using default value = True
+18:52:19.109814 - GSETTINGS SCHEMA HANDLE: braille / flash-messages not set [profile:default]
+18:52:19.109841 - GSETTINGS REGISTRY: braille/flash-messages using default value = True
+18:52:19.109886 - GSETTINGS SCHEMA HANDLE: braille / flash-messages-detailed not set [profile:default]
+18:52:19.109910 - GSETTINGS REGISTRY: braille/flash-messages-detailed using default value = True
+18:52:19.109936 - GSETTINGS REGISTRY: braille/enabled using default value = True
+18:52:19.109979 - GSETTINGS SCHEMA HANDLE: braille / flash-messages-persistent not set [profile:default]
+18:52:19.110003 - GSETTINGS REGISTRY: braille/flash-messages-persistent using default value = False
+18:52:19.110044 - GSETTINGS SCHEMA HANDLE: braille / flash-message-duration not set [profile:default]
+18:52:19.110068 - GSETTINGS REGISTRY: braille/flash-message-duration using default value = 5000
+18:52:19.110097 - BRAILLE: Display message: 'Screen reader on.' (flash_time: 5000)
+18:52:19.110114 - BRAILLE: Initializing flash: Source ID: 0
+18:52:19.110158 - BRAILLE: Not contracting 'Screen reader on.' because contracted braille is not enabled.
+18:52:19.110261 - BRAILLE: Refresh. Pan: True target: 0
+18:52:19.110295 - GSETTINGS REGISTRY: braille/enabled using default value = True
+18:52:19.110349 - BRAILLE: Last text object: None [(Caret:, 0,, Line:, 0,, Cell:, 0,)]
+18:52:19.110397 - BRAILLE: Current text object: None [(Caret:, 0,, Line:, 0,). On same line:] False
+18:52:19.110446 - BRAILLE: Line 0: 'Screen reader on.' focusOffset: 0 [[0, 17]]
+18:52:19.110479 - BRAILLE: Current range: (0, 32). Target cell: 0
+18:52:19.110499 - BRAILLE LINE:  'Screen reader on.'
+18:52:19.110521 -      VISIBLE:  'Screen reader on.', cursor=0
+18:52:19.110541 - BRAILLE: Enabling braille. BrlAPI running: False
+18:52:19.110547 - BRAILLE: Need to initialize first.
+18:52:19.110564 - BRAILLE: Initializing. Callback: input_event_manager.InputEventManager.process_braille_event
+18:52:19.110571 - BRAILLE: BrlAPI connection already in progress.
+18:52:19.110622 - EVENT MANAGER: Activating <unknown>.<module>:402 > orca._activate_services:219 > event_manager.activate:132
+18:52:19.115834 - AXDeviceManager: Starting key watcher.
+18:52:19.115898 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.115934 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.115947 - EVENT MANAGER: Activated
+18:52:19.115957 - SCRIPT MANAGER: Activating <unknown>.<module>:402 > orca._activate_services:220 > script_manager.activate:62
+18:52:19.116377 - EVENT MANAGER: Registering listeners for: default (module=orca.scripts.default)
+18:52:19.116400 - EVENT MANAGER: registering listener for: document:attributes-changed
+18:52:19.116984 - EVENT MANAGER: registering listener for: document:load-complete
+18:52:19.117269 - EVENT MANAGER: registering listener for: document:load-stopped
+18:52:19.117550 - EVENT MANAGER: registering listener for: document:page-changed
+18:52:19.117852 - EVENT MANAGER: registering listener for: document:reload
+18:52:19.118148 - EVENT MANAGER: registering listener for: mouse:button
+18:52:19.118432 - EVENT MANAGER: registering listener for: object:active-descendant-changed
+18:52:19.118686 - EVENT MANAGER: registering listener for: object:announcement
+18:52:19.119119 - EVENT MANAGER: registering listener for: object:attributes-changed
+18:52:19.119384 - EVENT MANAGER: registering listener for: object:children-changed:add
+18:52:19.119690 - EVENT MANAGER: registering listener for: object:children-changed:remove
+18:52:19.120005 - EVENT MANAGER: registering listener for: object:column-reordered
+18:52:19.120324 - EVENT MANAGER: registering listener for: object:property-change:accessible-description
+18:52:19.120664 - EVENT MANAGER: registering listener for: object:property-change:accessible-name
+18:52:19.121035 - EVENT MANAGER: registering listener for: object:property-change:accessible-value
+18:52:19.121473 - EVENT MANAGER: registering listener for: object:row-reordered
+18:52:19.121697 - EVENT MANAGER: registering listener for: object:selection-changed
+18:52:19.121903 - EVENT MANAGER: registering listener for: object:state-changed:active
+18:52:19.122673 - EVENT MANAGER: registering listener for: object:state-changed:busy
+18:52:19.123084 - EVENT MANAGER: registering listener for: object:state-changed:checked
+18:52:19.123712 - EVENT MANAGER: registering listener for: object:state-changed:expanded
+18:52:19.124185 - EVENT MANAGER: registering listener for: object:state-changed:focused
+18:52:19.124586 - EVENT MANAGER: registering listener for: object:state-changed:indeterminate
+18:52:19.125031 - EVENT MANAGER: registering listener for: object:state-changed:invalid-entry
+18:52:19.127444 - EVENT MANAGER: registering listener for: object:state-changed:pressed
+18:52:19.127879 - EVENT MANAGER: registering listener for: object:state-changed:selected
+18:52:19.128239 - EVENT MANAGER: registering listener for: object:state-changed:sensitive
+18:52:19.128686 - EVENT MANAGER: registering listener for: object:state-changed:showing
+18:52:19.129105 - EVENT MANAGER: registering listener for: object:text-attributes-changed
+18:52:19.129581 - EVENT MANAGER: registering listener for: object:text-caret-moved
+18:52:19.130057 - EVENT MANAGER: registering listener for: object:text-changed:delete
+18:52:19.130545 - EVENT MANAGER: registering listener for: object:text-changed:insert
+18:52:19.131236 - EVENT MANAGER: registering listener for: object:text-selection-changed
+18:52:19.131472 - EVENT MANAGER: registering listener for: object:value-changed
+18:52:19.131744 - EVENT MANAGER: registering listener for: window:activate
+18:52:19.132021 - EVENT MANAGER: registering listener for: window:create
+18:52:19.132300 - EVENT MANAGER: registering listener for: window:deactivate
+18:52:19.132580 - EVENT MANAGER: registering listener for: window:destroy
+18:52:19.132956 - SCRIPT MANAGER: Setting active script to default (module=orca.scripts.default) reason: activate
+18:52:19.132978 - DEFAULT: Activating script for None
+18:52:19.133266 - SPEECH MANAGER: Speech server is <orca.speechdispatcherfactory.SpeechServer object at 0xffff73730ec0>
+18:52:19.133343 - GSETTINGS SCHEMA HANDLE: speech / punctuation-level not set [profile:default]
+18:52:19.133374 - GSETTINGS REGISTRY: speech/punctuation-level using default value = 'most'
+18:52:19.133800 - SPEECH MANAGER: Speech server is <orca.speechdispatcherfactory.SpeechServer object at 0xffff73730ec0>
+18:52:19.133856 - GSETTINGS SCHEMA HANDLE: speech / capitalization-style not set [profile:default]
+18:52:19.133882 - GSETTINGS REGISTRY: speech/capitalization-style using default value = 'none'
+18:52:19.134157 - SPEECH MANAGER: Speech server is <orca.speechdispatcherfactory.SpeechServer object at 0xffff73730ec0>
+18:52:19.134250 - GSETTINGS SCHEMA HANDLE: speech / synthesizer not set [profile:default]
+18:52:19.134278 - GSETTINGS REGISTRY: speech/synthesizer using default value = ''
+18:52:19.134310 - SCRIPT MANAGER: Active script is: default (module=orca.scripts.default)
+18:52:19.134335 - CARET NAVIGATOR: Commands suspended: False: script activation, no prior state
+18:52:19.134393 - GSETTINGS SCHEMA HANDLE: keybindings / keyboard-layout not set [profile:default]
+18:52:19.134419 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.134467 - GSETTINGS SCHEMA HANDLE: keybindings / desktop-modifier-keys not set [profile:default]
+18:52:19.134494 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.134551 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.134575 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.134610 - SCRIPT MANAGER: Active script is: default (module=orca.scripts.default)
+18:52:19.134638 - STRUCTURAL NAVIGATOR: Suspended: False: script activation, no prior state
+18:52:19.134662 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.134685 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.134738 - STRUCTURAL NAVIGATOR: Setting mode for default (module=orca.scripts.default) to NavigationMode.OFF
+18:52:19.134754 - SCRIPT MANAGER: Active script is: default (module=orca.scripts.default)
+18:52:19.134779 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.134802 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.136033 - COMMAND MANAGER: set_group_enabled(Structural navigation, False): removed 82, added 0
+18:52:19.136068 - CARET NAVIGATOR: Setting enabled state for default (module=orca.scripts.default) to False
+18:52:19.136086 - SCRIPT MANAGER: Active script is: default (module=orca.scripts.default)
+18:52:19.136121 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.136145 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.136287 - COMMAND MANAGER: set_group_enabled(Caret navigation, False): removed 10, added 0
+18:52:19.136310 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.136332 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.136384 - GSETTINGS REGISTRY: Schema org.gnome.Orca.TableNavigation loaded
+18:52:19.136448 - GSETTINGS SCHEMA HANDLE: table-navigation / enabled not set [profile:default]
+18:52:19.136473 - GSETTINGS REGISTRY: table-navigation/enabled using default value = True
+18:52:19.136490 - TABLE NAVIGATOR: Refreshing enabled state for active app: True.
+18:52:19.136512 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.136533 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.136565 - COMMAND MANAGER: Activating commands: activated default (module=orca.scripts.default)
+18:52:19.136683 - GSETTINGS SCHEMA HANDLE: keybindings / entries no dict values set
+18:52:19.136707 - GSETTINGS REGISTRY: keybindings/entries using default value = {}
+18:52:19.136712 - COMMAND MANAGER: No user overrides to apply
+18:52:19.136784 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.136806 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.136915 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: t mods=256 clicks=2 grab ids=[] keysym=116 keycode=0 modifiers=32768
+18:52:19.136965 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: t mods=256 clicks=2 grab ids=[] keysym=116 keycode=0 modifiers=65536
+18:52:19.137062 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=114 keycode=0 modifiers=32769
+18:52:19.137109 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=114 keycode=0 modifiers=65537
+18:52:19.137156 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=82 keycode=0 modifiers=32769
+18:52:19.137202 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=82 keycode=0 modifiers=65537
+18:52:19.137323 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=99 keycode=0 modifiers=32769
+18:52:19.137370 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=99 keycode=0 modifiers=65537
+18:52:19.137415 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=67 keycode=0 modifiers=32769
+18:52:19.137461 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=67 keycode=0 modifiers=65537
+18:52:19.137532 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=2 grab ids=[] keysym=97 keycode=0 modifiers=32768
+18:52:19.137700 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=2 grab ids=[] keysym=97 keycode=0 modifiers=65536
+18:52:19.137869 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=3 grab ids=[] keysym=97 keycode=0 modifiers=32768
+18:52:19.137930 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=3 grab ids=[] keysym=97 keycode=0 modifiers=65536
+18:52:19.138001 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Up mods=0 clicks=2 grab ids=[] keysym=65431 keycode=0 modifiers=0
+18:52:19.138057 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Up mods=0 clicks=3 grab ids=[] keysym=65431 keycode=0 modifiers=0
+18:52:19.138138 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Begin mods=0 clicks=2 grab ids=[] keysym=65437 keycode=0 modifiers=0
+18:52:19.138253 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Begin mods=0 clicks=3 grab ids=[] keysym=65437 keycode=0 modifiers=0
+18:52:19.138320 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Down mods=0 clicks=2 grab ids=[] keysym=65433 keycode=0 modifiers=0
+18:52:19.138377 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Down mods=0 clicks=3 grab ids=[] keysym=65433 keycode=0 modifiers=0
+18:52:19.138430 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Add mods=0 clicks=2 grab ids=[] keysym=65451 keycode=0 modifiers=0
+18:52:19.138506 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: f mods=256 clicks=2 grab ids=[] keysym=102 keycode=0 modifiers=32768
+18:52:19.138555 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: f mods=256 clicks=2 grab ids=[] keysym=102 keycode=0 modifiers=65536
+18:52:19.138629 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=256 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=32768
+18:52:19.138679 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=256 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=65536
+18:52:19.138731 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=0 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=0
+
+vvvvv COMMAND MANAGER: Grab diff: activated default (module=orca.scripts.default) (old: 78, new: 78) vvvvv
+18:52:19.138776 -   No grab changes
+^^^^^ COMMAND MANAGER: Diff completed in 0.002 s. Removed 0, added 0, transferred 0 ^^^^^
+
+18:52:19.138881 - GSETTINGS SCHEMA HANDLE: speech / enable not set [profile:default]
+18:52:19.138907 - GSETTINGS REGISTRY: speech/enable using default value = True
+18:52:19.138912 - SPEECH MANAGER: Speech is enabled.
+18:52:19.138944 - SPEECH MANAGER: start_speech. Script: None Event: None notify_user: False
+18:52:19.138948 - SPEECH MANAGER: Initializing server
+18:52:19.138952 - SPEECH MANAGER: Already initialized
+18:52:19.138978 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.138995 - COMMAND MANAGER: Setting keyboard layout is_desktop to True.
+18:52:19.139216 - GSETTINGS REGISTRY: keybindings/entries using default value = {}
+18:52:19.139225 - COMMAND MANAGER: No user overrides to apply
+18:52:19.139314 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.139345 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.139448 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: t mods=256 clicks=2 grab ids=[] keysym=116 keycode=0 modifiers=32768
+18:52:19.139496 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: t mods=256 clicks=2 grab ids=[] keysym=116 keycode=0 modifiers=65536
+18:52:19.139592 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=114 keycode=0 modifiers=32769
+18:52:19.139638 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=114 keycode=0 modifiers=65537
+18:52:19.139684 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=82 keycode=0 modifiers=32769
+18:52:19.139733 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=82 keycode=0 modifiers=65537
+18:52:19.139821 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=99 keycode=0 modifiers=32769
+18:52:19.139868 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=99 keycode=0 modifiers=65537
+18:52:19.139912 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=67 keycode=0 modifiers=32769
+18:52:19.139959 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=67 keycode=0 modifiers=65537
+18:52:19.140032 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=2 grab ids=[] keysym=97 keycode=0 modifiers=32768
+18:52:19.140077 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=2 grab ids=[] keysym=97 keycode=0 modifiers=65536
+18:52:19.140142 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=3 grab ids=[] keysym=97 keycode=0 modifiers=32768
+18:52:19.140186 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=3 grab ids=[] keysym=97 keycode=0 modifiers=65536
+18:52:19.140236 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Up mods=0 clicks=2 grab ids=[] keysym=65431 keycode=0 modifiers=0
+18:52:19.140284 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Up mods=0 clicks=3 grab ids=[] keysym=65431 keycode=0 modifiers=0
+18:52:19.140335 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Begin mods=0 clicks=2 grab ids=[] keysym=65437 keycode=0 modifiers=0
+18:52:19.140388 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Begin mods=0 clicks=3 grab ids=[] keysym=65437 keycode=0 modifiers=0
+18:52:19.140442 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Down mods=0 clicks=2 grab ids=[] keysym=65433 keycode=0 modifiers=0
+18:52:19.140502 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Down mods=0 clicks=3 grab ids=[] keysym=65433 keycode=0 modifiers=0
+18:52:19.140550 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Add mods=0 clicks=2 grab ids=[] keysym=65451 keycode=0 modifiers=0
+18:52:19.140626 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: f mods=256 clicks=2 grab ids=[] keysym=102 keycode=0 modifiers=32768
+18:52:19.140679 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: f mods=256 clicks=2 grab ids=[] keysym=102 keycode=0 modifiers=65536
+18:52:19.140757 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=256 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=32768
+18:52:19.140804 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=256 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=65536
+18:52:19.140853 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=0 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=0
+
+vvvvv COMMAND MANAGER: Grab diff: keyboard layout change (old: 78, new: 78) vvvvv
+18:52:19.140896 -   No grab changes
+^^^^^ COMMAND MANAGER: Diff completed in 0.0015 s. Removed 0, added 0, transferred 0 ^^^^^
+
+18:52:19.140965 - COMMAND MANAGER: Keyboard layout set to desktop.
+18:52:19.140996 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.141018 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.141023 - SCRIPT MANAGER: Activated
+18:52:19.143149 - AXObject: Clearing AT-SPI cache on [frame: 'agentOS system bar' (0xffff71f7e240)] Recursive: False. Reason: Checking if window can be the active window
+18:52:19.146925 - AXUtilities: [frame: 'agentOS system bar' (0xffff71f7e240)] from [application: 'agent-os-desktop' (0xffff737c1240)] lacks active state
+18:52:19.147784 - AXObject: Clearing AT-SPI cache on [frame: 'Welcome to agentOS' (0xffff7378f1c0)] Recursive: False. Reason: Checking if window can be the active window
+18:52:19.150912 - AXUtilities: [frame: 'Welcome to agentOS' (0xffff7378f1c0)] from [application: 'agent-os-desktop' (0xffff737c1240)] lacks active state
+18:52:19.151837 - AXObject: Clearing AT-SPI cache on [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] Recursive: False. Reason: Checking if window can be the active window
+18:52:19.154602 - AXUtilities: [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] from [application: 'agent-os-desktop' (0xffff737c1240)] can be active window
+18:52:19.155288 - AXUtilities: Active window is [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)]
+18:52:19.155320 - FOCUS MANAGER: Locus of focus is None
+18:52:19.156353 - FOCUS MANAGER: Request to set active window to [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] in [application: 'agent-os-desktop' (0xffff737c1240)]
+18:52:19.156820 - FOCUS MANAGER: Request to set locus of focus to [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] <unknown>.<module>:402 > orca._activate_services:224 > focus_manager.set_active_window:431 > focus_manager.set_locus_of_focus:320
+18:52:19.158245 - AXObject: Clearing AT-SPI cache on [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] Recursive: False. Reason: Setting locus of focus.
+18:52:19.158276 - SCRIPT MANAGER: Active script is: default (module=orca.scripts.default)
+18:52:19.163427 - FOCUS MANAGER: Changing locus of focus from None to [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)]. Notify: True
+18:52:19.163511 - FOCUS MANAGER: Switching mode from None to focus-tracking
+18:52:19.164368 - FOCUS MANAGER: Region of interest: [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] (0, 0)
+18:52:19.165307 - FOCUS MANAGER: Switching object of interest from None to [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)]
+18:52:19.168478 - DOCUMENT PRESENTER: Updating mode for focus change. Old focus: None old doc: None New focus: [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] new doc: None
+18:52:19.168536 - SCRIPT MANAGER: Active script is: default (module=orca.scripts.default)
+18:52:19.168571 - CARET NAVIGATOR: Commands suspended: False: locus of focus no longer in document
+18:52:19.168643 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.168698 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.168754 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.168778 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.168814 - SCRIPT MANAGER: Active script is: default (module=orca.scripts.default)
+18:52:19.168844 - STRUCTURAL NAVIGATOR: Suspended: False: locus of focus no longer in document
+18:52:19.168875 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.168911 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.168981 - STRUCTURAL NAVIGATOR: Setting mode for default (module=orca.scripts.default) to NavigationMode.OFF
+18:52:19.168996 - SCRIPT MANAGER: Active script is: default (module=orca.scripts.default)
+18:52:19.169021 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.169044 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.169096 - CARET NAVIGATOR: Setting enabled state for default (module=orca.scripts.default) to False
+18:52:19.169111 - SCRIPT MANAGER: Active script is: default (module=orca.scripts.default)
+18:52:19.169134 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.169156 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.169191 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.169214 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.171488 - SCRIPT UTILITIES: [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] is top-level object for: [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)]
+18:52:19.171984 - FOCUS MANAGER: Request to set active window to [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)]
+18:52:19.172000 - FOCUS MANAGER: Setting active window to existing active window
+18:52:19.175332 - SCRIPT MANAGER: Getting script for [application: 'agent-os-desktop' (0xffff737c1240)] [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)]
+18:52:19.176884 - SCRIPT MANAGER: Creating toolkit script for [application: 'agent-os-desktop' (0xffff737c1240)] [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] gtk
+18:52:19.177668 - SCRIPT MANAGER: Mapped [application: 'agent-os-desktop' (0xffff737c1240)] to agent-os-desktop
+18:52:19.179101 - SCRIPT MANAGER: Found orca.scripts.toolkits.gtk
+18:52:19.180215 - DEFAULT: Setting up commands for [application: 'agent-os-desktop' (0xffff737c1240)]
+18:52:19.180226 - DEFAULT: Commands already initialized.
+18:52:19.180257 - SCRIPT: agent-os-desktop (module=orca.scripts.toolkits.gtk.script) initialized
+18:52:19.180767 - SCRIPT MANAGER: Creating app script for [application: 'agent-os-desktop' (0xffff737c1240)]
+18:52:19.181605 - SCRIPT MANAGER: Mapped [application: 'agent-os-desktop' (0xffff737c1240)] to agent-os-desktop
+18:52:19.183449 - DEFAULT: Setting up commands for [application: 'agent-os-desktop' (0xffff737c1240)]
+18:52:19.183464 - DEFAULT: Commands already initialized.
+18:52:19.183490 - SCRIPT: agent-os-desktop (module=orca.scripts.default) initialized
+18:52:19.184000 - SCRIPT MANAGER: Default script created for [application: 'agent-os-desktop' (0xffff737c1240)] (obj: None)
+18:52:19.184523 - GSETTINGS REGISTRY: Schema org.gnome.Orca.SleepMode loaded
+18:52:19.184599 - GSETTINGS SCHEMA HANDLE: sleep-mode / apps not set [profile:default]
+18:52:19.184628 - GSETTINGS REGISTRY: sleep-mode/apps using default value = []
+18:52:19.184890 - SCRIPT MANAGER: Script is app script agent-os-desktop (module=orca.scripts.default)
+18:52:19.184918 - SCRIPT MANAGER: Deactivating default (module=orca.scripts.default) reason: Setting active window
+18:52:19.184963 - SCRIPT MANAGER: Setting active script to agent-os-desktop (module=orca.scripts.default) reason: Setting active window
+18:52:19.185502 - DEFAULT: Activating script for [application: 'agent-os-desktop' (0xffff737c1240)]
+18:52:19.185815 - SPEECH MANAGER: Speech server is <orca.speechdispatcherfactory.SpeechServer object at 0xffff73730ec0>
+18:52:19.185903 - GSETTINGS SCHEMA HANDLE: speech / punctuation-level not set [app:agent-os-desktop, profile:default]
+18:52:19.185933 - GSETTINGS REGISTRY: speech/punctuation-level using default value = 'most'
+18:52:19.186290 - SPEECH MANAGER: Speech server is <orca.speechdispatcherfactory.SpeechServer object at 0xffff73730ec0>
+18:52:19.186365 - GSETTINGS SCHEMA HANDLE: speech / capitalization-style not set [app:agent-os-desktop, profile:default]
+18:52:19.186394 - GSETTINGS REGISTRY: speech/capitalization-style using default value = 'none'
+18:52:19.186766 - SPEECH MANAGER: Speech server is <orca.speechdispatcherfactory.SpeechServer object at 0xffff73730ec0>
+18:52:19.186950 - GSETTINGS SCHEMA HANDLE: speech / synthesizer not set [app:agent-os-desktop, profile:default]
+18:52:19.186983 - GSETTINGS REGISTRY: speech/synthesizer using default value = ''
+18:52:19.187093 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.default)
+18:52:19.187125 - CARET NAVIGATOR: Commands suspended: False: script activation, no prior state
+18:52:19.187191 - GSETTINGS SCHEMA HANDLE: keybindings / keyboard-layout not set [app:agent-os-desktop, profile:default]
+18:52:19.187216 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.187262 - GSETTINGS SCHEMA HANDLE: keybindings / desktop-modifier-keys not set [app:agent-os-desktop, profile:default]
+18:52:19.187287 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.187329 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.187356 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.187382 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.default)
+18:52:19.187405 - STRUCTURAL NAVIGATOR: Suspended: False: script activation, no prior state
+18:52:19.187428 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.187451 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.187496 - STRUCTURAL NAVIGATOR: Setting mode for agent-os-desktop (module=orca.scripts.default) to NavigationMode.OFF
+18:52:19.187510 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.default)
+18:52:19.187533 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.187555 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.187600 - CARET NAVIGATOR: Setting enabled state for agent-os-desktop (module=orca.scripts.default) to False
+18:52:19.187614 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.default)
+18:52:19.187636 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.187657 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.187690 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.187711 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.187777 - GSETTINGS SCHEMA HANDLE: table-navigation / enabled not set [app:agent-os-desktop, profile:default]
+18:52:19.187806 - GSETTINGS REGISTRY: table-navigation/enabled using default value = True
+18:52:19.187825 - TABLE NAVIGATOR: Refreshing enabled state for active app: True.
+18:52:19.187849 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.187872 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.187907 - COMMAND MANAGER: Activating commands: activated agent-os-desktop (module=orca.scripts.default)
+18:52:19.188019 - GSETTINGS SCHEMA HANDLE: keybindings / entries no dict values set
+18:52:19.188043 - GSETTINGS REGISTRY: keybindings/entries using default value = {}
+18:52:19.188047 - COMMAND MANAGER: No user overrides to apply
+18:52:19.188124 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.188147 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.188293 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: t mods=256 clicks=2 grab ids=[] keysym=116 keycode=0 modifiers=32768
+18:52:19.188353 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: t mods=256 clicks=2 grab ids=[] keysym=116 keycode=0 modifiers=65536
+18:52:19.188520 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=114 keycode=0 modifiers=32769
+18:52:19.188577 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=114 keycode=0 modifiers=65537
+18:52:19.188627 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=82 keycode=0 modifiers=32769
+18:52:19.188676 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=82 keycode=0 modifiers=65537
+18:52:19.188778 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=99 keycode=0 modifiers=32769
+18:52:19.188829 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=99 keycode=0 modifiers=65537
+18:52:19.188876 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=67 keycode=0 modifiers=32769
+18:52:19.188923 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=67 keycode=0 modifiers=65537
+18:52:19.189002 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=2 grab ids=[] keysym=97 keycode=0 modifiers=32768
+18:52:19.189054 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=2 grab ids=[] keysym=97 keycode=0 modifiers=65536
+18:52:19.189136 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=3 grab ids=[] keysym=97 keycode=0 modifiers=32768
+18:52:19.189188 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=3 grab ids=[] keysym=97 keycode=0 modifiers=65536
+18:52:19.189250 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Up mods=0 clicks=2 grab ids=[] keysym=65431 keycode=0 modifiers=0
+18:52:19.189301 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Up mods=0 clicks=3 grab ids=[] keysym=65431 keycode=0 modifiers=0
+18:52:19.189354 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Begin mods=0 clicks=2 grab ids=[] keysym=65437 keycode=0 modifiers=0
+18:52:19.189404 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Begin mods=0 clicks=3 grab ids=[] keysym=65437 keycode=0 modifiers=0
+18:52:19.189454 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Down mods=0 clicks=2 grab ids=[] keysym=65433 keycode=0 modifiers=0
+18:52:19.189506 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Down mods=0 clicks=3 grab ids=[] keysym=65433 keycode=0 modifiers=0
+18:52:19.189556 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Add mods=0 clicks=2 grab ids=[] keysym=65451 keycode=0 modifiers=0
+18:52:19.189626 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: f mods=256 clicks=2 grab ids=[] keysym=102 keycode=0 modifiers=32768
+18:52:19.189672 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: f mods=256 clicks=2 grab ids=[] keysym=102 keycode=0 modifiers=65536
+18:52:19.189739 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=256 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=32768
+18:52:19.189785 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=256 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=65536
+18:52:19.189835 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=0 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=0
+
+vvvvv COMMAND MANAGER: Grab diff: activated agent-os-desktop (module=orca.scripts.default) (old: 78, new: 78) vvvvv
+18:52:19.189879 -   No grab changes
+^^^^^ COMMAND MANAGER: Diff completed in 0.0017 s. Removed 0, added 0, transferred 0 ^^^^^
+
+18:52:19.189986 - GSETTINGS SCHEMA HANDLE: speech / enable not set [app:agent-os-desktop, profile:default]
+18:52:19.190012 - GSETTINGS REGISTRY: speech/enable using default value = True
+18:52:19.190017 - SPEECH MANAGER: Speech is enabled.
+18:52:19.190046 - SPEECH MANAGER: start_speech. Script: None Event: None notify_user: False
+18:52:19.190050 - SPEECH MANAGER: Initializing server
+18:52:19.190053 - SPEECH MANAGER: Already initialized
+18:52:19.190078 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.190096 - COMMAND MANAGER: Setting keyboard layout is_desktop to True.
+18:52:19.190184 - GSETTINGS REGISTRY: keybindings/entries using default value = {}
+18:52:19.190188 - COMMAND MANAGER: No user overrides to apply
+18:52:19.190256 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.190279 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.190366 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: t mods=256 clicks=2 grab ids=[] keysym=116 keycode=0 modifiers=32768
+18:52:19.190414 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: t mods=256 clicks=2 grab ids=[] keysym=116 keycode=0 modifiers=65536
+18:52:19.190509 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=114 keycode=0 modifiers=32769
+18:52:19.190556 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=114 keycode=0 modifiers=65537
+18:52:19.190603 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=82 keycode=0 modifiers=32769
+18:52:19.190651 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=82 keycode=0 modifiers=65537
+18:52:19.190741 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=99 keycode=0 modifiers=32769
+18:52:19.190788 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=99 keycode=0 modifiers=65537
+18:52:19.190839 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=67 keycode=0 modifiers=32769
+18:52:19.190886 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=67 keycode=0 modifiers=65537
+18:52:19.190955 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=2 grab ids=[] keysym=97 keycode=0 modifiers=32768
+18:52:19.191025 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=2 grab ids=[] keysym=97 keycode=0 modifiers=65536
+18:52:19.191097 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=3 grab ids=[] keysym=97 keycode=0 modifiers=32768
+18:52:19.191143 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=3 grab ids=[] keysym=97 keycode=0 modifiers=65536
+18:52:19.191194 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Up mods=0 clicks=2 grab ids=[] keysym=65431 keycode=0 modifiers=0
+18:52:19.191243 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Up mods=0 clicks=3 grab ids=[] keysym=65431 keycode=0 modifiers=0
+18:52:19.191314 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Begin mods=0 clicks=2 grab ids=[] keysym=65437 keycode=0 modifiers=0
+18:52:19.191366 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Begin mods=0 clicks=3 grab ids=[] keysym=65437 keycode=0 modifiers=0
+18:52:19.191415 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Down mods=0 clicks=2 grab ids=[] keysym=65433 keycode=0 modifiers=0
+18:52:19.191463 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Down mods=0 clicks=3 grab ids=[] keysym=65433 keycode=0 modifiers=0
+18:52:19.191513 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Add mods=0 clicks=2 grab ids=[] keysym=65451 keycode=0 modifiers=0
+18:52:19.191583 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: f mods=256 clicks=2 grab ids=[] keysym=102 keycode=0 modifiers=32768
+18:52:19.191629 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: f mods=256 clicks=2 grab ids=[] keysym=102 keycode=0 modifiers=65536
+18:52:19.191704 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=256 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=32768
+18:52:19.191754 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=256 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=65536
+18:52:19.191806 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=0 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=0
+
+vvvvv COMMAND MANAGER: Grab diff: keyboard layout change (old: 78, new: 78) vvvvv
+18:52:19.191851 -   No grab changes
+^^^^^ COMMAND MANAGER: Diff completed in 0.0016 s. Removed 0, added 0, transferred 0 ^^^^^
+
+18:52:19.191912 - COMMAND MANAGER: Keyboard layout set to desktop.
+18:52:19.191941 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.191964 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.191978 - PRESENTATION MANAGER: Not interrupting for locusOfFocus change: event is None
+18:52:19.193064 - FOCUS MANAGER: Active mode: focus-tracking Object of interest: [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)]
+18:52:19.193104 - GSETTINGS REGISTRY: speech/enable using default value = True
+18:52:19.193367 - GSETTINGS SCHEMA HANDLE: speech / verbosity-level not set [app:agent-os-desktop, profile:default]
+18:52:19.193394 - GSETTINGS REGISTRY: speech/verbosity-level using default value = 'verbose'
+18:52:19.193863 - FOCUS MANAGER: Locus of focus is [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)]
+18:52:19.193894 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.default)
+18:52:19.193960 - GSETTINGS SCHEMA HANDLE: speech / auto-language-switching not set [app:agent-os-desktop, profile:default]
+18:52:19.193987 - GSETTINGS REGISTRY: speech/auto-language-switching using default value = True
+18:52:19.194037 - GSETTINGS SCHEMA HANDLE: speech / only-switch-configured-languages not set [app:agent-os-desktop, profile:default]
+18:52:19.194062 - GSETTINGS REGISTRY: speech/only-switch-configured-languages using default value = False
+18:52:19.194539 - GSETTINGS SCHEMA HANDLE: speech / auto-language-switching-ui not set [app:agent-os-desktop, profile:default]
+18:52:19.194567 - GSETTINGS REGISTRY: speech/auto-language-switching-ui using default value = False
+18:52:19.194614 - GSETTINGS SCHEMA HANDLE: speech / insert-pauses-between-utterances not set [app:agent-os-desktop, profile:default]
+18:52:19.194638 - GSETTINGS REGISTRY: speech/insert-pauses-between-utterances using default value = True
+18:52:19.194663 - GSETTINGS REGISTRY: speech/punctuation-level using default value = 'most'
+18:52:19.194728 - GSETTINGS SCHEMA HANDLE: voice / established not set [app:agent-os-desktop, profile:default]
+18:52:19.194776 - GSETTINGS SCHEMA HANDLE: voice / rate not set [app:agent-os-desktop, profile:default]
+18:52:19.194822 - GSETTINGS SCHEMA HANDLE: voice / pitch not set [app:agent-os-desktop, profile:default]
+18:52:19.194866 - GSETTINGS SCHEMA HANDLE: voice / pitch-range not set [app:agent-os-desktop, profile:default]
+18:52:19.194911 - GSETTINGS SCHEMA HANDLE: voice / volume not set [app:agent-os-desktop, profile:default]
+18:52:19.194957 - GSETTINGS SCHEMA HANDLE: voice / family-name not set [app:agent-os-desktop, profile:default]
+18:52:19.195131 - GSETTINGS SCHEMA HANDLE: voice / family-lang not set [app:agent-os-desktop, profile:default]
+18:52:19.195194 - GSETTINGS SCHEMA HANDLE: voice / family-dialect not set [app:agent-os-desktop, profile:default]
+18:52:19.195240 - GSETTINGS SCHEMA HANDLE: voice / family-gender not set [app:agent-os-desktop, profile:default]
+18:52:19.195285 - GSETTINGS SCHEMA HANDLE: voice / family-variant not set [app:agent-os-desktop, profile:default]
+18:52:19.195352 - GSETTINGS SCHEMA HANDLE: voice / established not set [app:agent-os-desktop, profile:default]
+18:52:19.195397 - GSETTINGS SCHEMA HANDLE: voice / rate not set [app:agent-os-desktop, profile:default]
+18:52:19.195444 - GSETTINGS SCHEMA HANDLE: voice / pitch not set [app:agent-os-desktop, profile:default]
+18:52:19.195487 - GSETTINGS SCHEMA HANDLE: voice / pitch-range not set [app:agent-os-desktop, profile:default]
+18:52:19.195529 - GSETTINGS SCHEMA HANDLE: voice / volume not set [app:agent-os-desktop, profile:default]
+18:52:19.195575 - GSETTINGS SCHEMA HANDLE: voice / family-name not set [app:agent-os-desktop, profile:default]
+18:52:19.195617 - GSETTINGS SCHEMA HANDLE: voice / family-lang not set [app:agent-os-desktop, profile:default]
+18:52:19.195659 - GSETTINGS SCHEMA HANDLE: voice / family-dialect not set [app:agent-os-desktop, profile:default]
+18:52:19.195702 - GSETTINGS SCHEMA HANDLE: voice / family-gender not set [app:agent-os-desktop, profile:default]
+18:52:19.195743 - GSETTINGS SCHEMA HANDLE: voice / family-variant not set [app:agent-os-desktop, profile:default]
+18:52:19.195796 - GSETTINGS SCHEMA HANDLE: voice / established not set [app:agent-os-desktop, profile:default]
+18:52:19.195838 - GSETTINGS SCHEMA HANDLE: voice / rate not set [app:agent-os-desktop, profile:default]
+18:52:19.195880 - GSETTINGS SCHEMA HANDLE: voice / pitch not set [app:agent-os-desktop, profile:default]
+18:52:19.195921 - GSETTINGS SCHEMA HANDLE: voice / pitch-range not set [app:agent-os-desktop, profile:default]
+18:52:19.195966 - GSETTINGS SCHEMA HANDLE: voice / volume not set [app:agent-os-desktop, profile:default]
+18:52:19.196010 - GSETTINGS SCHEMA HANDLE: voice / family-name not set [app:agent-os-desktop, profile:default]
+18:52:19.196054 - GSETTINGS SCHEMA HANDLE: voice / family-lang not set [app:agent-os-desktop, profile:default]
+18:52:19.196097 - GSETTINGS SCHEMA HANDLE: voice / family-dialect not set [app:agent-os-desktop, profile:default]
+18:52:19.196139 - GSETTINGS SCHEMA HANDLE: voice / family-gender not set [app:agent-os-desktop, profile:default]
+18:52:19.196180 - GSETTINGS SCHEMA HANDLE: voice / family-variant not set [app:agent-os-desktop, profile:default]
+18:52:19.196227 - GSETTINGS SCHEMA HANDLE: voice / established not set [app:agent-os-desktop, profile:default]
+18:52:19.196270 - GSETTINGS SCHEMA HANDLE: voice / rate not set [app:agent-os-desktop, profile:default]
+18:52:19.196311 - GSETTINGS SCHEMA HANDLE: voice / pitch not set [app:agent-os-desktop, profile:default]
+18:52:19.196353 - GSETTINGS SCHEMA HANDLE: voice / pitch-range not set [app:agent-os-desktop, profile:default]
+18:52:19.196393 - GSETTINGS SCHEMA HANDLE: voice / volume not set [app:agent-os-desktop, profile:default]
+18:52:19.196434 - GSETTINGS SCHEMA HANDLE: voice / family-name not set [app:agent-os-desktop, profile:default]
+18:52:19.196475 - GSETTINGS SCHEMA HANDLE: voice / family-lang not set [app:agent-os-desktop, profile:default]
+18:52:19.196516 - GSETTINGS SCHEMA HANDLE: voice / family-dialect not set [app:agent-os-desktop, profile:default]
+18:52:19.196556 - GSETTINGS SCHEMA HANDLE: voice / family-gender not set [app:agent-os-desktop, profile:default]
+18:52:19.196597 - GSETTINGS SCHEMA HANDLE: voice / family-variant not set [app:agent-os-desktop, profile:default]
+18:52:19.196646 - GSETTINGS SCHEMA HANDLE: speech / only-speak-displayed-text not set [app:agent-os-desktop, profile:default]
+18:52:19.196669 - GSETTINGS REGISTRY: speech/only-speak-displayed-text using default value = False
+18:52:19.196711 - GSETTINGS SCHEMA HANDLE: speech / speak-description not set [app:agent-os-desktop, profile:default]
+18:52:19.196733 - GSETTINGS REGISTRY: speech/speak-description using default value = True
+18:52:19.196774 - GSETTINGS SCHEMA HANDLE: speech / speak-tutorial-messages not set [app:agent-os-desktop, profile:default]
+18:52:19.196796 - GSETTINGS REGISTRY: speech/speak-tutorial-messages using default value = True
+18:52:19.196837 - GSETTINGS SCHEMA HANDLE: speech / speak-position-in-set not set [app:agent-os-desktop, profile:default]
+18:52:19.196858 - GSETTINGS REGISTRY: speech/speak-position-in-set using default value = False
+18:52:19.196899 - GSETTINGS SCHEMA HANDLE: speech / speak-widget-mnemonic not set [app:agent-os-desktop, profile:default]
+18:52:19.196920 - GSETTINGS REGISTRY: speech/speak-widget-mnemonic using default value = True
+18:52:19.196961 - GSETTINGS SCHEMA HANDLE: speech / speak-blank-lines not set [app:agent-os-desktop, profile:default]
+18:52:19.196982 - GSETTINGS REGISTRY: speech/speak-blank-lines using default value = True
+18:52:19.197023 - GSETTINGS SCHEMA HANDLE: speech / speak-indentation not set [app:agent-os-desktop, profile:default]
+18:52:19.197044 - GSETTINGS REGISTRY: speech/speak-indentation using default value = False
+18:52:19.197085 - GSETTINGS SCHEMA HANDLE: speech / announce-cell-headers not set [app:agent-os-desktop, profile:default]
+18:52:19.197106 - GSETTINGS REGISTRY: speech/announce-cell-headers using default value = True
+18:52:19.197147 - GSETTINGS SCHEMA HANDLE: speech / announce-cell-coordinates not set [app:agent-os-desktop, profile:default]
+18:52:19.197168 - GSETTINGS REGISTRY: speech/announce-cell-coordinates using default value = True
+18:52:19.197207 - GSETTINGS SCHEMA HANDLE: speech / announce-spreadsheet-cell-coordinates not set [app:agent-os-desktop, profile:default]
+18:52:19.197229 - GSETTINGS REGISTRY: speech/announce-spreadsheet-cell-coordinates using default value = True
+18:52:19.197273 - GSETTINGS SCHEMA HANDLE: speech / announce-article not set [app:agent-os-desktop, profile:default]
+18:52:19.197296 - GSETTINGS REGISTRY: speech/announce-article using default value = True
+18:52:19.197336 - GSETTINGS SCHEMA HANDLE: speech / announce-blockquote not set [app:agent-os-desktop, profile:default]
+18:52:19.197358 - GSETTINGS REGISTRY: speech/announce-blockquote using default value = True
+18:52:19.197398 - GSETTINGS SCHEMA HANDLE: speech / announce-code-block not set [app:agent-os-desktop, profile:default]
+18:52:19.197421 - GSETTINGS REGISTRY: speech/announce-code-block using default value = True
+18:52:19.197460 - GSETTINGS SCHEMA HANDLE: speech / announce-document not set [app:agent-os-desktop, profile:default]
+18:52:19.197482 - GSETTINGS REGISTRY: speech/announce-document using default value = True
+18:52:19.197521 - GSETTINGS SCHEMA HANDLE: speech / announce-form not set [app:agent-os-desktop, profile:default]
+18:52:19.197542 - GSETTINGS REGISTRY: speech/announce-form using default value = True
+18:52:19.197582 - GSETTINGS SCHEMA HANDLE: speech / announce-grouping not set [app:agent-os-desktop, profile:default]
+18:52:19.197603 - GSETTINGS REGISTRY: speech/announce-grouping using default value = True
+18:52:19.197643 - GSETTINGS SCHEMA HANDLE: speech / announce-landmark not set [app:agent-os-desktop, profile:default]
+18:52:19.197664 - GSETTINGS REGISTRY: speech/announce-landmark using default value = True
+18:52:19.197706 - GSETTINGS SCHEMA HANDLE: speech / announce-list not set [app:agent-os-desktop, profile:default]
+18:52:19.197727 - GSETTINGS REGISTRY: speech/announce-list using default value = True
+18:52:19.197766 - GSETTINGS SCHEMA HANDLE: speech / announce-table not set [app:agent-os-desktop, profile:default]
+18:52:19.197787 - GSETTINGS REGISTRY: speech/announce-table using default value = True
+18:52:19.197827 - GSETTINGS SCHEMA HANDLE: speech / announce-tracked-changes not set [app:agent-os-desktop, profile:default]
+18:52:19.197848 - GSETTINGS REGISTRY: speech/announce-tracked-changes using default value = True
+18:52:19.197893 - GSETTINGS SCHEMA HANDLE: speech / speak-text-attribute-changes not set [app:agent-os-desktop, profile:default]
+18:52:19.197914 - GSETTINGS REGISTRY: speech/speak-text-attribute-changes using default value = 'off'
+18:52:19.197964 - GSETTINGS SCHEMA HANDLE: speech / speak-misspelled-indicator not set [app:agent-os-desktop, profile:default]
+18:52:19.197986 - GSETTINGS REGISTRY: speech/speak-misspelled-indicator using default value = True
+18:52:19.198984 - GENERATOR: _get_functional_role: frame
+18:52:19.199555 - SPEECH GENERATOR: speech_generator.SpeechGenerator._generate_frame for [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)]
+18:52:19.199860 - SPEECH GENERATOR: _generate_old_ancestors: []
+18:52:19.200142 - SPEECH GENERATOR: _generate_new_ancestors: []
+18:52:19.200591 - SPEECH GENERATOR: _generate_accessible_label: []
+18:52:19.200861 - GENERATOR: _generate_accessible_name: [Agent view · Session lifecycle]
+18:52:19.201351 - SPEECH GENERATOR: default voice requested for [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] language='', dialect=''Unmodified voice={'established': 'False'}
+18:52:19.202122 - SPEECH GENERATOR: Reported locale of [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] is C
+18:52:19.202179 - SPEECH GENERATOR: Updated to: '', ''
+18:52:19.203909 - SPEECH GENERATOR: Final voice is {'established': 'False', 'family': '{}', 'voice-type': 'default'}
+18:52:19.203970 - SPEECH GENERATOR: _generate_accessible_name: [Agent view · Session lifecycle, {'established': 'False', 'family': '{}', 'voice-type': 'default'}]
+18:52:19.204021 - GENERATOR: _generate_accessible_label_and_name: [Agent view · Session lifecycle, {'established': 'False', 'family': '{}', 'voice-type': 'default'}]
+18:52:19.204461 - SPEECH PRESENTER: Adjusting 'Agent view · Session lifecycle' from [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] start_offset: None
+18:52:19.204525 - GSETTINGS SCHEMA HANDLE: speech / speak-numbers-as-digits not set [app:agent-os-desktop, profile:default]
+18:52:19.204552 - GSETTINGS REGISTRY: speech/speak-numbers-as-digits using default value = False
+18:52:19.205113 - GSETTINGS SCHEMA HANDLE: speech / repeated-character-limit not set [app:agent-os-desktop, profile:default]
+18:52:19.205141 - GSETTINGS REGISTRY: speech/repeated-character-limit using default value = 4
+18:52:19.206184 - GSETTINGS SCHEMA HANDLE: speech / use-pronunciation-dictionary not set [app:agent-os-desktop, profile:default]
+18:52:19.206217 - GSETTINGS REGISTRY: speech/use-pronunciation-dictionary using default value = True
+18:52:19.206289 - GSETTINGS SCHEMA HANDLE: pronunciations / entries no dict values set
+18:52:19.206314 - GSETTINGS REGISTRY: pronunciations/entries using default value = {}
+18:52:19.206336 - SPEECH PRESENTER: Adjusted text: 'Agent view · Session lifecycle'
+18:52:19.206398 - SPEECH GENERATOR: _generate_accessible_label_and_name: [Agent view · Session lifecycle, {'established': 'False', 'family': '{}', 'voice-type': 'default'}]
+18:52:19.210153 - SPEECH GENERATOR: _generate_accessible_role: []
+18:52:19.213631 - AXUtilities: Unfocused alerts and dialogs for [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)]: []
+18:52:19.213661 - SPEECH GENERATOR: _generate_unfocused_dialog_count: []
+18:52:19.213721 - SPEECH GENERATOR: Results: [Agent view · Session lifecycle, {'established': 'False', 'family': '{}', 'voice-type': 'default'}]
+18:52:19.213781 - SPEECH: Speak [Agent view · Session lifecycle, {'established': 'False', 'family': '{}', 'voice-type': 'default'}], acss: None
+18:52:19.213834 - SPEECH OUTPUT: 'Agent view · Session lifecycle'{'established': 'False', 'voice-type': 'default'}
+18:52:19.213854 - SPEECH DISPATCHER: Speaking 'Agent view · Session lifecycle' as string
+18:52:19.214964 - SPEECH DISPATCHER: Speaking '<speak><mark name="0:5"/>Agent <mark name="6:10"/>view <mark name="11:12"/>· <mark name="13:20"/>Session <mark name="21:30"/>lifecycle</speak>' 
+                  ORCA rate 50, pitch 5.0, pitch-range 5.0, volume 10.0, language, punctuation: MOST
+                  SD rate 0, pitch 0, volume 100, language en-US
+18:52:19.215411 - GSETTINGS SCHEMA HANDLE: braille / enabled not set [app:agent-os-desktop, profile:default]
+18:52:19.215448 - GSETTINGS REGISTRY: braille/enabled using default value = True
+18:52:19.216080 - FOCUS MANAGER: Active mode: focus-tracking Object of interest: [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)]
+18:52:19.216127 - GSETTINGS REGISTRY: braille/enabled using default value = True
+18:52:19.216200 - GSETTINGS SCHEMA HANDLE: braille / verbosity-level not set [app:agent-os-desktop, profile:default]
+18:52:19.216232 - GSETTINGS REGISTRY: braille/verbosity-level using default value = 'verbose'
+18:52:19.216618 - FOCUS MANAGER: Locus of focus is [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)]
+18:52:19.216642 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.default)
+18:52:19.216698 - GSETTINGS SCHEMA HANDLE: braille / rolename-style not set [app:agent-os-desktop, profile:default]
+18:52:19.216723 - GSETTINGS REGISTRY: braille/rolename-style using default value = 'verbose'
+18:52:19.216770 - GSETTINGS SCHEMA HANDLE: braille / display-ancestors not set [app:agent-os-desktop, profile:default]
+18:52:19.216793 - GSETTINGS REGISTRY: braille/display-ancestors using default value = True
+18:52:19.216841 - GSETTINGS SCHEMA HANDLE: braille / end-of-line-indicator not set [app:agent-os-desktop, profile:default]
+18:52:19.216864 - GSETTINGS REGISTRY: braille/end-of-line-indicator using default value = True
+18:52:19.216908 - GSETTINGS SCHEMA HANDLE: braille / present-mnemonics not set [app:agent-os-desktop, profile:default]
+18:52:19.216931 - GSETTINGS REGISTRY: braille/present-mnemonics using default value = True
+18:52:19.218136 - GENERATOR: _get_functional_role: frame
+18:52:19.218887 - BRAILLE GENERATOR: braille_generator.BrailleGenerator._generate_frame for [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)]
+18:52:19.224479 - GENERATOR: _get_functional_role: application
+18:52:19.225345 - BRAILLE GENERATOR: [application: 'agent-os-desktop' (0xffff737c1240)] lacks dedicated generator
+18:52:19.226063 - BRAILLE GENERATOR: braille_generator.BrailleGenerator._generate_default_presentation for [application: 'agent-os-desktop' (0xffff737c1240)]
+18:52:19.228824 - AXUtilitiesRelation: [application: 'agent-os-desktop' (0xffff737c1240)] is labelled by: []
+18:52:19.228863 - GENERATOR: _generate_accessible_label: []
+18:52:19.229151 - GENERATOR: _generate_accessible_name: [agent-os-desktop]
+18:52:19.229192 - GENERATOR: _generate_accessible_label_and_name: [agent-os-desktop]
+18:52:19.230123 - BRAILLE GENERATOR: _generate_accessible_role: [application]
+18:52:19.230163 - BRAILLE: Not contracting 'agent-os-desktop application' because contracted braille is not enabled.
+18:52:19.230206 - BRAILLE GENERATOR: Results: [COMPONENT: 'agent-os-desktop application', cursor offset:0]
+18:52:19.230630 - BRAILLE GENERATOR: _generate_ancestors: [COMPONENT: 'agent-os-desktop application', cursor offset:0]
+18:52:19.232033 - AXUtilitiesRelation: [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] is labelled by: []
+18:52:19.232067 - GENERATOR: _generate_accessible_label: []
+18:52:19.232371 - GENERATOR: _generate_accessible_name: [Agent view · Session lifecycle]
+18:52:19.232401 - GENERATOR: _generate_accessible_label_and_name: [Agent view · Session lifecycle]
+18:52:19.233532 - BRAILLE GENERATOR: _generate_accessible_role: [frame]
+18:52:19.236161 - AXUtilities: Unfocused alerts and dialogs for [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)]: []
+18:52:19.236197 - BRAILLE GENERATOR: _generate_alert_and_dialog_count: []
+18:52:19.236224 - BRAILLE: Not contracting 'Agent view · Session lifecycle frame' because contracted braille is not enabled.
+18:52:19.237086 - AXUtilitiesRelation: [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] is described by: []
+18:52:19.237121 - GENERATOR: _generate_accessible_description: []
+18:52:19.237360 - GENERATOR: _generate_state_current: []
+18:52:19.237405 - BRAILLE GENERATOR: Results: [COMPONENT: 'agent-os-desktop application', cursor offset:0, REGION: ' ', cursor offset:0, COMPONENT: 'Agent view · Session lifecycle frame', cursor offset:0]
+18:52:19.237776 - BRAILLE: Refresh. Pan: True target: 0
+18:52:19.237789 - BRAILLE: Kill flash message braille.display_line:1774 > braille.refresh:2291 > braille._prepare_refresh:2007 > braille.kill_flash:2389
+18:52:19.240263 - GSETTINGS REGISTRY: braille/enabled using default value = True
+18:52:19.240321 - BRAILLE: Last text object: None [(Caret:, 0,, Line:, 0,, Cell:, 0,)]
+18:52:19.240368 - BRAILLE: Current text object: None [(Caret:, 0,, Line:, 0,). On same line:] False
+18:52:19.240449 - BRAILLE: Line 0: 'agent-os-desktop application Agent view · Session lifecycle frame' focusOffset: 29 [[0, 29], [29, 60], [60, 65]]
+18:52:19.240468 - BRAILLE: Cursor offset in line string is: 29
+18:52:19.240490 - BRAILLE: display_size=32 monitor=0
+18:52:19.240512 - BRAILLE: Adjusting offset to 29 (unhandled condition)
+18:52:19.240543 - BRAILLE: Current range: (29, 61). Target cell: 0
+18:52:19.240578 - BRAILLE LINE:  'agent-os-desktop application Agent view · Session lifecycle frame'
+18:52:19.240608 -      VISIBLE:  'Agent view · Session lifecycle f', cursor=1
+18:52:19.240632 - BRAILLE: Enabling braille. BrlAPI running: False
+18:52:19.240637 - BRAILLE: Need to initialize first.
+18:52:19.240653 - BRAILLE: Initializing. Callback: input_event_manager.InputEventManager.process_braille_event
+18:52:19.240664 - BRAILLE: BrlAPI connection already in progress.
+18:52:19.244806 - AXTable: Setting last cell coordinates to row=-1, column=-1
+18:52:19.245587 - FOCUS MANAGER: Setting last cursor position to [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] -1
+18:52:19.247335 - FOCUS MANAGER: Active window is [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] focus_manager.set_locus_of_focus:376 > focus_manager._save_object_details:303 > ax_utilities_event.save_object_info_for_events:474 > focus_manager.get_active_window:391
+18:52:19.249406 - SCRIPT MANAGER: Getting script for [application: 'agent-os-desktop' (0xffff737c1240)] [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)]
+18:52:19.249992 - GSETTINGS SCHEMA HANDLE: sleep-mode / apps not set [app:agent-os-desktop, profile:default]
+18:52:19.250024 - GSETTINGS REGISTRY: sleep-mode/apps using default value = []
+18:52:19.250212 - SCRIPT MANAGER: Script is app script agent-os-desktop (module=orca.scripts.default)
+18:52:19.262324 - AXUtilitiesObject: find_descendant: found [text: 'Accessible session draft' (0xffff70e118c0)] in 0.0103 s
+18:52:19.263558 - FOCUS MANAGER: Focused object in [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] is [text: 'Accessible session draft' (0xffff70e118c0)]
+18:52:19.264045 - FOCUS MANAGER: Request to set locus of focus to [text: 'Accessible session draft' (0xffff70e118c0)] <unknown>.<module>:402 > orca._activate_services:233 > focus_manager.set_locus_of_focus:320
+18:52:19.265046 - AXObject: Clearing AT-SPI cache on [text: 'Accessible session draft' (0xffff70e118c0)] Recursive: False. Reason: Setting locus of focus.
+18:52:19.265083 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.default)
+18:52:19.266776 - FOCUS MANAGER: Changing locus of focus from [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] to [text: 'Accessible session draft' (0xffff70e118c0)]. Notify: True
+18:52:19.267881 - FOCUS MANAGER: Region of interest: [text: 'Accessible session draft' (0xffff70e118c0)] (0, 0)
+18:52:19.269203 - FOCUS MANAGER: Switching object of interest from [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] to [text: 'Accessible session draft' (0xffff70e118c0)]
+18:52:19.281249 - DOCUMENT PRESENTER: Updating mode for focus change. Old focus: [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] old doc: None New focus: [text: 'Accessible session draft' (0xffff70e118c0)] new doc: None
+18:52:19.281294 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.default)
+18:52:19.281331 - CARET NAVIGATOR: Commands suspended: False: locus of focus no longer in document
+18:52:19.281369 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.281396 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.281451 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.281474 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.281502 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.default)
+18:52:19.281567 - STRUCTURAL NAVIGATOR: Suspended: False: locus of focus no longer in document
+18:52:19.281604 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.281627 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.281683 - STRUCTURAL NAVIGATOR: Setting mode for agent-os-desktop (module=orca.scripts.default) to NavigationMode.OFF
+18:52:19.281697 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.default)
+18:52:19.281719 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.281740 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.281782 - CARET NAVIGATOR: Setting enabled state for agent-os-desktop (module=orca.scripts.default) to False
+18:52:19.281795 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.default)
+18:52:19.281815 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.281845 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.281876 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.281897 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.288074 - SCRIPT UTILITIES: [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] is top-level object for: [text: 'Accessible session draft' (0xffff70e118c0)]
+18:52:19.288556 - FOCUS MANAGER: Request to set active window to [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)]
+18:52:19.288571 - FOCUS MANAGER: Setting active window to existing active window
+18:52:19.297037 - SCRIPT MANAGER: Getting script for [application: 'agent-os-desktop' (0xffff737c1240)] [text: 'Accessible session draft' (0xffff70e118c0)]
+18:52:19.298575 - GSETTINGS REGISTRY: sleep-mode/apps using default value = []
+18:52:19.299458 - SCRIPT MANAGER: Script is toolkit script agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.299491 - SCRIPT MANAGER: Deactivating agent-os-desktop (module=orca.scripts.default) reason: Setting active window
+18:52:19.299545 - SCRIPT MANAGER: Setting active script to agent-os-desktop (module=orca.scripts.toolkits.gtk.script) reason: Setting active window
+18:52:19.300224 - DEFAULT: Activating script for [application: 'agent-os-desktop' (0xffff737c1240)]
+18:52:19.300742 - SPEECH MANAGER: Speech server is <orca.speechdispatcherfactory.SpeechServer object at 0xffff73730ec0>
+18:52:19.300812 - GSETTINGS SCHEMA HANDLE: speech / punctuation-level not set [app:agent-os-desktop, profile:default]
+18:52:19.300840 - GSETTINGS REGISTRY: speech/punctuation-level using default value = 'most'
+18:52:19.301195 - SPEECH MANAGER: Speech server is <orca.speechdispatcherfactory.SpeechServer object at 0xffff73730ec0>
+18:52:19.301287 - GSETTINGS SCHEMA HANDLE: speech / capitalization-style not set [app:agent-os-desktop, profile:default]
+18:52:19.301319 - GSETTINGS REGISTRY: speech/capitalization-style using default value = 'none'
+18:52:19.301642 - SPEECH MANAGER: Speech server is <orca.speechdispatcherfactory.SpeechServer object at 0xffff73730ec0>
+18:52:19.301876 - GSETTINGS SCHEMA HANDLE: speech / synthesizer not set [app:agent-os-desktop, profile:default]
+18:52:19.301910 - GSETTINGS REGISTRY: speech/synthesizer using default value = ''
+18:52:19.301936 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.301961 - CARET NAVIGATOR: Commands suspended: False: script activation, no prior state
+18:52:19.302018 - GSETTINGS SCHEMA HANDLE: keybindings / keyboard-layout not set [app:agent-os-desktop, profile:default]
+18:52:19.302044 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.302091 - GSETTINGS SCHEMA HANDLE: keybindings / desktop-modifier-keys not set [app:agent-os-desktop, profile:default]
+18:52:19.302117 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.302160 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.302184 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.302212 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.302234 - STRUCTURAL NAVIGATOR: Suspended: False: script activation, no prior state
+18:52:19.302258 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.302281 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.302326 - STRUCTURAL NAVIGATOR: Setting mode for agent-os-desktop (module=orca.scripts.toolkits.gtk.script) to NavigationMode.OFF
+18:52:19.302340 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.302364 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.302386 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.302431 - CARET NAVIGATOR: Setting enabled state for agent-os-desktop (module=orca.scripts.toolkits.gtk.script) to False
+18:52:19.302444 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.302466 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.302488 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.302522 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.302544 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.302607 - GSETTINGS SCHEMA HANDLE: table-navigation / enabled not set [app:agent-os-desktop, profile:default]
+18:52:19.302635 - GSETTINGS REGISTRY: table-navigation/enabled using default value = True
+18:52:19.302653 - TABLE NAVIGATOR: Refreshing enabled state for active app: True.
+18:52:19.302676 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.302698 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.302731 - COMMAND MANAGER: Activating commands: activated agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.302849 - GSETTINGS SCHEMA HANDLE: keybindings / entries no dict values set
+18:52:19.302874 - GSETTINGS REGISTRY: keybindings/entries using default value = {}
+18:52:19.302878 - COMMAND MANAGER: No user overrides to apply
+18:52:19.302955 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.302978 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.303209 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: t mods=256 clicks=2 grab ids=[] keysym=116 keycode=0 modifiers=32768
+18:52:19.303266 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: t mods=256 clicks=2 grab ids=[] keysym=116 keycode=0 modifiers=65536
+18:52:19.303378 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=114 keycode=0 modifiers=32769
+18:52:19.303428 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=114 keycode=0 modifiers=65537
+18:52:19.303478 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=82 keycode=0 modifiers=32769
+18:52:19.303527 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=82 keycode=0 modifiers=65537
+18:52:19.303621 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=99 keycode=0 modifiers=32769
+18:52:19.303669 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=99 keycode=0 modifiers=65537
+18:52:19.303717 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=67 keycode=0 modifiers=32769
+18:52:19.303766 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=67 keycode=0 modifiers=65537
+18:52:19.303839 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=2 grab ids=[] keysym=97 keycode=0 modifiers=32768
+18:52:19.303888 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=2 grab ids=[] keysym=97 keycode=0 modifiers=65536
+18:52:19.303959 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=3 grab ids=[] keysym=97 keycode=0 modifiers=32768
+18:52:19.304007 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=3 grab ids=[] keysym=97 keycode=0 modifiers=65536
+18:52:19.304063 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Up mods=0 clicks=2 grab ids=[] keysym=65431 keycode=0 modifiers=0
+18:52:19.304115 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Up mods=0 clicks=3 grab ids=[] keysym=65431 keycode=0 modifiers=0
+18:52:19.304169 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Begin mods=0 clicks=2 grab ids=[] keysym=65437 keycode=0 modifiers=0
+18:52:19.304221 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Begin mods=0 clicks=3 grab ids=[] keysym=65437 keycode=0 modifiers=0
+18:52:19.304272 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Down mods=0 clicks=2 grab ids=[] keysym=65433 keycode=0 modifiers=0
+18:52:19.304323 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Down mods=0 clicks=3 grab ids=[] keysym=65433 keycode=0 modifiers=0
+18:52:19.304375 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Add mods=0 clicks=2 grab ids=[] keysym=65451 keycode=0 modifiers=0
+18:52:19.304449 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: f mods=256 clicks=2 grab ids=[] keysym=102 keycode=0 modifiers=32768
+18:52:19.304498 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: f mods=256 clicks=2 grab ids=[] keysym=102 keycode=0 modifiers=65536
+18:52:19.304571 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=256 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=32768
+18:52:19.304619 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=256 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=65536
+18:52:19.304675 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=0 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=0
+
+vvvvv COMMAND MANAGER: Grab diff: activated agent-os-desktop (module=orca.scripts.toolkits.gtk.script) (old: 78, new: 78) vvvvv
+18:52:19.304720 -   No grab changes
+^^^^^ COMMAND MANAGER: Diff completed in 0.0017 s. Removed 0, added 0, transferred 0 ^^^^^
+
+18:52:19.304830 - GSETTINGS SCHEMA HANDLE: speech / enable not set [app:agent-os-desktop, profile:default]
+18:52:19.304855 - GSETTINGS REGISTRY: speech/enable using default value = True
+18:52:19.304860 - SPEECH MANAGER: Speech is enabled.
+18:52:19.304889 - SPEECH MANAGER: start_speech. Script: None Event: None notify_user: False
+18:52:19.304893 - SPEECH MANAGER: Initializing server
+18:52:19.304896 - SPEECH MANAGER: Already initialized
+18:52:19.304920 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.304938 - COMMAND MANAGER: Setting keyboard layout is_desktop to True.
+18:52:19.305022 - GSETTINGS REGISTRY: keybindings/entries using default value = {}
+18:52:19.305026 - COMMAND MANAGER: No user overrides to apply
+18:52:19.305093 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.305115 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.305201 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: t mods=256 clicks=2 grab ids=[] keysym=116 keycode=0 modifiers=32768
+18:52:19.305248 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: t mods=256 clicks=2 grab ids=[] keysym=116 keycode=0 modifiers=65536
+18:52:19.305341 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=114 keycode=0 modifiers=32769
+18:52:19.305387 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=114 keycode=0 modifiers=65537
+18:52:19.305433 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=82 keycode=0 modifiers=32769
+18:52:19.305479 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: r mods=257 clicks=2 grab ids=[] keysym=82 keycode=0 modifiers=65537
+18:52:19.305571 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=99 keycode=0 modifiers=32769
+18:52:19.305619 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=99 keycode=0 modifiers=65537
+18:52:19.305666 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=67 keycode=0 modifiers=32769
+18:52:19.305715 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: c mods=257 clicks=2 grab ids=[] keysym=67 keycode=0 modifiers=65537
+18:52:19.305783 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=2 grab ids=[] keysym=97 keycode=0 modifiers=32768
+18:52:19.305829 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=2 grab ids=[] keysym=97 keycode=0 modifiers=65536
+18:52:19.305895 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=3 grab ids=[] keysym=97 keycode=0 modifiers=32768
+18:52:19.305942 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: a mods=256 clicks=3 grab ids=[] keysym=97 keycode=0 modifiers=65536
+18:52:19.305997 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Up mods=0 clicks=2 grab ids=[] keysym=65431 keycode=0 modifiers=0
+18:52:19.306047 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Up mods=0 clicks=3 grab ids=[] keysym=65431 keycode=0 modifiers=0
+18:52:19.306097 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Begin mods=0 clicks=2 grab ids=[] keysym=65437 keycode=0 modifiers=0
+18:52:19.306148 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Begin mods=0 clicks=3 grab ids=[] keysym=65437 keycode=0 modifiers=0
+18:52:19.306198 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Down mods=0 clicks=2 grab ids=[] keysym=65433 keycode=0 modifiers=0
+18:52:19.306249 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Down mods=0 clicks=3 grab ids=[] keysym=65433 keycode=0 modifiers=0
+18:52:19.306301 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Add mods=0 clicks=2 grab ids=[] keysym=65451 keycode=0 modifiers=0
+18:52:19.306376 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: f mods=256 clicks=2 grab ids=[] keysym=102 keycode=0 modifiers=32768
+18:52:19.306423 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: f mods=256 clicks=2 grab ids=[] keysym=102 keycode=0 modifiers=65536
+18:52:19.306490 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=256 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=32768
+18:52:19.306538 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=256 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=65536
+18:52:19.306588 - KEYBINDINGS: AT-SPI returned grab id 0 for BINDING: KP_Enter mods=0 clicks=2 grab ids=[] keysym=65421 keycode=0 modifiers=0
+
+vvvvv COMMAND MANAGER: Grab diff: keyboard layout change (old: 78, new: 78) vvvvv
+18:52:19.306631 -   No grab changes
+^^^^^ COMMAND MANAGER: Diff completed in 0.0015 s. Removed 0, added 0, transferred 0 ^^^^^
+
+18:52:19.306691 - COMMAND MANAGER: Keyboard layout set to desktop.
+18:52:19.306717 - GSETTINGS REGISTRY: keybindings/keyboard-layout using default value = 'desktop'
+18:52:19.306739 - GSETTINGS REGISTRY: keybindings/desktop-modifier-keys using default value = ['Insert', 'KP_Insert']
+18:52:19.306748 - PRESENTATION MANAGER: Not interrupting for locusOfFocus change: event is None
+18:52:19.307907 - FOCUS MANAGER: Active mode: focus-tracking Object of interest: [text: 'Accessible session draft' (0xffff70e118c0)]
+18:52:19.307949 - GSETTINGS REGISTRY: speech/enable using default value = True
+18:52:19.308018 - GSETTINGS SCHEMA HANDLE: speech / verbosity-level not set [app:agent-os-desktop, profile:default]
+18:52:19.308049 - GSETTINGS REGISTRY: speech/verbosity-level using default value = 'verbose'
+18:52:19.308665 - FOCUS MANAGER: Locus of focus is [text: 'Accessible session draft' (0xffff70e118c0)]
+18:52:19.308695 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.308764 - GSETTINGS SCHEMA HANDLE: speech / auto-language-switching not set [app:agent-os-desktop, profile:default]
+18:52:19.308792 - GSETTINGS REGISTRY: speech/auto-language-switching using default value = True
+18:52:19.308859 - GSETTINGS SCHEMA HANDLE: speech / only-switch-configured-languages not set [app:agent-os-desktop, profile:default]
+18:52:19.308894 - GSETTINGS REGISTRY: speech/only-switch-configured-languages using default value = False
+18:52:19.309312 - GSETTINGS SCHEMA HANDLE: speech / auto-language-switching-ui not set [app:agent-os-desktop, profile:default]
+18:52:19.309340 - GSETTINGS REGISTRY: speech/auto-language-switching-ui using default value = False
+18:52:19.309388 - GSETTINGS SCHEMA HANDLE: speech / insert-pauses-between-utterances not set [app:agent-os-desktop, profile:default]
+18:52:19.309412 - GSETTINGS REGISTRY: speech/insert-pauses-between-utterances using default value = True
+18:52:19.309448 - GSETTINGS REGISTRY: speech/punctuation-level using default value = 'most'
+18:52:19.309510 - GSETTINGS SCHEMA HANDLE: voice / established not set [app:agent-os-desktop, profile:default]
+18:52:19.309557 - GSETTINGS SCHEMA HANDLE: voice / rate not set [app:agent-os-desktop, profile:default]
+18:52:19.309603 - GSETTINGS SCHEMA HANDLE: voice / pitch not set [app:agent-os-desktop, profile:default]
+18:52:19.309648 - GSETTINGS SCHEMA HANDLE: voice / pitch-range not set [app:agent-os-desktop, profile:default]
+18:52:19.309692 - GSETTINGS SCHEMA HANDLE: voice / volume not set [app:agent-os-desktop, profile:default]
+18:52:19.309737 - GSETTINGS SCHEMA HANDLE: voice / family-name not set [app:agent-os-desktop, profile:default]
+18:52:19.309783 - GSETTINGS SCHEMA HANDLE: voice / family-lang not set [app:agent-os-desktop, profile:default]
+18:52:19.309826 - GSETTINGS SCHEMA HANDLE: voice / family-dialect not set [app:agent-os-desktop, profile:default]
+18:52:19.309869 - GSETTINGS SCHEMA HANDLE: voice / family-gender not set [app:agent-os-desktop, profile:default]
+18:52:19.309911 - GSETTINGS SCHEMA HANDLE: voice / family-variant not set [app:agent-os-desktop, profile:default]
+18:52:19.309963 - GSETTINGS SCHEMA HANDLE: voice / established not set [app:agent-os-desktop, profile:default]
+18:52:19.310006 - GSETTINGS SCHEMA HANDLE: voice / rate not set [app:agent-os-desktop, profile:default]
+18:52:19.310048 - GSETTINGS SCHEMA HANDLE: voice / pitch not set [app:agent-os-desktop, profile:default]
+18:52:19.310090 - GSETTINGS SCHEMA HANDLE: voice / pitch-range not set [app:agent-os-desktop, profile:default]
+18:52:19.310132 - GSETTINGS SCHEMA HANDLE: voice / volume not set [app:agent-os-desktop, profile:default]
+18:52:19.310174 - GSETTINGS SCHEMA HANDLE: voice / family-name not set [app:agent-os-desktop, profile:default]
+18:52:19.310216 - GSETTINGS SCHEMA HANDLE: voice / family-lang not set [app:agent-os-desktop, profile:default]
+18:52:19.310258 - GSETTINGS SCHEMA HANDLE: voice / family-dialect not set [app:agent-os-desktop, profile:default]
+18:52:19.310301 - GSETTINGS SCHEMA HANDLE: voice / family-gender not set [app:agent-os-desktop, profile:default]
+18:52:19.310342 - GSETTINGS SCHEMA HANDLE: voice / family-variant not set [app:agent-os-desktop, profile:default]
+18:52:19.310387 - GSETTINGS SCHEMA HANDLE: voice / established not set [app:agent-os-desktop, profile:default]
+18:52:19.310429 - GSETTINGS SCHEMA HANDLE: voice / rate not set [app:agent-os-desktop, profile:default]
+18:52:19.310471 - GSETTINGS SCHEMA HANDLE: voice / pitch not set [app:agent-os-desktop, profile:default]
+18:52:19.310513 - GSETTINGS SCHEMA HANDLE: voice / pitch-range not set [app:agent-os-desktop, profile:default]
+18:52:19.310555 - GSETTINGS SCHEMA HANDLE: voice / volume not set [app:agent-os-desktop, profile:default]
+18:52:19.310618 - GSETTINGS SCHEMA HANDLE: voice / family-name not set [app:agent-os-desktop, profile:default]
+18:52:19.310661 - GSETTINGS SCHEMA HANDLE: voice / family-lang not set [app:agent-os-desktop, profile:default]
+18:52:19.310702 - GSETTINGS SCHEMA HANDLE: voice / family-dialect not set [app:agent-os-desktop, profile:default]
+18:52:19.310744 - GSETTINGS SCHEMA HANDLE: voice / family-gender not set [app:agent-os-desktop, profile:default]
+18:52:19.310785 - GSETTINGS SCHEMA HANDLE: voice / family-variant not set [app:agent-os-desktop, profile:default]
+18:52:19.310830 - GSETTINGS SCHEMA HANDLE: voice / established not set [app:agent-os-desktop, profile:default]
+18:52:19.310871 - GSETTINGS SCHEMA HANDLE: voice / rate not set [app:agent-os-desktop, profile:default]
+18:52:19.310913 - GSETTINGS SCHEMA HANDLE: voice / pitch not set [app:agent-os-desktop, profile:default]
+18:52:19.310954 - GSETTINGS SCHEMA HANDLE: voice / pitch-range not set [app:agent-os-desktop, profile:default]
+18:52:19.311067 - GSETTINGS SCHEMA HANDLE: voice / volume not set [app:agent-os-desktop, profile:default]
+18:52:19.311116 - GSETTINGS SCHEMA HANDLE: voice / family-name not set [app:agent-os-desktop, profile:default]
+18:52:19.311158 - GSETTINGS SCHEMA HANDLE: voice / family-lang not set [app:agent-os-desktop, profile:default]
+18:52:19.311199 - GSETTINGS SCHEMA HANDLE: voice / family-dialect not set [app:agent-os-desktop, profile:default]
+18:52:19.311241 - GSETTINGS SCHEMA HANDLE: voice / family-gender not set [app:agent-os-desktop, profile:default]
+18:52:19.311282 - GSETTINGS SCHEMA HANDLE: voice / family-variant not set [app:agent-os-desktop, profile:default]
+18:52:19.311329 - GSETTINGS SCHEMA HANDLE: speech / only-speak-displayed-text not set [app:agent-os-desktop, profile:default]
+18:52:19.311352 - GSETTINGS REGISTRY: speech/only-speak-displayed-text using default value = False
+18:52:19.311395 - GSETTINGS SCHEMA HANDLE: speech / speak-description not set [app:agent-os-desktop, profile:default]
+18:52:19.311419 - GSETTINGS REGISTRY: speech/speak-description using default value = True
+18:52:19.311471 - GSETTINGS SCHEMA HANDLE: speech / speak-tutorial-messages not set [app:agent-os-desktop, profile:default]
+18:52:19.311493 - GSETTINGS REGISTRY: speech/speak-tutorial-messages using default value = True
+18:52:19.311534 - GSETTINGS SCHEMA HANDLE: speech / speak-position-in-set not set [app:agent-os-desktop, profile:default]
+18:52:19.311556 - GSETTINGS REGISTRY: speech/speak-position-in-set using default value = False
+18:52:19.311597 - GSETTINGS SCHEMA HANDLE: speech / speak-widget-mnemonic not set [app:agent-os-desktop, profile:default]
+18:52:19.311619 - GSETTINGS REGISTRY: speech/speak-widget-mnemonic using default value = True
+18:52:19.311660 - GSETTINGS SCHEMA HANDLE: speech / speak-blank-lines not set [app:agent-os-desktop, profile:default]
+18:52:19.311683 - GSETTINGS REGISTRY: speech/speak-blank-lines using default value = True
+18:52:19.311725 - GSETTINGS SCHEMA HANDLE: speech / speak-indentation not set [app:agent-os-desktop, profile:default]
+18:52:19.311746 - GSETTINGS REGISTRY: speech/speak-indentation using default value = False
+18:52:19.311787 - GSETTINGS SCHEMA HANDLE: speech / announce-cell-headers not set [app:agent-os-desktop, profile:default]
+18:52:19.311809 - GSETTINGS REGISTRY: speech/announce-cell-headers using default value = True
+18:52:19.311851 - GSETTINGS SCHEMA HANDLE: speech / announce-cell-coordinates not set [app:agent-os-desktop, profile:default]
+18:52:19.311873 - GSETTINGS REGISTRY: speech/announce-cell-coordinates using default value = True
+18:52:19.311914 - GSETTINGS SCHEMA HANDLE: speech / announce-spreadsheet-cell-coordinates not set [app:agent-os-desktop, profile:default]
+18:52:19.311936 - GSETTINGS REGISTRY: speech/announce-spreadsheet-cell-coordinates using default value = True
+18:52:19.311976 - GSETTINGS SCHEMA HANDLE: speech / announce-article not set [app:agent-os-desktop, profile:default]
+18:52:19.311998 - GSETTINGS REGISTRY: speech/announce-article using default value = True
+18:52:19.312039 - GSETTINGS SCHEMA HANDLE: speech / announce-blockquote not set [app:agent-os-desktop, profile:default]
+18:52:19.312060 - GSETTINGS REGISTRY: speech/announce-blockquote using default value = True
+18:52:19.312101 - GSETTINGS SCHEMA HANDLE: speech / announce-code-block not set [app:agent-os-desktop, profile:default]
+18:52:19.312122 - GSETTINGS REGISTRY: speech/announce-code-block using default value = True
+18:52:19.312163 - GSETTINGS SCHEMA HANDLE: speech / announce-document not set [app:agent-os-desktop, profile:default]
+18:52:19.312185 - GSETTINGS REGISTRY: speech/announce-document using default value = True
+18:52:19.312226 - GSETTINGS SCHEMA HANDLE: speech / announce-form not set [app:agent-os-desktop, profile:default]
+18:52:19.312247 - GSETTINGS REGISTRY: speech/announce-form using default value = True
+18:52:19.312289 - GSETTINGS SCHEMA HANDLE: speech / announce-grouping not set [app:agent-os-desktop, profile:default]
+18:52:19.312310 - GSETTINGS REGISTRY: speech/announce-grouping using default value = True
+18:52:19.312352 - GSETTINGS SCHEMA HANDLE: speech / announce-landmark not set [app:agent-os-desktop, profile:default]
+18:52:19.312374 - GSETTINGS REGISTRY: speech/announce-landmark using default value = True
+18:52:19.312416 - GSETTINGS SCHEMA HANDLE: speech / announce-list not set [app:agent-os-desktop, profile:default]
+18:52:19.312438 - GSETTINGS REGISTRY: speech/announce-list using default value = True
+18:52:19.312479 - GSETTINGS SCHEMA HANDLE: speech / announce-table not set [app:agent-os-desktop, profile:default]
+18:52:19.312500 - GSETTINGS REGISTRY: speech/announce-table using default value = True
+18:52:19.312541 - GSETTINGS SCHEMA HANDLE: speech / announce-tracked-changes not set [app:agent-os-desktop, profile:default]
+18:52:19.312562 - GSETTINGS REGISTRY: speech/announce-tracked-changes using default value = True
+18:52:19.312607 - GSETTINGS SCHEMA HANDLE: speech / speak-text-attribute-changes not set [app:agent-os-desktop, profile:default]
+18:52:19.312630 - GSETTINGS REGISTRY: speech/speak-text-attribute-changes using default value = 'off'
+18:52:19.312679 - GSETTINGS SCHEMA HANDLE: speech / speak-misspelled-indicator not set [app:agent-os-desktop, profile:default]
+18:52:19.312702 - GSETTINGS REGISTRY: speech/speak-misspelled-indicator using default value = True
+18:52:19.314737 - GENERATOR: _get_functional_role: text
+18:52:19.315332 - SPEECH GENERATOR: speech_generator.SpeechGenerator._generate_text for [text: 'Accessible session draft' (0xffff70e118c0)]
+18:52:19.325166 - SPEECH GENERATOR: _generate_old_ancestors: []
+18:52:19.329006 - AXUtilitiesObject: Looking for common ancestor of [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] and [text: 'Accessible session draft' (0xffff70e118c0)]
+18:52:19.335521 - AXUtilitiesObject: Common ancestor of [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] and [text: 'Accessible session draft' (0xffff70e118c0)] is [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)]
+18:52:19.336454 - GENERATOR: _get_functional_role: frame
+18:52:19.339848 - GENERATOR: _get_functional_role: panel
+18:52:19.341202 - AXUtilitiesRelation: [panel (0xffff71f9a0c0)] is labelled by: []
+18:52:19.341702 - AXUtilitiesRelation: [panel (0xffff71f9a0c0)] is described by: []
+18:52:19.342258 - AXUtilities: [panel (0xffff71f9a0c0)] believed to be layout only: True, lacks name, description, and relations
+18:52:19.347173 - GENERATOR: _get_functional_role: panel
+18:52:19.348725 - AXUtilitiesRelation: [panel (0xffff71f9a300)] is labelled by: []
+18:52:19.349223 - AXUtilitiesRelation: [panel (0xffff71f9a300)] is described by: []
+18:52:19.349697 - AXUtilities: [panel (0xffff71f9a300)] believed to be layout only: True, lacks name, description, and relations
+18:52:19.352150 - GENERATOR: _get_functional_role: panel
+18:52:19.353910 - AXUtilitiesRelation: [panel (0xffff70e119c0)] is labelled by: []
+18:52:19.354419 - AXUtilitiesRelation: [panel (0xffff70e119c0)] is described by: []
+18:52:19.355355 - AXUtilities: [panel (0xffff70e119c0)] believed to be layout only: True, lacks name, description, and relations
+18:52:19.357728 - GENERATOR: _get_functional_role: scroll-pane
+18:52:19.358461 - AXUtilities: [scroll pane (0xffff70e11a40)] believed to be layout only: True, has layout-only role
+18:52:19.360738 - GENERATOR: _get_functional_role: panel
+18:52:19.362468 - AXUtilitiesRelation: [panel (0xffff70e11880)] is labelled by: []
+18:52:19.366934 - AXUtilitiesRelation: [panel (0xffff70e11880)] is described by: []
+18:52:19.367536 - AXUtilities: [panel (0xffff70e11880)] believed to be layout only: True, lacks name, description, and relations
+18:52:19.370003 - GENERATOR: _get_functional_role: frame
+18:52:19.371567 - SPEECH GENERATOR: _generate_new_ancestors: []
+18:52:19.375505 - AXUtilitiesRelation: [text: 'Accessible session draft' (0xffff70e118c0)] is labelled by: []
+18:52:19.375546 - GENERATOR: _generate_accessible_label: []
+18:52:19.375572 - SPEECH GENERATOR: _generate_accessible_label: []
+18:52:19.375841 - GENERATOR: _generate_accessible_name: [Accessible session draft]
+18:52:19.376438 - SPEECH GENERATOR: default voice requested for [text: 'Accessible session draft' (0xffff70e118c0)] language='', dialect=''Unmodified voice={'established': 'False'}
+18:52:19.377131 - SPEECH GENERATOR: Reported locale of [text: 'Accessible session draft' (0xffff70e118c0)] is C
+18:52:19.377179 - SPEECH GENERATOR: Updated to: '', ''
+18:52:19.385370 - SPEECH GENERATOR: Final voice is {'established': 'False', 'family': '{}', 'voice-type': 'default'}
+18:52:19.385472 - SPEECH GENERATOR: _generate_accessible_name: [Accessible session draft, {'established': 'False', 'family': '{}', 'voice-type': 'default'}]
+18:52:19.385524 - GENERATOR: _generate_accessible_label_and_name: [Accessible session draft, {'established': 'False', 'family': '{}', 'voice-type': 'default'}]
+18:52:19.385925 - SPEECH PRESENTER: Adjusting 'Accessible session draft' from [text: 'Accessible session draft' (0xffff70e118c0)] start_offset: None
+18:52:19.386027 - GSETTINGS SCHEMA HANDLE: speech / speak-numbers-as-digits not set [app:agent-os-desktop, profile:default]
+18:52:19.386064 - GSETTINGS REGISTRY: speech/speak-numbers-as-digits using default value = False
+18:52:19.386421 - GSETTINGS SCHEMA HANDLE: speech / repeated-character-limit not set [app:agent-os-desktop, profile:default]
+18:52:19.386447 - GSETTINGS REGISTRY: speech/repeated-character-limit using default value = 4
+18:52:19.389510 - GSETTINGS SCHEMA HANDLE: speech / use-pronunciation-dictionary not set [app:agent-os-desktop, profile:default]
+18:52:19.389541 - GSETTINGS REGISTRY: speech/use-pronunciation-dictionary using default value = True
+18:52:19.389569 - SPEECH PRESENTER: Adjusted text: 'Accessible session draft'
+18:52:19.389623 - SPEECH GENERATOR: _generate_accessible_label_and_name: [Accessible session draft, {'established': 'False', 'family': '{}', 'voice-type': 'default'}]
+18:52:19.389870 - GENERATOR: _generate_state_read_only: []
+18:52:19.389895 - SPEECH GENERATOR: _generate_state_read_only: []
+18:52:19.396570 - SPEECH GENERATOR: system voice requested for [text: 'Accessible session draft' (0xffff70e118c0)] language='', dialect=''Unmodified voice={'established': 'False'}
+18:52:19.397010 - SPEECH GENERATOR: Reported locale of [text: 'Accessible session draft' (0xffff70e118c0)] is C
+18:52:19.397057 - SPEECH GENERATOR: Updated to: '', ''
+18:52:19.397106 - SPEECH GENERATOR: Final voice is {'established': 'False', 'family': '{}', 'voice-type': 'system'}
+18:52:19.397159 - SPEECH GENERATOR: _generate_accessible_role: [text, {'established': 'False', 'family': '{}', 'voice-type': 'system'}]
+18:52:19.397191 - SPEECH GENERATOR: _generate_text_indentation: []
+18:52:19.398705 - AXText: [text: 'Accessible session draft' (0xffff70e118c0)] reports 25 characters.
+18:52:19.399769 - AXText: [text: 'Accessible session draft' (0xffff70e118c0)] reports caret offset of 25.
+18:52:19.401993 - AXText: Line at offset 24 in [text: 'Accessible session draft' (0xffff70e118c0)]'Original accessible value' (0 - 25)
+18:52:19.403203 - AXText: Getting attributes for [text: 'Accessible session draft' (0xffff70e118c0)] chars: 0 - 25
+18:52:19.406772 - AXText: Attributes for [text: 'Accessible session draft' (0xffff70e118c0)] at offset 0: [{'bg-full-height': '0',
+                   'editable': 'false',
+                   'family-name': 'Inter,sans-serif',
+                   'indent': '0',
+                   'invisible': 'false',
+                   'justification': 'left',
+                   'language': 'c',
+                   'left-margin': '0',
+                   'pixels-above-lines': '0',
+                   'pixels-below-lines': '0',
+                   'pixels-inside-wrap': '0',
+                   'right-margin': '0',
+                   'rise': '0',
+                   'scale': '1',
+                   'size': '14',
+                   'stretch': 'normal',
+                   'strikethrough': 'false',
+                   'style': 'normal',
+                   'underline': 'false',
+                   'variant': 'normal',
+                   'weight': '400',
+                   'wrap-mode': 'word'}, 0, 25]
+18:52:19.407265 - AXText: 1 attribute ranges found.
+18:52:19.407372 - SPEECH GENERATOR: system voice requested for None language='', dialect=''Unmodified voice={'established': 'False'}
+18:52:19.407404 - SPEECH GENERATOR: Reported locale of None is 
+18:52:19.407446 - SPEECH GENERATOR: Updated to: '', ''
+18:52:19.407490 - SPEECH GENERATOR: Final voice is {'established': 'False', 'family': '{}', 'voice-type': 'system'}
+18:52:19.408283 - AXText: Text of [text: 'Accessible session draft' (0xffff70e118c0)] (0 - 25): 'Original accessible value'
+18:52:19.408853 - SPEECH PRESENTER: Adjusting 'Original accessible value' from [text: 'Accessible session draft' (0xffff70e118c0)] start_offset: 0
+18:52:19.409265 - AXUtilitiesHypertext: 0 hyperlinks found in [text: 'Accessible session draft' (0xffff70e118c0)] between start: 0 and end: 25
+18:52:19.409303 - GSETTINGS REGISTRY: speech/speak-numbers-as-digits using default value = False
+18:52:19.409859 - GSETTINGS REGISTRY: speech/repeated-character-limit using default value = 4
+18:52:19.413170 - GSETTINGS REGISTRY: speech/use-pronunciation-dictionary using default value = True
+18:52:19.413207 - SPEECH PRESENTER: Adjusted text: 'Original accessible value'
+18:52:19.416804 - SPEECH GENERATOR: None voice requested for [text: 'Accessible session draft' (0xffff70e118c0)] language='c', dialect=''Unmodified voice={'established': 'False'}
+18:52:19.416860 - SPEECH GENERATOR: Updated to: '', ''
+18:52:19.417208 - SPEECH GENERATOR: Final voice is {'established': 'False', 'family': '{}', 'voice-type': 'default'}
+18:52:19.417267 - SPEECH GENERATOR: _generate_text_line: [Original accessible value, {'established': 'False', 'family': '{}', 'voice-type': 'default'}]
+18:52:19.419300 - AXText: [text: 'Accessible session draft' (0xffff70e118c0)] reports 25 characters.
+18:52:19.419865 - AXText: [text: 'Accessible session draft' (0xffff70e118c0)] reports 1 selection(s).
+18:52:19.420468 - AXText: [text: 'Accessible session draft' (0xffff70e118c0)] reports selected ranges: [[0, 25]]
+18:52:19.420846 - SPEECH GENERATOR: system voice requested for [text: 'Accessible session draft' (0xffff70e118c0)] language='', dialect=''Unmodified voice={'established': 'False'}
+18:52:19.421215 - SPEECH GENERATOR: Reported locale of [text: 'Accessible session draft' (0xffff70e118c0)] is C
+18:52:19.421252 - SPEECH GENERATOR: Updated to: '', ''
+18:52:19.421291 - SPEECH GENERATOR: Final voice is {'established': 'False', 'family': '{}', 'voice-type': 'system'}
+18:52:19.421341 - SPEECH GENERATOR: _generate_text_selection: [selected, {'established': 'False', 'family': '{}', 'voice-type': 'system'}]
+18:52:19.422182 - AXText: [text: 'Accessible session draft' (0xffff70e118c0)] reports caret offset of 25.
+18:52:19.423096 - AXText: Attributes for [text: 'Accessible session draft' (0xffff70e118c0)] at offset 25: [{'bg-full-height': '0',
+                   'editable': 'false',
+                   'family-name': 'Inter,sans-serif',
+                   'indent': '0',
+                   'invisible': 'false',
+                   'justification': 'left',
+                   'language': 'c',
+                   'left-margin': '0',
+                   'pixels-above-lines': '0',
+                   'pixels-below-lines': '0',
+                   'pixels-inside-wrap': '0',
+                   'right-margin': '0',
+                   'rise': '0',
+                   'scale': '1',
+                   'size': '14',
+                   'stretch': 'normal',
+                   'strikethrough': 'false',
+                   'style': 'normal',
+                   'underline': 'false',
+                   'variant': 'normal',
+                   'weight': '400',
+                   'wrap-mode': 'word'}, 0, 25]
+18:52:19.424244 - AXUtilitiesRelation: [text: 'Accessible session draft' (0xffff70e118c0)] has error messages in: [[alert: 'Use a saved workspace name.' (0xffff70e2a240)]]
+18:52:19.425108 - AXText: [alert: 'Use a saved workspace name.' (0xffff70e2a240)] reports 27 characters.
+18:52:19.427185 - AXText: [alert: 'Use a saved workspace name.' (0xffff70e2a240)] reports 27 characters.
+18:52:19.427775 - AXText: Text of [alert: 'Use a saved workspace name.' (0xffff70e2a240)] (0 - 27): 'Use a saved workspace name.'
+18:52:19.427814 - GENERATOR: _generate_state_invalid: [invalid entry: Use a saved workspace name.]
+18:52:19.428221 - SPEECH GENERATOR: system voice requested for [text: 'Accessible session draft' (0xffff70e118c0)] language='', dialect=''Unmodified voice={'established': 'False'}
+18:52:19.428574 - SPEECH GENERATOR: Reported locale of [text: 'Accessible session draft' (0xffff70e118c0)] is C
+18:52:19.428630 - SPEECH GENERATOR: Updated to: '', ''
+18:52:19.428680 - SPEECH GENERATOR: Final voice is {'established': 'False', 'family': '{}', 'voice-type': 'system'}
+18:52:19.428751 - SPEECH GENERATOR: _generate_state_invalid: [invalid entry: Use a saved workspace name., {'established': 'False', 'family': '{}', 'voice-type': 'system'}]
+18:52:19.429591 - GENERATOR: _generate_keyboard_mnemonic: []
+18:52:19.429622 - SPEECH GENERATOR: _generate_keyboard_mnemonic: []
+18:52:19.430031 - GENERATOR: _generate_state_current: []
+18:52:19.430077 - SPEECH GENERATOR: _generate_state_current: []
+18:52:19.430101 - SPEECH GENERATOR: _generate_has_click_action: []
+18:52:19.430129 - SPEECH GENERATOR: _generate_has_details: []
+18:52:19.430150 - SPEECH GENERATOR: _generate_details_for: []
+18:52:19.431438 - AXUtilitiesRelation: [text: 'Accessible session draft' (0xffff70e118c0)] is described by: []
+18:52:19.431486 - GENERATOR: _generate_accessible_description: []
+18:52:19.431514 - SPEECH GENERATOR: _generate_accessible_description: []
+18:52:19.432066 - SPEECH GENERATOR: _generate_state_has_popup: []
+18:52:19.437740 - SPEECH GENERATOR: _generate_tutorial: []
+18:52:19.437939 - SPEECH GENERATOR: Results: [Accessible session draft, {'established': 'False', 'family': '{}', 'voice-type': 'default'}, text, {'established': 'False', 'family': '{}', 'voice-type': 'system'}, PAUSE, Original accessible value, {'established': 'False', 'family': '{}', 'voice-type': 'default'}, selected, {'established': 'False', 'family': '{}', 'voice-type': 'system'}, PAUSE, invalid entry: Use a saved workspace name., {'established': 'False', 'family': '{}', 'voice-type': 'system'}, PAUSE]
+18:52:19.438105 - SPEECH: Speak [Accessible session draft, {'established': 'False', 'family': '{}', 'voice-type': 'default'}, text, {'established': 'False', 'family': '{}', 'voice-type': 'system'}, PAUSE, Original accessible value, {'established': 'False', 'family': '{}', 'voice-type': 'default'}, selected, {'established': 'False', 'family': '{}', 'voice-type': 'system'}, PAUSE, invalid entry: Use a saved workspace name., {'established': 'False', 'family': '{}', 'voice-type': 'system'}, PAUSE], acss: None
+18:52:19.438171 - SPEECH OUTPUT: 'Accessible session draft text'{'established': 'False', 'voice-type': 'system'}
+18:52:19.438198 - SPEECH DISPATCHER: Speaking 'Accessible session draft text' as string
+18:52:19.439534 - SPEECH DISPATCHER: Speaking '<speak><mark name="0:10"/>Accessible <mark name="11:18"/>session <mark name="19:24"/>draft <mark name="25:29"/>text</speak>' 
+                  ORCA rate 50, pitch 5.0, pitch-range 5.0, volume 10.0, language, punctuation: MOST
+                  SD rate 0, pitch 0, volume 100, language en-US
+18:52:19.439913 - SPEECH OUTPUT: 'Original accessible value selected'{'established': 'False', 'voice-type': 'system'}
+18:52:19.439942 - SPEECH DISPATCHER: Speaking 'Original accessible value selected' as string
+18:52:19.440294 - SPEECH DISPATCHER: Speaking '<speak><mark name="0:8"/>Original <mark name="9:19"/>accessible <mark name="20:25"/>value <mark name="26:34"/>selected</speak>' 
+                  ORCA rate 50, pitch 5.0, pitch-range 5.0, volume 10.0, language, punctuation: MOST
+                  SD rate 0, pitch 0, volume 100, language en-US
+18:52:19.440797 - SPEECH OUTPUT: 'invalid entry: Use a saved workspace name.'{'established': 'False', 'voice-type': 'system'}
+18:52:19.440827 - SPEECH DISPATCHER: Speaking 'invalid entry: Use a saved workspace name.' as string
+18:52:19.441170 - SPEECH DISPATCHER: Speaking '<speak><mark name="0:7"/>invalid <mark name="8:14"/>entry: <mark name="15:18"/>Use <mark name="19:20"/>a <mark name="21:26"/>saved <mark name="27:36"/>workspace <mark name="37:42"/>name.</speak>' 
+                  ORCA rate 50, pitch 5.0, pitch-range 5.0, volume 10.0, language, punctuation: MOST
+                  SD rate 0, pitch 0, volume 100, language en-US
+18:52:19.441412 - GSETTINGS SCHEMA HANDLE: braille / enabled not set [app:agent-os-desktop, profile:default]
+18:52:19.441447 - GSETTINGS REGISTRY: braille/enabled using default value = True
+18:52:19.443379 - FOCUS MANAGER: Active mode: focus-tracking Object of interest: [text: 'Accessible session draft' (0xffff70e118c0)]
+18:52:19.443418 - GSETTINGS REGISTRY: braille/enabled using default value = True
+18:52:19.443483 - GSETTINGS SCHEMA HANDLE: braille / verbosity-level not set [app:agent-os-desktop, profile:default]
+18:52:19.443511 - GSETTINGS REGISTRY: braille/verbosity-level using default value = 'verbose'
+18:52:19.443843 - FOCUS MANAGER: Locus of focus is [text: 'Accessible session draft' (0xffff70e118c0)]
+18:52:19.443877 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.443947 - GSETTINGS SCHEMA HANDLE: braille / rolename-style not set [app:agent-os-desktop, profile:default]
+18:52:19.443975 - GSETTINGS REGISTRY: braille/rolename-style using default value = 'verbose'
+18:52:19.444024 - GSETTINGS SCHEMA HANDLE: braille / display-ancestors not set [app:agent-os-desktop, profile:default]
+18:52:19.444049 - GSETTINGS REGISTRY: braille/display-ancestors using default value = True
+18:52:19.444095 - GSETTINGS SCHEMA HANDLE: braille / end-of-line-indicator not set [app:agent-os-desktop, profile:default]
+18:52:19.444119 - GSETTINGS REGISTRY: braille/end-of-line-indicator using default value = True
+18:52:19.444164 - GSETTINGS SCHEMA HANDLE: braille / present-mnemonics not set [app:agent-os-desktop, profile:default]
+18:52:19.444187 - GSETTINGS REGISTRY: braille/present-mnemonics using default value = True
+18:52:19.444715 - GENERATOR: _get_functional_role: text
+18:52:19.445009 - BRAILLE GENERATOR: braille_generator.BrailleGenerator._generate_text for [text: 'Accessible session draft' (0xffff70e118c0)]
+18:52:19.445541 - AXText: [text: 'Accessible session draft' (0xffff70e118c0)] reports 25 characters.
+18:52:19.446119 - AXText: [text: 'Accessible session draft' (0xffff70e118c0)] reports caret offset of 25.
+18:52:19.455112 - AXText: Line at offset 24 in [text: 'Accessible session draft' (0xffff70e118c0)]'Original accessible value' (0 - 25)
+18:52:19.455990 - AXUtilitiesRelation: [text: 'Accessible session draft' (0xffff70e118c0)] flows from: []
+18:52:19.457836 - AXUtilities: [panel (0xffff71f9a0c0)] believed to be layout only: True, lacks name, description, and relations
+18:52:19.460094 - AXUtilities: [panel (0xffff71f9a300)] believed to be layout only: True, lacks name, description, and relations
+18:52:19.461828 - AXUtilities: [panel (0xffff70e119c0)] believed to be layout only: True, lacks name, description, and relations
+18:52:19.463915 - AXUtilities: [scroll pane (0xffff70e11a40)] believed to be layout only: True, has layout-only role
+18:52:19.466126 - AXUtilities: [panel (0xffff70e11880)] believed to be layout only: True, lacks name, description, and relations
+18:52:19.469344 - GENERATOR: _get_functional_role: frame
+18:52:19.469906 - BRAILLE GENERATOR: braille_generator.BrailleGenerator._generate_frame for [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)]
+18:52:19.471567 - AXUtilitiesRelation: [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] is labelled by: []
+18:52:19.471617 - GENERATOR: _generate_accessible_label: []
+18:52:19.471734 - GENERATOR: _generate_accessible_name: [Agent view · Session lifecycle]
+18:52:19.471763 - GENERATOR: _generate_accessible_label_and_name: [Agent view · Session lifecycle]
+18:52:19.472064 - BRAILLE GENERATOR: _generate_accessible_role: [frame]
+18:52:19.473209 - AXUtilities: Unfocused alerts and dialogs for [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)]: []
+18:52:19.473253 - BRAILLE GENERATOR: _generate_alert_and_dialog_count: []
+18:52:19.473282 - BRAILLE: Not contracting 'Agent view · Session lifecycle frame' because contracted braille is not enabled.
+18:52:19.473661 - AXUtilitiesRelation: [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] is described by: []
+18:52:19.473692 - GENERATOR: _generate_accessible_description: []
+18:52:19.473799 - GENERATOR: _generate_state_current: []
+18:52:19.473828 - BRAILLE GENERATOR: Results: [COMPONENT: 'Agent view · Session lifecycle frame', cursor offset:0]
+18:52:19.474509 - GENERATOR: _get_functional_role: application
+18:52:19.474671 - BRAILLE GENERATOR: [application: 'agent-os-desktop' (0xffff737c1240)] lacks dedicated generator
+18:52:19.474831 - BRAILLE GENERATOR: braille_generator.BrailleGenerator._generate_default_presentation for [application: 'agent-os-desktop' (0xffff737c1240)]
+18:52:19.476455 - AXUtilitiesRelation: [application: 'agent-os-desktop' (0xffff737c1240)] is labelled by: []
+18:52:19.476486 - GENERATOR: _generate_accessible_label: []
+18:52:19.476582 - GENERATOR: _generate_accessible_name: [agent-os-desktop]
+18:52:19.476608 - GENERATOR: _generate_accessible_label_and_name: [agent-os-desktop]
+18:52:19.476991 - BRAILLE GENERATOR: _generate_accessible_role: [application]
+18:52:19.477025 - BRAILLE: Not contracting 'agent-os-desktop application' because contracted braille is not enabled.
+18:52:19.477055 - BRAILLE GENERATOR: Results: [COMPONENT: 'agent-os-desktop application', cursor offset:0]
+18:52:19.477188 - BRAILLE GENERATOR: _generate_ancestors: [COMPONENT: 'agent-os-desktop application', cursor offset:0, REGION: ' ', cursor offset:0, COMPONENT: 'Agent view · Session lifecycle frame', cursor offset:0]
+18:52:19.478337 - AXUtilitiesRelation: [text: 'Accessible session draft' (0xffff70e118c0)] is labelled by: []
+18:52:19.478363 - GENERATOR: _generate_accessible_label: []
+18:52:19.478472 - GENERATOR: _generate_accessible_name: [Accessible session draft]
+18:52:19.478500 - GENERATOR: _generate_accessible_label_and_name: [Accessible session draft]
+18:52:19.478632 - BRAILLE GENERATOR: _generate_eol: [ $l]
+18:52:19.479185 - GENERATOR: _generate_keyboard_mnemonic: []
+18:52:19.479808 - BRAILLE: Creating text region for [text: 'Accessible session draft' (0xffff70e118c0)] label:'Accessible session draft', offsets: None - None, caret: None
+18:52:19.483207 - AXText: [text: 'Accessible session draft' (0xffff70e118c0)] reports caret offset of 25.
+18:52:19.483673 - AXText: [text: 'Accessible session draft' (0xffff70e118c0)] reports 25 characters.
+18:52:19.484851 - AXText: Line at offset 24 in [text: 'Accessible session draft' (0xffff70e118c0)]'Original accessible value' (0 - 25)
+18:52:19.484905 - BRAILLE: Not contracting 'Accessible session draft Original accessible value' because contracted braille is not enabled.
+18:52:19.487584 - AXText: [text: 'Accessible session draft' (0xffff70e118c0)] reports caret offset of 25.
+18:52:19.488752 - AXText: Attributes for [text: 'Accessible session draft' (0xffff70e118c0)] at offset 25: [{'bg-full-height': '0',
+                   'editable': 'false',
+                   'family-name': 'Inter,sans-serif',
+                   'indent': '0',
+                   'invisible': 'false',
+                   'justification': 'left',
+                   'language': 'c',
+                   'left-margin': '0',
+                   'pixels-above-lines': '0',
+                   'pixels-below-lines': '0',
+                   'pixels-inside-wrap': '0',
+                   'right-margin': '0',
+                   'rise': '0',
+                   'scale': '1',
+                   'size': '14',
+                   'stretch': 'normal',
+                   'strikethrough': 'false',
+                   'style': 'normal',
+                   'underline': 'false',
+                   'variant': 'normal',
+                   'weight': '400',
+                   'wrap-mode': 'word'}, 0, 25]
+18:52:19.489873 - AXUtilitiesRelation: [text: 'Accessible session draft' (0xffff70e118c0)] has error messages in: [[alert: 'Use a saved workspace name.' (0xffff70e2a240)]]
+18:52:19.491359 - AXText: [alert: 'Use a saved workspace name.' (0xffff70e2a240)] reports 27 characters.
+18:52:19.495574 - AXText: [alert: 'Use a saved workspace name.' (0xffff70e2a240)] reports 27 characters.
+18:52:19.496838 - AXText: Text of [alert: 'Use a saved workspace name.' (0xffff70e2a240)] (0 - 27): 'Use a saved workspace name.'
+18:52:19.496882 - GENERATOR: _generate_state_invalid: [invalid: Use a saved workspace name.]
+18:52:19.496909 - BRAILLE: Not contracting ' invalid: Use a saved workspace name.' because contracted braille is not enabled.
+18:52:19.497781 - GENERATOR: _generate_state_required: []
+18:52:19.498244 - GENERATOR: _generate_state_read_only: []
+18:52:19.498632 - GENERATOR: _generate_accessible_description: []
+18:52:19.498985 - GENERATOR: _generate_state_current: []
+18:52:19.499118 - BRAILLE GENERATOR: Results: [COMPONENT: 'agent-os-desktop application', cursor offset:0, REGION: ' ', cursor offset:0, COMPONENT: 'Agent view · Session lifecycle frame', cursor offset:0, REGION: ' ', cursor offset:0, TEXT: 'Accessible session draft Original accessible value $l', cursor offset:50 start offset:0, line offset:0, REGION: ' invalid: Use a saved workspace name.', cursor offset:0]
+18:52:19.500984 - AXText: [text: 'Accessible session draft' (0xffff70e118c0)] reports 25 characters.
+18:52:19.502232 - AXText: Text of [text: 'Accessible session draft' (0xffff70e118c0)]'Original accessible value'
+18:52:19.502269 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.503215 - AXUtilitiesHypertext: 0 hyperlinks found in [text: 'Accessible session draft' (0xffff70e118c0)]
+18:52:19.504105 - AXText: [text: 'Accessible session draft' (0xffff70e118c0)] reports 1 selection(s).
+18:52:19.504610 - AXText: [text: 'Accessible session draft' (0xffff70e118c0)] reports selected ranges: [[0, 25]]
+18:52:19.504666 - BRAILLE: Refresh. Pan: True target: 0
+18:52:19.504673 - BRAILLE: Kill flash message braille.display_line:1774 > braille.refresh:2291 > braille._prepare_refresh:2007 > braille.kill_flash:2389
+18:52:19.505142 - GSETTINGS REGISTRY: braille/enabled using default value = True
+18:52:19.505189 - BRAILLE: Last text object: None [(Caret:, 0,, Line:, 0,, Cell:, 0,)]
+18:52:19.505373 - BRAILLE: Current text object: [text: 'Accessible session draft' (0xffff70e118c0)] [(Caret:, 25,, Line:, 0,). On same line:] False
+18:52:19.505504 - BRAILLE: Line 0: 'agent-os-desktop application Agent view · Session lifecycle frame Accessible session draft Original accessible value $l invalid: Use a saved workspace name.' focusOffset: 66 [[0, 29], [29, 60], [60, 66], [66, 91], [91, 120], [120, 151], [151, 156]]
+18:52:19.505524 - BRAILLE: Cursor offset in line string is: 116
+18:52:19.505546 - BRAILLE: display_size=32 monitor=0
+18:52:19.505564 - BRAILLE: Adjusting offset to 91 (unhandled condition)
+18:52:19.505593 - BRAILLE: Current range: (91, 123). Target cell: 0
+18:52:19.505611 - BRAILLE LINE:  'agent-os-desktop application Agent view · Session lifecycle frame Accessible session draft Original accessible value $l invalid: Use a saved workspace name.'
+18:52:19.505632 -      VISIBLE:  'Original accessible value $l inv', cursor=26
+18:52:19.505672 - BRAILLE: Attribute mask for visible region [91, 123):
+                           TEXT: 'Original accessible value $l inv'
+                           MASK:  ^^^^^^^^^^^^^^^^^^^^^^^^^       
+18:52:19.505686 - BRAILLE: Enabling braille. BrlAPI running: False
+18:52:19.505690 - BRAILLE: Need to initialize first.
+18:52:19.505704 - BRAILLE: Initializing. Callback: input_event_manager.InputEventManager.process_braille_event
+18:52:19.505708 - BRAILLE: BrlAPI connection already in progress.
+18:52:19.508775 - AXTable: Setting last cell coordinates to row=-1, column=-1
+18:52:19.509240 - AXText: [text: 'Accessible session draft' (0xffff70e118c0)] reports caret offset of 25.
+18:52:19.509476 - FOCUS MANAGER: Setting last cursor position to [text: 'Accessible session draft' (0xffff70e118c0)] 25
+18:52:19.509789 - AXText: [text: 'Accessible session draft' (0xffff70e118c0)] reports 1 selection(s).
+18:52:19.510218 - AXText: [text: 'Accessible session draft' (0xffff70e118c0)] reports selected ranges: [[0, 25]]
+18:52:19.510611 - AXText: Text of [text: 'Accessible session draft' (0xffff70e118c0)] (0 - 25): 'Original accessible value'
+18:52:19.510976 - AXText: Selected text of [text: 'Accessible session draft' (0xffff70e118c0)]'Original accessible value' (0 - 25)
+18:52:19.511717 - AXText: [text: 'Accessible session draft' (0xffff70e118c0)] reports caret offset of 25.
+18:52:19.512698 - AXText: Attributes for [text: 'Accessible session draft' (0xffff70e118c0)] at offset 25: [{'bg-full-height': '0',
+                   'editable': 'false',
+                   'family-name': 'Inter,sans-serif',
+                   'indent': '0',
+                   'invisible': 'false',
+                   'justification': 'left',
+                   'language': 'c',
+                   'left-margin': '0',
+                   'pixels-above-lines': '0',
+                   'pixels-below-lines': '0',
+                   'pixels-inside-wrap': '0',
+                   'right-margin': '0',
+                   'rise': '0',
+                   'scale': '1',
+                   'size': '14',
+                   'stretch': 'normal',
+                   'strikethrough': 'false',
+                   'style': 'normal',
+                   'underline': 'false',
+                   'variant': 'normal',
+                   'weight': '400',
+                   'wrap-mode': 'word'}, 0, 25]
+18:52:19.519742 - FOCUS MANAGER: Active window is [frame: 'Agent view · Session lifecycle' (0xffff71f7b480)] focus_manager.set_locus_of_focus:376 > focus_manager._save_object_details:303 > ax_utilities_event.save_object_info_for_events:474 > focus_manager.get_active_window:391
+18:52:19.521822 - SCRIPT MANAGER: Getting script for [application: 'agent-os-desktop' (0xffff737c1240)] [text: 'Accessible session draft' (0xffff70e118c0)]
+18:52:19.522794 - GSETTINGS SCHEMA HANDLE: sleep-mode / apps not set [app:agent-os-desktop, profile:default]
+18:52:19.522833 - GSETTINGS REGISTRY: sleep-mode/apps using default value = []
+18:52:19.523423 - SCRIPT MANAGER: Script is toolkit script agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.523448 - CLIPBOARD PRESENTER: Activating
+18:52:19.524360 - CLIPBOARD PRESENTER: Could not access klipper interface: The name org.kde.klipper was not provided by any.service files
+18:52:19.524659 - CLIPBOARD PRESENTER: Could not access GPaste interface: The name org.gnome.GPaste was not provided by any.service files
+18:52:19.524841 - CLIPBOARD PRESENTER: Using Gtk.Clipboard as fallback.
+18:52:19.524851 - CLIPBOARD PRESENTER: Activated
+18:52:19.524874 - ORCA: Starting Atspi main event loop
+18:52:19.543617 - WARNING: Braille initialization failed: BrlAPI connection unavailable.
+18:52:19.543679 - BRAILLE: Scheduling BrlAPI retry in 2000 ms.
+
+18:52:19.544005 - EVENT MANAGER: object:children-changed:add for [desktop frame: 'main' (0xffff737c0d40)] in  (1, 0, [application: 'orca' (0xffff71f7bcc0)])
+18:52:19.544043 - FOCUS MANAGER: Locus of focus is [text: 'Accessible session draft' (0xffff70e118c0)]
+18:52:19.544319 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.544360 - EVENT MANAGER: Ignoring object:children-changed:add because event is not from active app
+
+18:52:19.705755 - EVENT MANAGER: object:children-changed:remove for [panel (0xffff71f9a0c0)] in agent-os-desktop (GTK 4.18.6) (2, 0, [alert: 'Use a saved workspace name.' (0xffff70e2a240)])
+18:52:19.705831 - FOCUS MANAGER: Locus of focus is [text: 'Accessible session draft' (0xffff70e118c0)]
+18:52:19.705959 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.706013 - EVENT MANAGER: Queueing object:children-changed:remove for [panel (0xffff71f9a0c0)] in agent-os-desktop (GTK 4.18.6) (2, 0, [alert: 'Use a saved workspace name.' (0xffff70e2a240)])
+18:52:19.706032 - EVENT MANAGER: App for event source is [application: 'agent-os-desktop' (0xffff737c1240)]
+18:52:19.706056 - SCRIPT MANAGER: Getting script for [application: 'agent-os-desktop' (0xffff737c1240)] [panel (0xffff71f9a0c0)]
+18:52:19.706109 - GSETTINGS REGISTRY: sleep-mode/apps using default value = []
+18:52:19.706133 - SCRIPT MANAGER: Script is toolkit script agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.706196 - EVENT MANAGER: object:children-changed:remove for [panel (0xffff71f9a0c0)] in agent-os-desktop (GTK 4.18.6) (2, 0, [alert: 'Use a saved workspace name.' (0xffff70e2a240)]) has priority level: LOW
+18:52:19.706272 - EVENT MANAGER: Queued object:children-changed:remove for [panel (0xffff71f9a0c0)] in agent-os-desktop (GTK 4.18.6) (2, 0, [alert: 'Use a saved workspace name.' (0xffff70e2a240)]) priority: LOW, counter: 0
+
+18:52:19.706333 - EVENT MANAGER: object:property-change:accessible-name for [alert (0xffff70e2a240)] in agent-os-desktop (GTK 4.18.6) (0, 0,)
+18:52:19.706349 - FOCUS MANAGER: Locus of focus is [text: 'Accessible session draft' (0xffff70e118c0)]
+18:52:19.706388 - EVENT_MANAGER: Not ignoring object:property-change:accessible-name due to role
+18:52:19.706440 - EVENT MANAGER: Queueing object:property-change:accessible-name for [alert (0xffff70e2a240)] in agent-os-desktop (GTK 4.18.6) (0, 0,)
+18:52:19.706467 - EVENT MANAGER: App for event source is [application: 'agent-os-desktop' (0xffff737c1240)]
+18:52:19.706486 - SCRIPT MANAGER: Getting script for [application: 'agent-os-desktop' (0xffff737c1240)] [alert (0xffff70e2a240)]
+18:52:19.706887 - GSETTINGS REGISTRY: sleep-mode/apps using default value = []
+18:52:19.706923 - SCRIPT MANAGER: Script is toolkit script agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.706996 - EVENT MANAGER: object:property-change:accessible-name for [alert (0xffff70e2a240)] in agent-os-desktop (GTK 4.18.6) (0, 0,) has priority level: NORMAL
+18:52:19.707126 - EVENT MANAGER: Queued object:property-change:accessible-name for [alert (0xffff70e2a240)] in agent-os-desktop (GTK 4.18.6) (0, 0,) priority: NORMAL, counter: 1
+18:52:19.707174 - EVENT MANAGER: Dequeueing object:property-change:accessible-name for [alert (0xffff70e2a240)] in agent-os-desktop (GTK 4.18.6) (0, 0,)
+18:52:19.707218 - EVENT MANAGER: Dequeued object:property-change:accessible-name for [alert (0xffff70e2a240)] in agent-os-desktop (GTK 4.18.6) (0, 0,) priority: NORMAL, counter: 1
+
+vvvvv START NORMAL -PRIORITY OBJECT EVENT OBJECT:PROPERTY-CHANGE:ACCESSIBLE-NAME (queue size: 1) vvvvv
+18:52:19.713567 - AXObject: [alert (0xffff70e2a240)] has index 2 ; parent [panel (0xffff71f9a0c0)] has 2 children
+18:52:19.714363 - EVENT SOURCE:
+                  app='agent-os-desktop (GTK 4.18.6)' name='' role='alert' axid='' id=0xffff70e2a240
+                  description=''
+                  help=''
+                  locale='C.UTF-8'
+                  states='focusable, sensitive, showing, visible, has-popup'
+                  relations='error-for: '
+                  actions='clipboard-copy; selection-delete; clipboard-paste; link-open; clipboard-cut; link-copy; menu-popup; selection-select-all'
+                  interfaces='Action, Component, Text'
+                  attributes='toolkit:GTK'
+                  text=''
+                  path=[-1, 2, 0, 1, 0, 0, 1, 2]
+                  
+18:52:19.714394 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.714417 - FOCUS MANAGER: Locus of focus is [text: 'Accessible session draft' (0xffff70e118c0)]
+18:52:19.714454 - EVENT MANAGER: Getting script for event for [application: 'agent-os-desktop' (0xffff737c1240)] [alert (0xffff70e2a240)]
+18:52:19.714472 - SCRIPT MANAGER: Getting script for [application: 'agent-os-desktop' (0xffff737c1240)] [alert (0xffff70e2a240)]
+18:52:19.714515 - GSETTINGS REGISTRY: sleep-mode/apps using default value = []
+18:52:19.714537 - SCRIPT MANAGER: Script is toolkit script agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.714551 - EVENT MANAGER: Script for event is agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.714570 - EVENT MANAGER: Processing object:property-change:accessible-name: script for event is active
+18:52:19.714607 - AXUtilitiesEvent: The name is empty.
+TOTAL PROCESSING TIME: 0.0074
+^^^^^ FINISHED NORMAL -PRIORITY OBJECT EVENT OBJECT:PROPERTY-CHANGE:ACCESSIBLE-NAME ^^^^^
+
+18:52:19.714697 - EVENT MANAGER: Dequeueing object:children-changed:remove for [panel (0xffff71f9a0c0)] in agent-os-desktop (GTK 4.18.6) (2, 0, [alert (0xffff70e2a240)])
+18:52:19.714742 - EVENT MANAGER: Dequeued object:children-changed:remove for [panel (0xffff71f9a0c0)] in agent-os-desktop (GTK 4.18.6) (2, 0, [alert (0xffff70e2a240)]) priority: LOW, counter: 0
+
+vvvvv START LOW -PRIORITY OBJECT EVENT OBJECT:CHILDREN-CHANGED:REMOVE (queue size: 0) vvvvv
+18:52:19.727277 - AXObject: [alert (0xffff70e2a240)] has index 2 ; parent [panel (0xffff71f9a0c0)] has 2 children
+18:52:19.728321 - EVENT SOURCE:
+                  app='agent-os-desktop (GTK 4.18.6)' name='' role='panel' axid='' id=0xffff71f9a0c0
+                  description=''
+                  help=''
+                  locale='C.UTF-8'
+                  states='sensitive, showing, vertical, visible'
+                  relations=''
+                  actions=''
+                  interfaces='Action, Component'
+                  attributes='toolkit:GTK'
+                  text=''
+                  path=[-1, 2, 0, 1, 0, 0, 1]
+                  
+                  EVENT ANY DATA:
+                  name='' role='alert' axid='' id=0xffff70e2a240
+                  description=''
+                  help=''
+                  locale='C.UTF-8'
+                  states='focusable, sensitive, showing, visible, has-popup'
+                  relations='error-for: '
+                  actions='clipboard-copy; selection-delete; clipboard-paste; link-open; clipboard-cut; link-copy; menu-popup; selection-select-all'
+                  interfaces='Action, Component, Text'
+                  attributes='toolkit:GTK'
+                  text=''
+                  path=[-1, 2, 0, 1, 0, 0, 1, 2]
+                  
+18:52:19.728356 - SCRIPT MANAGER: Active script is: agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.728383 - FOCUS MANAGER: Locus of focus is [text: 'Accessible session draft' (0xffff70e118c0)]
+18:52:19.728415 - EVENT MANAGER: Getting script for event for [application: 'agent-os-desktop' (0xffff737c1240)] [panel (0xffff71f9a0c0)]
+18:52:19.728434 - SCRIPT MANAGER: Getting script for [application: 'agent-os-desktop' (0xffff737c1240)] [panel (0xffff71f9a0c0)]
+18:52:19.728482 - GSETTINGS REGISTRY: sleep-mode/apps using default value = []
+18:52:19.728508 - SCRIPT MANAGER: Script is toolkit script agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.728522 - EVENT MANAGER: Script for event is agent-os-desktop (module=orca.scripts.toolkits.gtk.script)
+18:52:19.728543 - EVENT MANAGER: Processing object:children-changed:remove: script for event is active
+18:52:19.728690 - AXCacheManager: Invalidating caches AXObject.known-dead, AXObject.object-attributes, AXObject.supported-interfaces, AXUtilitiesRelation.relations, AXUtilitiesRelation.targets, AXUtilitiesEvent.last-known-description, AXUtilitiesEvent.last-known-name, AXUtilitiesEvent.last-known-checked, AXUtilitiesEvent.last-known-checked-state, AXUtilitiesEvent.last-known-expanded, AXUtilitiesEvent.last-known-indeterminate, AXUtilitiesEvent.last-known-invalid-entry, AXUtilitiesEvent.last-known-pressed, AXUtilitiesEvent.last-known-selected, AXUtilitiesEvent.last-known-value, AXUtilitiesEvent.last-known-value-text, AXUtilitiesEvent.ignore-name-changes-for, AXUtilitiesEvent.text-event-reason, AXUtilitiesSelection.is-all-items-selected, AXUtilities.set-members, AXUtilities.is-layout-only, AXUtilities.is-code-block-descendant, AXUtilities.is-combo-box-descendant, AXUtilities.is-document-descendant, AXUtilities.is-editable-combo-box-descendant, AXUtilities.is-embedded-descendant, AXUtilities.is-entry-descendant, AXUtilities.is-grid-descendant, AXUtilities.is-label-or-caption-descendant, AXUtilities.is-link-descendant, AXUtilities.is-menu-descendant, AXUtilities.is-tool-bar-descendant, AXUtilities.is-tool-tip-descendant, AXUtilities.is-presentational-child, AXUtilities.is-tree-or-tree-table-descendant, AXUtilities.nearest-block-ancestor, AXUtilities.embedded-document-frame Reason: children-changed event.
+TOTAL PROCESSING TIME: 0.014
+^^^^^ FINISHED LOW -PRIORITY OBJECT EVENT OBJECT:CHILDREN-CHANGED:REMOVE ^^^^^
+
+18:52:20.472734 - AXCacheManager: Invalidating caches Generator.description, Generator.image-description, Generator.static-text, Generator.text-substring, Generator.text-line, Generator.text, Generator.text-expanding-eocs, Generator.descendants, Generator.nesting-level, Generator.tree-item-level, Generator.is-nameless-toggle, Generator.is-description-used-for-name, Generator.is-description-used-for-static-text Reason: Automatic interval-based clearing.
+18:52:21.546688 - BRAILLE: Attempting connection with BrlAPI.
+18:52:21.547049 - BRAILLE: BrlAPI Connection is unavailable (ConnectionError): couldn't connect to b':0' with key b'keyfile:/etc/brlapi.key+polkit': connect: No such file or directory
+                  (brlerrno 11, libcerrno 2, gaierrno 0)
+                  Is BRLTTY really running?
+18:52:21.547166 - WARNING: Braille initialization failed: BrlAPI connection unavailable.
+18:52:21.547206 - BRAILLE: Scheduling BrlAPI retry in 4000 ms.
+18:52:22.472887 - AXCacheManager: Invalidating caches Generator.description, Generator.image-description, Generator.static-text, Generator.text-substring, Generator.text-line, Generator.text, Generator.text-expanding-eocs, Generator.descendants, Generator.nesting-level, Generator.tree-item-level, Generator.is-nameless-toggle, Generator.is-description-used-for-name, Generator.is-description-used-for-static-text Reason: Automatic interval-based clearing.
+18:52:24.472976 - AXCacheManager: Invalidating caches Generator.description, Generator.image-description, Generator.static-text, Generator.text-substring, Generator.text-line, Generator.text, Generator.text-expanding-eocs, Generator.descendants, Generator.nesting-level, Generator.tree-item-level, Generator.is-nameless-toggle, Generator.is-description-used-for-name, Generator.is-description-used-for-static-text Reason: Automatic interval-based clearing.
+18:52:25.547542 - BRAILLE: Attempting connection with BrlAPI.
+18:52:25.547948 - BRAILLE: BrlAPI Connection is unavailable (ConnectionError): couldn't connect to b':0' with key b'keyfile:/etc/brlapi.key+polkit': connect: No such file or directory
+                  (brlerrno 11, libcerrno 2, gaierrno 0)
+                  Is BRLTTY really running?
+18:52:25.548103 - WARNING: Braille initialization failed: BrlAPI connection unavailable.
+18:52:25.548145 - BRAILLE: Scheduling BrlAPI retry in 8000 ms.
+18:52:26.473079 - AXCacheManager: Invalidating caches Generator.description, Generator.image-description, Generator.static-text, Generator.text-substring, Generator.text-line, Generator.text, Generator.text-expanding-eocs, Generator.descendants, Generator.nesting-level, Generator.tree-item-level, Generator.is-nameless-toggle, Generator.is-description-used-for-name, Generator.is-description-used-for-static-text Reason: Automatic interval-based clearing.
+18:52:28.473189 - AXCacheManager: Invalidating caches Generator.description, Generator.image-description, Generator.static-text, Generator.text-substring, Generator.text-line, Generator.text, Generator.text-expanding-eocs, Generator.descendants, Generator.nesting-level, Generator.tree-item-level, Generator.is-nameless-toggle, Generator.is-description-used-for-name, Generator.is-description-used-for-static-text Reason: Automatic interval-based clearing.
