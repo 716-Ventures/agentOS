@@ -20,6 +20,7 @@ import time
 class Device:
     def __init__(self,keyboard,motion_ready=None):
         self.motion_ready=motion_ready
+        self.last_click=None
         self.fd=os.open('/dev/uinput',os.O_WRONLY|os.O_NONBLOCK)
         try:
             fcntl.ioctl(self.fd,0x40045564,1) # UI_SET_EVBIT EV_KEY
@@ -43,6 +44,7 @@ class Device:
         for key in keys:self.event(1,key,1);self.sync()
         for key in reversed(keys):self.event(1,key,0);self.sync()
     def click(self,x,y,width,height,button=272):
+        self.last_click={'x':x,'y':y,'button':button}
         self.event(3,0,round(x*65535/width));self.event(3,1,round(y*65535/height));self.sync()
         if self.motion_ready:self.motion_ready(x,y)
         else:time.sleep(.1)
@@ -434,7 +436,9 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
         def await_focus(predicate):
             deadline=time.monotonic()+8
             while not predicate(scene()['seat_focus']):
-                if time.monotonic()>deadline:raise RuntimeError('Kernel focus shortcut did not reach its target: '+repr({'focus':scene()['seat_focus'],'overview':scene()['shared']['overview'],'windows':scene()['windows']}))
+                if time.monotonic()>deadline:
+                    current=scene()
+                    raise RuntimeError('Kernel focus did not reach its target: '+repr({'focus':current['seat_focus'],'pointer_location':current['pointer_location'],'last_click':pointer.last_click,'overview':current['shared']['overview'],'workspace_error':current['shared']['error'],'workspaces':current['shared']['workspaces'],'windows':current['windows']}))
                 time.sleep(.05)
         keyboard.chord(29,56,15)
         await_focus(lambda focus:focus is not None and focus!=target)
