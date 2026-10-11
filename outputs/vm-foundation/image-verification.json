@@ -1,11 +1,11 @@
 {
-  "verified_at": "2026-10-11T04:02:06.536534+00:00",
+  "verified_at": "2026-10-11T04:34:44.892283+00:00",
   "result": "pass",
   "image": {
     "architecture": "arm64",
     "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
     "bootstrap_sha256": "e60ac4a8f76a106946ad3d91a392be97b7c0671587a75f4c5111d57dfb4c4879",
-    "builder_sha256": "0770570989b7a4bd38adf05d95c55223589fe179ba97578a3ce30f5255ab7969",
+    "builder_sha256": "e1b8102fbd47b1313549445b6fd7792a086c2a883233bdfbf16ff56cfea7a184",
     "compression": "zlib",
     "contains_personal_account": false,
     "contains_provider_credentials": false,
@@ -20,9 +20,9 @@
       "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
       "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
     },
-    "image_sha256": "6dadd282385810ed522de4a048d622f2df00de73ee2671c6b36860e4a4a94d30",
+    "image_sha256": "9d86b2b1c3745669b43573fc4011cd8777f2727b982a717b5e55681732abfef4",
     "name": "agentOS experimental native image",
-    "runtime_release": "ec5787f4a0439dc50befb946d8db214a0c804f06dd9054a572d01a586958dafc",
+    "runtime_release": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
     "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
     "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
   },
@@ -65,8 +65,8 @@
     "live Gateway or Jev inference; no configured credentials",
     "incompatible future state-format migrations"
   ],
-  "runtime_source_revision": "e907e553f373fbf22b380613f0ff82eeb1606d12",
-  "runtime_716_ui": "v0.1.0-alpha.30",
+  "runtime_source_revision": "6b459ea4129524baa253854f07cfedac4d790a86",
+  "runtime_716_ui": "v0.1.0-alpha.31",
   "compatible_rollback_probe": {
     "release": "3ebc478291575d588f89c5349397c930093233a51eb45c8892611cb38bebdc1f",
     "signed_bundle_sha256": "ede34e9cebebf6f393383ef7933c134aa37e215afb2155717abb8a06d91b25ad"
@@ -75,8 +75,8 @@
     "result": "pass",
     "before": {
       "result": "pass",
-      "boot_id": "39d0f5bc-2fee-40d1-9b82-951526b1678f",
-      "runtime": "ec5787f4a0439dc50befb946d8db214a0c804f06dd9054a572d01a586958dafc",
+      "boot_id": "4d0106bd-704d-4f90-85bf-7d1671f5ab5e",
+      "runtime": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
       "uid": 1000,
       "activity": 1,
       "file_persisted": true,
@@ -95,8 +95,8 @@
     },
     "reboot": {
       "result": "pass",
-      "boot_id": "80c62c2e-73c5-44ce-8781-d8d6b9e38186",
-      "runtime": "ec5787f4a0439dc50befb946d8db214a0c804f06dd9054a572d01a586958dafc",
+      "boot_id": "a38b2508-df2b-4fc4-b012-30b12b5045e3",
+      "runtime": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
       "uid": 1000,
       "activity": 1,
       "file_persisted": true,
@@ -115,8 +115,8 @@
     },
     "offline": {
       "result": "pass",
-      "boot_id": "45ef3607-a5b5-43a7-8330-acff0df467ee",
-      "runtime": "ec5787f4a0439dc50befb946d8db214a0c804f06dd9054a572d01a586958dafc",
+      "boot_id": "b8dcc99f-d300-49e3-b4d7-16ec95ec05a1",
+      "runtime": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
       "uid": 1000,
       "activity": 1,
       "file_persisted": true,
@@ -163,11 +163,11 @@
       "installed_executables": true,
       "cleanup_verified": true
     },
-    "final_offline_runtime": "ec5787f4a0439dc50befb946d8db214a0c804f06dd9054a572d01a586958dafc",
+    "final_offline_runtime": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
     "development_disk_restored": true,
     "guest_stopped": true
   },
-  "factory_source_revision": "e907e553f373fbf22b380613f0ff82eeb1606d12",
+  "factory_source_revision": "6b459ea4129524baa253854f07cfedac4d790a86",
   "browser": {
     "result": "pass",
     "checks": [
@@ -190,16 +190,16 @@
     "cleanup_verified": true
   },
   "qualification_observations": [
-    "Clean v9 qualification includes installed Table/List/KeyValue kernel selection, menus and separate-client clipboard, editor and VTE clipboard/menu/IME, native GTK idle/two-broker-CPU-job presentation, and synthetic Wayland presentation. The exact immutable runtime passed all 60 development reproduction checks.",
-    "The prior v6, v7 and v8 distributions remain untouched. Only the redundant guest v8 builder output was removed after fresh SHA-256 equality with the retained host distribution.",
-    "An initial qualification-script attempt used the prior runtime ID after successful rollback and stopped before input tests. Development disks/configuration were restored and UTM closed. The helper now derives identity from candidate metadata; the complete fresh-copy run is recorded here.",
-    "A second fixture attempt refused a retained temporary password before account creation; the disposable guest was powered off after orderly shutdown timed out, original disks/configuration restored and UTM closed. A third attempt reached editor/primary transfer but failed to focus its destination. An instrumented repeat on that booted copy passed without a runtime change; that intermittent input observation remains open.",
+    "Clean v10 qualification includes the exact alpha.31 form-owner fixes and the immutable runtime from all 60 reproduction checks, plus installed collection/editor/VTE/IME, idle/two-broker-CPU-job presentation, browser, offline speech, reboot and failed activation/account-preserving recovery.",
+    "The prior v6\u2013v9 distributions remain untouched. Only the redundant guest v9 builder output was removed after fresh SHA-256 equality with the retained host distribution.",
+    "The prior v9 qualification exposed an intermittent primary-transfer destination focus failure. An unchanged instrumented repeat and complete v9 fresh-copy run passed; that observation remains open. Its helper identity/password failures and subsequent exact disk/config/EFI restoration are retained in repository history.",
+    "An initial compressed v10 conversion ran out of builder space, published no image and cleaned its private temporary directory. The builder now checks a conservative 41 GiB peak-capacity bound before disk/loop creation; all 21 tooling tests pass. The dedicated development test disk was enlarged from 20 to 80 GiB after an exact hash-verified APFS recovery clone; its ext4 filesystem, saved activities, UID and runtime were verified with more than 60 GiB available. The distributed image remains 20 GiB.",
     "The new image uses supported zlib-compressed QCOW2 export. Its unbooted signed artifact remains separate from the verification copy."
   ],
   "direct_input_test_sha256": "07741bf3e654f0c214ca1c9488e4a6bf1ef8a4341d7a408418add99ffefbc62e",
   "terminal_input_test_sha256": "e17773d3dfbd3260ebbd1ea7d10e7b60874ab84bdb01a073d847ac37e7df1175",
-  "qualification_log_sha256": "a03d0891bf6b69d07d5bfff67ca8b887c2000651d4f1a8ed120148c78bc75a1a",
-  "full_reproduction_runtime": "ec5787f4a0439dc50befb946d8db214a0c804f06dd9054a572d01a586958dafc",
+  "qualification_log_sha256": "dfa92c040a105e3ea100280a74a5e2992484357db2c099de65edfeec68dcf0c4",
+  "full_reproduction_runtime": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
   "full_reproduction_check_count": 60,
   "native_input_presentation_profiles": [
     {
@@ -207,10 +207,10 @@
       "discarded": 0,
       "format": 1,
       "invalid": 0,
-      "max_ms": 44,
+      "max_ms": 41,
       "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
       "p50_ms": 35,
-      "p95_ms": 41,
+      "p95_ms": 40,
       "pending": 0,
       "presented": 20,
       "requested": 20,
@@ -222,18 +222,18 @@
       "discarded": 0,
       "format": 1,
       "invalid": 0,
-      "max_ms": 44,
+      "max_ms": 43,
       "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-      "p50_ms": 33,
-      "p95_ms": 43,
+      "p50_ms": 36,
+      "p95_ms": 42,
       "pending": 0,
       "presented": 20,
       "requested": 20,
       "sample_limit": 256,
       "profile": "two concurrent broker CPU jobs",
       "job_cpu_usage_usec": [
-        2569278,
-        2567062
+        3006334,
+        3007536
       ]
     }
   ],
