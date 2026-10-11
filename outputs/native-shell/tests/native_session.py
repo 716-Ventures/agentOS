@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import session_focus
 
 ROOT=Path(__file__).resolve().parents[1]
 SHELL=ROOT.parent if (ROOT.parent/'install_runtime.py').is_file() else ROOT.parent/'agent-shell'
@@ -108,11 +109,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
             assert not any(w['title'] in ('agentOS','agentOS system bar','Agent launcher') for w in layers['windows']),layers
             if screen_keyboard:
                 import accessibility,pyatspi
-                workspace=call(endpoint,{'op':'presentation.snapshot'})['documents'][f'desktop-{activity}']
-                call(endpoint,{'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
-                    'request_id':'keyboard-field-focus','expected_revisions':{workspace['workspace_id']:workspace['revision']},
-                    'operations':[{'op':'workspace.edit','workspace_id':workspace['workspace_id'],
-                        'edit':{'kind':'focus','surface_id':'session-fixture','element_id':'field'}}]})
+                session_focus.focus(lambda value:call(endpoint,value),f'desktop-{activity}','session-fixture','field','keyboard-field-focus')
                 field=accessibility.find('Accessible session draft',pyatspi.ROLE_TEXT)
                 wait_for(lambda:field.getState().contains(pyatspi.STATE_FOCUSED),[core,session])
                 original=call(control,{'op':'snapshot'})['seat_focus']
@@ -226,11 +223,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 print('PASS: trusted display zoom changes real output/workspace geometry; doubled zoom preserves keyboard dismissal, local typing and exact reset; same-login control denied',flush=True)
             if screen_reader:
                 import accessibility,pyatspi
-                workspace=call(endpoint,{'op':'presentation.snapshot'})['documents'][f'desktop-{activity}']
-                call(endpoint,{'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
-                    'request_id':'reader-fixture-focus','expected_revisions':{workspace['workspace_id']:workspace['revision']},
-                    'operations':[{'op':'workspace.edit','workspace_id':workspace['workspace_id'],
-                        'edit':{'kind':'focus','surface_id':'session-fixture','element_id':'field'}}]})
+                session_focus.focus(lambda value:call(endpoint,value),f'desktop-{activity}','session-fixture','field','reader-fixture-focus')
                 field=accessibility.find('Accessible session draft',pyatspi.ROLE_TEXT)
                 wait_for(lambda:field.getState().contains(pyatspi.STATE_FOCUSED),[core,session])
                 reader_log=pidfile.parent/'orca-speech.log'
@@ -302,11 +295,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 if ime:
                     import ime_accessibility
                     wait_for(lambda:(runtime/'ime-test.sock').exists(),[core,session])
-                    workspace=call(endpoint,{'op':'presentation.snapshot'})['documents'][f'desktop-{activity}']
-                    focused=call(endpoint,{'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
-                                   'request_id':'ime-fixture-focus','expected_revisions':{workspace['workspace_id']:workspace['revision']},
-                                   'operations':[{'op':'workspace.edit','workspace_id':workspace['workspace_id'],
-                                                  'edit':{'kind':'focus','surface_id':'session-fixture','element_id':'field'}}]})
+                    focused=session_focus.focus(lambda value:call(endpoint,value),f'desktop-{activity}','session-fixture','field','ime-fixture-focus')
                     assert focused['status']=='committed',focused
                     try:ime_accessibility.verify(lambda value:call(endpoint,value),runtime/'ime-test.sock',editor=ime_editor,observation=runtime/'ime-observation.json')
                     except Exception:
