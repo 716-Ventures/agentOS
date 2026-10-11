@@ -1437,12 +1437,45 @@
       "ci_result": "success",
       "native_source_sha256": "8f44f34cc0875a2214cf983250e7a796e5dfc1a496e4d2f0d27960cfb208ca79",
       "boundary": "Real native Unicode/text/keyed row/VTE and frozen request context checks pass, with initial-request absent-broker integration and complete session cleanup. The installed reproduction did not finish because of the separately retained Table placement observation; the preceding complete 62-check runtime and signed v10 retain their own identities."
+    },
+    "terminal_fixture_and_cold_broker_history": {
+      "runtime_release": "ba6c033436374457378f2205886dcad5aa0fa470e69681f15ef50039a4a5696f",
+      "qualified": [
+        "Installed VTE journey after immediate broker restart with more than 2000 durable jobs; kernel typing, exact Unicode clipboard and line copy, menus, interrupt, detach/reattach and owned session cleanup",
+        "2019-record recovery regression verifies live source publication in the first batch and eventual delivery of every historical observation",
+        "267 Python tests pass; selected guest stopped and owned UTM app closed"
+      ],
+      "corrections": [
+        "Read the current activity once instead of spawning a core CLI for each historical workspace; separately bound registration, definite stale-revision retry and geometry convergence and assert committed receipt",
+        "Stream recovered historical job observations through existing bounded backfill rather than placing them ahead of new work in the live queue"
+      ],
+      "measurements": {
+        "baseline_placement_seconds": 38.248745003,
+        "fixed_placement_seconds": 0.713725461,
+        "fixed_geometry_seconds": 0.582106769
+      },
+      "log_sha256": {
+        "agentos-context-second-full-failure-reproduction.json": "9d438b1f99eb4375e632128b9f9535cd1d22dbddb84c8d5807f6fce827512895",
+        "agentos-context-second-full-failure-direct-display-terminal.log": "222f762f4e2d9a5afe7fac74fdda08a2656b7b5c070c4f17dc0f4dc3890b0056",
+        "agentos-geometry-diagnostics-atomic.log": "6ae5c49f505f764f19ce69d8020cdca10a4248ff1dba1ce72169155eee6529b8",
+        "agentos-terminal-source-diagnostic.log": "a909f8cc9a80ac0cacf04a411eea45a6d52ae56b65595c45a519eca3e97a8d95",
+        "agentos-source-priority-baseline.log": "484c117da36f4c5edc7c0dfdc286ec75b62e9899627218fccf4d7988b8f045e3",
+        "agentos-source-priority-tests.log": "62cadfb9d2cd46372ef841e27860947d1f9b24ca49b3f12e401160239aaab591",
+        "agentos-terminal-cold-broker-fixed.log": "1956ea8decd37a0cb3307c3d8ac2d340302574ea63baada3064ac00ad498e670"
+      },
+      "source_sha256": {
+        "outputs/agent-shell/services/broker.py": "52fee78b1967a69a312fc16088db15edda5d196084ef0e6816252916efebdb84",
+        "outputs/agent-shell/tests/direct_input_probe.py": "6f6441a38968038b819ab2f88a3b50ab93215defd42cf447bdd3df39423530e3",
+        "outputs/agent-shell/tests/source_publisher_test.py": "5464499aa1f12a24026fd988cece535545c70a0e0dad153dfbc26b4570df2254"
+      },
+      "boundary": "Targeted installed qualification only. The current full 63-check reproduction has not yet completed. The earlier Table placement and v9 PRIMARY focus observations remain unresolved; no physical input/audio/GPU claim."
     }
   },
   "observations": [
     "The earlier intermittent Close/Undo stress failure recorded a later empty conventional window placement. Unbuffered-toplevel publication was reproduced and corrected; ten consecutive installed journeys then passed. Later genuine placement changes intentionally still reject Undo.",
     "Clean v9 qualification exposed one primary-transfer destination focus failure; an instrumented repeat and complete fresh-copy run passed without a runtime change. The observation remains open; the kernel fixture now records the last click, actual pointer location and full workspace/error state on focus failure.",
-    "The contextual-request installed reproduction stopped before completing at Table fixture placement: the requested 900x400 geometry was not observed within ten seconds. The following diagnostic probe passed without a runtime change and recorded normal asynchronous geometry convergence. The original failure remains unresolved; no retry is treated as a correction. Exact failed reproduction and diagnostic log hashes are retained separately."
+    "The contextual-request installed reproduction stopped before completing at Table fixture placement: the requested 900x400 geometry was not observed within ten seconds. The following diagnostic probe passed without a runtime change and recorded normal asynchronous geometry convergence. The original failure remains unresolved; no retry is treated as a correction. Exact failed reproduction and diagnostic log hashes are retained separately.",
+    "A second contextual-request full run passed 45 checks including Table, then failed terminal peer geometry. Diagnostics proved the fixture exhausted its ten-second deadline by performing a core CLI lookup per historical workspace (38.25 seconds). Corrected activity lookup and independent convergence deadline reduced placement to 0.71 seconds. An immediate cold broker probe separately reproduced missing live source publication behind more than 2000 historical jobs. Streamed historical backfill corrected the ordering; the installed terminal journey then passed after broker restart. These targeted fixes do not erase the earlier unresolved Table or PRIMARY focus observations."
   ],
   "owned_utm_app_closed": true
 }

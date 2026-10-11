@@ -41,6 +41,28 @@ class Sources(unittest.TestCase):
         self.assertEqual(len(seen),1100)
         self.assertLessEqual(len(sources.pending),1024)
 
+    def test_cold_recovery_publishes_live_work_before_historical_backfill(self):
+        import json
+        records=[{**self.job(), 'id':format(i,'032x'), 'status':'succeeded'} for i in range(2019)]
+        sources=BrokerSources('/unused',replay=broker.source_backfill)
+        with tempfile.TemporaryDirectory() as directory,patch.object(broker,'STATE',Path(directory)), \
+             patch.object(broker,'SOURCES',sources),patch.object(broker,'JOBS',{}):
+            for job in records:
+                (Path(directory)/(job['id']+'.json')).write_text(json.dumps(job))
+            broker.recover_jobs()
+            live={**self.job(), 'id':'f'*32}
+            sources.mark(live)
+            delivered=[]
+            def deliver(payload):
+                if payload['op']=='source.publish':delivered.append(payload['source'])
+                if len(set(delivered))==len(records)+1 or len(delivered)>4096:sources.stop.set()
+            with patch.object(sources,'request',side_effect=deliver),patch.object(sources.stop,'wait'):
+                sources.run()
+            self.assertIn('broker:'+live['id'],delivered[:16])
+            self.assertEqual(set(delivered),{'broker:'+job['id'] for job in records+[live]})
+            self.assertEqual(len(broker.JOBS),2019)
+            self.assertLessEqual(len(sources.pending),1024)
+
     def test_backfill_reads_only_bounded_regular_durable_records(self):
         import json
         import files

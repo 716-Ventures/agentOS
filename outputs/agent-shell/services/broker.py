@@ -485,7 +485,9 @@ def recover_jobs():
         recovered[job['id']] = job
     JOBS.clear()
     JOBS.update(recovered)
-    for job in recovered.values():SOURCES.mark(job)
+    # Historical records stream through backfill; keep the bounded live queue
+    # available for newly submitted work immediately after a cold restart.
+    with SOURCES.lock:SOURCES.needs_replay=True
 
 
 

@@ -346,6 +346,7 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
                 direct_terminal_probe.verify(metrics,output,core,scene,login_user,presentation,snapshot,keyboard,pointer,ime_endpoint=metrics/'ime-test.sock')
                 return
             receipts=metrics/'transfer-receipts.json'
+            source_started=time.monotonic()
             with (metrics/'transfer-source.log').open('w') as log:
                 source_client=subprocess.Popen(['runuser','-u',login_user,'--','python3',str(Path(__file__).resolve()),'--transfer-source',str(receipts),'--terminal-clipboard'],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
             deadline=time.monotonic()+10
@@ -356,17 +357,33 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
                 if source_client.poll() is not None:raise RuntimeError('Terminal clipboard source exited')
                 if time.monotonic()>deadline:raise RuntimeError('Terminal clipboard source did not register')
                 time.sleep(.05)
+            registered_at=time.monotonic()
+            activity=str(core('presentation.get')['activity_id'])
+            deadline=time.monotonic()+10
             while True:
-                workspace=next(doc for doc in scene()['shared']['workspaces'].values() if doc['activity_id']==core('presentation.get')['activity_id'])
+                workspace=next(doc for doc in scene()['shared']['workspaces'].values() if doc['activity_id']==activity)
                 try:
-                    presentation({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':'terminal-source-'+str(time.time_ns()),'expected_revisions':{workspace['workspace_id']:workspace['revision']},'operations':[{'op':'workspace.edit','workspace_id':workspace['workspace_id'],'edit':{'kind':'float','surface_id':logical,'output_id':next(iter(workspace['outputs'])),'x':980,'y':0,'width':300,'height':220}}]})
+                    receipt=presentation({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':'terminal-source-'+str(time.time_ns()),'expected_revisions':{workspace['workspace_id']:workspace['revision']},'operations':[{'op':'workspace.edit','workspace_id':workspace['workspace_id'],'edit':{'kind':'float','surface_id':logical,'output_id':next(iter(workspace['outputs'])),'x':980,'y':0,'width':300,'height':220}}]})
+                    assert receipt['status']=='committed',receipt
                     break
                 except RuntimeError as exc:
                     if '"code":"stale_revision"' not in str(exc) or time.monotonic()>deadline:raise
                     time.sleep(.05)
-            while next(row for row in scene()['windows'] if row['id']==source['id'])['geometry']!={'x':980,'y':work_area['y'],'width':300,'height':220}:
-                if time.monotonic()>deadline:raise RuntimeError('Terminal clipboard source geometry did not settle')
+            committed_at=time.monotonic()
+            deadline=committed_at+10
+            expected={'x':980,'y':work_area['y'],'width':300,'height':220}
+            geometries=[]
+            while True:
+                current=scene()
+                actual=next((row['geometry'] for row in current['windows'] if row['id']==source['id']),None)
+                if not geometries or geometries[-1]!=actual:
+                    geometries.append(actual)
+                    if len(geometries)>8:geometries.pop(0)
+                if actual==expected:break
+                if time.monotonic()>deadline:
+                    raise RuntimeError('Terminal clipboard source geometry did not settle: '+json.dumps({'expected':expected,'observed':geometries,'registration_seconds':registered_at-source_started,'placement_seconds':committed_at-registered_at,'geometry_seconds':time.monotonic()-committed_at,'placement_status':receipt['status'],'workspace':next((doc for doc in current['shared']['workspaces'].values() if doc['activity_id']==activity),None),'layers':current['system_layers']}))
                 time.sleep(.05)
+            print('CHECK: terminal peer geometry '+json.dumps({'expected':expected,'observed':geometries,'registration_seconds':registered_at-source_started,'placement_seconds':committed_at-registered_at,'geometry_seconds':time.monotonic()-committed_at,'placement_status':receipt['status']}),flush=True)
             import direct_terminal_probe
             direct_terminal_probe.verify(metrics,output,core,scene,login_user,presentation,snapshot,keyboard,pointer)
             return

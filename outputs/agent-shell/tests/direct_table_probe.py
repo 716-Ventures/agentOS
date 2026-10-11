@@ -64,7 +64,7 @@ def verify(metrics, output, core, scene, login_user, presentation, observe, keyb
             wait(placed, 'Table fixture placement was not applied')
         except RuntimeError as exc:
             current=scene()
-            raise RuntimeError(str(exc)+'; placement diagnostics: '+json.dumps({'expected':expected,'observed':observed,'workspaces':current['shared']['workspaces'],'outputs':current['outputs']})) from exc
+            raise RuntimeError(str(exc)+'; placement diagnostics: '+json.dumps({'expected':expected,'observed':observed,'workspace':next((doc for doc in current['shared']['workspaces'].values() if doc['activity_id']==activity),None),'outputs':current['outputs']})) from exc
         print('CHECK: collection placement '+json.dumps({'expected':expected,'observed':observed}),flush=True)
 
     def click(logical, point, button=272):
