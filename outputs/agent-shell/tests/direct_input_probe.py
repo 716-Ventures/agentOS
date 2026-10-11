@@ -161,7 +161,8 @@ def assistive():
             if request.startswith('keyboard:'):
                 node=find(request.split(':',1)[1],pyatspi.ROLE_PUSH_BUTTON)
                 rect=node.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
-                print(json.dumps({'point':[rect.x+rect.width/2,rect.y+rect.height/2]}),flush=True);continue
+                frame=find('On-screen keyboard',pyatspi.ROLE_FRAME).queryComponent().getExtents(pyatspi.WINDOW_COORDS)
+                print(json.dumps({'point':[rect.x-frame.x+rect.width/2,rect.y-frame.y+rect.height/2]}),flush=True);continue
             if request.startswith('terminal:'):
                 action=request.split(':',1)[1]
                 if action in ('attach','detach','attach-state'):

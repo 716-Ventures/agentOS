@@ -124,7 +124,12 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 keyboard=next(layer for layer in shown['system_layers'] if layer['namespace']=='agentos-keyboard')
                 assert shown['seat_focus']==original,shown
                 close=accessibility.find('Hide keyboard',pyatspi.ROLE_PUSH_BUTTON).queryComponent().getExtents(pyatspi.WINDOW_COORDS)
-                assert 0<=close.x and close.x+close.width<=keyboard['geometry']['width'],('Hide keyboard clipped',close,keyboard)
+                frame=accessibility.find('On-screen keyboard',pyatspi.ROLE_FRAME).queryComponent().getExtents(pyatspi.WINDOW_COORDS)
+                # GTK 4.14 includes its native frame origin in WINDOW extents.
+                # Compare within that frame, rather than with the Wayland origin.
+                assert frame.width==keyboard['geometry']['width'],(frame,keyboard)
+                assert 0<=close.x-frame.x and close.x-frame.x+close.width<=frame.width,('Hide keyboard clipped',close,frame,keyboard)
+                assert 0<=close.y-frame.y and close.y-frame.y+close.height<=frame.height,('Hide keyboard clipped vertically',close,frame,keyboard)
                 assert keyboard['work_area']['height'] < bar['work_area']['height'],keyboard
                 assert keyboard['geometry']['y']+keyboard['geometry']['height']==output['y']+output['height'],keyboard
                 assert field.queryEditableText().setTextContents('')
