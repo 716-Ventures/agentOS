@@ -70,7 +70,7 @@ def main():
         vm.prepare(args.base)
         print('Register the printed bundle once in UTM, then repeat this command without --prepare-only.')
         return
-    app_before=vm.utm_application_identity()
+    from utm_ownership import UTMApplicationOwnership
     machine=vm.machine()
     report={'started_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'result':'running',
             'vm_uuid':machine['uuid'],'base_sha512':vm.LOCK['sha512'],'checks':[],
@@ -80,56 +80,59 @@ def main():
         with path.open('w') as log:subprocess.run(args,stdout=log,stderr=subprocess.STDOUT,check=True,timeout=timeout)
         print('PASS:',name,flush=True);report['checks'].append(name)
     def remote(command,name,timeout=180):local(vm.ssh_args()+[command],name,timeout)
-    try:
-        local([sys.executable,'-m','unittest','discover','-s',str(ROOT/'tests'),'-p','*_test.py'],'vm-tool-tests')
-        if not vm.alive():vm.start()
-        vm.wait_ready(60)
-        remote('cloud-init status --wait','cloud-init',120)
-        local([sys.executable,str(SHELL/'deploy.py')],'provision',900)
-        report['deployment']=json.loads((vm.RUN/'deployment.json').read_text())
-        remote('cd /home/developer/agent-os-source && python3 -m unittest discover -s tests -p "*_test.py" && cargo test --locked','unit-suites')
-        for test,root in [('integration',False),('activity_removal',False),('broker_integration',False),
-                          ('broker_restart_guest',False),('broker_reuse_guest',False),('file_result_guest',False),('image_preview_guest',False),
-                          ('write_transport_guest',True),('layout_guest',False),('work_lifecycle_guest',True),('terminal_guest',False),('terminal_screen_guest',False),('presentation_guest',False),('broker_sources_guest',False),('voice_guest',False)]:
-            remote(('sudo -n ' if root else '')+'python3 /home/developer/agent-os-source/tests/'+test+'.py',test)
-        for name,command,timeout in graphical_checks():
-            remote('cd /home/developer/agent-os-source && '+command,name,timeout)
-        local([sys.executable,str(SHELL/'tests/work_lifecycle_terminal.py')],'terminal')
-        local([sys.executable,str(SHELL/'tests/interactive_terminal.py')],'interactive-terminal')
-        local([sys.executable,str(SHELL/'tests/voice_terminal.py')],'voice-terminal')
-        remote('sudo -n python3 /home/developer/agent-os-source/tests/installation_guest.py interrupts','installation-interruption')
-        remote('sudo -n python3 /home/developer/agent-os-source/tests/installation_guest.py rollbacks','runtime-rollback-recovery',300)
-        local([sys.executable,str(ROOT/'verify.py')],'foundation-reboot-cold-start',240)
-        remote('sudo -n python3 /home/developer/agent-os-source/tests/installation_guest.py verify','runtime-state-after-reboots')
-        before=json.loads(vm.ssh('cat /etc/agent-os/release.json',capture_output=True,text=True,check=True).stdout)['runtime_release']
-        remote('cd /home/developer/agent-os-source && sh install.sh','repeat-install',180)
-        after=json.loads(vm.ssh('cat /etc/agent-os/release.json',capture_output=True,text=True,check=True).stdout)['runtime_release']
-        if before!=after:raise RuntimeError('Repeat install changed the release identity unexpectedly')
-        remote('sudo -n python3 /home/developer/agent-os-source/tests/installation_guest.py verify','state-after-repeat-install')
-        remote('sudo -n python3 /home/developer/agent-os-source/tests/installation_guest.py cleanup','probe-cleanup')
-        report['runtime_release']=after
-        report['dependency_manifest']=json.loads(vm.ssh('sudo -n cat /var/lib/agent-os-install/dependencies.json',capture_output=True,text=True,check=True).stdout)
-        report['host_tools']={name:subprocess.check_output(command,text=True).strip() for name,command in
-                              [('utm',[str(vm.controller()),'version']),('qemu_img',['qemu-img','--version']),('python',[sys.executable,'--version'])]}
-        report['result']='pass'
-    except Exception as exc:
-        report.update(result='failed',error=str(exc));raise
-    finally:
+    with UTMApplicationOwnership(vm) as ownership:
         try:
-            vm.stop();deadline=time.monotonic()+40
-            while vm.alive() and time.monotonic()<deadline:time.sleep(1)
-            if vm.alive():raise RuntimeError('Guest did not complete orderly shutdown')
-            report['guest_stopped']=True
-            if app_before is None:
-                owned_app=vm.utm_application_identity()
-                report['owned_utm_app_closed']=owned_app is None or vm.close_owned_utm_application(owned_app)
-            else:
-                report['preexisting_utm_app_preserved']=True
+            local([sys.executable,'-m','unittest','discover','-s',str(ROOT/'tests'),'-p','*_test.py'],'vm-tool-tests')
+            if not vm.alive():vm.start()
+            vm.wait_ready(60)
+            remote('cloud-init status --wait','cloud-init',120)
+            local([sys.executable,str(SHELL/'deploy.py')],'provision',900)
+            report['deployment']=json.loads((vm.RUN/'deployment.json').read_text())
+            remote('cd /home/developer/agent-os-source && python3 -m unittest discover -s tests -p "*_test.py" && cargo test --locked','unit-suites')
+            for test,root in [('integration',False),('activity_removal',False),('broker_integration',False),
+                              ('broker_restart_guest',False),('broker_reuse_guest',False),('file_result_guest',False),('image_preview_guest',False),
+                              ('write_transport_guest',True),('layout_guest',False),('work_lifecycle_guest',True),('terminal_guest',False),('terminal_screen_guest',False),('presentation_guest',False),('broker_sources_guest',False),('voice_guest',False)]:
+                remote(('sudo -n ' if root else '')+'python3 /home/developer/agent-os-source/tests/'+test+'.py',test)
+            for name,command,timeout in graphical_checks():
+                remote('cd /home/developer/agent-os-source && '+command,name,timeout)
+            local([sys.executable,str(SHELL/'tests/work_lifecycle_terminal.py')],'terminal')
+            local([sys.executable,str(SHELL/'tests/interactive_terminal.py')],'interactive-terminal')
+            local([sys.executable,str(SHELL/'tests/voice_terminal.py')],'voice-terminal')
+            remote('sudo -n python3 /home/developer/agent-os-source/tests/installation_guest.py interrupts','installation-interruption')
+            remote('sudo -n python3 /home/developer/agent-os-source/tests/installation_guest.py rollbacks','runtime-rollback-recovery',300)
+            local([sys.executable,str(ROOT/'verify.py')],'foundation-reboot-cold-start',240)
+            remote('sudo -n python3 /home/developer/agent-os-source/tests/installation_guest.py verify','runtime-state-after-reboots')
+            before=json.loads(vm.ssh('cat /etc/agent-os/release.json',capture_output=True,text=True,check=True).stdout)['runtime_release']
+            remote('cd /home/developer/agent-os-source && sh install.sh','repeat-install',180)
+            after=json.loads(vm.ssh('cat /etc/agent-os/release.json',capture_output=True,text=True,check=True).stdout)['runtime_release']
+            if before!=after:raise RuntimeError('Repeat install changed the release identity unexpectedly')
+            remote('sudo -n python3 /home/developer/agent-os-source/tests/installation_guest.py verify','state-after-repeat-install')
+            remote('sudo -n python3 /home/developer/agent-os-source/tests/installation_guest.py cleanup','probe-cleanup')
+            report['runtime_release']=after
+            report['dependency_manifest']=json.loads(vm.ssh('sudo -n cat /var/lib/agent-os-install/dependencies.json',capture_output=True,text=True,check=True).stdout)
+            report['host_tools']={name:subprocess.check_output(command,text=True).strip() for name,command in
+                                  [('utm',[str(vm.controller()),'version']),('qemu_img',['qemu-img','--version']),('python',[sys.executable,'--version'])]}
+            report['result']='pass'
         except Exception as exc:
-            report.update(result='failed',error='Shutdown failed: '+str(exc));raise
+            report.update(result='failed',error=str(exc));raise
         finally:
-            report['finished_at']=datetime.datetime.now(datetime.timezone.utc).isoformat()
-            (vm.RUN/'reproduction.json').write_text(json.dumps(report,indent=2)+'\n')
-            print('Evidence:',vm.RUN/'reproduction.json',flush=True)
+            try:
+                vm.stop();deadline=time.monotonic()+40
+                while vm.alive() and time.monotonic()<deadline:time.sleep(1)
+                if vm.alive():raise RuntimeError('Guest did not complete orderly shutdown')
+                report['guest_stopped']=True
+                if ownership.initial is None:
+                    report['owned_utm_app_closed']=ownership.close()
+                    if ownership.owned is not None:
+                        report['owned_utm_application_identity']=list(ownership.owned)
+                else:
+                    ownership.close()
+                    report['preexisting_utm_app_preserved']=True
+            except Exception as exc:
+                report.update(result='failed',error='Shutdown failed: '+str(exc));raise
+            finally:
+                report['finished_at']=datetime.datetime.now(datetime.timezone.utc).isoformat()
+                (vm.RUN/'reproduction.json').write_text(json.dumps(report,indent=2)+'\n')
+                print('Evidence:',vm.RUN/'reproduction.json',flush=True)
 
 if __name__=='__main__':main()
