@@ -128,7 +128,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             writeln!(
                 stream,
                 "{}",
-                serde_json::json!({"ok":ok,"active":state.active,"serial":state.serial})
+                serde_json::json!({"ok":ok,"active":state.active,"serial":state.serial,"pid":std::process::id()})
             )?;
         }
         std::thread::sleep(Duration::from_millis(10));

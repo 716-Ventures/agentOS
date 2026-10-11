@@ -13,7 +13,7 @@ use std::{
 };
 
 pub struct Service {
-    child: process::OwnedChild,
+    child: Option<process::OwnedChild>,
     _manager: InputMethodManagerState,
     _text: TextInputManagerState,
 }
@@ -78,20 +78,31 @@ impl Service {
         let child = command.spawn()?;
         // socket closes in the parent. No filesystem socket carries the capability.
         Ok(Some(Self {
-            child: process::OwnedChild(Arc::new(Mutex::new(Some(child)))),
+            child: Some(process::OwnedChild(Arc::new(Mutex::new(Some(child))))),
             _manager: manager,
             _text: text,
         }))
     }
-    pub fn check(&self) -> Result<(), String> {
-        if let Some(child) = self.child.0.lock().unwrap().as_mut() {
-            if let Some(status) = child.try_wait().map_err(|e| e.to_string())? {
-                return Err(format!(
-                    "Configured helper exited ({status}); restart the session after inspecting it"
-                ));
+    pub fn check(&mut self) -> Result<(), String> {
+        let result = if let Some(owned) = &self.child {
+            let mut child = owned.0.lock().unwrap();
+            match child.as_mut().map(|child| child.try_wait()).transpose() {
+                Ok(Some(Some(status))) => Err(format!(
+                    "Configured helper exited ({status}); ordinary keyboard input remains available"
+                )),
+                Err(error) => Err(error.to_string()),
+                _ => Ok(()),
             }
+        } else {
+            Ok(())
+        };
+        if result.is_err() {
+            // Reap/clean the owned helper immediately and report only once.
+            // Keep text-input globals alive for existing clients; Smithay
+            // releases the disconnected method's grab and sends text leave.
+            self.child.take();
         }
-        Ok(())
+        result
     }
 }
 #[cfg(test)]

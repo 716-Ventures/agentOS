@@ -58,6 +58,9 @@ pub struct Draft {
     pub expected: u64,
     pub dirty: bool,
     pub resolved: Option<u64>,
+    // A confirmed local resolution may precede the renderer's next snapshot.
+    // Keep its proof across newer typing; never restore this authority from disk.
+    pub acknowledged: Option<(u64, String)>,
 }
 #[derive(Clone, Default, Debug)]
 pub struct Frame {
@@ -1021,11 +1024,13 @@ fn resolve_draft(
                 draft.expected = expected + 1;
                 draft.dirty = true;
                 draft.resolved = None;
+                draft.acknowledged = Some((resolved, text.clone()));
             }
         } else {
             edits.insert(
                 (surface.into(), element.into()),
                 Draft {
+                    acknowledged: Some((resolved, text.clone())),
                     text,
                     expected: expected + 1,
                     dirty: false,
@@ -1250,6 +1255,7 @@ mod draft_revision_tests {
                     expected: 0,
                     dirty: true,
                     resolved: None,
+                    acknowledged: None,
                 },
             )])));
             let frame = Arc::new(Mutex::new(Frame::default()));
@@ -1353,6 +1359,7 @@ mod draft_revision_tests {
                 expected: 1,
                 dirty: false,
                 resolved: None,
+                acknowledged: None,
             },
         )])));
         assert!(

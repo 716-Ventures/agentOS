@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 """Installed VTE through a real trusted Wayland protocol fixture, not a language engine."""
 import json
+import os
+from pathlib import Path
+import signal
 import socket
 import uuid
 
@@ -56,3 +59,20 @@ def verify(endpoint, surface, output, presentation, observe, keyboard, wait):
     update('IME reattached update')
     assert output()==before,'Reattachment replayed a pending IME commit'
     print('PASS: installed VTE Wayland IME preedit/Unicode commit, concurrent native rendering, detached-input rejection and no reattach replay',flush=True)
+    # A failed language helper must not take the desktop or attached program
+    # with it. Kill only the fixture identified by its private protocol socket.
+    wait(lambda:method('status')['active'],'VTE text input did not reactivate')
+    method('preedit','未確定')
+    helper=method('status')['pid']
+    assert isinstance(helper,int) and helper>1
+    assert Path(f'/proc/{helper}/exe').resolve().name=='ime_fixture'
+    before=output()
+    os.kill(helper,signal.SIGKILL)
+    wait(lambda:not Path(f'/proc/{helper}').exists(),'Exited input method was not reaped')
+    assert output()==before,'Failed composition entered the PTY'
+    keyboard.chord(30) # ordinary a, through kernel input after helper loss
+    keyboard.chord(28)
+    wait(lambda:'KERNEL_VTE_ACK a' in output(),'Input-method failure disabled ordinary terminal typing')
+    update('IME unavailable; keyboard retained')
+    assert observe('terminal:status')['attached'],'Helper failure detached the supervised program'
+    print('PASS: input-method crash during preedit preserves the desktop, attached program and ordinary kernel typing without replaying composition',flush=True)

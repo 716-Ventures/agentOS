@@ -50,6 +50,7 @@ fn decode(bytes: &[u8]) -> Option<Drafts> {
             } else {
                 Some(row["resolved"].as_u64()?)
             },
+            acknowledged: None,
         };
         if drafts
             .insert((surface.into(), element.into()), draft)
@@ -148,6 +149,7 @@ mod tests {
                 expected: 7,
                 dirty: true,
                 resolved: None,
+                acknowledged: Some((3, "Previously saved".into())),
             },
         );
         save(&file, &encode(&drafts).unwrap()).unwrap();
@@ -157,6 +159,7 @@ mod tests {
             "Unsaved λ 日本語"
         );
         assert_eq!(loaded.values().next().unwrap().expected, 7);
+        assert!(loaded.values().next().unwrap().acknowledged.is_none(), "Recovery files must not grant in-process commit authority");
         assert_eq!(
             fs::metadata(&file).unwrap().permissions().mode() & 0o777,
             0o600

@@ -5,6 +5,19 @@ import pyatspi
 import accessibility
 
 
+def rendered_text(value):
+    from collections import deque
+    queue=deque([pyatspi.Registry.getDesktop(0)])
+    for _ in range(2048):
+        if not queue:break
+        node=queue.popleft()
+        try:
+            if accessibility.text(node)==value:return True
+        except (NotImplementedError,RuntimeError,LookupError):pass
+        try:queue.extend(node[index] for index in range(min(node.childCount,128)))
+        except (RuntimeError,LookupError):pass
+    return False
+
 def verify(call, endpoint, editor=False, observation=None):
     def method(op, text=None):
         request = {'op': op}
@@ -33,19 +46,7 @@ def verify(call, endpoint, editor=False, observation=None):
                           'props': {'value': 'Unrelated update during composition'}}]})
     assert updated['status']=='committed',updated
     # Wait for the actual renderer to consume the update, not just core acceptance.
-    def rendered_status():
-        from collections import deque
-        queue=deque([pyatspi.Registry.getDesktop(0)])
-        for _ in range(2048):
-            if not queue:break
-            node=queue.popleft()
-            try:
-                if accessibility.text(node)=='Unrelated update during composition':return True
-            except (NotImplementedError,RuntimeError,LookupError):pass
-            try:queue.extend(node[index] for index in range(min(node.childCount,128)))
-            except (RuntimeError,LookupError):pass
-        return False
-    try:accessibility.wait(rendered_status,'Unrelated status was not rendered during composition')
+    try:accessibility.wait(lambda:rendered_text('Unrelated update during composition'),'Unrelated status was not rendered during composition')
     except AssertionError:
         print('Current composition document:',call({'op':'presentation.get','document_id':'session-fixture'}),flush=True)
         from collections import deque

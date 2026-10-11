@@ -31,7 +31,7 @@ fn verify_focused_draft_resolution(app: &gtk::Application, frame: &Frame, comman
         assert!(focused,"{kind} did not accept widget focus");
         edit(element,edited);assert_eq!(value(element),edited);
         surface.update(id,&doc,&frame,commands,&drafts);assert_eq!(value(&surface.elements["control"]),edited,"Background reconciliation replaced focused input");
-        drafts.lock().unwrap().insert(key.clone(),Draft{text:saved.into(),expected:4,dirty:false,resolved:Some(0)});
+        drafts.lock().unwrap().insert(key.clone(),Draft{text:saved.into(),expected:4,dirty:false,resolved:Some(0),acknowledged:None});
         frame.drafts.insert(key.clone(),json!({"draft_revision":4,"draft":null}));
         surface.update(id,&doc,&frame,commands,&drafts);
         assert_eq!(value(&surface.elements["control"]),saved,"Human resolution did not replace focused {kind}");
@@ -40,6 +40,17 @@ fn verify_focused_draft_resolution(app: &gtk::Application, frame: &Frame, comman
         let next=drafts.lock().unwrap()[&key].clone();assert!(next.dirty);assert_eq!(next.expected,4,"Next edit reused an obsolete construction-time draft revision");
         props["value"]=if kind=="Toggle@1" {json!(true)} else {json!(edited)};doc["elements"]["control"]["props"]=props;
         surface.update(id,&doc,&frame,commands,&drafts);assert_eq!(value(&surface.elements["control"]),edited);
+        // The core has committed this user's previous value, but newer typing
+        // has already begun before the renderer receives that revision.
+        doc["revision"]=json!(1);
+        edit(&surface.elements["control"],saved);
+        drafts.lock().unwrap().insert(key.clone(),Draft{text:saved.into(),expected:6,dirty:true,resolved:None,acknowledged:Some((1,edited.into()))});
+        frame.drafts.insert(key.clone(),json!({"draft_revision":6,"draft":saved}));
+        surface.update(id,&doc,&frame,commands,&drafts);
+        assert_eq!(surface.revision,Some(1),"Own Save left the displayed revision frozen for {kind}");
+        assert_eq!(value(&surface.elements["control"]),saved,"Acknowledged Save erased newer typing for {kind}");
+        assert!(drafts.lock().unwrap()[&key].dirty);
+        assert_eq!(surface.elements["control"].events.borrow()["revision"],1);
         surface.window.destroy();
     }
     println!("CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input");

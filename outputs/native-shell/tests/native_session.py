@@ -49,6 +49,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
     env={**os.environ,'HOME':str(root),'XDG_RUNTIME_DIR':str(runtime),'XDG_CONFIG_HOME':str(root/'config'),
          'XDG_STATE_HOME':str(root/'user-state'),'AGENT_OS_STATE':str(root/'core-state'),
          'AGENT_OS_SOCKET':str(endpoint),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),
+         'AGENT_OS_BROKER_SOCKET':str(root/'unavailable-broker.sock'),
          'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','G_DEBUG':'fatal-criticals','GTK_A11Y':'atspi'}
     env.pop('WAYLAND_DISPLAY',None);env.pop('DISPLAY',None)
     system_bar='--system-bar' in sys.argv
@@ -66,7 +67,8 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
         speech=root/'config/speech-dispatcher';speech.mkdir(parents=True)
         (speech/'speechd.conf').write_text('AddModule "espeak-ng" "sd_espeak-ng" "/etc/speech-dispatcher/modules/espeak-ng.conf"\nDefaultModule espeak-ng\nAudioOutputMethod "alsa"\nAudioALSADevice "null"\n')
     ime_editor='--ime-editor' in sys.argv
-    ime='--ime' in sys.argv or ime_editor
+    ime_failure='--ime-failure' in sys.argv
+    ime='--ime' in sys.argv or ime_editor or ime_failure
     if ime:
         env['AGENT_OS_INPUT_METHOD_ARGV']=json.dumps([str(ROOT.parent/'native-compositor/target/debug/examples/ime_fixture'),str(runtime/'ime-test.sock')])
         env['GTK_IM_MODULE']='wayland'
@@ -74,7 +76,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
         if ime_editor:env['AGENT_OS_NATIVE_IME_OBSERVATION']=str(runtime/'ime-observation.json')
     host_failure='--host-failure' in sys.argv
     compositor_failure='--compositor-failure' in sys.argv
-    with (OUTPUT/('session-compositor-failure.log' if compositor_failure else 'session-host-failure.log' if host_failure else 'session-ime-editor.log' if ime_editor else 'session-ime.log' if ime else 'session-reader.log' if screen_reader else 'session.log')).open('w') as log:
+    with (OUTPUT/('session-compositor-failure.log' if compositor_failure else 'session-host-failure.log' if host_failure else 'session-ime-failure.log' if ime_failure else 'session-ime-editor.log' if ime_editor else 'session-ime.log' if ime else 'session-reader.log' if screen_reader else 'session.log')).open('w') as log:
         core=subprocess.Popen([str(SHELL/'target/release/agent-os-core')],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
         session=None;owned=[]
         try:
@@ -160,6 +162,36 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                     except Exception:
                         print('Failed IME focus state:',call(control,{'op':'snapshot'}),flush=True)
                         raise
+                    if ime_failure:
+                        with socket.socket(socket.AF_UNIX) as conn:
+                            conn.settimeout(3);conn.connect(str(runtime/'ime-test.sock'))
+                            conn.sendall(b'{"op":"status"}\n')
+                            with conn.makefile('rb') as stream:helper=json.loads(stream.readline(4096))['pid']
+                        assert isinstance(helper,int) and helper>1
+                        assert Path(f'/proc/{helper}/exe').resolve().name=='ime_fixture'
+                        os.kill(helper,signal.SIGKILL)
+                        wait_for(lambda:not alive(helper),[core,session])
+                        # Continue actual desktop/core reconciliation after the
+                        # disconnect, rather than observing one pre-crash frame.
+                        import accessibility,pyatspi
+                        document=call(endpoint,{'op':'presentation.get','document_id':'session-fixture'})
+                        receipt=call(endpoint,{'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':'ime-recovery-render-barrier','expected_revisions':{'session-fixture':document['revision']},'operations':[{'op':'element.set_props','surface_id':'session-fixture','element_id':'reading','props':{'value':'Input method stopped; desktop available'}}]})
+                        assert receipt['status']=='committed',receipt
+                        # The previous Save's core receipt precedes renderer
+                        # reconciliation. Observe a new rendered status before
+                        # asking the editor to Save against its displayed view.
+                        accessibility.wait(lambda:ime_accessibility.rendered_text('Input method stopped; desktop available'),'Native desktop did not render after input-method loss')
+                        field=accessibility.find('Accessible session draft',pyatspi.ROLE_TEXT)
+                        value='Recovered without input method λ'
+                        assert field.queryEditableText().setTextContents(value)
+                        wait_for(lambda:call(endpoint,{'op':'draft.get','surface_id':'session-fixture','element_id':'field'}).get('draft')==value,[core,session])
+                        accessibility.activate(accessibility.find('Save draft',pyatspi.ROLE_PUSH_BUTTON))
+                        try:wait_for(lambda:call(endpoint,{'op':'presentation.get','document_id':'session-fixture'})['elements']['field']['props']['value']==value,[core,session])
+                        except AssertionError:
+                            print('Failed IME recovery Save:',json.dumps({'document':call(endpoint,{'op':'presentation.get','document_id':'session-fixture'}),'draft':call(endpoint,{'op':'draft.get','surface_id':'session-fixture','element_id':'field'}),'visible':accessibility.text(field),'scene':call(control,{'op':'snapshot'})}),flush=True)
+                            raise
+                        assert call(control,{'op':'snapshot'})['shared']['error'] is None
+                        print('PASS: failed input method leaves the native desktop and deliberate Unicode Save available',flush=True)
                 else:
                     import accessibility
                     accessibility.verify(lambda value:call(endpoint,value))
@@ -210,6 +242,9 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
             if screen_reader:print('PASS: owned reader and speech processes reaped after '+('compositor failure' if compositor_failure else 'normal logout'),flush=True)
             assert not control.exists(),'Compositor socket leaked'
             assert not list(runtime.glob('agentos-session-*')),'Session directory leaked'
+            if ime_failure:
+                log.flush()
+                assert (OUTPUT/'session-ime-failure.log').read_text().count('Input method unavailable:')==1,'Helper failure must be reported exactly once'
             print('PASS: '+('abrupt compositor loss' if compositor_failure else 'display-host loss' if host_failure else 'normal session')+' maps authenticated surfaces and reaps display host, compositor and renderer')
         finally:
             if session:reap(session)

@@ -413,6 +413,7 @@ fn construct(
                     expected: expected.get(),
                     dirty: false,
                     resolved: None,
+                    acknowledged: None,
                 });
                 draft.text = text;
                 draft.dirty = true;
@@ -515,6 +516,7 @@ fn construct(
                             expected: expected.get(),
                             dirty: false,
                             resolved: None,
+                            acknowledged: None,
                         });
                         draft.text = text;
                         draft.dirty = true;
@@ -597,6 +599,7 @@ fn construct(
                         expected: expected.get(),
                         dirty: false,
                         resolved: None,
+                        acknowledged: None,
                     });
                     draft.text = text;
                     draft.dirty = true;
@@ -918,9 +921,13 @@ impl Surface {
                         .is_some_and(|reference| frame.resources.contains_key(reference))
             });
         let changed = doc["revision"].as_u64() != self.revision || resource_ready;
+        let acknowledged: BTreeMap<String, (u64, String)> = drafts.lock().unwrap().iter()
+            .filter(|((surface, _), _)| surface == id)
+            .filter_map(|((_, element), draft)| draft.acknowledged.clone().map(|value| (element.clone(), value)))
+            .collect();
         let safe_text_update = changed
             && protected
-            && reconcile::text_only(&self.document, doc)
+            && reconcile::acknowledged_values(&self.document, doc, &acknowledged)
             && nodes.iter().all(|(id, node)| {
                 if self.document["elements"][id] == *node || node["type"] != "Text@1" {
                     return true;

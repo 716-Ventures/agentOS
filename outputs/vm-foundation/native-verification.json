@@ -2036,5 +2036,39 @@
       "measurement_seconds": 3.137,
       "completed_frames_between_observer_snapshots": 197
     }
+  },
+  "input_method_failure_and_local_save_reconciliation": {
+    "result": "targeted_pass",
+    "verified_at": "2026-10-11T09:45:10.944172+00:00",
+    "runtime_release": "a90f79ab208822974ad5148d7eef47c65162880a2a67620fb36a671bbea5e4ef",
+    "native_unit_tests": 32,
+    "native_ignored_hardware_tests": 7,
+    "compositor_unit_tests": 45,
+    "checks": [
+      "old installed compositor reproduces terminal typing loss after helper death",
+      "old native revision guard fails actual focused own-Save/newer-typing regression",
+      "helper death during preedit preserves ordinary kernel VTE typing and attached program without composition replay",
+      "native helper loss retains Unicode edit/Save and subsequent status reconciliation",
+      "acknowledged human field values advance the displayed revision while preserving newer typing for text, multiline, document, choice and toggle controls",
+      "unrelated values, structure, labels, actions and bindings remain guarded; recovery files restore no acknowledgment authority",
+      "existing real GTK editor IME overflow, draft and deliberate Save pass",
+      "guest, owned session/display processes and exact owned UTM app closed"
+    ],
+    "observations": [
+      "The native recovery test exposed a separate own-Save reconciliation bug; it was fixed rather than bypassing the revision guard.",
+      "A render barrier observes the previous core Save reaching the actual native view before the next deliberate Save. Native session fixtures now use a private unavailable broker endpoint rather than ambient development history.",
+      "One corrected-policy synthetic attempt reused the earlier negative-policy debug binary after source/cache timestamp restoration. An explicit source touch rebuilt it; the retained final targeted run passes. Deployment cache freshness needs a separate fix.",
+      "The full 66-check reproduction and clean v11 image retain their earlier exact identities; the expanded current-source reproduction is pending."
+    ],
+    "logs": {
+      "agentos-ime-crash-baseline-fixed-driver.log": "199325454abe0df20413cd81f389671dbce990ac681b624c10a8a0813e14278a",
+      "agentos-ime-headless-baseline.log": "4e556050c8e0698d13a26dcbbe9a3860a0d8a57eec7f104e1f585d19eeb6f966",
+      "agentos-own-save-revision-baseline.log": "4e4059929c4eea5544557cbcd62ec4c5f038e3cdc07261717606198df2d4d5bf",
+      "agentos-ime-save-final-targeted.log": "ab2181767f2676652fb55af55b5f206f667cdcfd2d9614a1ba249ee3f942fe24",
+      "agentos-ime-crash-recovery.log": "20f0a6ffb927963425c2a7921f1f84937c96ebc81d2b60f3a79209c1eb41c255",
+      "agentos-ime-crash-recovery-positive.log": "eb766c21a5d4a35ae7005e923cdc2d5b6d570a01599407cfa773ce21c9dfbfaf",
+      "agentos-ime-recovery-render-barrier.log": "134f69fa7d85a661f59ac3036f329a177a9ee2e02ef06ffe34591ae1066d3f34",
+      "agentos-ime-recovery-isolated-broker.log": "79fe0c01146ebd7cc992853f969c8398b1700775896790c58698ef08239ec10b"
+    }
   }
 }

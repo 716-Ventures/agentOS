@@ -86,7 +86,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         });
         data.state.accessibility=Some(accessibility::Service::start(keymap)?);
     }
-    let input_method = input_method::Service::start(&mut data.state)?;
+    let mut input_method = input_method::Service::start(&mut data.state)?;
     let control = control::Control::start()?;
     std::env::set_var("AGENT_OS_COMPOSITOR_SOCKET", &control.path);
     println!(
@@ -118,10 +118,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             if backend == "winit" {
                 data.state.arrange();
             }
-            if let Some(service) = &input_method {
+            if let Some(service) = &mut input_method {
                 if let Err(error) = service.check() {
                     eprintln!("Input method unavailable: {error}");
-                    data.state.loop_signal.stop();
                 }
             }
             if TERMINATE.load(std::sync::atomic::Ordering::Relaxed) {
@@ -169,8 +168,5 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         },
     )?;
 
-    if let Some(service) = &input_method {
-        service.check()?;
-    }
     Ok(())
 }
