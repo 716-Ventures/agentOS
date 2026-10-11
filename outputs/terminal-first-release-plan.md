@@ -20,6 +20,8 @@ The initial artifact can be a preinstalled bootable virtual disk plus a reproduc
 
 Validate microphone capture inside the guest. A host audio bridge may support interim interaction testing, but must be identified as such and cannot count as verified native guest audio. VM validation also does not establish physical-hardware compatibility.
 
+**Image qualification · October 11:** Signed candidate v17 contains the fully qualified alpha41 runtime, but its fresh-image lifecycle qualification failed when Orca did not announce the launcher request after repeated close/reopen transitions during an offline cold boot. The cause remains under investigation. Candidate v16 remains the qualified image; v17 is not release-qualified. See [the preserved failure and test limits](vm-foundation/runtime/fresh-verification/qualified-runs/signed-image-v17-failed-offline-reader/failure.json).
+
 ## Historical implementation status — September 17, 2026
 
 M0 is implemented and verified on this Mac using QEMU with hardware acceleration. The Debian-based ARM64 guest boots through UEFI, runs systemd, supports SSH and serial-console login, reaches the network, and preserves data through reboot and a full shutdown/start cycle. No failed guest services were reported. M0.1 is also implemented: the Rust activity and job core, separate terminal dashboard, structured history, cancellation, and restart reconciliation. M1 now has an installed Gateway tool-using agent with real system-information and disk tools. Live Gateway tool calls have been exercised; Jev is reserved for bounded tasks outside the conversational path. Voice remains unimplemented.

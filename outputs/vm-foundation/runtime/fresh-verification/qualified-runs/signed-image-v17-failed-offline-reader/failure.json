@@ -1,0 +1,26 @@
+{
+  "result": "fail",
+  "candidate": "candidate-v17",
+  "recorded_at": "2026-10-11T21:17:20.856067+00:00",
+  "image_sha256": "24f395bed7c70c7498bc734cbda0c7910c67ca59ba7baa4ffd38ff319de53a30",
+  "runtime_release": "12baac1fda411b918957f93a7fd78abc341e8d7c48f6418b1fab8153195f0de1",
+  "factory_source_revision": "40218f916e49fb1e15c44ad1cf61fe74d18717eb",
+  "qualified_runtime_source_revision": "e98da357788963f98f67a0b6c93802cfd8b0f628",
+  "failure": "Offline cold-boot direct screen-reader journey did not announce Ask Agent after repeated launcher hide/show. Lifecycle qualification stopped at this failure.",
+  "speech_sha256": "323383abe1b70dfb53d601ed648eb17f1c2d36142b946a86e5c1fa9820abb1c5",
+  "observations": [
+    "All eleven online direct profiles and installed reader controls/outcomes passed before reboot.",
+    "Offline browser handoff passed.",
+    "Speech log contains a new launcher frame and request-field ancestors referring to an earlier, nonexistent launcher frame. Root cause is under investigation."
+  ],
+  "not_completed": [
+    "offline reader commands and rescue VT",
+    "offline display zoom",
+    "activation failure/resume",
+    "qualification authority removal from failed boot copy"
+  ],
+  "qualified_image_remains": "candidate-v16",
+  "original_development_disk_and_efi_restored": true,
+  "owned_utm_closed": true,
+  "failed_boot_copy_authority": "Only disposable failed copies retain temporary verification authority; these copies must be cleaned or removed after diagnostics."
+}

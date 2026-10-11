@@ -1,0 +1,5 @@
+UTM guest started; check readiness through its console or guest agent.
+Collected failed speech bytes/hash: 921980 323383abe1b70dfb53d601ed648eb17f1c2d36142b946a86e5c1fa9820abb1c5
+Requested orderly guest shutdown. Check status before restarting.
+Exact owned UTM application exit verified
+Diagnostic copy removed; original development disk/EFI identities/config restored; owned app closed
