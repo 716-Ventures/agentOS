@@ -4,7 +4,7 @@
 
 The initial image includes the complete development dependency profile. It is an experimental VM release, not a minimal production distribution or a physical-hardware qualification. A repeat build identifies the exact base, dependency profile, runtime release, image-building sources and resulting disk hash; package installation and filesystem creation do not promise bit-for-bit identical disk bytes.
 
-The private build directory lives beside the requested output so final publication can hard-link the completed, fsynced image exclusively. This avoids a third disk-sized copy while refusing existing files and symlinks, including ones created during the build. The build still needs space for its sparse raw filesystem and converted qcow2 at the same time. A failed build cannot be packaged without complete metadata and signature verification. The current v9 export uses the supported zlib compression option; the metadata records the chosen mode.
+The private build directory lives beside the requested output so final publication can hard-link the completed, fsynced image exclusively. This avoids a third disk-sized copy while refusing existing files and symlinks, including ones created during the build. The build checks for at least 41 GiB free on the output filesystem before creating its private disk or loop device: room for the full 20 GiB raw disk and QCOW2 together, plus metadata overhead. Compression is not a guaranteed size reduction, so the same conservative bound applies with `--compress`. Other concurrent writes can still consume that space. A failed build cannot be packaged without complete metadata and signature verification. The current v9 export uses the supported zlib compression option; the metadata records the chosen mode.
 
 ## Build
 

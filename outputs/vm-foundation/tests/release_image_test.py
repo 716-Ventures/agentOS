@@ -23,6 +23,33 @@ package = module('image_package', ROOT / 'package_release_image.py')
 
 
 class ReleaseImageTest(unittest.TestCase):
+    def test_low_capacity_refuses_before_creating_a_build_or_loop_device(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            release = root / 'release'; release.mkdir()
+            output = root / 'new.qcow2'
+            lock = json.loads((ROOT / 'image-lock.json').read_text())
+            public = bytes.fromhex('302a300506032b6570032100') + bytes(32)
+            argv = ['build', '--base', str(root / 'base'), '--output', str(output),
+                    '--release', str(release), '--bootstrap', str(root / 'bootstrap'),
+                    '--update-key', str(root / 'public.pem'), '--dedicated-builder', '--compress']
+            with patch('sys.argv', argv), patch.object(image.os, 'geteuid', return_value=0), \
+                    patch.object(image.platform, 'machine', return_value='aarch64'), \
+                    patch.object(image.shutil, 'which', return_value='/fixture/tool'), \
+                    patch.object(image, 'regular'), patch.object(image, 'sha', return_value=lock['sha512']), \
+                    patch.object(image, 'payload', return_value=('a' * 64, {})), \
+                    patch.object(image, 'command', return_value=SimpleNamespace(stdout=public)) as commands, \
+                    patch.object(image.os, 'statvfs', return_value=SimpleNamespace(f_bavail=4, f_frsize=1024 ** 3)):
+                with self.assertRaisesRegex(ValueError, '41.0 GiB.*4.0 GiB'):
+                    image.main()
+            self.assertEqual([row.name for row in root.iterdir()], ['release'])
+            self.assertEqual(commands.call_count, 1)
+            self.assertEqual(commands.call_args.args[:2], ('openssl', 'pkey'))
+
+    def test_capacity_accepts_the_full_raw_and_qcow_bound(self):
+        with patch.object(image.os, 'statvfs', return_value=SimpleNamespace(f_bavail=41, f_frsize=1024 ** 3)):
+            image.require_build_space(Path('/fixture/output'))
+
     def test_completed_image_publication_reuses_inode_and_survives_build_cleanup(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

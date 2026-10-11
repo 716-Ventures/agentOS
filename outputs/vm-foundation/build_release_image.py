@@ -19,6 +19,19 @@ import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parent
+IMAGE_SIZE_GIB = 20
+
+
+def require_build_space(directory):
+    """Check capacity for both full disks; compression is not a size bound."""
+    info = os.statvfs(directory)
+    available = info.f_bavail * info.f_frsize
+    required = (2 * IMAGE_SIZE_GIB + 1) * 1024 ** 3
+    if available < required:
+        raise ValueError(
+            f'Image build needs at least {required / 1024 ** 3:.1f} GiB free on {directory}; '
+            f'found {available / 1024 ** 3:.1f} GiB. Allow space for the raw disk and '
+            'completed QCOW2 together, even with --compress.')
 
 
 def command(*argv, **kwargs):
@@ -199,7 +212,7 @@ def customize(root, release, ident, hashes, bootstrap, lock, update_key):
                 'voice_descriptor_sha256': sha(release / 'voice-assets.json'),
                 'foundation_sources': {name: sha(ROOT / 'guest' / name)
                                        for name in ('status.py', 'record-boot.py', 'agent-os-foundation.service')},
-                'disk_size': '20G',
+                'disk_size': f'{IMAGE_SIZE_GIB}G',
                 'update_key_sha256': sha(update_key),
                 'contains_personal_account': False, 'contains_provider_credentials': False}
         write(root, '/etc/agent-os/image.json', json.dumps(info, sort_keys=True, indent=2) + '\n')
@@ -244,11 +257,12 @@ def main():
     if output.exists() or output.is_symlink() or output.with_suffix('.json').exists() or output.with_suffix('.json').is_symlink():
         raise ValueError('Choose new output and metadata paths')
     output.parent.mkdir(parents=True, exist_ok=True)
+    require_build_space(output.parent)
     loop = None; mounted = False
     with tempfile.TemporaryDirectory(prefix='agentos-image-', dir=output.parent) as directory:
         work = Path(directory); raw = work / 'disk.raw'; root = work / 'root'; root.mkdir()
         command('qemu-img', 'convert', '-f', 'qcow2', '-O', 'raw', args.base, raw)
-        command('qemu-img', 'resize', '-f', 'raw', raw, '20G')
+        command('qemu-img', 'resize', '-f', 'raw', raw, f'{IMAGE_SIZE_GIB}G')
         loop = command('losetup', '--find', '--show', '--partscan', raw, capture_output=True, text=True).stdout.strip()
         try:
             command('udevadm', 'settle', '--timeout=10')
