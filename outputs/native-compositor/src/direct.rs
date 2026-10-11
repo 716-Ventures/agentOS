@@ -484,11 +484,22 @@ pub fn init(
             }
             _ => {}
         })?;
+    let mut frame_deadline = std::time::Instant::now();
     event_loop
         .handle()
         .insert_source(Timer::immediate(), move |_, _, data| {
-            device.borrow_mut().render(data);
-            TimeoutAction::ToDuration(Duration::from_millis(16))
+            let mut device = device.borrow_mut();
+            let refresh = device.heads.values()
+                .filter_map(|head| head.output.current_mode())
+                .map(|mode| mode.refresh)
+                .filter(|refresh| *refresh > 0)
+                .max().unwrap_or(60_000);
+            let interval = Duration::from_secs_f64(1000.0 / f64::from(refresh));
+            device.render(data);
+            // Keep a bounded refresh cadence without adding render duration to
+            // every interval or relying on virtual DRM completion pacing.
+            frame_deadline = crate::frame_cadence::next(frame_deadline, std::time::Instant::now(), interval);
+            TimeoutAction::ToInstant(frame_deadline)
         })?;
     data.state.direct_session = Some(session);
     std::env::set_var("WAYLAND_DISPLAY", &data.state.socket_name);

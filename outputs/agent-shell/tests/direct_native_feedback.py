@@ -6,7 +6,7 @@ import subprocess
 import time
 
 
-def verify(metrics, core, login_user, keyboard, wait_text, load=False):
+def verify(metrics, core, login_user, keyboard, wait_text, load=False, scene=None):
     def broker(op, **fields):
         code="import sys,json;sys.path.insert(0,'/usr/local/lib/agent-os/services');from broker_client import request;q=json.load(sys.stdin);print(json.dumps(request(q.pop('op'),**q)))"
         result=subprocess.run(['runuser','-u',login_user,'--','python3','-c',code],input=json.dumps({'op':op,**fields}),text=True,capture_output=True,check=True,timeout=8)
@@ -41,6 +41,8 @@ def verify(metrics, core, login_user, keyboard, wait_text, load=False):
                 subprocess.run(['agent-os-broker','approve',job],check=True,stdout=subprocess.DEVNULL,timeout=10)
                 wait(lambda:broker('poll',job_id=job)['status']=='running' and 'CPU_LOAD_READY' in broker('poll',job_id=job)['output'],'Owned CPU work did not start')
             before={job:cpu_usage(job) for job in jobs}
+        measurement_started=time.monotonic()
+        frames_before=scene()['direct_frames_presented'] if scene else None
         for index in range(20):
             keyboard.chord(30)
             wait_text(lambda value:value['text']=='a'*(index+1))
@@ -57,6 +59,10 @@ def verify(metrics, core, login_user, keyboard, wait_text, load=False):
             assert all(broker('poll',job_id=job)['status']=='running' for job in jobs),'CPU work stopped before measurement completed'
             report={**report,'profile':'two concurrent broker CPU jobs','job_cpu_usage_usec':usage}
         else:report={**report,'profile':'idle editor'}
+        if scene:
+            frames_after=scene()['direct_frames_presented']
+            report={**report,'measurement_seconds':round(time.monotonic()-measurement_started,3),
+                    'completed_frames_between_observer_snapshots':frames_after-frames_before}
         print('Native GTK input-to-presentation measurement '+json.dumps(report),flush=True)
         assert report['p95_ms']<=50,report
         print('PASS: native GTK editor kernel input-to-presentation '+json.dumps(report),flush=True)

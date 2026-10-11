@@ -1704,6 +1704,62 @@
         "Guest and exact owned app exit verified after both probes"
       ],
       "boundary": "Installed targeted follow-up to the separately identified 66-check full runtime; does not relabel that complete-run identity. Fresh integrated image, audible quality, physical input and full reference parity remain unqualified."
+    },
+    "reader_handoff_full_run_latency_observation": {
+      "result": "failed_latency_requirement",
+      "source_revision": "997b220ed9e61c5ad8c0e3c5913f7fcec8ebbd69",
+      "runtime_release": "f13383f488aab5169ede40f6458e40dfd47fedb568b6da40850d85ea2adc939d",
+      "passed_checks": 52,
+      "failed_check": "direct-rotated-output",
+      "measurement": {
+        "requested": 20,
+        "presented": 20,
+        "pending": 0,
+        "discarded": 0,
+        "invalid": 0,
+        "p50_ms": 35,
+        "p95_ms": 52,
+        "max_ms": 53,
+        "required_p95_ms": 50
+      },
+      "logs_sha256": {
+        "agentos-orca-handoff-full-failure.json": "97526d59ee47a40be434085b902a8a2b1693acd68addec2a62e7d880f0e534f2",
+        "agentos-orca-handoff-rotated-latency-failure.log": "4e738308c960dec47d48ccb4da89618f246f9909947ad4b54f8c937b3abf6d9d",
+        "agentos-orca-handoff-full-reproduction.log": "ac681fc3206deb114e3a2c957bd44903a676baef58922b7f21f72635735d01aa"
+      },
+      "guest_stopped": true,
+      "owned_utm_app_closed": true,
+      "boundary": "No missing presentation receipts; the 50 ms requirement remains unchanged. No complete current handoff-runtime reproduction claim; the prior 66-check run at a664 remains separately identified. Completion-driven rendering is under verification."
+    },
+    "fixed_scanout_frame_cadence": {
+      "result": "verified_installed_targeted",
+      "runtime_release": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
+      "source_sha256": {
+        "outputs/native-compositor/src/direct.rs": "af4be6039bf1a6b6f1225bdcf0ead608f4abc4b21b28e7c729bd1e92be92ab18",
+        "outputs/native-compositor/src/frame_cadence.rs": "e264f105b89c990b34411316706aa80bd5034b1a5a74149ea40d706fab1c256e"
+      },
+      "logs_sha256": {
+        "agentos-frame-cadence-baseline.log": "bec9ed0ed7560745f4976afe9d4e669b8205ad696b3ce9af01931a71a1db2431",
+        "agentos-frame-cadence-fixed.log": "81044a309b7e7749f8a31e726f1c1a2e69825a2059a9704c1fddc82013a6110b",
+        "agentos-scanout-completion.log": "a23ed90bf62f112a64ee06f96b2b18c15f44454d9f1fdf681eea87baaeed2e4b",
+        "agentos-fixed-frame-cadence.log": "3dc2f09f5987a44d5f5fa9a4a7aefde3c9b0d23b55d538ab8eecfe49855b9115"
+      },
+      "qualified": [
+        "Original relative timer models accumulate rendering cost; the cadence regression fails that policy and passes fixed deadlines",
+        "Rendering follows the fastest current positive output refresh; missed deadlines resume without catchup bursts and the timer retains startup/resume/error recovery",
+        "45 compositor tests pass; installed native key-to-presentation p95 45 ms rotated, 41 ms normal, 40 ms during two real broker CPU jobs; all 20 receipts delivered per profile",
+        "Synthetic real KMS presentation/superseded-discard/unmap checks and installed reader commands/full-grab VT/stop/denial pass",
+        "Owned guest and exact UTM app exit verified"
+      ],
+      "rejected_experiment": {
+        "runtime_release": "b299958946c00dc1eaa1e8104fa547bf67482949b9dafcee1d13187a8a3ad1d5",
+        "behavior": "Unpaced completion-triggered rendering",
+        "p50_ms": 51,
+        "p95_ms": 99,
+        "max_ms": 104,
+        "result": "Rejected and removed; not qualification evidence"
+      },
+      "boundary": "Original 52 ms observation preserved; fixed cadence removes proven render-duration drift but does not establish the sole cause of host/VM latency variation. The 50 ms p95 acceptance limit is unchanged. No complete new-cadence run or physical display qualification claimed. Frame-count telemetry includes observer IPC and is not a precise refresh-rate measurement."
     }
   },
   "observations": [

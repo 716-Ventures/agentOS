@@ -417,7 +417,7 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
             return
         if native_feedback:
             import direct_native_feedback
-            direct_native_feedback.verify(metrics,core,login_user,keyboard,wait,load=native_feedback_load)
+            direct_native_feedback.verify(metrics,core,login_user,keyboard,wait,load=native_feedback_load,scene=scene)
             return
         for key in (30,34,18,49,20,24,31):keyboard.chord(key) # agentos
         wait(lambda value:value['text']=='agentos')

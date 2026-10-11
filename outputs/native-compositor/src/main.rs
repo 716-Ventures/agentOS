@@ -18,6 +18,8 @@ mod direct;
 #[cfg(feature = "direct-display")]
 mod presentation_feedback;
 mod accessibility;
+#[cfg(feature = "direct-display")]
+mod frame_cadence;
 mod grabs;
 mod input;
 mod input_revision;
