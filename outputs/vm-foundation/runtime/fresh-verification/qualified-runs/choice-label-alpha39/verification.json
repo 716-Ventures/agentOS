@@ -1,0 +1,53 @@
+{
+  "started_at": "2026-10-11T18:12:34.669863+00:00",
+  "source_revision": "061a6b2ddafb45461d2a26b959be9dfddd8a2268",
+  "source_changes": [
+    " M outputs/agent-shell/Cargo.lock",
+    " M outputs/agent-shell/Cargo.toml",
+    " M outputs/native-shell/Cargo.lock",
+    " M outputs/native-shell/Cargo.toml",
+    " M outputs/native-shell/src/main.rs",
+    " M outputs/native-shell/src/verification.rs",
+    " M outputs/native-shell/tests/accessibility.py",
+    " M outputs/native-shell/tests/native_session.py"
+  ],
+  "source_archive_sha256": "9740f675c97e3bb98b2c299da5ba7fa84d4a56e7f90c3aff173ca7a1e7d075f6",
+  "passed": true,
+  "owned_utm_identity": [
+    11782,
+    "Sun Oct 11 14:12:34 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T18:15:08.071193+00:00",
+  "public_revision": "1a3b412ee3e5b19a42f6358c709d4c82e6b919a3",
+  "public_ci": 38162549698,
+  "public_tag": "v0.1.0-alpha.39",
+  "host_core_tests": 63,
+  "linux_core_tests": 65,
+  "native_unit_tests": 33,
+  "python_tests": 286,
+  "python_skips": 3,
+  "mapped_profiles": 4,
+  "independent_choice_name_sessions": 3,
+  "rendered_choice_revisions_per_session": 3,
+  "initial_failure": "Independent alpha38 reconciliation exposed label-only Available workspace instead of Available workspace: First; committed value First retained. Replaced renderer override with shared guarded Choice.set_label and protected selectable heading.",
+  "not_tested": [
+    "complete committed-source reproduction (next)",
+    "physical input/audio/GPU/multi-output",
+    "live providers",
+    "full reference parity",
+    "screen-reader Choice announcement quality"
+  ],
+  "changes_after_qualification": [
+    "documentation and evidence only"
+  ],
+  "evidence_sha256": {
+    "initial-name-verification.json": "d5cd9b754dfd5b5ba58ad593ff3aeeafa2796ec26c35820114b987d6c7e531fe",
+    "initial-name-probe.py": "935f0e498879726e33f03a8e4a1748b8dcaef8254446135ff82a118e1947cd29",
+    "host-core.log": "000b7eff62cc51a62a5f4a54ef833ac008a8c0209d5e027da2a759faea97dc9f",
+    "initial-name-guest.log": "11896e6275e50e5c2c74f5458866fc446df8453e249c776d9e5d96f0bd269c1c",
+    "initial-name-driver.log": "453f9c02fb9b7592c6946cd034e8b6e2c3a33c552b2bc056247fc0fbe5ff2d60",
+    "driver.log": "6894b19cc6835aa5915d264b678170521ea247e80ba29272def0d421fe997eb5",
+    "host-python.log": "731a664325f0edf79764cc042ed9b1ec48e894ac06835d7f18ca3ab19f52018b"
+  }
+}

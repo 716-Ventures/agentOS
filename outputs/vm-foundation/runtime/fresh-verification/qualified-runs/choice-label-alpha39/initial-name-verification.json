@@ -1,0 +1,15 @@
+{
+  "source_revision": "061a6b2ddafb45461d2a26b959be9dfddd8a2268",
+  "reproduced": true,
+  "started_at": "2026-10-11T18:04:48.555026+00:00",
+  "owned_utm_identity": [
+    5331,
+    "Sun Oct 11 14:04:48 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T18:05:24.404646+00:00",
+  "qualified_runtime": "26486fa38bd1de7034f34baa5256b75f7b668259feae05e7d041eb84037a97f1",
+  "qualified_source_revision": "b049091c5f01a0d20d460624b00dda86c97d0e5c",
+  "source_archive_sha256": "092cef32ef17383d5d07bd3898fc54bdacba7253dd684707e3499dc49ddc6698",
+  "public_pin": "8d024b4d35968514a39319f78db754df29bc5b04"
+}

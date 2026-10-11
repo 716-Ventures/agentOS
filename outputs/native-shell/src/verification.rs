@@ -94,6 +94,29 @@ fn verify_validation_feedback(app: &gtk::Application, frame: &Frame, commands: &
     println!("CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked");
 }
 
+fn verify_choice_heading(app: &gtk::Application, frame: &Frame, commands: &Sender<Command>) {
+    let id="choice-heading";let drafts=Arc::new(Mutex::new(BTreeMap::new()));
+    let mut doc=json!({"surface_id":id,"activity_id":"1","revision":0,"title":"Choice heading","root":"choice","elements":{"choice":{"type":"Choice@1","props":{"label":"Stable heading λ","options":["First","Second"],"value":"First"}}},"actions":{},"bindings":{}});
+    let mut surface=Surface::new(app,id,commands);surface.update(id,&doc,frame,commands,&drafts);
+    let original=surface.elements["choice"].widget.clone();
+    gtk::prelude::RootExt::set_focus(&surface.window,None::<&gtk::Widget>);
+    doc["revision"]=json!(1);doc["elements"]["choice"]["props"]["label"]=json!("Renamed heading 日本語");
+    surface.update(id,&doc,frame,commands,&drafts);
+    assert_eq!(surface.revision,Some(1));assert_eq!(surface.elements["choice"].widget,original);
+    let choice=surface.elements["choice"].choice.as_ref().unwrap();let heading=choice.heading.clone();
+    assert_eq!(heading.text(),"Renamed heading 日本語");assert_eq!(choice.value().as_deref(),Some("First"));assert!(drafts.lock().unwrap().is_empty());
+    heading.select_region(0,7);let selection=heading.selection_bounds();assert!(selection.is_some());
+    doc["revision"]=json!(2);doc["elements"]["choice"]["props"]["label"]=json!("Deferred heading");
+    surface.update(id,&doc,frame,commands,&drafts);
+    assert_eq!(surface.revision,Some(1));assert_eq!(heading.text(),"Renamed heading 日本語");assert_eq!(heading.selection_bounds(),selection);
+    heading.select_region(0,0);gtk::prelude::RootExt::set_focus(&surface.window,None::<&gtk::Widget>);
+    surface.update(id,&doc,frame,commands,&drafts);
+    assert_eq!(surface.revision,Some(2));assert_eq!(heading.text(),"Deferred heading");assert_eq!(surface.elements["choice"].widget,original);
+    assert_eq!(surface.elements["choice"].choice.as_ref().unwrap().value().as_deref(),Some("First"));assert!(drafts.lock().unwrap().is_empty());
+    surface.window.destroy();
+    println!("CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends");
+}
+
 fn verify_form_owners(frame: &Frame, commands: &Sender<Command>) {
     let drafts = Arc::new(Mutex::new(BTreeMap::new()));
     let baseline = Arc::strong_count(&drafts);
@@ -390,6 +413,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         verify_form_owners(&frame,&commands);
         verify_focused_draft_resolution(app,&frame,&commands);
         verify_validation_feedback(app,&frame,&commands);
+        verify_choice_heading(app,&frame,&commands);
         verify_container_replacement(app,&frame,&commands,&drafts);
         image_controls::verify();
         let mut controls=controls::Controls::new(app,commands.clone());controls.verify_controls(&frame,&commands);

@@ -10,4 +10,4 @@ libc = "0.2"
 rusqlite = { version = "0.32", features = ["bundled"] }
 serde_json = "1"
 serde = { version = "1", features = ["derive"] }
-seven-sixteen-ui = {git="https://github.com/716-Ventures/716-ui",rev="8d024b4d35968514a39319f78db754df29bc5b04",default-features=false}
+seven-sixteen-ui = {git="https://github.com/716-Ventures/716-ui",rev="1a3b412ee3e5b19a42f6358c709d4c82e6b919a3",default-features=false}

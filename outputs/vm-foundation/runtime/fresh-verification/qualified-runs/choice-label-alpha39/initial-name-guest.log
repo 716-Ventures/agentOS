@@ -1,0 +1,23 @@
+dbus-daemon[1984]: [session uid=1000 pid=1984 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=2020 comm="/tmp/agentos-session-test-e4afs_rr/bin/agent-os-de")
+dbus-daemon[1984]: [session uid=1000 pid=1984 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[2040]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=2020 comm="/tmp/agentos-session-test-e4afs_rr/bin/agent-os-de")
+dbus-daemon[2040]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI inline validation exposes literal error relation, preserves durable Unicode draft, rejects invalid transactions and clears without implicit Save
+PASS: independent AT-SPI toggle activation reaches the real durable draft; feedback and clearing retain the boolean without Save; scoped Discard restores committed state
+Choice naming observation: {"name": "Available workspace", "expected": "Available workspace: First", "iteration": 0, "committed": "First"}
+Traceback (most recent call last):
+  File "/tmp/agentos-choice-name-probe.py", line 47, in <module>
+    runpy.run_path(sys.argv[0],run_name='__main__')
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "native-shell/tests/native_session.py", line 338, in <module>
+    accessibility.verify_toggle_validation(lambda value:call(endpoint,value))
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/agentos-choice-name-probe.py", line 41, in probe
+    assert control.name==label+': First','Retained Choice reconciliation replaced its field-plus-option accessible name'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Retained Choice reconciliation replaced its field-plus-option accessible name

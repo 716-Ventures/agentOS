@@ -451,6 +451,7 @@ fn construct(
                 });
                 result.selection_notice = Some(notice);
                 result.validation = Some(choice.validation.clone());
+                lease(&choice.heading.clone().upcast(), surface, id, commands);
                 lease(&choice.control.clone().upcast(), surface, id, commands);
                 draft_controls(&choice.widget, surface, id, commands, &events);
                 result.widget = choice.widget.clone().upcast();
@@ -879,6 +880,7 @@ impl Surface {
                     .as_ref()
                     .map(|choice| {
                         choice.control.has_focus() || choice.control.focus_child().is_some()
+                            || choice.heading.has_focus() || choice.heading.selection_bounds().is_some()
                     })
                     .unwrap_or(false)
                 || e.toggle
@@ -1275,16 +1277,7 @@ impl Surface {
                 }
                 if let Some(choice) = &e.choice {
                     let label = props["label"].as_str().unwrap();
-                    if let Some(heading) = choice
-                        .widget
-                        .first_child()
-                        .and_then(|child| child.downcast::<gtk::Label>().ok())
-                    {
-                        heading.set_text(label);
-                    }
-                    choice
-                        .control
-                        .update_property(&[gtk::accessible::Property::Label(label)]);
+                    let _ = choice.set_label(label);
                 }
                 if let Some(toggle) = &e.toggle {
                     let label = props["label"].as_str().unwrap();

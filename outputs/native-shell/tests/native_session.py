@@ -336,6 +336,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                     accessibility.verify_button(lambda value:call(endpoint,value))
                     accessibility.verify_validation(lambda value:call(endpoint,value))
                     accessibility.verify_toggle_validation(lambda value:call(endpoint,value))
+                    accessibility.verify_choice_name(lambda value:call(endpoint,value))
                     accessibility.verify(lambda value:call(endpoint,value))
             if system_bar:
                 core.terminate();assert core.wait(timeout=5) in (0,-signal.SIGTERM)
