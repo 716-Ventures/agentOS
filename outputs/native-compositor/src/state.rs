@@ -33,6 +33,7 @@ pub struct Smallvil {
     pub viewport_offsets: std::collections::BTreeMap<String, (i32, i32)>,
     pub launcher_requests: u64,
     pub keyboard_requests: u64,
+    pub output_zoom: crate::output_zoom::Zoom,
     pub active_launcher: Option<WlSurface>,
     pub shell_identity: Option<(u32, String)>,
     pub shell_return_focus: Option<WlSurface>,
@@ -121,6 +122,7 @@ impl Smallvil {
             viewport_offsets: Default::default(),
             launcher_requests: 0,
             keyboard_requests: 0,
+            output_zoom: crate::output_zoom::Zoom::default(),
             active_launcher: None,
             shell_identity: None,
             shell_return_focus: None,
@@ -250,6 +252,12 @@ impl Smallvil {
     }
     pub fn shortcut(&mut self, action: crate::shortcuts::Shortcut) {
         use crate::shortcuts::Shortcut;
+        if let Shortcut::Zoom(direction) = action {
+            self.output_zoom.change(direction);
+            self.arrange();
+            self.reconcile_pointer();
+            return;
+        }
         if action == Shortcut::Keyboard {self.keyboard_requests = self.keyboard_requests.saturating_add(1);return;}
         if action == Shortcut::Launcher {
             if let Some(surface) = self.active_launcher.clone() {
@@ -366,6 +374,8 @@ impl Smallvil {
         }
     }
     pub fn arrange(&mut self) {
+        let outputs=self.space.outputs().cloned().collect::<Vec<_>>();
+        self.output_zoom.apply(&outputs);
         let windows = self.space.elements().cloned().collect::<Vec<_>>();
         let ids = windows
             .iter()

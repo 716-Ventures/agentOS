@@ -28,6 +28,8 @@ class Device:
                 for key in range(1,249):fcntl.ioctl(self.fd,0x40045565,key)
             else:
                 for key in (272,273,274):fcntl.ioctl(self.fd,0x40045565,key)
+                fcntl.ioctl(self.fd,0x40045564,2) # EV_REL scroll, with absolute pointer motion
+                for axis in (6,8):fcntl.ioctl(self.fd,0x40045566,axis) # HWHEEL, WHEEL
                 fcntl.ioctl(self.fd,0x40045564,3) # EV_ABS
                 for axis in (0,1):
                     fcntl.ioctl(self.fd,0x40045567,axis) # UI_SET_ABSBIT
@@ -439,6 +441,8 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
             return
         import direct_screen_keyboard_probe
         direct_screen_keyboard_probe.verify(output,scene,target,snapshot,keyboard,pointer,wait)
+        import direct_display_zoom_probe
+        direct_display_zoom_probe.verify(scene,target,snapshot,keyboard,pointer,wait)
         for key in (30,34,18,49,20,24,31):keyboard.chord(key) # agentos
         wait(lambda value:value['text']=='agentos')
         # Include the separator in the copied span. GTK coalesces adjacent single-word inserts.

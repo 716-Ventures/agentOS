@@ -2602,5 +2602,72 @@
       "ci_run": 38134725194,
       "ci_result": "success"
     }
+  },
+  "display_zoom": {
+    "status": "targeted source-built UI and installed kernel journeys pass; clean-source expanded69 reproduction pending",
+    "source": {
+      "source_archive_sha256": "426f6e519760ddb4d23847743b63b8cbb6ac65fd28599d986f0baeb28c34cad5",
+      "revision": "0f22ce6873d57f27f939de86df62127466ffc5eb",
+      "changes": [
+        " M .github/workflows/contracts.yml",
+        " M outputs/agent-shell/tests/direct_display_guest.py",
+        " A outputs/agent-shell/tests/direct_display_zoom_probe.py",
+        " M outputs/agent-shell/tests/direct_input_probe.py",
+        " M outputs/native-compositor/src/control.rs",
+        " M outputs/native-compositor/src/input.rs",
+        " M outputs/native-compositor/src/main.rs",
+        " A outputs/native-compositor/src/output_zoom.rs",
+        " M outputs/native-compositor/src/shell_keyboard.rs",
+        " M outputs/native-compositor/src/shortcuts.rs",
+        " M outputs/native-compositor/src/state.rs",
+        " M outputs/native-shell/README.md",
+        " M outputs/native-shell/src/main.rs",
+        " M outputs/native-shell/src/screen_keyboard.rs",
+        " M outputs/native-shell/src/system_bar.rs",
+        " M outputs/native-shell/tests/native_session.py",
+        " M outputs/vm-foundation/reproduce.py"
+      ]
+    },
+    "installed_initial_runtime": "b9237d0edc5d47141b21982bdfae6ee98539d01a45b4df48249365edcb8a3d91",
+    "compositor_tests": 51,
+    "native_tests": {
+      "passed": 32,
+      "ignored": 7
+    },
+    "qualified": [
+      "100\u2013200% session zoom with exact configured scale reset",
+      "negative origin/rotated output unit geometry and live handle reconnect without compounding scale",
+      "dark and light doubled-text UI with native work-area/dismissal bounds",
+      "same-login display control rejection",
+      "session-owned Orca learn-mode enter/isolation/exit after zoom/reset",
+      "installed kernel Equals/Minus/Zero shortcuts and scaled pointer typing",
+      "real kernel vertical/horizontal wheel access to Shift and Backspace",
+      "always-reachable Hide keyboard and restored work area/focus",
+      "responsive header yields title to full status and dismissal text",
+      "owned guest and UTM app stopped after every driver"
+    ],
+    "evidence": {
+      "/tmp/agentos-display-zoom-current-second.log": "43b3d3d80f3a2aea0822234fc79630b392431c95c7573a33f9863da9e0e303dc",
+      "/tmp/agentos-display-zoom-responsive.log": "9b7bfc900e8ef74c2543b8cc40fb5122cc62ed11d916b9a0d0956dd7505fbab5",
+      "/tmp/agentos-display-zoom-wheel.log": "baafd1eb6ad0c9ee64f515392d8dbe8ec737ad1c4dd8e32977989a7a26915222",
+      "/tmp/agentos-display-zoom-final-light-2.png": "3ff00d85e1d20d5c4080ac32242c6488a1dcc8fd52d340c206157a099ca96e34",
+      "/tmp/agentos-display-zoom-final-reader.png": "d1f567ce1cdd44dbb51360d4e9e0c056588acf8a7168ffce803561c6d5eaaea5"
+    },
+    "retained_failures": [
+      {
+        "observation": "Initial build failed on an ambiguous GTK display method; explicit WidgetExt dispatch corrected it before runtime qualification. Owned guest/app cleanup passed.",
+        "log_sha256": "6d7df85c9cf6f62d5b20a139e2a1b1b87db7caea07ee9266bad3dedf5149ab6d"
+      },
+      {
+        "observation": "Initial doubled-text capture crowded status behind the frame title. Responsive title yielding restores full Keyboard ready and Hide keyboard labels.",
+        "capture_sha256": "b191196694091c4fbbe2bfcc577c60df7d8dc3f7479330b7d0ed31f7b2b0c52f"
+      }
+    ],
+    "boundaries": [
+      "clean-source full69 and CI pending",
+      "session-local display reflow; free-panning viewport magnifier remains unimplemented",
+      "physical GPU/input and live multiple-output magnification not qualified",
+      "signed v11 remains the earlier distribution artifact"
+    ]
   }
 }

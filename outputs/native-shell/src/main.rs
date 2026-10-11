@@ -1508,6 +1508,7 @@ fn main() {
             toggle.set_tooltip_text(Some("On-screen keyboard (Ctrl+Alt+K)"));
             let keys = keyboard.clone();toggle.connect_clicked(move |_|keys.toggle());
             controls.borrow().monitor_content.prepend(&toggle);
+            controls.borrow().monitor_content.prepend(&keyboard.zoom_controls());
             screen_keyboard = Some(keyboard);
             window.present();
             bar_window = Some(window);
@@ -1546,6 +1547,7 @@ fn main() {
                 if let Ok(path) = std::env::var("AGENT_OS_LAUNCHER_CAPTURE") { launcher_captured = system_bar::capture(&main, &path); }
             }
             if let Some(events) = launcher_events.borrow().as_ref() {
+                if let Some(keyboard)=&screen_keyboard {keyboard.set_zoom(events.zoom());}
                 let keyboard_current = events.keyboard_sequence.load(std::sync::atomic::Ordering::Relaxed);
                 if keyboard_current != keyboard_sequence {
                     keyboard_sequence = keyboard_current;

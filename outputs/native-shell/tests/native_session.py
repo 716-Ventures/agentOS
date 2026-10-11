@@ -52,7 +52,8 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
          'AGENT_OS_BROKER_SOCKET':str(root/'unavailable-broker.sock'),
          'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','G_DEBUG':'fatal-criticals','GTK_A11Y':'atspi'}
     env.pop('WAYLAND_DISPLAY',None);env.pop('DISPLAY',None)
-    screen_keyboard='--screen-keyboard' in sys.argv
+    display_zoom='--display-zoom' in sys.argv
+    screen_keyboard='--screen-keyboard' in sys.argv or display_zoom
     system_bar='--system-bar' in sys.argv
     if system_bar or screen_keyboard:
         appearance=os.environ.get('AGENT_OS_BAR_TEST_APPEARANCE','dark');scale=float(os.environ.get('AGENT_OS_BAR_TEST_SCALE','1'))
@@ -172,6 +173,46 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 restored_bar=next(layer for layer in restored['system_layers'] if layer['namespace']=='agentos-system-bar')
                 assert restored_bar['work_area']==bar['work_area'],restored_bar
                 print('PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection',flush=True)
+            if display_zoom:
+                import accessibility,pyatspi,ime_accessibility,shutil
+                denied=call(control,{'op':'snapshot'})['display_zoom']
+                with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as conn:
+                    conn.connect(str(control));conn.sendall(b'{"op":"display.zoom","direction":1}\n')
+                    with conn.makefile('rb') as stream:response=json.loads(stream.readline())
+                assert not response['ok'] and call(control,{'op':'snapshot'})['display_zoom']==denied,response
+                accessibility.activate(accessibility.find('Keyboard',pyatspi.ROLE_PUSH_BUTTON))
+                for factor in (1.25,1.5,1.75,2.0):
+                    accessibility.activate(accessibility.find('Zoom in',pyatspi.ROLE_PUSH_BUTTON))
+                    wait_for(lambda:call(control,{'op':'snapshot'})['display_zoom']==factor,[core,session])
+                    wait_for(lambda:ime_accessibility.rendered_text(f'Display zoom {factor*100:.0f}%'),[core,session])
+                def zoomed_keyboard():
+                    state=call(control,{'op':'snapshot'})
+                    layer=next((layer for layer in state['system_layers'] if layer['namespace']=='agentos-keyboard' and layer['mapped']),None)
+                    return (state,layer) if layer and 0<layer['geometry']['height']<=state['outputs'][0]['height']/2 else None
+                zoomed,layer=wait_for(zoomed_keyboard,[core,session])
+                assert zoomed['outputs'][0]['width']==output['width']//2,zoomed
+                assert zoomed['outputs'][0]['height']==output['height']//2,zoomed
+                assert layer['work_area']['height']>0,layer
+                assert zoomed['seat_focus']==original,zoomed
+                def fitted_dismissal():
+                    geometry=json.loads((OUTPUT/'screen-keyboard.json').read_text())
+                    if geometry['window'][0]!=zoomed['outputs'][0]['width']:return None
+                    x,y,w,h=geometry['dismissal'];width,height=geometry['window']
+                    return geometry if 0<=x and x+w<=width and 0<=y and y+h<=height else None
+                wait_for(fitted_dismissal,[core,session])
+                shutil.copyfile(OUTPUT/'screen-keyboard.png',OUTPUT/'display-zoom.png')
+                field=accessibility.find('Accessible session draft',pyatspi.ROLE_TEXT)
+                assert field.queryEditableText().setTextContents('')
+                accessibility.activate(accessibility.find('a',pyatspi.ROLE_PUSH_BUTTON))
+                wait_for(lambda:accessibility.text(field)=='a',[core,session])
+                assert field.queryEditableText().setTextContents('Original accessible value')
+                accessibility.activate(accessibility.find('Hide keyboard',pyatspi.ROLE_PUSH_BUTTON))
+                accessibility.activate(accessibility.find('Reset zoom',pyatspi.ROLE_PUSH_BUTTON))
+                wait_for(lambda:call(control,{'op':'snapshot'})['display_zoom']==1.0,[core,session])
+                restored=wait_for(lambda:(lambda state:state if state['outputs'][0]['width']==output['width'] and not any(layer['namespace']=='agentos-keyboard' and layer['mapped'] for layer in state['system_layers']) else None)(call(control,{'op':'snapshot'})),[core,session])
+                assert next(layer['work_area'] for layer in restored['system_layers'] if layer['namespace']=='agentos-system-bar')==bar['work_area'],restored
+                assert restored['keyboard_pressed_count']==0,restored
+                print('PASS: trusted display zoom changes real output/workspace geometry; doubled zoom preserves keyboard dismissal, local typing and exact reset; same-login control denied',flush=True)
             if screen_reader:
                 import accessibility,pyatspi
                 workspace=call(endpoint,{'op':'presentation.snapshot'})['documents'][f'desktop-{activity}']

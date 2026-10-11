@@ -3,6 +3,7 @@
 pub enum Shortcut {
     Launcher,
     Keyboard,
+    Zoom(i8),
     Cycle(bool),
     Maximize,
     Restore,
@@ -26,6 +27,9 @@ pub fn decode(ctrl: bool, alt: bool, shift: bool, key: u32) -> Option<Shortcut> 
         return None;
     }
     match function_key(key) {
+        0x2b | 0x3d | 0xffab => Some(Shortcut::Zoom(1)), // Plus, Equals, keypad Add
+        0x2d | 0xffad => Some(Shortcut::Zoom(-1)), // Minus, keypad Subtract
+        0x30 | 0xffb0 => Some(Shortcut::Zoom(0)), // Zero, keypad Zero
         0x6b | 0x4b => Some(Shortcut::Keyboard),
         0x20 => Some(Shortcut::Launcher), // Space
         0xff09 | 0xfe20 => Some(Shortcut::Cycle(shift || key == 0xfe20)), // Tab / ISO Left Tab
@@ -72,6 +76,12 @@ mod tests {
     use super::*;
     #[test]
     fn shortcuts_require_both_modifiers_and_leave_typing_alone() {
+        assert_eq!(decode(true,true,false,0x3d),Some(Shortcut::Zoom(1)));
+        assert_eq!(decode(true,true,true,0x2b),Some(Shortcut::Zoom(1)));
+        assert_eq!(decode(true,true,false,0x2d),Some(Shortcut::Zoom(-1)));
+        assert_eq!(decode(true,true,false,0x30),Some(Shortcut::Zoom(0)));
+        assert_eq!(decode(false,true,false,0x3d),None);
+        assert_eq!(decode(true,false,false,0x2d),None);
         assert_eq!(decode(true, true, false, 0x20), Some(Shortcut::Launcher));
         assert_eq!(decode(true, true, false, 0x6b), Some(Shortcut::Keyboard));
         assert_eq!(decode(true, true, true, 0x4b), Some(Shortcut::Keyboard));

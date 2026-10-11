@@ -100,6 +100,7 @@ pub fn configure_keyboard(window: &gtk::ApplicationWindow) -> Result<libloading:
 pub struct LauncherEvents {
     pub sequence: Arc<AtomicU64>,
     pub keyboard_sequence: Arc<AtomicU64>,
+    zoom: Arc<AtomicU64>,
     stop: Arc<AtomicBool>,
     worker: Option<std::thread::JoinHandle<()>>,
 }
@@ -108,6 +109,8 @@ impl LauncherEvents {
         let sequence = Arc::new(AtomicU64::new(0));
         let keyboard_sequence = Arc::new(AtomicU64::new(0));
         let keyboard_events = keyboard_sequence.clone();
+        let zoom=Arc::new(AtomicU64::new(1.0f64.to_bits()));
+        let zoom_events=zoom.clone();
         let stop = Arc::new(AtomicBool::new(false));
         let (events, stopping) = (sequence.clone(), stop.clone());
         let path = std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET").map(PathBuf::from);
@@ -121,6 +124,7 @@ impl LauncherEvents {
                         &json!({"op":"launcher.state"}),
                         Duration::from_millis(300),
                     ) {
+                        if let Some(factor)=value["display_zoom"].as_f64().filter(|factor| factor.is_finite() && (1.0..=2.0).contains(factor)) {zoom_events.store(factor.to_bits(),Ordering::Relaxed);}
                         if let Some(current) = value["keyboard_sequence"].as_u64() {
                             if prior_keyboard.is_some_and(|old| current > old) {
                                 keyboard_events.fetch_add(1, Ordering::Relaxed);
@@ -141,10 +145,12 @@ impl LauncherEvents {
         Self {
             sequence,
             keyboard_sequence,
+            zoom,
             stop,
             worker,
         }
     }
+    pub fn zoom(&self) -> f64 {f64::from_bits(self.zoom.load(Ordering::Relaxed))}
     pub fn current(&self) -> u64 {
         self.sequence.load(Ordering::Relaxed)
     }

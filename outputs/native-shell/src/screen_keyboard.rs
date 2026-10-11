@@ -15,8 +15,12 @@ struct Commands {
 }
 impl Commands {
     fn send(&self, value: Value) -> Result<(), String> {
-        let sequence = self.latest.fetch_add(1, std::sync::atomic::Ordering::Relaxed) + 1;
-        self.sender.try_send((std::time::Instant::now(), sequence, value))
+        let sequence = self
+            .latest
+            .fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+            + 1;
+        self.sender
+            .try_send((std::time::Instant::now(), sequence, value))
             .map_err(|_| "Keyboard busy; try again".to_owned())
     }
 }
@@ -26,8 +30,10 @@ struct Input {
     worker: Mutex<Option<std::thread::JoinHandle<()>>>,
 }
 impl Input {
-    fn start(status: &gtk::Label) -> Self {
-        let (commands, requests) = std::sync::mpsc::sync_channel::<(std::time::Instant, u64, Value)>(4);
+    fn start(status: &gtk::Label, ready: &str) -> Self {
+        let ready = ready.to_owned();
+        let (commands, requests) =
+            std::sync::mpsc::sync_channel::<(std::time::Instant, u64, Value)>(4);
         let latest = Arc::new(std::sync::atomic::AtomicU64::new(0));
         let stop = Arc::new(std::sync::atomic::AtomicBool::new(false));
         let stopping = stop.clone();
@@ -35,8 +41,11 @@ impl Input {
         let results = replies.clone();
         let worker = std::thread::spawn(move || {
             while !stopping.load(std::sync::atomic::Ordering::Relaxed) {
-                if let Ok((created, sequence, value)) = requests.recv_timeout(Duration::from_millis(50)) {
-                    *results.lock().unwrap() = Some((sequence,
+                if let Ok((created, sequence, value)) =
+                    requests.recv_timeout(Duration::from_millis(50))
+                {
+                    *results.lock().unwrap() = Some((
+                        sequence,
                         if std::time::Instant::now().duration_since(created)
                             > Duration::from_millis(150)
                         {
@@ -58,16 +67,15 @@ impl Input {
                 if sequence != current.load(std::sync::atomic::Ordering::Relaxed) {
                     return glib::ControlFlow::Continue;
                 }
-                status.set_text(if value.is_empty() {
-                    "Keyboard ready"
-                } else {
-                    &value
-                });
+                status.set_text(if value.is_empty() { &ready } else { &value });
             }
             glib::ControlFlow::Continue
         });
         Self {
-            commands: Commands { sender: commands, latest },
+            commands: Commands {
+                sender: commands,
+                latest,
+            },
             stop,
             worker: Mutex::new(Some(worker)),
         }
@@ -92,6 +100,9 @@ pub struct Keyboard {
     window: gtk::ApplicationWindow,
     _library: libloading::Library,
     input: Input,
+    zoom_input: Input,
+    zoom_controls: gtk::Box,
+    zoom_label: gtk::Label,
 }
 impl Keyboard {
     pub fn new(app: &gtk::Application) -> Result<Self, String> {
@@ -112,13 +123,14 @@ impl Keyboard {
         let header = ui::row(12);
         let title = ui::text("On-screen keyboard", true);
         title.set_selectable(false);
+        title.set_ellipsize(gtk::pango::EllipsizeMode::End);
         let status = ui::status("Keyboard ready");
         status.set_selectable(false);
         status.set_hexpand(true);
         status.set_xalign(0.0);
         status.set_wrap(false);
         status.set_ellipsize(gtk::pango::EllipsizeMode::End);
-        let input = Input::start(&status);
+        let input = Input::start(&status, "Keyboard ready");
         let close = ui::button("Hide keyboard", ButtonVariant::Ghost, false);
         close.set_focus_on_click(false);
         let weak = window.downgrade();
@@ -131,15 +143,55 @@ impl Keyboard {
         header.append(&status);
         header.append(&close);
         root.append(&header);
-        root.append(
-            &gtk::ScrolledWindow::builder()
-                .hscrollbar_policy(gtk::PolicyType::Automatic)
-                .vscrollbar_policy(gtk::PolicyType::Automatic)
-                .propagate_natural_height(true)
-                .max_content_height(280)
-                .child(&body)
-                .build(),
-        );
+        let scroller = gtk::ScrolledWindow::builder()
+            .hscrollbar_policy(gtk::PolicyType::Automatic)
+            .vscrollbar_policy(gtk::PolicyType::Automatic)
+            .propagate_natural_height(true)
+            .max_content_height(280)
+            .child(&body)
+            .build();
+        root.append(&scroller);
+        let scroll = scroller.downgrade();
+        let head = header.downgrade();
+        let heading = title.downgrade();
+        let feedback = status.downgrade();
+        let dismissal = close.downgrade();
+        window.add_tick_callback(move |window, _| {
+            if let (Some(scroll), Some(head), Some(monitor)) = (
+                scroll.upgrade(),
+                head.upgrade(),
+                window.surface().and_then(|surface| {
+                    gtk::prelude::WidgetExt::display(window).monitor_at_surface(&surface)
+                }),
+            ) {
+                if let (Some(title), Some(status), Some(close)) =
+                    (heading.upgrade(), feedback.upgrade(), dismissal.upgrade())
+                {
+                    // Keep the operation status and dismissal readable before
+                    // spending scarce width on the redundant frame heading.
+                    let title_width = title
+                        .create_pango_layout(Some(title.text().as_str()))
+                        .pixel_size()
+                        .0;
+                    let status_width = status
+                        .create_pango_layout(Some(status.text().as_str()))
+                        .pixel_size()
+                        .0;
+                    title.set_visible(
+                        title_width
+                            + status_width
+                            + close.measure(gtk::Orientation::Horizontal, -1).1
+                            + 48
+                            <= window.width(),
+                    );
+                }
+                let limit = (monitor.geometry().height() / 2 - head.height() - 32).clamp(1, 280);
+                if scroll.max_content_height() != limit {
+                    scroll.set_max_content_height(limit);
+                }
+            }
+            glib::ControlFlow::Continue
+        });
         let modifiers = Rc::new(Cell::new(0u64));
         let shifts = Rc::new(RefCell::new(Vec::<(gtk::Button, String, String)>::new()));
         let letters = [
@@ -302,36 +354,80 @@ impl Keyboard {
         if let Ok(path) = std::env::var("AGENT_OS_KEYBOARD_CAPTURE") {
             let weak = window.downgrade();
             let dismissal = close.downgrade();
+            let mut prior_geometry = None;
             glib::timeout_add_local(Duration::from_millis(100), move || {
                 let Some(window) = weak.upgrade() else {
                     return glib::ControlFlow::Break;
                 };
-                if window.is_visible() && system_bar::capture(&window, &path) {
-                    if let Some(bounds) = dismissal.upgrade().and_then(|button| button.compute_bounds(&window)) {
+                if window.is_visible() {
+                    if let Some(bounds) = dismissal
+                        .upgrade()
+                        .and_then(|button| button.compute_bounds(&window))
+                    {
                         let geometry = json!({"window":[window.width(),window.height()],
                             "dismissal":[bounds.x(),bounds.y(),bounds.width(),bounds.height()]});
-                        let _ = std::fs::write(PathBuf::from(&path).with_extension("json"), geometry.to_string());
+                        if prior_geometry.as_ref() != Some(&geometry)
+                            && system_bar::capture(&window, &path)
+                        {
+                            let _ = std::fs::write(
+                                PathBuf::from(&path).with_extension("json"),
+                                geometry.to_string(),
+                            );
+                            prior_geometry = Some(geometry);
+                        }
                     }
-                    glib::ControlFlow::Break
-                } else {
-                    glib::ControlFlow::Continue
                 }
+                glib::ControlFlow::Continue
             });
         }
+        let zoom_controls = ui::column(6);
+        let zoom_label = ui::text("Display zoom 100%", false);
+        let zoom_status = ui::status("Zoom controls ready");
+        let zoom_input = Input::start(&zoom_status, "Zoom controls ready");
+        zoom_controls.append(&zoom_label);
+        let buttons = ui::row(6);
+        for (label, direction) in [("Zoom out", -1), ("Reset zoom", 0), ("Zoom in", 1)] {
+            let button = ui::button(label, ButtonVariant::Outline, false);
+            let commands = zoom_input.commands.clone();
+            let status = zoom_status.clone();
+            button.connect_clicked(move |_| {
+                let result = commands.send(json!({"op":"display.zoom","direction":direction}));
+                status.set_text(result.err().as_deref().unwrap_or("Changing display zoom…"));
+            });
+            buttons.append(&button);
+        }
+        zoom_controls.append(&buttons);
+        zoom_controls.append(&zoom_status);
         Ok(Self {
             window,
             _library: library,
             input,
+            zoom_input,
+            zoom_controls,
+            zoom_label,
         })
     }
+    pub fn zoom_controls(&self) -> gtk::Box {
+        self.zoom_controls.clone()
+    }
+    pub fn set_zoom(&self, factor: f64) {
+        let text = format!("Display zoom {:.0}%", factor * 100.0);
+        if self.zoom_label.text().as_str() != text {
+            self.zoom_label.set_text(&text);
+        }
+    }
     pub fn close(&self) {
+        self.zoom_input.close();
         self.window.set_visible(false);
         self.input.close();
     }
     pub fn toggle(&self) {
         self.window.set_visible(!self.window.is_visible());
         if self.window.is_visible() {
-            let _ = self.input.commands.send(json!({"op":"keyboard.restore_focus"}));
+            let _ = self
+                .input
+                .commands
+                .send(json!({"op":"keyboard.restore_focus"}));
         }
     }
 }

@@ -144,7 +144,7 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
     use smithay::reexports::wayland_server::Resource;
     let result = (|| -> Result<Value, String> {
         match v["op"].as_str() {
-            Some("launcher.state") => Ok(json!({"sequence":state.launcher_requests,"keyboard_sequence":state.keyboard_requests})),
+            Some("launcher.state") => Ok(json!({"sequence":state.launcher_requests,"keyboard_sequence":state.keyboard_requests,"display_zoom":state.output_zoom.factor()})),
             Some("snapshot") => {
                 state.arrange();
                 let windows=state.space.elements().map(|w|{let surface=w.toplevel().unwrap().wl_surface();let (title,app_id)=smithay::wayland::compositor::with_states(surface,|states|{let data=states.data_map.get::<smithay::wayland::shell::xdg::XdgToplevelSurfaceData>().unwrap().lock().unwrap();(data.title.clone(),data.app_id.clone())});let geometry=state.space.element_geometry(w);json!({"id":format!("{:?}",surface.id()),"title":title,"app_id":app_id,"xdg":xdg_diagnostics(surface),"geometry":geometry.map(|r|json!({"x":r.loc.x,"y":r.loc.y,"width":r.size.w,"height":r.size.h}))})}).collect::<Vec<_>>();
@@ -159,7 +159,7 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
                     .and_then(|keyboard| keyboard.current_focus())
                     .map(|surface| format!("{:?}", surface.id()));
                 Ok(
-                    json!({"reader":state.accessibility.as_ref().map(|reader|reader.status()),"keyboard_pressed_count":state.seat.get_keyboard().map(|keyboard|keyboard.pressed_keys().len()),"launcher_requests":state.launcher_requests,"system_layers":crate::system_shell::snapshot(state),"seat_focus":seat_focus,"pointer_location":state.seat.get_pointer().map(|pointer|{let point=pointer.current_location();json!([point.x,point.y])}),"layout":state.policy.current,"windows":windows,"outputs":outputs,"direct_frames_presented":state.direct_frames_presented,"input_frame_wakeups":state.input_frame_wakeups,"drag_icon":state.drag_icon.is_some(),"drag_icon_render_submissions":state.drag_icon_render_submissions,"direct_active":state.direct_active,"direct_resume_error":state.direct_resume_error,"shared":scene.map(|s|json!({"identities":s.identities,"workspaces":s.workspaces,"error":s.error,"overview":s.overview}))}),
+                    json!({"display_zoom":state.output_zoom.factor(),"reader":state.accessibility.as_ref().map(|reader|reader.status()),"keyboard_pressed_count":state.seat.get_keyboard().map(|keyboard|keyboard.pressed_keys().len()),"launcher_requests":state.launcher_requests,"system_layers":crate::system_shell::snapshot(state),"seat_focus":seat_focus,"pointer_location":state.seat.get_pointer().map(|pointer|{let point=pointer.current_location();json!([point.x,point.y])}),"layout":state.policy.current,"windows":windows,"outputs":outputs,"direct_frames_presented":state.direct_frames_presented,"input_frame_wakeups":state.input_frame_wakeups,"drag_icon":state.drag_icon.is_some(),"drag_icon_render_submissions":state.drag_icon_render_submissions,"direct_active":state.direct_active,"direct_resume_error":state.direct_resume_error,"shared":scene.map(|s|json!({"identities":s.identities,"workspaces":s.workspaces,"error":s.error,"overview":s.overview}))}),
                 )
             }
             Some("viewport.pan") => {

@@ -52,6 +52,12 @@ pub fn handle(state: &mut Smallvil, peer: Option<u32>, value: &Value) -> Value {
         {
             return Err("Trusted renderer identity changed".into());
         }
+        if value["op"] == "display.zoom" {
+            if state.direct_active == Some(false) {return Err("Display is inactive".into());}
+            let direction=value["direction"].as_i64().filter(|n|(-1..=1).contains(n)).ok_or("Invalid zoom change")?;
+            state.shortcut(crate::shortcuts::Shortcut::Zoom(direction as i8));
+            return Ok(json!({"factor":state.output_zoom.factor()}));
+        }
         let keyboard = state.seat.get_keyboard().ok_or("Keyboard unavailable")?;
         if keyboard
             .current_focus()

@@ -29,6 +29,7 @@ mod input_method;
 mod input_method_tests;
 #[cfg(feature = "direct-display")]
 mod output_config;
+mod output_zoom;
 mod pointer_geometry;
 mod state;
 mod winit;
@@ -133,7 +134,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let _ = req.reply.try_send(serde_json::json!({"ok":false,"error":"Input or command expired; try again"}));
                     continue;
                 }
-                if matches!(req.value["op"].as_str(), Some("keyboard.stroke" | "keyboard.restore_focus")) {
+                if matches!(req.value["op"].as_str(), Some("keyboard.stroke" | "keyboard.restore_focus" | "display.zoom")) {
                     let response = shell_keyboard::handle(&mut data.state, req.peer_pid, &req.value);
                     let _ = req.reply.try_send(response);
                     continue;

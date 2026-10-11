@@ -125,6 +125,7 @@ jobs:
           dbus-run-session -- python3 outputs/native-shell/tests/native_session.py --ime
           dbus-run-session -- python3 outputs/native-shell/tests/native_session.py --ime-editor
           dbus-run-session -- python3 outputs/native-shell/tests/native_session.py --screen-keyboard
+          dbus-run-session -- python3 outputs/native-shell/tests/native_session.py --display-zoom
           dbus-run-session -- python3 outputs/native-shell/tests/native_session.py --ime-failure
           dbus-run-session -- python3 outputs/native-shell/tests/native_session.py --host-failure
           dbus-run-session -- python3 outputs/native-shell/tests/native_session.py --compositor-failure

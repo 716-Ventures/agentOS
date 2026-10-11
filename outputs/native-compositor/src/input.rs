@@ -31,6 +31,14 @@ impl Smallvil {
         crate::pointer_geometry::clamp((position.x, position.y), outputs).map(Into::into)
     }
 
+    pub fn reconcile_pointer(&mut self) {
+        if let Some(pointer) = self.seat.get_pointer() {
+            if let Some(position) = self.clamp_pointer(pointer.current_location()) {
+                self.move_pointer(position, self.start_time.elapsed().as_millis() as u32);
+            }
+        }
+    }
+
     fn move_pointer(
         &mut self,
         pos: smithay::utils::Point<f64, smithay::utils::Logical>,
