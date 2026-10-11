@@ -2070,5 +2070,18 @@
       "agentos-ime-recovery-render-barrier.log": "134f69fa7d85a661f59ac3036f329a177a9ee2e02ef06ffe34591ae1066d3f34",
       "agentos-ime-recovery-isolated-broker.log": "79fe0c01146ebd7cc992853f969c8398b1700775896790c58698ef08239ec10b"
     }
+  },
+  "restored_source_build_cache": {
+    "result": "host_regression_pass",
+    "cargo": "1.99.0 (5f94df478 2026-08-27), Homebrew macOS ARM64",
+    "baseline": "Real executable still prints first after source bytes change to other and the earlier source timestamp is restored; ordinary Cargo release build accepts the stale artifact.",
+    "fixed": "Installation cleans dev and release artifacts of each local package before its locked release build. Real regression executable prints other and the old debug executable is removed. Dependency packages are not selected for cleanup.",
+    "checks": [
+      "real Cargo/binary timestamp regression passes",
+      "tracked-source deployment archive test passes",
+      "install.sh shell syntax passes"
+    ],
+    "test_sha256": "cf4fd108b209d228631703ddbffb45c350eb52072567140f286a93f7900adcfe",
+    "linux_full_reproduction": "pending"
   }
 }
