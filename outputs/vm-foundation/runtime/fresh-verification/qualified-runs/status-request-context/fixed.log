@@ -1,0 +1,392 @@
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+   Compiling agent-os-desktop v0.1.0-alpha.1 (/home/developer/agent-os-source/native-shell)
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+ --> src/document_dialog.rs:8:11
+  |
+8 | ) -> gtk::FileChooserNative {
+  |           ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:10:23
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:61:23
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:10:42
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:11:10
+   |
+11 |         .title(if save {
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:16:10
+   |
+16 |         .action(if save {
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:21:10
+   |
+21 |         .accept_label(if save { "Export" } else { "Import" })
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:22:10
+   |
+22 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:23:10
+   |
+23 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:24:10
+   |
+24 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+  --> src/document_dialog.rs:27:16
+   |
+27 |         dialog.set_current_name("document.txt");
+   |                ^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:31:40
+   |
+31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:61:42
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:62:10
+   |
+62 |         .title("Choose existing text file to review")
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:63:10
+   |
+63 |         .action(gtk::FileChooserAction::Open)
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:64:10
+   |
+64 |         .accept_label("Review replacement")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:65:10
+   |
+65 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:66:10
+   |
+66 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:67:10
+   |
+67 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:72:40
+   |
+72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: `agent-os-desktop` (bin "agent-os-desktop") generated 20 warnings
+    Finished `dev` profile [unoptimized] target(s) in 2.69s
+warning: function `project` is never used
+ --> src/pressure.rs:5:8
+  |
+5 | pub fn project(
+  |        ^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: `agent-os-compositor` (bin "agent-os-compositor") generated 1 warning
+    Finished `dev` profile [unoptimized] target(s) in 0.18s
+    Finished `dev` profile [unoptimized] target(s) in 0.06s
+    Finished `test` profile [unoptimized] target(s) in 0.06s
+     Running unittests src/main.rs (native-compositor/target/debug/deps/agent_os_compositor-c02510f001e032dc)
+
+running 51 tests
+test accessibility::tests::exact_mask_grab_and_watch_never_consume_unrelated_typing ... ok
+test accessibility::tests::custom_modifier_double_tap_restores_ordinary_key_behavior ... ok
+test accessibility::tests::monitor_commands_consume_balanced_pairs_and_disconnect_releases_ownership ... ok
+test accessibility::tests::grab_does_not_orphan_a_previously_forwarded_key_release ... ok
+test accessibility::tests::replacement_bus_owner_cannot_receive_a_previous_readers_pending_key_release ... ok
+test bridge::pages::cache_tests::errors_keep_the_previous_consistent_cache_and_cancellation_sends_nothing ... ok
+test bridge::pages::tests::cancellation_and_nonprogressing_cursors_stop_reads ... ok
+test bridge::pages::cache_tests::unchanged_documents_are_not_refetched_and_tombstones_remove_old_views ... ok
+test bridge::pages::tests::retries_from_scratch_after_interleaved_edits ... ok
+test bridge::tests::app_id_alone_cannot_impersonate_native_surface ... ok
+test bridge::tests::healthy_multiple_outputs_preserve_their_coordinates ... ok
+test bridge::tests::automatic_views_use_balanced_rows_instead_of_repeatedly_halving_old_views ... ok
+test bridge::tests::new_windows_remain_manageable_in_manually_constrained_workspaces ... ok
+test bridge::tests::multi_output_pressure_is_local_and_hidden_views_leave_the_scene ... ok
+test bridge::tests::split_rounding_covers_odd_dimensions_and_maximize_preserves_base ... ok
+test bridge::work_area_input_tests::global_keyboard_geometry_roundtrips_through_output_local_workspace_coordinates ... ok
+test bridge::grabs::tests::release_commits_frozen_revision_and_always_releases_lease ... ok
+test bridge::grabs::tests::pointer_begin_reconciles_only_element_focus_and_never_replays_its_lease ... ok
+test core_ipc::tests::incomplete_and_oversized_responses_are_rejected ... ok
+test control::deadline_tests::keyboard_requests_expire_before_late_input_and_carry_kernel_peer_identity ... ok
+test frame_cadence::tests::input_wakes_wait_for_a_callback_and_are_bounded_by_refresh ... ok
+test frame_cadence::tests::missed_deadlines_resume_without_an_unbounded_catchup_burst ... ok
+test frame_cadence::tests::stale_or_cancelled_input_does_not_wake_later_animation ... ok
+test frame_cadence::tests::variable_render_cost_does_not_accumulate_into_the_refresh_period ... ok
+test input_method::tests::human_input_method_configuration_is_literal_and_bounded ... ok
+wl_display#1: error 0: Invalid binding of zwlr_layer_shell_v1 version 4 for global 6.
+wl_display#1: error 0: Invalid binding of zwp_input_method_manager_v2 version 1 for global 1.
+zwlr_layer_surface_v1#10: error 1: width 0 requested without setting left and right anchors
+test input_method_tests::private_input_method_delivers_unicode_and_cannot_be_bound_by_an_application ... ok
+test input_revision::tests::element_focus_can_advance_without_replaying_or_overwriting_layout ... ok
+test output_config::tests::every_transform_matches_advertised_geometry_and_adjacent_output_spacing ... ok
+test output_config::tests::fractional_scales_negative_origins_and_exact_modes_are_retained ... ok
+test output_config::tests::malformed_preferences_fail_before_device_configuration ... ok
+test output_zoom::tests::reconnect_uses_new_preferences_and_never_compounds_zoom ... ok
+test output_zoom::tests::zoom_preserves_base_rotation_position_and_exact_reset ... ok
+test pointer_geometry::tests::final_pixel_subpixels_and_negative_zero_edges_stay_inside ... ok
+test pointer_geometry::tests::gaps_and_removed_outputs_choose_nearest_remaining_display ... ok
+test pointer_geometry::tests::invalid_coordinates_and_extreme_integer_origins_are_safe ... ok
+test pointer_geometry::tests::relative_motion_crosses_adjacent_outputs_and_retains_subpixels ... ok
+test policy::tests::exact_revisions_and_divergent_undo ... ok
+test policy::tests::floating_windows_survive_smaller_output ... ok
+test policy::tests::grid_is_in_bounds_and_has_no_overlap ... ok
+test policy::tests::new_window_does_not_steal_focus ... ok
+test pressure::tests::disconnected_output_recovery_exposes_views_without_rewriting_preferences ... ok
+test pressure::tests::pressure_keeps_floating_work_and_does_not_shrink_clients ... ok
+test pressure::tests::viewport_exposes_every_edge_and_retains_client_dimensions ... ok
+test process::tests::unwinding_reaps_the_owned_renderer ... ok
+test shell_keyboard::tests::chords_are_bounded_and_never_duplicate_a_held_modifier ... ok
+test shortcuts::tests::shortcuts_require_both_modifiers_and_leave_typing_alone ... ok
+test timings::tests::disabled_diagnostics_do_not_collect_stages_or_files ... ok
+test timings::tests::percentiles_are_bounded_recent_samples_and_cumulative_mean_is_explicit ... ok
+test core_ipc::tests::delayed_fragmented_reply_does_not_resend_request ... ok
+test core_ipc::tests::partial_reply_has_one_total_deadline ... ok
+test control::deadline_tests::socket_timeout_expires_the_request_still_waiting_in_the_render_queue ... ok
+
+test result: ok. 51 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.02s
+
+dbus-daemon[1443]: [session uid=1000 pid=1443 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=1464 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[1443]: [session uid=1000 pid=1443 pidfd=5] Successfully activated service 'org.a11y.Bus'
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+dbus-daemon[1483]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=1464 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[1483]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+CHECK: mapped native surface
+CHECK: authenticated immutable image resource and native texture
+CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+CHECK: native PTY renderer remains detached without running authorized work
+CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+CHECK: reference intent, revision and target disappearance/reappearance
+CHECK: virtualized work history with stable identities and recycled controls
+CHECK: selection and live binding preserved
+CHECK: typed numeric progress and invalid-range availability
+CHECK: local edit preserved
+CHECK: reordered retained widgets
+CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+PASS: native test core and private display cleaned up
+PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+dbus-daemon[1569]: [session uid=1000 pid=1569 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=1590 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[1569]: [session uid=1000 pid=1569 pidfd=5] Successfully activated service 'org.a11y.Bus'
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+dbus-daemon[1609]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=1590 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[1609]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+CHECK: mapped native surface
+CHECK: authenticated immutable image resource and native texture
+CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+CHECK: native PTY renderer remains detached without running authorized work
+CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+CHECK: reference intent, revision and target disappearance/reappearance
+CHECK: virtualized work history with stable identities and recycled controls
+CHECK: selection and live binding preserved
+CHECK: typed numeric progress and invalid-range availability
+CHECK: local edit preserved
+CHECK: reordered retained widgets
+CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+PASS: native test core and private display cleaned up
+PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+dbus-daemon[1693]: [session uid=1000 pid=1693 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=1731 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[1693]: [session uid=1000 pid=1693 pidfd=5] Successfully activated service 'org.a11y.Bus'
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+dbus-daemon[1750]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=1731 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[1750]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+CHECK: mapped native surface
+CHECK: authenticated immutable image resource and native texture
+CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+CHECK: native PTY renderer remains detached without running authorized work
+CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+CHECK: reference intent, revision and target disappearance/reappearance
+CHECK: virtualized work history with stable identities and recycled controls
+CHECK: selection and live binding preserved
+CHECK: typed numeric progress and invalid-range availability
+CHECK: local edit preserved
+CHECK: reordered retained widgets
+CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+PASS: native test core and private display cleaned up
+PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+dbus-daemon[1833]: [session uid=1000 pid=1833 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=1856 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[1833]: [session uid=1000 pid=1833 pidfd=5] Successfully activated service 'org.a11y.Bus'
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+dbus-daemon[1875]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=1856 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[1875]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+CHECK: mapped native surface
+CHECK: authenticated immutable image resource and native texture
+CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+CHECK: native PTY renderer remains detached without running authorized work
+CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+CHECK: reference intent, revision and target disappearance/reappearance
+CHECK: virtualized work history with stable identities and recycled controls
+CHECK: selection and live binding preserved
+CHECK: typed numeric progress and invalid-range availability
+CHECK: local edit preserved
+CHECK: reordered retained widgets
+CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+PASS: native test core and private display cleaned up
+PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+dbus-daemon[1960]: [session uid=1000 pid=1960 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=2010 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[1960]: [session uid=1000 pid=1960 pidfd=5] Successfully activated service 'org.a11y.Bus'
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+dbus-daemon[2030]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=2010 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[2030]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+CHECK: mapped native surface
+CHECK: authenticated immutable image resource and native texture
+CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+CHECK: native PTY renderer remains detached without running authorized work
+CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+CHECK: reference intent, revision and target disappearance/reappearance
+CHECK: virtualized work history with stable identities and recycled controls
+CHECK: selection and live binding preserved
+CHECK: typed numeric progress and invalid-range availability
+CHECK: local edit preserved
+CHECK: reordered retained widgets
+CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+PASS: agentOS Wayland compositor renders native and conventional apps, exact revisions, float/maximize/undo, no focus stealing
+PASS: native test core and private display cleaned up
+PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+dbus-daemon[2181]: [session uid=1000 pid=2181 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=2377 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[2181]: [session uid=1000 pid=2181 pidfd=5] Successfully activated service 'org.a11y.Bus'
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+dbus-daemon[2396]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=2377 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[2396]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+CHECK: mapped native surface
+CHECK: authenticated immutable image resource and native texture
+CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+CHECK: native PTY renderer remains detached without running authorized work
+CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+CHECK: reference intent, revision and target disappearance/reappearance
+CHECK: virtualized work history with stable identities and recycled controls
+CHECK: selection and live binding preserved
+CHECK: typed numeric progress and invalid-range availability
+CHECK: local edit preserved
+CHECK: reordered retained widgets
+CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+PASS: configured unbuffered Wayland toplevel never enters durable placement
+PASS: measured minimum sizes, viewport edges, preserved hidden geometry, activity restore and unchanged preferred placement
+PASS: explicit returning-process association, atomic transient-placement removal, retained identity/binding and idempotent receipt
+PASS: live conventional window metadata, typed source binding and source discovery
+PASS: simulated output loss, temporary reachable projection, preserved placement and explicit recovery
+PASS: authenticated native identity, conventional registration, durable shared layout/focus, stale revision rejection, actual float/maximize rendering and journal undo
+PASS: agentOS Wayland compositor renders native and conventional apps, exact revisions, float/maximize/undo, no focus stealing
+PASS: native test core and private display cleaned up
+PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+cat: /home/developer/agent-os-source/native-shell/test-output/session-orca-speech.log: No such file or directory
+Requested orderly guest shutdown. Check status before restarting.
+{"started_at": "2026-10-11T22:58:57.775359+00:00", "source_revision": "bd5bb61b5bcd383b3553aac27f0aab2c9bb0d8e4", "source_changes": [" M outputs/native-shell/src/input_context.rs"], "source_archive_sha256": "4c0ea1bb156ea815162329de882a2e5475c0dbbce077868f001fefb9f94988cb", "passed": true, "owned_utm_identity": [45991, "Sun Oct 11 18:58:57 2026"], "owned_utm_closed": true, "finished_at": "2026-10-11T22:59:48.410262+00:00"}

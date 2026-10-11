@@ -73,6 +73,7 @@ fn selection(element: &Element) -> Option<(String, Option<String>)> {
     let labels = element
         .label
         .iter()
+        .chain(element.status.iter().map(|v| &v.value))
         .chain(element.rich.iter().map(|v| &v.widget))
         .chain(
             element
@@ -201,11 +202,15 @@ pub fn verify(
     for kind in [
         "TextField@1",
         "DocumentEditor@1",
+        "Status@1",
         "Table@1",
         "List@1",
         "KeyValue@1",
     ] {
         let mut props = json!({"label":"Context selection","value":"Before λ 日本語 after"});
+        if kind == "Status@1" {
+            props = json!({"value":"Before λ 日本語 after"});
+        }
         if kind == "Table@1" {
             props = json!({"label":"Context selection","columns":["Name","Detail"],"rows":[{"id":"stable-row","cells":["λ","日本語"]}]});
         }
@@ -226,6 +231,10 @@ pub fn verify(
         } else if let Some(area) = &element.area {
             let buffer = area.view.buffer();
             buffer.select_range(&buffer.iter_at_offset(7), &buffer.iter_at_offset(12));
+            "λ 日本語"
+        } else if let Some(status) = &element.status {
+            status.value.select_region(7, 12);
+            assert!(!status.reconcile("New observed state 日本語").unwrap());
             "λ 日本語"
         } else if let Some(table) = &element.table {
             assert!(table.select_key("stable-row"));
@@ -253,13 +262,15 @@ pub fn verify(
         if matches!(kind, "Table@1" | "List@1" | "KeyValue@1") {
             assert_eq!(captured["object_id"], "stable-row");
             assert_eq!(captured["selection_kind"], "selected_object");
+        } else {
+            assert_eq!(captured["selection_kind"], "selected_text");
         }
         surfaces["context-fixture"].window.destroy();
     }
     let unicode = "日本語λ".repeat(3000);
     let value = bounded(unicode.clone());
     assert!(value.len() <= 8000 && unicode.starts_with(&value));
-    println!("CHECK: actual native field/editor and Table/List/KeyValue Unicode selections retain stable surface/element/row identities");
+    println!("CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities");
 }
 
 /// Recheck authority-relevant identities before launching a request. Original

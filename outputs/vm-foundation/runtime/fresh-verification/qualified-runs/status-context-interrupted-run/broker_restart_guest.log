@@ -1,0 +1,1 @@
+{"result": "pass", "checks": ["Broker restart stops root command and detached child", "Interrupted status and completion time are persisted", "Unapproved proposal survives without execution", "Second restart preserves evidence without replay"]}

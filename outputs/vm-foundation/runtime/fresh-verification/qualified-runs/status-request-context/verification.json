@@ -1,0 +1,43 @@
+{
+  "baseline": {
+    "started_at": "2026-10-11T22:56:16.134210+00:00",
+    "source_revision": "bd5bb61b5bcd383b3553aac27f0aab2c9bb0d8e4",
+    "source_changes": [
+      " M outputs/native-shell/src/input_context.rs"
+    ],
+    "source_archive_sha256": "77d0232e881483f84ecb1110f2e130d3b8029f2e65f46e44be88f26df902fcb7",
+    "passed": false,
+    "baseline_failure_reproduced": true,
+    "owned_utm_identity": [
+      44042,
+      "Sun Oct 11 18:56:16 2026"
+    ],
+    "owned_utm_closed": true,
+    "finished_at": "2026-10-11T22:56:35.788695+00:00"
+  },
+  "fixed": {
+    "started_at": "2026-10-11T22:58:57.775359+00:00",
+    "source_revision": "bd5bb61b5bcd383b3553aac27f0aab2c9bb0d8e4",
+    "source_changes": [
+      " M outputs/native-shell/src/input_context.rs"
+    ],
+    "source_archive_sha256": "4c0ea1bb156ea815162329de882a2e5475c0dbbce077868f001fefb9f94988cb",
+    "passed": true,
+    "owned_utm_identity": [
+      45991,
+      "Sun Oct 11 18:58:57 2026"
+    ],
+    "owned_utm_closed": true,
+    "finished_at": "2026-10-11T22:59:48.410262+00:00"
+  },
+  "meaning": "Selected Unicode Status text remains the immutable request selection while a newer observation is visible. The common context capture feeds typed and voice requests. Four light/dark and scale 1/2 native profiles and nested/shared compositor journeys pass. Complete committed-source qualification remains pending.",
+  "sha256": {
+    "baseline-native.log": "9983a61b62493622fda9bcdffd349dceeb4516061cfe1284e316c7ce0bb03e09",
+    "baseline.py": "3ff2a189d60a78e8b51bae024936349eae9237382a36105245e64c55114ec617",
+    "fixed.log": "fa83981ddc2d574009ae890f4889e85c8c8fc3ce1dddf12e7108173e997fb530",
+    "fixed.py": "b8910677eba6f33ecec21c573b7fa5f05451c5e5267297ae96f9bda5d79b7f04",
+    "fixed.json": "890f62f3d31cfe4832e9e16b97e783d8c969f5cae5f1020b13a4885e911d9529",
+    "baseline.log": "35f630ed2130aad431947e54fbc78a3832dd6f1e5efdc5635615cb969ef9cd7f",
+    "baseline.json": "8cb6ae5c6aef2293ecb932488aeb3a3f759463964b5e1eb0f901a0e361bd05d5"
+  }
+}

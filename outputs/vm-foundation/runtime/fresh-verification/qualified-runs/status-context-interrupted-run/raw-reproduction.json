@@ -1,0 +1,53 @@
+{
+  "started_at": "2026-10-11T22:53:38.538586+00:00",
+  "result": "running",
+  "vm_uuid": "27176EA2-E994-4165-9BBA-70FEED59E66B",
+  "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
+  "checks": [
+    "vm-tool-tests",
+    "cloud-init",
+    "provision",
+    "unit-suites",
+    "integration",
+    "activity_removal",
+    "broker_integration",
+    "broker_restart_guest",
+    "broker_reuse_guest",
+    "file_result_guest",
+    "image_preview_guest",
+    "write_transport_guest",
+    "layout_guest",
+    "work_lifecycle_guest",
+    "terminal_guest",
+    "terminal_screen_guest",
+    "presentation_guest",
+    "broker_sources_guest",
+    "voice_guest",
+    "native-build",
+    "native-broker-pty",
+    "native-installed-broker",
+    "direct-backend-cleanup",
+    "native-light-1"
+  ],
+  "not_tested": [
+    "live model inference",
+    "microphone/speaker signal",
+    "physical graphical input",
+    "physical hardware",
+    "OS update rollback"
+  ],
+  "deployment": {
+    "created_at": "2026-10-11T22:53:52.727510+00:00",
+    "source_archive_sha256": "663c0f70c4e24e4390f26d83e57dba22b6a52117e010a24d1028926d3b0e3884",
+    "repository_revision": "bd5bb61b5bcd383b3553aac27f0aab2c9bb0d8e4",
+    "source_changes": [],
+    "installed": true
+  },
+  "guest_stopped": true,
+  "owned_utm_app_closed": true,
+  "owned_utm_application_identity": [
+    41962,
+    "Sun Oct 11 18:53:39 2026"
+  ],
+  "finished_at": "2026-10-11T22:55:47.119204+00:00"
+}
