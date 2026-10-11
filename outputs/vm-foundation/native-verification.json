@@ -1243,6 +1243,20 @@
         "Expanded complete 61-check UTM reproduction"
       ],
       "boundary": "Only the 90-degree orientation has this installed virtual KMS/input qualification. Other transforms have geometry/policy tests. Physical panels, touch calibration, hotplug and multi-output routing remain unqualified."
+    },
+    "primary_focus_stress": {
+      "runtime_release": "b7d7c9b708481cfcd389f9b21d29903f8a91b074ad14bac61f451c58e9e1f2d1",
+      "cycles": 50,
+      "log_sha256": "9bbe6e34c68e9b100926bb930526111e6f9a0baa1d216a03d3fc44b55044918c",
+      "probe_sha256": "1a1cf3b0582475ccca0294e9f54b5223d0c83e34de820c4e6c0d67227fcf8a1e",
+      "driver_sha256": "dd7d722d58522cdc767bb8b2e707a57887be874f885e8e46286e1c121740eab3",
+      "qualified": [
+        "50 consecutive real conventional-source publication, native destination focus, exact PRIMARY paste and grouped undo cycles",
+        "Existing direct editing, layout, close/undo, Unicode COPY drop and oversized drop rejection also pass",
+        "Diagnostic failure path retains pointer position, last click, complete workspace/error and window state",
+        "Owned input devices, clients, session/scope, guest and UTM app closed"
+      ],
+      "observation": "The earlier v9 focus failure was not reproduced. This pass does not establish its cause or resolution; the original observation remains open."
     }
   },
   "observations": [

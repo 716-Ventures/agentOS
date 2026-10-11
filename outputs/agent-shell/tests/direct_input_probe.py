@@ -236,7 +236,7 @@ def assistive():
         print(json.dumps(response),flush=True)
 
 
-def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False,presentation_feedback=False,native_feedback=False,native_feedback_load=False,table_input=False):
+def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False,presentation_feedback=False,native_feedback=False,native_feedback_load=False,table_input=False,focus_transfers=1):
     subprocess.run(['modprobe','uinput'],check=True)
     # Join only this test session's accessibility bus; never inspect other users.
     bus=None;observer_runtime=None;wayland=None;deadline=time.monotonic()+10
@@ -550,20 +550,25 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
         field=snapshot()['field'];end=(destination['x']+field[0],destination['y']+field[1])
         # Establish source keyboard ownership before publishing a selection,
         # then navigate to the destination before middle-paste.
-        pointer.click(*transfer_point('Publish primary text'),width,height)
-        await_focus(lambda focus:focus==source_window['id'])
-        count=json.loads(receipts.read_text())['primary']
-        pointer.click(*transfer_point('Publish primary text'),width,height)
-        deadline=time.monotonic()+5
-        while json.loads(receipts.read_text())['primary']<=count:
-            if time.monotonic()>deadline:raise RuntimeError('Kernel pointer did not publish the primary selection')
-            time.sleep(.05)
-        pointer.click(*end,width,height)
-        await_focus(lambda focus:focus==restored_target)
-        wait(lambda value:value['focused'])
-        pointer.click(*end,width,height,button=274)
-        wait(lambda value:value['text']=='agentos PRIMARY')
-        keyboard.chord(29,44);wait(lambda value:value['text']=='agentos')
+        for transfer_cycle in range(focus_transfers):
+            pointer.click(*transfer_point('Publish primary text'),width,height)
+            await_focus(lambda focus:focus==source_window['id'])
+            count=json.loads(receipts.read_text())['primary']
+            pointer.click(*transfer_point('Publish primary text'),width,height)
+            deadline=time.monotonic()+5
+            while json.loads(receipts.read_text())['primary']<=count:
+                if time.monotonic()>deadline:raise RuntimeError('Kernel pointer did not publish the primary selection')
+                time.sleep(.05)
+            pointer.click(*end,width,height)
+            await_focus(lambda focus:focus==restored_target)
+            wait(lambda value:value['focused'])
+            pointer.click(*end,width,height,button=274)
+            wait(lambda value:value['text']=='agentos PRIMARY')
+            keyboard.chord(29,44);wait(lambda value:value['text']=='agentos')
+            if focus_transfers > 1 and (transfer_cycle+1)%10 == 0:
+                print('Focus/primary transfer cycles passed:',transfer_cycle+1,flush=True)
+        if focus_transfers > 1:
+            print('PASS: '+str(focus_transfers)+' consecutive source publication, destination focus, exact primary paste and undo cycles',flush=True)
         for label,expected in [('Copy transfer text','agentos DROP λ'),('Oversized transfer','agentos')]:
             count=json.loads(receipts.read_text())['ended']
             before_icon=scene()['drag_icon_render_submissions'];before_frame=scene()['direct_frames_presented']

@@ -25,6 +25,7 @@ def main():
     parser.add_argument('--hold-seconds', type=int, default=0, choices=range(31),
                         help='Keep the verified desktop visible briefly for console inspection (0–30 seconds)')
     parser.add_argument('--input',action='store_true',help='Exercise temporary kernel input devices in this dedicated VM')
+    parser.add_argument('--focus-transfers',type=int,choices=range(1,51),default=1,help='Repeat real source publication/destination focus/primary paste/undo cycles (dedicated VM only)')
     parser.add_argument('--output-transform',choices=['normal','90','180','270','flipped','flipped-90','flipped-180','flipped-270'],help='Use isolated output preferences on the dedicated single-output virtual KMS guest')
     modes=parser.add_mutually_exclusive_group()
     modes.add_argument('--list-input',action='store_true',help='Qualify installed List selection and copying through kernel input')
@@ -36,7 +37,10 @@ def main():
     modes.add_argument('--native-feedback',action='store_true',help='Measure kernel typing to actual native GTK presentation receipts')
     modes.add_argument('--native-feedback-load',action='store_true',help='Measure native feedback during two bounded real broker CPU jobs')
     args = parser.parse_args()
+    if args.focus_transfers > 1:args.input=True
     collection_kind = "List@1" if args.list_input else "KeyValue@1" if args.keyvalue_input else "Table@1" if args.table_input else None
+    if args.focus_transfers > 1 and (collection_kind or args.terminal_input or args.terminal_ime or args.presentation_feedback or args.native_feedback or args.native_feedback_load or args.output_transform not in (None, 'normal')):
+        parser.error('Focus transfer stress requires the ordinary editor input journey')
     if collection_kind:args.input=True
     if args.native_feedback_load:args.native_feedback=True
     if args.native_feedback:args.input=True
@@ -107,7 +111,7 @@ def main():
                     '--property=StandardInput=tty', '--property=TTYReset=yes',
                     '--property=TTYVHangup=yes', '--property=KillMode=control-group',
                     '--property=StandardOutput=journal', '--property=StandardError=journal',
-                    '--property=TimeoutStopSec=15', '--property=RuntimeMaxSec='+('120' if args.terminal_input or collection_kind else '90'),
+                    '--property=TimeoutStopSec=15', '--property=RuntimeMaxSec='+('180' if args.focus_transfers > 1 else '120' if args.terminal_input or collection_kind else '90'),
                     '--setenv=XDG_RUNTIME_DIR=' + str(runtime),
                     '--setenv=XDG_SESSION_TYPE=wayland', '--setenv=XDG_SESSION_CLASS=user',
                     '--setenv=XDG_SEAT=seat0', '--setenv=XDG_VTNR=7',
@@ -197,7 +201,7 @@ def main():
                     if target is not None and observed.get('seat_focus')==target:break
                     if time.monotonic()>deadline:raise RuntimeError('Direct input fixture did not receive seat focus')
                     time.sleep(.05)
-                direct_input_probe.verify(metrics,snapshot['outputs'][0],core,lambda:control(endpoint,'snapshot'),target,user.pw_name,presentation,terminal_input=args.terminal_input,terminal_ime=args.terminal_ime,presentation_feedback=args.presentation_feedback,native_feedback=args.native_feedback,native_feedback_load=args.native_feedback_load,table_input=collection_kind)
+                direct_input_probe.verify(metrics,snapshot['outputs'][0],core,lambda:control(endpoint,'snapshot'),target,user.pw_name,presentation,terminal_input=args.terminal_input,terminal_ime=args.terminal_ime,presentation_feedback=args.presentation_feedback,native_feedback=args.native_feedback,native_feedback_load=args.native_feedback_load,table_input=collection_kind,focus_transfers=args.focus_transfers)
             if args.hold_seconds:
                 print('Direct desktop ready for console inspection', flush=True)
                 time.sleep(args.hold_seconds)
@@ -265,6 +269,7 @@ def main():
                           'native_feedback_qualified': args.native_feedback,
                           'native_feedback_load_qualified': args.native_feedback_load,
                           'output_transform_qualified': args.output_transform,
+                          'focus_transfer_cycles': args.focus_transfers if args.input and not args.terminal_input and not collection_kind and not args.native_feedback and not args.presentation_feedback else None,
                           'not_tested': ['physical input', 'hotplug', 'physical GPU presentation']}))
 
 
