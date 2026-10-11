@@ -1,5 +1,5 @@
 {
-  "verified_at": "2026-10-10T18:52:05.581504+00:00",
+  "verified_at": "2026-10-11T01:52:08.351390+00:00",
   "result": "pass",
   "image": {
     "architecture": "arm64",
@@ -20,9 +20,9 @@
       "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
       "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
     },
-    "image_sha256": "008f5312afeeb41f564c0b14ca3ee7e4417be289b1bd80443fd6726146a0bad6",
+    "image_sha256": "301163035ba00da81a64d2b3e55f6d1bd6981938859ee4514dcb754cec78116d",
     "name": "agentOS experimental native image",
-    "runtime_release": "b990c0f461e3cc72c1ff26f43cafa4be3e52d45392a9b0a2ad7d35982f9ffd99",
+    "runtime_release": "59b2c1cf7303bd87a066aa0435bb952908d3fe9b92bec256af4547db7867493c",
     "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
     "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
   },
@@ -51,7 +51,8 @@
     "original signed distribution remains unbooted",
     "HTTP/HTTPS Firefox defaults; native Link launches isolated real browser and shared conventional window online and on loopback-only boot",
     "image publication reuses completed inode; 19 tooling tests pass including offline lifecycle UUID guards and no uncertain start replay",
-    "two complete kernel-input journeys with observed pointer position before button events"
+    "separate installed native VTE kernel keyboard/selection, exact Unicode clipboard/menu Copy/Paste, popup focus/motion, detached-input rejection and program interruption",
+    "original development disk and EFI inode identities and exact config restored after verification"
   ],
   "not_tested": [
     "production signing/distribution authority",
@@ -61,8 +62,8 @@
     "live Gateway or Jev inference; no configured credentials",
     "incompatible future state-format migrations"
   ],
-  "runtime_source_revision": "6e2781aacc4b3ecd4ddf9a0be748241ae869a502",
-  "runtime_716_ui": "v0.1.0-alpha.22",
+  "runtime_source_revision": "0959e7562cbcde436c3ab329076fca5079f0dc26",
+  "runtime_716_ui": "v0.1.0-alpha.25",
   "compatible_rollback_probe": {
     "release": "3ebc478291575d588f89c5349397c930093233a51eb45c8892611cb38bebdc1f",
     "signed_bundle_sha256": "ede34e9cebebf6f393383ef7933c134aa37e215afb2155717abb8a06d91b25ad"
@@ -71,8 +72,8 @@
     "result": "pass",
     "before": {
       "result": "pass",
-      "boot_id": "a64821ea-aea3-4780-9344-07d579c04124",
-      "runtime": "b990c0f461e3cc72c1ff26f43cafa4be3e52d45392a9b0a2ad7d35982f9ffd99",
+      "boot_id": "9e078d0a-6ac8-4fa0-acb4-a599f284a97a",
+      "runtime": "59b2c1cf7303bd87a066aa0435bb952908d3fe9b92bec256af4547db7867493c",
       "uid": 1000,
       "activity": 1,
       "file_persisted": true,
@@ -91,8 +92,8 @@
     },
     "reboot": {
       "result": "pass",
-      "boot_id": "8202c4c7-2765-4b6f-9fc3-89777277fb9d",
-      "runtime": "b990c0f461e3cc72c1ff26f43cafa4be3e52d45392a9b0a2ad7d35982f9ffd99",
+      "boot_id": "fae8e03b-67ce-4615-b7e1-f77c8ce372ca",
+      "runtime": "59b2c1cf7303bd87a066aa0435bb952908d3fe9b92bec256af4547db7867493c",
       "uid": 1000,
       "activity": 1,
       "file_persisted": true,
@@ -111,8 +112,8 @@
     },
     "offline": {
       "result": "pass",
-      "boot_id": "74502e0d-dd34-4e48-9c13-02e64220e279",
-      "runtime": "b990c0f461e3cc72c1ff26f43cafa4be3e52d45392a9b0a2ad7d35982f9ffd99",
+      "boot_id": "3237bb24-3e57-4f0c-96d3-c95087a6e6a7",
+      "runtime": "59b2c1cf7303bd87a066aa0435bb952908d3fe9b92bec256af4547db7867493c",
       "uid": 1000,
       "activity": 1,
       "file_persisted": true,
@@ -159,11 +160,11 @@
       "installed_executables": true,
       "cleanup_verified": true
     },
-    "final_offline_runtime": "b990c0f461e3cc72c1ff26f43cafa4be3e52d45392a9b0a2ad7d35982f9ffd99",
+    "final_offline_runtime": "59b2c1cf7303bd87a066aa0435bb952908d3fe9b92bec256af4547db7867493c",
     "development_disk_restored": true,
     "guest_stopped": true
   },
-  "factory_source_revision": "40a982296d712b7b0b722659827cf6ce4e0a1277",
+  "factory_source_revision": "0959e7562cbcde436c3ab329076fca5079f0dc26",
   "browser": {
     "result": "pass",
     "checks": [
@@ -186,8 +187,12 @@
     "cleanup_verified": true
   },
   "qualification_observations": [
-    "Initial image input run did not focus editor; diagnostic retry passed. Two subsequent complete runs use compositor pointer-position acknowledgement before clicks. The original intermittent failure was not causally reproduced.",
-    "The original offline helper returned a startup error while bypassing bounded VM lookup. Inspection confirmed the guest stopped and no QEMU process; console-only wrapper startup then passed."
+    "Clean v7 qualification completed without a retry. The matching immutable runtime also passed the 54-check development reproduction, including the private trusted VTE IME fixture; the clean-image journey separately exercises the installed terminal clipboard/menu path.",
+    "The prior v6 distribution remains untouched. Only its redundant guest builder output was removed after fresh SHA-256 equality with the retained host distribution."
   ],
-  "direct_input_test_sha256": "5f477edc85eba8684d0510f1a7f3551e451ea2b62d0f887caf789e1bb996e26a"
+  "direct_input_test_sha256": "2b5b5a10225e43cac1a142fc5f1c94a923b000e67d22a91ada563036ca702185",
+  "terminal_input_test_sha256": "e17773d3dfbd3260ebbd1ea7d10e7b60874ab84bdb01a073d847ac37e7df1175",
+  "qualification_log_sha256": "1093ee431f4587b7843b3dcf3c6fa83e680c2887a0379577038079c1f6b37ad7",
+  "full_reproduction_runtime": "59b2c1cf7303bd87a066aa0435bb952908d3fe9b92bec256af4547db7867493c",
+  "full_reproduction_check_count": 54
 }
