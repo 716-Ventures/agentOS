@@ -4,7 +4,7 @@
 
 The initial image includes the complete development dependency profile. It is an experimental VM release, not a minimal production distribution or a physical-hardware qualification. A repeat build identifies the exact base, dependency profile, runtime release, image-building sources and resulting disk hash; package installation and filesystem creation do not promise bit-for-bit identical disk bytes.
 
-The private build directory lives beside the requested output so final publication can hard-link the completed, fsynced image exclusively. This avoids a third disk-sized copy while refusing existing files and symlinks, including ones created during the build. The build still needs space for its sparse raw filesystem and converted qcow2 at the same time. A failed build cannot be packaged without complete metadata and signature verification.
+The private build directory lives beside the requested output so final publication can hard-link the completed, fsynced image exclusively. This avoids a third disk-sized copy while refusing existing files and symlinks, including ones created during the build. The build still needs space for its sparse raw filesystem and converted qcow2 at the same time. A failed build cannot be packaged without complete metadata and signature verification. The current v8 export uses the supported zlib compression option; the metadata records the chosen mode.
 
 ## Build
 
@@ -14,7 +14,7 @@ Provision an Ed25519 update **public** key as a build input. Keep its private si
 
 ```sh
 sudo python3 outputs/vm-foundation/build_release_image.py \
-  --dedicated-builder \
+  --dedicated-builder --compress \
   --base /path/to/pinned-base.qcow2 \
   --output /path/to/new-agentos-release.qcow2 \
   --bootstrap outputs/agent-shell/bootstrap.py \
@@ -49,6 +49,6 @@ Qualification evidence is recorded in [image-verification.json](image-verificati
 
 UTM can retain an in-memory VM configuration after its bundle file is edited. For a qualification-only disk, seed or network change, stop all guests and restart the owned UTM app before starting the changed guest. Verify the actual guest block-device and network inventory; the saved plist alone is not evidence that a seed or adapter is absent. Keep the development disk/configuration/EFI backed up until the qualification copy is stopped and restore them before finishing.
 
-The latest clean image includes the same runtime that passed the full 54-check UTM reproduction, including public 716 UI alpha.25 and Firefox ESR and the compositor transport/input ownership, popup recovery and unbuffered-window placement fixes. Qualification stages a signed compatible older runtime, activates it, then rolls back to the clean image runtime while preserving activity/file state. The image runtime also passes direct input with observed pointer motion before clicks, speech fixtures, reboot, loopback-only browser handoff and offline setup recovery. The latest clean-image qualification completed without retries; earlier artifact observations remain in repository history. Exact image/runtime and rollback-probe identities are retained in `image-verification.json`; all artifacts retain the development signing authority boundary.
+The latest clean image includes the same runtime that passed the full 57-check UTM reproduction, including public 716 UI alpha.26 and Firefox ESR and the compositor transport/input ownership, popup recovery and unbuffered-window placement fixes. Qualification stages a signed compatible older runtime, activates it, then rolls back to the clean image runtime while preserving activity/file state. The image runtime also passes direct input with observed pointer motion before clicks, speech fixtures, reboot, loopback-only browser handoff and offline setup recovery. The latest clean-image qualification completed without retries; earlier artifact observations remain in repository history. Exact image/runtime and rollback-probe identities are retained in `image-verification.json`; all artifacts retain the development signing authority boundary.
 
-The current clean image also passes the separate installed VTE kernel/clipboard/menu journey: exact Unicode selection copy, secondary-click and Shift+F10 actions, popup focus/motion recovery, detached Paste rejection and ordinary Ctrl+C. The matching development runtime passes trusted Wayland IME protocol qualification; that helper is not an installed language engine. The unbooted signed v7 artifact remains distinct from its booted verification copy, and restoration checks confirm the original development disk/EFI identities and exact configuration.
+The clean v8 image separately passes the installed editor, VTE kernel/clipboard/menu and trusted Wayland IME protocol journeys. Native GTK typing receives completed presentation acknowledgments at p95 39 ms idle and 43 ms during two real broker CPU jobs (20 characters per profile). The synthetic Wayland client independently verifies unbuffered/superseded presentation boundaries. These are virtual-display and protocol qualifications; physical input, language-engine quality and live inference remain unqualified. The unbooted signed v8 artifact stays separate from its booted verification copy. Original development disk/EFI identities and configuration were restored, and all owned work, displays, the guest and UTM app were closed.
