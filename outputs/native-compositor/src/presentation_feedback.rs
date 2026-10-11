@@ -31,6 +31,9 @@ pub fn collect(
     for window in state.space.elements() {
         window.with_surfaces(update);
     }
+    for layer in smithay::desktop::layer_map_for_output(output).layers() {
+        layer.with_surfaces(update);
+    }
     if let CursorImageStatus::Surface(surface) = &state.cursor_image {
         with_surfaces_surface_tree(surface, update);
     }
@@ -46,6 +49,10 @@ pub fn collect(
                 |surface, _| surface_presentation_feedback_flags_from_states(surface, rendered),
             );
         }
+    }
+    for layer in smithay::desktop::layer_map_for_output(output).layers() {
+        layer.take_presentation_feedback(&mut feedback, surface_primary_scanout_output,
+            |surface, _| surface_presentation_feedback_flags_from_states(surface, rendered));
     }
     for surface in state.drag_icon.iter().chain(match &state.cursor_image {
         CursorImageStatus::Surface(surface) => Some(surface),

@@ -33,6 +33,8 @@ def verify(metrics, output, core, scene, login_user, presentation, observe, keyb
         current = scene()
         return next((row for row in current['windows'] if current['shared']['identities'].get(row['id']) == logical), None)
 
+    work_area=next(layer['work_area'] for layer in scene()['system_layers'] if layer['namespace']=='agentos-system-bar' and layer['mapped'])
+
     def place(logical, x, width):
         deadline = time.monotonic() + 10
         while True:
@@ -48,7 +50,7 @@ def verify(metrics, output, core, scene, login_user, presentation, observe, keyb
                 if '"code":"stale_revision"' not in str(exc) or time.monotonic() > deadline:
                     raise
                 time.sleep(.05)
-        wait(lambda: window(logical)['geometry'] == {'x': x, 'y': 0, 'width': width, 'height': 400}, 'Table fixture placement was not applied')
+        wait(lambda: window(logical)['geometry'] == {'x': x, 'y': work_area['y'], 'width': width, 'height': 400}, 'Table fixture placement was not applied')
 
     def click(logical, point, button=272):
         geometry = window(logical)['geometry']

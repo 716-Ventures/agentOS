@@ -17,6 +17,7 @@ mod pty_transport;
 mod pty_view;
 mod reconcile;
 mod state_pages;
+mod system_bar;
 mod terminal_actions;
 mod timings;
 mod transport;
@@ -1377,6 +1378,17 @@ fn main() {
     let frontend = backend.clone();
     app.connect_activate(move |app| {
         let display = gtk::gdk::Display::default().expect("A native Wayland display is required");
+        let trusted = std::env::var("AGENT_OS_TRUSTED_SHELL").as_deref() == Ok("1");
+        if trusted {
+            // GDK owns the connected, close-on-exec descriptor now. Helpers must
+            // connect normally and cannot inherit the host shell capability.
+            std::env::remove_var("WAYLAND_SOCKET");
+            std::env::remove_var("AGENT_OS_TRUSTED_SHELL");
+            if let Ok(preload) = std::env::var("LD_PRELOAD") {
+                let retained = preload.split_whitespace().filter(|name| *name != "libgtk4-layer-shell.so.0").collect::<Vec<_>>().join(" ");
+                if retained.is_empty() { std::env::remove_var("LD_PRELOAD"); } else { std::env::set_var("LD_PRELOAD", retained); }
+            }
+        }
         apply_preferences(&display);
         let bar = ui::row(20);
         bar.add_css_class("seven-ui");
@@ -1395,24 +1407,79 @@ fn main() {
         bar.append(&status);
         let logout=ui::button("End desktop session",ButtonVariant::Outline,false);
         let desktop=app.clone();logout.connect_clicked(move |_|desktop.quit());
-        bar.append(&logout);
+        if !trusted { bar.append(&logout); }
+        clock.set_selectable(false);
+        clock.set_wrap(false);
+        clock.set_ellipsize(gtk::pango::EllipsizeMode::End);
+        user.set_selectable(false);
+        user.set_hexpand(true);
+        user.set_xalign(0.0);
+        user.set_ellipsize(gtk::pango::EllipsizeMode::End);
         let controls = Rc::new(RefCell::new(controls::Controls::new(
             app,
             frontend.borrow().commands.clone(),
         )));
         let content = ui::column(12);
-        content.append(&bar);
+        if !trusted { content.append(&bar); }
+        if trusted {
+            controls.borrow().temporary_launcher();
+            controls.borrow().monitor_content.append(&logout);
+        }
         content.append(&controls.borrow().widget);
         let scroll=gtk::ScrolledWindow::builder().hscrollbar_policy(gtk::PolicyType::Never).child(&content).build();
         let main = gtk::ApplicationWindow::builder()
             .application(app)
-            .title("agentOS")
+            .title(if trusted { "Agent launcher" } else { "agentOS" })
             .default_width(800)
-            .default_height(330)
+            .default_height(if trusted { 600 } else { 330 })
             .child(&scroll)
             .build();
         main.add_css_class("seven-ui");
-        main.present();
+        let mut layer_library = None;
+        let mut bar_window = None;
+        let launcher_events = Rc::new(RefCell::new(if trusted { Some(system_bar::LauncherEvents::start()) } else { None }));
+        let event_cleanup = launcher_events.clone();
+        app.connect_shutdown(move |_| { event_cleanup.borrow_mut().take(); });
+        if trusted {
+            let window = gtk::ApplicationWindow::builder().application(app).title("agentOS system bar").decorated(false).child(&bar).build();
+            window.add_css_class("seven-ui");
+            match system_bar::configure(&window, false) {
+                Ok(library) => layer_library = Some(library),
+                Err(error) => { eprintln!("System bar unavailable: {error}"); app.quit(); return; }
+            }
+            if let Err(error) = system_bar::configure(&main, true) { eprintln!("Launcher unavailable: {error}"); app.quit(); return; }
+            main.set_decorated(false);
+            let header = ui::row(12);
+            header.set_margin_start(20); header.set_margin_end(20); header.set_margin_top(12);
+            let title = ui::text("Agent launcher", true); title.set_selectable(false); title.set_hexpand(true); title.set_xalign(0.0);
+            title.set_ellipsize(gtk::pango::EllipsizeMode::End); title.set_wrap(false);
+            let dismiss = ui::button("Close launcher", ButtonVariant::Ghost, false);
+            header.append(&title); header.append(&dismiss);
+            let weak = main.downgrade();
+            dismiss.connect_clicked(move |_| { if let Some(window) = weak.upgrade() { window.close(); } });
+            main.set_child(gtk::Widget::NONE);
+            let body = ui::column(0); body.append(&header); body.append(&scroll);
+            scroll.set_vexpand(true);
+            main.set_child(Some(&body));
+            let closer = controls.clone();
+            main.connect_close_request(move |window| { closer.borrow().hide_launcher(); window.set_visible(false); glib::Propagation::Stop });
+            let key = gtk::EventControllerKey::new();
+            let weak = main.downgrade();
+            key.connect_key_pressed(move |_, key, _, _| {
+                if key == gtk::gdk::Key::Escape {
+                    if let Some(window) = weak.upgrade() { window.close(); }
+                    glib::Propagation::Stop
+                } else { glib::Propagation::Proceed }
+            });
+            main.add_controller(key);
+            let open = ui::button("Open launcher", ButtonVariant::Primary, false);
+            let weak = main.downgrade();
+            let focus = controls.clone();
+            open.connect_clicked(move |_| { if let Some(window) = weak.upgrade() { window.present(); focus.borrow().focus_request(); } });
+            controls.borrow().monitor_content.prepend(&open);
+            window.present();
+            bar_window = Some(window);
+        } else { main.present(); }
         first_run::present(app,frontend.borrow().commands.clone());
         let voice_cleanup=controls.clone();app.connect_shutdown(move |_|voice_cleanup.borrow().close());
         let opener = controls.clone();
@@ -1425,7 +1492,35 @@ fn main() {
         let ime_editor_fixture = fixture_mode == "editor";
         let mut fixture_focused = false;
         let mut fixture_selected = false;
+        let mut launcher_sequence = 0;
+        let mut bar_captured = false;
+        let mut launcher_captured = false;
         glib::timeout_add_local(Duration::from_millis(50), move || {
+            // Keep the layer library and system window alive for this session.
+            let _ = (&layer_library, &bar_window);
+            if !bar_captured {
+                if let (Some(window), Ok(path)) = (&bar_window, std::env::var("AGENT_OS_SYSTEM_BAR_CAPTURE")) {
+                    if window.width() > 0 && window.height() > 0 && frontend.borrow().frame.lock().unwrap().connected && !clock.text().is_empty() && status.label().as_deref() == Some("Agent Monitor") {
+                        let paintable = gtk::WidgetPaintable::new(Some(window));
+                        let snapshot = gtk::Snapshot::new();
+                        paintable.snapshot(&snapshot, window.width() as f64, window.height() as f64);
+                        if let (Some(node), Some(renderer)) = (snapshot.to_node(), window.renderer()) {
+                            if renderer.render_texture(&node, None).save_to_png(path).is_ok() { bar_captured = true; }
+                        }
+                    }
+                }
+            }
+            if !launcher_captured && main.is_visible() {
+                if let Ok(path) = std::env::var("AGENT_OS_LAUNCHER_CAPTURE") { launcher_captured = system_bar::capture(&main, &path); }
+            }
+            if let Some(events) = launcher_events.borrow().as_ref() {
+                let current = events.current();
+                if current != launcher_sequence {
+                    launcher_sequence = current;
+                    main.present();
+                    controls.borrow().focus_request();
+                }
+            }
             let backend = frontend.borrow();
             let frame = backend.frame.lock().unwrap().clone();
             if let Ok(now) = glib::DateTime::now_local() {

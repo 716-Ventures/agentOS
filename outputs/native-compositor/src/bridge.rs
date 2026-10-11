@@ -541,6 +541,12 @@ impl Bridge {
         else {
             return;
         };
+        if edit["kind"] == "float" {
+            if let Err(error) = localize_edit(&scene, &mut edit) {
+                self.scene.lock().unwrap().error = Some(error);
+                return;
+            }
+        }
         edit["surface_id"] = json!(surface);
         let Some(id) = document["workspace_id"].as_str() else {
             return;
@@ -987,5 +993,74 @@ mod tests {
         max["maximized"] = json!("a");
         assert_eq!(rectangles(&max, area).unwrap()["a"], area);
         assert_eq!(rectangles(&layout, area).unwrap(), result);
+    }
+}
+
+/// Compositor previews and hit tests are global; WorkspaceDocument geometry is
+/// local to its output work area. Keep the conversion at the IPC boundary.
+fn local_rect(rect: Rect, area: Rect) -> Result<Rect, String> {
+    Ok(Rect {
+        x: rect
+            .x
+            .checked_sub(area.x)
+            .ok_or("Output coordinate overflow")?,
+        y: rect
+            .y
+            .checked_sub(area.y)
+            .ok_or("Output coordinate overflow")?,
+        ..rect
+    })
+}
+fn localize_edit(scene: &Scene, edit: &mut Value) -> Result<(), String> {
+    let area = scene
+        .output_areas
+        .get(edit["output_id"].as_str().ok_or("Output required")?)
+        .ok_or("Output work area unavailable")?;
+    for (key, origin) in [("x", area.x), ("y", area.y)] {
+        let coordinate = edit[key]
+            .as_i64()
+            .ok_or("Integer compositor coordinate required")?;
+        edit[key] = json!(coordinate
+            .checked_sub(origin as i64)
+            .ok_or("Output coordinate overflow")?);
+    }
+    Ok(())
+}
+#[cfg(test)]
+mod work_area_input_tests {
+    use super::*;
+    #[test]
+    fn global_keyboard_geometry_roundtrips_through_output_local_workspace_coordinates() {
+        for (x, y) in [(0, 60), (-1280, 60), (1280, -600)] {
+            let area = Rect {
+                x,
+                y,
+                width: 1280,
+                height: 740,
+            };
+            let mut scene = Scene::default();
+            scene.output_areas.insert("display".into(), area);
+            let mut edit = json!({"kind":"float","output_id":"display","x":x+20,"y":y+30,"width":320,"height":240});
+            localize_edit(&scene, &mut edit).unwrap();
+            assert_eq!(
+                (edit["x"].as_i64(), edit["y"].as_i64()),
+                (Some(20), Some(30))
+            );
+            let layout = json!({"tiles":null,"floating":[{"surface_id":"view","x":edit["x"],"y":edit["y"],"width":320,"height":240}],"maximized":null});
+            assert_eq!(
+                rectangles(&layout, area).unwrap()["view"],
+                Rect {
+                    x: x + 20,
+                    y: y + 30,
+                    width: 320,
+                    height: 240
+                }
+            );
+        }
+        assert!(localize_edit(
+            &Scene::default(),
+            &mut json!({"kind":"float","output_id":"removed","x":0,"y":0})
+        )
+        .is_err());
     }
 }

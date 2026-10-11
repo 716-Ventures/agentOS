@@ -297,6 +297,41 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
             except OSError:pass
         time.sleep(.5) # bounded kernel/udev/libinput hotplug discovery
         width,height=output['width'],output['height']
+        work_area=next(layer['work_area'] for layer in scene()['system_layers'] if layer['namespace']=='agentos-system-bar' and layer['mapped'])
+        if not terminal_input and not table_input and not presentation_feedback and not native_feedback:
+            def layer_state(mapped):
+                deadline=time.monotonic()+5
+                while True:
+                    observed=scene()
+                    layers=[layer for layer in observed.get('system_layers',[]) if layer['namespace']=='agentos-launcher' and layer['mapped']]
+                    if bool(layers)==mapped:
+                        if not mapped or observed['seat_focus']==layers[0]['id']:return observed
+                    if time.monotonic()>deadline:raise RuntimeError('Launcher map/focus transition failed: '+json.dumps(observed))
+                    time.sleep(.05)
+            before=scene();bar=next(layer for layer in before['system_layers'] if layer['namespace']=='agentos-system-bar' and layer['mapped'])
+            for cycle in range(3):
+                keyboard.chord(29,56,57) # Ctrl+Alt+Space
+                opened=layer_state(True)
+                assert next(layer for layer in opened['system_layers'] if layer['namespace']=='agentos-launcher')['work_area']==bar['work_area']
+                assert not any(row['title']=='Agent launcher' for row in opened['windows'])
+                if cycle==0:
+                    pointer.click(width//2, bar['geometry']['height']//2, width, height)
+                    deadline=time.monotonic()+5
+                    while scene()['seat_focus']!=bar['id']:
+                        if time.monotonic()>deadline:raise RuntimeError('System bar did not receive deliberate pointer focus')
+                        time.sleep(.05)
+                    keyboard.chord(29,56,57)
+                    refocused=layer_state(True) # Re-invocation restores focus without queuing a delayed reopen.
+                    assert refocused['launcher_requests']==opened['launcher_requests'], 'An already open launcher queued another open event'
+                if cycle==2:keyboard.chord(29,56,111) # Ctrl+Alt+Delete closes the launcher, not underlying work
+                else:keyboard.chord(1) # Escape
+                closed=layer_state(False)
+                assert any(row['id']==target for row in closed['windows']), 'Closing the launcher closed underlying work'
+                deadline=time.monotonic()+5
+                while closed['seat_focus']!=target:
+                    if time.monotonic()>deadline:raise RuntimeError('Launcher did not restore workspace focus: '+json.dumps(closed))
+                    time.sleep(.05);closed=scene()
+            print('PASS: kernel Ctrl+Alt+Space opens temporary launcher; Escape and Ctrl+Alt+Delete close it, preserving work and restoring typing',flush=True)
         if table_input:
             import direct_table_probe
             direct_table_probe.verify(metrics,output,core,scene,login_user,presentation,snapshot,keyboard,pointer,env,kind=table_input)
@@ -329,7 +364,7 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
                 except RuntimeError as exc:
                     if '"code":"stale_revision"' not in str(exc) or time.monotonic()>deadline:raise
                     time.sleep(.05)
-            while next(row for row in scene()['windows'] if row['id']==source['id'])['geometry']!={'x':980,'y':0,'width':300,'height':220}:
+            while next(row for row in scene()['windows'] if row['id']==source['id'])['geometry']!={'x':980,'y':work_area['y'],'width':300,'height':220}:
                 if time.monotonic()>deadline:raise RuntimeError('Terminal clipboard source geometry did not settle')
                 time.sleep(.05)
             import direct_terminal_probe
@@ -343,7 +378,7 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
         click(initial['field'])
         time.sleep(.2)
         observed=scene()
-        assert observed['seat_focus']==target,'Kernel click changed the focused window unexpectedly'
+        assert observed['seat_focus']==target,'Kernel click changed the focused window unexpectedly: '+json.dumps({'initial':initial,'current':snapshot(),'click':pointer.last_click,'scene':observed})
         try:
             wait(lambda value:value['focused'])
         except RuntimeError:
@@ -395,20 +430,20 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
                 if actual==expected:return
                 if time.monotonic()>deadline:raise RuntimeError('Kernel workspace shortcut did not reach geometry: '+repr((expected,actual,scene()['shared'])))
                 time.sleep(.05)
-        full={'x':0,'y':0,'width':width,'height':height}
+        full=dict(work_area)
         await_geometry(full)
         # The compositor handles these before delivering ordinary typing to GTK.
         keyboard.chord(29,56,42,105) # Ctrl+Alt+Shift+Left: resize
-        smaller={**full,'width':width-20}
+        smaller={**full,'width':full['width']-20}
         await_geometry(smaller)
         keyboard.chord(29,56,42,103)
-        smaller['height']=height-20
+        smaller['height']=full['height']-20
         await_geometry(smaller)
         keyboard.chord(29,56,106) # Ctrl+Alt+Right: move
-        smaller['x']=20
+        smaller['x']=full['x']+20
         await_geometry(smaller)
         keyboard.chord(29,56,108)
-        smaller['y']=20
+        smaller['y']=full['y']+20
         await_geometry(smaller)
         keyboard.chord(29,56,68) # Ctrl+Alt+F10: maximize
         await_geometry(full)
@@ -430,7 +465,8 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
             shared=scene()['shared'];logical=shared['identities'][target]
             placements=[entry for workspace in shared['workspaces'].values() for layout in workspace['outputs'].values()
                         for entry in layout['floating'] if entry['surface_id']==logical]
-            if any(all(entry[key]==value for key,value in dragged.items()) for entry in placements):break
+            local_dragged={**dragged,'x':dragged['x']-work_area['x'],'y':dragged['y']-work_area['y']}
+            if any(all(entry[key]==value for key,value in local_dragged.items()) for entry in placements):break
             if time.monotonic()>deadline:raise RuntimeError('Pointer preview was not committed to the durable workspace')
             time.sleep(.05)
         def await_focus(predicate):
@@ -541,12 +577,12 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
             time.sleep(.05)
         while True:
             source_window=next(row for row in scene()['windows'] if row['id']==source_window['id'])
-            if source_window['geometry']=={'x':980,'y':0,'width':300,'height':180}:break
+            if source_window['geometry']=={'x':980,'y':work_area['y'],'width':300,'height':180}:break
             if time.monotonic()>deadline:raise RuntimeError('Transfer source geometry was not applied')
             time.sleep(.05)
         destination=next(row['geometry'] for row in scene()['windows'] if row['id']==restored_target)
         def transfer_point(label):
-            point=snapshot('transfer:'+label)['point'];return (980+point[0],point[1])
+            point=snapshot('transfer:'+label)['point'];return (source_window['geometry']['x']+point[0],source_window['geometry']['y']+point[1])
         field=snapshot()['field'];end=(destination['x']+field[0],destination['y']+field[1])
         # Establish source keyboard ownership before publishing a selection,
         # then navigate to the destination before middle-paste.

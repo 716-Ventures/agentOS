@@ -41,6 +41,7 @@
     "tmux",
     "cmake",
     "libgtk-4-dev",
+    "libgtk4-layer-shell0",
     "fonts-inter",
     "fonts-noto-cjk",
     "at-spi2-core",

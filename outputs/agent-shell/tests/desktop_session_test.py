@@ -17,7 +17,7 @@ class DesktopSession(unittest.TestCase):
             root=Path(directory)
             for name in ('agent-os-compositor','agent-os-desktop'):(root/name).write_text('#!/bin/sh\nexit 0\n');(root/name).chmod(0o700)
             argv=session.child_command(root,root/'core with spaces.sock')
-            self.assertEqual(argv,[str(root/'agent-os-compositor'),'--command',str(root/'agent-os-desktop'),'--socket',str(root/'core with spaces.sock')])
+            self.assertEqual(argv,[str(root/'agent-os-compositor'),'--trusted-shell','--command',str(root/'agent-os-desktop'),'--socket',str(root/'core with spaces.sock')])
             self.assertEqual(session.child_command(root,root/'core.sock',17)[-2:],['--activity','17'])
             for invalid in (0,-1,True,'17'):
                 with self.assertRaises(ValueError):session.child_command(root,root/'core.sock',invalid)

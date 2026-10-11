@@ -27,7 +27,7 @@ def child_command(bin_dir,core,activity=None):
     compositor=bin_dir/'agent-os-compositor';desktop=bin_dir/'agent-os-desktop'
     if any(not path.is_absolute() or not path.is_file() or not os.access(path,os.X_OK) for path in (compositor,desktop)):
         raise ValueError('The graphical runtime is not installed')
-    command=[str(compositor),'--command',str(desktop),'--socket',str(core)]
+    command=[str(compositor),'--trusted-shell','--command',str(desktop),'--socket',str(core)]
     if activity is not None:
         if type(activity) is not int or activity<1:raise ValueError('Choose a positive activity ID')
         command.extend(['--activity',str(activity)])

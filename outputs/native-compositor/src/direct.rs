@@ -283,6 +283,7 @@ impl Device {
                         );
                     }
                 }
+                crate::system_shell::send_frames(&data.state, &head.output);
                 for window in data.state.space.elements() {
                     window.send_frame(
                         &head.output,

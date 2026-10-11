@@ -27,6 +27,9 @@ impl CompositorHandler for Smallvil {
         &client.get_data::<ClientState>().unwrap().compositor_state
     }
 
+    fn new_surface(&mut self, surface: &WlSurface) {
+        crate::system_shell::prepare_surface(surface);
+    }
     fn destroyed(&mut self, surface: &WlSurface) {
         if self.drag_icon.as_ref() == Some(surface) {
             self.drag_icon = None;
@@ -49,6 +52,7 @@ impl CompositorHandler for Smallvil {
             }
         };
 
+        crate::system_shell::committed(self,surface);
         xdg_shell::handle_commit(&mut self.popups, &self.space, surface);
         resize_grab::handle_commit(&mut self.space, surface);
     }

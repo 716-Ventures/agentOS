@@ -309,7 +309,7 @@ pub fn handle_commit(popups: &mut PopupManager, space: &Space<Window>, surface: 
 }
 
 impl Smallvil {
-    fn unconstrain_popup(&self, popup: &PopupSurface) {
+    pub(crate) fn unconstrain_popup(&self, popup: &PopupSurface) {
         let Ok(root) = find_popup_root_surface(&PopupKind::Xdg(popup.clone())) else {
             return;
         };
@@ -318,6 +318,11 @@ impl Smallvil {
             .elements()
             .find(|w| w.toplevel().unwrap().wl_surface() == &root)
         else {
+            if let Some((mut target, origin)) = crate::system_shell::root_geometry(self, &root) {
+                target.loc -= origin;
+                target.loc -= get_popup_toplevel_coords(&PopupKind::Xdg(popup.clone()));
+                popup.with_pending_state(|state| state.geometry = state.positioner.get_unconstrained_geometry(target));
+            }
             return;
         };
 

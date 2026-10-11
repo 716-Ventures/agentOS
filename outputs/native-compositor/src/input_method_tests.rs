@@ -22,6 +22,7 @@ use wayland_protocols::wp::text_input::zv3::client::{
 use wayland_protocols_misc::zwp_input_method_v2::client::{
     zwp_input_method_manager_v2, zwp_input_method_v2,
 };
+use wayland_protocols_wlr::layer_shell::v1::client::{zwlr_layer_shell_v1, zwlr_layer_surface_v1};
 
 #[derive(Default)]
 struct Client {
@@ -30,6 +31,10 @@ struct Client {
     text: Option<zwp_text_input_manager_v3::ZwpTextInputManagerV3>,
     ime: Option<zwp_input_method_manager_v2::ZwpInputMethodManagerV2>,
     ime_global: Option<u32>,
+    layer: Option<zwlr_layer_shell_v1::ZwlrLayerShellV1>,
+    layer_global: Option<u32>,
+    layer_configures: Vec<(String, u32, u32)>,
+    layer_closed: Vec<String>,
     entered: bool,
     preedit: Vec<String>,
     commits: Vec<String>,
@@ -54,6 +59,10 @@ impl Dispatch<wl_registry::WlRegistry, ()> for Client {
                 "wl_seat" => state.seat = Some(registry.bind(name, version.min(7), qh, ())),
                 "wl_compositor" => {
                     state.compositor = Some(registry.bind(name, version.min(4), qh, ()))
+                }
+                "zwlr_layer_shell_v1" => {
+                    state.layer_global = Some(name);
+                    state.layer = Some(registry.bind(name, 4.min(version), qh, ()));
                 }
                 "zwp_text_input_manager_v3" => state.text = Some(registry.bind(name, 1, qh, ())),
                 "zwp_input_method_manager_v2" => {
@@ -101,6 +110,32 @@ impl Dispatch<zwp_input_method_v2::ZwpInputMethodV2, ()> for Client {
         }
     }
 }
+impl Dispatch<zwlr_layer_surface_v1::ZwlrLayerSurfaceV1, &'static str> for Client {
+    fn event(
+        state: &mut Self,
+        proxy: &zwlr_layer_surface_v1::ZwlrLayerSurfaceV1,
+        event: zwlr_layer_surface_v1::Event,
+        name: &&'static str,
+        _: &Connection,
+        _: &QueueHandle<Self>,
+    ) {
+        match event {
+            zwlr_layer_surface_v1::Event::Configure {
+                serial,
+                width,
+                height,
+            } => {
+                proxy.ack_configure(serial);
+                state
+                    .layer_configures
+                    .push((name.to_string(), width, height));
+            }
+            zwlr_layer_surface_v1::Event::Closed => state.layer_closed.push(name.to_string()),
+            _ => {}
+        }
+    }
+}
+wayland_client::delegate_noop!(Client: ignore zwlr_layer_shell_v1::ZwlrLayerShellV1);
 wayland_client::delegate_noop!(Client: ignore wl_seat::WlSeat);
 wayland_client::delegate_noop!(Client: ignore wl_compositor::WlCompositor);
 wayland_client::delegate_noop!(Client: ignore wl_surface::WlSurface);
@@ -111,6 +146,8 @@ wayland_client::delegate_noop!(Client: ignore zwp_input_method_manager_v2::ZwpIn
 fn private_input_method_delivers_unicode_and_cannot_be_bound_by_an_application() {
     let (app_server, app_socket) = UnixStream::pair().unwrap();
     let (ime_server, ime_socket) = UnixStream::pair().unwrap();
+    let (shell_server, shell_socket) = UnixStream::pair().unwrap();
+    let (layer_app_server, layer_app_socket) = UnixStream::pair().unwrap();
     let (commands, receive) = mpsc::channel::<Option<u32>>();
     let (ack, acknowledged) = mpsc::channel();
     let server = std::thread::spawn(move || {
@@ -134,13 +171,52 @@ fn private_input_method_delivers_unicode_and_cannot_be_bound_by_an_application()
             }),
         )
         .unwrap();
+        dh.insert_client(
+            shell_server,
+            Arc::new(ClientState {
+                system_shell: true,
+                ..ClientState::default()
+            }),
+        )
+        .unwrap();
+        dh.insert_client(layer_app_server, Arc::new(ClientState::default()))
+            .unwrap();
         let _manager = InputMethodManagerState::new::<Smallvil, _>(&dh, |client| {
             client
                 .get_data::<ClientState>()
                 .is_some_and(|d| d.input_method)
         });
         let _text = TextInputManagerState::new::<Smallvil>(&dh);
-        let state = Smallvil::new(&mut event_loop, display);
+        let mut state = Smallvil::new(&mut event_loop, display);
+        let output = smithay::output::Output::new(
+            "shell-test".into(),
+            smithay::output::PhysicalProperties {
+                size: (0, 0).into(),
+                subpixel: smithay::output::Subpixel::Unknown,
+                make: "test".into(),
+                model: "test".into(),
+            },
+        );
+        output.change_current_state(
+            Some(smithay::output::Mode {
+                size: (800, 600).into(),
+                refresh: 60000,
+            }),
+            Some(smithay::utils::Transform::Normal),
+            None,
+            Some((0, 0).into()),
+        );
+        state.space.map_output(&output, (-100, 50));
+        state.shortcut(crate::shortcuts::Shortcut::Launcher);
+        assert_eq!(
+            state.launcher_requests, 1,
+            "Empty workspace blocked the launcher shortcut"
+        );
+        assert_eq!(
+            crate::control::handle(&mut state, &serde_json::json!({"op":"launcher.state"}))
+                ["result"]["sequence"],
+            1
+        );
         let mut data = CalloopData {
             state,
             display_handle: dh.clone(),
@@ -163,7 +239,8 @@ fn private_input_method_delivers_unicode_and_cannot_be_bound_by_an_application()
                     surface,
                     smithay::utils::SERIAL_COUNTER.next_serial(),
                 );
-                ack.send(()).unwrap();
+                ack.send(crate::system_shell::work_area(&data.state, &output).unwrap())
+                    .unwrap();
             }
             dh.flush_clients().unwrap();
         }
@@ -192,6 +269,121 @@ fn private_input_method_delivers_unicode_and_cannot_be_bound_by_an_application()
     ime.display().get_registry(&ime_qh, ());
     let mut method = Client::default();
     ime_queue.roundtrip(&mut method).unwrap();
+    assert!(
+        application.layer.is_none() && method.layer.is_none(),
+        "Ordinary/IME clients can see the host shell layer global"
+    );
+    let shell = Connection::from_socket(shell_socket).unwrap();
+    let mut shell_queue = shell.new_event_queue::<Client>();
+    let shell_qh = shell_queue.handle();
+    shell.display().get_registry(&shell_qh, ());
+    let mut host = Client::default();
+    shell_queue.roundtrip(&mut host).unwrap();
+    shell_queue.roundtrip(&mut host).unwrap();
+    assert!(
+        host.layer.is_some() && host.ime.is_none(),
+        "Shell capability is missing or grants IME authority"
+    );
+    let bar_surface = host
+        .compositor
+        .as_ref()
+        .unwrap()
+        .create_surface(&shell_qh, ());
+    let bar = host.layer.as_ref().unwrap().get_layer_surface(
+        &bar_surface,
+        None,
+        zwlr_layer_shell_v1::Layer::Top,
+        "agentos-system-bar".into(),
+        &shell_qh,
+        "bar",
+    );
+    bar.set_size(0, 40);
+    bar.set_anchor(
+        zwlr_layer_surface_v1::Anchor::Top
+            | zwlr_layer_surface_v1::Anchor::Left
+            | zwlr_layer_surface_v1::Anchor::Right,
+    );
+    bar.set_exclusive_zone(40);
+    bar_surface.commit();
+    shell_queue.roundtrip(&mut host).unwrap();
+    shell_queue.roundtrip(&mut host).unwrap();
+    assert!(
+        host.layer_configures.contains(&("bar".into(), 800, 40)),
+        "System layer did not receive the output width and requested height"
+    );
+    commands.send(None).unwrap();
+    let area = acknowledged.recv_timeout(Duration::from_secs(2)).unwrap();
+    assert_eq!(
+        (area.loc.x, area.loc.y, area.size.w, area.size.h),
+        (-100, 90, 800, 560)
+    );
+    bar.destroy();
+    bar_surface.attach(None, 0, 0);
+    bar_surface.commit();
+    shell_queue
+        .roundtrip(&mut host)
+        .expect("Destroying a role then committing null disconnected the shell");
+    let reopened = host.layer.as_ref().unwrap().get_layer_surface(
+        &bar_surface,
+        None,
+        zwlr_layer_shell_v1::Layer::Top,
+        "agentos-system-bar".into(),
+        &shell_qh,
+        "reopened",
+    );
+    reopened.set_size(0, 48);
+    reopened.set_anchor(
+        zwlr_layer_surface_v1::Anchor::Top
+            | zwlr_layer_surface_v1::Anchor::Left
+            | zwlr_layer_surface_v1::Anchor::Right,
+    );
+    reopened.set_exclusive_zone(48);
+    bar_surface.commit();
+    shell_queue.roundtrip(&mut host).unwrap();
+    shell_queue.roundtrip(&mut host).unwrap();
+    assert!(host
+        .layer_configures
+        .contains(&("reopened".into(), 800, 48)));
+    reopened.destroy();
+    bar_surface.attach(None, 0, 0);
+    bar_surface.commit();
+    shell_queue.roundtrip(&mut host).unwrap();
+    bar_surface.destroy();
+    shell_queue.roundtrip(&mut host).unwrap();
+    commands.send(None).unwrap();
+    let area = acknowledged.recv_timeout(Duration::from_secs(2)).unwrap();
+    assert_eq!(
+        (area.loc.x, area.loc.y, area.size.w, area.size.h),
+        (-100, 50, 800, 600)
+    );
+    let invalid_surface = host
+        .compositor
+        .as_ref()
+        .unwrap()
+        .create_surface(&shell_qh, ());
+    let _invalid = host.layer.as_ref().unwrap().get_layer_surface(
+        &invalid_surface,
+        None,
+        zwlr_layer_shell_v1::Layer::Top,
+        "generated-content".into(),
+        &shell_qh,
+        "invalid",
+    );
+    shell_queue.roundtrip(&mut host).unwrap();
+    assert!(host.layer_closed.contains(&"invalid".into()));
+    let layer_app = Connection::from_socket(layer_app_socket).unwrap();
+    let mut layer_queue = layer_app.new_event_queue::<Client>();
+    let layer_qh = layer_queue.handle();
+    let registry = layer_app.display().get_registry(&layer_qh, ());
+    let mut ordinary = Client::default();
+    layer_queue.roundtrip(&mut ordinary).unwrap();
+    assert!(ordinary.layer.is_none());
+    let _: zwlr_layer_shell_v1::ZwlrLayerShellV1 =
+        registry.bind(host.layer_global.unwrap(), 4, &layer_qh, ());
+    assert!(
+        layer_queue.roundtrip(&mut ordinary).is_err(),
+        "Hidden system-layer global accepted a forced bind"
+    );
     let input =
         method
             .ime
@@ -243,6 +435,25 @@ fn private_input_method_delivers_unicode_and_cannot_be_bound_by_an_application()
     assert!(
         app_queue.roundtrip(&mut application).is_err(),
         "Hidden privileged global accepted a forced bind"
+    );
+    let invalid_size = host
+        .compositor
+        .as_ref()
+        .unwrap()
+        .create_surface(&shell_qh, ());
+    let live = host.layer.as_ref().unwrap().get_layer_surface(
+        &invalid_size,
+        None,
+        zwlr_layer_shell_v1::Layer::Top,
+        "agentos-system-bar".into(),
+        &shell_qh,
+        "invalid-size",
+    );
+    live.set_size(0, 40); // Zero width without opposing anchors remains illegal.
+    invalid_size.commit();
+    assert!(
+        shell_queue.roundtrip(&mut host).is_err(),
+        "Dead-role compatibility weakened live layer validation"
     );
     drop(commands);
     server.join().unwrap();

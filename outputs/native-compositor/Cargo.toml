@@ -33,3 +33,4 @@ debug = 0
 wayland-client = "0.31.15"
 wayland-protocols = { version = "0.32.12", features = ["client", "unstable"] }
 wayland-protocols-misc = { version = "0.3.12", features = ["client"] }
+wayland-protocols-wlr = { version = "=0.3.12", features = ["client"] }

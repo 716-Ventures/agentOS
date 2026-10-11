@@ -1,6 +1,7 @@
 //! Desktop shortcuts use XKB keysyms; printable application input passes through.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Shortcut {
+    Launcher,
     Cycle(bool),
     Maximize,
     Restore,
@@ -24,6 +25,7 @@ pub fn decode(ctrl: bool, alt: bool, shift: bool, key: u32) -> Option<Shortcut> 
         return None;
     }
     match function_key(key) {
+        0x20 => Some(Shortcut::Launcher), // Space
         0xff09 | 0xfe20 => Some(Shortcut::Cycle(shift || key == 0xfe20)), // Tab / ISO Left Tab
         0xffc7 => Some(Shortcut::Maximize),                               // F10
         0xffc6 => Some(Shortcut::Restore),                                // F9
@@ -68,6 +70,9 @@ mod tests {
     use super::*;
     #[test]
     fn shortcuts_require_both_modifiers_and_leave_typing_alone() {
+        assert_eq!(decode(true, true, false, 0x20), Some(Shortcut::Launcher));
+        assert_eq!(decode(false, true, false, 0x20), None);
+        assert_eq!(decode(true, false, false, 0x20), None);
         assert_eq!(decode(true, true, false, 0x1008fe08), Some(Shortcut::Float));
         assert_eq!(decode(true, true, false, 0x1008fe09), Some(Shortcut::Restore));
         assert_eq!(decode(true, true, false, 0x1008fe0a), Some(Shortcut::Maximize));

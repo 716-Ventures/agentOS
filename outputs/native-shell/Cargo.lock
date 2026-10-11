@@ -9,6 +9,7 @@ dependencies = [
  "base64",
  "gdk4-wayland",
  "libc",
+ "libloading",
  "serde_json",
  "seven-sixteen-ui",
  "vte4",

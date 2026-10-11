@@ -30,6 +30,8 @@ pub struct Smallvil {
     pub bridge: Option<crate::bridge::Bridge>,
     pub applied_focus: Option<String>,
     pub viewport_offsets: std::collections::BTreeMap<String, (i32, i32)>,
+    pub launcher_requests: u64,
+    pub active_launcher: Option<WlSurface>,
     pub suppressed_keys: std::collections::BTreeSet<u32>,
     pub start_time: std::time::Instant,
     pub socket_name: OsString,
@@ -41,6 +43,7 @@ pub struct Smallvil {
     // Smithay State
     pub compositor_state: CompositorState,
     pub xdg_shell_state: XdgShellState,
+    pub system_shell_state: smithay::wayland::shell::wlr_layer::WlrLayerShellState,
     pub shm_state: ShmState,
     pub output_manager_state: OutputManagerState,
     pub _relative_pointer_manager: RelativePointerManagerState,
@@ -69,6 +72,7 @@ impl Smallvil {
 
         let compositor_state = CompositorState::new::<Self>(&dh);
         let xdg_shell_state = XdgShellState::new::<Self>(&dh);
+        let system_shell_state = smithay::wayland::shell::wlr_layer::WlrLayerShellState::new_with_filter::<Self,_>(&dh, |client| client.get_data::<ClientState>().is_some_and(|data| data.system_shell));
         let shm_state = ShmState::new::<Self>(&dh, vec![]);
         let output_manager_state = OutputManagerState::new_with_xdg_output::<Self>(&dh);
         let relative_pointer_manager = RelativePointerManagerState::new::<Self>(&dh);
@@ -106,6 +110,8 @@ impl Smallvil {
                 .map(|p| crate::bridge::Bridge::start(p.into())),
             applied_focus: None,
             viewport_offsets: Default::default(),
+            launcher_requests: 0,
+            active_launcher: None,
             suppressed_keys: Default::default(),
             start_time,
             display_handle: dh,
@@ -116,6 +122,7 @@ impl Smallvil {
 
             compositor_state,
             xdg_shell_state,
+            system_shell_state,
             shm_state,
             output_manager_state,
             _relative_pointer_manager: relative_pointer_manager,
@@ -205,7 +212,7 @@ impl Smallvil {
         self.space
             .outputs()
             .next()
-            .and_then(|output| self.space.output_geometry(output))
+            .and_then(|output| crate::system_shell::work_area(self, output))
     }
     pub fn pan_view(&mut self, id: &str, x: i32, y: i32) -> Result<(), String> {
         let scene = self
@@ -227,6 +234,22 @@ impl Smallvil {
     }
     pub fn shortcut(&mut self, action: crate::shortcuts::Shortcut) {
         use crate::shortcuts::Shortcut;
+        if action == Shortcut::Launcher {
+            if let Some(surface) = self.active_launcher.clone() {
+                if let Some(keyboard) = self.seat.get_keyboard() {
+                    keyboard.set_focus(self, Some(surface), smithay::utils::SERIAL_COUNTER.next_serial());
+                }
+            } else {
+                self.launcher_requests = self.launcher_requests.saturating_add(1);
+            }
+            return;
+        }
+        // Workspace edits must not affect a view underneath the temporary
+        // launcher. Close applies to the host layer that owns this interaction.
+        if self.active_launcher.is_some() {
+            if action == Shortcut::Close { crate::system_shell::close_launcher(self); }
+            return;
+        }
         let Some(bridge) = &self.bridge else { return };
         let scene = bridge.scene.lock().unwrap().clone();
         let ids = scene.visible.iter().cloned().collect::<Vec<_>>();
@@ -333,7 +356,7 @@ impl Smallvil {
             .collect::<Vec<_>>();
         self.policy.synchronize(&ids);
         let mut observed_outputs: Vec<crate::bridge::OutputObservation> = self.space.outputs().filter_map(|output| {
-            let geometry = self.space.output_geometry(output)?;
+            let geometry = crate::system_shell::work_area(self, output)?;
             Some(crate::bridge::OutputObservation {
                 id: if output.name()=="winit" {"nested-primary".into()} else {format!("drm-{}",output.name())},
                 area: crate::policy::Rect {x:geometry.loc.x,y:geometry.loc.y,width:geometry.size.w,height:geometry.size.h},
@@ -356,7 +379,7 @@ impl Smallvil {
         let Some(output) = self.space.outputs().next() else {
             return;
         };
-        let Some(area) = self.space.output_geometry(output) else {
+        let Some(area) = crate::system_shell::work_area(self, output) else {
             return;
         };
         let area = crate::policy::Rect {
@@ -441,13 +464,13 @@ impl Smallvil {
                     // The popup grab rejects this while active, and restores
                     // the authoritative root once ended. Do not leave focus
                     // on a closed popup until another key happens to arrive.
-                    let focus = windows
+                    let focus = self.active_launcher.clone().or_else(|| windows
                         .iter()
                         .find(|w| {
                             Some(format!("{:?}", w.toplevel().unwrap().wl_surface().id()))
                                 == scene.focus
                         })
-                        .map(|w| w.toplevel().unwrap().wl_surface().clone());
+                        .map(|w| w.toplevel().unwrap().wl_surface().clone()));
                     keyboard.set_focus(self, focus, smithay::utils::SERIAL_COUNTER.next_serial());
                 }
             }
@@ -506,6 +529,7 @@ impl Smallvil {
         &self,
         pos: Point<f64, Logical>,
     ) -> Option<(WlSurface, Point<f64, Logical>)> {
+        if let Some(layer) = crate::system_shell::surface_under(self, pos) { return Some(layer); }
         self.space
             .element_under(pos)
             .and_then(|(window, location)| {
@@ -522,11 +546,14 @@ pub struct ClientState {
     pub peer: Option<(u32, String)>,
     // Only a compositor-created private socket can receive this capability.
     pub input_method: bool,
+    pub system_shell: bool,
 }
 
 impl ClientData for ClientState {
     fn initialized(&self, _client_id: ClientId) {}
-    fn disconnected(&self, _client_id: ClientId, _reason: DisconnectReason) {}
+    fn disconnected(&self, _client_id: ClientId, reason: DisconnectReason) {
+        if self.system_shell { eprintln!("Host shell Wayland disconnect: {reason:?}"); }
+    }
 }
 
 pub fn observe(window: &Window) -> crate::bridge::Observed {

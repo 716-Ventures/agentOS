@@ -10,6 +10,7 @@ struct Lease {
     workspace: String,
     surface: String,
     output: String,
+    area: Rect,
     revision: Value,
     renewed: Instant,
 }
@@ -98,6 +99,10 @@ impl Grabs {
                     })
                     .map(|(id, _)| id.clone())
                     .ok_or("Output unavailable")?;
+                let area = *scene
+                    .output_areas
+                    .get(&output)
+                    .ok_or("Output work area unavailable")?;
                 let workspace = doc["workspace_id"]
                     .as_str()
                     .ok_or("Workspace required")?
@@ -134,6 +139,7 @@ impl Grabs {
                         workspace,
                         surface: surface.clone(),
                         output,
+                        area,
                         revision: response["surface_revision"].clone(),
                         renewed: Instant::now(),
                     },
@@ -148,6 +154,9 @@ impl Grabs {
                     .leases
                     .get(runtime)
                     .ok_or("Pointer lease unavailable")?;
+                if scene.output_areas.get(&lease.output) != Some(&lease.area) {
+                    return Err("Output work area changed during pointer interaction".into());
+                }
                 let rect = self
                     .previews
                     .lock()
@@ -155,6 +164,7 @@ impl Grabs {
                     .get(runtime)
                     .ok_or("Pointer preview unavailable")?
                     .rect;
+                let rect = local_rect(rect, lease.area)?;
                 let stamp = std::time::SystemTime::now()
                     .duration_since(std::time::UNIX_EPOCH)
                     .unwrap_or_default()
@@ -182,7 +192,8 @@ mod tests {
     };
     #[test]
     fn release_commits_frozen_revision_and_always_releases_lease() {
-        for reject in [false, true] {
+        for mode in ["accept", "reject", "shift", "remove"] {
+            let changed_output = matches!(mode, "shift" | "remove");
             let stamp = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
@@ -192,13 +203,13 @@ mod tests {
             let listener = UnixListener::bind(&path).unwrap();
             let worker = thread::spawn(move || {
                 let mut requests = vec![];
-                for step in 0..3 {
+                for step in 0..if changed_output { 2 } else { 3 } {
                     let (mut stream, _) = listener.accept().unwrap();
                     let mut line = String::new();
                     BufReader::new(&mut stream).read_line(&mut line).unwrap();
                     let request: Value = serde_json::from_str(&line).unwrap();
                     requests.push(request);
-                    let response = if step == 1 && reject {
+                    let response = if step == 1 && mode == "reject" {
                         json!({"ok":false,"error":"stale_revision"})
                     } else {
                         json!({"ok":true,"result":{"surface_revision":42}})
@@ -211,8 +222,8 @@ mod tests {
                 "runtime".into(),
                 Preview {
                     rect: Rect {
-                        x: 20,
-                        y: 30,
+                        x: -780,
+                        y: 90,
                         width: 320,
                         height: 240,
                     },
@@ -220,8 +231,17 @@ mod tests {
                 },
             )])));
             let mut grabs = Grabs::new(previews.clone());
-            let scene = Scene {
+            let mut scene = Scene {
                 identities: BTreeMap::from([("runtime".into(), "surface".into())]),
+                output_areas: BTreeMap::from([(
+                    "display".into(),
+                    Rect {
+                        x: -800,
+                        y: 60,
+                        width: 800,
+                        height: 740,
+                    },
+                )]),
                 workspaces: json!({"w":{"workspace_id":"w","revision":42,"outputs":{"display":{"tiles":{"kind":"leaf","surface_id":"surface"},"floating":[],"maximized":null}}}}),
                 ..Scene::default()
             };
@@ -234,6 +254,12 @@ mod tests {
                 .unwrap()
                 .is_ok());
             assert!(previews.lock().unwrap()["runtime"].active);
+            if mode == "shift" {
+                scene.output_areas.get_mut("display").unwrap().y += 1;
+            }
+            if mode == "remove" {
+                scene.output_areas.remove("display");
+            }
             let result = grabs
                 .handle(
                     &path,
@@ -241,14 +267,24 @@ mod tests {
                     &json!({"op":"workspace.grab.finish","runtime":"runtime"}),
                 )
                 .unwrap();
-            assert_eq!(result.is_err(), reject);
+            assert_eq!(result.is_err(), mode != "accept");
             assert!(grabs.leases.is_empty());
             assert!(previews.lock().unwrap().is_empty());
             let requests = worker.join().unwrap();
             assert_eq!(requests[0]["op"], "interaction.begin");
-            assert_eq!(requests[1]["expected_revisions"]["w"], 42);
-            assert_eq!(requests[1]["operations"][0]["edit"]["x"], 20);
-            assert_eq!(requests[2]["op"], "interaction.end");
+            if changed_output {
+                assert_eq!(
+                    requests.len(),
+                    2,
+                    "Output change dispatched a geometry mutation"
+                );
+                assert_eq!(requests[1]["op"], "interaction.end");
+            } else {
+                assert_eq!(requests[1]["expected_revisions"]["w"], 42);
+                assert_eq!(requests[1]["operations"][0]["edit"]["x"], 20);
+                assert_eq!(requests[1]["operations"][0]["edit"]["y"], 30);
+                assert_eq!(requests[2]["op"], "interaction.end");
+            }
             std::fs::remove_file(path).unwrap();
         }
     }
@@ -316,6 +352,15 @@ mod tests {
             let mut grabs = Grabs::new(previews.clone());
             let scene = Scene {
                 identities: BTreeMap::from([("runtime".into(), "surface".into())]),
+                output_areas: BTreeMap::from([(
+                    "display".into(),
+                    Rect {
+                        x: 0,
+                        y: 0,
+                        width: 800,
+                        height: 600,
+                    },
+                )]),
                 workspaces: json!({"w":baseline}),
                 ..Scene::default()
             };

@@ -8,6 +8,7 @@ import uuid
 
 
 def verify(metrics, output, core, scene, login_user, presentation, observe, keyboard, pointer, ime_endpoint=None):
+    work_area=next(layer['work_area'] for layer in scene()['system_layers'] if layer['namespace']=='agentos-system-bar' and layer['mapped'])
     activity = int(core('presentation.get')['activity_id'])
     def broker(op, **fields):
         query = json.dumps({'op':op, **fields})
@@ -50,8 +51,8 @@ def verify(metrics, output, core, scene, login_user, presentation, observe, keyb
             while True:
                 workspace=next(doc for doc in scene()['shared']['workspaces'].values() if doc['activity_id']==str(activity))
                 try:
-                    geometry={'x':0,'y':0,'width':output['width'] if maximize else min(900,output['width']),'height':output['height'] if maximize else min(600,output['height'])}
-                    floating={'op':'workspace.edit','workspace_id':workspace['workspace_id'],'edit':{'kind':'float','surface_id':surface,'output_id':next(iter(workspace['outputs'])),**geometry}}
+                    geometry={'x':work_area['x'],'y':work_area['y'],'width':work_area['width'] if maximize else min(900,work_area['width']),'height':work_area['height'] if maximize else min(600,work_area['height'])}
+                    floating={'op':'workspace.edit','workspace_id':workspace['workspace_id'],'edit':{'kind':'float','surface_id':surface,'output_id':next(iter(workspace['outputs'])),**geometry,'x':geometry['x']-work_area['x'],'y':geometry['y']-work_area['y']}}
                     changing={'op':'workspace.edit','workspace_id':workspace['workspace_id'],'edit':{'kind':'maximize' if maximize else 'restore','surface_id':surface}}
                     edits=([floating,changing] if maximize else [changing,floating])+[{'op':'workspace.edit','workspace_id':workspace['workspace_id'],'edit':{'kind':'focus','surface_id':surface,'element_id':'terminal'}}]
                     result=presentation({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':surface+'-focus-'+uuid.uuid4().hex,'expected_revisions':{workspace['workspace_id']:workspace['revision']},'operations':edits})

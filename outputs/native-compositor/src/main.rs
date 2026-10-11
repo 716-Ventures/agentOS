@@ -8,6 +8,7 @@ mod handlers;
 mod policy;
 mod pressure;
 mod process;
+mod system_shell;
 mod shortcuts;
 #[path = "../../native-shell/src/timings.rs"]
 mod timings;
@@ -82,13 +83,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
     let child = std::sync::Arc::new(std::sync::Mutex::new(None::<std::process::Child>));
     let _owned = process::OwnedChild(child.clone());
-    let mut args = std::env::args().skip(1);
+    let mut args = std::env::args().skip(1).peekable();
+    let trusted_shell=args.peek().is_some_and(|arg|arg=="--trusted-shell");
+    if trusted_shell {args.next();}
     if matches!(args.next().as_deref(), Some("-c" | "--command")) {
         if let Some(command) = args.next() {
             let mut renderer = std::process::Command::new(command);
             renderer.args(args);
-            process::configure_child(&mut renderer);
-            *child.lock().unwrap() = Some(renderer.spawn()?);
+            if trusted_shell {system_shell::spawn(&mut data.state,&mut renderer,&child)?;} else {
+                process::configure_child(&mut renderer);
+                *child.lock().unwrap() = Some(renderer.spawn()?);
+            }
         }
     }
     event_loop.run(
@@ -135,7 +140,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let _ = req.reply.try_send(response);
             }
             if let Some(child) = &mut *child.lock().unwrap() {
-                if child.try_wait().ok().flatten().is_some() {
+                if let Some(status) = child.try_wait().ok().flatten() {
+                    eprintln!("Owned renderer exited: {status}");
                     data.state.loop_signal.stop();
                 }
             }

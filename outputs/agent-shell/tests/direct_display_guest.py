@@ -132,7 +132,7 @@ def main():
                 if endpoints:
                     try:
                         snapshot = control(endpoints[0], 'snapshot')
-                        if (snapshot['windows'] and snapshot['outputs'] and snapshot['direct_frames_presented'] > 0
+                        if (any(layer['namespace']=='agentos-system-bar' and layer['mapped'] for layer in snapshot['system_layers']) and snapshot['outputs'] and snapshot['direct_frames_presented'] > 0
                                 and snapshot['shared'] and not snapshot['shared']['error']):
                             endpoint = endpoints[0]
                             break
@@ -140,7 +140,7 @@ def main():
                         pass
                 time.sleep(.1)
             if endpoint is None:
-                raise RuntimeError('Direct display did not expose a native window and output within 30 seconds')
+                raise RuntimeError('Direct display did not expose a mapped native system bar and output within 30 seconds')
             assert all(row['width'] > 0 and row['height'] > 0 for row in snapshot['outputs']), snapshot
             if args.output_transform:
                 expected = {'normal':'Normal','90':'_90','180':'_180','270':'_270','flipped':'Flipped','flipped-90':'Flipped90','flipped-180':'Flipped180','flipped-270':'Flipped270'}[args.output_transform]
@@ -156,7 +156,7 @@ def main():
                 try:
                     resumed = control(endpoint, 'snapshot')
                     assert resumed['outputs'] == snapshot['outputs'], resumed
-                    assert resumed['windows'], resumed
+                    assert any(layer['namespace']=='agentos-system-bar' and layer['mapped'] for layer in resumed['system_layers']), resumed
                     if resumed['direct_frames_presented'] <= snapshot['direct_frames_presented']:
                         raise RuntimeError('No completed KMS frame after VT resume')
                     break
@@ -259,7 +259,7 @@ def main():
                           'native_feedback': [json.loads(path.read_text()) for path in metrics.glob('feedback-*.json')],
                           'frames_before_vt': snapshot['direct_frames_presented'],
                           'frames_after_vt': resumed['direct_frames_presented'],
-                          'checks': ['direct native window', 'KMS output discovery', 'shared core connection',
+                          'checks': ['private native system bar', 'KMS output discovery', 'shared core connection',
                                      'VT switch and resume', 'orderly shutdown', 'session directory cleanup', 'owned login scope cleanup'] + (['kernel '+collection_kind+' pointer and keyboard row selection','Ctrl+C and accessible Shift+F10/secondary clipboard menus','separate-client exact Unicode row text','focused refresh rejection and key-based selection across background reorder/update','empty-selection Copy rejection, row removal and local menu focus restoration'] if collection_kind else ['native GTK editor kernel key-to-presentation receipts, 20 sequential samples']+(['two distinct concurrent broker CPU jobs with measured CPU consumption','owned CPU work cancellation and unit cleanup'] if args.native_feedback_load else []) if args.native_feedback else ['Wayland presentation timestamps from completed virtual KMS frames','kernel key-triggered content feedback','superseded frame discard and unmap'] if args.presentation_feedback else ['kernel keyboard and absolute pointer','clipboard copy/paste','undo/redo','retained draft','deliberate pointer Save','kernel workspace move/resize/maximize/restore/undo','native titlebar drag with durable placement','kernel focus cycling','kernel VT shortcut and acknowledged resume','kernel close and native assistive undo','focused primary middle-paste across Wayland clients','Unicode COPY drag/drop and grouped undo','oversized drop rejection','drag icon rendering and release cleanup'] if args.input and not args.terminal_input else ['kernel keyboard and absolute pointer in VTE','trusted Wayland IME preedit and Unicode commit','concurrent native rendering during VTE composition','detached IME commit rejected without reattach replay'] if args.terminal_ime else ['kernel keyboard and absolute pointer in VTE','Unicode Wayland clipboard to PTY','explicit native detach and reattach','kernel pointer selection and exact Unicode line copy','accessible secondary-click and Shift+F10 clipboard menus','closed-popup seat focus and first absolute pointer motion','detached menu Paste disabled and input rejected','ordinary Ctrl+C program interruption'] if args.terminal_input else []),
                           'table_input_qualified': args.table_input,
                           'collection_input_qualified': collection_kind,

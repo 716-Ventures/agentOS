@@ -137,6 +137,7 @@ pub fn init_winit(
                     }
                     backend.submit(Some(&[damage])).unwrap();
 
+                    crate::system_shell::send_frames(&state, &output);
                     state.space.elements().for_each(|window| {
                         window.send_frame(
                             &output,

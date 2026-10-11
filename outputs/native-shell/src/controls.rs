@@ -8,6 +8,7 @@ pub struct Controls {
     chooser_model: gtk::StringList,
     changing: Rc<Cell<bool>>,
     monitor: gtk::ApplicationWindow,
+    pub monitor_content: gtk::Box,
     jobs: super::job_list::JobList,
     message: gtk::Label,
     model_text: gtk::Label,
@@ -358,6 +359,7 @@ impl Controls {
             chooser_model,
             changing,
             monitor,
+            monitor_content,
             jobs,
             message,
             model_text,
@@ -459,6 +461,32 @@ impl Controls {
     }
     pub fn close(&self) {
         self.voice.cancel();
+    }
+    pub fn hide_launcher(&self) {
+        let phase = self.voice.state.lock().unwrap().phase.clone();
+        if phase == "starting" || phase == "recording" { self.voice.cancel(); }
+    }
+    pub fn focus_request(&self) { self.request_field.entry.grab_focus(); }
+    pub fn temporary_launcher(&self) {
+        let settings = ui::column(12);
+        let direct = gtk::FlowBox::new();
+        direct.set_selection_mode(gtk::SelectionMode::None);
+        direct.set_min_children_per_line(1);
+        direct.set_max_children_per_line(3);
+        direct.set_column_spacing(12);
+        direct.set_row_spacing(12);
+        while let Some(child) = self.widget.first_child() {
+            if child == self.request_field.widget.clone().upcast::<gtk::Widget>() { break; }
+            self.widget.remove(&child);
+            let quick = child.downcast_ref::<gtk::Button>().and_then(|button| button.label()).is_some_and(|label| matches!(label.as_str(), "Open terminal" | "New document" | "Import text file…"));
+            if quick { direct.insert(&child, -1); } else { settings.append(&child); }
+        }
+        self.widget.remove(&self.images.widget);
+        settings.append(&self.images.widget);
+        self.widget.append(&direct);
+        self.widget.set_margin_top(16);
+        let section = gtk::Expander::builder().label("Activities, appearance and setup").child(&settings).build();
+        self.monitor_content.append(&section);
     }
     pub fn present(&self) {
         self.monitor.present();

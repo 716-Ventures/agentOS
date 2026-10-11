@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-10-11T04:45:31.478130+00:00",
+  "started_at": "2026-10-11T05:51:50.286314+00:00",
   "result": "pass",
   "vm_uuid": "27176EA2-E994-4165-9BBA-70FEED59E66B",
   "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -39,6 +39,7 @@
     "native-compositor",
     "native-shared-workspace",
     "native-session-logout",
+    "native-session-system-bar",
     "native-session-ime",
     "native-session-ime-editor",
     "native-session-host-loss",
@@ -73,21 +74,53 @@
     "physical hardware",
     "OS update rollback",
     "physical VTE IME, language-engine/candidate behavior and visual preedit quality",
-    "native control latency outside the measured editor profile; physical display and live inference-load latency"
+    "native control latency outside the measured editor profile; physical display and live inference-load latency",
+    "complete contextual selection grounding for typed launcher requests",
+    "physical system bar/launcher use, multi-output system layers and hotplug"
   ],
   "deployment": {
-    "created_at": "2026-10-11T04:45:44.910667+00:00",
-    "source_archive_sha256": "9549f1c07551e1b12a8b207c40247d96daa7f058fa4df818b110b1ac3e94f468",
-    "repository_revision": "97c41c97a8d8ceea23d43c0ca5709566d9df2faa",
+    "created_at": "2026-10-11T05:52:03.713047+00:00",
+    "source_archive_sha256": "56407e63251bfac025c6bcf5d76f0291aa050f23ec6aef73cb56da27c91554f4",
+    "repository_revision": "bed2a2293f19b18cd7f3ca42a7d9ff7197758975",
     "source_changes": [
+      " M outputs/agent-shell/dependencies.json",
+      " M outputs/agent-shell/services/desktop_session.py",
+      " M outputs/agent-shell/tests/desktop_session_test.py",
       " M outputs/agent-shell/tests/direct_display_guest.py",
+      " M outputs/agent-shell/tests/direct_input_probe.py",
+      " M outputs/agent-shell/tests/direct_table_probe.py",
+      " M outputs/agent-shell/tests/direct_terminal_probe.py",
+      " M outputs/native-compositor/Cargo.lock",
+      " M outputs/native-compositor/Cargo.toml",
+      " M outputs/native-compositor/THIRD_PARTY.md",
+      " M outputs/native-compositor/src/bridge.rs",
+      " M outputs/native-compositor/src/bridge_grabs.rs",
+      " M outputs/native-compositor/src/control.rs",
       " M outputs/native-compositor/src/direct.rs",
-      " M outputs/native-compositor/src/output_config.rs",
-      " M outputs/native-shell/README.md"
+      " M outputs/native-compositor/src/handlers/compositor.rs",
+      " M outputs/native-compositor/src/handlers/xdg_shell.rs",
+      " M outputs/native-compositor/src/input.rs",
+      " M outputs/native-compositor/src/input_method_tests.rs",
+      " M outputs/native-compositor/src/main.rs",
+      " M outputs/native-compositor/src/presentation_feedback.rs",
+      " M outputs/native-compositor/src/shortcuts.rs",
+      " M outputs/native-compositor/src/state.rs",
+      " A outputs/native-compositor/src/system_shell.rs",
+      " M outputs/native-compositor/src/winit.rs",
+      " M outputs/native-shell/Cargo.lock",
+      " M outputs/native-shell/Cargo.toml",
+      " M outputs/native-shell/README.md",
+      " A outputs/native-shell/THIRD_PARTY.md",
+      " A outputs/native-shell/licenses/gtk4-layer-shell-1.0.4-LICENSE-MIT.txt",
+      " M outputs/native-shell/src/controls.rs",
+      " M outputs/native-shell/src/main.rs",
+      " A outputs/native-shell/src/system_bar.rs",
+      " A outputs/native-shell/tests/install_layer_shell.sh",
+      " M outputs/native-shell/tests/native_session.py"
     ],
     "installed": true
   },
-  "runtime_release": "b7d7c9b708481cfcd389f9b21d29903f8a91b074ad14bac61f451c58e9e1f2d1",
+  "runtime_release": "c63694f27a61961cc34fddabe6222cc2ed391b489893aa02df640adbb9b02393",
   "dependency_manifest": {
     "packages": {
       "adduser": "3.152",
@@ -401,6 +434,7 @@
       "libgtk-4-1:arm64": "4.18.6+ds-2",
       "libgtk-4-common": "4.18.6+ds-2",
       "libgtk-4-dev:arm64": "4.18.6+ds-2",
+      "libgtk4-layer-shell0:arm64": "1.0.4-2",
       "libgudev-1.0-0:arm64": "238-6",
       "libgudev-1.0-dev:arm64": "238-6",
       "libharfbuzz-cairo0:arm64": "10.2.0-1+deb13u1",
@@ -869,7 +903,7 @@
       "zlib1g:arm64": "1:1.3.dfsg+really1.3.1-1+b1",
       "zstd": "1.5.7+dfsg-1"
     },
-    "profile_sha256": "e76be92153567973abe0df91b2a9c27b3e58cfe306a41337020448471908e923"
+    "profile_sha256": "276112989db7afac34b8e962f801ad8ce1b18fd14ed8cc31d81d79e49f51ce33"
   },
   "host_tools": {
     "utm": "4.7.5",
@@ -877,7 +911,7 @@
     "python": "Python 3.9.6"
   },
   "guest_stopped": true,
-  "finished_at": "2026-10-11T04:52:39.435063+00:00",
+  "finished_at": "2026-10-11T05:59:16.921802+00:00",
   "public_ui_release": {
     "tag": "v0.1.0-alpha.32",
     "revision": "3c999c68067730f3ebd962c0934e7df6186d8dec",
@@ -1013,16 +1047,16 @@
       "collector_sha256": "847cfb831aa9982543abf8841d240f2d3c64fc191795fa2564d582b2cc23305a"
     },
     "native_gtk_presentation_feedback": {
-      "runtime_release": "b7d7c9b708481cfcd389f9b21d29903f8a91b074ad14bac61f451c58e9e1f2d1",
+      "runtime_release": "c63694f27a61961cc34fddabe6222cc2ed391b489893aa02df640adbb9b02393",
       "measurement": {
         "clock_id": 1,
         "discarded": 0,
         "format": 1,
         "invalid": 0,
-        "max_ms": 44,
+        "max_ms": 46,
         "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-        "p50_ms": 30,
-        "p95_ms": 41,
+        "p50_ms": 29,
+        "p95_ms": 46,
         "pending": 0,
         "presented": 20,
         "requested": 20,
@@ -1037,11 +1071,11 @@
         "Existing editor, arrangement, transfer, VTE clipboard/menu/IME, VT and lifecycle journeys pass in the full reproduction"
       ],
       "collector_sha256": "03ca158ae7254431d6e5d632bcd099136f9a80712142cb5796303a1fc6db8739",
-      "probe_sha256": "07741bf3e654f0c214ca1c9488e4a6bf1ef8a4341d7a408418add99ffefbc62e",
+      "probe_sha256": "cde8addae10568f4785bb7e4c8cd2d78f76f0643c8dc90009cae90d21cad0f97",
       "baseline_log_sha256": "5e3eceeeae3550f67cab15076a031cf5d9adeda13e4ccdb0ab58112df6baa60b",
       "targeted_log_sha256": "654add5b529532736165de1b254979b802250e408df5a71fcfa1fef88164c2b6",
-      "full_reproduction_log_sha256": "8787051e0a9008293930b3f5a6aab914614b9f1d7e8d46d07fcbbab2ce8683fd",
-      "display_log_sha256": "2a1e0af2fef58f3ff35e4f7c7c735543cd2c33ce937ad9d2ff29c9d9e43e90f1",
+      "full_reproduction_log_sha256": "1034c94aed75ac06cc2bd6edad7faa65bdaf1a83d3cb35ae61ce3377f93510fb",
+      "display_log_sha256": "4260da34563fb7945af4f7d03f5f5ad44d5fa456a3b4a08ef77d8fb6115612db",
       "boundary": "Opt-in diagnostics with at most 256 key-triggered requests per window. No key codes, text or document identity recorded. Event millisecond quantization contributes less than 1ms. This native editor/UTM profile does not qualify every control, physical display, subjective responsiveness or live inference load.",
       "typing_fixture_sha256": "01f8bc588e4dd90583824479172861d03ed6000ac1dd16393225f318ec15982c",
       "cpu_job_profile": {
@@ -1050,21 +1084,21 @@
           "discarded": 0,
           "format": 1,
           "invalid": 0,
-          "max_ms": 45,
+          "max_ms": 49,
           "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-          "p50_ms": 30,
-          "p95_ms": 42,
+          "p50_ms": 36,
+          "p95_ms": 46,
           "pending": 0,
           "presented": 20,
           "requested": 20,
           "sample_limit": 256,
           "profile": "two concurrent broker CPU jobs",
           "job_cpu_usage_usec": [
-            2410401,
-            2440894
+            1638933,
+            1580671
           ]
         },
-        "log_sha256": "567e8ea1ca67c225819e30c85bd4eaec4f6dbb7a586d14e9bb8719e2deab1c9f",
+        "log_sha256": "576a3a2c65d66a85710ef0bcbd5c20349a292cd8010f933656b11afa460c2329",
         "targeted_log_sha256": "0755068a7baae888347be14f2d749bc50e230c3fc8e3f67dae8b7ad1e7b78dc1",
         "qualified": [
           "Two distinct real broker jobs consumed CPU throughout measurement",
@@ -1257,6 +1291,117 @@
         "Owned input devices, clients, session/scope, guest and UTM app closed"
       ],
       "observation": "The earlier v9 focus failure was not reproduced. This pass does not establish its cause or resolution; the original observation remains open."
+    },
+    "private_system_bar_and_launcher": {
+      "runtime_release": "c63694f27a61961cc34fddabe6222cc2ed391b489893aa02df640adbb9b02393",
+      "public_ui_release": {
+        "tag": "v0.1.0-alpha.32",
+        "revision": "3c999c68067730f3ebd962c0934e7df6186d8dec",
+        "public_ci_run": 38111765207
+      },
+      "qualified_log_sha256": {
+        "targeted_kernel": "0a2e3bc87e6b63ed514496bf8005ce78eb71ac5afada5f27e34e4c38d279436a",
+        "full_reproduction": "1034c94aed75ac06cc2bd6edad7faa65bdaf1a83d3cb35ae61ce3377f93510fb",
+        "system_bar_session": "8661391240c5d051be45e95f5ddf176d3f84e5ccf8b45763dfc5340be93736ae",
+        "native_build_and_protocol": "3ac7dab488488f038dc2e5dc64136a6a786640369ef1b15691f725eb4a7f6f97"
+      },
+      "source_sha256": {
+        "outputs/native-compositor/src/system_shell.rs": "bdac40b24697fdbc7af952a7c29928c351ad4793a48056deb1c896d3b6b9ef5e",
+        "outputs/native-compositor/src/state.rs": "36563479a78298e4f8a681f47af31871980b3032d4d8491e7bdd40e46faa8fc5",
+        "outputs/native-compositor/src/bridge.rs": "1ba133c9703e8ad134c8305759d1ff79642a6e6520e2a1a93e3cdfd5e8003314",
+        "outputs/native-compositor/src/bridge_grabs.rs": "c0e8e96129afd2a311610b7a29cb4cc62528800ffee94be382ce0ae0ed422022",
+        "outputs/native-compositor/src/input_method_tests.rs": "01fd52c0c686d893460223be450561afea5c47f75777d560c3f5a730c1180c3e",
+        "outputs/native-shell/src/system_bar.rs": "b0b34e9cb5877a6e4d0716a95b5a7e76bad19392b43f3a74a09dc5008adde309",
+        "outputs/native-shell/src/main.rs": "6ba5cfe4d4f9794f2f15612f0361f2e5aad3ced7ecce7ef27da37633782af973",
+        "outputs/native-shell/src/controls.rs": "c01c68628b759d281fc9f5c669caab42e984425dfcc48785f5d5cb4f148d753a",
+        "outputs/native-shell/tests/native_session.py": "16be83a54a44dedd3d44f844c4636e7e5ffad7467e84fd80764cfb4f24111e01",
+        "outputs/agent-shell/tests/direct_input_probe.py": "cde8addae10568f4785bb7e4c8cd2d78f76f0643c8dc90009cae90d21cad0f97"
+      },
+      "qualified": [
+        "Private socket capability exposes system layers only to the selected shell, never ordinary or input-method clients",
+        "Top-layer date/time, signed-in identity and Agent Monitor reserve work area without an ordinary workspace tile",
+        "Temporary overlay launcher retains typed drafts across close/reopen; independent controls remain reachable after core loss",
+        "Kernel Ctrl+Alt+Space opens and refocuses the launcher; re-invocation queues no delayed reopen; Escape and Ctrl+Alt+Delete preserve underlying work and restore typing",
+        "Real GTK hide/destroy/null-buffer/recreate lifecycle passes; invalid live layer geometry still rejects",
+        "Keyboard resize/move and pointer drag convert global display coordinates to output-local durable workspace geometry; shifted and negative origins roundtrip",
+        "A moved or removed output cancels an active pointer transaction without dispatching geometry and always releases its lease",
+        "Full 62-check installed UTM reproduction, including editor, all three collections, VTE/IME, VT, browser, signed packaging, rollback, reboot and repeat-install; owned guest and app stopped"
+      ],
+      "visual_review": {
+        "rounds": 2,
+        "profiles": [
+          "dark text scale 1",
+          "light text scale 3"
+        ],
+        "capture_sha256": {
+          "agentos-system-bar-dark-1.png": "ebab82a76559a4b35601d207f8e217fc5f94d3803cb1401f02e2c67784175b7d",
+          "agentos-launcher-dark-1.png": "cccb9de178e85536566c5eb7b684cc7ba216bfcb98bbe7f8e3ca684176d33660",
+          "agentos-system-bar-light-3.png": "bbfc762bb84dc3d6b3bddc122888d334d0858747d45fe50e3c8070dd92f34150",
+          "agentos-launcher-light-3.png": "d43693e29949a0cb71b15350d4b75c040ecbb9c1e7a611475ba15d1b7e9a3ce7"
+        },
+        "boundary": "Bounded system bar/launcher layout inspection; full component reference conformance and physical usability remain unqualified."
+      },
+      "native_feedback": {
+        "direct-native-feedback": {
+          "clock_id": 1,
+          "discarded": 0,
+          "format": 1,
+          "invalid": 0,
+          "max_ms": 46,
+          "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+          "p50_ms": 29,
+          "p95_ms": 46,
+          "pending": 0,
+          "presented": 20,
+          "requested": 20,
+          "sample_limit": 256,
+          "profile": "idle editor"
+        },
+        "direct-native-feedback-load": {
+          "clock_id": 1,
+          "discarded": 0,
+          "format": 1,
+          "invalid": 0,
+          "max_ms": 49,
+          "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+          "p50_ms": 36,
+          "p95_ms": 46,
+          "pending": 0,
+          "presented": 20,
+          "requested": 20,
+          "sample_limit": 256,
+          "profile": "two concurrent broker CPU jobs",
+          "job_cpu_usage_usec": [
+            1638933,
+            1580671
+          ]
+        },
+        "direct-rotated-output": {
+          "clock_id": 1,
+          "discarded": 0,
+          "format": 1,
+          "invalid": 0,
+          "max_ms": 52,
+          "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+          "p50_ms": 42,
+          "p95_ms": 50,
+          "pending": 0,
+          "presented": 20,
+          "requested": 20,
+          "sample_limit": 256,
+          "profile": "idle editor"
+        }
+      },
+      "reproduced_and_corrected": [
+        "Smithay 0.6 retained a layer geometry validation hook after GTK destroyed its role, causing a fatal protocol error on the legal NULL-buffer hide commit",
+        "System bar reservation exposed global display coordinates being sent as output-local workspace geometry",
+        "Already open launcher refocus queued an extra asynchronous open event which could reopen the launcher after Escape"
+      ],
+      "fixture_corrections": [
+        "Work-area expectations now exclude the system bar while physical pointer coordinates still cover the full output",
+        "Isolated core outage teardown accepts actual SIGTERM termination status"
+      ],
+      "boundary": "This qualifies virtual single-output behavior. Typed contextual selected-object grounding is the next implementation gap. Live provider quality, physical input/audio/GPU, multi-output layers and hotplug remain unqualified. The separately signed v10 image retains its alpha.31/runtime identity; the historical v9 primary-focus observation remains open."
     }
   },
   "observations": [

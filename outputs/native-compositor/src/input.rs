@@ -169,11 +169,16 @@ impl Smallvil {
                 let button_state = event.state();
 
                 if ButtonState::Pressed == button_state && !pointer.is_grabbed() {
-                    if let Some((window, _loc)) = self
+                    if let Some((surface, _)) = crate::system_shell::surface_under(self, pointer.current_location()) {
+                        keyboard.set_focus(self, Some(surface), serial);
+                    } else if let Some((window, _loc)) = self
                         .space
                         .element_under(pointer.current_location())
                         .map(|(w, l)| (w.clone(), l))
                     {
+                        // A click returning from the host bar must reapply the core's
+                        // focus even when the selected workspace view did not change.
+                        self.applied_focus = None;
                         if let Some(bridge) = &self.bridge {
                             use smithay::reexports::wayland_server::Resource;
                             let id = format!("{:?}", window.toplevel().unwrap().wl_surface().id());

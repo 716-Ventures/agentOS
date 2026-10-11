@@ -51,6 +51,13 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
          'AGENT_OS_SOCKET':str(endpoint),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),
          'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','G_DEBUG':'fatal-criticals','GTK_A11Y':'atspi'}
     env.pop('WAYLAND_DISPLAY',None);env.pop('DISPLAY',None)
+    system_bar='--system-bar' in sys.argv
+    if system_bar:
+        appearance=os.environ.get('AGENT_OS_BAR_TEST_APPEARANCE','dark');scale=float(os.environ.get('AGENT_OS_BAR_TEST_SCALE','1'))
+        config=root/'config/agent-os';config.mkdir(parents=True)
+        (config/'desktop.json').write_text(json.dumps({'appearance':appearance,'text_scale':scale,'reduced_motion':True}))
+        env['AGENT_OS_SYSTEM_BAR_CAPTURE']=str(OUTPUT/f'system-bar-{appearance}-{scale:g}.png')
+        env['AGENT_OS_LAUNCHER_CAPTURE']=str(OUTPUT/f'launcher-{appearance}-{scale:g}.png')
     ime_editor='--ime-editor' in sys.argv
     ime='--ime' in sys.argv or ime_editor
     if ime:
@@ -75,6 +82,31 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
             wait_for(control.exists,[core,session])
             state=wait_for(lambda:(lambda s:s if s.get('shared') and 'session-fixture' in s['shared']['identities'].values() else None)(call(control,{'op':'snapshot'})),[core,session])
             assert any(w['app_id'].startswith('agentos.surface.') for w in state['windows']),state
+            layers=wait_for(lambda:(lambda s:s if any(layer['namespace']=='agentos-system-bar' and layer['mapped'] and layer['geometry']['height']>0 for layer in s['system_layers']) else None)(call(control,{'op':'snapshot'})),[core,session])
+            bar=next(layer for layer in layers['system_layers'] if layer['namespace']=='agentos-system-bar')
+            output=layers['outputs'][0]
+            assert bar['geometry']['width']==output['width'] and 0<bar['geometry']['height']<output['height']/2,bar
+            assert bar['work_area']['y']==output['y']+bar['geometry']['height'],bar
+            assert bar['work_area']['height']==output['height']-bar['geometry']['height'],bar
+            assert not any(w['title'] in ('agentOS','agentOS system bar','Agent launcher') for w in layers['windows']),layers
+            if system_bar:
+                import accessibility,pyatspi
+                accessibility.activate(accessibility.find('Agent Monitor',pyatspi.ROLE_PUSH_BUTTON))
+                accessibility.activate(accessibility.find('Open launcher',pyatspi.ROLE_PUSH_BUTTON))
+                opened=wait_for(lambda:(lambda s:s if any(layer['namespace']=='agentos-launcher' and layer['mapped'] and s['seat_focus']==layer['id'] for layer in s['system_layers']) else None)(call(control,{'op':'snapshot'})),[core,session])
+                launcher=next(layer for layer in opened['system_layers'] if layer['namespace']=='agentos-launcher')
+                assert launcher['work_area']==bar['work_area'],(launcher,bar)
+                assert not any(w['title']=='Agent launcher' for w in opened['windows']),opened
+                request=accessibility.find('Ask Agent',pyatspi.ROLE_TEXT)
+                assert request.queryEditableText().setTextContents('Retain this launcher draft λ')
+                accessibility.activate(accessibility.find('Close launcher',pyatspi.ROLE_PUSH_BUTTON))
+                wait_for(lambda:not any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in call(control,{'op':'snapshot'})['system_layers']),[core,session])
+                accessibility.activate(accessibility.find('Open launcher',pyatspi.ROLE_PUSH_BUTTON))
+                wait_for(lambda:any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in call(control,{'op':'snapshot'})['system_layers']),[core,session])
+                assert accessibility.text(accessibility.find('Ask Agent',pyatspi.ROLE_TEXT))=='Retain this launcher draft λ'
+                accessibility.activate(accessibility.find('Close launcher',pyatspi.ROLE_PUSH_BUTTON))
+                wait_for(lambda:Path(env['AGENT_OS_SYSTEM_BAR_CAPTURE']).exists(),[core,session])
+                print('PASS: private system bar reserves work area; launcher opens, closes and retains drafts without workspace tiles')
             if not host_failure and not compositor_failure:
                 if ime:
                     import ime_accessibility
@@ -92,6 +124,15 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 else:
                     import accessibility
                     accessibility.verify(lambda value:call(endpoint,value))
+            if system_bar:
+                core.terminate();assert core.wait(timeout=5) in (0,-signal.SIGTERM)
+                accessibility.find('Connection unavailable',pyatspi.ROLE_PUSH_BUTTON)
+                accessibility.activate(accessibility.find('Open launcher',pyatspi.ROLE_PUSH_BUTTON))
+                accessibility.wait(lambda:any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in call(control,{'op':'snapshot'})['system_layers']), 'Offline launcher did not map')
+                assert session.poll() is None
+                assert accessibility.text(accessibility.find('Ask Agent',pyatspi.ROLE_TEXT))=='Retain this launcher draft λ'
+                accessibility.activate(accessibility.find('Close launcher',pyatspi.ROLE_PUSH_BUTTON))
+                print('PASS: core outage is visible; independent launcher and retained draft remain reachable without model work')
             # Every process in this private runtime is ours. Record identities before teardown.
             for proc in Path('/proc').iterdir():
                 if not proc.name.isdigit() or int(proc.name)==core.pid:continue
@@ -108,7 +149,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
             exit_code=session.wait(timeout=20)
             assert exit_code>=0 if compositor_failure else exit_code==0
             remaining=lambda:[pid for pid in owned if alive(pid)]
-            try:wait_for(lambda:not remaining(),[core],timeout=5)
+            try:wait_for(lambda:not remaining(),[core] if core.poll() is None else [],timeout=5)
             except AssertionError:raise AssertionError('Session processes survived shutdown: '+str({pid:Path(f'/proc/{pid}/cmdline').read_bytes().replace(bytes([0]),b' ') for pid in remaining()}))
             assert not control.exists(),'Compositor socket leaked'
             assert not list(runtime.glob('agentos-session-*')),'Session directory leaked'
