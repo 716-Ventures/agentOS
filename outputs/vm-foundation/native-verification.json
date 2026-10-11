@@ -939,10 +939,35 @@
       "compositor_focus_sha256": "792b841a68fedc4feb89e0deb0342565d1bd51669ab970bb8bcf8fe988226f40",
       "fixture_sha256": "78e367ff7549c85ba455b28a12527d6c22e998118e1746de13d2b2833adbd55e",
       "boundary": "Synthetic kernel input and private Wayland clipboard client; physical input, VTE IME and a complete screen-reader usability assessment remain unqualified"
+    },
+    "unbuffered_toplevel_placement": {
+      "runtime_release": "59b2c1cf7303bd87a066aa0435bb952908d3fe9b92bec256af4547db7867493c",
+      "deployment": {
+        "created_at": "2026-10-11T01:32:58.765025+00:00",
+        "source_archive_sha256": "9aeacc2fbf00c063f5d31ac0a674d68dfab490aa8f37dc98336e58347bb9c34d",
+        "repository_revision": "7b1a417dad1cf218d65fc2dc1effbbf39901b277",
+        "source_changes": [
+          "A  outputs/native-compositor/examples/unmapped_fixture.rs",
+          " M outputs/native-compositor/src/state.rs",
+          " M outputs/native-shell/tests/native_desktop.py"
+        ],
+        "installed": true
+      },
+      "qualified": [
+        "Real configured unbuffered Wayland toplevel remains outside durable host placement beyond the registration grace period",
+        "36 compositor tests and the complete shared-workspace journey",
+        "Ten consecutive installed kernel editor/arrangement/Close/Undo and primary/DND journeys",
+        "Owned guest and UTM app closed"
+      ],
+      "baseline": "Stress cycle two rejected Undo after a new empty-title/app-id conventional surface changed the layout. A real unbuffered client separately reproduced unwanted durable placement on the old compositor.",
+      "baseline_log_sha256": "ee7952cafee2dd2885d34ad073f61c60dbb25460cd35be76a2435e091101be44",
+      "repeated_journey_log_sha256": "17ebd8a889ed975ade289801ab68dc0313caf97298cd536aa3923348b63c5f04",
+      "compositor_state_sha256": "cf37f5946d0d5bd6292b76b4869b11770c02ff0e4cf061d3931e9feaafe04636",
+      "boundary": "Historical empty surface buffer state was not recorded; the reproduced publication defect is fixed. Later real placement changes still reject Undo. The top-level 53-check reproduction remains the preceding terminal-menu runtime."
     }
   },
   "observations": [
-    "An earlier intermittent installed close/undo failure remains unresolved. Bounded accessible-status and journal diagnostics are retained; three consecutive installed editor journeys and the complete reproduction subsequently passed without a new delay immediately before Close."
+    "The earlier intermittent Close/Undo stress failure recorded a later empty conventional window placement. Unbuffered-toplevel publication was reproduced and corrected; ten consecutive installed journeys then passed. Later genuine placement changes intentionally still reject Undo."
   ],
   "owned_utm_app_closed": true
 }

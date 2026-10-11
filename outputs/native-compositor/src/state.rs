@@ -340,7 +340,16 @@ impl Smallvil {
         }).collect();
         observed_outputs.sort_by(|a, b| a.area.x.cmp(&b.area.x).then_with(|| a.id.cmp(&b.id)));
         if let Some(bridge) = &self.bridge {
-            bridge.observe(windows.iter().map(observe).collect(), observed_outputs);
+            // new_toplevel is inserted into Space before the client attaches
+            // content so we can send its initial configure. Do not publish that
+            // protocol setup (or a later null-buffer unmap) as visible work.
+            let mapped = windows.iter().filter(|window| {
+                smithay::backend::renderer::utils::with_renderer_surface_state(
+                    window.toplevel().unwrap().wl_surface(),
+                    |state| state.buffer().is_some(),
+                ).unwrap_or(false)
+            });
+            bridge.observe(mapped.map(observe).collect(), observed_outputs);
         }
         let Some(output) = self.space.outputs().next() else {
             return;

@@ -138,6 +138,26 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                             if len(state['windows'])>=count and len(state['layout']['order'])>=count:return state
                             assert time.monotonic()<deadline,state
                             time.sleep(.02)
+                    if shared:
+                        # A configured xdg_toplevel without a buffer is not a
+                        # visible window, even after the host registration grace.
+                        ready=runtime/'unmapped-ready'
+                        unmapped=subprocess.Popen([str(ROOT.parent/'native-compositor/target/debug/examples/unmapped_fixture'),str(ready)],env=childenv,stdout=nestedlog,stderr=subprocess.STDOUT,start_new_session=True)
+                        applications.append(unmapped)
+                        try:
+                            deadline=time.monotonic()+5
+                            while not ready.exists():
+                                assert unmapped.poll() is None,'Unmapped fixture exited'
+                                assert time.monotonic()<deadline,'Unmapped fixture was not configured'
+                                time.sleep(.02)
+                            deadline=time.monotonic()+1
+                            while time.monotonic()<deadline:
+                                assert unmapped.poll() is None,'Unmapped fixture exited during observation'
+                                hosts=call({'op':'presentation.snapshot'})['host_surfaces']
+                                assert not any(row.get('app_id')=='com.agentos.UnmappedFixture' for row in hosts.values()),'Unbuffered toplevel changed the durable workspace'
+                                time.sleep(.03)
+                        finally:reap(unmapped)
+                        print('PASS: configured unbuffered Wayland toplevel never enters durable placement')
                     simple=subprocess.Popen(['weston-simple-shm'],env=childenv,stdout=nestedlog,stderr=subprocess.STDOUT,start_new_session=True);applications.append(simple)
                     state=wait_windows(1);ident=state['windows'][0]['id']
                     if shared:
