@@ -108,7 +108,8 @@
     "DocumentEditor@1": {
       "props": {
         "label": "string",
-        "value": "string"
+        "value": "string",
+        "validation_message": "string"
       },
       "bindable": [],
       "events": [
@@ -355,7 +356,8 @@
         "label": "string",
         "multiline": "boolean",
         "placeholder": "string",
-        "value": "string"
+        "value": "string",
+        "validation_message": "string"
       },
       "bindable": [],
       "events": [

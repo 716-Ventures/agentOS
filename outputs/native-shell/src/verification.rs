@@ -56,6 +56,38 @@ fn verify_focused_draft_resolution(app: &gtk::Application, frame: &Frame, comman
     println!("CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input");
 }
 
+fn verify_validation_feedback(app: &gtk::Application, frame: &Frame, commands: &Sender<Command>) {
+    for (kind,multiline) in [("TextField@1",false),("TextField@1",true),("DocumentEditor@1",false)] {
+        let id="validation-resolution"; let key=(id.into(),"control".into());
+        let drafts=Arc::new(Mutex::new(BTreeMap::new()));
+        let mut doc=json!({"surface_id":id,"activity_id":"1","revision":0,"title":"Validation feedback","root":"control","elements":{"control":{"type":kind,"props":{"label":"Stable editor","value":"Saved","multiline":multiline}}},"actions":{},"bindings":{}});
+        if kind=="DocumentEditor@1" {doc["elements"]["control"]["props"].as_object_mut().unwrap().remove("multiline");}
+        let mut surface=Surface::new(app,id,commands);surface.update(id,&doc,frame,commands,&drafts);
+        let element=&surface.elements["control"];let original=element.widget.clone();
+        if let Some(field)=&element.field {assert!(field.entry.grab_focus());field.entry.set_text("Unsaved λ 日本語");field.entry.select_region(0,3);}
+        if let Some(area)=&element.area {assert!(area.view.grab_focus());area.view.buffer().set_text("Unsaved λ 日本語");area.view.buffer().select_range(&area.view.buffer().start_iter(),&area.view.buffer().iter_at_offset(3));}
+        let focus=gtk::prelude::RootExt::focus(&surface.window);let draft=drafts.lock().unwrap()[&key].clone();
+        for (revision,message) in [(1,Some("Literal <b>日本語</b> λ")),(2,Some("Choose another name.")),(3,None),(4,Some("Keep selected error"))] {
+            doc["revision"]=json!(revision);
+            if let Some(message)=message {doc["elements"]["control"]["props"]["validation_message"]=json!(message);} else {doc["elements"]["control"]["props"].as_object_mut().unwrap().remove("validation_message");}
+            surface.update(id,&doc,frame,commands,&drafts);
+            let element=&surface.elements["control"];assert_eq!(element.widget,original);assert_eq!(surface.revision,Some(revision));
+            assert_eq!(gtk::prelude::RootExt::focus(&surface.window),focus);
+            let feedback=element.validation.as_ref().unwrap();assert_eq!(feedback.label.is_visible(),message.is_some());assert_eq!(feedback.label.text(),message.unwrap_or(""));
+            if let Some(field)=&element.field {assert_eq!(field.entry.text(),"Unsaved λ 日本語");assert_eq!(field.entry.selection_bounds(),Some((0,3)));}
+            if let Some(area)=&element.area {assert_eq!(area.value(),"Unsaved λ 日本語");assert_eq!(area.view.buffer().selection_bounds().map(|(a,b)|(a.offset(),b.offset())),Some((0,3)));}
+            let current=drafts.lock().unwrap()[&key].clone();assert_eq!((current.text,current.expected,current.dirty,current.resolved,current.acknowledged),(draft.text.clone(),draft.expected,draft.dirty,draft.resolved,draft.acknowledged.clone()));
+        }
+        let label=surface.elements["control"].validation.as_ref().unwrap().label.clone();label.select_region(0,4);
+        doc["revision"]=json!(5);doc["elements"]["control"]["props"]["validation_message"]=json!("Deferred error");
+        surface.update(id,&doc,frame,commands,&drafts);assert_eq!(surface.revision,Some(4));assert_eq!(label.text(),"Keep selected error");
+        label.select_region(0,0);surface.update(id,&doc,frame,commands,&drafts);assert_eq!(surface.revision,Some(5));assert_eq!(label.text(),"Deferred error");
+        for prop in ["value","label"] {let mut unsafe_doc=doc.clone();unsafe_doc["revision"]=json!(6);unsafe_doc["elements"]["control"]["props"][prop]=json!("Background replacement");surface.update(id,&unsafe_doc,frame,commands,&drafts);assert_eq!(surface.revision,Some(5));assert_eq!(surface.elements["control"].widget,original);}
+        surface.window.destroy();
+    }
+    println!("CHECK: inline validation preserves focused editor identity, logical focus, draft and selection; selected error text defers replacement and unrelated changes remain blocked");
+}
+
 fn verify_form_owners(frame: &Frame, commands: &Sender<Command>) {
     let drafts = Arc::new(Mutex::new(BTreeMap::new()));
     let baseline = Arc::strong_count(&drafts);
@@ -351,6 +383,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         frame.core=transport::request(&socket,&json!({"op":"snapshot"})).unwrap();frame.activity=doc["activity_id"].as_str().map(String::from);frame.usage=json!({"unavailable":true});frame.broker=json!([]);
         verify_form_owners(&frame,&commands);
         verify_focused_draft_resolution(app,&frame,&commands);
+        verify_validation_feedback(app,&frame,&commands);
         verify_container_replacement(app,&frame,&commands,&drafts);
         image_controls::verify();
         let mut controls=controls::Controls::new(app,commands.clone());controls.verify_controls(&frame,&commands);

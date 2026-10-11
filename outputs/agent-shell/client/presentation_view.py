@@ -59,7 +59,9 @@ def project(document,bindings=None,width=80):
             text='\n'.join([props.get('label','Table'),' | '.join(props.get('columns',[])),*(' | '.join(row['cells']) for row in props.get('rows',[]))])
         elif kind=='List@1':text='\n'.join([props.get('label','List'),*('• '+row['cells'][0] for row in props.get('rows',[]))])
         elif kind=='KeyValue@1':text='\n'.join([props.get('label','Details'),*(': '.join(row['cells']) for row in props.get('rows',[]))])
-        elif kind in ('TextField@1','Choice@1','Toggle@1','DocumentEditor@1'):text=f"[{key}] {props.get('label','Text')}: {props.get('value','')}";controls[key]=node
+        elif kind in ('TextField@1','Choice@1','Toggle@1','DocumentEditor@1'):
+            text=f"[{key}] {props.get('label','Text')}: {props.get('value','')}";controls[key]=node
+            if props.get('validation_message'):text+='\nValidation: '+props['validation_message']
         elif kind=='Button@1':
             text=f"[{key}] {props.get('label','Action')}"+(' (disabled)' if props.get('disabled') else '')
             if not props.get('disabled'):controls[key]=node

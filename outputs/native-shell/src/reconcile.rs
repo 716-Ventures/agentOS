@@ -38,6 +38,17 @@ pub fn text_only(before: &Value, after: &Value) -> bool {
         if previous == node {
             continue;
         }
+        if matches!(node["type"].as_str(), Some("TextField@1" | "DocumentEditor@1")) {
+            let mut comparable = previous.clone();
+            if let Some(message) = node["props"].get("validation_message") {
+                comparable["props"]["validation_message"] = message.clone();
+            } else if let Some(props) = comparable["props"].as_object_mut() {
+                props.remove("validation_message");
+            }
+            if comparable != *node { return false; }
+            projected["elements"][id] = node.clone();
+            continue;
+        }
         if !matches!(node["type"].as_str(), Some("Text@1" | "Status@1"))
             || previous["type"] != node["type"]
             || previous["props"]["role"] != node["props"]["role"]
@@ -52,6 +63,21 @@ pub fn text_only(before: &Value, after: &Value) -> bool {
 mod tests {
     use super::*;
     use serde_json::json;
+    #[test]
+    fn feedback_can_change_without_authorizing_text_structure_or_actions() {
+        for kind in ["TextField@1", "DocumentEditor@1"] {
+            let mut before=json!({"revision":0,"root":"field","elements":{"field":{"type":kind,"props":{"label":"Draft","value":"Saved"}}},"actions":{},"bindings":{}});
+            for message in [Some("Choose a saved workspace."),Some("Readable 日本語 λ"),None] {
+                let mut after=before.clone();after["revision"]=json!(before["revision"].as_u64().unwrap()+1);
+                if let Some(message)=message {after["elements"]["field"]["props"]["validation_message"]=json!(message);} else {after["elements"]["field"]["props"].as_object_mut().unwrap().remove("validation_message");}
+                assert!(text_only(&before,&after));
+                for (path,value) in [("/elements/field/props/value",json!("Overwrite")),("/elements/field/props/label",json!("Different field")),("/actions",json!({"injected":{}})),("/bindings",json!({"injected":{}})),("/elements/field/type",json!("Button@1"))] {
+                    let mut changed=after.clone();*changed.pointer_mut(path).unwrap()=value;assert!(!text_only(&before,&changed),"{kind}: {path}");
+                }
+                before=after;
+            }
+        }
+    }
     #[test]
     fn confirmed_local_values_advance_without_granting_other_mutations() {
         let before=json!({"revision":0,"root":"field","elements":{"field":{"type":"TextField@1","props":{"value":"Before","label":"Draft"}}},"actions":{},"bindings":{}});

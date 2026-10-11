@@ -23,6 +23,13 @@ class Projection(unittest.TestCase):
         lines,controls=view.project(doc);self.assertIn('[button] Next 日本語','\n'.join(lines));self.assertIn('button',controls)
         props['disabled']=True
         lines,controls=view.project(doc);self.assertIn('[button] Next 日本語 (disabled)','\n'.join(lines));self.assertNotIn('button',controls)
+    def test_validation_feedback_is_literal_sanitized_and_keeps_the_edit_control(self):
+        for kind in ('TextField@1','DocumentEditor@1'):
+            doc=document();doc['elements']['field']['type']=kind
+            doc['elements']['field']['props']['validation_message']='Choose <b>日本語</b> λ\x1b]52;c;evil\x07'
+            lines,controls=view.project(doc,width=80);text='\n'.join(lines)
+            self.assertIn('Validation: Choose <b>日本語</b> λ',text);self.assertNotIn('evil',text);self.assertIn('field',controls)
+            self.assertEqual(controls['field']['props']['value'],'0')
     def test_table_projects_headers_and_rows_as_inert_terminal_text(self):
         doc=document();doc['elements']['table']={'type':'Table@1','props':{'label':'Observed files','columns':['Name','State'],'rows':[{'id':'a','cells':['日本語','Ready\x1b]52;c;evil\x07']}]}}
         doc['elements']['root']['slots']['children'].append('table')

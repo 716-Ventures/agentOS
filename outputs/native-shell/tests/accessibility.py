@@ -3,6 +3,10 @@ from collections import deque
 import json
 import time
 import pyatspi
+import gi
+gi.require_version('Gtk','4.0')
+from gi.repository import Gtk
+ERROR_RELATION = pyatspi.RELATION_DESCRIBED_BY if Gtk.get_major_version()==4 and Gtk.get_minor_version()<16 else pyatspi.RELATION_ERROR_MESSAGE
 
 
 def wait(predicate,description):
@@ -133,3 +137,38 @@ def verify_button(call):
     assert call({'op':'presentation.get','document_id':'button-session-fixture'})==current
     assert find('Next styled action 日本語',pyatspi.ROLE_PUSH_BUTTON).queryAction().nActions>0
     print('PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision')
+
+
+def verify_validation(call):
+    field=find('Accessible session draft',pyatspi.ROLE_TEXT)
+    value='Validation draft λ 日本語'
+    assert field.queryEditableText().setTextContents(value)
+    def draft():return call({'op':'draft.get','surface_id':'session-fixture','element_id':'field'}).get('draft')
+    wait(lambda:draft()==value,'Validation draft did not reach core')
+    def document():return call({'op':'presentation.get','document_id':'session-fixture'})
+    def apply(props):
+        return call({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
+                     'request_id':'validation-'+str(time.monotonic_ns()),'expected_revisions':{'session-fixture':document()['revision']},
+                     'operations':[{'op':'element.set_props','surface_id':'session-fixture','element_id':'field','props':props}]})
+    props=document()['elements']['field']['props'].copy()
+    message='Choose <b>literal 日本語</b> λ'
+    assert apply({**props,'validation_message':message})['status']=='committed'
+    wait(lambda:field.getState().contains(pyatspi.STATE_INVALID_ENTRY),'Missing accessible invalid state')
+    def related_error():
+        relations=[r for r in field.getRelationSet() if r.getRelationType()==ERROR_RELATION]
+        return len(relations)==1 and relations[0].getNTargets()==1 and text(relations[0].getTarget(0))==message
+    wait(related_error,'Missing exact accessible validation message')
+    assert text(field)==value and draft()==value
+    saved=document();assert saved['elements']['field']['props']['value']=='Original accessible value'
+    for invalid in ('','λ'*513):
+        try:apply({**props,'validation_message':invalid})
+        except (AssertionError,RuntimeError) as error:assert 'Invalid validation message' in str(error),error
+        else:raise AssertionError('Core accepted invalid feedback')
+        assert document()==saved and draft()==value and text(field)==value
+    assert apply(props)['status']=='committed'
+    wait(lambda:not field.getState().contains(pyatspi.STATE_INVALID_ENTRY),'Accessible invalid state did not clear')
+    wait(lambda:not any(r.getRelationType()==ERROR_RELATION for r in field.getRelationSet()),'Accessible error relation did not clear')
+    assert draft()==value and text(field)==value
+    activate(find('Discard draft',pyatspi.ROLE_PUSH_BUTTON))
+    wait(lambda:draft() is None and text(field)==props['value'],'Explicit Discard did not restore the validation draft')
+    print('PASS: independent AT-SPI inline validation exposes literal error relation, preserves durable Unicode draft, rejects invalid transactions and clears without implicit Save')

@@ -1,0 +1,69 @@
+{
+  "started_at": "2026-10-11T16:55:37.905407+00:00",
+  "source_revision": "338e46b13374ef06039a0f67de83f61d139543f3",
+  "source_changes": [
+    " M outputs/agent-shell/Cargo.lock",
+    " M outputs/agent-shell/Cargo.toml",
+    " M outputs/agent-shell/client/presentation_view.py",
+    " M outputs/agent-shell/release-contract.json",
+    " M outputs/agent-shell/src/presentation.rs",
+    " M outputs/agent-shell/tests/installation_guest.py",
+    " M outputs/agent-shell/tests/presentation_view_test.py",
+    " M outputs/native-shell/Cargo.lock",
+    " M outputs/native-shell/Cargo.toml",
+    " M outputs/native-shell/README.md",
+    " M outputs/native-shell/src/main.rs",
+    " M outputs/native-shell/src/reconcile.rs",
+    " M outputs/native-shell/src/verification.rs",
+    " M outputs/native-shell/tests/accessibility.py",
+    " M outputs/native-shell/tests/native_session.py"
+  ],
+  "source_archive_sha256": "0ceccacd470f879d42859ca05a6e28051c08f3073a5b716af1730b7df889e58b",
+  "passed": true,
+  "owned_utm_identity": [
+    47558,
+    "Sun Oct 11 12:55:38 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T16:57:49.966047+00:00",
+  "public_revision": "9cf3eb3891cdaf90534f652641c170dd51a2a95c",
+  "public_ci": 38157261378,
+  "host_core_tests": 63,
+  "linux_core_tests": 65,
+  "native_unit_tests": 33,
+  "fixture_only_ignored": 7,
+  "python_tests": 281,
+  "python_skips": 3,
+  "mapped_profiles": 4,
+  "independent_sessions": [
+    "normal",
+    "screen-keyboard",
+    "display-zoom",
+    "ime-editor"
+  ],
+  "installed_checks": [
+    "saved icon and validation property preflight",
+    "compatible rollback",
+    "SIGKILL activation and rollback recovery",
+    "signed nested-notice graphical bundle staging",
+    "probe cleanup"
+  ],
+  "changes_after_qualification": [
+    "Documentation and evidence only"
+  ],
+  "not_tested": [
+    "complete installed-system reproduction (next)",
+    "live providers",
+    "physical input/audio/GPU/multi-output",
+    "screen-reader validation announcements",
+    "complete shadcn error appearance/motion"
+  ],
+  "initial_failure": "IME session exited before control socket; targeted runner omitted compositor examples removed by clean package builds. Complete retry builds examples and passes. Earlier raw IME-specific child log remains in guest previous source tree.",
+  "evidence_sha256": {
+    "host-core.log": "c4eb1c8f10879ff1b9294bc0cafce171c604655683f75da39e16feed19095b19",
+    "initial-driver.log": "6bb5cdc3c8b3f8d94eec1e361e568573fe28e1f4c313de1e5b960b2e7c4009db",
+    "driver.log": "c4439c3d09f11126b0397bb1dc8e42e7be9b0f7fd46857a91e682e4150fc276e",
+    "host-python.log": "220a05b14b3eee64e13db93c662d10d7bad878006561e97592c9945629007207",
+    "initial-verification.json": "996e025d5162bf04e5e9aaaf6ac69a8d782e4997d0dd8a9a2bb02f910834ea48"
+  }
+}

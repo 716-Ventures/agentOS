@@ -69,6 +69,7 @@ struct Element {
     image_attempted: bool,
     chart: Option<ui::BoundedChart>,
     field: Option<TextField>,
+    validation: Option<ui::ValidationFeedback>,
     choice: Option<ui::Choice>,
     selection_notice: Option<gtk::Label>,
     toggle: Option<ui::Toggle>,
@@ -216,6 +217,7 @@ fn construct(
         image_attempted: false,
         chart: None,
         field: None,
+        validation: None,
         choice: None,
         selection_notice: None,
         toggle: None,
@@ -485,15 +487,18 @@ fn construct(
                 .or_else(|| props["value"].as_str())
                 .unwrap_or("");
             if props["multiline"] == true || kind == "DocumentEditor@1" {
-                let (area, widget) = if kind == "DocumentEditor@1" {
+                let (area, widget, validation) = if kind == "DocumentEditor@1" {
                     let editor =
                         ui::DocumentEditor::new(props["label"].as_str().unwrap(), value).unwrap();
-                    (editor.area, editor.widget)
+                    (editor.area, editor.widget, editor.validation)
                 } else {
                     let area = ui::TextArea::new(props["label"].as_str().unwrap_or("Text"), value);
                     let widget = area.widget.clone();
-                    (area, widget)
+                    let validation = ui::ValidationFeedback::new(&area.view);
+                    widget.append(&validation.label);
+                    (area, widget, validation)
                 };
+                result.validation = Some(validation);
                 let (s, e, edits, applying) = (
                     surface.to_string(),
                     id.to_string(),
@@ -610,6 +615,7 @@ fn construct(
             draft_controls(&field.widget, surface, id, commands, &events);
             result.widget = field.widget.clone().upcast();
             lease(&field.entry.clone().upcast(), surface, id, commands);
+            result.validation = Some(field.validation.clone());
             result.field = Some(field);
         }
         "Button@1" => {
@@ -664,6 +670,10 @@ fn construct(
             result.widget = label.clone().upcast();
             result.label = Some(label);
         }
+    }
+    if let Some(feedback) = &result.validation {
+        lease(&feedback.label.clone().upcast(), surface, id, commands);
+        let _ = feedback.set_message(props["validation_message"].as_str());
     }
     result
 }
@@ -910,6 +920,7 @@ impl Surface {
                     view.message.selection_bounds().is_some()
                         || view.heading.selection_bounds().is_some()
                 })
+                || e.validation.as_ref().is_some_and(|feedback| feedback.label.selection_bounds().is_some())
                 || e.label
                     .as_ref()
                     .map(|l| l.selection_bounds().is_some())
@@ -939,6 +950,10 @@ impl Surface {
             && protected
             && reconcile::acknowledged_values(&self.document, doc, &acknowledged)
             && nodes.iter().all(|(id, node)| {
+                if self.document["elements"][id]["props"]["validation_message"] != node["props"]["validation_message"]
+                    && self.elements.get(id).and_then(|element| element.validation.as_ref())
+                        .is_some_and(|feedback| feedback.label.selection_bounds().is_some())
+                { return false; }
                 if self.document["elements"][id] == *node || node["type"] != "Text@1" {
                     return true;
                 }
@@ -1211,6 +1226,9 @@ impl Surface {
                             label.set_text(&text);
                         }
                     }
+                }
+                if let Some(feedback) = &e.validation {
+                    let _ = feedback.set_message(props["validation_message"].as_str());
                 }
                 if e.field.is_some() || e.area.is_some() || e.choice.is_some() || e.toggle.is_some()
                 {

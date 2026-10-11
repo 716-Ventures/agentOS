@@ -1,0 +1,73 @@
+    Updating git repository `https://github.com/716-Ventures/716-ui`
+   Compiling seven-sixteen-ui v0.1.0-alpha.37 (https://github.com/716-Ventures/716-ui?rev=9cf3eb3891cdaf90534f652641c170dd51a2a95c#9cf3eb38)
+   Compiling agent-os-core v0.5.0 (/Users/chrisjdavis/development/agentOS/outputs/agent-shell)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.53s
+     Running unittests src/main.rs (outputs/agent-shell/target/debug/deps/agent_os_core-a6b3b497db101ded)
+
+running 63 tests
+test presentation::tests::human_reconnect_preserves_logical_identity_and_durable_receipt ... ok
+test presentation::tests::conventional_reconnect_never_adopts_another_live_compositors_window ... ok
+test presentation::tests::closed_identities_cannot_be_recycled_and_undo_keeps_revisions_monotonic ... ok
+test presentation::tests::document_pages_are_bounded_scoped_and_refuse_mixed_revisions ... ok
+test presentation::tests::focused_user_geometry_preserves_another_process_input_and_draft ... ok
+test presentation::tests::image_resources_are_immutable_scoped_human_owned_and_metadata_only_for_models ... ok
+test presentation::tests::committing_a_native_draft_is_atomic_scoped_and_idempotent ... ok
+test presentation::tests::atomic_rejection_stale_and_deduplicated_receipts ... ok
+test presentation::tests::conventional_reconnect_requires_an_unambiguous_authenticated_process_and_dead_host ... ok
+test presentation::tests::embedded_terminals_only_reference_registered_same_activity_broker_work ... ok
+test presentation::tests::labeled_sections_and_scroll_regions_validate_complete_nested_trees ... ok
+test presentation::tests::conventional_window_metadata_is_typed_scoped_and_host_observed ... ok
+test presentation::tests::adversarial_update_cannot_recurse_through_an_editing_lease ... ok
+test presentation::tests::inactive_activities_do_not_block_other_views ... ok
+test presentation::tests::broker_observations_are_scoped_monotonic_and_unwritable_by_presentation_clients ... ok
+test presentation::tests::button_choices_and_dependent_icons_validate_atomically ... ok
+test presentation::tests::conventional_surface_registration_is_host_scoped_and_placeholders_are_durable ... ok
+test presentation::tests::closing_a_placed_view_keeps_its_draft_and_undo_restores_it ... ok
+test presentation::tests::file_metadata_is_typed_private_scoped_and_monotonic ... ok
+test presentation::tests::direct_workspace_edits_are_atomic_revisioned_and_undoable ... ok
+test presentation::tests::native_input_and_recovered_drafts_survive_agent_updates ... ok
+test presentation::tests::closed_view_undo_does_not_resurrect_input_but_preserves_draft_protection ... ok
+test presentation::tests::numeric_bindings_use_the_released_catalog_number_type ... ok
+test presentation::tests::choice_and_toggle_drafts_are_typed_atomic_and_user_owned ... ok
+test presentation::tests::output_resize_disconnect_and_restore_preserve_preferred_work ... ok
+test presentation::tests::references_are_scoped_guarded_and_survive_target_closure ... ok
+test presentation::tests::repeated_image_references_share_an_aggregate_decoded_pixel_budget ... ok
+test presentation::tests::renderer_restart_can_recover_a_dead_process_draft_without_waiting_for_timeout ... ok
+test presentation::tests::shared_document_edits_persist_only_through_guarded_human_draft_commit ... ok
+test presentation_external_actions::tests::broker_adapter_sends_fixed_target_revision_and_activity_only ... ok
+test presentation::tests::table_documents_validate_keyed_rows_before_native_allocation ... ok
+test presentation::tests::typed_source_bindings_are_live_and_cross_activity_access_is_rejected ... ok
+test presentation::tests::undo_is_compensating_idempotent_and_rejects_divergence ... ok
+test presentation::tests::compact_change_pages_preserve_tombstones_and_guard_document_reads ... ok
+test tests::log_pages_preserve_unicode_across_every_byte_boundary ... ok
+test tests::packaged_component_capabilities_match_the_validator ... ok
+test presentation::tests::workspace_enforces_outputs_placements_sizes_focus_and_provenance ... ok
+test presentation_actions::tests::interrupted_callback_stays_unknown_until_observed_and_is_never_replayed ... ok
+test presentation_actions::tests::defaults_are_stable_user_scoped_discoverable_and_keep_revocation ... ok
+test presentation_actions::tests::only_core_issued_scoped_callbacks_are_available ... ok
+test presentation_actions::tests::stale_or_revoked_callbacks_do_not_allocate_execution_receipts ... ok
+test presentation::tests::unused_image_release_is_human_owned_in_use_guarded_and_never_rebinds_an_identity ... ok
+test presentation::tests::lists_and_key_value_groups_enforce_exact_cells_and_accessible_labels ... ok
+test presentation_actions::tests::retries_never_execute_a_callback_twice_and_changed_payloads_fail ... ok
+test presentation_actions::tests::output_parameters_are_typed_bounded_and_cannot_change_the_target ... ok
+test presentation::tests::rich_text_and_chart_literals_reject_unbounded_or_executable_shapes ... ok
+test presentation_external_actions::tests::fixed_adapters_are_scoped_user_owned_revocable_and_receipted ... ok
+test presentation::tests::ordered_subscription_and_reopen_preserve_receipts ... ok
+test presentation::tests::result_and_error_content_is_bounded_typed_and_source_bindable ... ok
+test presentation::tests::tabs_and_splits_require_complete_bounded_labeled_children ... ok
+test presentation::tests::workspace_undo_preserves_new_focus_but_refuses_new_placement ... ok
+test tests::invalid_commands_create_no_jobs ... ok
+test tests::activities_and_history_survive_reopen ... ok
+test tests::removing_an_activity_preserves_files_and_can_be_reversed ... ok
+test tests::stale_mutations_leave_state_unchanged ... ok
+test presentation::tests::dead_host_connections_do_not_exhaust_capacity_or_inflate_live_snapshots ... ok
+test tests::restart_marks_unfinished_jobs_without_replaying_them ... ok
+test presentation::tests::validation_feedback_is_atomic_bounded_and_never_resolves_a_draft ... ok
+test presentation::tests::malformed_trees_unknown_fields_and_executable_links_are_rejected ... ok
+test presentation::tests::document_page_byte_budget_keeps_large_collections_bounded ... ok
+test presentation::tests::legacy_snapshot_and_subscription_require_bounded_reads_without_skipping_events ... ok
+test tests::event_history_pages_are_complete_scoped_and_byte_bounded ... ok
+test tests::runtime_pages_bound_bytes_preserve_history_and_reject_mixed_revisions ... ok
+
+test result: ok. 63 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.31s
+

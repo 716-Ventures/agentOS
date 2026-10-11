@@ -109,9 +109,22 @@ def property_rollback_guard(installer,source):
         assert Path('/usr/local/lib/agent-os/current').resolve().name==current
         assert present({'op':'presentation.get','document_id':ident})==saved
         apply('plain',saved['revision'],[{'op':'element.set_props','surface_id':ident,'element_id':'button','props':{'label':'Plain legacy action λ'}}])
+        field={'type':'TextField@1','props':{'label':'Saved validation λ','value':'Unsaved authority remains separate','validation_message':'Choose another saved name.'}}
+        current_doc=present({'op':'presentation.get','document_id':ident})
+        apply('validation',current_doc['revision'],[{'op':'element.put','surface_id':ident,'element_id':'button','element':field}])
+        saved=present({'op':'presentation.get','document_id':ident})
+        try:installer.activate(legacy)
+        except ValueError as error:assert 'TextField@1.validation_message' in str(error),error
+        else:raise AssertionError('Unannotated legacy runtime accepted saved validation properties')
+        assert identities()==before,'Validation preflight stopped or restarted a live service'
+        assert installer.journal.read_bytes()==journal
+        assert Path('/usr/local/lib/agent-os/current').resolve().name==current
+        assert present({'op':'presentation.get','document_id':ident})==saved
+        field['props'].pop('validation_message')
+        apply('plain-field',saved['revision'],[{'op':'element.set_props','surface_id':ident,'element_id':'button','props':field['props']}])
         installer.compatible_components(installer.contract(installer.root/'releases'/legacy))
         verify()
-        print('PASS: installed schema preflight rejects saved icon properties without stopping services or changing journal/document; plain legacy button remains compatible',flush=True)
+        print('PASS: installed schema preflight rejects saved icon and validation properties without stopping services or changing journal/document; plain legacy controls remain compatible',flush=True)
     finally:
         current=present({'op':'presentation.get','document_id':ident})
         apply('close',current['revision'],[{'op':'surface.close','surface_id':ident}])
@@ -141,7 +154,7 @@ def rollbacks():
         property_rollback_guard(installer,source)
     return ['Compatible update and rollback preserve activities, outputs, layouts, pending approvals, user files and provider configuration',
             'SIGKILL during rollback at stopped and activated phases recovers to the selected release without rewinding live state',
-            'Saved property/schema incompatibility is rejected without stopping live services, changing document/journal or preventing plain legacy buttons']
+            'Saved property/schema incompatibility is rejected without stopping live services, changing document/journal or preventing plain legacy controls']
 
 def cleanup():
     probe=verify()

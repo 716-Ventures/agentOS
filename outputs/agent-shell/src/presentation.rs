@@ -389,6 +389,12 @@ fn walk_elements(
         seven_sixteen_ui::ButtonProps::from_value(json!(node.props))
             .map_err(|error| invalid(format!("Invalid button declaration: {error}")))?;
     }
+    if matches!(node.kind.as_str(), "TextField@1" | "DocumentEditor@1") {
+        if let Some(message) = node.props.get("validation_message").and_then(Value::as_str) {
+            seven_sixteen_ui::validate_validation_message(message)
+                .map_err(|error| invalid(format!("Invalid validation message: {error}")))?;
+        }
+    }
     if ["Table@1", "List@1", "KeyValue@1"].contains(&node.kind.as_str()) {
         let columns = match node.kind.as_str() {
             "Table@1" => node.props["columns"].as_array().unwrap().len(),
@@ -1257,7 +1263,18 @@ fn guard(
         } else {
             match (old, new) {
                 (Some(Document::Surface(a)), Some(Document::Surface(b))) => {
-                    a.elements.get(&element) != b.elements.get(&element)
+                    // A same-user host can explain an invalid draft without
+                    // replacing its value, actions, kind or tree position.
+                    // The draft lease and revision remain owned by the editor.
+                    let feedback_only = match (a.elements.get(&element), b.elements.get(&element)) {
+                        (Some(old), Some(new)) if who.uid == uid && matches!(old.kind.as_str(), "TextField@1" | "DocumentEditor@1") => {
+                            let mut old = old.clone(); let mut new = new.clone();
+                            old.props.remove("validation_message"); new.props.remove("validation_message");
+                            old == new
+                        }
+                        _ => false,
+                    };
+                    (a.elements.get(&element) != b.elements.get(&element) && !feedback_only)
                         || a.root != b.root
                         || element_path(a, &element) != element_path(b, &element)
                 }
@@ -2307,6 +2324,33 @@ mod tests {
     }
     fn props(request: &str, revision: u64, element: &str, text: &str) -> Value {
         json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":request,"expected_revisions":{"surface-a":revision},"operations":[{"op":"element.set_props","surface_id":"surface-a","element_id":element,"props":{"text":text}}]})
+    }
+    #[test]
+    fn validation_feedback_is_atomic_bounded_and_never_resolves_a_draft() {
+        for kind in ["TextField@1", "DocumentEditor@1"] {
+            let mut db=fixture();let mut doc=surface();
+            let feedback_host=Principal{uid:1000,session:"validation-host".into()};
+            doc["elements"]["input"]=json!({"type":kind,"props":{"label":"Request","value":"Original"}});
+            handle(&mut db,&json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"validation-create","expected_revisions":{"surface-a":null},"operations":[{"op":"surface.create","document":doc}]}),&human()).unwrap();
+            handle(&mut db,&json!({"op":"interaction.begin","surface_id":"surface-a","element_id":"input"}),&human()).unwrap();
+            handle(&mut db,&json!({"op":"draft.save","surface_id":"surface-a","element_id":"input","expected_draft_revision":0,"draft":"Unsaved 日本語 λ"}),&human()).unwrap();
+            let query=json!({"op":"draft.get","surface_id":"surface-a","element_id":"input"});
+            let draft=handle(&mut db,&query,&human()).unwrap();let before=snapshot(&db).unwrap();
+            for (index,message) in [json!(""),json!(" \n\t"),json!("λ".repeat(513)),json!("bad\u{001b}text"),json!("bad\0text"),Value::Null,json!(false),json!({"binding":"work"})].into_iter().enumerate() {
+                let request=json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":format!("invalid-feedback-{index}"),"expected_revisions":{"surface-a":0},"operations":[{"op":"element.set_props","surface_id":"surface-a","element_id":"text","props":{"text":"Must roll back"}},{"op":"element.set_props","surface_id":"surface-a","element_id":"input","props":{"label":"Request","value":"Original","validation_message":message}}]});
+                assert!(handle(&mut db,&request,&human()).is_err());assert_eq!(snapshot(&db).unwrap(),before);assert_eq!(handle(&mut db,&query,&human()).unwrap(),draft);
+            }
+            let mut accepted=json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"feedback-add","expected_revisions":{"surface-a":0},"operations":[{"op":"element.set_props","surface_id":"surface-a","element_id":"input","props":{"label":"Request","value":"Original","validation_message":"λ".repeat(512)}}]});
+            if accepted["request_id"] == "feedback-add" {
+                assert!(handle(&mut db,&accepted,&agent()).is_err(),"Feedback exception crossed a local-user boundary");
+            }
+            handle(&mut db,&accepted,&feedback_host).unwrap();assert_eq!(handle(&mut db,&query,&human()).unwrap(),draft);
+            let mut destructive=accepted.clone();destructive["request_id"]=json!("feedback-cannot-replace-input");destructive["expected_revisions"]["surface-a"]=json!(1);destructive["operations"][0]["props"]["value"]=json!("Replaced");
+            assert!(handle(&mut db,&destructive,&feedback_host).is_err());assert_eq!(handle(&mut db,&query,&human()).unwrap(),draft);
+            accepted["request_id"]=json!("feedback-stale");assert!(handle(&mut db,&accepted,&human()).is_err());
+            accepted["request_id"]=json!("feedback-clear");accepted["expected_revisions"]["surface-a"]=json!(1);accepted["operations"][0]["props"].as_object_mut().unwrap().remove("validation_message");
+            handle(&mut db,&accepted,&feedback_host).unwrap();assert_eq!(handle(&mut db,&query,&human()).unwrap(),draft);
+        }
     }
     #[test]
     fn button_choices_and_dependent_icons_validate_atomically() {
