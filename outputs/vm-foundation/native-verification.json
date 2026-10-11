@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-10-11T04:04:37.468880+00:00",
+  "started_at": "2026-10-11T04:36:00.621430+00:00",
   "result": "pass",
   "vm_uuid": "27176EA2-E994-4165-9BBA-70FEED59E66B",
   "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -75,9 +75,9 @@
     "native control latency outside the measured editor profile; physical display and live inference-load latency"
   ],
   "deployment": {
-    "created_at": "2026-10-11T04:04:50.870464+00:00",
-    "source_archive_sha256": "6583c292e637ec2fe1ed8012cef58a87afcbf49b9e1db78a9681fc4896e1a192",
-    "repository_revision": "cf5466688f792c25203d58435f50c2992cb23961",
+    "created_at": "2026-10-11T04:36:14.059587+00:00",
+    "source_archive_sha256": "ad7fcac439fd7fdd566b6d17b6417f1318503d458fcfc501942a3502c5e2665a",
+    "repository_revision": "a60ec1a9db2cb5d0d2f0fa7c63f6de4711eafa9c",
     "source_changes": [
       " M outputs/agent-shell/Cargo.lock",
       " M outputs/agent-shell/Cargo.toml",
@@ -89,7 +89,7 @@
     ],
     "installed": true
   },
-  "runtime_release": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
+  "runtime_release": "f56819b449f16e5c55dbae8a4f2cc2d63660f25256f5715e8bbf3e8c6887d8d3",
   "dependency_manifest": {
     "packages": {
       "adduser": "3.152",
@@ -879,11 +879,11 @@
     "python": "Python 3.9.6"
   },
   "guest_stopped": true,
-  "finished_at": "2026-10-11T04:11:56.123185+00:00",
+  "finished_at": "2026-10-11T04:43:23.319704+00:00",
   "public_ui_release": {
-    "tag": "v0.1.0-alpha.31",
-    "revision": "800e8733bbcd7dafdbfc560d3a13c2677a4f4de6",
-    "public_ci_run": 38110039741
+    "tag": "v0.1.0-alpha.32",
+    "revision": "3c999c68067730f3ebd962c0934e7df6186d8dec",
+    "public_ci_run": 38111765207
   },
   "additional_targeted_regressions": {
     "queued_initial_documents": {
@@ -1015,16 +1015,16 @@
       "collector_sha256": "847cfb831aa9982543abf8841d240f2d3c64fc191795fa2564d582b2cc23305a"
     },
     "native_gtk_presentation_feedback": {
-      "runtime_release": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
+      "runtime_release": "f56819b449f16e5c55dbae8a4f2cc2d63660f25256f5715e8bbf3e8c6887d8d3",
       "measurement": {
         "clock_id": 1,
         "discarded": 0,
         "format": 1,
         "invalid": 0,
-        "max_ms": 49,
+        "max_ms": 43,
         "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-        "p50_ms": 39,
-        "p95_ms": 49,
+        "p50_ms": 34,
+        "p95_ms": 42,
         "pending": 0,
         "presented": 20,
         "requested": 20,
@@ -1043,7 +1043,7 @@
       "baseline_log_sha256": "5e3eceeeae3550f67cab15076a031cf5d9adeda13e4ccdb0ab58112df6baa60b",
       "targeted_log_sha256": "654add5b529532736165de1b254979b802250e408df5a71fcfa1fef88164c2b6",
       "full_reproduction_log_sha256": "ebe66b465b537f99cf731d45541c4a6bb5df2a9599c5c35df48e9d332091e6e7",
-      "display_log_sha256": "ae304f746993dd596b69d5a67ef34a0d165d023f0cdc6a02eb0e82d02c6e3788",
+      "display_log_sha256": "6437946cadccee7d4207942cd373e04256ae29583502f825a59549b1eee1f1b0",
       "boundary": "Opt-in diagnostics with at most 256 key-triggered requests per window. No key codes, text or document identity recorded. Event millisecond quantization contributes less than 1ms. This native editor/UTM profile does not qualify every control, physical display, subjective responsiveness or live inference load.",
       "typing_fixture_sha256": "01f8bc588e4dd90583824479172861d03ed6000ac1dd16393225f318ec15982c",
       "cpu_job_profile": {
@@ -1052,9 +1052,9 @@
           "discarded": 0,
           "format": 1,
           "invalid": 0,
-          "max_ms": 48,
+          "max_ms": 47,
           "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-          "p50_ms": 36,
+          "p50_ms": 35,
           "p95_ms": 47,
           "pending": 0,
           "presented": 20,
@@ -1062,11 +1062,11 @@
           "sample_limit": 256,
           "profile": "two concurrent broker CPU jobs",
           "job_cpu_usage_usec": [
-            2361990,
-            2363975
+            2424402,
+            2502711
           ]
         },
-        "log_sha256": "49532a5aa8b06b36fa1db5f8d90d00e14744655a2224ff270b7db7b842d0430f",
+        "log_sha256": "1413c2ceab854609c6ddb795ce616a8e6d820d41d70a249d02487f15027621d9",
         "targeted_log_sha256": "0755068a7baae888347be14f2d749bc50e230c3fc8e3f67dae8b7ad1e7b78dc1",
         "qualified": [
           "Two distinct real broker jobs consumed CPU throughout measurement",
@@ -1163,6 +1163,34 @@
         "Owned displays, native clients, guest and UTM app closed"
       ],
       "boundary": "Native callback/ownership and synthetic kernel/virtual-output evidence; complete physical input, speech, screen-reader use and live inference remain unqualified."
+    },
+    "selected_outcome_freshness": {
+      "runtime_release": "f56819b449f16e5c55dbae8a4f2cc2d63660f25256f5715e8bbf3e8c6887d8d3",
+      "public_ui_release": {
+        "tag": "v0.1.0-alpha.32",
+        "revision": "3c999c68067730f3ebd962c0934e7df6186d8dec",
+        "public_ci_run": 38111765207
+      },
+      "baseline_log_sha256": {
+        "selected_outcome": "7adeb86ccbde5cbb6ed7b402d353b03538f9cb6047a2958b13007609cf7c32c0",
+        "core_disconnect": "cabe539ed535196f115758c1f3d35f31d7bfe4b4e47359c6e968ff6d2ffaf0e9"
+      },
+      "qualified_log_sha256": {
+        "standalone_gallery": "e6db8a46d71616ca221d38913092b96896ab75142ad488d4f9f6d04da29cabb6",
+        "native_bindings": "3c7034f48deb1b592cd939089d15fff6a15f253686578f26d2b499f56232fbaa",
+        "full_reproduction": "ebe66b465b537f99cf731d45541c4a6bb5df2a9599c5c35df48e9d332091e6e7"
+      },
+      "native_fixture_sha256": "54e1f3d3c2e0bbd14112ee83113b3bc733803b0821011314272b72fae62f51bd",
+      "public_fixture_sha256": "bd8b0a361ace14b55dbc66ed5145e81d4c546b7368ae3626049b20a222fdaf0a",
+      "qualified": [
+        "Selected Result/Error Unicode snapshot retained while current changes stay mapped in both appearances",
+        "Successive source updates and invalid update rejection",
+        "Real renderer binding failure, source disconnect and core connection loss expose current unavailability",
+        "Deselection reconciles the main message; reconnection restores available source data; refresh dispatches no action",
+        "Complete standalone gallery, Linux CI and all 60 installed UTM reproduction checks",
+        "Owned displays, native clients, guest and UTM app closed"
+      ],
+      "boundary": "Native mapped/renderer state and virtual kernel-input evidence; screen-reader announcement timing, physical input/speech and live provider quality remain unqualified."
     }
   },
   "observations": [

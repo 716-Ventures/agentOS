@@ -753,6 +753,11 @@ fn editor_value(
 }
 fn bound(surface: &str, value: &Value, frame: &Frame) -> Value {
     if let Some(binding) = value["binding"].as_str() {
+        // A retained snapshot supports recovery, but cannot establish that its
+        // source is still current after the authenticated core disconnects.
+        if !frame.connected {
+            return Value::Null;
+        }
         match frame.bindings.get(surface) {
             Some(snapshot) if snapshot["bindings"][binding]["availability"] == "available" => {
                 snapshot["bindings"][binding]["value"].clone()

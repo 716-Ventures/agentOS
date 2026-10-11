@@ -324,6 +324,40 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             let outcome=surface.elements["result"].outcome.as_ref().unwrap();assert_eq!(outcome.widget.accessible_role(),gtk::AccessibleRole::Status);assert_eq!(outcome.message.text(),"succeeded");
             let failure=surface.elements["failure"].outcome.as_ref().unwrap();assert_eq!(failure.widget.accessible_role(),gtk::AccessibleRole::Alert);assert_eq!(failure.message.text(),"Fixture reason 日本語");assert!(!failure.recovery.is_visible());
 
+            // Real renderer binding refresh must expose the latest observed value
+            // without replacing the human-selected snapshot or dispatching actions.
+            let original_bindings=frame.bindings["native-fixture"].clone();
+            let outcome=surface.elements["result"].outcome.as_ref().unwrap();
+            assert!(outcome.message.grab_focus());outcome.message.select_region(0,-1);
+            frame.bindings.get_mut("native-fixture").unwrap()["bindings"]["work"]["value"]=json!("failed 日本語");
+            surface.update("native-fixture",&doc,&frame,&commands,&drafts);
+            let outcome=surface.elements["result"].outcome.as_ref().unwrap();
+            assert_eq!(outcome.message.text(),"succeeded");assert!(outcome.message.selection_bounds().is_some());
+            assert!(outcome.current.is_visible());assert_eq!(outcome.current.text(),"Current value:\nCompletion\nfailed 日本語");
+            assert_eq!(outcome.current.accessible_role(),gtk::AccessibleRole::Status);
+            frame.bindings.get_mut("native-fixture").unwrap()["bindings"]["work"]["availability"]=json!("disconnected");
+            surface.update("native-fixture",&doc,&frame,&commands,&drafts);
+            let outcome=surface.elements["result"].outcome.as_ref().unwrap();
+            assert_eq!(outcome.message.text(),"succeeded");assert!(outcome.message.selection_bounds().is_some());
+            assert_eq!(outcome.current.text(),"Current value:\nCompletion\nUnavailable");
+            frame.bindings.get_mut("native-fixture").unwrap()["bindings"]["work"]["availability"]=json!("available");
+            surface.update("native-fixture",&doc,&frame,&commands,&drafts);
+            assert_eq!(surface.elements["result"].outcome.as_ref().unwrap().current.text(),"Current value:\nCompletion\nfailed 日本語");
+            frame.connected=false;
+            surface.update("native-fixture",&doc,&frame,&commands,&drafts);
+            let outcome=surface.elements["result"].outcome.as_ref().unwrap();
+            assert_eq!(outcome.current.text(),"Current value:\nCompletion\nUnavailable","Disconnected core retained a live-looking outcome");
+            outcome.message.select_region(0,0);
+            surface.update("native-fixture",&doc,&frame,&commands,&drafts);
+            let outcome=surface.elements["result"].outcome.as_ref().unwrap();
+            assert_eq!(outcome.message.text(),"Unavailable");assert!(!outcome.current.is_visible());
+            frame.connected=true;
+            frame.bindings.insert("native-fixture".into(),original_bindings);
+            surface.update("native-fixture",&doc,&frame,&commands,&drafts);
+            assert_eq!(surface.elements["result"].outcome.as_ref().unwrap().message.text(),"succeeded");
+            assert!(!rx.try_iter().any(|c|matches!(c,Command::Action{..})),"Binding refresh dispatched an action");
+            println!("CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection");
+
             let reference=surface.elements["reference"].reference.as_ref().unwrap();assert!(reference.widget.is_sensitive());reference.widget.emit_clicked();
             assert!(rx.try_iter().any(|c|matches!(c,Command::Navigate{surface,element,revision} if surface=="native-fixture" && element=="reference" && revision==doc["revision"].as_u64().unwrap())));
             let mut missing=frame.clone();missing.documents.remove("native-fixture");surface.update("native-fixture",&doc,&missing,&commands,&drafts);
