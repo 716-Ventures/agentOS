@@ -52,6 +52,19 @@ class GroundingTests(unittest.TestCase):
     def test_context_keeps_original_identity_timestamp_and_evidence(self):
         context=self.context();validated=grounding.validate(context,1)
         self.assertEqual(validated,context);self.assertIsNot(validated,context)
+    def test_typed_text_and_stable_object_snapshots_keep_original_evidence(self):
+        for kind in ('selected_text','selected_object','focused_surface'):
+            context={**self.context(),'modality':'typed','selection_kind':kind,'element_id':'body','selection_captured_at':time.time()-1}
+            if kind=='selected_object':context['object_id']='row-λ'
+            captured=grounding.validate(context,1);context['selection']='Later selection'
+            self.assertEqual(captured['selection'],'Untrusted command output')
+            self.assertEqual(captured['element_id'],'body')
+            if kind=='selected_object':self.assertEqual(captured['object_id'],'row-λ')
+    def test_selected_objects_require_ids_and_valid_selection_timestamp(self):
+        for change in ({'modality':'unknown'},{'selection_kind':'unknown'},{'selection_kind':'selected_object'},
+            {'selection_captured_at':float('nan')},{'selection_captured_at':True},{'selection_captured_at':time.time()+100},
+            {'element_id':''},{'object_id':[]},{'object_id':'x'*129}):
+            with self.assertRaises(ValueError):grounding.validate({**self.context(),**change},1)
     def test_invalid_referents_and_revisions_are_rejected(self):
         for change in ({'activity_id':2},{'captured_at':float('nan')},{'captured_at':time.time()+100},
             {'layout_revision':True},{'expected_generation':-1},{'actor':'human'},{'job_ref':'/tmp/other'},

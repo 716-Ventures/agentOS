@@ -24,7 +24,9 @@ pub struct Controls {
     voice: voice::Voice,
     voice_button: gtk::Button,
     voice_status: gtk::Label,
-    voice_context: Rc<RefCell<Value>>,
+    frozen_context: Rc<RefCell<Option<Value>>>,
+    context_provider: Rc<RefCell<Option<Rc<dyn Fn() -> Value>>>>,
+    context_label: gtk::Label,
     review: gtk::ApplicationWindow,
     transcript: TextField,
     review_ready: bool,
@@ -144,28 +146,38 @@ impl Controls {
         widget.append(&activity_row);
         let request = TextField::new("Ask Agent", "Describe the work you want done", "");
         widget.append(&request.widget);
+        let frozen_context = Rc::new(RefCell::new(None::<Value>));
+        let context_provider = Rc::new(RefCell::new(None::<Rc<dyn Fn() -> Value>>));
+        let context_label = ui::status("Context is captured when you send a request");
+        context_label.set_selectable(false);
+        context_label.set_wrap(false);
+        context_label.set_ellipsize(gtk::pango::EllipsizeMode::End);
+        widget.append(&context_label);
         let send = ui::button("Send request", ButtonVariant::Primary, false);
         widget.append(&send);
         let (current, commands_now, entry) =
             (activity.clone(), commands.clone(), request.entry.clone());
+        let (frozen, provider) = (frozen_context.clone(), context_provider.clone());
+        let failure=context_label.clone();
         let submit = Rc::new(move || {
             let id = current
                 .borrow()
                 .as_ref()
                 .and_then(|s: &String| s.parse::<i64>().ok());
-            if let Some(activity) = id {
-                let _ = commands_now.send(Command::Ask {
-                    activity,
-                    prompt: entry.text().into(),
-                    grounding: None,
-                });
-            }
+            let mut context = frozen.borrow().clone().unwrap_or_else(||provider.borrow().as_ref().map(|capture|capture()).unwrap_or(Value::Null));
+            if !context.is_object() { context=json!({"surface_id":"native-launcher","layout_revision":0,"job_ref":null,"selection":"","selection_kind":"focused_surface","surface_title":"Agent request"}); }
+            if context["activity_id"].is_null() {context["activity_id"]=json!(id);}
+            let activity=context["activity_id"].as_i64();
+            failure.set_text(&format!("Context: {}",context["surface_title"].as_str().unwrap_or("Agent request")));
+                match input_context::stamp(context,"typed") {
+                    Ok(context)=>{let _ = commands_now.send(Command::Ask { activity, prompt: entry.text().into(), grounding: Some(context) });},
+                    Err(_)=>failure.set_text("Could not capture the request context. Try again."),
+                }
         });
         let click = submit.clone();
         send.connect_clicked(move |_| click());
         request.entry.connect_activate(move |_| submit());
         let voice = voice::Voice::new();
-        let voice_context = Rc::new(RefCell::new(Value::Null));
         let voice_button = ui::button("Record voice", ButtonVariant::Outline, false);
         let voice_status = ui::status("Microphone idle");
         let voice_row = ui::row(12);
@@ -191,13 +203,13 @@ impl Controls {
             .build();
         review.add_css_class("seven-ui");
         let recorder = voice.clone();
-        let context = voice_context.clone();
+        let (frozen, provider) = (frozen_context.clone(), context_provider.clone());
         voice_button.connect_clicked(move |_| {
             let phase = recorder.state.lock().unwrap().phase.clone();
             if phase == "recording" {
                 recorder.finish();
             } else if phase == "idle" {
-                let context = context.borrow().clone();
+                let context = frozen.borrow().clone().unwrap_or_else(||provider.borrow().as_ref().map(|capture|capture()).unwrap_or(Value::Null));
                 if !context.is_null() {
                     recorder.start(context);
                 }
@@ -226,7 +238,7 @@ impl Controls {
             if let Some(context) = recorder.consume() {
                 if let Some(activity) = context["activity_id"].as_i64() {
                     let _ = sender.send(Command::Ask {
-                        activity,
+                        activity: Some(activity),
                         prompt: entry.text().into(),
                         grounding: Some(context),
                     });
@@ -375,7 +387,9 @@ impl Controls {
             voice,
             voice_button,
             voice_status,
-            voice_context,
+            frozen_context,
+            context_provider,
+            context_label,
             review,
             transcript,
             review_ready: false,
@@ -400,6 +414,16 @@ impl Controls {
         self.workspace.verify(frame);
 
         self.present();
+    }
+    pub fn verify_context_request(&self, frame: &Frame) {
+        let source=Rc::new(RefCell::new(json!({"activity_id":frame.activity.as_ref().unwrap().parse::<i64>().unwrap(),"surface_id":"native-fixture","layout_revision":7,"job_ref":null,"selection":"Original selected λ 日本語","selection_kind":"selected_text","surface_title":"Selected document","element_id":"field","selection_captured_at":SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs_f64()})));
+        let capture=source.clone();self.context_provider(Rc::new(move ||capture.borrow().clone()));
+        self.open_launcher();
+        source.borrow_mut()["selection"]=json!("Later selection must not replace captured evidence");
+        self.request_field.entry.set_text("Contextual native request λ");self.request_field.entry.emit_activate();
+        self.hide_launcher();self.open_launcher();
+        self.request_field.entry.set_text("Refreshed contextual request");self.request_field.entry.emit_activate();
+        self.hide_launcher();
     }
     pub fn verify_history(&mut self, frame: &Frame, commands: &Sender<Command>) {
         self.jobs.verify_virtualization(frame, commands);
@@ -434,9 +458,9 @@ impl Controls {
         assert!(!buffer.has_selection());
         self.output_previous.emit_clicked();
     }
-    pub fn context(&self, mut context: Value) {
+    pub fn capture_context(&self, mut context: Value) -> Value {
         let buffer = self.inspection.buffer();
-        if self.monitor.is_active() || buffer.has_selection() {
+        if self.monitor.is_active() {
             if let Some(page) = &self.output_page {
                 let mut selection = buffer
                     .selection_bounds()
@@ -447,6 +471,9 @@ impl Controls {
                 }
                 context["activity_id"] = json!(page.activity);
                 context["surface_id"] = json!("native-monitor");
+                context["selection_kind"] = json!("focused_output");
+                context.as_object_mut().unwrap().remove("element_id");
+                context.as_object_mut().unwrap().remove("object_id");
                 context["layout_revision"] = json!(page.start);
                 context["job_ref"] = if page.source == "core" {
                     page.job.clone()
@@ -457,12 +484,25 @@ impl Controls {
                 context["surface_title"] = json!(page.title.chars().take(200).collect::<String>());
             }
         }
-        *self.voice_context.borrow_mut() = context;
+        context
     }
+    pub fn context_provider(&self, capture: Rc<dyn Fn() -> Value>) { *self.context_provider.borrow_mut()=Some(capture); }
+    pub fn open_launcher(&self) {
+        if self.frozen_context.borrow().is_none() {
+            let context=self.context_provider.borrow().as_ref().map(|capture|capture()).unwrap_or(Value::Null);
+            let title=context["surface_title"].as_str().unwrap_or("Agent request");
+            let kind=if context["selection"].as_str().is_some_and(|s|!s.is_empty()) {"Selection"} else {"Context"};
+            self.context_label.set_text(&format!("{kind}: {title}"));
+            *self.frozen_context.borrow_mut()=Some(context);
+        }
+        self.focus_request();
+    }
+
     pub fn close(&self) {
         self.voice.cancel();
     }
     pub fn hide_launcher(&self) {
+        self.frozen_context.borrow_mut().take();
         let phase = self.voice.state.lock().unwrap().phase.clone();
         if phase == "starting" || phase == "recording" { self.voice.cancel(); }
     }

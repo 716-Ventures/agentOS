@@ -14,7 +14,7 @@ libloading = "=0.8.9"
 gdk4-wayland = { version = "=0.9.6", features = ["wayland_crate"] }
 wayland-client = "=0.31.15"
 wayland-protocols = { version = "=0.32.12", features = ["client"] }
-vte4 = "=0.8.0"
+vte4 = { version = "=0.8.0", features = ["v0_70"] }
 
 [profile.dev]
 debug = 0

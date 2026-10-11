@@ -300,6 +300,16 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         let mut controls=controls::Controls::new(app,commands.clone());controls.verify_controls(&frame,&commands);
         let gestures=rx.try_iter().collect::<Vec<_>>();assert!(gestures.iter().any(|c|matches!(c,Command::Ask{prompt,..} if prompt=="Explicit native request λ")));assert!(gestures.iter().any(|c|matches!(c,Command::CreateDocument)));
 
+        controls.verify_context_request(&frame);
+        let context_commands=rx.try_iter().collect::<Vec<_>>();
+        for (prompt,selection) in [("Contextual native request λ","Original selected λ 日本語"),("Refreshed contextual request","Later selection must not replace captured evidence")] {
+            let context=context_commands.iter().find_map(|c|match c {Command::Ask{prompt:p,grounding:Some(context),..} if p==prompt=>Some(context),_=>None}).expect("Contextual request missing");
+            assert_eq!(context["modality"],"typed");assert_eq!(context["selection"],selection);assert_eq!(context["element_id"],"field");assert_eq!(context["layout_revision"],7);
+            assert_eq!(context["input_id"].as_str().unwrap().len(),32);
+            assert!(context["selection_captured_at"].as_f64().unwrap()<=context["captured_at"].as_f64().unwrap());
+        }
+        input_context::verify(app,&frame,&commands,&drafts);
+        println!("CHECK: typed request preserves immutable selected context; reopening captures the new selection");
         controls.verify_output(&frame,&commands);
         let output_commands=rx.try_iter().collect::<Vec<_>>();
         assert!(output_commands.iter().any(|command|matches!(command,Command::FreezeOutput(10))));
@@ -319,6 +329,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             assert_eq!(surface.elements["editor"].area.as_ref().unwrap().value(),"Document body λ\n日本語");
             let pty=surface.elements["pty"].pty.as_ref().unwrap();assert!(!pty.view.input_enabled());assert!(!pty.attach.is_sensitive());
             pty.view.feed(b"Terminal fixture\r\n",false).unwrap();
+            input_context::verify_terminal_selection(&surface.elements["pty"]);
             println!("CHECK: native PTY renderer remains detached without running authorized work");
 
             let outcome=surface.elements["result"].outcome.as_ref().unwrap();assert_eq!(outcome.widget.accessible_role(),gtk::AccessibleRole::Status);assert_eq!(outcome.message.text(),"succeeded");

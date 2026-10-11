@@ -29,6 +29,7 @@ def graphical_checks():
         for scale in (1,2):
             checks.append((f'native-{appearance}-{scale}',f'dbus-run-session -- python3 native-shell/tests/native_desktop.py --appearance {appearance} --text-scale {scale}',120))
     checks += [
+        ('native-initial-request','python3 native-shell/tests/initial_request.py',120),
         ('native-first-document','dbus-run-session -- python3 native-shell/tests/first_document.py',120),
         ('native-queued-documents','dbus-run-session -- python3 native-shell/tests/first_document.py --queued',120),
         ('native-first-import','dbus-run-session -- python3 native-shell/tests/first_document.py --import',120),

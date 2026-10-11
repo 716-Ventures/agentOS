@@ -9,6 +9,7 @@ mod draft_dialog;
 mod feedback_metrics;
 mod first_run;
 mod image_controls;
+mod input_context;
 mod job_list;
 mod log_view;
 mod preferences;
@@ -1415,6 +1416,7 @@ fn main() {
         user.set_hexpand(true);
         user.set_xalign(0.0);
         user.set_ellipsize(gtk::pango::EllipsizeMode::End);
+        let surfaces = Rc::new(RefCell::new(BTreeMap::<String, Surface>::new()));
         let controls = Rc::new(RefCell::new(controls::Controls::new(
             app,
             frontend.borrow().commands.clone(),
@@ -1435,6 +1437,14 @@ fn main() {
             .child(&scroll)
             .build();
         main.add_css_class("seven-ui");
+        let (weak_frontend, weak_surfaces, weak_controls) = (Rc::downgrade(&frontend), Rc::downgrade(&surfaces), Rc::downgrade(&controls));
+        controls.borrow().context_provider(Rc::new(move || {
+            let (Some(backend),Some(surfaces),Some(controls))=(weak_frontend.upgrade(),weak_surfaces.upgrade(),weak_controls.upgrade()) else {return Value::Null;};
+            let frame=backend.borrow().frame.lock().unwrap().clone();
+            let context=input_context::snapshot(&surfaces.borrow(),&frame);
+            let captured=controls.borrow().capture_context(context);
+            captured
+        }));
         let mut layer_library = None;
         let mut bar_window = None;
         let launcher_events = Rc::new(RefCell::new(if trusted { Some(system_bar::LauncherEvents::start()) } else { None }));
@@ -1475,7 +1485,7 @@ fn main() {
             let open = ui::button("Open launcher", ButtonVariant::Primary, false);
             let weak = main.downgrade();
             let focus = controls.clone();
-            open.connect_clicked(move |_| { if let Some(window) = weak.upgrade() { window.present(); focus.borrow().focus_request(); } });
+            open.connect_clicked(move |_| { if let Some(window) = weak.upgrade() { focus.borrow().open_launcher(); window.present(); } });
             controls.borrow().monitor_content.prepend(&open);
             window.present();
             bar_window = Some(window);
@@ -1484,7 +1494,6 @@ fn main() {
         let voice_cleanup=controls.clone();app.connect_shutdown(move |_|voice_cleanup.borrow().close());
         let opener = controls.clone();
         status.connect_clicked(move |_| opener.borrow().present());
-        let surfaces = Rc::new(RefCell::new(BTreeMap::<String, Surface>::new()));
         let frontend = frontend.clone();
         let application = app.clone();
         let fixture_mode = std::env::var("AGENT_OS_NATIVE_IME_FIXTURE").unwrap_or_default();
@@ -1517,8 +1526,8 @@ fn main() {
                 let current = events.current();
                 if current != launcher_sequence {
                     launcher_sequence = current;
+                    controls.borrow().open_launcher();
                     main.present();
-                    controls.borrow().focus_request();
                 }
             }
             let backend = frontend.borrow();
@@ -1535,14 +1544,6 @@ fn main() {
             };
             status.set_label(connection);
             controls.borrow_mut().update(&frame, &backend.commands);
-            if let Some(activity)=frame.activity.as_ref().and_then(|a|a.parse::<i64>().ok()) {
-                let mut context=json!({"activity_id":activity,"surface_id":"native-launcher","layout_revision":0,"job_ref":null,"selection":"","selection_kind":"focused_output","surface_title":"Agent request"});
-                for (id,surface) in surfaces.borrow().iter(){
-                    let selection=surface.elements.values().filter_map(|e|e.label.as_ref()).find_map(|label|label.selection_bounds().map(|(a,b)|label.text().chars().skip(a.min(b) as usize).take((b-a).unsigned_abs() as usize).collect::<String>()));
-                    if surface.window.is_active() || selection.is_some(){let mut selected=selection.unwrap_or_default();while selected.len()>8000{selected.pop();}context["surface_id"]=json!(id);context["layout_revision"]=json!(surface.revision.unwrap_or(0));context["selection"]=json!(selected);context["surface_title"]=surface.document["title"].clone();break;}
-                }
-                controls.borrow().context(context);
-            }
             let mut surfaces = surfaces.borrow_mut();
             for (id, doc) in &frame.documents {
                 if doc.get("surface_id").is_some() {

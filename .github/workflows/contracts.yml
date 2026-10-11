@@ -113,6 +113,7 @@ jobs:
           cargo +1.85.1 build --release --locked --manifest-path outputs/agent-shell/Cargo.toml
           dbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py --compositor
           dbus-run-session -- python3 outputs/native-shell/tests/native_desktop.py --compositor --shared
+          python3 outputs/native-shell/tests/initial_request.py
           dbus-run-session -- python3 outputs/native-shell/tests/first_document.py
           dbus-run-session -- python3 outputs/native-shell/tests/first_document.py --queued
       - name: Installed native approval journey against systemd broker

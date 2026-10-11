@@ -161,7 +161,7 @@ pub enum Command {
     CreateActivity(String),
     CreateDocument,
     Ask {
-        activity: i64,
+        activity: Option<i64>,
         prompt: String,
         grounding: Option<Value>,
     },
@@ -395,30 +395,29 @@ fn run(
                         activity=current.activity.clone();result
                     },
                     Command::CreateActivity(name)=>request(&socket,&json!({"op":"create","name":name})).map(|created|{activity=Some(created["id"].to_string());created}),
-                    Command::Ask{activity,prompt,grounding}=>{
-                        if prompt.trim().is_empty() || prompt.len()>16000 {Err("Enter a request up to 16 KiB".into())}
-                        else {
+                    Command::Ask{activity:requested,prompt,mut grounding}=>{
+                        if prompt.trim().is_empty() || prompt.chars().count()>4000 {Err("Enter a request of 1–4,000 characters".into())}
+                        else { (|| {
+                            let selected=match requested {
+                                Some(id) if id>0=>id,
+                                Some(_)=>return Err("Invalid request activity".into()),
+                                None=>{
+                                    let mut current=frame.lock().unwrap().clone();current.activity=activity.clone();
+                                    let id=ensure_document_activity(&socket,&mut current)?;activity=current.activity;
+                                    id.parse::<i64>().map_err(|_|"Request activity was not confirmed".to_string())?
+                                }
+                            };
+                            let activity=selected;
+                            if let Some(context)=grounding.as_mut() {
+                                if context["activity_id"].is_null() && context["surface_id"]=="native-launcher" { context["activity_id"]=json!(activity); }
+                            }
                             let mut argv=vec!["/usr/bin/python3".to_string(),"-u".into(),"/usr/local/lib/agent-os/services/worker.py".into(),"ask".into(),activity.to_string(),prompt];
                             if let Some(context)=grounding {
-                                let surface=context["surface_id"].as_str().unwrap_or("");
-                                if surface=="native-monitor" {
-                                    let reference=&context["job_ref"];
-                                    let valid=if let Some(id)=reference.as_i64() {
-                                        request(&socket,&json!({"op":"job.get","job_id":id})).map(|job|job["id"]==id && job["activity_id"]==activity).unwrap_or(false)
-                                    }else if let Some(id)=reference.as_str().and_then(|r|r.strip_prefix("broker:")) {
-                                        request(&broker_socket(),&json!({"op":"poll","job_id":id})).map(|job|job["activity"]==activity).unwrap_or(false)
-                                    }else{false};
-                                    if !valid {frame.lock().unwrap().error=Some("The recorded work is unavailable or belongs to another activity; record a new request".into());continue;}
-                                }else if surface!="native-launcher" {
-                                    let snapshot=super::presentation_pages::read(|value|request(&socket,value),None,||stop.load(Ordering::Relaxed));
-                                    if snapshot.as_ref().map(|s|s["documents"][surface]["activity_id"].as_str()!=Some(activity.to_string().as_str())).unwrap_or(true) {
-                                        frame.lock().unwrap().error=Some("The recorded view was closed or moved; record a new request".into());continue;
-                                    }
-                                }
+                                let context=super::input_context::prepare(context,activity,|query|request(&socket,query),|query|request(&broker_socket(),query),||stop.load(Ordering::Relaxed))?;
                                 argv.extend(["--grounding".into(),context.to_string()]);
                             }
                             request(&socket,&json!({"op":"run","activity_id":activity,"argv":argv}))
-                        }
+                        })() }
                     },
                     Command::Stop{source,job}=>request(&if source=="core"{socket.clone()}else{broker_socket()},&json!({"op":"cancel","job_id":job})),
                     Command::Inspect{source,job}=>{
@@ -1372,6 +1371,31 @@ mod draft_revision_tests {
 
 #[cfg(test)]
 mod initial_document_tests {
+    #[test]
+    #[ignore]
+    fn initial_typed_requests_validate_before_creating_and_never_launch_on_broker_failure() {
+        let socket=PathBuf::from(std::env::var("AGENT_OS_SOCKET").unwrap());
+        let mut backend=Backend::start(socket.clone(),None);
+        fn wait(backend:&Backend, predicate:impl Fn(&Frame)->bool) {
+            let deadline=Instant::now()+Duration::from_secs(10);
+            loop {let current=backend.frame.lock().unwrap().clone();if predicate(&current){return;}assert!(Instant::now()<deadline,"Request did not settle: {:?}",current.error);thread::sleep(Duration::from_millis(20));}
+        }
+        wait(&backend,|frame|frame.connected);
+        let context=json!({"activity_id":null,"surface_id":"native-launcher","surface_title":"Agent request","layout_revision":0,"job_ref":null,"selection":"","selection_kind":"focused_surface","modality":"typed"});
+        backend.commands.send(Command::Ask{activity:None,prompt:"   ".into(),grounding:Some(context.clone())}).unwrap();
+        wait(&backend,|frame|frame.error.is_some());
+        assert_eq!(request(&socket,&json!({"op":"snapshot"})).unwrap()["activities"],json!([]));
+        for _ in 0..2 {
+            backend.frame.lock().unwrap().error=None;
+            backend.commands.send(Command::Ask{activity:None,prompt:"A deliberate typed request".into(),grounding:Some(context.clone())}).unwrap();
+            wait(&backend,|frame|frame.error.is_some() && frame.activity.is_some());
+            let state=request(&socket,&json!({"op":"snapshot"})).unwrap();
+            assert_eq!(state["activities"].as_array().unwrap().len(),1);
+            assert_eq!(state["activities"][0]["name"],"Personal");
+            assert_eq!(state["jobs"],json!([]),"Broker failure launched inference work");
+        }
+        backend.close();
+    }
     #[test]
     #[ignore]
     fn queued_new_documents_reuse_the_confirmed_activity() {
