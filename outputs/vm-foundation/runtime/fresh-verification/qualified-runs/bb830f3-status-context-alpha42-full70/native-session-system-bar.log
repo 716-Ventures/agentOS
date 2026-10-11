@@ -1,0 +1,18 @@
+dbus-daemon[14896]: [session uid=1000 pid=14896 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=14915 comm="/tmp/agentos-session-test-8b60si7i/bin/agent-os-de")
+dbus-daemon[14896]: [session uid=1000 pid=14896 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[14941]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=14915 comm="/tmp/agentos-session-test-8b60si7i/bin/agent-os-de")
+dbus-daemon[14941]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: background workspace focus reconciliation preserves active launcher typing
+PASS: private system bar reserves work area; launcher opens, closes and retains drafts without workspace tiles
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI inline validation exposes literal error relation, preserves durable Unicode draft, rejects invalid transactions and clears without implicit Save
+PASS: independent AT-SPI toggle activation reaches the real durable draft; feedback and clearing retain the boolean without Save; scoped Discard restores committed state
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 0, "committed": "First"}
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 1, "committed": "First"}
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 2, "committed": "First"}
+PASS: independent agentOS Choice retains its field-plus-option name across three rendered feedback revisions
+PASS: local callback parse/range errors relate to the exact retained field, never dispatch or Save, clear on edit and retry once with registered typed values
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: core outage is visible; independent launcher and retained draft remain reachable without model work
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
