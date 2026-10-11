@@ -1,0 +1,5 @@
+{
+  "first_fix": "Selected work text and visible latest state passed, but deselection did not apply latest state when source data was unchanged. Row.update ran only when item data changed.",
+  "result": "failed",
+  "correction": "Refresh observed text for bound unchanged rows on each host update, keeping identity and command control updates tied to changed item data."
+}

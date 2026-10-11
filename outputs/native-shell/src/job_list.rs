@@ -10,7 +10,7 @@ struct Item {
 #[derive(Clone)]
 struct Row {
     widget: gtk::Box,
-    label: gtk::Label,
+    label: Rc<ui::StatusView>,
     stop: gtk::Button,
     review: gtk::Button,
     attach: gtk::Button,
@@ -22,8 +22,9 @@ struct Row {
 impl Row {
     fn new(app: &gtk::Application, commands: &Sender<Command>) -> Self {
         let widget = ui::column(8);
-        let label = ui::text("", false);
-        widget.append(&label);
+        let label = Rc::new(ui::StatusView::new("").unwrap());
+        label.value.remove_css_class("muted");
+        widget.append(&label.widget);
         let inspect = ui::button("Read output", ButtonVariant::Outline, false);
         let stop = ui::button("Stop work", ButtonVariant::Destructive, false);
         let review = ui::button("Review approval", ButtonVariant::Outline, false);
@@ -112,30 +113,15 @@ impl Row {
         ] {
             button.update_property(&[gtk::accessible::Property::Description(&identity)]);
         }
-        let argv = item.job["argv"]
-            .as_array()
-            .map(|a| {
-                a.iter()
-                    .filter_map(Value::as_str)
-                    .collect::<Vec<_>>()
-                    .join(" ")
-            })
-            .unwrap_or_default();
         let status = item.job["status"].as_str().unwrap_or("unavailable");
-        let text = format!(
-            "{} · {}{}\n{}",
-            item.source,
-            status,
-            if item.available {
-                ""
-            } else {
-                " · service unavailable"
-            },
-            argv
-        );
-        if self.label.text() != text {
-            self.label.set_text(&text);
+        // A recycled cell must release the previous selection before it can
+        // represent another job. Initial binding is not a background update.
+        if self.current.borrow().as_ref().map(|previous| &previous.key) != Some(&item.key) {
+            self.label.widget.set_visible(false);
+            self.label.value.select_region(0, 0);
         }
+        self.refresh_status(item);
+        self.label.widget.set_visible(true);
         self.review.set_sensitive(
             item.available && item.source == "broker" && status == "approval_required",
         );
@@ -161,7 +147,36 @@ impl Row {
         );
         *self.current.borrow_mut() = Some(item.clone());
     }
+    fn refresh_status(&self, item: &Item) {
+        status_projection::update(&self.label, &Self::observed_text(item));
+    }
+    fn observed_text(item: &Item) -> String {
+        let argv = item.job["argv"]
+            .as_array()
+            .map(|a| {
+                a.iter()
+                    .filter_map(Value::as_str)
+                    .collect::<Vec<_>>()
+                    .join(" ")
+            })
+            .unwrap_or_default();
+        let status = item.job["status"].as_str().unwrap_or("unavailable");
+        format!(
+            "{} · {}{}\n{}",
+            item.source,
+            status,
+            if item.available {
+                ""
+            } else {
+                " · service unavailable"
+            },
+            argv
+        )
+    }
     fn clear(&self) {
+        self.label.widget.set_visible(false);
+        self.label.value.select_region(0, 0);
+        status_projection::update(&self.label, "");
         self.widget
             .update_property(&[gtk::accessible::Property::Label("Unavailable work row")]);
         *self.current.borrow_mut() = None;
@@ -284,11 +299,20 @@ impl JobList {
                 };
                 if let Some(object) = self.items.get(&key) {
                     let mut previous = object.borrow_mut::<Item>();
-                    if previous.job != item.job || previous.available != item.available {
+                    let changed = previous.job != item.job || previous.available != item.available;
+                    if changed {
                         *previous = item.clone();
-                        if let Some(pointer) = self.bound.borrow().get(&key) {
-                            if let Some(row) = self.rows.borrow().get(pointer) {
+                    }
+                    if let Some(pointer) = self.bound.borrow().get(&key) {
+                        if let Some(row) = self.rows.borrow().get(pointer) {
+                            if changed {
                                 row.update(&item);
+                            } else if row.label.current.is_visible()
+                                && row.label.value.selection_bounds().is_none()
+                            {
+                                // Only a completed selection needs a text refresh;
+                                // unchanged visible rows do not rebuild command text.
+                                row.refresh_status(&item);
                             }
                         }
                     }
@@ -312,6 +336,10 @@ impl JobList {
                 self.items.remove(&key);
             }
         }
+    }
+    pub fn status_capture_view(&self) -> Rc<ui::StatusView> {
+        let pointer = *self.bound.borrow().get("core:731").expect("Mapped capture work row missing");
+        self.rows.borrow()[&pointer].label.clone()
     }
     pub fn verify_initial(&self) {
         assert!(self
@@ -340,8 +368,22 @@ impl JobList {
             "GTK must not construct a widget for every history entry"
         );
         let original = self.items["core:1"].clone();
+        let pointer = *self.bound.borrow().get("core:1").expect("First mapped work row missing");
+        let label = self.rows.borrow()[&pointer].label.value.clone();
+        let selected = label.text();
+        label.select_region(0, -1);
+        let bounds = label.selection_bounds();
+        assert!(bounds.is_some());
         fixture.core["jobs"][0]["status"] = json!("succeeded");
         self.update(&fixture);
+        assert_eq!(label.text(), selected, "work: background refresh replaced selected status");
+        assert_eq!(label.selection_bounds(), bounds);
+        assert!(!self.rows.borrow()[&pointer].stop.is_sensitive());
+        assert!(self.rows.borrow()[&pointer].label.current.is_visible());
+        assert!(self.rows.borrow()[&pointer].label.current.text().contains("succeeded"));
+        label.select_region(0, 0);
+        self.update(&fixture);
+        assert_ne!(label.text(), selected);
         assert_eq!(self.items["core:1"], original);
         if let Some(pointer) = self.bound.borrow().get("core:1") {
             let row = &self.rows.borrow()[pointer];
@@ -361,6 +403,9 @@ impl JobList {
         // Recycled or unbound controls must never retain a previous command target.
         for row in self.rows.borrow().values() {
             assert!(row.current.borrow().is_none());
+            assert!(row.label.value.selection_bounds().is_none());
+            assert!(row.label.value.text().is_empty());
+            assert!(!row.label.current.is_visible());
         }
         let _ = commands;
         self.update(frame);

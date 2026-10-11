@@ -1,0 +1,25 @@
+{
+  "started_at": "2026-10-11T23:49:14.234701+00:00",
+  "source_revision": "f7a5f635e1313aed37612d2b0f32c6ea86953fe0",
+  "source_changes": [
+    " M outputs/native-shell/src/controls.rs",
+    " M outputs/native-shell/src/job_list.rs",
+    " M outputs/native-shell/src/main.rs",
+    "A  outputs/native-shell/src/status_projection.rs",
+    " M outputs/native-shell/src/verification.rs"
+  ],
+  "source_archive_sha256": "51cd7fd7af5054eb3cb1d08ecefd16dbdcdc1371c2e658fa88ed15a6d4a82fb1",
+  "passed": true,
+  "host_status_captures": [
+    "status-host-message-light-1.png",
+    "status-host-voice-dark-2.png",
+    "status-host-model-light-2.png",
+    "status-host-work-dark-1.png"
+  ],
+  "owned_utm_identity": [
+    89222,
+    "Sun Oct 11 19:49:14 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T23:50:13.577364+00:00"
+}

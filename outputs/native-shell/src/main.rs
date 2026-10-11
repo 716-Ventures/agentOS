@@ -18,6 +18,7 @@ mod pty_transport;
 mod pty_view;
 mod reconcile;
 mod state_pages;
+mod status_projection;
 mod system_bar;
 mod screen_keyboard;
 mod terminal_actions;

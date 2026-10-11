@@ -10,8 +10,8 @@ pub struct Controls {
     monitor: gtk::ApplicationWindow,
     pub monitor_content: gtk::Box,
     jobs: super::job_list::JobList,
-    message: gtk::Label,
-    model_text: gtk::Label,
+    message: ui::StatusView,
+    model_text: ui::StatusView,
     inspection: gtk::TextView,
     output_page: Option<log_view::Page>,
     output_label: gtk::Label,
@@ -23,7 +23,7 @@ pub struct Controls {
     output_displayed: Rc<RefCell<Option<log_view::Page>>>,
     voice: voice::Voice,
     voice_button: gtk::Button,
-    voice_status: gtk::Label,
+    voice_status: ui::StatusView,
     frozen_context: Rc<RefCell<Option<Value>>>,
     context_provider: Rc<RefCell<Option<Rc<dyn Fn() -> Value>>>>,
     context_label: gtk::Label,
@@ -179,10 +179,11 @@ impl Controls {
         request.entry.connect_activate(move |_| submit());
         let voice = voice::Voice::new();
         let voice_button = ui::button("Record voice", ButtonVariant::Outline, false);
-        let voice_status = ui::status("Microphone idle");
+        voice_button.set_valign(gtk::Align::Start);
+        let voice_status = ui::StatusView::new("Microphone idle").unwrap();
         let voice_row = ui::row(12);
         voice_row.append(&voice_button);
-        voice_row.append(&voice_status);
+        voice_row.append(&voice_status.widget);
         widget.append(&voice_row);
         let review_content = ui::column(12);
         review_content.append(&ui::text("Review voice request", true));
@@ -246,8 +247,8 @@ impl Controls {
                 }
             }
         });
-        let message = ui::status("Select or create an activity to start work.");
-        widget.append(&message);
+        let message = ui::StatusView::new("Select or create an activity to start work.").unwrap();
+        widget.append(&message.widget);
         let monitor_content = ui::column(16);
         for side in [0, 1, 2, 3] {
             match side {
@@ -258,8 +259,9 @@ impl Controls {
             }
         }
         monitor_content.append(&ui::text("Agent Monitor", true));
-        let model_text = ui::text("Model configuration and measured usage unavailable", false);
-        monitor_content.append(&model_text);
+        let model_text = ui::StatusView::new("Model configuration and measured usage unavailable").unwrap();
+        model_text.value.remove_css_class("muted");
+        monitor_content.append(&model_text.widget);
         let images = image_controls::ImageControls::new(commands.clone());
         widget.append(&images.widget);
         let workspace = workspace_controls::WorkspaceControls::new(commands.clone());
@@ -410,10 +412,108 @@ impl Controls {
             .set_text("Explicit native request λ");
         self.request_field.entry.emit_activate();
         self.jobs.verify_initial();
-        assert!(!self.model_text.text().is_empty());
+        assert!(!self.model_text.value.text().is_empty());
         self.workspace.verify(frame);
 
         self.present();
+    }
+    pub fn verify_status_updates(&mut self, frame: &Frame, commands: &Sender<Command>) {
+        let original_voice = self.voice.state.lock().unwrap().clone();
+        let request = self.request_field.entry.text();
+        for kind in ["message", "voice", "model"] {
+            if std::env::var("AGENT_OS_STATUS_SELECTION_CASE").is_ok_and(|case| case != kind) {
+                continue;
+            }
+            let mut fixture = frame.clone();
+            fixture.notice = Some("Original notice λ 日本語".into());
+            fixture.error = None;
+            fixture.usage = json!({"configuration":[{"model":"Original λ 日本語","role":"fixture","configured":false}],"models":{}});
+            self.voice.state.lock().unwrap().error = Some("Original microphone λ 日本語".into());
+            self.update(&fixture, commands);
+            let label = match kind {
+                "message" => self.message.value.clone(),
+                "voice" => self.voice_status.value.clone(),
+                _ => self.model_text.value.clone(),
+            };
+            let original = label.text();
+            label.select_region(0, -1);
+            let selection = label.selection_bounds();
+            assert!(selection.is_some());
+            fixture.notice = Some("Current notice 日本語".into());
+            fixture.usage["configuration"][0]["model"] = json!("Current 日本語");
+            self.voice.state.lock().unwrap().error = Some("Current microphone 日本語".into());
+            self.update(&fixture, commands);
+            assert_eq!(label.text(), original, "{kind}: background refresh replaced selected status");
+            assert_eq!(label.selection_bounds(), selection, "{kind}");
+            assert_eq!(self.request_field.entry.text(), request);
+            let view = match kind { "message" => &self.message, "voice" => &self.voice_status, _ => &self.model_text };
+            assert!(view.current.is_visible(), "{kind}: current observation hidden");
+            assert!(view.current.text().contains("Current"), "{kind}: current observation missing");
+            self.update(&fixture, commands);
+            assert_eq!(label.selection_bounds(), selection, "{kind}: repeated poll changed selection");
+            label.select_region(0, 0);
+            self.update(&fixture, commands);
+            assert_ne!(label.text(), original, "{kind}: deselection did not apply current state");
+            println!("CHECK: selected {kind} status retains snapshot and request draft across background refresh");
+        }
+        *self.voice.state.lock().unwrap() = original_voice;
+        self.update(frame, commands);
+    }
+    pub fn capture_status(mut self, kind: String, path: String, mut frame: Frame, commands: Sender<Command>, quit: gtk::Application) {
+        frame.connected = true;
+        frame.error = None;
+        frame.notice = Some("Original notice λ 日本語".into());
+        frame.usage = json!({"configuration":[{"model":"Original model λ 日本語","role":"fixture","configured":false}],"models":{}});
+        frame.core["jobs"] = json!([{"id":731,"status":"running","argv":["Selection verification","λ 日本語"]}]);
+        frame.broker = json!([]);
+        self.voice.state.lock().unwrap().error = Some("Original microphone λ 日本語".into());
+        self.request_field.entry.set_text("Unsent request λ 日本語");
+        self.update(&frame, &commands);
+        self.temporary_launcher();
+        let window = if matches!(kind.as_str(), "voice" | "message") {
+            let window = gtk::ApplicationWindow::builder().application(&quit)
+                .title("Status selection verification").default_width(720).child(&self.widget).build();
+            window.add_css_class("seven-ui");
+            window.present();
+            window
+        } else {
+            self.monitor.present();
+            self.monitor.clone()
+        };
+        glib::timeout_add_local_once(Duration::from_millis(180), move || {
+            let (label, current) = match kind.as_str() {
+                "message" => (self.message.value.clone(), self.message.current.clone()),
+                "voice" => (self.voice_status.value.clone(), self.voice_status.current.clone()),
+                "model" => (self.model_text.value.clone(), self.model_text.current.clone()),
+                "work" => { let view = self.jobs.status_capture_view(); (view.value.clone(), view.current.clone()) },
+                _ => panic!("Unknown status capture"),
+            };
+            let original = label.text();
+            label.select_region(0, -1);
+            assert!(label.grab_focus());
+            frame.notice = Some("Current notice 日本語".into());
+            frame.usage["configuration"][0]["model"] = json!("Current model 日本語");
+            frame.core["jobs"][0]["status"] = json!("failed");
+            self.voice.state.lock().unwrap().error = Some("Current microphone 日本語".into());
+            self.update(&frame, &commands);
+            assert_eq!(label.text(), original);
+            assert!(current.is_visible());
+            assert_eq!(self.request_field.entry.text(), "Unsent request λ 日本語");
+            glib::timeout_add_local_once(Duration::from_millis(180), move || {
+                assert!(label.is_mapped() && current.is_mapped());
+                assert!(current.width() > 0 && current.height() > 0);
+                let paintable = gtk::WidgetPaintable::new(Some(&window));
+                let snapshot = gtk::Snapshot::new();
+                paintable.snapshot(&snapshot, window.width() as f64, window.height() as f64);
+                let node = snapshot.to_node().expect("Status host capture has no rendered node");
+                window.renderer().unwrap().render_texture(&node, None).save_to_png(path).unwrap();
+                println!("PASS: mapped {kind} status current notice and retained selection captured with unsent request intact");
+                label.select_region(0, 0);
+                window.destroy();
+                self.close();
+                quit.quit();
+            });
+        });
     }
     pub fn verify_context_request(&self, frame: &Frame) {
         let source=Rc::new(RefCell::new(json!({"activity_id":frame.activity.as_ref().unwrap().parse::<i64>().unwrap(),"surface_id":"native-fixture","layout_revision":7,"job_ref":null,"selection":"Original selected λ 日本語","selection_kind":"selected_text","surface_title":"Selected document","element_id":"field","selection_captured_at":SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs_f64()})));
@@ -545,7 +645,7 @@ impl Controls {
         });
         self.voice_button
             .set_sensitive(matches!(voice.phase.as_str(), "idle" | "recording"));
-        self.voice_status.set_text(
+        status_projection::update(&self.voice_status,
             voice
                 .error
                 .as_deref()
@@ -602,7 +702,7 @@ impl Controls {
                 .unwrap_or(gtk::INVALID_LIST_POSITION),
         );
         self.changing.set(false);
-        self.message.set_text(
+        status_projection::update(&self.message,
             frame
                 .error
                 .as_deref()
@@ -655,9 +755,7 @@ impl Controls {
             }
             lines.join("\n")
         };
-        if self.model_text.text() != usage {
-            self.model_text.set_text(&usage);
-        }
+        status_projection::update(&self.model_text, &usage);
         if let Some(output) = &frame.inspection {
             let buffer = self.inspection.buffer();
             self.output_previous.set_sensitive(output.has_previous);

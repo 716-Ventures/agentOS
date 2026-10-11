@@ -1,0 +1,7 @@
+{
+  "captures_inspected": 4,
+  "functional_tests": "pass",
+  "visual_defect": "Selected microphone current notice stretches the Record voice button vertically.",
+  "correction": "Align Record voice to the top of its row so added status lines cannot stretch its height.",
+  "confirmation_round_pending": true
+}

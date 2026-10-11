@@ -491,6 +491,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         }
         input_context::verify(app,&frame,&commands,&drafts);
         println!("CHECK: typed request preserves immutable selected context; reopening captures the new selection");
+        controls.verify_status_updates(&frame,&commands);
         controls.verify_output(&frame,&commands);
         let output_commands=rx.try_iter().collect::<Vec<_>>();
         assert!(output_commands.iter().any(|command|matches!(command,Command::FreezeOutput(10))));
@@ -636,7 +637,13 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             glib::timeout_add_local_once(Duration::from_millis(180),move || {
             if let Some(path)=capture {let snapshot=gtk::Snapshot::new();paintable.snapshot(&snapshot,surface.window.width() as f64,surface.window.height() as f64);let node=snapshot.to_node().unwrap();surface.window.renderer().unwrap().render_texture(&node,None).save_to_png(path).unwrap();}
             println!("PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view");
-            surface.window.destroy();quit.quit();
+            surface.window.destroy();
+            if let Ok(kind) = std::env::var("AGENT_OS_STATUS_CAPTURE") {
+                let path = std::env::var("AGENT_OS_STATUS_CAPTURE_PATH").expect("Status capture path missing");
+                controls.capture_status(kind, path, frame.clone(), commands.clone(), quit);
+            } else {
+                quit.quit();
+            }
             });
         });
     });

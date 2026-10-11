@@ -1,0 +1,19 @@
+{
+  "started_at": "2026-10-11T23:43:25.440015+00:00",
+  "source_revision": "f7a5f635e1313aed37612d2b0f32c6ea86953fe0",
+  "source_changes": [
+    " M outputs/native-shell/src/controls.rs",
+    " M outputs/native-shell/src/job_list.rs",
+    " M outputs/native-shell/src/main.rs",
+    "A  outputs/native-shell/src/status_projection.rs",
+    " M outputs/native-shell/src/verification.rs"
+  ],
+  "source_archive_sha256": "9d5b9e9f6f0046feeb7bff7aa7a8d4f8ee760152a195b24f3a37d4e49befe99e",
+  "passed": false,
+  "owned_utm_identity": [
+    84508,
+    "Sun Oct 11 19:43:25 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T23:43:51.709302+00:00"
+}

@@ -1,0 +1,64 @@
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+dbus-daemon[1790]: [session uid=1000 pid=1790 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=1810 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[1790]: [session uid=1000 pid=1790 pidfd=5] Successfully activated service 'org.a11y.Bus'
+
+thread 'main' panicked at src/controls.rs:444:13:
+assertion `left == right` failed: voice: background refresh replaced selected status
+  left: "Current microphone 日本語"
+ right: "Original microphone λ 日本語"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'main' panicked at library/core/src/panicking.rs:218:5:
+panic in a function that cannot unwind
+stack backtrace:
+   0:     0xaaaaba19ff44 - <std::sys::backtrace::BacktraceLock::print::DisplayBacktrace as core::fmt::Display>::fmt::hdb6f6d042b491751
+   1:     0xaaaaba1dae3c - core::fmt::write::h6d72b50863dc4fa0
+   2:     0xaaaaba1c2dd0 - std::io::Write::write_fmt::hd2f963b87cdd5023
+   3:     0xaaaaba19fdf8 - std::sys::backtrace::BacktraceLock::print::h435d5ca8e4e67cf2
+   4:     0xaaaaba1af0f0 - std::panicking::default_hook::{{closure}}::h19a0ec54d5eb587c
+   5:     0xaaaaba1aef64 - std::panicking::default_hook::h1242a7d680affcc5
+   6:     0xaaaaba1af6a8 - std::panicking::rust_panic_with_hook::hbdc292c9fdd02555
+   7:     0xaaaaba1a06d4 - std::panicking::begin_panic_handler::{{closure}}::hfe80fb29e0038c40
+   8:     0xaaaaba1a01ac - std::sys::backtrace::__rust_end_short_backtrace::ha2a0318cc297b45e
+   9:     0xaaaaba1af214 - rust_begin_unwind
+  10:     0xaaaab9e5d5b0 - core::panicking::panic_nounwind_fmt::h4574a6bdf9fe1159
+  11:     0xaaaab9e5d628 - core::panicking::panic_nounwind::h28ad1a13bfa41d0f
+  12:     0xaaaab9e5d7a0 - core::panicking::panic_cannot_unwind::hf4bd0b5abce28105
+  13:     0xaaaab9eb8ba4 - gio::auto::application::ApplicationExt::connect_activate::activate_trampoline::h42299ce07837e1df
+  14:     0xffffa95c8950 - g_closure_invoke
+  15:     0xffffa95df310 - <unknown>
+  16:     0xffffa95e07e8 - <unknown>
+  17:     0xffffa95e6278 - g_signal_emit_valist
+  18:     0xffffa95e6320 - g_signal_emit
+  19:     0xffffa973f5b8 - <unknown>
+  20:     0xffffa973f744 - g_application_run
+  21:     0xaaaab9e97d68 - gio::application::ApplicationExtManual::run_with_args::hf50ca3ed210ce125
+  22:     0xaaaab9f9e74c - agent_os_desktop::verification::run::h02606fa83fcf22a1
+  23:     0xaaaab9f1e5d4 - agent_os_desktop::main::h1154d31c1cc5ebae
+  24:     0xaaaab9ebb184 - core::ops::function::FnOnce::call_once::hbf7b422ab63ecc6d
+  25:     0xaaaab9eef868 - std::sys::backtrace::__rust_begin_short_backtrace::he518991cdf5c81ee
+  26:     0xaaaab9f762d8 - std::rt::lang_start::{{closure}}::h99263bdd633b4269
+  27:     0xaaaaba1c2438 - std::rt::lang_start_internal::hdd95299bbc4bc65d
+  28:     0xaaaab9f762b8 - std::rt::lang_start::h2c2ce8b9ed4b2999
+  29:     0xaaaab9f1e62c - main
+  30:     0xffffa921225c - <unknown>
+  31:     0xffffa921233c - __libc_start_main
+  32:     0xaaaab9e5dd30 - _start
+  33:                0x0 - <unknown>
+thread caused non-unwinding panic. aborting.
+Traceback (most recent call last):
+  File "/home/developer/agent-os-source/native-shell/tests/native_desktop.py", line 108, in <module>
+    if '--compositor' not in sys.argv:subprocess.run(command,env=env,check=True,timeout=30)
+                                      ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['/home/developer/agent-os-source/native-shell/target/debug/agent-os-desktop', '--self-test', '--socket', '/tmp/agentos-native-8yoxql7a/core.sock', '--capture', '/home/developer/agent-os-source/native-shell/test-output/light-1/desktop.png']' died with <Signals.SIGABRT: 6>.

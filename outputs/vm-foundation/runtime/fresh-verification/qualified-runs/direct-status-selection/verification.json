@@ -1,0 +1,93 @@
+{
+  "baseline": {
+    "started_at": "2026-10-11T23:39:40.791530+00:00",
+    "source_revision": "f7a5f635e1313aed37612d2b0f32c6ea86953fe0",
+    "source_changes": [
+      " M outputs/native-shell/src/controls.rs",
+      " M outputs/native-shell/src/job_list.rs",
+      " M outputs/native-shell/src/verification.rs"
+    ],
+    "source_archive_sha256": "37ba993b7077ffe7eb66a9211bfc473acac68bb42c49841a757481f869d205a2",
+    "passed": false,
+    "baseline_failures_reproduced": [
+      "message",
+      "voice",
+      "model",
+      "work"
+    ],
+    "owned_utm_identity": [
+      81716,
+      "Sun Oct 11 19:39:40 2026"
+    ],
+    "owned_utm_closed": true,
+    "finished_at": "2026-10-11T23:40:10.977120+00:00"
+  },
+  "fixed": {
+    "started_at": "2026-10-11T23:51:20.993259+00:00",
+    "source_revision": "f7a5f635e1313aed37612d2b0f32c6ea86953fe0",
+    "source_changes": [
+      " M outputs/native-shell/src/controls.rs",
+      " M outputs/native-shell/src/job_list.rs",
+      " M outputs/native-shell/src/main.rs",
+      "A  outputs/native-shell/src/status_projection.rs",
+      " M outputs/native-shell/src/verification.rs"
+    ],
+    "source_archive_sha256": "1610f9c7668232f83fa0c614bb408999a5e24c1f222fa57bb1abc86f25fa773e",
+    "passed": true,
+    "host_status_captures": [
+      "status-host-message-light-1.png",
+      "status-host-voice-dark-2.png",
+      "status-host-model-light-2.png",
+      "status-host-work-dark-1.png"
+    ],
+    "owned_utm_identity": [
+      90914,
+      "Sun Oct 11 19:51:21 2026"
+    ],
+    "owned_utm_closed": true,
+    "finished_at": "2026-10-11T23:52:20.426613+00:00"
+  },
+  "native_unit_tests": {
+    "passed": 35,
+    "ignored": 7
+  },
+  "four_mapped_profiles_and_nested_shared_compositor": "pass",
+  "visual_review": {
+    "initial_and_confirmation_captures_inspected": 8,
+    "confirmation_defects": [],
+    "scope": [
+      "light notice",
+      "dark doubled-text microphone",
+      "light doubled-text model usage",
+      "dark work row"
+    ],
+    "record_voice_alignment_corrected": true
+  },
+  "behavior": [
+    "Selected notice/microphone/model/work text retains its older snapshot while current observations remain visible.",
+    "Repeated polling preserves selection and unsent request; deselection applies latest text.",
+    "Work actions immediately follow current job state; recycled rows release selection, visible text and command targets.",
+    "Unchanged work rows only rebuild text when a deferred selection has ended.",
+    "Host display text is bounded to 65536 UTF-8 bytes, marks truncation and renders NUL as a visible control symbol; underlying observations are unchanged."
+  ],
+  "earlier_deselection_failure": "qualified-runs/direct-status-deferred-poll/observation.json",
+  "earlier_visual_captures": "qualified-runs/direct-status-host-initial-captures/visual-review.json",
+  "complete_committed_source_qualification": "pending",
+  "current_signed_image": "v19 retains the separately qualified runtime 921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
+  "sha256": {
+    "baseline/voice.log": "09fbb624287152cb799c040df6115e4e0f8d76a794b92639d965948be6dd408e",
+    "baseline/message.log": "44d084aec7edeaac5bad4ae1905b4a7ed3d99b0e25a3c24e6c6a376e61ccf968",
+    "baseline/driver.json": "1fc4411281a5deab6c9ccfaaa6b7109aef48540cf78f8144eea0416a7bf5c918",
+    "baseline/model.log": "a86cee70e1ab7072e891cd43de16cde1cc868c7c960b9540d4c4448f3712640a",
+    "baseline/driver.log": "a6bbd1a6423c88323c9922fb6b84fc7ed10cbed185b6c0593d8ce2a25952be14",
+    "baseline/work.log": "9a7dde7967535db29b1ab20684ef63a60d28eef887ef0832b2bfc10d607abf61",
+    "baseline/driver.py": "235fccfdfb40798dbd5dfd41adfa50c287444025b6ae9633dbe818ccd3dc0bff",
+    "fixed/status-host-work-dark-1.png": "5a580c7083a94190e7d36af01a3818f436e30e45275957cfbcefc5bcdd0c6c7e",
+    "fixed/status-host-voice-dark-2.png": "8ab10f66036d113d6399870b3b9ca9e7658454fe3e7a837414a8601f17708351",
+    "fixed/status-host-message-light-1.png": "ad7d54315f69552eaba9e73c321a5178c391a162c66e85d735a018556245168e",
+    "fixed/driver.json": "badbb082b7350151b898797e8eda89a9ed49d23bc11c602d5e71aaba5ad49f15",
+    "fixed/driver.log": "e86d294c45b1a2620bd4ce70156073c49059b7cf5302d5ce6c67c44afadc944f",
+    "fixed/driver.py": "b6378b7d165f6a58736c332344e8584f90f5ee5fe2aeffc7552567caf0453052",
+    "fixed/status-host-model-light-2.png": "ee8c7ad5c9bb061bebacd4c3b68f1c24b41c53bdf74cba38bdf0b7b07e3b3779"
+  }
+}
