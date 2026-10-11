@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-10-11T04:36:00.621430+00:00",
+  "started_at": "2026-10-11T04:45:31.478130+00:00",
   "result": "pass",
   "vm_uuid": "27176EA2-E994-4165-9BBA-70FEED59E66B",
   "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -51,6 +51,7 @@
     "direct-display-terminal-ime",
     "direct-native-feedback-load",
     "direct-native-feedback",
+    "direct-rotated-output",
     "direct-display-presentation",
     "conventional-browser-links",
     "signed-graphical-release",
@@ -75,21 +76,18 @@
     "native control latency outside the measured editor profile; physical display and live inference-load latency"
   ],
   "deployment": {
-    "created_at": "2026-10-11T04:36:14.059587+00:00",
-    "source_archive_sha256": "ad7fcac439fd7fdd566b6d17b6417f1318503d458fcfc501942a3502c5e2665a",
-    "repository_revision": "a60ec1a9db2cb5d0d2f0fa7c63f6de4711eafa9c",
+    "created_at": "2026-10-11T04:45:44.910667+00:00",
+    "source_archive_sha256": "9549f1c07551e1b12a8b207c40247d96daa7f058fa4df818b110b1ac3e94f468",
+    "repository_revision": "97c41c97a8d8ceea23d43c0ca5709566d9df2faa",
     "source_changes": [
-      " M outputs/agent-shell/Cargo.lock",
-      " M outputs/agent-shell/Cargo.toml",
-      " M outputs/native-shell/Cargo.lock",
-      " M outputs/native-shell/Cargo.toml",
-      " M outputs/native-shell/README.md",
-      " M outputs/native-shell/src/main.rs",
-      " M outputs/native-shell/src/verification.rs"
+      " M outputs/agent-shell/tests/direct_display_guest.py",
+      " M outputs/native-compositor/src/direct.rs",
+      " M outputs/native-compositor/src/output_config.rs",
+      " M outputs/native-shell/README.md"
     ],
     "installed": true
   },
-  "runtime_release": "f56819b449f16e5c55dbae8a4f2cc2d63660f25256f5715e8bbf3e8c6887d8d3",
+  "runtime_release": "b7d7c9b708481cfcd389f9b21d29903f8a91b074ad14bac61f451c58e9e1f2d1",
   "dependency_manifest": {
     "packages": {
       "adduser": "3.152",
@@ -879,7 +877,7 @@
     "python": "Python 3.9.6"
   },
   "guest_stopped": true,
-  "finished_at": "2026-10-11T04:43:23.319704+00:00",
+  "finished_at": "2026-10-11T04:52:39.435063+00:00",
   "public_ui_release": {
     "tag": "v0.1.0-alpha.32",
     "revision": "3c999c68067730f3ebd962c0934e7df6186d8dec",
@@ -1015,16 +1013,16 @@
       "collector_sha256": "847cfb831aa9982543abf8841d240f2d3c64fc191795fa2564d582b2cc23305a"
     },
     "native_gtk_presentation_feedback": {
-      "runtime_release": "f56819b449f16e5c55dbae8a4f2cc2d63660f25256f5715e8bbf3e8c6887d8d3",
+      "runtime_release": "b7d7c9b708481cfcd389f9b21d29903f8a91b074ad14bac61f451c58e9e1f2d1",
       "measurement": {
         "clock_id": 1,
         "discarded": 0,
         "format": 1,
         "invalid": 0,
-        "max_ms": 43,
+        "max_ms": 44,
         "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-        "p50_ms": 34,
-        "p95_ms": 42,
+        "p50_ms": 30,
+        "p95_ms": 41,
         "pending": 0,
         "presented": 20,
         "requested": 20,
@@ -1042,8 +1040,8 @@
       "probe_sha256": "07741bf3e654f0c214ca1c9488e4a6bf1ef8a4341d7a408418add99ffefbc62e",
       "baseline_log_sha256": "5e3eceeeae3550f67cab15076a031cf5d9adeda13e4ccdb0ab58112df6baa60b",
       "targeted_log_sha256": "654add5b529532736165de1b254979b802250e408df5a71fcfa1fef88164c2b6",
-      "full_reproduction_log_sha256": "ebe66b465b537f99cf731d45541c4a6bb5df2a9599c5c35df48e9d332091e6e7",
-      "display_log_sha256": "6437946cadccee7d4207942cd373e04256ae29583502f825a59549b1eee1f1b0",
+      "full_reproduction_log_sha256": "8787051e0a9008293930b3f5a6aab914614b9f1d7e8d46d07fcbbab2ce8683fd",
+      "display_log_sha256": "2a1e0af2fef58f3ff35e4f7c7c735543cd2c33ce937ad9d2ff29c9d9e43e90f1",
       "boundary": "Opt-in diagnostics with at most 256 key-triggered requests per window. No key codes, text or document identity recorded. Event millisecond quantization contributes less than 1ms. This native editor/UTM profile does not qualify every control, physical display, subjective responsiveness or live inference load.",
       "typing_fixture_sha256": "01f8bc588e4dd90583824479172861d03ed6000ac1dd16393225f318ec15982c",
       "cpu_job_profile": {
@@ -1052,21 +1050,21 @@
           "discarded": 0,
           "format": 1,
           "invalid": 0,
-          "max_ms": 47,
+          "max_ms": 45,
           "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-          "p50_ms": 35,
-          "p95_ms": 47,
+          "p50_ms": 30,
+          "p95_ms": 42,
           "pending": 0,
           "presented": 20,
           "requested": 20,
           "sample_limit": 256,
           "profile": "two concurrent broker CPU jobs",
           "job_cpu_usage_usec": [
-            2424402,
-            2502711
+            2410401,
+            2440894
           ]
         },
-        "log_sha256": "1413c2ceab854609c6ddb795ce616a8e6d820d41d70a249d02487f15027621d9",
+        "log_sha256": "567e8ea1ca67c225819e30c85bd4eaec4f6dbb7a586d14e9bb8719e2deab1c9f",
         "targeted_log_sha256": "0755068a7baae888347be14f2d749bc50e230c3fc8e3f67dae8b7ad1e7b78dc1",
         "qualified": [
           "Two distinct real broker jobs consumed CPU throughout measurement",
@@ -1191,6 +1189,60 @@
         "Owned displays, native clients, guest and UTM app closed"
       ],
       "boundary": "Native mapped/renderer state and virtual kernel-input evidence; screen-reader announcement timing, physical input/speech and live provider quality remain unqualified."
+    },
+    "direct_output_transforms": {
+      "runtime_release": "b7d7c9b708481cfcd389f9b21d29903f8a91b074ad14bac61f451c58e9e1f2d1",
+      "public_ui_release": {
+        "tag": "v0.1.0-alpha.32",
+        "revision": "3c999c68067730f3ebd962c0934e7df6186d8dec",
+        "public_ci_run": 38111765207
+      },
+      "qualified_log_sha256": {
+        "targeted_compositor_and_virtual_output": "55a7d478c479f750d38405cced8b2569f233e3fb5d6551560f294f3adfdff70d",
+        "rotated_output": "f85da19bbe65ce61e5ce9f1210d31ad9329804fdbda020826e516e6351dac4f2",
+        "full_reproduction": "8787051e0a9008293930b3f5a6aab914614b9f1d7e8d46d07fcbbab2ce8683fd"
+      },
+      "source_sha256": {
+        "outputs/native-compositor/src/output_config.rs": "460beb5391edeba492e2715b5651e4e41438fb1522672345d30d2547f4c78d37",
+        "outputs/native-compositor/src/direct.rs": "64c0409fcdc6127a7584d93a2bbb510b23f26869bc7bb8624ba281e3cfee9a7d",
+        "outputs/agent-shell/tests/direct_display_guest.py": "4673afb943d279abbd260ac5c5b00e51a73f68abad5bffb9fdffc1c704fe1902"
+      },
+      "outputs": [
+        {
+          "height": 1280,
+          "name": "Virtual-1",
+          "scale": 1.0,
+          "transform": "_90",
+          "width": 800,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "measurement": {
+        "clock_id": 1,
+        "discarded": 0,
+        "format": 1,
+        "invalid": 0,
+        "max_ms": 49,
+        "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+        "p50_ms": 38,
+        "p95_ms": 47,
+        "pending": 0,
+        "presented": 20,
+        "requested": 20,
+        "sample_limit": 256,
+        "profile": "idle editor"
+      },
+      "qualified": [
+        "All eight Wayland transforms match actual Smithay logical geometry at fractional scale",
+        "Automatic side-by-side spacing uses transformed logical width; existing configuration defaults remain normal",
+        "Malformed transform strings and numeric transform values fail before device configuration",
+        "Installed single virtual KMS output rotates to 800 by 1280 logical pixels",
+        "Completed KMS frames before and after VT pause/resume; 20 real kernel key-to-native-presentation receipts",
+        "Isolated temporary output preferences leave user configuration untouched; owned session/scope/guest/app closed",
+        "Expanded complete 61-check UTM reproduction"
+      ],
+      "boundary": "Only the 90-degree orientation has this installed virtual KMS/input qualification. Other transforms have geometry/policy tests. Physical panels, touch calibration, hotplug and multi-output routing remain unqualified."
     }
   },
   "observations": [
