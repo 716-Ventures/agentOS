@@ -1,0 +1,9 @@
+PASS: system http handler is Firefox ESR
+PASS: system https handler is Firefox ESR
+dbus-daemon[59518]: [session uid=1000 pid=59518 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.1' (uid=1000 pid=59519 comm="python3 native-shell/tests/browser_links.py")
+dbus-daemon[59518]: [session uid=1000 pid=59518 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[59560]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=59519 comm="python3 native-shell/tests/browser_links.py")
+dbus-daemon[59560]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: native Link, real Firefox, shared conventional window, focus/maximize and disconnect
+PASS: browser profile, launch group, native clients, core and private displays cleaned up
