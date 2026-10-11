@@ -1,0 +1,71 @@
+{
+  "result": "pass",
+  "source": {
+    "started_at": "2026-10-11T19:39:42.147619+00:00",
+    "source_revision": "b532c1114d2c72c6b3d6c8801d0754ffb3fdab5d",
+    "source_changes": [
+      " M outputs/native-shell/tests/accessibility.py",
+      " M outputs/native-shell/tests/native_session.py"
+    ],
+    "source_archive_sha256": "3c1e45593fa71e4392e5bbe88acf671e4a5dc006f15c8b5189ef21405b38496b",
+    "passed": true,
+    "owned_utm_identity": [
+      82086,
+      "Sun Oct 11 15:39:42 2026"
+    ],
+    "owned_utm_closed": true,
+    "finished_at": "2026-10-11T19:41:00.338723+00:00"
+  },
+  "runtime": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
+  "public_ui_revision": "4a816cc289e5a7649fb83678532c3ed536757bbb",
+  "profiles": {
+    "debug": {
+      "raw_speech_sha256": "853b2405149dd473c37318be627b69c3b46ddff398f2bc3855327eec413a2c23",
+      "raw_speech_bytes": 2077425,
+      "compressed_log": "debug-orca-speech.log.gz",
+      "speech_output": "debug-speech-output.log"
+    },
+    "installed": {
+      "raw_speech_sha256": "6d71f2a121408741c2c67d4c636580964e0952515e9eff7c2e0e245169fa0640",
+      "raw_speech_bytes": 2065719,
+      "compressed_log": "installed-orca-speech.log.gz",
+      "speech_output": "installed-speech-output.log"
+    }
+  },
+  "scope": "Real Orca speech for focused TextField, DocumentEditor, Choice and Toggle error/clear; trusted on-screen keyboard navigation; exact values/drafts, explicit scoped discard, generic callback/edit/save/discard; owned cleanup.",
+  "limitations": [
+    "Null audio sink does not qualify audible quality or braille",
+    "Choice value and absent draft retained; this test does not select a different option",
+    "Prior fixture placement mechanisms remain bounded observations; successful fixture places controls in its initial document"
+  ],
+  "evidence_sha256": {
+    "debug-speech-output.log": "39d49c5b160237b7f1fbe6bcad87e726d17180b118edd51ee15beb786d67e238",
+    "installed-orca-speech.log.gz": "4e064972d5f026afc929c5d26ea8cc6f89c607bec4d3d53dfce2a771cb4c508a",
+    "discard-scope-failure.json": "6d2b62d8fca7b5a9093d6dfb219aae9d4984fb0d16cc64bdacb3a635fe5eed71",
+    "initial-startup-failure.log": "ebd03d24d459eabb0f012d376787e4d68efa866bbf58f27422b3d22482211144",
+    "monitor-focus-failure.json": "186ec3454c3b89c274dabcee911e5f8d82f6965d6c125f628e1b03979aa29800",
+    "unplaced-failure.json": "22141575cfe0ed9b7d427dcd6f509e05f2cc8fbc656206722938caa7a547f8af",
+    "discard-scope-session.log": "5fc7803414f584391ff3a1a19fa7180450441e86689a5a085e0b91714014fbbc",
+    "control-tab-session.log": "c6c078785db20d689bb96bd75f0d8fe6a89b29edf19304fb2405c6eb6d6bd0b5",
+    "atspi-focus-failure.json": "b78daad319d0881de15a1db13e6e8e5a2b6ad52a5efc28f707f2f90cd2cb30cc",
+    "control-tab-failure.json": "1fde35d26af0ea37828a361e6ebb841bfa6830840bc7aac71d9e74b5da3d0236",
+    "active-input-failure.json": "292b9a04d7aa36f9667d7b83a91b907800955b74986daeeade42500175205254",
+    "atspi-focus-session.log": "4ab75ef65c66331c92a1787059308074921f704686b384f8b0733346e8b7b828",
+    "unplaced-failure.log": "3f2ac4ba97a64d87d2825dc06b3937a5e58cba71aeda5b8122b61334bf94022e",
+    "integration.log": "3d3b2add1a79c3ba85fc1e3518d1d31b7bc9813793e2a5cf60c6a7bbef9e5ac6",
+    "active-input-session.log": "ffbdf280c25cfbcee8561988f209f89185183e24bfc31414245bbe9a622ab6f6",
+    "monitor-focus-failure.log": "7fba44314181320262dad319666e5226424be2f2a633fec006bba984ef812546",
+    "debug-orca-speech.log.gz": "0bccf6319dfdffd563e4ae77fb7806cd4a080808bb38e5185534b16873b60f5f",
+    "installed-speech-output.log": "064c96e308adafd9ab57b504604824ce6db1e1764cf9a2fd6eb75b926c5efe5d",
+    "initial-startup-session.log": "cdbd0a5ea7b5d2cf92f77429f43f5b54fc343cb23679ce38992748090154b859",
+    "discard-scope-failure.log": "27bec4b4c9900d7ef8f45620839ff00ab30b55229577870bf3188cd88a9e739e",
+    "control-tab-failure.log": "1abab8dbf9bbe109a7e0fb3260c355c7bac296751d1da5c5f3c1d2eae90bcc1f",
+    "integration.json": "b209181ad9acb1523587bf836507f79385b79f78068767bfa5b1bfe4196464fd",
+    "driver.py": "4492bc947c72d5d2e5ec28cbe5fe9f74407f7dfc7f9fb74a3b599004e05c9718",
+    "initial-startup-failure.json": "38d63f639379e7b1038deb3427901db0bbdc1240f02c57f0e606ca1542e36e8d",
+    "atspi-focus-failure.log": "a3194098ebd6e7e6b63db29539a42ef331102a122bcf54828ba44b0f19674d8e",
+    "monitor-focus-session.log": "579ae9ba83201e0dc439b5494d08642cb61a2796060700b5fcf08de140daa9b3",
+    "active-input-failure.log": "a880ac304682cb8cb20b7a1df892e247a7586796ee7f04e56f3a199b17f20e0e",
+    "unplaced-session.log": "610d8c0a7cd5c990d0f16ddddb4972bb8aa53ab8ce24e18c3b115dd4176765ee"
+  }
+}

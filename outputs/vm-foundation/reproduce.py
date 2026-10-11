@@ -37,7 +37,7 @@ def graphical_checks():
         ('native-cpu-contention','dbus-run-session -- python3 native-shell/tests/native_desktop.py --load',120),
         ('native-compositor','dbus-run-session -- python3 native-shell/tests/native_desktop.py --compositor',120),
         ('native-shared-workspace','dbus-run-session -- python3 native-shell/tests/native_desktop.py --compositor --shared',180)]
-    for name,option in [('logout',''),('system-bar','--system-bar'),('ime','--ime'),('ime-editor','--ime-editor'),('ime-failure','--ime-failure'),('screen-keyboard','--screen-keyboard --screen-reader'),('display-zoom','--display-zoom'),('screen-reader','--screen-reader --installed'),('screen-reader-compositor-loss','--screen-reader --compositor-failure'),('host-loss','--host-failure'),('compositor-loss','--compositor-failure')]:
+    for name,option in [('logout',''),('system-bar','--system-bar'),('ime','--ime'),('ime-editor','--ime-editor'),('ime-failure','--ime-failure'),('screen-keyboard','--screen-keyboard --screen-reader'),('display-zoom','--display-zoom'),('screen-reader','--screen-reader --installed --reader-controls'),('screen-reader-compositor-loss','--screen-reader --compositor-failure'),('host-loss','--host-failure'),('compositor-loss','--compositor-failure')]:
         checks.append(('native-session-'+name,'dbus-run-session -- python3 native-shell/tests/native_session.py '+option,120))
     checks.append(('direct-display-input-vt','sudo -n python3 tests/direct_display_guest.py --input',120))
     checks.append(('direct-display-fresh-profile-input','sudo -n python3 tests/direct_display_guest.py --input --fresh-profile',120))

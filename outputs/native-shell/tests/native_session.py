@@ -93,6 +93,9 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
             wait_for(endpoint.exists,[core])
             activity=call(endpoint,{'op':'create','name':'Full desktop session'})['id']
             document={'protocol':'agentos.presentation/1','catalog_revision':'native-core/1','surface_id':'session-fixture','activity_id':str(activity),'revision':0,'title':'Session lifecycle','root':'root','elements':{'root':{'type':'Stack@1','props':{'spacing':'normal'},'slots':{'children':['reading','field']}},'reading':{'type':'Status@1','props':{'value':'Authenticated session fixture'}},'field':{'type':'DocumentEditor@1' if ime_editor else 'TextField@1','props':{'label':'Accessible session draft','value':'Original accessible value'}}},'bindings':{},'actions':{}}
+            if '--reader-controls' in sys.argv:
+                document['elements'].update({'editor':{'type':'DocumentEditor@1','props':{'label':'Reader document draft','value':'Saved document'}},'choice':{'type':'Choice@1','props':{'label':'Reader workspace choice','options':['First','Second'],'value':'First'}},'toggle':{'type':'Toggle@1','props':{'label':'Reader confirmation','value':False}}})
+                document['elements']['root']['slots']['children'].extend(['editor','choice','toggle'])
             call(endpoint,{'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':'session-fixture','expected_revisions':{'session-fixture':None},'operations':[{'op':'surface.create','document':document}]})
             session=subprocess.Popen(['python3',str(SHELL/'services/desktop_session.py'),'--backend','headless','--pixman','--bin-dir',str(bins),'--socket',str(endpoint)]+(['--screen-reader'] if screen_reader else []),env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
             pidfile=wait_for(lambda:next(runtime.glob('agentos-session-*/compositor.pid'),None),[core,session])
@@ -234,6 +237,11 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 wait_for(announced,[core,session],timeout=30)
                 print('PASS: session-owned Orca initializes speech and announces the focused native field',flush=True)
                 accessibility.verify_reader_validation(lambda value:call(endpoint,value),reader_log)
+                if '--reader-controls' in sys.argv:
+                    accessibility.verify_reader_controls(lambda value:call(endpoint,value),reader_log)
+                # Normal logout removes the private session directory before finally.
+                # Capture tested speech while that owned directory is still alive.
+                (OUTPUT/'reader-validation-speech.log').write_bytes(reader_log.read_bytes())
                 if screen_keyboard:
                     accessibility.activate(accessibility.find('Keyboard',pyatspi.ROLE_PUSH_BUTTON))
                     wait_for(lambda:any(layer['namespace']=='agentos-keyboard' and layer['mapped'] for layer in call(control,{'op':'snapshot'})['system_layers']),[core,session])

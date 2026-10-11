@@ -1,0 +1,182 @@
+   Compiling agent-os-desktop v0.1.0-alpha.1 (/home/developer/agent-os-source/native-shell)
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+ --> src/document_dialog.rs:8:11
+  |
+8 | ) -> gtk::FileChooserNative {
+  |           ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:10:23
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:61:23
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:10:42
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:11:10
+   |
+11 |         .title(if save {
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:16:10
+   |
+16 |         .action(if save {
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:21:10
+   |
+21 |         .accept_label(if save { "Export" } else { "Import" })
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:22:10
+   |
+22 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:23:10
+   |
+23 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:24:10
+   |
+24 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+  --> src/document_dialog.rs:27:16
+   |
+27 |         dialog.set_current_name("document.txt");
+   |                ^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:31:40
+   |
+31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:61:42
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:62:10
+   |
+62 |         .title("Choose existing text file to review")
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:63:10
+   |
+63 |         .action(gtk::FileChooserAction::Open)
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:64:10
+   |
+64 |         .accept_label("Review replacement")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:65:10
+   |
+65 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:66:10
+   |
+66 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:67:10
+   |
+67 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:72:40
+   |
+72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: `agent-os-desktop` (bin "agent-os-desktop") generated 20 warnings
+    Finished `dev` profile [unoptimized] target(s) in 4.69s
+   Compiling agent-os-compositor v0.1.0 (/home/developer/agent-os-source/native-compositor)
+warning: function `project` is never used
+ --> src/pressure.rs:5:8
+  |
+5 | pub fn project(
+  |        ^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: `agent-os-compositor` (bin "agent-os-compositor") generated 1 warning
+    Finished `dev` profile [unoptimized] target(s) in 5.93s
+   Compiling agent-os-compositor v0.1.0 (/home/developer/agent-os-source/native-compositor)
+    Finished `dev` profile [unoptimized] target(s) in 0.61s
+dbus-daemon[2036]: [session uid=1000 pid=2036 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.3' (uid=1000 pid=2069 comm="/tmp/agentos-session-test-j6cvgqef/bin/agent-os-de")
+dbus-daemon[2036]: [session uid=1000 pid=2036 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[2103]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=2069 comm="/tmp/agentos-session-test-j6cvgqef/bin/agent-os-de")
+dbus-daemon[2103]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+dbus-daemon[2036]: [session uid=1000 pid=2036 pidfd=5] Activating service name='ca.desrt.dconf' requested by ':1.4' (uid=1000 pid=2097 comm="/usr/libexec/at-spi-bus-launcher")
+dbus-daemon[2036]: [session uid=1000 pid=2036 pidfd=5] Successfully activated service 'ca.desrt.dconf'
+PASS: session-owned Orca initializes speech and announces the focused native field
+
+(process:2037): atspi-WARNING **: 19:30:31.046: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:2037): atspi-WARNING **: 19:30:31.352: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: session-owned Orca sends the focused field error and cleared-valid state to speech without changing input or drafts; physical audio and braille remain unqualified
+Traceback (most recent call last):
+  File "/home/developer/agent-os-source/native-shell/tests/native_session.py", line 238, in <module>
+    accessibility.verify_reader_controls(lambda value:call(endpoint,value),reader_log)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/developer/agent-os-source/native-shell/tests/accessibility.py", line 337, in verify_reader_controls
+    session_focus.focus(call,f'desktop-{activity}',surface,key,'reader-'+key)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/developer/agent-os-source/native-shell/tests/session_focus.py", line 12, in focus
+    return request({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
+        'request_id':request_id+'-'+str(attempt),'expected_revisions':{workspace_id:workspace['revision']},
+        'operations':[{'op':'workspace.edit','workspace_id':workspace_id,
+            'edit':{'kind':'focus','surface_id':surface_id,'element_id':element_id}}]})
+  File "/home/developer/agent-os-source/native-shell/tests/native_session.py", line 238, in <lambda>
+    accessibility.verify_reader_controls(lambda value:call(endpoint,value),reader_log)
+                                                      ~~~~^^^^^^^^^^^^^^^^
+  File "/home/developer/agent-os-source/native-shell/tests/native_session.py", line 31, in call
+    assert response['ok'],response
+           ~~~~~~~~^^^^^^
+AssertionError: {'error': '{"code":"missing_reference","detail":"Focus surface not placed"}', 'ok': False}
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+Requested orderly guest shutdown. Check status before restarting.
+{"started_at": "2026-10-11T19:30:04.181743+00:00", "source_revision": "b532c1114d2c72c6b3d6c8801d0754ffb3fdab5d", "source_changes": [" M outputs/native-shell/tests/accessibility.py", " M outputs/native-shell/tests/native_session.py"], "source_archive_sha256": "6eef5a25f2bba593c84279b7c4f8d87dd166a54fb9964218974c160dab9d59bd", "passed": false, "owned_utm_identity": [74493, "Sun Oct 11 15:30:04 2026"], "owned_utm_closed": true, "finished_at": "2026-10-11T19:30:39.356192+00:00"}
+Traceback (most recent call last):
+  File "/tmp/agentos-reader-controls-rebuilt.py", line 30, in <module>
+    vm.ssh('cd /home/developer/agent-os-source && dbus-run-session -- python3 native-shell/tests/native_session.py --screen-reader --reader-controls'+option,check=True)
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/vm.py", line 309, in ssh
+    return subprocess.run(ssh_args() + [command], **kwargs)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ssh', '-p', '22221', '-i', '/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/id_ed25519', '-o', 'IdentitiesOnly=yes', '-o', 'StrictHostKeyChecking=accept-new', '-o', 'UserKnownHostsFile=/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/known_hosts', '-o', 'ConnectTimeout=3', '-o', 'BatchMode=yes', '-o', 'LogLevel=ERROR', 'developer@127.0.0.1', 'cd /home/developer/agent-os-source && dbus-run-session -- python3 native-shell/tests/native_session.py --screen-reader --reader-controls']' returned non-zero exit status 1.

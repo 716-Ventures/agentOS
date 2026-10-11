@@ -302,6 +302,109 @@ def verify_reader_validation(call, speech_log):
     print('PASS: session-owned Orca sends the focused field error and cleared-valid state to speech without changing input or drafts; physical audio and braille remain unqualified',flush=True)
 
 
+
+def verify_reader_controls(call, speech_log):
+    """Observe real Orca speech for the remaining native validation controls."""
+    import ime_accessibility
+    activity=call({'op':'presentation.get','document_id':'session-fixture'})['activity_id']
+    surface='session-fixture'
+    props={
+        'editor':{'label':'Reader document draft','value':'Saved document'},
+        'choice':{'label':'Reader workspace choice','options':['First','Second'],'value':'First'},
+        'toggle':{'label':'Reader confirmation','value':False},
+    }
+    kinds={'editor':('DocumentEditor@1',pyatspi.ROLE_TEXT),'choice':('Choice@1',pyatspi.ROLE_COMBO_BOX),'toggle':('Toggle@1',pyatspi.ROLE_CHECK_BOX)}
+    def current():return call({'op':'presentation.get','document_id':surface})
+    def apply(operations,revision):
+        return call({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':'reader-controls-'+str(time.monotonic_ns()),'expected_revisions':{surface:revision},'operations':operations})
+    frame=find('Agent view · Session lifecycle',pyatspi.ROLE_FRAME)
+    def speech_since(offset,message):
+        return any('SPEECH OUTPUT:' in line and message in line for line in speech_log.read_text(errors='replace')[offset:].splitlines())
+    def focused(control):
+        queue=deque([control]);visited=0
+        while queue and visited<128:
+            node=queue.popleft();visited+=1
+            if node is None:continue
+            if node.getState().contains(pyatspi.STATE_FOCUSED):return True
+            queue.extend(node[i] for i in range(min(node.childCount,32)))
+        return False
+    activate(find('Agent Monitor',pyatspi.ROLE_PUSH_BUTTON))
+    activate(find('Keyboard',pyatspi.ROLE_PUSH_BUTTON))
+    tab=find('Tab',pyatspi.ROLE_PUSH_BUTTON)
+    control_modifier=False
+    def focused_path():
+        queue=deque([(frame,())]);visited=0
+        while queue and visited<512:
+            node,path=queue.popleft();visited+=1
+            if node is None:continue
+            if node.getState().contains(pyatspi.STATE_FOCUSED):return (path,node.name,node.getRole())
+            queue.extend((node[i],path+(i,)) for i in range(min(node.childCount,64)))
+        return None
+    def navigate(control):
+        nonlocal control_modifier
+        for _ in range(32):
+            if focused(control):return
+            previous=focused_path()
+            needs_control=previous is not None and previous[1]==props['editor']['label']
+            if needs_control!=control_modifier:
+                activate(find('Ctrl on' if control_modifier else 'Ctrl',pyatspi.ROLE_PUSH_BUTTON))
+                control_modifier=needs_control
+            activate(tab)
+            wait(lambda:ime_accessibility.rendered_text('Keyboard ready'),'Trusted navigation stroke did not finish')
+            try:wait(lambda:focused_path()!=previous,'Tab did not move native focus')
+            except AssertionError:
+                print('Reader navigation diagnostics: '+json.dumps({'before':previous,'after':focused_path(),'target':control.name,'control_modifier':control_modifier,'labels':accessible_labels()}),flush=True)
+                raise
+        raise AssertionError('Native keyboard navigation did not reach '+control.name)
+    def scoped_discard(control):
+        parent=control.parent
+        for _ in range(12):
+            if parent is None:break
+            queue=deque([parent]);buttons=[];visited=0
+            while queue and visited<512:
+                node=queue.popleft();visited+=1
+                if node is None:continue
+                if node.name=='Discard draft' and node.getRole()==pyatspi.ROLE_PUSH_BUTTON:buttons.append(node)
+                queue.extend(node[i] for i in range(min(node.childCount,64)))
+            if len(buttons)==1:return buttons[0]
+            if len(buttons)>1:break
+            parent=parent.parent
+        raise AssertionError('No unique Discard control in the same field group: '+control.name)
+    for key,(kind,role) in kinds.items():
+        name=props[key]['label']+(': First' if key=='choice' else '')
+        control=find(name,role,root=frame)
+        focus_baseline=len(speech_log.read_text(errors='replace'))
+        navigate(control)
+        wait(lambda:speech_since(focus_baseline,props[key]['label']),'Orca did not announce initial '+kind+' focus')
+        if key=='editor':
+            assert control.queryEditableText().setTextContents('Unsaved document λ 日本語')
+            wait(lambda:call({'op':'draft.get','surface_id':surface,'element_id':key}).get('draft')=='Unsaved document λ 日本語','Reader editor draft did not reach core')
+        elif key=='toggle':
+            activate(control)
+            wait(lambda:call({'op':'draft.get','surface_id':surface,'element_id':key}).get('draft')=='true','Reader toggle draft did not reach core')
+        before=call({'op':'draft.get','surface_id':surface,'element_id':key})
+        visible=text(control) if key=='editor' else control.name if key=='choice' else control.getState().contains(pyatspi.STATE_CHECKED)
+        message={'editor':'Review this document before saving.','choice':'Choose an available workspace.','toggle':'Confirm this requirement before continuing.'}[key]
+        baseline=len(speech_log.read_text(errors='replace'))
+        assert apply([{'op':'element.set_props','surface_id':surface,'element_id':key,'props':{**props[key],'validation_message':message}}],current()['revision'])['status']=='committed'
+        wait(lambda:speech_since(baseline,message),'Orca did not speak '+kind+' validation')
+        assert control.getState().contains(pyatspi.STATE_INVALID_ENTRY)
+        assert call({'op':'draft.get','surface_id':surface,'element_id':key})==before
+        baseline=len(speech_log.read_text(errors='replace'))
+        assert apply([{'op':'element.set_props','surface_id':surface,'element_id':key,'props':props[key]}],current()['revision'])['status']=='committed'
+        wait(lambda:speech_since(baseline,'Entry valid.'),'Orca did not speak cleared '+kind+' validation')
+        assert not control.getState().contains(pyatspi.STATE_INVALID_ENTRY) and focused(control)
+        after=text(control) if key=='editor' else control.name if key=='choice' else control.getState().contains(pyatspi.STATE_CHECKED)
+        assert after==visible and call({'op':'draft.get','surface_id':surface,'element_id':key})==before
+        assert current()['elements'][key]['props']==props[key]
+        if before.get('draft') is not None:
+            activate(scoped_discard(control))
+            wait(lambda:call({'op':'draft.get','surface_id':surface,'element_id':key}).get('draft') is None,'Reader fixture draft did not explicitly discard')
+        print('PASS: real Orca error/clear speech retains '+kind+' focus, value and exact draft without Save',flush=True)
+    navigate(find('Accessible session draft',pyatspi.ROLE_TEXT))
+    if control_modifier:activate(find('Ctrl on',pyatspi.ROLE_PUSH_BUTTON))
+    activate(find('Hide keyboard',pyatspi.ROLE_PUSH_BUTTON))
+
 def verify_local_form(call, database):
     import accessibility as a
     import pyatspi,json,time,sqlite3,ime_accessibility

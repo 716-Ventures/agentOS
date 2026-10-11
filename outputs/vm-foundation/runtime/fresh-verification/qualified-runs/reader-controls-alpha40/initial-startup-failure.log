@@ -1,0 +1,19 @@
+Traceback (most recent call last):
+  File "/home/developer/agent-os-source/native-shell/tests/native_session.py", line 98, in <module>
+    pidfile=wait_for(lambda:next(runtime.glob('agentos-session-*/compositor.pid'),None),[core,session])
+  File "/home/developer/agent-os-source/native-shell/tests/native_session.py", line 23, in wait_for
+    assert all(p.poll() is None for p in children),'A session process exited; inspect session.log'
+           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: A session process exited; inspect session.log
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+Requested orderly guest shutdown. Check status before restarting.
+{"started_at": "2026-10-11T19:29:27.282794+00:00", "source_revision": "acb269810ce6d954ef9ee28cee82580e329fe857", "source_changes": [" M outputs/implementation-status.md", " M outputs/native-shell/tests/accessibility.py", " M outputs/native-shell/tests/native_session.py", " M outputs/vm-foundation/README.md", " M outputs/vm-foundation/native-verification.json"], "source_archive_sha256": "6eef5a25f2bba593c84279b7c4f8d87dd166a54fb9964218974c160dab9d59bd", "passed": false, "owned_utm_identity": [73658, "Sun Oct 11 15:29:27 2026"], "owned_utm_closed": true, "finished_at": "2026-10-11T19:29:44.008740+00:00"}
+Traceback (most recent call last):
+  File "/tmp/agentos-reader-controls.py", line 27, in <module>
+    vm.ssh('cd /home/developer/agent-os-source && dbus-run-session -- python3 native-shell/tests/native_session.py --screen-reader --reader-controls'+option,check=True)
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/vm.py", line 309, in ssh
+    return subprocess.run(ssh_args() + [command], **kwargs)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ssh', '-p', '22221', '-i', '/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/id_ed25519', '-o', 'IdentitiesOnly=yes', '-o', 'StrictHostKeyChecking=accept-new', '-o', 'UserKnownHostsFile=/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/known_hosts', '-o', 'ConnectTimeout=3', '-o', 'BatchMode=yes', '-o', 'LogLevel=ERROR', 'developer@127.0.0.1', 'cd /home/developer/agent-os-source && dbus-run-session -- python3 native-shell/tests/native_session.py --screen-reader --reader-controls']' returned non-zero exit status 1.

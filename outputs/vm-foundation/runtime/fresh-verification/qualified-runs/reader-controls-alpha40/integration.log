@@ -1,0 +1,253 @@
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+ --> src/document_dialog.rs:8:11
+  |
+8 | ) -> gtk::FileChooserNative {
+  |           ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:10:23
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:61:23
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:10:42
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:11:10
+   |
+11 |         .title(if save {
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:16:10
+   |
+16 |         .action(if save {
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:21:10
+   |
+21 |         .accept_label(if save { "Export" } else { "Import" })
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:22:10
+   |
+22 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:23:10
+   |
+23 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:24:10
+   |
+24 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+  --> src/document_dialog.rs:27:16
+   |
+27 |         dialog.set_current_name("document.txt");
+   |                ^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:31:40
+   |
+31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:61:42
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:62:10
+   |
+62 |         .title("Choose existing text file to review")
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:63:10
+   |
+63 |         .action(gtk::FileChooserAction::Open)
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:64:10
+   |
+64 |         .accept_label("Review replacement")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:65:10
+   |
+65 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:66:10
+   |
+66 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:67:10
+   |
+67 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:72:40
+   |
+72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: `agent-os-desktop` (bin "agent-os-desktop") generated 20 warnings
+    Finished `dev` profile [unoptimized] target(s) in 0.15s
+warning: function `project` is never used
+ --> src/pressure.rs:5:8
+  |
+5 | pub fn project(
+  |        ^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: `agent-os-compositor` (bin "agent-os-compositor") generated 1 warning
+    Finished `dev` profile [unoptimized] target(s) in 0.19s
+    Finished `dev` profile [unoptimized] target(s) in 0.06s
+dbus-daemon[869]: [session uid=1000 pid=869 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.3' (uid=1000 pid=918 comm="/tmp/agentos-session-test-c935gdv7/bin/agent-os-de")
+dbus-daemon[869]: [session uid=1000 pid=869 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[958]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=918 comm="/tmp/agentos-session-test-c935gdv7/bin/agent-os-de")
+dbus-daemon[958]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+dbus-daemon[869]: [session uid=1000 pid=869 pidfd=5] Activating service name='ca.desrt.dconf' requested by ':1.4' (uid=1000 pid=952 comm="/usr/libexec/at-spi-bus-launcher")
+dbus-daemon[869]: [session uid=1000 pid=869 pidfd=5] Successfully activated service 'ca.desrt.dconf'
+PASS: session-owned Orca initializes speech and announces the focused native field
+
+(process:870): atspi-WARNING **: 19:39:58.280: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:870): atspi-WARNING **: 19:39:58.488: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: session-owned Orca sends the focused field error and cleared-valid state to speech without changing input or drafts; physical audio and braille remain unqualified
+
+(process:870): atspi-WARNING **: 19:40:06.894: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:870): atspi-WARNING **: 19:40:07.208: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: real Orca error/clear speech retains DocumentEditor@1 focus, value and exact draft without Save
+
+(process:870): atspi-WARNING **: 19:40:10.788: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:870): atspi-WARNING **: 19:40:11.052: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: real Orca error/clear speech retains Choice@1 focus, value and exact draft without Save
+
+(process:870): atspi-WARNING **: 19:40:13.191: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:870): atspi-WARNING **: 19:40:13.507: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: real Orca error/clear speech retains Toggle@1 focus, value and exact draft without Save
+
+(process:870): atspi-WARNING **: 19:40:17.291: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:870): atspi-WARNING **: 19:40:17.607: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:870): atspi-WARNING **: 19:40:18.954: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:870): atspi-WARNING **: 19:40:19.214: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:870): atspi-WARNING **: 19:40:20.066: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI inline validation exposes literal error relation, preserves durable Unicode draft, rejects invalid transactions and clears without implicit Save
+PASS: independent AT-SPI toggle activation reaches the real durable draft; feedback and clearing retain the boolean without Save; scoped Discard restores committed state
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 0, "committed": "First"}
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 1, "committed": "First"}
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 2, "committed": "First"}
+PASS: independent agentOS Choice retains its field-plus-option name across three rendered feedback revisions
+
+(process:870): atspi-WARNING **: 19:40:21.723: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:870): atspi-WARNING **: 19:40:21.784: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:870): atspi-WARNING **: 19:40:22.245: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:870): atspi-WARNING **: 19:40:22.299: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: local callback parse/range errors relate to the exact retained field, never dispatch or Save, clear on edit and retry once with registered typed values
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: owned reader and speech processes reaped after normal logout
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+dbus-daemon[5652]: [session uid=1000 pid=5652 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.3' (uid=1000 pid=5685 comm="/tmp/agentos-session-test-jggzyz7i/bin/agent-os-de")
+dbus-daemon[5652]: [session uid=1000 pid=5652 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[5709]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=5685 comm="/tmp/agentos-session-test-jggzyz7i/bin/agent-os-de")
+dbus-daemon[5709]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+dbus-daemon[5652]: [session uid=1000 pid=5652 pidfd=5] Activating service name='ca.desrt.dconf' requested by ':1.4' (uid=1000 pid=5703 comm="/usr/libexec/at-spi-bus-launcher")
+dbus-daemon[5652]: [session uid=1000 pid=5652 pidfd=5] Successfully activated service 'ca.desrt.dconf'
+PASS: session-owned Orca initializes speech and announces the focused native field
+
+(process:5653): atspi-WARNING **: 19:40:31.815: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:5653): atspi-WARNING **: 19:40:32.122: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: session-owned Orca sends the focused field error and cleared-valid state to speech without changing input or drafts; physical audio and braille remain unqualified
+
+(process:5653): atspi-WARNING **: 19:40:40.526: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:5653): atspi-WARNING **: 19:40:40.840: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: real Orca error/clear speech retains DocumentEditor@1 focus, value and exact draft without Save
+
+(process:5653): atspi-WARNING **: 19:40:44.390: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:5653): atspi-WARNING **: 19:40:44.708: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: real Orca error/clear speech retains Choice@1 focus, value and exact draft without Save
+
+(process:5653): atspi-WARNING **: 19:40:46.855: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:5653): atspi-WARNING **: 19:40:47.119: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: real Orca error/clear speech retains Toggle@1 focus, value and exact draft without Save
+
+(process:5653): atspi-WARNING **: 19:40:50.869: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:5653): atspi-WARNING **: 19:40:51.130: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:5653): atspi-WARNING **: 19:40:52.577: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:5653): atspi-WARNING **: 19:40:52.783: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:5653): atspi-WARNING **: 19:40:53.658: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI inline validation exposes literal error relation, preserves durable Unicode draft, rejects invalid transactions and clears without implicit Save
+PASS: independent AT-SPI toggle activation reaches the real durable draft; feedback and clearing retain the boolean without Save; scoped Discard restores committed state
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 0, "committed": "First"}
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 1, "committed": "First"}
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 2, "committed": "First"}
+PASS: independent agentOS Choice retains its field-plus-option name across three rendered feedback revisions
+
+(process:5653): atspi-WARNING **: 19:40:55.329: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:5653): atspi-WARNING **: 19:40:55.384: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:5653): atspi-WARNING **: 19:40:55.849: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:5653): atspi-WARNING **: 19:40:55.903: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: local callback parse/range errors relate to the exact retained field, never dispatch or Save, clear on edit and retry once with registered typed values
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: owned reader and speech processes reaped after normal logout
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+Requested orderly guest shutdown. Check status before restarting.
+{"started_at": "2026-10-11T19:39:42.147619+00:00", "source_revision": "b532c1114d2c72c6b3d6c8801d0754ffb3fdab5d", "source_changes": [" M outputs/native-shell/tests/accessibility.py", " M outputs/native-shell/tests/native_session.py"], "source_archive_sha256": "3c1e45593fa71e4392e5bbe88acf671e4a5dc006f15c8b5189ef21405b38496b", "passed": true, "owned_utm_identity": [82086, "Sun Oct 11 15:39:42 2026"], "owned_utm_closed": true, "finished_at": "2026-10-11T19:41:00.338723+00:00"}

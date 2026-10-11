@@ -1,0 +1,16 @@
+{
+  "started_at": "2026-10-11T19:30:04.181743+00:00",
+  "source_revision": "b532c1114d2c72c6b3d6c8801d0754ffb3fdab5d",
+  "source_changes": [
+    " M outputs/native-shell/tests/accessibility.py",
+    " M outputs/native-shell/tests/native_session.py"
+  ],
+  "source_archive_sha256": "6eef5a25f2bba593c84279b7c4f8d87dd166a54fb9964218974c160dab9d59bd",
+  "passed": false,
+  "owned_utm_identity": [
+    74493,
+    "Sun Oct 11 15:30:04 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T19:30:39.356192+00:00"
+}
