@@ -1,0 +1,64 @@
+dbus-daemon[22700]: [session uid=1000 pid=22700 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.3' (uid=1000 pid=22757 comm="/tmp/agentos-session-test-936dchua/bin/agent-os-de")
+dbus-daemon[22700]: [session uid=1000 pid=22700 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[22787]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=22757 comm="/tmp/agentos-session-test-936dchua/bin/agent-os-de")
+dbus-daemon[22787]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+dbus-daemon[22700]: [session uid=1000 pid=22700 pidfd=5] Activating service name='ca.desrt.dconf' requested by ':1.4' (uid=1000 pid=22779 comm="/usr/libexec/at-spi-bus-launcher")
+dbus-daemon[22700]: [session uid=1000 pid=22700 pidfd=5] Successfully activated service 'ca.desrt.dconf'
+PASS: session-owned Orca initializes speech and announces the focused native field
+
+(process:22701): atspi-WARNING **: 03:04:24.717: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:22701): atspi-WARNING **: 03:04:25.027: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: session-owned Orca sends the focused field error and cleared-valid state to speech without changing input or drafts; physical audio and braille remain unqualified
+
+(process:22701): atspi-WARNING **: 03:04:36.927: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:22701): atspi-WARNING **: 03:04:37.248: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: real Orca error/clear speech retains DocumentEditor@1 focus, value and exact draft without Save
+
+(process:22701): atspi-WARNING **: 03:04:42.627: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:22701): atspi-WARNING **: 03:04:42.859: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: real Orca error/clear speech retains Choice@1 focus, value and exact draft without Save
+
+(process:22701): atspi-WARNING **: 03:04:45.329: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:22701): atspi-WARNING **: 03:04:45.621: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: real Orca error/clear speech retains Toggle@1 focus, value and exact draft without Save
+Reader current notice: {"name": "", "role": "status bar", "text": "Current value:\nReader result outcome\nfailed"}
+PASS: actual Orca announces changed result job outcome once while selected snapshot, focus and exact field draft persist
+Reader current notice: {"name": "", "role": "status bar", "text": "Current value:\nReader failure outcome\nfailed"}
+PASS: actual Orca announces changed failure job outcome once while selected snapshot, focus and exact field draft persist
+Reader current notice: {"name": "", "role": "status bar", "text": "Current value:\nfailed"}
+PASS: actual Orca announces changed status job outcome once while selected snapshot, focus and exact field draft persist
+PASS: trusted Ctrl+C copies the selected old Status through the Wayland clipboard after its live job has failed
+
+(process:22701): atspi-WARNING **: 03:05:24.105: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:22701): atspi-WARNING **: 03:05:24.417: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:22701): atspi-WARNING **: 03:05:25.809: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:22701): atspi-WARNING **: 03:05:26.020: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:22701): atspi-WARNING **: 03:05:26.890: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI inline validation exposes literal error relation, preserves durable Unicode draft, rejects invalid transactions and clears without implicit Save
+PASS: independent AT-SPI toggle activation reaches the real durable draft; feedback and clearing retain the boolean without Save; scoped Discard restores committed state
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 0, "committed": "First"}
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 1, "committed": "First"}
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 2, "committed": "First"}
+PASS: independent agentOS Choice retains its field-plus-option name across three rendered feedback revisions
+
+(process:22701): atspi-WARNING **: 03:05:28.537: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:22701): atspi-WARNING **: 03:05:28.591: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:22701): atspi-WARNING **: 03:05:29.104: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:22701): atspi-WARNING **: 03:05:29.157: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: local callback parse/range errors relate to the exact retained field, never dispatch or Save, clear on edit and retry once with registered typed values
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: owned reader and speech processes reaped after normal logout
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer

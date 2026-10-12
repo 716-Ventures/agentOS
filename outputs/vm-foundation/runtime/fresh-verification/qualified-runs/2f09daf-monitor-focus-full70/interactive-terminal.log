@@ -1,0 +1,1 @@
+{"result": "pass", "checks": ["dashboard R starts proposal", "I reviews explicit root terminal approval", "I attaches and sends input", "SSH window resize", "Ctrl-] returns to working dashboard", "CLI reconnect preserves running command", "full screen curses and arrow keys"]}

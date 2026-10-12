@@ -1,0 +1,1 @@
+{"result": "pass", "checks": ["visible microphone state", "explicit finish", "transcript or no-signal review", "no implicit request submission", "Esc cancellation", "q recorder cleanup"]}
