@@ -1,0 +1,7 @@
+dbus-daemon[17128]: [session uid=1000 pid=17128 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=17148 comm="/tmp/agentos-session-test-kaeii7b2/bin/agent-os-de")
+dbus-daemon[17128]: [session uid=1000 pid=17128 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[17174]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=17148 comm="/tmp/agentos-session-test-kaeii7b2/bin/agent-os-de")
+dbus-daemon[17174]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: GTK text-input-v3 Unicode preedit/commit survives unrelated rendering; draft and Save remain distinct
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer

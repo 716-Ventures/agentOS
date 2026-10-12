@@ -1,0 +1,7 @@
+Guest login and foundation service are ready.
+PASS: login, kernel/init, root disk, cloud-init, system health, DNS, HTTPS, service restart
+PASS: guest reboot, changed boot ID, persistent user data and boot history
+Requested orderly guest shutdown. Check status before restarting.
+UTM guest started; SSH is forwarded on localhost:22221.
+PASS: full shutdown and hardware-accelerated cold start with persistent data
+Evidence: /Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/foundation-verification.json
