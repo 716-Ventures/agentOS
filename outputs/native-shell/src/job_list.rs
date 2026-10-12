@@ -337,8 +337,22 @@ impl JobList {
             }
         }
     }
-    pub fn status_capture_view(&self) -> Rc<ui::StatusView> {
-        let pointer = *self.bound.borrow().get("core:731").expect("Mapped capture work row missing");
+    pub fn selected_context(&self) -> Option<Value> {
+        for row in self.rows.borrow().values() {
+            let Some(selection) = input_context::label_selection(&row.label.value) else { continue; };
+            let current = row.current.borrow();
+            let Some(item) = current.as_ref() else { continue; };
+            let reference = if item.source == "core" { item.job["id"].clone() }
+                else { json!(format!("broker:{}", item.job["id"].as_str().unwrap_or(""))) };
+            let activity = if item.source == "core" { &item.job["activity_id"] } else { &item.job["activity"] };
+            return Some(json!({"activity_id":activity,"surface_id":"native-monitor","layout_revision":0,
+                "job_ref":reference,"selection_kind":"selected_text","selection":input_context::bounded(selection),
+                "surface_title":format!("Selected {} work",item.source),"element_id":"work-status","object_id":item.key}));
+        }
+        None
+    }
+    pub fn status_capture_view(&self, key: &str) -> Rc<ui::StatusView> {
+        let pointer = *self.bound.borrow().get(key).expect("Mapped capture work row missing");
         self.rows.borrow()[&pointer].label.clone()
     }
     pub fn verify_initial(&self) {

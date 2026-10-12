@@ -492,6 +492,20 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         input_context::verify(app,&frame,&commands,&drafts);
         println!("CHECK: typed request preserves immutable selected context; reopening captures the new selection");
         controls.verify_status_updates(&frame,&commands);
+        let local_contexts = controls.verify_local_status_requests(&frame, &commands);
+        let local_requests = rx.try_iter().collect::<Vec<_>>();
+        for (kind, expected) in local_contexts {
+            let prompt = format!("Explain selected local {kind} status");
+            let actual = local_requests.iter().find_map(|command| match command {
+                Command::Ask { prompt: text, grounding: Some(context), .. } if text == &prompt => Some(context),
+                _ => None,
+            }).expect("Local status request missing");
+            assert_eq!(actual["selection"], expected["selection"], "{kind}: local status did not replace launcher context");
+            assert_eq!(actual["surface_id"], "native-launcher");
+            assert_eq!(actual["element_id"], expected["element_id"]);
+            assert_eq!(actual["modality"], "typed");
+            println!("CHECK: deliberate local {kind} selection replaces the launcher's earlier context without replacing its selected snapshot");
+        }
         controls.verify_output(&frame,&commands);
         let output_commands=rx.try_iter().collect::<Vec<_>>();
         assert!(output_commands.iter().any(|command|matches!(command,Command::FreezeOutput(10))));
@@ -562,6 +576,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
             let list=surface.elements["list"].list.as_ref().unwrap();assert_eq!(list.row_count(),200);assert!(list.select_key("item-7"));assert_eq!(list.selected_key().as_deref(),Some("item-7"));
             assert_eq!(surface.elements["details"].list.as_ref().unwrap().row_count(),2);
             controls.verify_history(&frame,&commands);
+            controls.verify_work_context(&frame,&commands);
             println!("CHECK: virtualized work history with stable identities and recycled controls");
             let reading=surface.elements["reading"].label.clone().unwrap();
             let field=surface.elements["field"].field.clone().unwrap();

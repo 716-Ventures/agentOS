@@ -1,5 +1,17 @@
 //! Direct human controls; authority is dispatched through the existing core/broker.
 use super::*;
+// Preserve the launch-time source while typing. A deliberate selection of
+// status text inside the launcher is a new local reference chosen by the user.
+fn request_context(frozen: Option<Value>, current: Value) -> Value {
+    let local_status = current["surface_id"] == "native-launcher"
+        && current["selection_kind"] == "selected_text"
+        && current["job_ref"].is_null()
+        && current["selection"].as_str().is_some_and(|text| !text.is_empty())
+        && current["element_id"].as_str().is_some_and(|element|
+            matches!(element, "message-status" | "microphone-status" | "model-status"));
+    if local_status { current } else { frozen.unwrap_or(current) }
+}
+
 pub struct Controls {
     pub widget: gtk::Box,
     activity: Rc<RefCell<Option<String>>>,
@@ -164,7 +176,7 @@ impl Controls {
                 .borrow()
                 .as_ref()
                 .and_then(|s: &String| s.parse::<i64>().ok());
-            let mut context = frozen.borrow().clone().unwrap_or_else(||provider.borrow().as_ref().map(|capture|capture()).unwrap_or(Value::Null));
+            let mut context = request_context(frozen.borrow().clone(), provider.borrow().as_ref().map(|capture|capture()).unwrap_or(Value::Null));
             if !context.is_object() { context=json!({"surface_id":"native-launcher","layout_revision":0,"job_ref":null,"selection":"","selection_kind":"focused_surface","surface_title":"Agent request"}); }
             if context["activity_id"].is_null() {context["activity_id"]=json!(id);}
             let activity=context["activity_id"].as_i64();
@@ -210,7 +222,7 @@ impl Controls {
             if phase == "recording" {
                 recorder.finish();
             } else if phase == "idle" {
-                let context = frozen.borrow().clone().unwrap_or_else(||provider.borrow().as_ref().map(|capture|capture()).unwrap_or(Value::Null));
+                let context = request_context(frozen.borrow().clone(), provider.borrow().as_ref().map(|capture|capture()).unwrap_or(Value::Null));
                 if !context.is_null() {
                     recorder.start(context);
                 }
@@ -446,6 +458,11 @@ impl Controls {
             assert_eq!(label.text(), original, "{kind}: background refresh replaced selected status");
             assert_eq!(label.selection_bounds(), selection, "{kind}");
             assert_eq!(self.request_field.entry.text(), request);
+            let seed = json!({"activity_id":frame.activity.as_ref().unwrap().parse::<i64>().unwrap(),"surface_id":"native-launcher","layout_revision":0,"job_ref":null,"selection":"","selection_kind":"focused_surface","surface_title":"Agent request"});
+            let captured = self.capture_context_for_surfaces(seed.clone(), kind == "model", kind != "model");
+            assert_eq!(captured["selection"], original.as_str(), "{kind}: selected status missing from input context");
+            assert_eq!(captured["selection_kind"], "selected_text");
+            assert_eq!(self.capture_context_for_surfaces(seed.clone(), false, false), seed, "Inactive status selection replaced focused context");
             let view = match kind { "message" => &self.message, "voice" => &self.voice_status, _ => &self.model_text };
             assert!(view.current.is_visible(), "{kind}: current observation hidden");
             assert!(view.current.text().contains("Current"), "{kind}: current observation missing");
@@ -458,6 +475,71 @@ impl Controls {
         }
         *self.voice.state.lock().unwrap() = original_voice;
         self.update(frame, commands);
+    }
+    pub fn verify_local_status_requests(&mut self, frame: &Frame, commands: &Sender<Command>) -> Vec<(String, Value)> {
+        let previous_provider = self.context_provider.borrow().clone();
+        let previous_voice = self.voice.state.lock().unwrap().clone();
+        let previous_request = self.request_field.entry.text();
+        let activity = frame.activity.as_ref().unwrap().parse::<i64>().unwrap();
+        let mut expected = Vec::new();
+        for kind in ["message", "voice"] {
+            if std::env::var("AGENT_OS_LOCAL_STATUS_INPUT_CASE").is_ok_and(|selected| selected != kind) { continue; }
+            self.hide_launcher();
+            let source = Rc::new(RefCell::new(json!({"activity_id":activity,"surface_id":"native-fixture","layout_revision":7,"job_ref":null,"selection":"Original view selection","selection_kind":"selected_text","surface_title":"Original document","element_id":"field"})));
+            let current = source.clone(); self.context_provider(Rc::new(move || current.borrow().clone()));
+            self.open_launcher();
+            let mut fixture = frame.clone(); fixture.error = None;
+            fixture.notice = Some("Original local notice λ 日本語".into());
+            self.voice.state.lock().unwrap().error = Some("Original local microphone λ 日本語".into());
+            self.update(&fixture, commands);
+            let label = if kind == "message" { self.message.value.clone() } else { self.voice_status.value.clone() };
+            label.select_region(0, -1);
+            fixture.notice = Some("Current local notice".into());
+            self.voice.state.lock().unwrap().error = Some("Current local microphone".into());
+            self.update(&fixture, commands);
+            let selected = self.capture_context_for_surfaces(json!({"activity_id":activity,"surface_id":"native-launcher","layout_revision":0,"job_ref":null,"selection":"","selection_kind":"focused_surface","surface_title":"Agent request"}), false, true);
+            assert_eq!(selected["selection"], label.text().as_str());
+            *source.borrow_mut() = selected.clone();
+            self.request_field.entry.set_text(&format!("Explain selected local {kind} status"));
+            self.request_field.entry.emit_activate();
+            expected.push((kind.to_owned(), selected));
+            label.select_region(0, 0);
+            self.hide_launcher();
+        }
+        *self.context_provider.borrow_mut() = previous_provider;
+        *self.voice.state.lock().unwrap() = previous_voice;
+        self.request_field.entry.set_text(&previous_request);
+        self.update(frame, commands);
+        expected
+    }
+    pub fn verify_work_context(&mut self, frame: &Frame, commands: &Sender<Command>) {
+        for source in ["core", "broker"] {
+            let case = if source == "core" { "work" } else { "work-broker" };
+            if std::env::var("AGENT_OS_STATUS_SELECTION_CASE").is_ok_and(|selected| selected != case) { continue; }
+            let mut fixture = frame.clone();
+            fixture.core["jobs"] = json!([]);
+            fixture.broker = json!([]);
+            let activity = frame.activity.as_ref().unwrap().parse::<i64>().unwrap();
+            let id = if source == "core" { json!(731) } else { json!("0123456789abcdef0123456789abcdef") };
+            let job = json!({"id":id,"activity_id":activity,"activity":activity,"status":"running","argv":["Selected work λ 日本語"]});
+            if source == "core" { fixture.core["jobs"] = json!([job]); } else { fixture.broker = json!([job]); }
+            self.update(&fixture, commands);
+            for _ in 0..32 { if glib::MainContext::default().pending() { glib::MainContext::default().iteration(false); } else { break; } }
+            let key = format!("{source}:{}", if source == "core" { "731" } else { id.as_str().unwrap() });
+            let view = self.jobs.status_capture_view(&key);
+            let original = view.value.text();
+            view.value.select_region(0, -1);
+            let seed = json!({"activity_id":activity,"surface_id":"native-launcher","layout_revision":0,"job_ref":null,"selection":"","selection_kind":"focused_surface","surface_title":"Agent request"});
+            let captured = self.capture_context_for_surfaces(seed.clone(), true, false);
+            assert_eq!(captured["selection"], original.as_str(), "{case}: selected status missing from input context");
+            assert_eq!(captured["job_ref"], if source == "core" { id } else { json!(format!("broker:{}",id.as_str().unwrap())) });
+            assert_eq!(captured["activity_id"], activity);
+            assert_eq!(captured["surface_id"], "native-monitor");
+            assert_eq!(self.capture_context_for_surfaces(seed.clone(), false, false), seed);
+            view.value.select_region(0, 0);
+            self.update(frame, commands);
+            println!("CHECK: selected {source} work context retains exact row text and job/activity identity without using another output page");
+        }
     }
     pub fn capture_status(mut self, kind: String, path: String, mut frame: Frame, commands: Sender<Command>, quit: gtk::Application) {
         frame.connected = true;
@@ -485,7 +567,7 @@ impl Controls {
                 "message" => (self.message.value.clone(), self.message.current.clone()),
                 "voice" => (self.voice_status.value.clone(), self.voice_status.current.clone()),
                 "model" => (self.model_text.value.clone(), self.model_text.current.clone()),
-                "work" => { let view = self.jobs.status_capture_view(); (view.value.clone(), view.current.clone()) },
+                "work" => { let view = self.jobs.status_capture_view("core:731"); (view.value.clone(), view.current.clone()) },
                 _ => panic!("Unknown status capture"),
             };
             let original = label.text();
@@ -558,9 +640,43 @@ impl Controls {
         assert!(!buffer.has_selection());
         self.output_previous.emit_clicked();
     }
-    pub fn capture_context(&self, mut context: Value) -> Value {
+    pub fn capture_context(&self, context: Value) -> Value {
+        let launcher_active = self.widget.root()
+            .and_then(|root| root.downcast::<gtk::Window>().ok())
+            .is_some_and(|window| window.is_active());
+        self.capture_context_for_surfaces(context, self.monitor.is_active(), launcher_active)
+    }
+    fn capture_context_for_surfaces(&self, mut context: Value, monitor_active: bool, launcher_active: bool) -> Value {
+        for (active, view, element, title) in [
+            (monitor_active, &self.model_text, "model-status", "Model configuration and measured usage"),
+            (launcher_active, &self.message, "message-status", "Agent status"),
+            (launcher_active, &self.voice_status, "microphone-status", "Microphone status"),
+        ] {
+            if !active { continue; }
+            if let Some(selection) = input_context::label_selection(&view.value) {
+                let activity = self.activity.borrow().as_ref().and_then(|id| id.parse::<i64>().ok());
+                context["activity_id"] = json!(activity);
+                context["surface_id"] = json!("native-launcher");
+                context["layout_revision"] = json!(0);
+                context["job_ref"] = Value::Null;
+                context["selection_kind"] = json!("selected_text");
+                context["selection"] = json!(input_context::bounded(selection));
+                context["surface_title"] = json!(title);
+                context["element_id"] = json!(element);
+                context.as_object_mut().unwrap().remove("object_id");
+                return context;
+            }
+        }
+        if monitor_active {
+            if let Some(selected) = self.jobs.selected_context() {
+                let fields = context.as_object_mut().unwrap();
+                fields.remove("element_id"); fields.remove("object_id");
+                fields.extend(selected.as_object().unwrap().clone());
+                return context;
+            }
+        }
         let buffer = self.inspection.buffer();
-        if self.monitor.is_active() {
+        if monitor_active {
             if let Some(page) = &self.output_page {
                 let mut selection = buffer
                     .selection_bounds()
@@ -603,6 +719,10 @@ impl Controls {
     }
     pub fn hide_launcher(&self) {
         self.frozen_context.borrow_mut().take();
+        // Closed launcher statuses cannot become stale selections in a later
+        // request. The request entry and selected monitor/domain views persist.
+        self.message.value.select_region(0, 0);
+        self.voice_status.value.select_region(0, 0);
         let phase = self.voice.state.lock().unwrap().phase.clone();
         if phase == "starting" || phase == "recording" { self.voice.cancel(); }
     }
@@ -911,4 +1031,24 @@ pub(super) fn review_proposal(app: &gtk::Application, proposal: Value, commands:
         }
     });
     window.present();
+}
+
+#[cfg(test)]
+mod context_tests {
+    use super::*;
+    #[test]
+    fn request_context_only_replaces_frozen_source_for_explicit_local_status() {
+        let original = json!({"surface_id":"document","selection":"Original λ"});
+        let changed = json!({"surface_id":"document","selection":"Later 日本語"});
+        assert_eq!(request_context(Some(original.clone()), changed.clone()), original);
+        assert_eq!(request_context(None, changed.clone()), changed);
+        for element in ["message-status", "microphone-status", "model-status"] {
+            let selected = json!({"surface_id":"native-launcher","selection_kind":"selected_text","job_ref":null,"element_id":element,"selection":"Selected λ 日本語"});
+            assert_eq!(request_context(Some(original.clone()), selected.clone()), selected);
+            let mut empty = selected.clone(); empty["selection"] = json!("");
+            assert_eq!(request_context(Some(original.clone()), empty), original);
+            let mut other = selected; other["element_id"] = json!("field");
+            assert_eq!(request_context(Some(original.clone()), other), original);
+        }
+    }
 }

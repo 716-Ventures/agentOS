@@ -1,0 +1,105 @@
+{
+  "capture_baseline": {
+    "started_at": "2026-10-11T23:55:15.159049+00:00",
+    "source_revision": "9e3dd0be6757186522106b17e96466593b19c779",
+    "source_changes": [
+      " M outputs/native-shell/src/controls.rs",
+      " M outputs/native-shell/src/job_list.rs",
+      " M outputs/native-shell/src/verification.rs"
+    ],
+    "source_archive_sha256": "b3ff2747577f884733737128c1e83a8dbe20c2bfc636fe73db86e730b1efd4df",
+    "passed": false,
+    "baseline_failures_reproduced": [
+      "message",
+      "voice",
+      "model",
+      "work",
+      "work-broker"
+    ],
+    "owned_utm_identity": [
+      94075,
+      "Sun Oct 11 19:55:15 2026"
+    ],
+    "owned_utm_closed": true,
+    "finished_at": "2026-10-11T23:55:39.888301+00:00"
+  },
+  "launcher_baseline": {
+    "started_at": "2026-10-11T23:59:40.458261+00:00",
+    "source_revision": "9e3dd0be6757186522106b17e96466593b19c779",
+    "source_changes": [
+      " M outputs/native-shell/src/controls.rs",
+      " M outputs/native-shell/src/input_context.rs",
+      " M outputs/native-shell/src/job_list.rs",
+      " M outputs/native-shell/src/verification.rs"
+    ],
+    "source_archive_sha256": "cfde1d2ade09db8932d6b33e50218ff831a02a5cfd2e66c4451c31b4d19eef99",
+    "passed": false,
+    "baseline_failures_reproduced": [
+      "message",
+      "voice"
+    ],
+    "owned_utm_identity": [
+      97592,
+      "Sun Oct 11 19:59:40 2026"
+    ],
+    "owned_utm_closed": true,
+    "finished_at": "2026-10-12T00:00:00.908302+00:00"
+  },
+  "fixed": {
+    "started_at": "2026-10-12T00:00:36.619309+00:00",
+    "source_revision": "9e3dd0be6757186522106b17e96466593b19c779",
+    "source_changes": [
+      " M outputs/native-shell/src/controls.rs",
+      " M outputs/native-shell/src/input_context.rs",
+      " M outputs/native-shell/src/job_list.rs",
+      " M outputs/native-shell/src/verification.rs"
+    ],
+    "source_archive_sha256": "ffb8357d9abf6f06b7bbe02488637aa82b0d55cbf673a6109159377c617942b7",
+    "passed": true,
+    "owned_utm_identity": [
+      98408,
+      "Sun Oct 11 20:00:36 2026"
+    ],
+    "owned_utm_closed": true,
+    "finished_at": "2026-10-12T00:01:25.561756+00:00"
+  },
+  "native_unit_tests": {
+    "passed": 36,
+    "ignored": 7
+  },
+  "four_mapped_profiles_and_both_compositor_journeys": "pass",
+  "behavior": [
+    "Selected status text captures the older Unicode snapshot even while current values are visible.",
+    "Active model/launcher status selections and core/broker work rows precede the previously open output page.",
+    "Work selection carries the actual row job, source and activity identity; inactive host selections leave domain context unchanged.",
+    "A deliberate local launcher status selection can replace the earlier request source; other background context changes remain frozen.",
+    "Typed submission uses the exact selected text and source; voice recording shares the same context-choice function.",
+    "Closing the launcher releases local notice/microphone selections while retaining the request draft and selected monitor/domain views."
+  ],
+  "boundaries": [
+    "Headless context fixtures supply active host flags to verify ownership gating; they do not establish physical focus delivery or microphone signal.",
+    "Existing job/activity revalidation, stop-generation checks and backend grounding validation remain in force.",
+    "Complete committed-source qualification and fresh-image qualification are pending; signed v19 retains its independently qualified runtime."
+  ],
+  "sha256": {
+    "capture-baseline/agentos-chrome-context-baseline-last-speech.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "capture-baseline/agentos-chrome-context-baseline-work-broker.log": "74f6d8d0609c1b51b8ad0936f4d6143b66271e746bbb5b191b770f19c99cc054",
+    "capture-baseline/agentos-chrome-context-baseline-voice.log": "8e14afd95f08b8af61cd796c3edba9b0b4f39259b14adcf78a30b3bbbd1eb1eb",
+    "capture-baseline/agentos-chrome-context-baseline-message.log": "f324082e82647b4331eccde61618e3e50c3e6b2b3dee67480547c6c80c10acbc",
+    "capture-baseline/agentos-chrome-context-baseline-work.log": "e02232e745769fc2ce331ef9e35e68b10a8b5cb50b7b21f8b985fd1ce63a5d0c",
+    "capture-baseline/driver.json": "523af4e7cc7ddc24a683a22b0e8a6631151c54b41c07269003c2b8193a9d84df",
+    "capture-baseline/driver.log": "0f0fcd455b69d6a3e4b1d0595873948675570e42899b2d400842d056dad0f00a",
+    "capture-baseline/driver.py": "fe0f5867fc485f3499cb99f4a781835a39114fda7af0e0f92100220048b1e7fc",
+    "capture-baseline/agentos-chrome-context-baseline-model.log": "c2526ccb70b5feb46c93be8beb33d123f79e6ee8b1f881f5661553a8655d4920",
+    "launcher-baseline/agentos-local-status-input-baseline-message.log": "3ef9af35ddf2185186b93b304e839f102de9536435862c5bee08c530a438e2aa",
+    "launcher-baseline/driver.json": "270bee70fc388822da697fcf5dc2647859c249dd808220a2e43b0877def74389",
+    "launcher-baseline/driver.log": "cd484571baa06e984fd79e9c91dc70443f09ee4ac5e8ed3fc9c0b490c60ab157",
+    "launcher-baseline/agentos-local-status-input-baseline-voice.log": "02338ee893db6bff44dbcf33b6f8bc9a804fea9ff77fe018c38d0ff990bccfeb",
+    "launcher-baseline/driver.py": "3b0737a83bebbfdabc524b002a90f7306ab446ffac3b0cf7311db7922c5a1404",
+    "launcher-baseline/agentos-local-status-input-baseline-last-speech.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fixed/driver.json": "d10b0232573741da0300751b30deb0b0cfa2eaaca884e0200360f479a19feb7a",
+    "fixed/agentos-status-grounding-final-last-speech.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fixed/driver.log": "26589adc297af480b6d8d19cbb44b68bbd393ba63d3161640162871a5f1b3a5d",
+    "fixed/driver.py": "8d50ad5f021694b5c45c6be9c2abd2643d2bbec1bae655d3618f9ce2a0397178"
+  }
+}

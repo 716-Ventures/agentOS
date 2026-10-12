@@ -1,0 +1,24 @@
+{
+  "started_at": "2026-10-11T23:55:15.159049+00:00",
+  "source_revision": "9e3dd0be6757186522106b17e96466593b19c779",
+  "source_changes": [
+    " M outputs/native-shell/src/controls.rs",
+    " M outputs/native-shell/src/job_list.rs",
+    " M outputs/native-shell/src/verification.rs"
+  ],
+  "source_archive_sha256": "b3ff2747577f884733737128c1e83a8dbe20c2bfc636fe73db86e730b1efd4df",
+  "passed": false,
+  "baseline_failures_reproduced": [
+    "message",
+    "voice",
+    "model",
+    "work",
+    "work-broker"
+  ],
+  "owned_utm_identity": [
+    94075,
+    "Sun Oct 11 19:55:15 2026"
+  ],
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-11T23:55:39.888301+00:00"
+}

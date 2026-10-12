@@ -9,7 +9,7 @@ pub fn bounded(mut value: String) -> String {
     }
     value
 }
-fn label_selection(label: &gtk::Label) -> Option<String> {
+pub fn label_selection(label: &gtk::Label) -> Option<String> {
     label.selection_bounds().map(|(a, b)| {
         label
             .text()

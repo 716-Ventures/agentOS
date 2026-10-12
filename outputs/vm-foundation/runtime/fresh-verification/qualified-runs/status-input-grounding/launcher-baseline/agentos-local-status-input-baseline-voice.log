@@ -1,0 +1,67 @@
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+CHECK: selected message status retains snapshot and request draft across background refresh
+CHECK: selected voice status retains snapshot and request draft across background refresh
+CHECK: selected model status retains snapshot and request draft across background refresh
+dbus-daemon[1270]: [session uid=1000 pid=1270 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=1308 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[1270]: [session uid=1000 pid=1270 pidfd=5] Successfully activated service 'org.a11y.Bus'
+
+thread 'main' panicked at src/verification.rs:503:13:
+assertion `left == right` failed: voice: local status did not replace launcher context
+  left: String("Original view selection")
+ right: String("Original local microphone λ 日本語")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'main' panicked at library/core/src/panicking.rs:218:5:
+panic in a function that cannot unwind
+stack backtrace:
+   0:     0xaaaac275fa98 - <std::sys::backtrace::BacktraceLock::print::DisplayBacktrace as core::fmt::Display>::fmt::hdb6f6d042b491751
+   1:     0xaaaac279a9c0 - core::fmt::write::h6d72b50863dc4fa0
+   2:     0xaaaac2782924 - std::io::Write::write_fmt::hd2f963b87cdd5023
+   3:     0xaaaac275f94c - std::sys::backtrace::BacktraceLock::print::h435d5ca8e4e67cf2
+   4:     0xaaaac276ec44 - std::panicking::default_hook::{{closure}}::h19a0ec54d5eb587c
+   5:     0xaaaac276eab8 - std::panicking::default_hook::h1242a7d680affcc5
+   6:     0xaaaac276f1fc - std::panicking::rust_panic_with_hook::hbdc292c9fdd02555
+   7:     0xaaaac2760228 - std::panicking::begin_panic_handler::{{closure}}::hfe80fb29e0038c40
+   8:     0xaaaac275fd00 - std::sys::backtrace::__rust_end_short_backtrace::ha2a0318cc297b45e
+   9:     0xaaaac276ed68 - rust_begin_unwind
+  10:     0xaaaac240e830 - core::panicking::panic_nounwind_fmt::h4574a6bdf9fe1159
+  11:     0xaaaac240e8a8 - core::panicking::panic_nounwind::h28ad1a13bfa41d0f
+  12:     0xaaaac240ea20 - core::panicking::panic_cannot_unwind::hf4bd0b5abce28105
+  13:     0xaaaac251798c - gio::auto::application::ApplicationExt::connect_activate::activate_trampoline::h42299ce07837e1df
+  14:     0xffffa28b8950 - g_closure_invoke
+  15:     0xffffa28cf310 - <unknown>
+  16:     0xffffa28d07e8 - <unknown>
+  17:     0xffffa28d6278 - g_signal_emit_valist
+  18:     0xffffa28d6320 - g_signal_emit
+  19:     0xffffa2a2f5b8 - <unknown>
+  20:     0xffffa2a2f744 - g_application_run
+  21:     0xaaaac2447d10 - gio::application::ApplicationExtManual::run_with_args::hf50ca3ed210ce125
+  22:     0xaaaac255ebb8 - agent_os_desktop::verification::run::h02606fa83fcf22a1
+  23:     0xaaaac24dbe34 - agent_os_desktop::main::h1154d31c1cc5ebae
+  24:     0xaaaac2475120 - core::ops::function::FnOnce::call_once::hbf7b422ab63ecc6d
+  25:     0xaaaac2560384 - std::sys::backtrace::__rust_begin_short_backtrace::he518991cdf5c81ee
+  26:     0xaaaac24e56f0 - std::rt::lang_start::{{closure}}::h99263bdd633b4269
+  27:     0xaaaac2781f8c - std::rt::lang_start_internal::hdd95299bbc4bc65d
+  28:     0xaaaac24e56d0 - std::rt::lang_start::h2c2ce8b9ed4b2999
+  29:     0xaaaac24dbe8c - main
+  30:     0xffffa250225c - <unknown>
+  31:     0xffffa250233c - __libc_start_main
+  32:     0xaaaac240efb0 - _start
+  33:                0x0 - <unknown>
+thread caused non-unwinding panic. aborting.
+Traceback (most recent call last):
+  File "/home/developer/agent-os-source/native-shell/tests/native_desktop.py", line 108, in <module>
+    if '--compositor' not in sys.argv:subprocess.run(command,env=env,check=True,timeout=30)
+                                      ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['/home/developer/agent-os-source/native-shell/target/debug/agent-os-desktop', '--self-test', '--socket', '/tmp/agentos-native-y5ivwole/core.sock', '--capture', '/home/developer/agent-os-source/native-shell/test-output/light-1/desktop.png']' died with <Signals.SIGABRT: 6>.
