@@ -94,14 +94,26 @@ def verify(log, keyboard, pointer, snapshot, scene, request, output, activity, r
             until(placed_window,'Monitor did not reopen at cycle '+str(cycle))
             time.sleep(.3)
             point(retained_point)
-            keyboard.chord(15);keyboard.chord(42,15) # Real focus traversal back to the retained work text.
+            def focused_window():
+                observed=scene()
+                candidate=next((w for w in observed['windows'] if w['title']=='Agent Monitor'),None)
+                return candidate and observed['seat_focus']==candidate['id'] and candidate['xdg']['configured'] and candidate['xdg']['pending_count']==0
             def reopened_speech():
                 recent=log.read_text(errors='replace')[baseline_reopen:]
                 for chunk in recent.split('SPEECH OUTPUT:')[1:]:
                     utterance, complete, _=chunk.partition("'{'established':")
                     if complete and utterance.startswith(" 'core · failed\n") and marker in utterance:return True
                 return False
-            until(reopened_speech,'Orca did not read the reopened Monitor work at cycle '+str(cycle),15)
+            try:
+                until(focused_window,'Reopened Monitor did not acknowledge compositor focus at cycle '+str(cycle))
+                keyboard.chord(15);keyboard.chord(42,15) # Real focus traversal back to the retained work text.
+                until(reopened_speech,'Orca did not read the reopened Monitor work at cycle '+str(cycle),15)
+            except RuntimeError:
+                # Inspect only after the assertion fails, so this cannot repair
+                # a reader cache and turn the failed assertion into a pass.
+                observed=scene()
+                print('Monitor reopen diagnostics: '+json.dumps({'cycle':cycle,'work':work(),'retained_point':retained_point,'last_click':pointer.last_click,'scene':{k:observed.get(k) for k in ('windows','seat_focus','pointer_routing','layout')}}),flush=True)
+                raise
             current=work()
             assert current['text']==expected and current['active'] and current['focused'],current
             keyboard.chord(29,56,111)

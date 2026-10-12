@@ -1,0 +1,25 @@
+{
+  "started_at": "2026-10-12T02:55:13.858424+00:00",
+  "source_revision": "71c3c098501111d522711f5b0d38ce025d258d20",
+  "source_changes": [
+    " M outputs/agent-shell/tests/direct_monitor_reader_probe.py"
+  ],
+  "source_archive_sha256": "390b1defd1537ee5508fbde8398f46f93e2cef478b6bf52358a0a2a13c4a2f67",
+  "passed": true,
+  "installed_runtime_before_probe": "3cb57dd863298f61cc67c52c288c28c6472a75e168104f500d9fe6c4eb2ec412",
+  "original_test_sha256": "fa2359b215e2cdce7f02fab5073e4bd9413dc898780de30ab5cbfdd198f79a3b",
+  "probe_sha256": "0af91315f6a3660775a493f7579eef276b95a7949db4bc0423a02f144e811dc5",
+  "predecessor_fresh_profile_passed": true,
+  "raw_speech_sha256": "325c959f581d5306090c2f417d0398b06adcde345040bea52b692c74488cb637",
+  "deployment": {
+    "created_at": "2026-10-12T02:42:36.385769+00:00",
+    "source_archive_sha256": "3af3addb1b7f52756225c5f38b5eef26b02b210ed3a2dc247ac39d0ea9978ae3",
+    "repository_revision": "71c3c098501111d522711f5b0d38ce025d258d20",
+    "source_changes": [],
+    "installed": true
+  },
+  "runtime_release": "3cb57dd863298f61cc67c52c288c28c6472a75e168104f500d9fe6c4eb2ec412",
+  "original_test_restored": true,
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-12T02:57:51.956962+00:00"
+}

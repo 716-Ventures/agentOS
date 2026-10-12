@@ -1,0 +1,5 @@
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+Raw failed speech SHA-256: 2139b74f54ed546d992420a510a5dc051a0b127bed8ba8d132498031af8d3144
+Requested orderly guest shutdown. Check status before restarting.
+Owned guest/app closed

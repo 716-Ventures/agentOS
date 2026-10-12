@@ -1,0 +1,386 @@
+   Compiling agent-os-desktop v0.1.0-alpha.1 (/home/developer/agent-os-source/native-shell)
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+ --> src/document_dialog.rs:8:11
+  |
+8 | ) -> gtk::FileChooserNative {
+  |           ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:10:23
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:61:23
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:10:42
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:11:10
+   |
+11 |         .title(if save {
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:16:10
+   |
+16 |         .action(if save {
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:21:10
+   |
+21 |         .accept_label(if save { "Export" } else { "Import" })
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:22:10
+   |
+22 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:23:10
+   |
+23 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:24:10
+   |
+24 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+  --> src/document_dialog.rs:27:16
+   |
+27 |         dialog.set_current_name("document.txt");
+   |                ^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:31:40
+   |
+31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:61:42
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:62:10
+   |
+62 |         .title("Choose existing text file to review")
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:63:10
+   |
+63 |         .action(gtk::FileChooserAction::Open)
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:64:10
+   |
+64 |         .accept_label("Review replacement")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:65:10
+   |
+65 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:66:10
+   |
+66 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:67:10
+   |
+67 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:72:40
+   |
+72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_file`: Since 4.10
+   --> src/document_dialog.rs:308:20
+    |
+308 |             dialog.set_file(&gtk::gio::File::for_path(&path)).unwrap();
+    |                    ^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+   --> src/document_dialog.rs:310:26
+    |
+310 |             while dialog.file().and_then(|file| file.path()).as_ref() != Some(&path) {
+    |                          ^^^^
+
+warning: `agent-os-desktop` (bin "agent-os-desktop" test) generated 22 warnings
+    Finished `test` profile [unoptimized] target(s) in 4.05s
+     Running unittests src/main.rs (native-shell/target/debug/deps/agent_os_desktop-5a9d9cb94b44b4cd)
+
+running 43 tests
+test broker_controls::tests::stored_input_preview_matches_the_frozen_proposal_and_byte_count ... ok
+test action_parameters::tests::edited_parameters_are_bounded_data_and_cannot_select_a_command_or_target ... ok
+test broker_controls::tests::continuation_is_a_typed_existing_job_reference_without_command_text ... ok
+test broker_controls::tests::stale_review_cannot_authorize_changed_command_or_input ... ok
+test broker_pages::tests::pages_scope_and_epoch_restarts_preserve_one_consistent_history ... ok
+test document_dialog::initial_import_tests::accepted_file_selection_keeps_its_optional_activity_context ... ignored
+test controls::context_tests::request_context_only_replaces_frozen_source_for_explicit_local_status ... ok
+test draft_cache::tests::corrupt_or_oversized_fields_do_not_become_recovered_edits ... ok
+test feedback_metrics::tests::unknown_clock_future_input_and_invalid_receipts_do_not_become_fast_samples ... ok
+test feedback_metrics::tests::key_clock_wrap_and_millisecond_quantization_are_preserved ... ok
+test input_context::tests::application_context_rejects_changed_disconnected_moved_or_forged_referents ... ok
+test draft_cache::tests::private_recovery_roundtrip_preserves_revision_and_unicode ... ok
+test input_context::tests::real_core_application_context_rechecks_registered_revision_and_connection ... ignored
+test input_context::tests::revoked_voice_and_cross_activity_context_stop_before_source_lookup ... ok
+test input_context::tests::application_context_uses_authenticated_workspace_identity_never_a_title_match ... ok
+test input_context::tests::selected_object_context_keeps_original_content_and_rejects_removed_or_moved_targets ... ok
+test presentation_pages::cache_tests::unchanged_documents_are_not_refetched_and_tombstones_remove_old_views ... ok
+test presentation_pages::tests::cancellation_and_nonprogressing_cursors_stop_reads ... ok
+test log_view::tests::live_follow_refreshes_the_tail_and_selection_can_freeze_its_page ... ok
+test presentation_pages::cache_tests::errors_keep_the_previous_consistent_cache_and_cancellation_sends_nothing ... ok
+test pty_transport::tests::real_broker_terminal_round_trip_and_reattach ... ignored, requires isolated Linux tmux broker fixture
+test presentation_pages::tests::retries_from_scratch_after_interleaved_edits ... ok
+test pty_transport::tests::terminal_pages_preserve_raw_bytes_and_require_exact_cursor_boundaries ... ok
+test pty_view::tests::manual_detach_restores_attach_without_a_source_refresh ... ignored
+test reconcile::tests::confirmed_local_values_advance_without_granting_other_mutations ... ok
+test log_view::tests::pages_keep_identity_and_retry_the_same_offset_after_disconnect ... ok
+test state_pages::tests::cancellation_and_invalid_cursors_stop_paging ... ok
+test reconcile::tests::unrelated_text_can_advance_but_fields_structure_and_authority_stay_frozen ... ok
+test state_pages::tests::scopes_jobs_and_restarts_after_interleaved_changes ... ok
+test timings::tests::disabled_diagnostics_do_not_collect_stages_or_files ... ok
+test timings::tests::percentiles_are_bounded_recent_samples_and_cumulative_mean_is_explicit ... ok
+test reconcile::tests::feedback_can_change_without_authorizing_text_structure_or_actions ... ok
+test transport::action_field_tests::callbacks_use_local_then_recovered_then_committed_editable_values ... ok
+test transport::draft_revision_tests::save_refuses_a_revision_the_user_has_not_seen_and_retains_the_local_draft ... ok
+test transport::draft_revision_tests::reviewed_save_rejects_a_changed_draft_without_committing_and_ends_its_lease ... ok
+test transport::initial_document_tests::an_implicit_document_activity_is_created_once_and_reused ... ok
+test transport::draft_revision_tests::unfocused_edit_uses_a_temporary_lease_and_preserves_conflicting_drafts ... ok
+test transport::initial_document_tests::import_into_an_empty_core_validates_before_creating_an_activity ... ignored
+test transport::initial_document_tests::initial_typed_requests_validate_before_creating_and_never_launch_on_broker_failure ... ignored
+test transport::initial_document_tests::queued_new_documents_reuse_the_confirmed_activity ... ignored
+test transport::initial_document_tests::an_unconfirmed_activity_creation_is_not_retried_or_used ... ok
+test status_projection::tests::host_observations_preserve_unicode_and_bound_display_without_nul ... ok
+test pty_transport::tests::attachment_retries_only_unwritten_input_and_detaches_on_drop ... ok
+
+test result: ok. 36 passed; 0 failed; 7 ignored; 0 measured; 0 filtered out; finished in 0.84s
+
+    Finished `dev` profile [unoptimized] target(s) in 0.03s
+   Compiling agent-os-desktop v0.1.0-alpha.1 (/home/developer/agent-os-source/native-shell)
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+ --> src/document_dialog.rs:8:11
+  |
+8 | ) -> gtk::FileChooserNative {
+  |           ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:10:23
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:61:23
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:10:42
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:11:10
+   |
+11 |         .title(if save {
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:16:10
+   |
+16 |         .action(if save {
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:21:10
+   |
+21 |         .accept_label(if save { "Export" } else { "Import" })
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:22:10
+   |
+22 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:23:10
+   |
+23 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:24:10
+   |
+24 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+  --> src/document_dialog.rs:27:16
+   |
+27 |         dialog.set_current_name("document.txt");
+   |                ^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:31:40
+   |
+31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:61:42
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:62:10
+   |
+62 |         .title("Choose existing text file to review")
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:63:10
+   |
+63 |         .action(gtk::FileChooserAction::Open)
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:64:10
+   |
+64 |         .accept_label("Review replacement")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:65:10
+   |
+65 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:66:10
+   |
+66 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:67:10
+   |
+67 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:72:40
+   |
+72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: `agent-os-desktop` (bin "agent-os-desktop") generated 20 warnings
+    Finished `dev` profile [unoptimized] target(s) in 4.28s
+   Compiling agent-os-compositor v0.1.0 (/home/developer/agent-os-source/native-compositor)
+    Finished `test` profile [unoptimized] target(s) in 5.23s
+     Running unittests src/main.rs (native-compositor/target/debug/deps/agent_os_compositor-c02510f001e032dc)
+
+running 51 tests
+test accessibility::tests::grab_does_not_orphan_a_previously_forwarded_key_release ... ok
+test accessibility::tests::monitor_commands_consume_balanced_pairs_and_disconnect_releases_ownership ... ok
+test accessibility::tests::custom_modifier_double_tap_restores_ordinary_key_behavior ... ok
+test accessibility::tests::exact_mask_grab_and_watch_never_consume_unrelated_typing ... ok
+test accessibility::tests::replacement_bus_owner_cannot_receive_a_previous_readers_pending_key_release ... ok
+test bridge::pages::cache_tests::errors_keep_the_previous_consistent_cache_and_cancellation_sends_nothing ... ok
+test bridge::pages::tests::cancellation_and_nonprogressing_cursors_stop_reads ... ok
+test bridge::pages::tests::retries_from_scratch_after_interleaved_edits ... ok
+test bridge::pages::cache_tests::unchanged_documents_are_not_refetched_and_tombstones_remove_old_views ... ok
+test bridge::tests::app_id_alone_cannot_impersonate_native_surface ... ok
+test bridge::tests::healthy_multiple_outputs_preserve_their_coordinates ... ok
+test bridge::tests::automatic_views_use_balanced_rows_instead_of_repeatedly_halving_old_views ... ok
+test bridge::tests::multi_output_pressure_is_local_and_hidden_views_leave_the_scene ... ok
+test bridge::tests::new_windows_remain_manageable_in_manually_constrained_workspaces ... ok
+test bridge::work_area_input_tests::global_keyboard_geometry_roundtrips_through_output_local_workspace_coordinates ... ok
+test bridge::tests::split_rounding_covers_odd_dimensions_and_maximize_preserves_base ... ok
+test bridge::grabs::tests::release_commits_frozen_revision_and_always_releases_lease ... ok
+test bridge::grabs::tests::pointer_begin_reconciles_only_element_focus_and_never_replays_its_lease ... ok
+test core_ipc::tests::incomplete_and_oversized_responses_are_rejected ... ok
+test control::deadline_tests::keyboard_requests_expire_before_late_input_and_carry_kernel_peer_identity ... ok
+test frame_cadence::tests::input_wakes_wait_for_a_callback_and_are_bounded_by_refresh ... ok
+test frame_cadence::tests::missed_deadlines_resume_without_an_unbounded_catchup_burst ... ok
+test frame_cadence::tests::stale_or_cancelled_input_does_not_wake_later_animation ... ok
+test frame_cadence::tests::variable_render_cost_does_not_accumulate_into_the_refresh_period ... ok
+test input_method::tests::human_input_method_configuration_is_literal_and_bounded ... ok
+wl_display#1: error 0: Invalid binding of zwlr_layer_shell_v1 version 4 for global 6.
+wl_display#1: error 0: Invalid binding of zwp_input_method_manager_v2 version 1 for global 1.
+zwlr_layer_surface_v1#10: error 1: width 0 requested without setting left and right anchors
+test input_method_tests::private_input_method_delivers_unicode_and_cannot_be_bound_by_an_application ... ok
+test input_revision::tests::element_focus_can_advance_without_replaying_or_overwriting_layout ... ok
+test output_config::tests::every_transform_matches_advertised_geometry_and_adjacent_output_spacing ... ok
+test output_config::tests::fractional_scales_negative_origins_and_exact_modes_are_retained ... ok
+test output_config::tests::malformed_preferences_fail_before_device_configuration ... ok
+test output_zoom::tests::reconnect_uses_new_preferences_and_never_compounds_zoom ... ok
+test output_zoom::tests::zoom_preserves_base_rotation_position_and_exact_reset ... ok
+test pointer_geometry::tests::final_pixel_subpixels_and_negative_zero_edges_stay_inside ... ok
+test pointer_geometry::tests::gaps_and_removed_outputs_choose_nearest_remaining_display ... ok
+test pointer_geometry::tests::invalid_coordinates_and_extreme_integer_origins_are_safe ... ok
+test pointer_geometry::tests::relative_motion_crosses_adjacent_outputs_and_retains_subpixels ... ok
+test policy::tests::exact_revisions_and_divergent_undo ... ok
+test policy::tests::floating_windows_survive_smaller_output ... ok
+test policy::tests::grid_is_in_bounds_and_has_no_overlap ... ok
+test policy::tests::new_window_does_not_steal_focus ... ok
+test pressure::tests::disconnected_output_recovery_exposes_views_without_rewriting_preferences ... ok
+test pressure::tests::pressure_keeps_floating_work_and_does_not_shrink_clients ... ok
+test pressure::tests::viewport_exposes_every_edge_and_retains_client_dimensions ... ok
+test process::tests::unwinding_reaps_the_owned_renderer ... ok
+test shell_keyboard::tests::chords_are_bounded_and_never_duplicate_a_held_modifier ... ok
+test shortcuts::tests::shortcuts_require_both_modifiers_and_leave_typing_alone ... ok
+test timings::tests::disabled_diagnostics_do_not_collect_stages_or_files ... ok
+test timings::tests::percentiles_are_bounded_recent_samples_and_cumulative_mean_is_explicit ... ok
+test core_ipc::tests::delayed_fragmented_reply_does_not_resend_request ... ok
+test core_ipc::tests::partial_reply_has_one_total_deadline ... ok
+test control::deadline_tests::socket_timeout_expires_the_request_still_waiting_in_the_render_queue ... ok
+
+test result: ok. 51 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.01s
+
+    Finished `dev` profile [unoptimized] target(s) in 0.06s
+   Compiling agent-os-compositor v0.1.0 (/home/developer/agent-os-source/native-compositor)
+warning: function `project` is never used
+ --> src/pressure.rs:5:8
+  |
+5 | pub fn project(
+  |        ^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: `agent-os-compositor` (bin "agent-os-compositor") generated 1 warning
+    Finished `dev` profile [unoptimized] target(s) in 5.42s
