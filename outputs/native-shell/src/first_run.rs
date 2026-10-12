@@ -17,7 +17,6 @@ pub fn present(app: &gtk::Application, commands: Sender<Command>) {
         return;
     }
     let content = ui::column(16);
-    content.add_css_class("seven-ui");
     content.set_margin_start(24);
     content.set_margin_end(24);
     content.set_margin_top(24);
@@ -43,5 +42,10 @@ pub fn present(app: &gtk::Application, commands: Sender<Command>) {
     });
     let welcome = window.clone();
     later.connect_clicked(move |_| welcome.close());
+    let mut child=content.first_child();
+    while let Some(widget)=child {
+        child=widget.next_sibling();
+        if let Ok(label)=widget.downcast::<gtk::Label>() {label.set_selectable(false);}
+    }
     window.present();
 }

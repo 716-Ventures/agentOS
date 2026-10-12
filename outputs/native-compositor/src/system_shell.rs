@@ -376,8 +376,16 @@ pub fn present_monitor(state: &mut Smallvil, peer: Option<u32>) -> Result<(), St
     }).cloned().ok_or("Monitor unavailable")?;
     state.space.raise_element(&window,true);
     let surface=window.toplevel().unwrap().wl_surface().clone();
-    if let Some(keyboard)=state.seat.get_keyboard() {keyboard.set_focus(state,Some(surface.clone()),smithay::utils::SERIAL_COUNTER.next_serial());}
-    if let Some(bridge)=&state.bridge {bridge.input(&format!("{:?}",surface.id()),serde_json::json!({"kind":"focus","element_id":null}));}
+    let runtime=format!("{:?}",surface.id());
+    if let Some(bridge)=&state.bridge {
+        // Let the acknowledged workspace focus drive the seat. Moving the seat
+        // ahead of its scene leaves applied_focus stale and can lose a later
+        // deliberate return to the editor. Retry until this window is registered.
+        if !bridge.scene.snapshot().identities.contains_key(&runtime) {return Err("Monitor unavailable".into());}
+        bridge.input(&runtime,serde_json::json!({"kind":"focus","element_id":null}));
+    } else if let Some(keyboard)=state.seat.get_keyboard() {
+        keyboard.set_focus(state,Some(surface.clone()),smithay::utils::SERIAL_COUNTER.next_serial());
+    }
     state.arrange();
     Ok(())
 }

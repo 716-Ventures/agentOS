@@ -1307,7 +1307,19 @@ fn guard(
                                     && c.provenance == "direct_manipulation"
                                     && c.strength == "required"
                             });
-                        w.outputs != new.outputs && !direct
+                        // Adding a floating host window leaves every existing
+                        // editor's geometry and draft intact. It must not retile,
+                        // reorder, move, maximize, or constrain existing work.
+                        let floating_addition = who.human() && who.uid == uid
+                            && w.activity_id == new.activity_id && w.focus == new.focus
+                            && w.constraints == new.constraints
+                            && w.outputs.keys().eq(new.outputs.keys())
+                            && w.outputs.iter().all(|(name, old)| {
+                                let next = &new.outputs[name];
+                                old.tiles == next.tiles && old.maximized == next.maximized
+                                    && next.floating.starts_with(&old.floating)
+                            });
+                        w.outputs != new.outputs && !direct && !floating_addition
                     }
                     _ => true,
                 }
@@ -2797,6 +2809,40 @@ mod tests {
             let draft: String = db.query_row("SELECT draft FROM presentation_leases WHERE document='surface-a'", [], |r| r.get(0)).unwrap();
             assert_eq!(draft, "Unsaved λ");
         }
+    }
+    #[test]
+    fn human_floating_addition_preserves_active_editor_and_draft() {
+        let db = fixture();
+        db.execute("INSERT INTO presentation_leases(document,element,uid,session,expires,draft) VALUES('surface-a','input',1000,'editor',?,'Unsaved λ')", [now()+30]).unwrap();
+        let mut w = workspace();
+        w["focus"] = json!({"surface_id":"surface-a","element_id":"input"});
+        w["outputs"]["output-a"]["floating"] = json!([{"surface_id":"existing","x":0,"y":0,"width":320,"height":240}]);
+        let before = BTreeMap::from([
+            ("surface-a".into(), Document::Surface(decode(surface()).unwrap())),
+            ("workspace-a".into(), Document::Workspace(decode(w.clone()).unwrap())),
+        ]);
+        w["outputs"]["output-a"]["floating"].as_array_mut().unwrap().push(json!({"surface_id":"monitor","x":20,"y":20,"width":640,"height":480}));
+        let mut after=before.clone();
+        after.insert("workspace-a".into(),Document::Workspace(decode(w.clone()).unwrap()));
+        guard(&db,&before,&after,&human()).unwrap();
+        assert!(guard(&db,&before,&after,&agent()).is_err());
+        assert!(guard(&db,&before,&after,&Principal{uid:1001,session:"foreign".into()}).is_err());
+        for mutation in ["tiles", "maximized", "focus", "constraints", "moved-floating", "removed-floating", "reordered-floating"] {
+            let mut changed=w.clone();
+            match mutation {
+                "tiles"=>changed["outputs"]["output-a"]["tiles"]=Value::Null,
+                "maximized"=>changed["outputs"]["output-a"]["maximized"]=json!("monitor"),
+                "focus"=>changed["focus"]=Value::Null,
+                "moved-floating"=>changed["outputs"]["output-a"]["floating"][0]["x"]=json!(10),
+                "removed-floating"=>{changed["outputs"]["output-a"]["floating"].as_array_mut().unwrap().remove(0);},
+                "reordered-floating"=>changed["outputs"]["output-a"]["floating"].as_array_mut().unwrap().reverse(),
+                _=>changed["constraints"]=json!([{"surface_id":"surface-a","output_id":"output-a","provenance":"inferred_preference","strength":"preferred"}]),
+            }
+            after.insert("workspace-a".into(),Document::Workspace(decode(changed).unwrap()));
+            assert!(guard(&db,&before,&after,&human()).is_err(),"{mutation}");
+        }
+        let draft:String=db.query_row("SELECT draft FROM presentation_leases WHERE document='surface-a'",[],|r|r.get(0)).unwrap();
+        assert_eq!(draft,"Unsaved λ");
     }
     #[test]
     fn focused_user_geometry_preserves_another_process_input_and_draft() {

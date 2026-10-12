@@ -118,6 +118,11 @@ jobs:
           dbus-run-session -- python3 outputs/native-shell/tests/first_document.py --queued
       - name: Installed native approval journey against systemd broker
         run: sudo env "PATH=$PATH" "CARGO_HOME=$HOME/.cargo" "RUSTUP_HOME=$HOME/.rustup" GITHUB_ACTIONS=true RUSTUP_TOOLCHAIN=1.85.1 python3 outputs/agent-shell/tests/installed_native_ci.py
+      - name: Desktop composition and monitor visual cases
+        run: |
+          dbus-run-session -- python3 outputs/native-shell/tests/monitor_preview.py
+          dbus-run-session -- python3 outputs/native-shell/tests/desktop_design.py
+          dbus-run-session -- python3 outputs/native-shell/tests/desktop_design.py --appearance light
       - name: Full graphical login lifecycle and staged release
         run: |
           dbus-run-session -- python3 outputs/native-shell/tests/native_session.py

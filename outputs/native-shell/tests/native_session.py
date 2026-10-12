@@ -139,6 +139,15 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                     assert not reply['ok'] and 'Trusted renderer required' in reply['error'],reply
                 accessibility.activate(accessibility.find('Agents',pyatspi.ROLE_PUSH_BUTTON))
                 accessibility.disclose('Desktop controls')
+                # Agents deliberately presents and focuses the floating monitor.
+                # Return to the editor before testing the keyboard's focus lease.
+                def monitor_focused():
+                    state=call(control,{'op':'snapshot'})
+                    (OUTPUT/'monitor-focus.json').write_text(json.dumps(state,indent=2))
+                    return any(w['app_id']=='agentos.monitor' and w['id']==state['seat_focus'] for w in state['windows'])
+                wait_for(monitor_focused,[core,session])
+                session_focus.focus(lambda value:call(endpoint,value),f'desktop-{activity}','session-fixture','field','keyboard-return-to-editor')
+                wait_for(lambda:field.getState().contains(pyatspi.STATE_FOCUSED),[core,session])
                 accessibility.activate(accessibility.find('Keyboard',pyatspi.ROLE_PUSH_BUTTON))
                 shown=wait_for(lambda:(lambda state:state if any(layer['namespace']=='agentos-keyboard' and layer['mapped'] for layer in state['system_layers']) else None)(call(control,{'op':'snapshot'})),[core,session])
                 keyboard=next(layer for layer in shown['system_layers'] if layer['namespace']=='agentos-keyboard')

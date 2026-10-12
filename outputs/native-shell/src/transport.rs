@@ -357,7 +357,7 @@ fn run(
                         if let Some(path)=std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET") {
                             let path=PathBuf::from(path);
                             let mut result=Err("Monitor unavailable".into());
-                            for _ in 0..10 {
+                            for _ in 0..40 {
                                 result=request(&path,&json!({"op":"monitor.present"}));
                                 if result.is_ok() || stop.load(Ordering::Relaxed) {break;}
                                 thread::sleep(Duration::from_millis(25));
