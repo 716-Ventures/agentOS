@@ -10,7 +10,7 @@ import time
 import uuid
 
 
-def verify(env, metrics, core, scene, login_user, presentation, keyboard, pointer, hotplug=False, hotplug_primary=False):
+def verify(env, metrics, core, scene, login_user, presentation, keyboard, pointer, hotplug=False, hotplug_primary=False, hotplug_all=False):
     outputs = scene()['outputs']
     assert len(outputs) == 2 and {o['name'] for o in outputs} == {'Virtual-1', 'Virtual-2'}, outputs
     assert all(o['scale'] == 1 and o['transform'] == 'Normal' and o['x'] >= 0 and o['y'] >= 0 for o in outputs), outputs
@@ -28,8 +28,9 @@ def verify(env, metrics, core, scene, login_user, presentation, keyboard, pointe
         assert os.geteuid() == 0 and (device/'driver').resolve().name == 'virtio-pci'
         assert identity.get('PCI_ID') == '1AF4:1050' and identity.get('PCI_CLASS') == '38000', identity
         assert (connector/'status').read_text().strip() == 'connected'
-    def connector_state(state):
-        (connector/'status').write_text(state)
+    def connector_state(state, target_connector=None):
+        selected = target_connector if target_connector is not None else connector
+        (selected/'status').write_text(state)
         subprocess.run(['udevadm', 'trigger', '--action=change', '--subsystem-match=drm', '--sysname-match=card0'], check=True)
         subprocess.run(['udevadm', 'settle', '--timeout=5'], check=True)
 
@@ -70,23 +71,34 @@ def verify(env, metrics, core, scene, login_user, presentation, keyboard, pointe
             primary_bar = next(layer['id'] for layer in scene()['system_layers'] if layer['namespace'] == 'agentos-system-bar' and layer['mapped'])
             first, second = sorted(outputs, key=lambda o: o['x'])
             survivor, removed = (second, first) if hotplug_primary else (first, second)
-            phases = [('first', survivor), ('second', removed)] + ([('removed', survivor), ('reconnected', removed)] if hotplug else []) + [('return', survivor)]
+            phases = [('first', survivor), ('second', removed)] + ([('removed', survivor), ('reconnected', removed)] if hotplug else []) + [('return', survivor)] + ([('all-removed', first), ('all-reconnected', second)] if hotplug_all else [])
             for phase, output in phases:
-                if phase in ('removed', 'reconnected'):
+                recovering = phase in ('removed', 'reconnected', 'all-removed', 'all-reconnected')
+                if recovering:
                     preferred = next(w['outputs'] for w in scene()['shared']['workspaces'].values() if w['activity_id'] == activity)
-                    connector_state('off' if phase == 'removed' else 'on')
-                    expected = {survivor['name']} if phase == 'removed' else {'Virtual-1', 'Virtual-2'}
+                    if phase == 'all-removed':
+                        for name in ('Virtual-1', 'Virtual-2'):
+                            connector_state('off', Path('/sys/class/drm/card0-'+name))
+                        wait(lambda: not scene()['outputs'], 'All-output disappearance was not observed')
+                        assert window() and core('presentation.get')['activity_id'] == activity, 'Work/session lost with no outputs'
+                        print('All virtual outputs absent; original work and live core retained', flush=True)
+                        connector_state('on', Path('/sys/class/drm/card0-Virtual-1'))
+                    elif phase == 'all-reconnected':
+                        connector_state('on', Path('/sys/class/drm/card0-Virtual-2'))
+                    else:
+                        connector_state('off' if phase == 'removed' else 'on')
+                    expected = {survivor['name']} if phase == 'removed' else {'Virtual-1'} if phase == 'all-removed' else {'Virtual-1', 'Virtual-2'}
                     wait(lambda: {o['name'] for o in scene()['outputs']} == expected, 'Connector change was not published: '+phase)
                     observed = scene()
                     output = next(o for o in observed['outputs'] if o['name'] == output['name'])
                     assert any(layer['id'] == primary_bar and layer['mapped'] for layer in observed['system_layers']), 'Session system bar lost on '+phase
                     assert window() and target['id'] in observed['shared']['identities'], 'Open work identity lost on '+phase
-                    if phase == 'removed':
+                    if phase in ('removed', 'all-removed'):
                         px, py = observed['pointer_location']
                         assert output['x'] <= px < output['x']+output['width'] and output['y'] <= py < output['y']+output['height'], 'Pointer not recovered after removal: '+json.dumps(observed['pointer_location'])
                     print('Connector recovery state: '+json.dumps({'phase':phase, 'outputs':observed['outputs'], 'window':window(), 'pointer':observed['pointer_location'], 'primary_bar':primary_bar}), flush=True)
 
-                if phase not in ('removed', 'reconnected'):
+                if not recovering:
                     deadline = time.monotonic() + 8
                     while True:
                         observed = scene()
@@ -118,9 +130,9 @@ def verify(env, metrics, core, scene, login_user, presentation, keyboard, pointe
                     # only reconnection must restore the saved float geometry.
                     preferred_geometry = (g and g['x'] == area['x']+100 and g['y'] == area['y']+120 and row['xdg']['acked_size'] == [200, 160])
                     return row if (reachable and row['xdg']['configured'] and row['xdg']['pending_count'] == 0 and
-                        (phase == 'removed' or preferred_geometry)) else None
+                        (phase in ('removed', 'all-removed') or preferred_geometry)) else None
                 row = wait(placed, 'Fixture did not settle wholly on '+output['name'])
-                if phase in ('removed', 'reconnected'):
+                if recovering:
                     assert next(w['outputs'] for w in scene()['shared']['workspaces'].values() if w['activity_id'] == activity) == preferred, 'Recovery changed durable preferred placement'
                 print('Multi-output placed client: '+json.dumps(row), flush=True)
                 g = row['geometry']
@@ -155,7 +167,11 @@ def verify(env, metrics, core, scene, login_user, presentation, keyboard, pointe
             print('PASS: kernel pointer and keyboard input with '+str(len(results)*20)+' named KMS presentation receipts across both virtual outputs'+(' and connector removal/reconnection' if hotplug else '')+' and return movement', flush=True)
         finally:
             try:
-                if connector is not None:connector_state('on')
+                if connector is not None:
+                    connector_state('on')
+                    if hotplug_all:
+                        for name in ('Virtual-1', 'Virtual-2'):
+                            connector_state('on', Path('/sys/class/drm/card0-'+name))
             finally:
                 if client.poll() is None:
                     try:method('stop')

@@ -5435,6 +5435,24 @@
         "difference_from_runtime_pin": "same immutable code and evidence revision"
       },
       "checks": 70
+    },
+    "virtual_output_hotplug": {
+      "evidence_directories": [
+        "qualified-runs/virtual-hotplug-bar-loss-baseline",
+        "qualified-runs/virtual-hotplug-secondary",
+        "qualified-runs/virtual-hotplug-primary-bar-loss-baseline",
+        "qualified-runs/virtual-hotplug-primary",
+        "qualified-runs/virtual-hotplug-all"
+      ],
+      "retained_fixture_failures": [
+        "qualified-runs/virtual-hotplug-recovery-geometry-fixture",
+        "qualified-runs/virtual-hotplug-layer-origin-fixture"
+      ],
+      "secondary_removal_named_frames": 100,
+      "primary_removal_and_total_disappearance_named_frames": 140,
+      "physical_hotplug_qualified": false,
+      "complete70_pending": true,
+      "exact_owned_cleanup_verified": true
     }
   },
   "observations": [
