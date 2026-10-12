@@ -1,0 +1,25 @@
+{
+  "result": "pass",
+  "source_revision": "d600160d7a6b83c1ea6a2b83a50ed087980b2674",
+  "source_archive_sha256": "8bd714c8da4dff50d9a4dae658e95e9bb401de970fa7d5c5a4b4dc19c6ab8f96",
+  "runtime_release": "3be42897c22f722d14af4a305b0210508110e0bc86e8b2b3a9c9574791ebcf2e",
+  "presented": 60,
+  "journey_outputs": [
+    "Virtual-1",
+    "Virtual-2",
+    "Virtual-1"
+  ],
+  "kernel_pointer_focus_both_outputs": true,
+  "post_vt_presented_both_outputs": true,
+  "physical_qualification": false,
+  "hotplug_qualification": false,
+  "file_sha256": {
+    "agentos-multihead-input-v9-driver.log": "da82616121f953db67a2584a1018fa1ea420953dcdef2efd6257aaa27c875e89",
+    "agentos-multihead-input-v9-driver.json": "741af62047a25069821b9516c6253f82f8f5a7ef5b79a47ea8c878dd9540485b",
+    "agentos-multihead-input-v9.json": "d4700b36e27b36587645f07f6f2e1ae99d1bc22c205006beb68e361b98c108f6",
+    "agentos-multihead-input-v9-guest-output.log": "f562e425e8dd57b097e2dd688c15a7f4c92bbb9ee21d12296a342400a36a5080",
+    "agentos-multihead-input-v9.log": "dea8ae60a755fb7044fd9106ab577be1eb04be0adbb5754ecf180d7e250584fe",
+    "agentos-multihead-input-v9-driver.py": "064e5c1a5a8916fe89346aab58efd7c6b1fae500d630c5b0aa800a2de5715c8c",
+    "guest.py": "e2301d1e20fbdc30a8671d19c2481d26de6d6abf58b384ef5ee75f6b24e1a781"
+  }
+}

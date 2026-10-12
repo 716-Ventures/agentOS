@@ -1,0 +1,11 @@
+{
+  "failed_title_episode_counts": [
+    4,
+    2,
+    2
+  ],
+  "window_title_utterances": 3,
+  "monitor_button_utterances": 4,
+  "meaning": "One actual reopen read the exact work without repeating the window title; the direct probe still independently required new completed work speech before any AT-SPI tree query at all three reopens",
+  "qualification_tests_changed": false
+}

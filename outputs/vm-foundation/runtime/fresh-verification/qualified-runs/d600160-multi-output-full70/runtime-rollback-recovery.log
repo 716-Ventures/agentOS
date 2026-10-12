@@ -1,0 +1,14 @@
+Installed and healthy: 3be42897c22f722d14af4a305b0210508110e0bc86e8b2b3a9c9574791ebcf2e
+Warning: The unit file, source configuration file or drop-ins of agent-os-core.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-layout.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-disk.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-broker.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-ai.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-voice.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Installed and healthy: 3be42897c22f722d14af4a305b0210508110e0bc86e8b2b3a9c9574791ebcf2e
+Installed and healthy: 3b65dab37eee3272477d81da1a53342705d1c3a6846668bd53f0bdf81bd6cc3e
+Installed and healthy: 3be42897c22f722d14af4a305b0210508110e0bc86e8b2b3a9c9574791ebcf2e
+Installed and healthy: 3b65dab37eee3272477d81da1a53342705d1c3a6846668bd53f0bdf81bd6cc3e
+Installed and healthy: 3b65dab37eee3272477d81da1a53342705d1c3a6846668bd53f0bdf81bd6cc3e
+PASS: installed schema preflight rejects saved icon and text/choice/toggle validation properties without stopping services or changing journal/document; plain legacy controls remain compatible
+{"result": "pass", "checks": ["Compatible update and rollback preserve activities, outputs, layouts, pending approvals, user files and provider configuration", "SIGKILL during rollback at stopped and activated phases recovers to the selected release without rewinding live state", "Saved property/schema incompatibility is rejected without stopping live services, changing document/journal or preventing plain legacy controls"], "provider_calls": "none"}
