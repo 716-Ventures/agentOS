@@ -1,0 +1,9 @@
+{
+  "source_revision": "a0808aea108d70ca1e1b1d8aa3b31f196b6e6077",
+  "passed_checks": 46,
+  "failure": "Expanded ordinary input completed assertions but reached systemd RuntimeMaxSec=90 before normal shutdown; runtime path cleanup assertion then failed.",
+  "ci_run": 38225934746,
+  "ci_result": "success",
+  "owned_vm_and_app_closed": true,
+  "exact_historical_signal_cause_proven": false
+}

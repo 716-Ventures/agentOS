@@ -46,6 +46,7 @@ def main():
     parser.add_argument("--bin-dir", type=Path, help="Use explicitly selected qualification binaries")
     parser.add_argument("--keyboard-geometry", type=Path, help="Write read-only native keyboard geometry diagnostics")
     parser.add_argument("--fresh-profile", action="store_true", help="Exercise a private first-run desktop with default preferences")
+    parser.add_argument('--force-session-stop', action='store_true', help='Verify owned runtime cleanup after systemd stops the mapped direct session')
     args = parser.parse_args()
     if args.multi_output_shell_hotplug or args.multi_output_restoration:args.multi_output=True
     if args.multi_output_hotplug_all:args.multi_output_hotplug_primary=True
@@ -64,6 +65,9 @@ def main():
     if args.presentation_feedback:args.input=True
     if args.terminal_ime:args.terminal_input=True
     if args.terminal_input:args.input=True
+    if args.force_session_stop and args.input:
+        parser.error('Forced session stop uses a separate mapped-session cleanup journey')
+    ordinary_editor_input=args.input and not args.terminal_input and not collection_kind and not args.native_feedback and not args.presentation_feedback and not args.screen_reader_input and not args.multi_output
     if os.geteuid() != 0:
         raise SystemExit('Run this dedicated-VM display qualification with sudo')
     login = json.loads(Path('/etc/agent-os/login-user.json').read_text())
@@ -147,7 +151,10 @@ def main():
                     # The stress profile repeats acknowledged publication, focus,
                     # paste and undo; preserve time for the final drag/drop checks.
                     # Individual convergence deadlines remain unchanged.
-                    '--property=TimeoutStopSec=15', '--property=RuntimeMaxSec='+(str(max(180,90+8*(args.focus_transfers-1))) if args.focus_transfers > 1 else '150' if args.screen_reader_input else '120' if args.terminal_input or collection_kind else '90'),
+                    # Ordinary input now also hotplugs two keyboards and tests
+                    # partial/final modifier release and removal. This is the
+                    # whole-journey watchdog, not an interaction/latency bound.
+                    '--property=TimeoutStopSec=15', '--property=RuntimeMaxSec='+(str(max(180,120+8*(args.focus_transfers-1))) if args.focus_transfers > 1 else '150' if args.screen_reader_input else '120' if args.terminal_input or collection_kind or ordinary_editor_input else '90'),
                     '--setenv=XDG_RUNTIME_DIR=' + str(runtime),
                     '--setenv=XDG_SESSION_TYPE=wayland', '--setenv=XDG_SESSION_CLASS=user',
                     '--setenv=XDG_SEAT=seat0', '--setenv=XDG_VTNR=7',
@@ -256,7 +263,10 @@ def main():
             if args.hold_seconds:
                 print('Direct desktop ready for console inspection', flush=True)
                 time.sleep(args.hold_seconds)
-            control(endpoint, 'shutdown')
+            if args.force_session_stop:
+                command('systemctl', 'stop', unit)
+            else:
+                control(endpoint, 'shutdown')
             deadline = time.monotonic() + 12
             while time.monotonic() < deadline:
                 running = subprocess.run(['systemctl', 'is-active', '--quiet', unit], check=False)
@@ -276,8 +286,11 @@ def main():
                     if row.get('tty') == 'tty7' and row.get('uid') == user.pw_uid and row.get('leader') == leader:
                         command('loginctl', 'terminate-session', row['session'])
                         scope = 'session-' + row['session'] + '.scope'
-                        if not verified:print(subprocess.check_output(['journalctl','-u',scope,'--no-pager','-o','cat','-n','80'],text=True))
-                        deadline = time.monotonic() + 3
+                        if not verified or args.force_session_stop:print(subprocess.check_output(['journalctl','-u',scope,'--no-pager','-o','cat','-n','80'],text=True))
+                        # Forced service stop may leave the wrapper draining its
+                        # separate PAM scope. Give it the same 15-second grace
+                        # as TimeoutStopSec before killing unresponsive daemons.
+                        deadline = time.monotonic() + (15 if args.force_session_stop else 3)
                         while time.monotonic() < deadline:
                             if subprocess.run(['systemctl', 'is-active', '--quiet', scope], check=False).returncode != 0:
                                 break
@@ -295,7 +308,7 @@ def main():
         deadline = time.monotonic() + 5
         while any(path.exists() for path in owned) and time.monotonic() < deadline:
             time.sleep(.1)
-        assert not any(path.exists() for path in owned), 'Direct session runtime leaked'
+        assert not any(path.exists() for path in owned), 'Direct session runtime leaked: '+repr([str(path) for path in owned if path.exists()])
         deadline = time.monotonic() + 5
         while True:
             sessions = json.loads(subprocess.check_output(['loginctl', 'list-sessions', '--json=short'], text=True))
@@ -304,17 +317,18 @@ def main():
             assert time.monotonic() < deadline, 'Owned local login scope leaked'
             time.sleep(.1)
         reports = [json.loads(path.read_text()) for path in metrics.glob('render-*.json')]
-        assert any(row['stages'].get('compositor.direct_render_attempt', {}).get('samples_total', 0) > 0
-                   for row in reports), 'Direct session produced no render diagnostics'
-        ordinary_editor_input=args.input and not args.terminal_input and not collection_kind and not args.native_feedback and not args.presentation_feedback and not args.screen_reader_input and not args.multi_output
+        if not args.force_session_stop:
+            assert any(row['stages'].get('compositor.direct_render_attempt', {}).get('samples_total', 0) > 0
+                       for row in reports), 'Direct session produced no render diagnostics'
         print(json.dumps({'result': 'pass', 'fresh_profile_qualified':args.fresh_profile, 'binary_directory':str(args.bin_dir.resolve()) if args.bin_dir else '/usr/local/bin', 'outputs': snapshot['outputs'], 'metrics': reports,
                           'native_feedback': [json.loads(path.read_text()) for path in metrics.glob('feedback-*.json')],
                           'frames_before_vt': snapshot['direct_frames_presented'],
                           'frames_after_vt': resumed['direct_frames_presented'],
                           'checks': ['private native system bar', 'KMS output discovery', 'shared core connection',
-                                     'VT switch and resume', 'orderly shutdown', 'session directory cleanup', 'owned login scope cleanup'] + (['two virtual KMS outputs with named frame receipts','kernel pointer focus on both displays and return movement',('140 kernel keyboard-triggered presented frames, including total display recovery' if args.multi_output_hotplug_all else '100 kernel keyboard-triggered presented frames, including connector recovery' if args.multi_output_hotplug else '60 kernel keyboard-triggered presented frames')]+(['guarded virtual connector removal and reconnection','surviving system bar and workspace identity','pointer recovery without new input'] if args.multi_output_hotplug else []) if args.multi_output else ['kernel '+collection_kind+' pointer and keyboard row selection','Ctrl+C and accessible Shift+F10/secondary clipboard menus','separate-client exact Unicode row text','focused refresh rejection and key-based selection across background reorder/update','empty-selection Copy rejection, row removal and local menu focus restoration'] if collection_kind else ['native GTK editor kernel key-to-presentation receipts, 20 sequential samples']+(['two distinct concurrent broker CPU jobs with measured CPU consumption','owned CPU work cancellation and unit cleanup'] if args.native_feedback_load else []) if args.native_feedback else ['Wayland presentation timestamps from completed virtual KMS frames','kernel key-triggered content feedback','superseded frame discard and unmap'] if args.presentation_feedback else ['session-owned Orca field announcement','kernel Orca learn-mode enter/exit','assistive grab isolation and ordinary typing restoration' ] if args.screen_reader_input else ['session-local display zoom and exact reset','scaled kernel pointer typing and keyboard dismissal','scaled kernel wheel access to modifier and editing keys','trusted on-screen keyboard pointer typing and editing','physical held-key isolation and balanced virtual chords','keyboard seat focus retention and workspace restoration','kernel keyboard and absolute pointer','clipboard copy/paste','undo/redo','retained draft','deliberate pointer Save','kernel workspace move/resize/maximize/restore/undo','native titlebar drag with durable placement','kernel focus cycling','kernel VT shortcut and acknowledged resume','kernel close and native assistive undo','focused primary middle-paste across Wayland clients','Unicode COPY drag/drop and grouped undo','oversized drop rejection','drag icon rendering and release cleanup'] if args.input and not args.terminal_input else ['kernel keyboard and absolute pointer in VTE','trusted Wayland IME preedit and Unicode commit','concurrent native rendering during VTE composition','detached IME commit rejected without reattach replay'] if args.terminal_ime else ['kernel keyboard and absolute pointer in VTE','Unicode Wayland clipboard to PTY','explicit native detach and reattach','kernel pointer selection and exact Unicode line copy','accessible secondary-click and Shift+F10 clipboard menus','closed-popup seat focus and first absolute pointer motion','detached menu Paste disabled and input rejected','ordinary Ctrl+C program interruption'] if args.terminal_input else []) + (['same live launcher and keyboard through primary and all-output disappearance','trusted keyboard pointer typing into launcher and editor after recovery','retained unsent request/editor drafts, durable output preferences and exact focus return','released keyboard work-area reservation and balanced keys'] if args.multi_output_shell_hotplug else []) + (['active editor remains on its recovery display through preferred output return','trusted explicit restoration preserves draft and typing','same-user restoration injection denied'] if args.multi_output_restoration else []),
+                                     'VT switch and resume', 'forced systemd stop' if args.force_session_stop else 'orderly shutdown', 'session directory cleanup', 'owned login scope cleanup'] + (['two virtual KMS outputs with named frame receipts','kernel pointer focus on both displays and return movement',('140 kernel keyboard-triggered presented frames, including total display recovery' if args.multi_output_hotplug_all else '100 kernel keyboard-triggered presented frames, including connector recovery' if args.multi_output_hotplug else '60 kernel keyboard-triggered presented frames')]+(['guarded virtual connector removal and reconnection','surviving system bar and workspace identity','pointer recovery without new input'] if args.multi_output_hotplug else []) if args.multi_output else ['kernel '+collection_kind+' pointer and keyboard row selection','Ctrl+C and accessible Shift+F10/secondary clipboard menus','separate-client exact Unicode row text','focused refresh rejection and key-based selection across background reorder/update','empty-selection Copy rejection, row removal and local menu focus restoration'] if collection_kind else ['native GTK editor kernel key-to-presentation receipts, 20 sequential samples']+(['two distinct concurrent broker CPU jobs with measured CPU consumption','owned CPU work cancellation and unit cleanup'] if args.native_feedback_load else []) if args.native_feedback else ['Wayland presentation timestamps from completed virtual KMS frames','kernel key-triggered content feedback','superseded frame discard and unmap'] if args.presentation_feedback else ['session-owned Orca field announcement','kernel Orca learn-mode enter/exit','assistive grab isolation and ordinary typing restoration' ] if args.screen_reader_input else ['session-local display zoom and exact reset','scaled kernel pointer typing and keyboard dismissal','scaled kernel wheel access to modifier and editing keys','trusted on-screen keyboard pointer typing and editing','physical held-key isolation and balanced virtual chords','keyboard seat focus retention and workspace restoration','kernel keyboard and absolute pointer','clipboard copy/paste','undo/redo','retained draft','deliberate pointer Save','kernel workspace move/resize/maximize/restore/undo','native titlebar drag with durable placement','kernel focus cycling','kernel VT shortcut and acknowledged resume','kernel close and native assistive undo','focused primary middle-paste across Wayland clients','Unicode COPY drag/drop and grouped undo','oversized drop rejection','drag icon rendering and release cleanup'] if args.input and not args.terminal_input else ['kernel keyboard and absolute pointer in VTE','trusted Wayland IME preedit and Unicode commit','concurrent native rendering during VTE composition','detached IME commit rejected without reattach replay'] if args.terminal_ime else ['kernel keyboard and absolute pointer in VTE','Unicode Wayland clipboard to PTY','explicit native detach and reattach','kernel pointer selection and exact Unicode line copy','accessible secondary-click and Shift+F10 clipboard menus','closed-popup seat focus and first absolute pointer motion','detached menu Paste disabled and input rejected','ordinary Ctrl+C program interruption'] if args.terminal_input else []) + (['same live launcher and keyboard through primary and all-output disappearance','trusted keyboard pointer typing into launcher and editor after recovery','retained unsent request/editor drafts, durable output preferences and exact focus return','released keyboard work-area reservation and balanced keys'] if args.multi_output_shell_hotplug else []) + (['active editor remains on its recovery display through preferred output return','trusted explicit restoration preserves draft and typing','same-user restoration injection denied'] if args.multi_output_restoration else []),
                           'screen_keyboard_input_qualified': ordinary_editor_input,
                           'multiple_keyboard_input_qualified': ordinary_editor_input,
+                          'forced_session_stop_qualified': args.force_session_stop,
                           'screen_reader_input_qualified': args.screen_reader_input,
                           'table_input_qualified': args.table_input,
                           'collection_input_qualified': collection_kind,

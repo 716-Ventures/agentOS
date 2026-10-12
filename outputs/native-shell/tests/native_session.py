@@ -86,6 +86,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
         if ime_editor:env['AGENT_OS_NATIVE_IME_OBSERVATION']=str(runtime/'ime-observation.json')
     host_failure='--host-failure' in sys.argv
     compositor_failure='--compositor-failure' in sys.argv
+    session_hangup='--session-hangup' in sys.argv
     with (OUTPUT/('session-compositor-failure.log' if compositor_failure else 'session-host-failure.log' if host_failure else 'session-ime-failure.log' if ime_failure else 'session-ime-editor.log' if ime_editor else 'session-ime.log' if ime else 'session-reader.log' if screen_reader else 'session.log')).open('w') as log:
         core=subprocess.Popen([str(SHELL/'target/release/agent-os-core')],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
         session=None;owned=[]
@@ -401,8 +402,11 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 # Simulate display-host loss, rather than the ordinary logout path.
                 host=int(Path(f'/proc/{session.pid}/task/{session.pid}/children').read_text().split()[0])
                 os.kill(host,signal.SIGTERM)
+            elif session_hangup:session.send_signal(signal.SIGHUP)
             else:session.terminate()
             exit_code=session.wait(timeout=20)
+            if session_hangup:
+                print('SESSION_HANGUP_OUTCOME '+json.dumps({'exit_code':exit_code,'runtime_directories':[str(p) for p in runtime.glob('agentos-session-*')]}),flush=True)
             assert exit_code>=0 if compositor_failure else exit_code==0
             remaining=lambda:[pid for pid in owned if alive(pid)]
             try:wait_for(lambda:not remaining(),[core] if core.poll() is None else [],timeout=5)
@@ -413,7 +417,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
             if ime_failure:
                 log.flush()
                 assert (OUTPUT/'session-ime-failure.log').read_text().count('Input method unavailable:')==1,'Helper failure must be reported exactly once'
-            print('PASS: '+('abrupt compositor loss' if compositor_failure else 'display-host loss' if host_failure else 'normal session')+' maps authenticated surfaces and reaps display host, compositor and renderer')
+            print('PASS: '+('session hangup' if session_hangup else 'abrupt compositor loss' if compositor_failure else 'display-host loss' if host_failure else 'normal session')+' maps authenticated surfaces and reaps display host, compositor and renderer')
         finally:
             if screen_reader and 'pidfile' in locals():
                 speech_log=pidfile.parent/'orca-speech.log'

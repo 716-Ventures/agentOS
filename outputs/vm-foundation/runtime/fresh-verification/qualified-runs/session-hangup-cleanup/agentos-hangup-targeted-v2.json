@@ -1,0 +1,45 @@
+{
+  "runtime_release": "39d7a11c50ebb9522ae97c4badfa2fa221c6d3c4a1fd4d459a250a241c32af25",
+  "cases": [
+    {
+      "argv": [
+        "runuser",
+        "-u",
+        "developer",
+        "--",
+        "dbus-run-session",
+        "--",
+        "python3",
+        "/home/developer/agent-os-source/native-shell/tests/native_session.py",
+        "--installed",
+        "--session-hangup"
+      ],
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "python3",
+        "/home/developer/agent-os-source/tests/direct_display_guest.py",
+        "--force-session-stop"
+      ],
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "python3",
+        "/home/developer/agent-os-source/tests/direct_display_guest.py",
+        "--input"
+      ],
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "python3",
+        "/home/developer/agent-os-source/tests/direct_display_guest.py",
+        "--input",
+        "--fresh-profile"
+      ],
+      "returncode": 0
+    }
+  ]
+}

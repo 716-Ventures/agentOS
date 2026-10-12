@@ -1,0 +1,10 @@
+{
+  "returncode": 1,
+  "hangup_outcome": {
+    "exit_code": -1,
+    "runtime_directories": [
+      "/tmp/agentos-session-test-u4ayeo9a/runtime/agentos-session-rewlbtax"
+    ]
+  },
+  "independent_negative": true
+}

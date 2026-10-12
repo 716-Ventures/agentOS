@@ -121,6 +121,7 @@ jobs:
       - name: Full graphical login lifecycle and staged release
         run: |
           dbus-run-session -- python3 outputs/native-shell/tests/native_session.py
+          dbus-run-session -- python3 outputs/native-shell/tests/native_session.py --session-hangup
           dbus-run-session -- python3 outputs/native-shell/tests/native_session.py --system-bar
           dbus-run-session -- python3 outputs/native-shell/tests/native_session.py --ime
           dbus-run-session -- python3 outputs/native-shell/tests/native_session.py --ime-editor

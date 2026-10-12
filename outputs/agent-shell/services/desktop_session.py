@@ -159,7 +159,9 @@ def main():
     def stop(_signum,_frame):
         nonlocal stopped
         stopped=True
-    previous={sig:signal.signal(sig,stop) for sig in (signal.SIGINT,signal.SIGTERM)}
+    # A graphical login can lose its TTY while systemd stops the session group.
+    # Treat hangup as a graceful stop so owned children and runtime paths drain.
+    previous={sig:signal.signal(sig,stop) for sig in (signal.SIGINT,signal.SIGTERM,signal.SIGHUP)}
     proc=None;owned=None;display_runtime=runtime
     try:
         with tempfile.TemporaryDirectory(prefix='agentos-session-',dir=runtime) as directory:

@@ -1,0 +1,25 @@
+Input fixture device: event5 ['ID_INPUT=1', 'ID_INPUT_MOUSE=1']
+Input fixture device: event4 ['ID_INPUT=1', 'ID_INPUT_KEY=1', 'ID_INPUT_KEYBOARD=1']
+PASS: kernel Ctrl+Alt+Space opens temporary launcher; Escape and Ctrl+Alt+Delete close it, preserving work and restoring typing
+PASS: two kernel keyboards retain merged Shift and reject OSK input after partial release/removal; last release/removal restores lowercase, balanced keys and focus
+PASS: kernel on-screen keyboard shortcut/pointer typing, Shift/edit, held physical key isolation, focus retention and work-area restoration
+PASS: kernel display zoom changes logical geometry, scaled pointer typing, wheel access to modifier/edit keys and keyboard dismissal work; zoom-out and exact reset preserve focus and workspace
+
+Session terminated, killing shell... ...killed.
+PASS: direct kernel/libinput keyboard, absolute pointer, GTK clipboard, grouped undo/redo, retained draft and deliberate Save
+PASS: direct kernel workspace resize, move, maximize, restore and presentation undo preserve saved document
+PASS: direct kernel titlebar drag, focus cycling, VT shortcut/resume and close-view; native assistive undo restores exact saved document
+PASS: real Wayland primary middle-paste and COPY drag/drop; Unicode handoff, grouped undo and oversized rejection preserve saved document
+Started agentos-display-test-4aee003aeb834183bf6d446239868f1f.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 2310.
+pam_unix(login:session): session opened for user developer(uid=1000) by developer(uid=0)
+agentos-display-test-4aee003aeb834183bf6d446239868f1f.service: Service reached runtime time limit. Stopping.
+agentos-display-test-4aee003aeb834183bf6d446239868f1f.service: Failed with result 'timeout'.
+
+Traceback (most recent call last):
+  File "/home/developer/agent-os-source/tests/direct_display_guest.py", line 338, in <module>
+    main()
+    ~~~~^^
+  File "/home/developer/agent-os-source/tests/direct_display_guest.py", line 298, in main
+    assert not any(path.exists() for path in owned), 'Direct session runtime leaked'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Direct session runtime leaked

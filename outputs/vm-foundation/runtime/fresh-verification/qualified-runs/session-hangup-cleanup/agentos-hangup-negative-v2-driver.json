@@ -1,0 +1,17 @@
+{
+  "source_revision": "a0808aea108d70ca1e1b1d8aa3b31f196b6e6077",
+  "source_clean": false,
+  "negative": {
+    "returncode": 1,
+    "hangup_outcome": {
+      "exit_code": -1,
+      "runtime_directories": [
+        "/tmp/agentos-session-test-u4ayeo9a/runtime/agentos-session-rewlbtax"
+      ]
+    },
+    "independent_negative": true
+  },
+  "owned_utm_closed": true,
+  "original_config_unchanged": true,
+  "original_disk_efi_inodes_preserved": true
+}
