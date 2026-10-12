@@ -1,0 +1,9 @@
+{
+  "failed_ci_run": 38222358492,
+  "failed_source_revision": "e2bae2c2093cf7697377bafe105d90104bd5364b",
+  "failure": "Installed approval fixture dereferenced an absent AT-SPI child in its custom search. Native and contract CI jobs passed; compositor job failed at installed approval.",
+  "old_search_negative": "Both maintained tests fail with NoneType AttributeError",
+  "fixed_search_unit_tests_passed": 2,
+  "production_code_changed": false,
+  "subsequent_ci_and_clean_source_full70_pending": true
+}

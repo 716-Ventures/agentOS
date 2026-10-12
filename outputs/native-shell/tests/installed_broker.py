@@ -33,6 +33,8 @@ def button(name, work=None):
         while queue and visited < 4096:
             node = queue.popleft()
             visited += 1
+            if node is None:
+                continue  # AT-SPI may expose an absent child during widget teardown.
             try:
                 if (node.name == name and node.getRole() == pyatspi.ROLE_PUSH_BUTTON
                         and node.getState().contains(pyatspi.STATE_SENSITIVE)):
@@ -60,6 +62,7 @@ def button(name, work=None):
         for _ in range(512):
             if not queue:break
             node=queue.popleft()
+            if node is None:continue
             try:
                 print('Accessible:',node.getRoleName(),repr(node.name),repr(node.description),
                       'sensitive=',node.getState().contains(pyatspi.STATE_SENSITIVE),flush=True)
