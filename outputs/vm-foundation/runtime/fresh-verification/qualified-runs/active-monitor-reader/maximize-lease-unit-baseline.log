@@ -1,0 +1,22 @@
+   Compiling agent-os-core v0.5.0 (/Users/chrisjdavis/development/agentOS/outputs/agent-shell)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.71s
+     Running unittests src/main.rs (outputs/agent-shell/target/debug/deps/agent_os_core-f635340e0356aad2)
+
+running 1 test
+test presentation::tests::maximize_and_restore_preserve_focused_cross_process_drafts ... FAILED
+
+failures:
+
+---- presentation::tests::maximize_and_restore_preserve_focused_cross_process_drafts stdout ----
+
+thread 'presentation::tests::maximize_and_restore_preserve_focused_cross_process_drafts' (29352590) panicked at src/presentation.rs:2794:51:
+called `Result::unwrap()` on an `Err` value: "{\"code\":\"interaction_conflict\",\"detail\":\"surface-a/input has active input or a recoverable draft\"}"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    presentation::tests::maximize_and_restore_preserve_focused_cross_process_drafts
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 63 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `--bin agent-os-core`

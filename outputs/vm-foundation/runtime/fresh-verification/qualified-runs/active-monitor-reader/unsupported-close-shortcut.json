@@ -1,0 +1,20 @@
+{
+  "started_at": "2026-10-12T01:20:53.105907+00:00",
+  "source_revision": "8eccb5650e4806850d96799564a3eb05052c6c2c",
+  "source_changes": [
+    " M outputs/agent-shell/tests/direct_input_probe.py",
+    "AM outputs/agent-shell/tests/direct_monitor_reader_probe.py",
+    " M outputs/agent-shell/tests/direct_screen_reader_probe.py",
+    " M outputs/native-shell/tests/accessibility.py"
+  ],
+  "source_archive_sha256": "4bd4548b5a2cd01489772d298faca1f3e9f0243b4a4df183beb0948df44a7ab6",
+  "passed": false,
+  "base_deployment_source_archive_sha256": "a843f02dd34ca8cadd9e840a73db340e414d40da34d232c1fbc3ae4ef5905aa8",
+  "applied_test_file_sha256": {
+    "direct_monitor_reader_probe.py": "d529c127a84490adbc4dfab2a8aa1daa831b77390a1921e9b3b9533cdd4fbe21",
+    "direct_input_probe.py": "d20ec7c44bda17b080434601e984c47f7d1063d743daa8aeded4faaa672f2f01",
+    "direct_screen_reader_probe.py": "a112a82da6c1da1b28eeea11f898edff3981eeb8bcb5628606dc0e7373ab1551"
+  },
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-12T01:21:36.207112+00:00"
+}

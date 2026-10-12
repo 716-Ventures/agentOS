@@ -508,7 +508,7 @@ def verify_reader_outcomes(call, speech_log, outcomes, database):
                     active='OBJECT:ANNOUNCEMENT' in line
                 if active and ('SPEECH OUTPUT: '+repr(announcement)+'{') in line:
                     spoken.append(line)
-                if 'END ' in line and 'OBJECT EVENT ' in line:active=False
+                if ('END ' in line or 'FINISHED ' in line) and 'OBJECT EVENT ' in line:active=False
             return spoken
         wait(lambda:announcements(),'Orca did not announce changed selected '+key+' outcome')
         if key=='status':

@@ -1,0 +1,19 @@
+{
+  "started_at": "2026-10-12T01:19:09.423932+00:00",
+  "source_revision": "8eccb5650e4806850d96799564a3eb05052c6c2c",
+  "source_changes": [
+    " M outputs/agent-shell/tests/direct_input_probe.py",
+    "AM outputs/agent-shell/tests/direct_monitor_reader_probe.py",
+    " M outputs/agent-shell/tests/direct_screen_reader_probe.py"
+  ],
+  "source_archive_sha256": "850e3125ef34f354c635634d83cc13782db971ba26fd83619df73ef1aa0cdf4d",
+  "passed": false,
+  "base_deployment_source_archive_sha256": "a843f02dd34ca8cadd9e840a73db340e414d40da34d232c1fbc3ae4ef5905aa8",
+  "applied_test_file_sha256": {
+    "direct_monitor_reader_probe.py": "7abbed6cdb692ba7153eec7d9632cf6076d41eb32502ef0f7aed9b3936abadc2",
+    "direct_input_probe.py": "f439364f3aa68bcce5b9ea089db958dd218b2e13270ad888cd0271b3fbd09be5",
+    "direct_screen_reader_probe.py": "a112a82da6c1da1b28eeea11f898edff3981eeb8bcb5628606dc0e7373ab1551"
+  },
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-12T01:19:48.977375+00:00"
+}

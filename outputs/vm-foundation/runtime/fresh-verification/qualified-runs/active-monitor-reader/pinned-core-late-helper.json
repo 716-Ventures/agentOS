@@ -1,0 +1,16 @@
+{
+  "started_at": "2026-10-12T01:32:15.564346+00:00",
+  "source_revision": "8eccb5650e4806850d96799564a3eb05052c6c2c",
+  "source_changes": [
+    " M outputs/agent-shell/src/presentation.rs",
+    " M outputs/agent-shell/src/presentation/workspace.rs",
+    " M outputs/agent-shell/tests/direct_input_probe.py",
+    "AM outputs/agent-shell/tests/direct_monitor_reader_probe.py",
+    " M outputs/agent-shell/tests/direct_screen_reader_probe.py",
+    " M outputs/native-shell/tests/accessibility.py"
+  ],
+  "source_archive_sha256": "6b4edd92e1fedc2428be64c8adcfe7ae99ad6646b0faff4d4705b6b2c1a267f1",
+  "passed": false,
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-12T01:33:26.204639+00:00"
+}

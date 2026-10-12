@@ -135,6 +135,30 @@ def assistive():
                 node=find('Ask Agent',pyatspi.ROLE_TEXT)
                 text=node.queryText()
                 print(json.dumps({'text':text.getText(0,min(text.characterCount,65536)),'focused':node.getState().contains(pyatspi.STATE_FOCUSED)}),flush=True);continue
+            if request=='monitor-button':
+                node=find('Agent Monitor',pyatspi.ROLE_PUSH_BUTTON)
+                r=node.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
+                print(json.dumps({'point':[r.x+r.width/2,r.y+r.height/2]}),flush=True);continue
+            if request.startswith('monitor-work:'):
+                marker=request.split(':',1)[1];frame=find('Agent Monitor',pyatspi.ROLE_FRAME)
+                queue=deque([frame]);label=None;current=''
+                for _ in range(2048):
+                    if not queue:break
+                    node=queue.popleft()
+                    if node is None:continue
+                    try:
+                        t=node.queryText();value=t.getText(0,min(t.characterCount,4096))
+                        if marker in value:
+                            if value.startswith('core · '):label=node
+                            elif value.startswith('Current value:\ncore · ') and node.getState().contains(pyatspi.STATE_SHOWING):current=value
+                    except (NotImplementedError,RuntimeError,LookupError):pass
+                    try:queue.extend(node[i] for i in range(min(node.childCount,128)))
+                    except (RuntimeError,LookupError):pass
+                if label is None:raise ValueError('Monitor work row missing: '+marker)
+                t=label.queryText();value=t.getText(0,min(t.characterCount,4096));selection=None
+                if t.getNSelections():selection=t.getText(*t.getSelection(0))
+                r=label.queryComponent().getExtents(pyatspi.WINDOW_COORDS);f=frame.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
+                print(json.dumps({'text':value,'selection':selection,'current':current,'point':[r.x+r.width/2,r.y+r.height/2],'width':f.width,'height':f.height,'active':frame.getState().contains(pyatspi.STATE_ACTIVE),'focused':label.getState().contains(pyatspi.STATE_FOCUSED)}),flush=True);continue
             if request=='tree':
                 queue=deque([pyatspi.Registry.getDesktop(0)]);rows=[];remaining=49152
                 while queue and len(rows)<1024:
@@ -437,7 +461,17 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
             raise
         if screen_reader:
             import direct_screen_reader_probe
-            direct_screen_reader_probe.verify(metrics,env,login_user,keyboard,snapshot,wait,core,scene)
+            def restore_editor():
+                click(snapshot()['field'])
+                deadline=time.monotonic()+8
+                while scene()['seat_focus']!=target:
+                    if time.monotonic()>deadline:raise RuntimeError('Monitor clipboard receiver did not receive seat focus')
+                    time.sleep(.05)
+                wait(lambda value:value['focused'])
+            def foreground_monitor(log):
+                import direct_monitor_reader_probe
+                return direct_monitor_reader_probe.verify(log,keyboard,pointer,snapshot,scene,presentation,output,core('presentation.get')['activity_id'],restore_editor)
+            direct_screen_reader_probe.verify(metrics,env,login_user,keyboard,snapshot,wait,core,scene,foreground_monitor)
             return
         if native_feedback:
             import direct_native_feedback

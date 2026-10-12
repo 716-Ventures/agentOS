@@ -1,11 +1,12 @@
 """Real session-owned Orca commands over kernel input; null sink, not audible QA."""
 from pathlib import Path
 import ast
+import json
 import subprocess
 import time
 
 
-def verify(metrics,env,login_user,keyboard,snapshot,wait,core,scene):
+def verify(metrics,env,login_user,keyboard,snapshot,wait,core,scene,foreground_monitor):
     log=Path(env['XDG_RUNTIME_DIR'])/'orca-speech.log'
     output=Path(__file__).resolve().parents[1]/'test-output'
     output.mkdir(exist_ok=True)
@@ -28,6 +29,7 @@ def verify(metrics,env,login_user,keyboard,snapshot,wait,core,scene):
         raise RuntimeError('Keyboard reading order did not reach '+name+'; '+repr(snapshot('focused')))
     try:
         await_speech(lambda text:'Using speech server factory:' in text,'Session-owned Orca did not initialize speech')
+        print('PASS: active Monitor reader selection '+json.dumps(foreground_monitor(log)),flush=True)
         def launcher(mapped):
             deadline=time.monotonic()+8
             while any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in scene()['system_layers'])!=mapped:

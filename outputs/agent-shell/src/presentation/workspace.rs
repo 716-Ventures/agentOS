@@ -270,7 +270,8 @@ pub fn apply(w: &mut WorkspaceDocument, edit: Edit) -> Result<()> {
         Edit::Maximize { surface_id } => {
             let output = location(w, &surface_id)
                 .ok_or_else(|| error("missing_reference", "Surface is not placed"))?;
-            w.outputs.get_mut(&output).unwrap().maximized = Some(surface_id);
+            w.outputs.get_mut(&output).unwrap().maximized = Some(surface_id.clone());
+            pin(w, &surface_id, true)?;
         }
         Edit::Restore { surface_id } => {
             if location(w, &surface_id).is_none() {
@@ -281,6 +282,7 @@ pub fn apply(w: &mut WorkspaceDocument, edit: Edit) -> Result<()> {
                     o.maximized = None;
                 }
             }
+            pin(w, &surface_id, true)?;
         }
         Edit::Focus {
             surface_id,

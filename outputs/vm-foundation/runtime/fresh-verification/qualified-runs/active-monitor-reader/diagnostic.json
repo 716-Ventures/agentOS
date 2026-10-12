@@ -1,0 +1,13 @@
+{
+  "started_at": "2026-10-12T01:13:41.236513+00:00",
+  "source_revision": "8eccb5650e4806850d96799564a3eb05052c6c2c",
+  "source_changes": [
+    " M outputs/agent-shell/tests/direct_input_probe.py",
+    "AM outputs/agent-shell/tests/direct_monitor_reader_probe.py",
+    " M outputs/agent-shell/tests/direct_screen_reader_probe.py"
+  ],
+  "source_archive_sha256": "3c277eca7262813f55f7cfb78bdb480e89cb5c657d8d6481a10fc03e6ce3520e",
+  "passed": false,
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-12T01:14:54.945810+00:00"
+}

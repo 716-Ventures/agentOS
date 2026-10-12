@@ -2777,6 +2777,28 @@ mod tests {
         json!({"protocol":PROTOCOL,"workspace_id":"workspace-a","activity_id":"1","revision":0,"outputs":{"output-a":{"tiles":{"kind":"leaf","surface_id":"surface-a"},"floating":[],"maximized":null}},"constraints":[],"focus":null})
     }
     #[test]
+    fn maximize_and_restore_preserve_focused_cross_process_drafts() {
+        for kind in ["maximize", "restore"] {
+            let db = fixture();
+            db.execute("INSERT INTO presentation_leases(document,element,uid,session,expires,draft) VALUES('surface-a','input',1000,'editor',?,'Unsaved λ')", [now()+30]).unwrap();
+            let mut w: WorkspaceDocument = decode(workspace()).unwrap();
+            w.focus = Some(Focus { surface_id: "surface-a".into(), element_id: Some("input".into()) });
+            if kind == "restore" { w.outputs.get_mut("output-a").unwrap().maximized = Some("surface-a".into()); }
+            let before = BTreeMap::from([
+                ("surface-a".into(), Document::Surface(decode(surface()).unwrap())),
+                ("workspace-a".into(), Document::Workspace(w.clone())),
+            ]);
+            workspace::apply(&mut w, decode(json!({"kind":kind,"surface_id":"surface-a"})).unwrap()).unwrap();
+            let mut after = before.clone();
+            after.insert("workspace-a".into(), Document::Workspace(w));
+            guard(&db, &before, &after, &human()).unwrap();
+            assert!(guard(&db, &before, &after, &agent()).is_err(), "{kind}");
+            assert!(guard(&db, &before, &after, &Principal { uid: 1001, session: "foreign".into() }).is_err(), "{kind}");
+            let draft: String = db.query_row("SELECT draft FROM presentation_leases WHERE document='surface-a'", [], |r| r.get(0)).unwrap();
+            assert_eq!(draft, "Unsaved λ");
+        }
+    }
+    #[test]
     fn focused_user_geometry_preserves_another_process_input_and_draft() {
         let db = fixture();
         db.execute("INSERT INTO presentation_leases(document,element,uid,session,expires,draft) VALUES('surface-a','input',1000,'editor',?,'Unsaved λ')", [now()+30]).unwrap();

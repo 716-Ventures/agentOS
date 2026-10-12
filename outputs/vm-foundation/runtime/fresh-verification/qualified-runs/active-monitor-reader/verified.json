@@ -1,0 +1,23 @@
+{
+  "started_at": "2026-10-12T01:33:39.505149+00:00",
+  "source_revision": "8eccb5650e4806850d96799564a3eb05052c6c2c",
+  "source_changes": [
+    " M outputs/agent-shell/src/presentation.rs",
+    " M outputs/agent-shell/src/presentation/workspace.rs",
+    " M outputs/agent-shell/tests/direct_input_probe.py",
+    "AM outputs/agent-shell/tests/direct_monitor_reader_probe.py",
+    " M outputs/agent-shell/tests/direct_screen_reader_probe.py",
+    " M outputs/native-shell/tests/accessibility.py"
+  ],
+  "source_archive_sha256": "a63e210688a16694b0e1e65b3d7658a464c7aec17469cc1a8eb09b45d186af52",
+  "passed": true,
+  "base_deployment_source_archive_sha256": "6b4edd92e1fedc2428be64c8adcfe7ae99ad6646b0faff4d4705b6b2c1a267f1",
+  "applied_test_file_sha256": {
+    "direct_monitor_reader_probe.py": "3f380c9ee33038b707a12fe608fde4ba160f8f7e3062e12dc23ffc66ab69e2ca",
+    "direct_input_probe.py": "3ee74a9d55bbe89f095d89c1eced9d63eff00db72248a89de5163e7ac667ab4a",
+    "direct_screen_reader_probe.py": "a112a82da6c1da1b28eeea11f898edff3981eeb8bcb5628606dc0e7373ab1551"
+  },
+  "raw_speech_sha256": "76294a63d865d4ee48f4fe50aac5531c02b0ffe6dd97f329f428180d673d6e5c",
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-12T01:34:54.570820+00:00"
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Agent OS development foundation",
+  "version": "0.7.0-dev",
+  "milestone": "Experimental native desktop",
+  "base": "Debian 13",
+  "architecture": "arm64",
+  "base_build": "20260914-2601",
+  "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
+  "agent_runtime": "Gateway agent with general execution and filesystem broker; Jev typed effect advisory",
+  "voice": "Offline English recognition and reviewed microphone input",
+  "guest_sources": {
+    "agent-os-foundation.service": "e5acc8fbfec78024dfd7fb27fafe615391c7b17672c1b56e235e12023e3b6bd2",
+    "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
+    "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
+  },
+  "runtime_release": "3973c220292d7e912e5bedea18cc6a9b8a6d2299d6c0a179206645da2ff987e6"
+}
