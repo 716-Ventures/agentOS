@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import select
 import signal
+import socket
 import struct
 import subprocess
 import sys
@@ -131,6 +132,16 @@ def assistive():
     for line in sys.stdin:
         try:
             request=line.strip()
+            if request=='restore-output-placement':
+                node=find('Restore preferred placement',pyatspi.ROLE_PUSH_BUTTON)
+                r=node.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
+                print(json.dumps({'point':[r.x+r.width/2,r.y+r.height/2],'sensitive':node.getState().contains(pyatspi.STATE_SENSITIVE),'showing':node.getState().contains(pyatspi.STATE_SHOWING),'bounds':[r.x,r.y,r.width,r.height]}),flush=True);continue
+            if request=='restore-output-rejection':
+                with socket.socket(socket.AF_UNIX) as connection:
+                    connection.settimeout(6);connection.connect(os.environ['AGENT_OS_COMPOSITOR_SOCKET'])
+                    connection.sendall(b'{"op":"workspace.restore_outputs","recovery":{}}\n')
+                    with connection.makefile('rb') as reader:result=json.loads(reader.readline(65537))
+                print(json.dumps({'response':result}),flush=True);continue
             if request=='launcher-request':
                 node=find('Ask Agent',pyatspi.ROLE_TEXT)
                 text=node.queryText()
@@ -294,21 +305,22 @@ def assistive():
         print(json.dumps(response),flush=True)
 
 
-def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False,presentation_feedback=False,native_feedback=False,native_feedback_load=False,table_input=False,focus_transfers=1,screen_reader=False,multi_output=False,multi_output_shell_hotplug=False,multi_output_hotplug=False,multi_output_hotplug_primary=False,multi_output_hotplug_all=False):
+def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False,presentation_feedback=False,native_feedback=False,native_feedback_load=False,table_input=False,focus_transfers=1,screen_reader=False,multi_output=False,multi_output_shell_hotplug=False,multi_output_restoration=False,multi_output_hotplug=False,multi_output_hotplug_primary=False,multi_output_hotplug_all=False):
     subprocess.run(['modprobe','uinput'],check=True)
     # Join only this test session's accessibility bus; never inspect other users.
-    bus=None;observer_runtime=None;wayland=None;deadline=time.monotonic()+10
+    bus=None;observer_runtime=None;wayland=None;compositor_socket=None;deadline=time.monotonic()+10
     while bus is None and time.monotonic()<deadline:
         for proc in Path('/proc').iterdir():
             if not proc.name.isdigit():continue
             try:
                 values=dict(value.split(b'=',1) for value in (proc/'environ').read_bytes().split(b'\0') if b'=' in value)
                 if ((proc/'exe').resolve().name=='agent-os-desktop' and values.get(b'AGENT_OS_METRICS_DIR')==str(metrics).encode() and values.get(b'DBUS_SESSION_BUS_ADDRESS')):
-                    bus=values[b'DBUS_SESSION_BUS_ADDRESS'].decode();observer_runtime=values[b'XDG_RUNTIME_DIR'].decode();wayland=values[b'WAYLAND_DISPLAY'].decode();break
+                    bus=values[b'DBUS_SESSION_BUS_ADDRESS'].decode();observer_runtime=values[b'XDG_RUNTIME_DIR'].decode();wayland=values[b'WAYLAND_DISPLAY'].decode();compositor_socket=values.get(b'AGENT_OS_COMPOSITOR_SOCKET',b'').decode();break
             except (OSError,ValueError):pass
         if bus is None:time.sleep(.05)
     if bus is None:raise RuntimeError('Owned direct-session bus not found')
     env={**os.environ,'DBUS_SESSION_BUS_ADDRESS':bus,'XDG_RUNTIME_DIR':observer_runtime,'WAYLAND_DISPLAY':wayland,'GDK_BACKEND':'wayland'}
+    if compositor_socket:env['AGENT_OS_COMPOSITOR_SOCKET']=compositor_socket
     # libatspi may otherwise reuse the login user's cached accessibility bus.
     address=subprocess.check_output(['runuser','-u',login_user,'--','gdbus','call','--session','--dest','org.a11y.Bus','--object-path','/org/a11y/bus','--method','org.a11y.Bus.GetAddress'],env=env,text=True,timeout=5)
     env['AT_SPI_BUS_ADDRESS']=ast.literal_eval(address)[0]
@@ -396,7 +408,10 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
             return
         if multi_output:
             import direct_multi_output_probe
-            direct_multi_output_probe.verify(env,metrics,core,scene,login_user,presentation,keyboard,pointer,hotplug=multi_output_hotplug,hotplug_primary=multi_output_hotplug_primary,hotplug_all=multi_output_hotplug_all)
+            direct_multi_output_probe.verify(env,metrics,core,scene,login_user,presentation,keyboard,pointer,hotplug=multi_output_hotplug,hotplug_primary=multi_output_hotplug_primary,hotplug_all=multi_output_hotplug_all,snapshot=snapshot)
+            if multi_output_restoration:
+                import direct_output_restore_probe
+                direct_output_restore_probe.verify(scene,target,snapshot,keyboard,pointer,capture=metrics/'restoration.png')
             if multi_output_shell_hotplug:
                 import direct_shell_hotplug_probe
                 direct_shell_hotplug_probe.verify(scene,target,snapshot,keyboard,pointer)

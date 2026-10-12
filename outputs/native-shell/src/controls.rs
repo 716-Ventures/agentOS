@@ -278,6 +278,7 @@ impl Controls {
         let images = image_controls::ImageControls::new(commands.clone());
         widget.append(&images.widget);
         let workspace = workspace_controls::WorkspaceControls::new(commands.clone());
+        monitor_content.append(&workspace.restoration);
         monitor_content.append(&workspace.widget);
         let jobs = super::job_list::JobList::new(app, &commands);
         monitor_content.append(&jobs.widget);
@@ -785,6 +786,12 @@ impl Controls {
         self.widget.set_margin_top(16);
         let section = gtk::Expander::builder().label("Activities, appearance and setup").child(&settings).build();
         self.monitor_content.append(&section);
+    }
+    /// Opt-in verification capture of the mapped, active restoration controls.
+    pub fn capture_output_restoration(&self, path: &str) -> bool {
+        self.monitor.is_visible() && self.monitor.is_active()
+            && self.workspace.restoration.is_visible()
+            && system_bar::capture(&self.monitor, path)
     }
     pub fn present(&self) {
         self.monitor.present();

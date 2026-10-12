@@ -1,0 +1,27 @@
+{
+  "meaning": "Independent production failure: preferred output return moves a focused, typed native editor off the surviving secondary display. Draft and focus remain intact.",
+  "runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
+  "source_revision": "5e0058b7bd26556f2498203fb48774342cda856c",
+  "source_clean": true,
+  "cleanup_verified": true,
+  "evidence": [
+    {
+      "expected_retained_secondary_geometry": {
+        "x": 1280,
+        "y": 60,
+        "width": 1024,
+        "height": 708
+      },
+      "observed_geometry": {
+        "height": 800,
+        "width": 1280,
+        "x": 0,
+        "y": 0
+      },
+      "focused": true,
+      "draft_preserved": true,
+      "seat_focus": "ObjectId(wl_surface@37[0], 72)",
+      "overview": null
+    }
+  ]
+}

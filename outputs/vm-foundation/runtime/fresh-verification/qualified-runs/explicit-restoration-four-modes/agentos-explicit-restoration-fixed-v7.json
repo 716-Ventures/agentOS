@@ -1,0 +1,402 @@
+{
+  "virtual_gpu_pci_identity": {
+    "DRIVER": "virtio-pci",
+    "PCI_CLASS": "38000",
+    "PCI_ID": "1AF4:1050",
+    "PCI_SUBSYS_ID": "1AF4:1100",
+    "PCI_SLOT_NAME": "0000:00:02.0",
+    "MODALIAS": "pci:v00001AF4d00001050sv00001AF4sd00001100bc03sc80i00"
+  },
+  "original_second_connector_status": "disconnected",
+  "synthetic_connector_force": true,
+  "physical_hotplug_qualified": false,
+  "cases": [
+    {
+      "mode": "--multi-output-restoration",
+      "kms_session": {
+        "result": "pass",
+        "fresh_profile_qualified": false,
+        "binary_directory": "/usr/local/bin",
+        "outputs": [
+          {
+            "height": 800,
+            "name": "Virtual-1",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1280,
+            "x": 0,
+            "y": 0
+          },
+          {
+            "height": 768,
+            "name": "Virtual-2",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1024,
+            "x": 1280,
+            "y": 0
+          }
+        ],
+        "metrics": [
+          {
+            "format": 1,
+            "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence",
+            "pid": 3175,
+            "sample_limit_per_stage": 256,
+            "stages": {
+              "compositor.direct_render_attempt": {
+                "discarded": 0,
+                "max_recent_ms": 7.763598,
+                "mean_all_ms": 2.457156019834706,
+                "p50_recent_ms": 2.139962,
+                "p95_recent_ms": 4.185092,
+                "retained": 256,
+                "samples_total": 2420
+              }
+            }
+          }
+        ],
+        "native_feedback": [],
+        "frames_before_vt": 58,
+        "frames_after_vt": 73,
+        "checks": [
+          "private native system bar",
+          "KMS output discovery",
+          "shared core connection",
+          "VT switch and resume",
+          "orderly shutdown",
+          "session directory cleanup",
+          "owned login scope cleanup",
+          "two virtual KMS outputs with named frame receipts",
+          "kernel pointer focus on both displays and return movement",
+          "60 kernel keyboard-triggered presented frames",
+          "active editor remains on its recovery display through preferred output return",
+          "trusted explicit restoration preserves draft and typing",
+          "same-user restoration injection denied"
+        ],
+        "screen_keyboard_input_qualified": false,
+        "screen_reader_input_qualified": false,
+        "table_input_qualified": false,
+        "collection_input_qualified": null,
+        "terminal_input_qualified": false,
+        "terminal_ime_qualified": false,
+        "presentation_feedback_qualified": false,
+        "multi_output_qualified": true,
+        "virtual_shell_hotplug_qualified": false,
+        "virtual_explicit_output_restoration_qualified": true,
+        "virtual_output_hotplug_qualified": false,
+        "virtual_primary_output_hotplug_qualified": false,
+        "virtual_all_outputs_removed_qualified": false,
+        "native_feedback_qualified": false,
+        "native_feedback_load_qualified": false,
+        "output_transform_qualified": null,
+        "focus_transfer_cycles": null,
+        "not_tested": [
+          "physical input",
+          "physical connector hotplug",
+          "physical GPU presentation"
+        ]
+      }
+    },
+    {
+      "mode": "--multi-output-hotplug",
+      "kms_session": {
+        "result": "pass",
+        "fresh_profile_qualified": false,
+        "binary_directory": "/usr/local/bin",
+        "outputs": [
+          {
+            "height": 800,
+            "name": "Virtual-1",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1280,
+            "x": 0,
+            "y": 0
+          },
+          {
+            "height": 768,
+            "name": "Virtual-2",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1024,
+            "x": 1280,
+            "y": 0
+          }
+        ],
+        "metrics": [
+          {
+            "format": 1,
+            "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence",
+            "pid": 8883,
+            "sample_limit_per_stage": 256,
+            "stages": {
+              "compositor.direct_render_attempt": {
+                "discarded": 0,
+                "max_recent_ms": 8.259957,
+                "mean_all_ms": 2.5854745305291726,
+                "p50_recent_ms": 2.1521470000000003,
+                "p95_recent_ms": 4.178834,
+                "retained": 256,
+                "samples_total": 2211
+              }
+            }
+          }
+        ],
+        "native_feedback": [],
+        "frames_before_vt": 34,
+        "frames_after_vt": 48,
+        "checks": [
+          "private native system bar",
+          "KMS output discovery",
+          "shared core connection",
+          "VT switch and resume",
+          "orderly shutdown",
+          "session directory cleanup",
+          "owned login scope cleanup",
+          "two virtual KMS outputs with named frame receipts",
+          "kernel pointer focus on both displays and return movement",
+          "100 kernel keyboard-triggered presented frames, including connector recovery",
+          "guarded virtual connector removal and reconnection",
+          "surviving system bar and workspace identity",
+          "pointer recovery without new input"
+        ],
+        "screen_keyboard_input_qualified": false,
+        "screen_reader_input_qualified": false,
+        "table_input_qualified": false,
+        "collection_input_qualified": null,
+        "terminal_input_qualified": false,
+        "terminal_ime_qualified": false,
+        "presentation_feedback_qualified": false,
+        "multi_output_qualified": true,
+        "virtual_shell_hotplug_qualified": false,
+        "virtual_explicit_output_restoration_qualified": false,
+        "virtual_output_hotplug_qualified": true,
+        "virtual_primary_output_hotplug_qualified": false,
+        "virtual_all_outputs_removed_qualified": false,
+        "native_feedback_qualified": false,
+        "native_feedback_load_qualified": false,
+        "output_transform_qualified": null,
+        "focus_transfer_cycles": null,
+        "not_tested": [
+          "physical input",
+          "physical connector hotplug",
+          "physical GPU presentation"
+        ]
+      }
+    },
+    {
+      "mode": "--multi-output-hotplug-all",
+      "kms_session": {
+        "result": "pass",
+        "fresh_profile_qualified": false,
+        "binary_directory": "/usr/local/bin",
+        "outputs": [
+          {
+            "height": 800,
+            "name": "Virtual-1",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1280,
+            "x": 0,
+            "y": 0
+          },
+          {
+            "height": 768,
+            "name": "Virtual-2",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1024,
+            "x": 1280,
+            "y": 0
+          }
+        ],
+        "metrics": [
+          {
+            "format": 1,
+            "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence",
+            "pid": 15005,
+            "sample_limit_per_stage": 256,
+            "stages": {
+              "compositor.direct_render_attempt": {
+                "discarded": 0,
+                "max_recent_ms": 7.368615,
+                "mean_all_ms": 2.6276212937538594,
+                "p50_recent_ms": 2.226813,
+                "p95_recent_ms": 5.395053000000001,
+                "retained": 256,
+                "samples_total": 3234
+              }
+            }
+          }
+        ],
+        "native_feedback": [],
+        "frames_before_vt": 14,
+        "frames_after_vt": 29,
+        "checks": [
+          "private native system bar",
+          "KMS output discovery",
+          "shared core connection",
+          "VT switch and resume",
+          "orderly shutdown",
+          "session directory cleanup",
+          "owned login scope cleanup",
+          "two virtual KMS outputs with named frame receipts",
+          "kernel pointer focus on both displays and return movement",
+          "140 kernel keyboard-triggered presented frames, including total display recovery",
+          "guarded virtual connector removal and reconnection",
+          "surviving system bar and workspace identity",
+          "pointer recovery without new input"
+        ],
+        "screen_keyboard_input_qualified": false,
+        "screen_reader_input_qualified": false,
+        "table_input_qualified": false,
+        "collection_input_qualified": null,
+        "terminal_input_qualified": false,
+        "terminal_ime_qualified": false,
+        "presentation_feedback_qualified": false,
+        "multi_output_qualified": true,
+        "virtual_shell_hotplug_qualified": false,
+        "virtual_explicit_output_restoration_qualified": false,
+        "virtual_output_hotplug_qualified": true,
+        "virtual_primary_output_hotplug_qualified": true,
+        "virtual_all_outputs_removed_qualified": true,
+        "native_feedback_qualified": false,
+        "native_feedback_load_qualified": false,
+        "output_transform_qualified": null,
+        "focus_transfer_cycles": null,
+        "not_tested": [
+          "physical input",
+          "physical connector hotplug",
+          "physical GPU presentation"
+        ]
+      }
+    },
+    {
+      "mode": "--multi-output-shell-hotplug",
+      "kms_session": {
+        "result": "pass",
+        "fresh_profile_qualified": false,
+        "binary_directory": "/usr/local/bin",
+        "outputs": [
+          {
+            "height": 800,
+            "name": "Virtual-1",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1280,
+            "x": 0,
+            "y": 0
+          },
+          {
+            "height": 768,
+            "name": "Virtual-2",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1024,
+            "x": 1280,
+            "y": 0
+          }
+        ],
+        "metrics": [
+          {
+            "format": 1,
+            "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence",
+            "pid": 23490,
+            "sample_limit_per_stage": 256,
+            "stages": {
+              "compositor.direct_render_attempt": {
+                "discarded": 0,
+                "max_recent_ms": 16.069463,
+                "mean_all_ms": 2.6981123289689086,
+                "p50_recent_ms": 2.533702,
+                "p95_recent_ms": 4.986613,
+                "retained": 256,
+                "samples_total": 2444
+              }
+            }
+          }
+        ],
+        "native_feedback": [],
+        "frames_before_vt": 37,
+        "frames_after_vt": 51,
+        "checks": [
+          "private native system bar",
+          "KMS output discovery",
+          "shared core connection",
+          "VT switch and resume",
+          "orderly shutdown",
+          "session directory cleanup",
+          "owned login scope cleanup",
+          "two virtual KMS outputs with named frame receipts",
+          "kernel pointer focus on both displays and return movement",
+          "60 kernel keyboard-triggered presented frames",
+          "same live launcher and keyboard through primary and all-output disappearance",
+          "trusted keyboard pointer typing into launcher and editor after recovery",
+          "retained unsent request/editor drafts, durable output preferences and exact focus return",
+          "released keyboard work-area reservation and balanced keys"
+        ],
+        "screen_keyboard_input_qualified": false,
+        "screen_reader_input_qualified": false,
+        "table_input_qualified": false,
+        "collection_input_qualified": null,
+        "terminal_input_qualified": false,
+        "terminal_ime_qualified": false,
+        "presentation_feedback_qualified": false,
+        "multi_output_qualified": true,
+        "virtual_shell_hotplug_qualified": true,
+        "virtual_explicit_output_restoration_qualified": false,
+        "virtual_output_hotplug_qualified": false,
+        "virtual_primary_output_hotplug_qualified": false,
+        "virtual_all_outputs_removed_qualified": false,
+        "native_feedback_qualified": false,
+        "native_feedback_load_qualified": false,
+        "output_transform_qualified": null,
+        "focus_transfer_cycles": null,
+        "not_tested": [
+          "physical input",
+          "physical connector hotplug",
+          "physical GPU presentation"
+        ]
+      }
+    }
+  ],
+  "forced_status": "connected",
+  "forced_modes": [
+    "1024x768",
+    "4096x2160",
+    "4096x2160",
+    "2560x1600",
+    "2560x1600",
+    "1920x1440",
+    "1856x1392",
+    "1792x1344",
+    "2048x1152",
+    "1920x1200",
+    "1920x1200",
+    "1920x1080",
+    "1600x1200",
+    "1680x1050",
+    "1680x1050",
+    "1400x1050",
+    "1400x1050",
+    "1600x900",
+    "1280x1024",
+    "1440x900",
+    "1440x900",
+    "1280x960",
+    "1366x768",
+    "1366x768",
+    "1360x768",
+    "1280x800",
+    "1280x800",
+    "1280x768",
+    "1280x768",
+    "1280x720",
+    "800x600",
+    "800x600",
+    "848x480",
+    "640x480"
+  ],
+  "restored_second_connector_status": "disconnected"
+}

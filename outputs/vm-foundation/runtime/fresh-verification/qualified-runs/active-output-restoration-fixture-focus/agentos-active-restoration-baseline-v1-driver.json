@@ -1,0 +1,71 @@
+{
+  "started_at": "2026-10-12T05:48:42.571350+00:00",
+  "original_config_sha256": "b2ba8798840483e3a9d810658eb84e69eba42cfadd6460844f3e3d91e38cd186",
+  "purpose": "Targeted live launcher/keyboard virtual recovery on unchanged complete70 production binaries; not physical hotplug",
+  "targeted_source_archive_sha256": "d20990908326dbb6679af4b25bda087892ddb1d18d2e0d77e62082bf263607a8",
+  "source_changes": [],
+  "qualified_production_source_archive_sha256": "953a80f83840fd06a32b324bed4b1e10d186346318c29784dc23f33f82cd4328",
+  "test_only_source_changes": [
+    "LAYOUT.md",
+    "native-shell/README.md",
+    "tests/direct_display_guest.py",
+    "tests/direct_input_probe.py",
+    "tests/direct_shell_hotplug_probe.py"
+  ],
+  "targeted_test_source_sha256": {
+    "LAYOUT.md": "4bf972cbc332284809b357b7296cb4cc8725ffdee5f8cbfe9da0399e9cc67323",
+    "tests/direct_shell_hotplug_probe.py": "e30b0d679b8af75bb0369f037269a106e647c316e8cbc40c4a39d11e30d35254",
+    "tests/direct_input_probe.py": "784531fa7111dce641cb33d739ee719334913f934eda849a9c8b1a2f3562c889",
+    "tests/direct_display_guest.py": "67e5fd4ad51b344e5ffab4388edab2c1ff59a2bd985efa253a31643011ec1a46",
+    "native-shell/README.md": "4a0ff4275edb3eda76f5133a699c23b1dd92d67d595f3a5f4c4ef9d186335eb8"
+  },
+  "source_revision": "5e0058b7bd26556f2498203fb48774342cda856c",
+  "qualified_runtime_source_archive_sha256": "953a80f83840fd06a32b324bed4b1e10d186346318c29784dc23f33f82cd4328",
+  "installed_runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
+  "source_clean": true,
+  "connectors": [
+    {
+      "name": "card0-Virtual-1",
+      "status": "connected",
+      "modes": [
+        "1280x800",
+        "5120x2160",
+        "4096x2160",
+        "3840x2160",
+        "3840x2160",
+        "3840x2160",
+        "1920x1440",
+        "2560x1080",
+        "1856x1392",
+        "1792x1344",
+        "2048x1152",
+        "1920x1200",
+        "1920x1080",
+        "1920x1080",
+        "1600x1200",
+        "1680x1050",
+        "1400x1050",
+        "1280x1024",
+        "1440x900",
+        "1280x960",
+        "1360x768",
+        "1280x768",
+        "1024x768",
+        "800x600",
+        "640x480",
+        "640x480"
+      ],
+      "enabled": "enabled"
+    },
+    {
+      "name": "card0-Virtual-2",
+      "status": "disconnected",
+      "modes": [],
+      "enabled": "disabled"
+    }
+  ],
+  "two_connectors_observed": true,
+  "owned_utm_closed": true,
+  "original_disk_efi_inodes_preserved": true,
+  "original_config_restored": true
+}

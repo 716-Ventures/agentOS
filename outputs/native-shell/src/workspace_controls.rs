@@ -2,6 +2,9 @@
 use super::*;
 pub struct WorkspaceControls {
     pub widget: gtk::Expander,
+    pub restoration: gtk::Box,
+    restoration_offer: Rc<RefCell<Option<Value>>>,
+    restore_outputs: gtk::Button,
     notice: gtk::Label,
     surfaces: gtk::DropDown,
     targets: gtk::DropDown,
@@ -30,6 +33,19 @@ fn spin(label: &str, min: f64, max: f64, step: f64, value: f64) -> gtk::SpinButt
 }
 impl WorkspaceControls {
     pub fn new(commands: Sender<Command>) -> Self {
+        let restoration=ui::column(8);
+        let restoration_message=ui::text("A preferred display is available. Your work stays here until you choose to restore its saved placement.",false);
+        restoration_message.set_wrap(true);
+        let restore_outputs=ui::button("Restore preferred placement",ButtonVariant::Outline,false);
+        restoration.append(&restoration_message);
+        restoration.append(&restore_outputs);
+        restoration.set_visible(false);
+        let restoration_offer=Rc::new(RefCell::new(None::<Value>));
+        let offer=restoration_offer.clone();
+        let sender=commands.clone();
+        restore_outputs.connect_clicked(move |_| {
+            if let Some(recovery)=offer.borrow().clone() {let _=sender.send(Command::RestoreOutputs(recovery));}
+        });
         let content = ui::column(12);
         let widget = gtk::Expander::builder()
             .label("Arrange workspace")
@@ -133,6 +149,9 @@ impl WorkspaceControls {
             }
         });
         Self {
+            restoration,
+            restoration_offer,
+            restore_outputs,
             notice,
             widget,
             surfaces,
@@ -160,6 +179,10 @@ impl WorkspaceControls {
         }
     }
     pub fn update(&self, frame: &Frame) {
+        let offer=frame.compositor["overview"]["restoration"].as_object().map(|_|frame.compositor["overview"]["restoration"].clone());
+        self.restoration.set_visible(offer.is_some());
+        self.restore_outputs.set_sensitive(frame.connected && offer.is_some());
+        *self.restoration_offer.borrow_mut()=offer;
         *self.hosts.borrow_mut() = frame.host_surfaces.clone();
         self.reconnect.set_sensitive(frame.connected);
         let message = frame.compositor["unavailable"]

@@ -1,0 +1,13 @@
+{
+  "meaning": "Same 98ae runtime completed actual pointer restore. Immediate close shortcut removed editor instead of unfocused Monitor. Later strict focus probe independently exposed Monitor being hidden by the recovery overview.",
+  "runtime": "98ae7620103f888903a13e19871dcea7090c7b46e9af4c34bbfd62bb0e38ed50",
+  "files_sha256": {
+    "agentos-explicit-restoration-fixed-v3-0.log.gz": "631cae3109b68620e8881a12b8c7ade0589114848b9a3ec19ac0ecc3a7cf627a",
+    "agentos-explicit-restoration-fixed-v3-driver.json": "4dc35d0d7b106236f46b46cfc407777be55e9bfd354e701dbae9c84733d3b346",
+    "agentos-explicit-restoration-fixed-v3-driver.log.gz": "63778bda9219b90bf08eb0f4f10a3ca08fb5c240d007a74c8c5c3d55ff695f35",
+    "agentos-explicit-restoration-fixed-v3-driver.py": "6a498320d328c7d013ddf296adad32e476423068c894e0a4d47c884a6d0c1dea",
+    "agentos-explicit-restoration-fixed-v3-guest-output.log.gz": "f716a31f7631160610e69b834098da871371d07098b996e2e0413e75fa2d9276",
+    "agentos-explicit-restoration-fixed-v3-guest.py": "36f38dfeee8e7e1a458132722ca120f3551b342e52cddf009339d9736c9d558d",
+    "agentos-explicit-restoration-fixed-v3.json": "da6aa20c3e538dd9b684295626b884efd1cb76e2a0eb547858a0c02fc83fbf33"
+  }
+}

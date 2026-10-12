@@ -61,6 +61,8 @@ fn project_outputs(
     outputs: &BTreeMap<String, Rect>,
     primary: &str,
     recovered: &BTreeSet<String>,
+    recovery_destinations: &BTreeSet<String>,
+    recovery_surfaces: &BTreeSet<String>,
 ) -> Value {
     let mut overviews = serde_json::Map::new();
     for (id, area) in outputs {
@@ -69,13 +71,15 @@ fn project_outputs(
             .filter(|(runtime, _)| assignments.get(*runtime).map(String::as_str) == Some(id))
             .map(|(id, r)| (id.clone(), *r))
             .collect::<BTreeMap<_, _>>();
-        let recovering = id == primary && !recovered.is_empty();
-        let empty = BTreeSet::new();
+        let recovering = recovery_destinations.contains(id);
+        // Recover original floating work into the reachable overview, but keep
+        // newly opened floating controls above it so restoration is usable.
+        let recovery_floating = floating.difference(recovery_surfaces).cloned().collect();
         let original_ids = subset.keys().cloned().collect::<Vec<_>>();
         let overview = crate::pressure::project_recovery(
             &mut subset,
             windows,
-            if recovering { &empty } else { floating },
+            if recovering { &recovery_floating } else { floating },
             focus,
             *area,
             recovering,
@@ -129,7 +133,11 @@ impl Bridge {
             let mut published = BTreeMap::new();
             let mut output_areas = BTreeMap::<String, OutputObservation>::new();
             let mut document_cache = pages::Cache::default();
+            let mut recovery = crate::output_recovery::Recovery::default();
             let mut selected_activity = None::<String>;
+            // A switch can precede restoration in this batch, before Recovery
+            // observes the new activity. Reject that stale control immediately.
+            let mut activity_pending = false;
             let mut first_seen = BTreeMap::<String, std::time::Instant>::new();
             let mut nonce = [0u8; 16];
             if std::fs::File::open("/dev/urandom")
@@ -150,6 +158,11 @@ impl Bridge {
                         result
                     } else {
                         match req.value["op"].as_str() {
+                            Some("workspace.restore_outputs") => {
+                                let available=input.lock().unwrap().as_ref().map(|observed|observed.outputs.iter().map(|o|o.id.clone()).collect::<BTreeSet<_>>()).unwrap_or_default();
+                                if !recovery.context_matches(&available,if activity_pending {selected_activity.as_deref()} else {None}) {Err("Outputs or activity changed; review the current restoration offer".into())}
+                                else {recovery.restore(&req.value["recovery"]).map_err(String::from)}
+                            }
                             Some("workspace.transaction") => {
                                 if let Some(baseline) = req.value.get("input_baseline") {
                                     call(&socket, &json!({"op":"presentation.get","document_id":baseline["workspace_id"]}))
@@ -172,6 +185,7 @@ impl Bridge {
                                         return Err("Activity unavailable".into());
                                     }
                                     selected_activity = Some(activity.into());
+                                    activity_pending = true;
                                     Ok(json!({"activity_id":activity}))
                                 }),
                             Some("workspace.apply") => put(
@@ -393,7 +407,10 @@ impl Bridge {
                             .map(|(runtime, surface)| (surface.clone(), runtime.clone()))
                             .collect::<BTreeMap<_, _>>();
                         let mut floating = BTreeSet::new();
-                        let mut recovered_outputs = BTreeSet::new();
+                        let available_outputs=next.output_areas.keys().cloned().collect();
+                        recovery.observe(&activity,&next.workspaces,&available_outputs,primary_id);
+                        activity_pending = false;
+                        let recovered_outputs=recovery.recovered_outputs();
                         for doc in next
                             .workspaces
                             .as_object()
@@ -404,13 +421,11 @@ impl Bridge {
                                 continue;
                             }
                             for (id, layout) in doc["outputs"].as_object().into_iter().flatten() {
-                                let actual = output_areas.get(id);
+                                let workspace=doc["workspace_id"].as_str().ok_or("Workspace identity missing")?;
+                                let routed=recovery.destination(workspace,id).unwrap_or(id);
+                                let actual = output_areas.get(routed);
                                 let area = actual.map(|o| o.area).unwrap_or(primary_area);
-                                let destination =
-                                    actual.map(|o| o.id.as_str()).unwrap_or(primary_id);
-                                if actual.is_none() {
-                                    recovered_outputs.insert(id.clone());
-                                }
+                                let destination=actual.map(|o|o.id.as_str()).unwrap_or(primary_id);
                                 if let Some(runtime) =
                                     layout["maximized"].as_str().and_then(|id| reverse.get(id))
                                 {
@@ -450,7 +465,14 @@ impl Bridge {
                             &next.output_areas,
                             primary_id,
                             &recovered_outputs,
+                            &recovery.destinations(),
+                            &recovery.surfaces().iter().filter_map(|id| reverse.get(id).cloned()).collect(),
                         );
+                        if let Some(offer)=recovery.offer() {
+                            if next.overview.is_null() {next.overview=json!({});}
+                            next.overview["restoration"]=offer;
+                            next.overview["reason"]=json!("A preferred display is available. Work stays here until you restore preferred placement in Agent Monitor.");
+                        }
                         Ok(next)
                     })();
                     match result {
@@ -857,6 +879,8 @@ mod tests {
             &outputs,
             "left",
             &BTreeSet::new(),
+            &BTreeSet::new(),
+            &BTreeSet::new(),
         );
         assert_eq!(
             rectangles["a"], left,
@@ -910,10 +934,28 @@ mod tests {
             None,
             &outputs,
             "left",
+            &BTreeSet::new(),
+            &BTreeSet::new(),
             &BTreeSet::new()
         )
         .is_null());
         assert_eq!(rectangles, saved);
+    }
+    #[test]
+    fn recovery_keeps_new_floating_controls_reachable_above_original_work() {
+        let area = Rect { x:1280,y:60,width:1024,height:708 };
+        let mut rectangles=BTreeMap::from([
+            ("editor".into(),Rect{x:1380,y:180,width:400,height:300}),
+            ("monitor".into(),Rect{x:1560,y:160,width:720,height:600}),
+        ]);
+        let assignments=BTreeMap::from([("editor".into(),"right".into()),("monitor".into(),"right".into())]);
+        let floats=BTreeSet::from(["editor".into(),"monitor".into()]);
+        let overview=project_outputs(&mut rectangles,&assignments,&[],&floats,Some(&"editor".into()),
+            &BTreeMap::from([("right".into(),area)]),"right",&BTreeSet::from(["left".into()]),
+            &BTreeSet::from(["right".into()]),&BTreeSet::from(["editor".into()]));
+        assert_eq!(rectangles["editor"],area);
+        assert_eq!(rectangles["monitor"],Rect{x:1560,y:160,width:720,height:600});
+        assert_eq!(overview["selected"],"editor");
     }
     #[test]
     fn automatic_views_use_balanced_rows_instead_of_repeatedly_halving_old_views() {

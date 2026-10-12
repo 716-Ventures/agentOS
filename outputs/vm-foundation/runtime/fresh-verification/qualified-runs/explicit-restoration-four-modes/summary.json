@@ -1,0 +1,17 @@
+{
+  "meaning": "59 compositor tests and all four virtual KMS modes pass on runtime 8dc33f. The captured actual active Monitor is readable and its restoration action reachable. The subsequent final candidate adds a separate stale selected-activity guard; complete70 and exact clean final-source repetition remain pending.",
+  "runtime": "8dc33f175dc446d5999e82ef6d841c4891f8f348d27a0648221e7b786fcdd294",
+  "files_sha256": {
+    "agentos-explicit-restoration-fixed-v7-0.log.gz": "8293a853b770c4f4ca8dae095b10f6427267007242f390ea5824f9c96b4b211d",
+    "agentos-explicit-restoration-fixed-v7-1.log.gz": "805ec3877773d413299a9182620bb8538093f82a04b023e415b1781f9809a8a7",
+    "agentos-explicit-restoration-fixed-v7-2.log.gz": "33c15b64aafcc810b69860c987c5f1f08125d61e6fe6877c6bb4bd4949f6d265",
+    "agentos-explicit-restoration-fixed-v7-3.log.gz": "cff3f31f4ad9dc27eab6cbdfab202ee9596e3d637ca50c42f8e33b018a404689",
+    "agentos-explicit-restoration-fixed-v7-driver.json": "864cabd5d177d7e6ae1815e3189b1d77e30d2cc3a2932b0db095106257835a38",
+    "agentos-explicit-restoration-fixed-v7-driver.log.gz": "11b94e4c8bdd183c09f419ba2d10659f024fc2b58f38d57c80a6a606afaec6b7",
+    "agentos-explicit-restoration-fixed-v7-driver.py": "d9905f1bfe0bf4434f685a04c0554716e6014495a684c887c65a799cdb3fb35f",
+    "agentos-explicit-restoration-fixed-v7-guest-output.log.gz": "21931c2e4abda573c01fc8f004412aa047646dce2eb1ce9c5ca366b6288fc71e",
+    "agentos-explicit-restoration-fixed-v7-guest.py": "f57853fc5db5772a7d87a6d51f6e596579269186cf1684c4da625b7cd6b0be59",
+    "agentos-explicit-restoration-fixed-v7.json": "1ccd1a2e5cc540b4188e28b06f19822787b04464fb74f10f6427281edef075cf",
+    "agentos-explicit-restoration-fixed-v7.png": "ca5b365b98970580d9644569db91df139303e7527475abb3a5238d5df5aa256b"
+  }
+}

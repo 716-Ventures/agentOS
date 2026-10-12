@@ -1,0 +1,29 @@
+{
+  "started_at": "2026-10-12T06:16:13.444957+00:00",
+  "original_config_sha256": "b2ba8798840483e3a9d810658eb84e69eba42cfadd6460844f3e3d91e38cd186",
+  "purpose": "Targeted explicit preferred-output restoration, core recovery unit regressions and actual kernel/native controls; not physical hotplug",
+  "deployment": {
+    "created_at": "2026-10-12T06:16:27.203027+00:00",
+    "source_archive_sha256": "f2ccdb5700f353ba16b56c435a32b96907bd8208b3aabe18a6b639536cd74e2c",
+    "repository_revision": "5e0058b7bd26556f2498203fb48774342cda856c",
+    "source_changes": [
+      " M outputs/agent-shell/tests/direct_display_guest.py",
+      " M outputs/agent-shell/tests/direct_input_probe.py",
+      " M outputs/agent-shell/tests/direct_multi_output_probe.py",
+      "AM outputs/agent-shell/tests/direct_output_restore_probe.py",
+      " M outputs/native-compositor/src/bridge.rs",
+      " M outputs/native-compositor/src/main.rs",
+      "AM outputs/native-compositor/src/output_recovery.rs",
+      " M outputs/native-compositor/src/shell_keyboard.rs",
+      " M outputs/native-compositor/src/system_shell.rs",
+      " M outputs/native-shell/src/controls.rs",
+      " M outputs/native-shell/src/transport.rs",
+      " M outputs/native-shell/src/workspace_controls.rs"
+    ],
+    "installed": true
+  },
+  "installed_runtime": "5a3a1e20c8a70c6a5e3af0a9f0dae1d1da904bc15ef02045ada519d7544c8945",
+  "owned_utm_closed": true,
+  "original_disk_efi_inodes_preserved": true,
+  "original_config_restored": true
+}

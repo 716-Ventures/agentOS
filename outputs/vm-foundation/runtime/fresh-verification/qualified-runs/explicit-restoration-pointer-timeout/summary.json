@@ -1,0 +1,13 @@
+{
+  "meaning": "Same 98ae runtime retained editor and rejected untrusted restore, but pointer action timed out. No cause was established from this trace.",
+  "runtime": "98ae7620103f888903a13e19871dcea7090c7b46e9af4c34bbfd62bb0e38ed50",
+  "files_sha256": {
+    "agentos-explicit-restoration-fixed-v2-0.log.gz": "e2a0a108db001f1fdbc9ec0b124596d70e902c17d74118d68ad15be4270640e8",
+    "agentos-explicit-restoration-fixed-v2-driver.json": "1511f59bacb60b5ee5da507a2aa8f213f94b722ac6bbd80ef3e59d8c56187af8",
+    "agentos-explicit-restoration-fixed-v2-driver.log.gz": "15b24077f4c19080baae8aa0c26b788835a4fa39db219283e66e64d451ee8915",
+    "agentos-explicit-restoration-fixed-v2-driver.py": "c7da78f9bbd2eb9472744fc1c4668ab278a0d68e13145eb9e2f223fb2ceff8df",
+    "agentos-explicit-restoration-fixed-v2-guest-output.log.gz": "82cf95e66d476b31ffca14128e184d873d2e1551e9fcfb89f81d2c9931e882fc",
+    "agentos-explicit-restoration-fixed-v2-guest.py": "1995ea528ef1f52fe2cc45704212dc8a303e4596262cd660405e2776ffbe94c0",
+    "agentos-explicit-restoration-fixed-v2.json": "da6aa20c3e538dd9b684295626b884efd1cb76e2a0eb547858a0c02fc83fbf33"
+  }
+}

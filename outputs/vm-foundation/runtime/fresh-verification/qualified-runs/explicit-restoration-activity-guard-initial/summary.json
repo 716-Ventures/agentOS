@@ -1,0 +1,14 @@
+{
+  "meaning": "60 compositor tests and actual active-editor restoration pass. The final candidate additionally limits the pending-switch context check to the period before scene reconciliation, allowing normal fallback after an activity is removed.",
+  "runtime": "5e44934989607671c34f99fae163e20105a33599c4fd760b943a87438ba71cf2",
+  "files_sha256": {
+    "agentos-explicit-restoration-fixed-v8-0.log.gz": "c43eb5d17b34b6b1763c7aa5c4bbd92da057ea5a4bc9bbb70413065317050005",
+    "agentos-explicit-restoration-fixed-v8-driver.json": "e2f902fdf1458f119200841d75f2891865062af1852e80e376e6fe25de697118",
+    "agentos-explicit-restoration-fixed-v8-driver.log.gz": "940c6cdc90b8c62f21385c114cd647781284da5cf990e9c3961bf7105e2aa54a",
+    "agentos-explicit-restoration-fixed-v8-driver.py": "ea90571649afea5ce2c958d64c7e2955a89c58d314fe07c33e97d5dec0849c00",
+    "agentos-explicit-restoration-fixed-v8-guest-output.log.gz": "4b6240a85962c8f120f4e221478d2851553c2a883f25228dab6aff42d1761bad",
+    "agentos-explicit-restoration-fixed-v8-guest.py": "dd46ff1eb8cd0b843ff088711101ca5ca8bb652f2372a4de72c4d8c9c190e21f",
+    "agentos-explicit-restoration-fixed-v8.json": "0c64be0eb79dc85842997af0fc48c6dd0b6cf719a785f041525caaaa73df6e06",
+    "agentos-explicit-restoration-fixed-v8.png": "ca5b365b98970580d9644569db91df139303e7527475abb3a5238d5df5aa256b"
+  }
+}

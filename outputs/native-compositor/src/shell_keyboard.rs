@@ -29,29 +29,7 @@ fn stroke(code: u64, modifiers: u64) -> Result<Vec<u32>, &'static str> {
 
 pub fn handle(state: &mut Smallvil, peer: Option<u32>, value: &Value) -> Value {
     let result = (|| -> Result<Value, String> {
-        let (pid, start) = state
-            .shell_identity
-            .as_ref()
-            .ok_or("Trusted renderer unavailable")?;
-        if peer != Some(*pid) {
-            return Err("Trusted renderer required".into());
-        }
-        let stat = std::fs::read_to_string(format!("/proc/{pid}/stat"))
-            .map_err(|_| "Trusted renderer exited")?;
-        if stat
-            .rsplit_once(')')
-            .and_then(|(_, tail)| tail.split_whitespace().next())
-            .is_some_and(|state| matches!(state, "Z" | "X"))
-        {
-            return Err("Trusted renderer exited".into());
-        }
-        if stat
-            .rsplit_once(')')
-            .and_then(|(_, tail)| tail.split_whitespace().nth(19))
-            != Some(start.as_str())
-        {
-            return Err("Trusted renderer identity changed".into());
-        }
+        crate::system_shell::trusted_renderer(state, peer)?;
         if value["op"] == "display.zoom" {
             if state.direct_active == Some(false) {return Err("Display is inactive".into());}
             let direction=value["direction"].as_i64().filter(|n|(-1..=1).contains(n)).ok_or("Invalid zoom change")?;

@@ -30,6 +30,7 @@ mod input_method_tests;
 #[cfg(feature = "direct-display")]
 mod output_config;
 mod output_zoom;
+mod output_recovery;
 mod pointer_geometry;
 mod state;
 mod winit;
@@ -143,6 +144,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let result=data.state.accessibility.as_mut().ok_or("Screen reader is disabled").and_then(|service|service.register(req.peer_pid,req.value["pid"].as_u64(),req.value["start"].as_str()));
                     let response=match result {Ok(())=>serde_json::json!({"ok":true,"result":{}}),Err(error)=>serde_json::json!({"ok":false,"error":error})};
                     let _=req.reply.try_send(response);continue;
+                }
+                if req.value["op"].as_str()==Some("workspace.restore_outputs") {
+                    if let Err(error)=system_shell::trusted_renderer(&data.state,req.peer_pid) {
+                        let _=req.reply.try_send(serde_json::json!({"ok":false,"error":error}));
+                        continue;
+                    }
                 }
                 if req.value["op"]
                     .as_str()

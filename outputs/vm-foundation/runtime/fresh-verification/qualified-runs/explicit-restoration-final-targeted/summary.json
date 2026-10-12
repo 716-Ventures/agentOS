@@ -1,0 +1,14 @@
+{
+  "meaning": "60 compositor tests and actual native pointer restoration pass on the final candidate. Active typing survives preferred display return, untrusted same-user restore is denied, acknowledged Monitor focus survives restoration, the editor draft survives and subsequent typing works. Complete committed-source70 and exact final-source four-mode repeat remain pending.",
+  "runtime": "e33cf49ba658e780eb61a23056a22e8b2974afa4d31ef294b662f92714a40410",
+  "files_sha256": {
+    "agentos-explicit-restoration-fixed-v9-0.log.gz": "df5075960939bd623a3ca7395da3843598aebc0fe9e2c4a57cb0cf60d51f63a9",
+    "agentos-explicit-restoration-fixed-v9-driver.json": "9fe40944afd10567412bdedf2a2085d36778d69ad6b37d97ed8077e7014d31d6",
+    "agentos-explicit-restoration-fixed-v9-driver.log.gz": "1c9d0600778bb281827415177384b7a19237ee11387152e8359eaa5274d8425e",
+    "agentos-explicit-restoration-fixed-v9-driver.py": "e237b2611272e7ca707887134041c1a3adc90f6c8acc4fd83e250d6472285054",
+    "agentos-explicit-restoration-fixed-v9-guest-output.log.gz": "a14a2e07757d8ad6b8f40429502df895d4f7250807b21756e85dc20c99197bd0",
+    "agentos-explicit-restoration-fixed-v9-guest.py": "f3344210040420058b0fb55ab90e008a2a547a5539199b3c6ee9f7afcd2cad26",
+    "agentos-explicit-restoration-fixed-v9.json": "21766f4d9056c63780ddea0902cf1af74a3a1b296fffdb7dfba53e82a9209376",
+    "agentos-explicit-restoration-fixed-v9.png": "ca5b365b98970580d9644569db91df139303e7527475abb3a5238d5df5aa256b"
+  }
+}

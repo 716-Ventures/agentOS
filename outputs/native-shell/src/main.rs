@@ -1580,6 +1580,7 @@ fn main() {
         let mut keyboard_sequence = 0;
         let mut bar_captured = false;
         let mut launcher_captured = false;
+        let mut restoration_captured = false;
         glib::timeout_add_local(Duration::from_millis(50), move || {
             // Keep the layer library and system window alive for this session.
             let _ = (&layer_library, &bar_window, &screen_keyboard);
@@ -1626,6 +1627,11 @@ fn main() {
             };
             status.set_label(connection);
             controls.borrow_mut().update(&frame, &backend.commands);
+            if !restoration_captured {
+                if let Ok(path) = std::env::var("AGENT_OS_RESTORATION_CAPTURE") {
+                    restoration_captured = controls.borrow().capture_output_restoration(&path);
+                }
+            }
             let mut surfaces = surfaces.borrow_mut();
             for (id, doc) in &frame.documents {
                 if doc.get("surface_id").is_some() {

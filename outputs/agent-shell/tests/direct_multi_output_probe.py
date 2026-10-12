@@ -10,7 +10,7 @@ import time
 import uuid
 
 
-def verify(env, metrics, core, scene, login_user, presentation, keyboard, pointer, hotplug=False, hotplug_primary=False, hotplug_all=False):
+def verify(env, metrics, core, scene, login_user, presentation, keyboard, pointer, hotplug=False, hotplug_primary=False, hotplug_all=False,snapshot=None):
     outputs = scene()['outputs']
     assert len(outputs) == 2 and {o['name'] for o in outputs} == {'Virtual-1', 'Virtual-2'}, outputs
     assert all(o['scale'] == 1 and o['transform'] == 'Normal' and o['x'] >= 0 and o['y'] >= 0 for o in outputs), outputs
@@ -96,6 +96,10 @@ def verify(env, metrics, core, scene, login_user, presentation, keyboard, pointe
                     if phase in ('removed', 'all-removed'):
                         px, py = observed['pointer_location']
                         assert output['x'] <= px < output['x']+output['width'] and output['y'] <= py < output['y']+output['height'], 'Pointer not recovered after removal: '+json.dumps(observed['pointer_location'])
+                    if phase in ('reconnected','all-reconnected'):
+                        wait(lambda: (scene()['shared']['overview'] or {}).get('restoration'), 'Preferred restoration offer missing')
+                        import direct_output_restore_probe
+                        direct_output_restore_probe.restore_preferred(scene,snapshot,keyboard,pointer)
                     print('Connector recovery state: '+json.dumps({'phase':phase, 'outputs':observed['outputs'], 'window':window(), 'pointer':observed['pointer_location'], 'primary_bar':primary_bar}), flush=True)
 
                 if not recovering:
@@ -133,7 +137,14 @@ def verify(env, metrics, core, scene, login_user, presentation, keyboard, pointe
                         (phase in ('removed', 'all-removed') or preferred_geometry)) else None
                 row = wait(placed, 'Fixture did not settle wholly on '+output['name'])
                 if recovering:
-                    assert next(w['outputs'] for w in scene()['shared']['workspaces'].values() if w['activity_id'] == activity) == preferred, 'Recovery changed durable preferred placement'
+                    observed=json.loads(json.dumps(next(w['outputs'] for w in scene()['shared']['workspaces'].values() if w['activity_id']==activity)))
+                    # Opening the real restoration controls legitimately adds a
+                    # new floating Monitor. Compare every pre-existing placement
+                    # exactly, allowing only these unrelated new floating rows.
+                    for output_id,layout in observed.items():
+                        original_ids={r['surface_id'] for r in preferred.get(output_id,{}).get('floating',[])}
+                        layout['floating']=[r for r in layout.get('floating',[]) if r['surface_id'] in original_ids]
+                    assert observed==preferred, 'Recovery changed durable preferred placement'
                 print('Multi-output placed client: '+json.dumps(row), flush=True)
                 g = row['geometry']
                 live_outputs = scene()['outputs']

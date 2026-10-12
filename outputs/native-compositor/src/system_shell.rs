@@ -22,6 +22,34 @@ use std::{
     sync::{Arc, Mutex},
 };
 
+/// Authenticate the exact host-selected renderer, including process start time.
+pub fn trusted_renderer(state: &Smallvil, peer: Option<u32>) -> Result<(), String> {
+    let (pid, start) = state
+        .shell_identity
+        .as_ref()
+        .ok_or("Trusted renderer unavailable")?;
+    if peer != Some(*pid) {
+        return Err("Trusted renderer required".into());
+    }
+    let stat = std::fs::read_to_string(format!("/proc/{pid}/stat"))
+        .map_err(|_| "Trusted renderer exited")?;
+    if stat
+        .rsplit_once(')')
+        .and_then(|(_, tail)| tail.split_whitespace().next())
+        .is_some_and(|state| matches!(state, "Z" | "X"))
+    {
+        return Err("Trusted renderer exited".into());
+    }
+    if stat
+        .rsplit_once(')')
+        .and_then(|(_, tail)| tail.split_whitespace().nth(19))
+        != Some(start.as_str())
+    {
+        return Err("Trusted renderer identity changed".into());
+    }
+    Ok(())
+}
+
 pub fn spawn(
     state: &mut Smallvil,
     command: &mut std::process::Command,

@@ -141,6 +141,7 @@ pub enum Command {
         edit: Value,
     },
     WorkspaceUndo(i64),
+    RestoreOutputs(Value),
     ReviewDraft {
         surface: String,
         element: String,
@@ -356,6 +357,7 @@ fn run(
                     Command::ReconnectWindow{missing,live,missing_revision,live_revision}=>reconnect_window(&socket,&missing,&live,missing_revision,live_revision),
                     Command::Navigate{surface,element,revision}=>{let current=frame.lock().unwrap().clone();navigate(&socket,&current,&surface,&element,revision).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt})},
                     Command::WorkspaceEdit{workspace,revision,edit}=>request(&socket,&json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("workspace-{}",super::nonce()),"expected_revisions":{workspace.clone():revision},"operations":[{"op":"workspace.edit","workspace_id":workspace,"edit":edit}]})).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt}),
+                    Command::RestoreOutputs(recovery)=>std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET").ok_or_else(||"Display host unavailable".to_owned()).and_then(|path|request(&PathBuf::from(path),&json!({"op":"workspace.restore_outputs","recovery":recovery}))),
                     Command::WorkspaceUndo(cursor)=>request(&socket,&json!({"op":"presentation.undo","event_cursor":cursor,"request_id":format!("undo-{}",super::nonce())})).map(|receipt|{frame.lock().unwrap().workspace_undo=None;receipt}),
                     Command::RegisterRenderer(surface)=>request(&socket,&json!({"op":"host.renderer","surface_id":surface})),
                     Command::ReviewDraft{surface,element,reply}=>{

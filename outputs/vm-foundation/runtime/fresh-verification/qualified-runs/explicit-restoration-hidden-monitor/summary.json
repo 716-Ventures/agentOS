@@ -1,0 +1,13 @@
+{
+  "meaning": "Strict deliberate pointer focus failed: settled recovery overview hid newly opened Agent Monitor at -100000 coordinates while editor stayed focused. This establishes the unreachable-control defect; the new projection regression exercises it.",
+  "runtime": "98ae7620103f888903a13e19871dcea7090c7b46e9af4c34bbfd62bb0e38ed50",
+  "files_sha256": {
+    "agentos-explicit-restoration-fixed-v4-0.log.gz": "8f767e7eb1dcf3b7b5d0cdf0b466c03a2e453496eb5b53e31dc397a1f5e277f7",
+    "agentos-explicit-restoration-fixed-v4-driver.json": "3bd749ff002f9bdf161fb1093aae4606a41df113182d73b3c4b1ec60f3077522",
+    "agentos-explicit-restoration-fixed-v4-driver.log.gz": "6fdbf6ae7871de35f1cb60f2e0b2ff73f90a3f5a4e126335755a0359e92dde3f",
+    "agentos-explicit-restoration-fixed-v4-driver.py": "a33fa90cd4b1cf510c486d70b98e678808da47e92a84671243b97ec3c31f1089",
+    "agentos-explicit-restoration-fixed-v4-guest-output.log.gz": "b5a685791e4c913d78744e88284ae45c5ef972ed191760a66b54c113e731b590",
+    "agentos-explicit-restoration-fixed-v4-guest.py": "fac13df6b74f868728bab864368af66a3666912f8423e29da8734c8db3f45c39",
+    "agentos-explicit-restoration-fixed-v4.json": "da6aa20c3e538dd9b684295626b884efd1cb76e2a0eb547858a0c02fc83fbf33"
+  }
+}

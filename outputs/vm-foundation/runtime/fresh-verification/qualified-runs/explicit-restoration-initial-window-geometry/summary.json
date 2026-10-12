@@ -1,0 +1,13 @@
+{
+  "meaning": "Projection retains the newly opened floating Monitor, but the fixture clicks before its final geometry commits. Strict focus fails. The same production runtime passes the active-editor journey in v6 after requiring acknowledged, committed and stable geometry.",
+  "runtime": "5a3a1e20c8a70c6a5e3af0a9f0dae1d1da904bc15ef02045ada519d7544c8945",
+  "files_sha256": {
+    "agentos-explicit-restoration-fixed-v5-0.log.gz": "b67674e398f254634fd99aad123177714111db7293e4163b97ffe506f573afc9",
+    "agentos-explicit-restoration-fixed-v5-driver.json": "7eb86df802fd895fdfde8762bf6edce3ca0c0913e7e06d14cab224a8afe02320",
+    "agentos-explicit-restoration-fixed-v5-driver.log.gz": "e587175047dbcf0d515eec6f028c9d39b19d9021541cd96c1fb3e3433060feb9",
+    "agentos-explicit-restoration-fixed-v5-driver.py": "39b229570d398c1617abec6c7da5c37de915ec9f80f0826bfcb842a9d7e77c2e",
+    "agentos-explicit-restoration-fixed-v5-guest-output.log.gz": "89f44a0b010e66601a93edc29422ae9c0cdb09885f9640ecd259f3c19b152799",
+    "agentos-explicit-restoration-fixed-v5-guest.py": "fab3f51edeeed080bf219a36deea027d97436377a8ffb708a30a1bfb320e41de",
+    "agentos-explicit-restoration-fixed-v5.json": "da6aa20c3e538dd9b684295626b884efd1cb76e2a0eb547858a0c02fc83fbf33"
+  }
+}

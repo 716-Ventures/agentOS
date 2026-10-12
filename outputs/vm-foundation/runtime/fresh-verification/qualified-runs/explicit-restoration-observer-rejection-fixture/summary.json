@@ -1,0 +1,51 @@
+{
+  "meaning": "Production retained editor geometry, draft and focus; trusted-renderer guard rejected the separate same-user observer. The test snapshot helper raised that expected error before the assertion could inspect it. Only response wrapping is corrected for the next attempt. Explicit UI restoration was not reached.",
+  "runtime": "98ae7620103f888903a13e19871dcea7090c7b46e9af4c34bbfd62bb0e38ed50",
+  "compositor_tests_passed": 58,
+  "active_editor": {
+    "expected_retained_secondary_geometry": {
+      "x": 1280,
+      "y": 60,
+      "width": 1024,
+      "height": 708
+    },
+    "observed_geometry": {
+      "height": 708,
+      "width": 1024,
+      "x": 1280,
+      "y": 60
+    },
+    "focused": true,
+    "draft_preserved": true,
+    "seat_focus": "ObjectId(wl_surface@43[0], 72)",
+    "overview": {
+      "outputs": {
+        "drm-Virtual-2": {
+          "constrained": [],
+          "reason": "Some preferred outputs are unavailable. Views are temporarily reachable on this output; saved placement is retained. Switch views with Ctrl+Alt+Tab or Agent Monitor.",
+          "selected": "ObjectId(wl_surface@43[0], 72)",
+          "views": [
+            "ObjectId(wl_surface@31[0], 43)",
+            "ObjectId(wl_surface@43[0], 72)"
+          ]
+        }
+      },
+      "reason": "A preferred display is available. Work stays here until you restore preferred placement in Agent Monitor.",
+      "recovered_outputs": [
+        "drm-Virtual-1"
+      ],
+      "restoration": {
+        "activity_id": "2119",
+        "generation": 3,
+        "outputs": [
+          {
+            "preferred_output": "drm-Virtual-1",
+            "temporary_output": "drm-Virtual-2",
+            "workspace_id": "desktop-2119"
+          }
+        ]
+      }
+    }
+  },
+  "production_changes_for_next_attempt": false
+}
