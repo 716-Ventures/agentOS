@@ -1,0 +1,13 @@
+bash: line 1: /home/developer/.cargo/bin/cargo: No such file or directory
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+Requested orderly guest shutdown. Check status before restarting.
+{"started_at": "2026-10-12T03:34:30.383869+00:00", "original_config_sha256": "b2ba8798840483e3a9d810658eb84e69eba42cfadd6460844f3e3d91e38cd186", "purpose": "Force one virtual connector for two-output KMS/VT qualification; not physical or host-view qualification", "owned_utm_closed": true, "original_disk_efi_inodes_preserved": true, "original_config_restored": true}
+Traceback (most recent call last):
+  File "/tmp/agentos-multihead-input-v1-driver.py", line 30, in <module>
+    vm.ssh('cd /home/developer/agent-os-source && ~/.cargo/bin/cargo build --locked --manifest-path native-compositor/Cargo.toml --example presentation_fixture',check=True,timeout=180)
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/vm.py", line 309, in ssh
+    return subprocess.run(ssh_args() + [command], **kwargs)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ssh', '-p', '22221', '-i', '/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/id_ed25519', '-o', 'IdentitiesOnly=yes', '-o', 'StrictHostKeyChecking=accept-new', '-o', 'UserKnownHostsFile=/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/known_hosts', '-o', 'ConnectTimeout=3', '-o', 'BatchMode=yes', '-o', 'LogLevel=ERROR', 'developer@127.0.0.1', 'cd /home/developer/agent-os-source && ~/.cargo/bin/cargo build --locked --manifest-path native-compositor/Cargo.toml --example presentation_fixture']' returned non-zero exit status 127.

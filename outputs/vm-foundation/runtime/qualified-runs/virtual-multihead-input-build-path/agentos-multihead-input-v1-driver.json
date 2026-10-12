@@ -1,0 +1,8 @@
+{
+  "started_at": "2026-10-12T03:34:30.383869+00:00",
+  "original_config_sha256": "b2ba8798840483e3a9d810658eb84e69eba42cfadd6460844f3e3d91e38cd186",
+  "purpose": "Force one virtual connector for two-output KMS/VT qualification; not physical or host-view qualification",
+  "owned_utm_closed": true,
+  "original_disk_efi_inodes_preserved": true,
+  "original_config_restored": true
+}

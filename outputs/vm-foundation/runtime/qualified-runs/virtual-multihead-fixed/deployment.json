@@ -1,0 +1,15 @@
+{
+  "created_at": "2026-10-12T03:45:46.119079+00:00",
+  "source_archive_sha256": "b014159963b888829a5a735941def1454ac3dd76641aac5ee14e4f7383b7c8f4",
+  "repository_revision": "ea67e264bc5426dc13ec0009e0b4a01ffc117352",
+  "source_changes": [
+    "M  outputs/agent-shell/tests/direct_display_guest.py",
+    "M  outputs/agent-shell/tests/direct_input_probe.py",
+    "A  outputs/agent-shell/tests/direct_multi_output_probe.py",
+    "M  outputs/native-compositor/examples/presentation_fixture.rs",
+    "M  outputs/native-compositor/src/direct.rs",
+    "M  outputs/native-compositor/src/input.rs",
+    "M  outputs/native-compositor/src/pointer_geometry.rs"
+  ],
+  "installed": true
+}

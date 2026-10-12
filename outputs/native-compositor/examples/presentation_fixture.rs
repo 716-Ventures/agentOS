@@ -1,5 +1,6 @@
 //! Private real-Wayland receipt fixture; never installed in the runtime.
 use std::{
+    collections::HashMap,
     fs::File,
     io::{BufRead, BufReader, Read, Write},
     os::{
@@ -13,11 +14,12 @@ use std::{
     time::{Duration, Instant},
 };
 use wayland_client::{
+    backend::ObjectId,
     protocol::{
-        wl_buffer, wl_compositor, wl_keyboard, wl_registry, wl_seat, wl_shm, wl_shm_pool,
-        wl_surface,
+        wl_buffer, wl_compositor, wl_keyboard, wl_output, wl_registry, wl_seat, wl_shm,
+        wl_shm_pool, wl_surface,
     },
-    Connection, Dispatch, QueueHandle, WEnum,
+    Connection, Dispatch, Proxy, QueueHandle, WEnum,
 };
 use wayland_protocols::{
     wp::presentation_time::client::{wp_presentation, wp_presentation_feedback},
@@ -36,6 +38,9 @@ struct Fixture {
     mapped: bool,
     next: u64,
     receipts: Vec<serde_json::Value>,
+    outputs: Vec<wl_output::WlOutput>,
+    output_names: HashMap<ObjectId, String>,
+    feedback_outputs: HashMap<u64, Vec<ObjectId>>,
 }
 #[derive(Clone, Copy)]
 struct Receipt {
@@ -118,8 +123,28 @@ impl Dispatch<wl_registry::WlRegistry, ()> for Fixture {
                 "wl_seat" => {
                     let _: wl_seat::WlSeat = registry.bind(name, version.min(7), qh, ());
                 }
+                "wl_output" => {
+                    let output: wl_output::WlOutput = registry.bind(name, version.min(4), qh, ());
+                    state.outputs.push(output);
+                    assert!(state.outputs.len() <= 32, "Fixture output bound");
+                }
                 _ => {}
             }
+        }
+    }
+}
+impl Dispatch<wl_output::WlOutput, ()> for Fixture {
+    fn event(
+        state: &mut Self,
+        output: &wl_output::WlOutput,
+        event: wl_output::Event,
+        _: &(),
+        _: &Connection,
+        _: &QueueHandle<Self>,
+    ) {
+        if let wl_output::Event::Name { name } = event {
+            assert!(name.len() <= 256, "Fixture output name bound");
+            state.output_names.insert(output.id(), name);
         }
     }
 }
@@ -189,6 +214,12 @@ impl Dispatch<wp_presentation_feedback::WpPresentationFeedback, Receipt> for Fix
         _: &QueueHandle<Self>,
     ) {
         match event {
+            wp_presentation_feedback::Event::SyncOutput { output } => {
+                let outputs = state.feedback_outputs.entry(data.id).or_default();
+                if !outputs.contains(&output.id()) {
+                    outputs.push(output.id());
+                }
+            }
             wp_presentation_feedback::Event::Presented {
                 tv_sec_hi,
                 tv_sec_lo,
@@ -201,11 +232,22 @@ impl Dispatch<wp_presentation_feedback::WpPresentationFeedback, Receipt> for Fix
                 let timestamp = ((u64::from(tv_sec_hi) << 32) | u64::from(tv_sec_lo))
                     * 1_000_000_000
                     + u64::from(tv_nsec);
-                state.receipts.push(serde_json::json!({"id":data.id,"kind":"presented","time_ns":timestamp,"refresh_ns":refresh,"sequence":(u64::from(seq_hi)<<32)|u64::from(seq_lo),"flags":flags.into_result().map(|f|f.bits()).unwrap_or(0),"key_time_ms":data.key_time}));
+                let outputs = state
+                    .feedback_outputs
+                    .remove(&data.id)
+                    .unwrap_or_default()
+                    .iter()
+                    .filter_map(|id| state.output_names.get(id))
+                    .cloned()
+                    .collect::<Vec<_>>();
+                state.receipts.push(serde_json::json!({"id":data.id,"kind":"presented","outputs":outputs,"time_ns":timestamp,"refresh_ns":refresh,"sequence":(u64::from(seq_hi)<<32)|u64::from(seq_lo),"flags":flags.into_result().map(|f|f.bits()).unwrap_or(0),"key_time_ms":data.key_time}));
             }
-            wp_presentation_feedback::Event::Discarded => state
-                .receipts
-                .push(serde_json::json!({"id":data.id,"kind":"discarded"})),
+            wp_presentation_feedback::Event::Discarded => {
+                state.feedback_outputs.remove(&data.id);
+                state
+                    .receipts
+                    .push(serde_json::json!({"id":data.id,"kind":"discarded"}));
+            }
             _ => {}
         }
         assert!(state.receipts.len() <= 256, "Fixture receipt bound");

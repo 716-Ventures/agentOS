@@ -1,0 +1,218 @@
+Dependency profile and installed versions unchanged.
+Verified offline speech assets: 9f796231bf027914973e24315967f66a2698220f2e40420d87155963793be634
+     Removed 0 files
+     Removed 8 files, 9.1MiB total
+   Compiling agent-os-core v0.5.0 (/home/developer/agent-os-source)
+    Finished `release` profile [optimized] target(s) in 7.80s
+     Removed 0 files
+     Removed 9 files, 7.4MiB total
+   Compiling agent-os-desktop v0.1.0-alpha.1 (/home/developer/agent-os-source/native-shell)
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+ --> src/document_dialog.rs:8:11
+  |
+8 | ) -> gtk::FileChooserNative {
+  |           ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:10:23
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:61:23
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:10:42
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:11:10
+   |
+11 |         .title(if save {
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:16:10
+   |
+16 |         .action(if save {
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:21:10
+   |
+21 |         .accept_label(if save { "Export" } else { "Import" })
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:22:10
+   |
+22 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:23:10
+   |
+23 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:24:10
+   |
+24 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+  --> src/document_dialog.rs:27:16
+   |
+27 |         dialog.set_current_name("document.txt");
+   |                ^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:31:40
+   |
+31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:61:42
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:62:10
+   |
+62 |         .title("Choose existing text file to review")
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:63:10
+   |
+63 |         .action(gtk::FileChooserAction::Open)
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:64:10
+   |
+64 |         .accept_label("Review replacement")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:65:10
+   |
+65 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:66:10
+   |
+66 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:67:10
+   |
+67 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:72:40
+   |
+72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: `agent-os-desktop` (bin "agent-os-desktop") generated 20 warnings
+    Finished `release` profile [optimized] target(s) in 9.22s
+     Removed 591 files, 98.8MiB total
+     Removed 9 files, 22.0MiB total
+   Compiling agent-os-compositor v0.1.0 (/home/developer/agent-os-source/native-compositor)
+warning: function `project` is never used
+ --> src/pressure.rs:5:8
+  |
+5 | pub fn project(
+  |        ^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: `agent-os-compositor` (bin "agent-os-compositor") generated 1 warning
+    Finished `release` profile [optimized] target(s) in 13.54s
+Collected dependency notices: 188
+Installed and healthy: 3be42897c22f722d14af4a305b0210508110e0bc86e8b2b3a9c9574791ebcf2e
+Installed. Reconnect your login session for group membership, then run agent-os.
+   Compiling agent-os-compositor v0.1.0 (/home/developer/agent-os-source/native-compositor)
+    Finished `test` profile [unoptimized] target(s) in 5.08s
+     Running unittests src/main.rs (native-compositor/target/debug/deps/agent_os_compositor-c02510f001e032dc)
+
+running 53 tests
+test accessibility::tests::custom_modifier_double_tap_restores_ordinary_key_behavior ... ok
+test accessibility::tests::exact_mask_grab_and_watch_never_consume_unrelated_typing ... ok
+test accessibility::tests::monitor_commands_consume_balanced_pairs_and_disconnect_releases_ownership ... ok
+test accessibility::tests::grab_does_not_orphan_a_previously_forwarded_key_release ... ok
+test accessibility::tests::replacement_bus_owner_cannot_receive_a_previous_readers_pending_key_release ... ok
+test bridge::pages::cache_tests::errors_keep_the_previous_consistent_cache_and_cancellation_sends_nothing ... ok
+test bridge::pages::tests::cancellation_and_nonprogressing_cursors_stop_reads ... ok
+test bridge::pages::tests::retries_from_scratch_after_interleaved_edits ... ok
+test bridge::pages::cache_tests::unchanged_documents_are_not_refetched_and_tombstones_remove_old_views ... ok
+test bridge::tests::app_id_alone_cannot_impersonate_native_surface ... ok
+test bridge::tests::automatic_views_use_balanced_rows_instead_of_repeatedly_halving_old_views ... ok
+test bridge::tests::healthy_multiple_outputs_preserve_their_coordinates ... ok
+test bridge::tests::multi_output_pressure_is_local_and_hidden_views_leave_the_scene ... ok
+test bridge::tests::split_rounding_covers_odd_dimensions_and_maximize_preserves_base ... ok
+test bridge::work_area_input_tests::global_keyboard_geometry_roundtrips_through_output_local_workspace_coordinates ... ok
+test bridge::tests::new_windows_remain_manageable_in_manually_constrained_workspaces ... ok
+test bridge::grabs::tests::release_commits_frozen_revision_and_always_releases_lease ... ok
+test bridge::grabs::tests::pointer_begin_reconciles_only_element_focus_and_never_replays_its_lease ... ok
+test core_ipc::tests::incomplete_and_oversized_responses_are_rejected ... ok
+test control::deadline_tests::keyboard_requests_expire_before_late_input_and_carry_kernel_peer_identity ... ok
+test frame_cadence::tests::input_wakes_wait_for_a_callback_and_are_bounded_by_refresh ... ok
+test frame_cadence::tests::missed_deadlines_resume_without_an_unbounded_catchup_burst ... ok
+test frame_cadence::tests::stale_or_cancelled_input_does_not_wake_later_animation ... ok
+test frame_cadence::tests::variable_render_cost_does_not_accumulate_into_the_refresh_period ... ok
+test input_method::tests::human_input_method_configuration_is_literal_and_bounded ... ok
+wl_display#1: error 0: Invalid binding of zwlr_layer_shell_v1 version 4 for global 6.
+wl_display#1: error 0: Invalid binding of zwp_input_method_manager_v2 version 1 for global 1.
+zwlr_layer_surface_v1#10: error 1: width 0 requested without setting left and right anchors
+test input_method_tests::private_input_method_delivers_unicode_and_cannot_be_bound_by_an_application ... ok
+test input_revision::tests::element_focus_can_advance_without_replaying_or_overwriting_layout ... ok
+test output_config::tests::every_transform_matches_advertised_geometry_and_adjacent_output_spacing ... ok
+test output_config::tests::fractional_scales_negative_origins_and_exact_modes_are_retained ... ok
+test output_config::tests::malformed_preferences_fail_before_device_configuration ... ok
+test output_zoom::tests::reconnect_uses_new_preferences_and_never_compounds_zoom ... ok
+test output_zoom::tests::zoom_preserves_base_rotation_position_and_exact_reset ... ok
+test pointer_geometry::tests::absolute_device_handles_negative_origins_gaps_removal_and_edges ... ok
+test pointer_geometry::tests::absolute_device_reaches_both_heads_independent_of_output_order ... ok
+test pointer_geometry::tests::final_pixel_subpixels_and_negative_zero_edges_stay_inside ... ok
+test pointer_geometry::tests::gaps_and_removed_outputs_choose_nearest_remaining_display ... ok
+test pointer_geometry::tests::invalid_coordinates_and_extreme_integer_origins_are_safe ... ok
+test pointer_geometry::tests::relative_motion_crosses_adjacent_outputs_and_retains_subpixels ... ok
+test policy::tests::exact_revisions_and_divergent_undo ... ok
+test policy::tests::floating_windows_survive_smaller_output ... ok
+test policy::tests::grid_is_in_bounds_and_has_no_overlap ... ok
+test policy::tests::new_window_does_not_steal_focus ... ok
+test pressure::tests::disconnected_output_recovery_exposes_views_without_rewriting_preferences ... ok
+test pressure::tests::pressure_keeps_floating_work_and_does_not_shrink_clients ... ok
+test pressure::tests::viewport_exposes_every_edge_and_retains_client_dimensions ... ok
+test process::tests::unwinding_reaps_the_owned_renderer ... ok
+test shell_keyboard::tests::chords_are_bounded_and_never_duplicate_a_held_modifier ... ok
+test shortcuts::tests::shortcuts_require_both_modifiers_and_leave_typing_alone ... ok
+test timings::tests::disabled_diagnostics_do_not_collect_stages_or_files ... ok
+test timings::tests::percentiles_are_bounded_recent_samples_and_cumulative_mean_is_explicit ... ok
+test core_ipc::tests::delayed_fragmented_reply_does_not_resend_request ... ok
+test core_ipc::tests::partial_reply_has_one_total_deadline ... ok
+test control::deadline_tests::socket_timeout_expires_the_request_still_waiting_in_the_render_queue ... ok
+
+test result: ok. 53 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.02s
+
+    Finished `dev` profile [unoptimized] target(s) in 0.07s
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+Requested orderly guest shutdown. Check status before restarting.
+{"started_at": "2026-10-12T03:45:32.449634+00:00", "original_config_sha256": "b2ba8798840483e3a9d810658eb84e69eba42cfadd6460844f3e3d91e38cd186", "purpose": "Force one virtual connector for two-output KMS/VT qualification; not physical or host-view qualification", "connectors": [{"name": "card0-Virtual-1", "status": "connected", "modes": ["1280x800", "5120x2160", "4096x2160", "3840x2160", "3840x2160", "3840x2160", "1920x1440", "2560x1080", "1856x1392", "1792x1344", "2048x1152", "1920x1200", "1920x1080", "1920x1080", "1600x1200", "1680x1050", "1400x1050", "1280x1024", "1440x900", "1280x960", "1360x768", "1280x768", "1024x768", "800x600", "640x480", "640x480"], "enabled": "enabled"}, {"name": "card0-Virtual-2", "status": "disconnected", "modes": [], "enabled": "disabled"}], "two_connectors_observed": true, "virtual_kms": {"virtual_gpu_pci_identity": {"DRIVER": "virtio-pci", "PCI_CLASS": "38000", "PCI_ID": "1AF4:1050", "PCI_SUBSYS_ID": "1AF4:1100", "PCI_SLOT_NAME": "0000:00:02.0", "MODALIAS": "pci:v00001AF4d00001050sv00001AF4sd00001100bc03sc80i00"}, "original_second_connector_status": "disconnected", "synthetic_connector_force": true, "physical_hotplug_qualified": false, "forced_status": "connected", "forced_modes": ["1024x768", "4096x2160", "4096x2160", "2560x1600", "2560x1600", "1920x1440", "1856x1392", "1792x1344", "2048x1152", "1920x1200", "1920x1200", "1920x1080", "1600x1200", "1680x1050", "1680x1050", "1400x1050", "1400x1050", "1600x900", "1280x1024", "1440x900", "1440x900", "1280x960", "1366x768", "1366x768", "1360x768", "1280x800", "1280x800", "1280x768", "1280x768", "1280x720", "800x600", "800x600", "848x480", "640x480"], "kms_session": {"result": "pass", "fresh_profile_qualified": false, "binary_directory": "/usr/local/bin", "outputs": [{"height": 800, "name": "Virtual-1", "scale": 1.0, "transform": "Normal", "width": 1280, "x": 0, "y": 0}, {"height": 768, "name": "Virtual-2", "scale": 1.0, "transform": "Normal", "width": 1024, "x": 1280, "y": 0}], "metrics": [{"format": 1, "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence", "pid": 3196, "sample_limit_per_stage": 256, "stages": {"compositor.direct_render_attempt": {"discarded": 0, "max_recent_ms": 5.986562, "mean_all_ms": 1.9883979595176566, "p50_recent_ms": 1.788886, "p95_recent_ms": 2.641493, "retained": 256, "samples_total": 1161}}}], "native_feedback": [], "frames_before_vt": 22, "frames_after_vt": 58, "checks": ["private native system bar", "KMS output discovery", "shared core connection", "VT switch and resume", "orderly shutdown", "session directory cleanup", "owned login scope cleanup", "two virtual KMS outputs with named frame receipts", "kernel pointer focus on both displays and return movement", "60 kernel keyboard-triggered presented frames"], "screen_keyboard_input_qualified": false, "screen_reader_input_qualified": false, "table_input_qualified": false, "collection_input_qualified": null, "terminal_input_qualified": false, "terminal_ime_qualified": false, "presentation_feedback_qualified": false, "multi_output_qualified": true, "native_feedback_qualified": false, "native_feedback_load_qualified": false, "output_transform_qualified": null, "focus_transfer_cycles": null, "not_tested": ["physical input", "hotplug", "physical GPU presentation"]}, "restored_second_connector_status": "disconnected"}, "owned_utm_closed": true, "original_disk_efi_inodes_preserved": true, "original_config_restored": true}

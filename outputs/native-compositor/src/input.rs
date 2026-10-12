@@ -196,16 +196,21 @@ impl Smallvil {
                 self.move_pointer(pos, event.time_msec());
             }
             InputEvent::PointerMotionAbsolute { event, .. } => {
-                let Some(geometry) = self
+                let normalized = event.position_transformed((1, 1).into());
+                let outputs = self
                     .space
                     .outputs()
-                    .find_map(|output| self.space.output_geometry(output))
-                else {
-                    return;
-                };
-                let pos = event.position_transformed(geometry.size) + geometry.loc.to_f64();
-                if let Some(pos) = self.clamp_pointer(pos) {
-                    self.move_pointer(pos, event.time_msec());
+                    .filter_map(|output| self.space.output_geometry(output))
+                    .map(|r| crate::pointer_geometry::OutputRect {
+                        x: r.loc.x,
+                        y: r.loc.y,
+                        width: r.size.w,
+                        height: r.size.h,
+                    });
+                if let Some(pos) =
+                    crate::pointer_geometry::absolute((normalized.x, normalized.y), outputs)
+                {
+                    self.move_pointer(pos.into(), event.time_msec());
                 }
             }
             InputEvent::PointerButton { event, .. } => {

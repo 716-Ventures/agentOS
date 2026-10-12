@@ -295,7 +295,7 @@ impl Device {
                 Ok(())
             })();
             if let Err(error) = rendered {
-                eprintln!("Direct output frame failed: {error}");
+                eprintln!("Direct output {} frame failed: {error}", head.output.name());
                 head.damage = OutputDamageTracker::from_output(&head.output);
                 self.retry_at = std::time::Instant::now() + Duration::from_secs(1);
             }
@@ -410,7 +410,10 @@ pub fn init(
                         .and_then(|_| {
                             device
                                 .drm
-                                .activate(false)
+                                // Another VT can change connector/CRTC state.
+                                // Reset both the kernel state and Smithay's cached
+                                // surface state so every head modesets on resume.
+                                .activate(true)
                                 .map_err(|error| format!("DRM resume failed: {error}"))
                         });
                     if let Err(error) = resumed {

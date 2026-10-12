@@ -5165,6 +5165,51 @@
         "difference_from_runtime_pin": "same immutable code and evidence revision"
       },
       "checks": 70
+    },
+    "virtual_multi_output": {
+      "result": "pass",
+      "runtime_release": "3be42897c22f722d14af4a305b0210508110e0bc86e8b2b3a9c9574791ebcf2e",
+      "source_parent": "ea67e264bc5426dc13ec0009e0b4a01ffc117352",
+      "tested_working_tree": true,
+      "compositor_tests": 53,
+      "host_vm_tests": 31,
+      "journey_outputs": [
+        "Virtual-1",
+        "Virtual-2",
+        "Virtual-1"
+      ],
+      "presented_receipts": 60,
+      "post_resume_einval_observed": false,
+      "kernel_pointer_and_keyboard_both_heads": true,
+      "physical_input_or_gpu_qualified": false,
+      "hotplug_qualified": false,
+      "native_gtk_latency_qualified": false,
+      "full70_pending": true,
+      "signed_image_contains_change": false,
+      "file_sha256": {
+        "agentos-multihead-input-v8-guest-output.log": "bc32f4ef56fc79f6d24516fa654fbb5b78c90f8b17758c891f97e9b936e450af",
+        "agentos-multihead-input-v8-driver.py": "3e3a0786c6a1e16b8b7352a6efd7f9e3852ef864ffbf0033b4db2dbd6d475cec",
+        "deployment.json": "258bf791b85ea2df2865aa151e1cf4ca22a5edecb4f2f9606fecc222afd0e6c3",
+        "agentos-multihead-input-v8.log": "0e82dbd7944bede9239178e7d4b2c971e93d386d63d2ee849290e7924d12a0d7",
+        "agentos-multihead-input-v8.json": "071d1e5cfb08b9ac9ce52db3fd8d99937c587a8ba908ef7e499efbdf04ccfd41",
+        "agentos-multihead-input-v8-driver.json": "b2da4438aac5ef0dd82610f9a49aba79add29de04dc002ed22ed413ac426109b",
+        "host-tests.log": "93ef7c1fe01720d9b35c322e41a7029900a3cde8e3781009a2b4e4d71b2616cb",
+        "guest.py": "345c7514c22ea6dcb928de4b7c7943d9c11687ed9562909cf72cba41ddacabc5",
+        "agentos-multihead-input-v8-driver.log": "e649fdd35e29ae4545c18e3a09fae4ca94098123f5e64711dd295cb0a0957c34"
+      },
+      "source_sha256": {
+        "outputs/native-compositor/src/input.rs": "9fe383bc7431e3301c55260e1c50addfd89b0ab27cf26174b6cfe4135bf0e945",
+        "outputs/native-compositor/src/pointer_geometry.rs": "0b0a2c7f957b3f9f9e26fb7ea99f2833466c8c04eece053b511a38003646822a",
+        "outputs/native-compositor/src/direct.rs": "a8992525dd50064980d3ccc43777a868aae8e0ea10d2af229bda2c5afdd169c1",
+        "outputs/native-compositor/examples/presentation_fixture.rs": "c554025ce8884faf15f751f94a97ce37c230dad65f295861a37ff63289dd26e1",
+        "outputs/agent-shell/tests/direct_multi_output_probe.py": "caafc95c5efbe0d6ece3d11f5e7c7c071b42e9203da560ef2c715d171cafca99",
+        "outputs/agent-shell/tests/direct_display_guest.py": "7fcb59f77a9bccac09e43ca3ffe25266b29249dd0950503cdf8f2cf6ed5bb603",
+        "outputs/agent-shell/tests/direct_input_probe.py": "a6bb660d2d762d3144d2a2662ef667b119c735dace1764bcf761a30fec0bc1fc"
+      },
+      "evidence_directory": "qualified-runs/virtual-multihead-fixed",
+      "pointer_baseline_directory": "qualified-runs/virtual-multihead-pointer-baseline",
+      "resume_baseline_directory": "qualified-runs/virtual-multihead-resume-baseline",
+      "startup_failure_directory": "qualified-runs/virtual-multihead-startup-failure"
     }
   },
   "observations": [

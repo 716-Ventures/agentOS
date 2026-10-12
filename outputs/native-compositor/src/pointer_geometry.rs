@@ -19,6 +19,37 @@ fn inside_edge(edge: f64) -> f64 {
         f64::from_bits(edge.to_bits() + 1)
     }
 }
+/// Map an unassigned absolute device across the complete logical desktop.
+/// Gaps and the far edge resolve to the nearest point inside a live output.
+pub fn absolute(
+    normalized: (f64, f64),
+    outputs: impl IntoIterator<Item = OutputRect>,
+) -> Option<(f64, f64)> {
+    if !normalized.0.is_finite() || !normalized.1.is_finite() {
+        return None;
+    }
+    let outputs: Vec<_> = outputs
+        .into_iter()
+        .filter(|r| r.width > 0 && r.height > 0)
+        .collect();
+    let left = outputs.iter().map(|r| f64::from(r.x)).reduce(f64::min)?;
+    let top = outputs.iter().map(|r| f64::from(r.y)).reduce(f64::min)?;
+    let right = outputs
+        .iter()
+        .map(|r| f64::from(r.x) + f64::from(r.width))
+        .reduce(f64::max)?;
+    let bottom = outputs
+        .iter()
+        .map(|r| f64::from(r.y) + f64::from(r.height))
+        .reduce(f64::max)?;
+    clamp(
+        (
+            left + normalized.0.clamp(0.0, 1.0) * (right - left),
+            top + normalized.1.clamp(0.0, 1.0) * (bottom - top),
+        ),
+        outputs,
+    )
+}
 pub fn clamp(
     position: (f64, f64),
     outputs: impl IntoIterator<Item = OutputRect>,
@@ -65,6 +96,33 @@ mod tests {
             clamp((-999.0, 999.0), outputs),
             Some((-100.0, inside_edge(100.0)))
         );
+    }
+    #[test]
+    fn absolute_device_reaches_both_heads_independent_of_output_order() {
+        let outputs = [output(0, 0, 1280, 800), output(1280, 0, 1024, 768)];
+        for heads in [outputs, [outputs[1], outputs[0]]] {
+            assert_eq!(
+                absolute((640.0 / 2304.0, 30.0 / 800.0), heads),
+                Some((640.0, 30.0))
+            );
+            assert_eq!(
+                absolute((1400.0 / 2304.0, 200.0 / 800.0), heads),
+                Some((1400.0, 200.0))
+            );
+        }
+    }
+    #[test]
+    fn absolute_device_handles_negative_origins_gaps_removal_and_edges() {
+        let outputs = [output(-100, -50, 100, 100), output(100, 0, 100, 100)];
+        assert_eq!(absolute((0.0, 0.0), outputs), Some((-100.0, -50.0)));
+        assert_eq!(absolute((0.6, 0.5), outputs), Some((100.0, 25.0)));
+        assert_eq!(
+            absolute((1.0, 1.0), outputs),
+            Some((inside_edge(200.0), inside_edge(100.0)))
+        );
+        assert_eq!(absolute((0.5, 0.5), [outputs[0]]), Some((-50.0, 0.0)));
+        assert_eq!(absolute((0.5, 0.5), []), None);
+        assert_eq!(absolute((f64::NAN, 0.5), outputs), None);
     }
     #[test]
     fn final_pixel_subpixels_and_negative_zero_edges_stay_inside() {

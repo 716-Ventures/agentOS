@@ -1,0 +1,53 @@
+Traceback (most recent call last):
+  File "<stdin>", line 20, in <module>
+AssertionError:  (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+[2m2026-10-12T03:44:15.549830Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event5"
+[2m2026-10-12T03:44:15.680800Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event4"
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+dbus-daemon[901]: Reloaded configuration
+dbus-daemon[852]: [session uid=1000 pid=852 pidfd=5] Reloaded configuration
+
+Started agentos-display-test-7d506af56a4742d7a7d2148798d855b0.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 1994.
+pam_unix(login:session): session opened for user developer(uid=1000) by developer(uid=0)
+Stopping agentos-display-test-7d506af56a4742d7a7d2148798d855b0.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 1994...
+agentos-display-test-7d506af56a4742d7a7d2148798d855b0.service: Deactivated successfully.
+Stopped agentos-display-test-7d506af56a4742d7a7d2148798d855b0.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 1994.
+
+
+Session terminated, killing shell... ...killed.
+Traceback (most recent call last):
+  File "/home/developer/agent-os-source/tests/direct_display_guest.py", line 317, in <module>
+    main()
+    ~~~~^^
+  File "/home/developer/agent-os-source/tests/direct_display_guest.py", line 241, in main
+    direct_input_probe.verify(metrics,snapshot['outputs'][0],core,lambda:control(endpoint,'snapshot'),target,user.pw_name,presentation,terminal_input=args.terminal_input,terminal_ime=args.terminal_ime,presentation_feedback=args.presentation_feedback,multi_output=args.multi_output,native_feedback=args.native_feedback,native_feedback_load=args.native_feedback_load,screen_reader=args.screen_reader_input,table_input=collection_kind,focus_transfers=args.focus_transfers)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/developer/agent-os-source/tests/direct_input_probe.py", line 399, in verify
+    direct_multi_output_probe.verify(env,metrics,core,scene,login_user,presentation,keyboard,pointer)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/developer/agent-os-source/tests/direct_multi_output_probe.py", line 102, in verify
+    event = wait(lambda: next((r for r in method('status')['receipts'] if r['id'] > previous and r['kind'] == 'presented' and r['key_time_ms'] is not None), None), 'Key frame missing on '+output['name'])
+  File "/home/developer/agent-os-source/tests/direct_multi_output_probe.py", line 36, in wait
+    raise RuntimeError(meaning)
+RuntimeError: Key frame missing on Virtual-2
+

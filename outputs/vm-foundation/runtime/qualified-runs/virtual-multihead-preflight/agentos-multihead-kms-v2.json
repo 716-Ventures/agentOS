@@ -1,0 +1,123 @@
+{
+  "virtual_gpu_pci_identity": {
+    "DRIVER": "virtio-pci",
+    "PCI_CLASS": "38000",
+    "PCI_ID": "1AF4:1050",
+    "PCI_SUBSYS_ID": "1AF4:1100",
+    "PCI_SLOT_NAME": "0000:00:02.0",
+    "MODALIAS": "pci:v00001AF4d00001050sv00001AF4sd00001100bc03sc80i00"
+  },
+  "original_second_connector_status": "disconnected",
+  "synthetic_connector_force": true,
+  "physical_hotplug_qualified": false,
+  "forced_status": "connected",
+  "forced_modes": [
+    "1024x768",
+    "4096x2160",
+    "4096x2160",
+    "2560x1600",
+    "2560x1600",
+    "1920x1440",
+    "1856x1392",
+    "1792x1344",
+    "2048x1152",
+    "1920x1200",
+    "1920x1200",
+    "1920x1080",
+    "1600x1200",
+    "1680x1050",
+    "1680x1050",
+    "1400x1050",
+    "1400x1050",
+    "1600x900",
+    "1280x1024",
+    "1440x900",
+    "1440x900",
+    "1280x960",
+    "1366x768",
+    "1366x768",
+    "1360x768",
+    "1280x800",
+    "1280x800",
+    "1280x768",
+    "1280x768",
+    "1280x720",
+    "800x600",
+    "800x600",
+    "848x480",
+    "640x480"
+  ],
+  "kms_session": {
+    "result": "pass",
+    "fresh_profile_qualified": false,
+    "binary_directory": "/usr/local/bin",
+    "outputs": [
+      {
+        "height": 800,
+        "name": "Virtual-1",
+        "scale": 1.0,
+        "transform": "Normal",
+        "width": 1280,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "height": 768,
+        "name": "Virtual-2",
+        "scale": 1.0,
+        "transform": "Normal",
+        "width": 1024,
+        "x": 1280,
+        "y": 0
+      }
+    ],
+    "metrics": [
+      {
+        "format": 1,
+        "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence",
+        "pid": 807,
+        "sample_limit_per_stage": 256,
+        "stages": {
+          "compositor.direct_render_attempt": {
+            "discarded": 0,
+            "max_recent_ms": 45.361540999999995,
+            "mean_all_ms": 1.1672230740740737,
+            "p50_recent_ms": 0.000125,
+            "p95_recent_ms": 1.997708,
+            "retained": 54,
+            "samples_total": 54
+          }
+        }
+      }
+    ],
+    "native_feedback": [],
+    "frames_before_vt": 36,
+    "frames_after_vt": 38,
+    "checks": [
+      "private native system bar",
+      "KMS output discovery",
+      "shared core connection",
+      "VT switch and resume",
+      "orderly shutdown",
+      "session directory cleanup",
+      "owned login scope cleanup"
+    ],
+    "screen_keyboard_input_qualified": false,
+    "screen_reader_input_qualified": false,
+    "table_input_qualified": false,
+    "collection_input_qualified": null,
+    "terminal_input_qualified": false,
+    "terminal_ime_qualified": false,
+    "presentation_feedback_qualified": false,
+    "native_feedback_qualified": false,
+    "native_feedback_load_qualified": false,
+    "output_transform_qualified": null,
+    "focus_transfer_cycles": null,
+    "not_tested": [
+      "physical input",
+      "hotplug",
+      "physical GPU presentation"
+    ]
+  },
+  "restored_second_connector_status": "disconnected"
+}

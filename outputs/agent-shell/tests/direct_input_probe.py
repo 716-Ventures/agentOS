@@ -294,7 +294,7 @@ def assistive():
         print(json.dumps(response),flush=True)
 
 
-def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False,presentation_feedback=False,native_feedback=False,native_feedback_load=False,table_input=False,focus_transfers=1,screen_reader=False):
+def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False,presentation_feedback=False,native_feedback=False,native_feedback_load=False,table_input=False,focus_transfers=1,screen_reader=False,multi_output=False):
     subprocess.run(['modprobe','uinput'],check=True)
     # Join only this test session's accessibility bus; never inspect other users.
     bus=None;observer_runtime=None;wayland=None;deadline=time.monotonic()+10
@@ -356,7 +356,7 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
         time.sleep(.5) # bounded kernel/udev/libinput hotplug discovery
         width,height=output['width'],output['height']
         work_area=next(layer['work_area'] for layer in scene()['system_layers'] if layer['namespace']=='agentos-system-bar' and layer['mapped'])
-        if not terminal_input and not table_input and not presentation_feedback and not native_feedback:
+        if not terminal_input and not table_input and not presentation_feedback and not native_feedback and not multi_output:
             def layer_state(mapped):
                 deadline=time.monotonic()+5
                 while True:
@@ -393,6 +393,10 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
         if table_input:
             import direct_table_probe
             direct_table_probe.verify(metrics,output,core,scene,login_user,presentation,snapshot,keyboard,pointer,env,kind=table_input)
+            return
+        if multi_output:
+            import direct_multi_output_probe
+            direct_multi_output_probe.verify(env,metrics,core,scene,login_user,presentation,keyboard,pointer)
             return
         if presentation_feedback:
             import direct_presentation_probe

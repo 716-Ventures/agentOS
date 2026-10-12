@@ -1,0 +1,11 @@
+{
+  "exact_owned_app": [
+    74546,
+    "Sun Oct 11 23:35:59 2026"
+  ],
+  "start_command_issued": false,
+  "no_qemu_backend": true,
+  "disk_and_efi_not_open": true,
+  "owned_app_closed": true,
+  "original_config_restored": true
+}

@@ -1,0 +1,66 @@
+Traceback (most recent call last):
+  File "<stdin>", line 20, in <module>
+AssertionError:  error 2)
+dbus-daemon[1024]: [session uid=1000 pid=1024 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=1030 comm="/usr/local/bin/agent-os-desktop --socket /run/agen")
+dbus-daemon[1024]: [session uid=1000 pid=1024 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[1087]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=1030 comm="/usr/local/bin/agent-os-desktop --socket /run/agen")
+dbus-daemon[1087]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+[2m2026-10-12T03:35:18.303097Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event0"
+[2m2026-10-12T03:35:18.303114Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event1"
+[2m2026-10-12T03:35:18.303118Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event2"
+[2m2026-10-12T03:35:18.303120Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event3"
+[2m2026-10-12T03:35:18.303121Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event1"
+[2m2026-10-12T03:35:18.303157Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event0"
+[2m2026-10-12T03:35:18.303163Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event3"
+[2m2026-10-12T03:35:18.303189Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event2"
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Permission denied (os error 13))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Permission denied (os error 13))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+[2m2026-10-12T03:35:20.227618Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event0"
+[2m2026-10-12T03:35:20.227640Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event1"
+[2m2026-10-12T03:35:20.227642Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event2"
+[2m2026-10-12T03:35:20.227643Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event3"
+[2m2026-10-12T03:35:20.276441Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event5"
+[2m2026-10-12T03:35:20.276956Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event4"
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+[2m2026-10-12T03:35:23.129959Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event5"
+[2m2026-10-12T03:35:23.233771Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event4"
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+dbus-daemon[1087]: Reloaded configuration
+dbus-daemon[1024]: [session uid=1000 pid=1024 pidfd=5] Reloaded configuration
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Invalid argument (os error 22))
+
+Started agentos-display-test-3988da6a34244f45bf55bebb2c5e3c2a.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 1990.
+pam_unix(login:session): session opened for user developer(uid=1000) by developer(uid=0)
+Stopping agentos-display-test-3988da6a34244f45bf55bebb2c5e3c2a.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 1990...
+agentos-display-test-3988da6a34244f45bf55bebb2c5e3c2a.service: Deactivated successfully.
+Stopped agentos-display-test-3988da6a34244f45bf55bebb2c5e3c2a.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 1990.
+
+
+Session terminated, killing shell... ...killed.
+Traceback (most recent call last):
+  File "/home/developer/agent-os-source/tests/direct_display_guest.py", line 316, in <module>
+    main()
+    ~~~~^^
+  File "/home/developer/agent-os-source/tests/direct_display_guest.py", line 241, in main
+    direct_input_probe.verify(metrics,snapshot['outputs'][0],core,lambda:control(endpoint,'snapshot'),target,user.pw_name,presentation,terminal_input=args.terminal_input,terminal_ime=args.terminal_ime,presentation_feedback=args.presentation_feedback,multi_output=args.multi_output,native_feedback=args.native_feedback,native_feedback_load=args.native_feedback_load,screen_reader=args.screen_reader_input,table_input=collection_kind,focus_transfers=args.focus_transfers)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/developer/agent-os-source/tests/direct_input_probe.py", line 399, in verify
+    direct_multi_output_probe.verify(env,metrics,core,scene,login_user,presentation,keyboard,pointer)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/developer/agent-os-source/tests/direct_multi_output_probe.py", line 61, in verify
+    receipt = presentation({'op': 'presentation.apply', 'protocol': 'agentos.presentation/1', 'catalog_revision': 'native-core/1',
+        'request_id': 'multi-output-'+uuid.uuid4().hex, 'expected_revisions': {workspace['workspace_id']: workspace['revision']},
+    ...<2 lines>...
+                       {'op': 'workspace.edit', 'workspace_id': workspace['workspace_id'],
+                        'edit': {'kind': 'focus', 'surface_id': logical, 'element_id': None}}]})
+  File "/home/developer/agent-os-source/tests/direct_display_guest.py", line 211, in presentation
+    if result.returncode:raise RuntimeError('Fixture workspace request failed: '+result.stdout+result.stderr)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Fixture workspace request failed: Agent OS: {"code":"missing_reference","detail":"Output Virtual-1 unavailable"}
+
+

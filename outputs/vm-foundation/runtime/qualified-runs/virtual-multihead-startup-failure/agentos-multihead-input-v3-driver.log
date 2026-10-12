@@ -1,0 +1,51 @@
+Traceback (most recent call last):
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/vm.py", line 106, in status
+    result = call([control, 'status', current['uuid']], capture_output=True,
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/utm_ownership.py", line 25, in call
+    return self.original_call(args, **kwargs)
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/vm.py", line 32, in call
+    return subprocess.run([str(a) for a in args], check=True, **kwargs)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/utmctl-control-v2/utmctl', 'status', '27176EA2-E994-4165-9BBA-70FEED59E66B']' returned non-zero exit status 1.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/tmp/agentos-multihead-input-v3-driver.py", line 23, in <module>
+    vm.start();vm.wait_ready(60)
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/vm.py", line 236, in start
+    if alive():
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/vm.py", line 127, in alive
+    return status() != 'stopped'
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/vm.py", line 119, in status
+    raise RuntimeError(f'UTM cannot find/control this guest. Open {current["bundle"]} in UTM to register it.\n{detail}') from exc
+RuntimeError: UTM cannot find/control this guest. Open /Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/agentOS.utm in UTM to register it.
+Error: Virtual machine not found.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/vm.py", line 106, in status
+    result = call([control, 'status', current['uuid']], capture_output=True,
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/utm_ownership.py", line 25, in call
+    return self.original_call(args, **kwargs)
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/vm.py", line 32, in call
+    return subprocess.run([str(a) for a in args], check=True, **kwargs)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/utmctl-control-v2/utmctl', 'status', '27176EA2-E994-4165-9BBA-70FEED59E66B']' returned non-zero exit status 1.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/tmp/agentos-multihead-input-v3-driver.py", line 51, in <module>
+    vm.stop();deadline=time.monotonic()+60
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/vm.py", line 250, in stop
+    if alive():
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/vm.py", line 127, in alive
+    return status() != 'stopped'
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/vm.py", line 119, in status
+    raise RuntimeError(f'UTM cannot find/control this guest. Open {current["bundle"]} in UTM to register it.\n{detail}') from exc
+RuntimeError: UTM cannot find/control this guest. Open /Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/agentOS.utm in UTM to register it.
+Error: Virtual machine not found.
