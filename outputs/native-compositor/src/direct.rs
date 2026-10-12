@@ -23,6 +23,7 @@ use smithay::{
         session::{libseat::LibSeatSession, Event as SessionEvent, Session},
         udev::{primary_gpu, UdevBackend, UdevEvent},
     },
+    desktop::{layer_map_for_output, LayerSurface},
     input::pointer::{CursorImageStatus, CursorImageSurfaceData},
     output::{Mode, Output, PhysicalProperties, Scale, Subpixel},
     reexports::{
@@ -67,6 +68,7 @@ struct Device {
     gbm: GbmDevice<DrmDeviceFd>,
     renderer: GlesRenderer,
     heads: HashMap<crtc::Handle, Head>,
+    orphaned_layers: Vec<LayerSurface>,
     active: bool,
     cursor: MemoryRenderBuffer,
     retry_at: std::time::Instant,
@@ -112,19 +114,25 @@ impl Device {
             };
             let mut candidates = Vec::new();
             for encoder in connector.encoders() {
-                if let Ok(encoder) = self.drm.get_encoder(*encoder) {
-                    candidates.extend(resources.filter_crtcs(encoder.possible_crtcs()));
-                }
+                let encoder = self.drm.get_encoder(*encoder)?;
+                candidates.extend(resources.filter_crtcs(encoder.possible_crtcs()));
             }
             discovered.push((*handle, connector, name, preference, mode, candidates));
         }
         // wl_output identity owns shell layer maps and client bindings. Keep
         // unchanged heads (including in-flight frames) when another connector
         // changes, rather than destroying every output on each udev event.
-        self.heads.retain(|_, head| {
-            let keep = discovered.iter().any(|(connector, _, _, _, mode, _)|
-                head.connector == *connector && head.mode == *mode);
+        self.heads.retain(|crtc, head| {
+            let keep = discovered.iter().any(|(connector, _, _, _, mode, candidates)| {
+                head.connector == *connector && head.mode == *mode && candidates.contains(crtc)
+            });
             if !keep {
+                let mut map = layer_map_for_output(&head.output);
+                let layers = map.layers().cloned().collect::<Vec<_>>();
+                for layer in layers {
+                    map.unmap_layer(&layer);
+                    self.orphaned_layers.push(layer);
+                }
                 data.state.space.unmap_output(&head.output);
                 data.display_handle.remove_global::<Smallvil>(head.global.clone());
             }
@@ -203,6 +211,24 @@ impl Device {
                 },
             );
             used.insert(crtc);
+        }
+        // Host controls belong to the session, not to a removable connector.
+        // Retain detached layers if no output remains, then map them once a
+        // usable output returns. Unchanged layers are never moved.
+        if let Some(output) = data.state.space.outputs().next().cloned() {
+            let mut map = layer_map_for_output(&output);
+            for layer in self.orphaned_layers.drain(..) {
+                if map.layers().any(|known| known.namespace() == layer.namespace()) {
+                    layer.layer_surface().send_close();
+                    continue;
+                }
+                if let Err(error) = map.map_layer(&layer) {
+                    eprintln!("Cannot recover system layer: {error}");
+                    layer.layer_surface().send_close();
+                } else {
+                    layer.layer_surface().send_pending_configure();
+                }
+            }
         }
         data.state.arrange();
         data.state.reconcile_pointer();
@@ -388,6 +414,7 @@ pub fn init(
         gbm,
         renderer,
         heads: HashMap::new(),
+        orphaned_layers: Vec::new(),
         active: session.is_active(),
         cursor: cursor(),
         retry_at: std::time::Instant::now(),

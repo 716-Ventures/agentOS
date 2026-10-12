@@ -10,7 +10,7 @@ import time
 import uuid
 
 
-def verify(env, metrics, core, scene, login_user, presentation, keyboard, pointer, hotplug=False):
+def verify(env, metrics, core, scene, login_user, presentation, keyboard, pointer, hotplug=False, hotplug_primary=False):
     outputs = scene()['outputs']
     assert len(outputs) == 2 and {o['name'] for o in outputs} == {'Virtual-1', 'Virtual-2'}, outputs
     assert all(o['scale'] == 1 and o['transform'] == 'Normal' and o['x'] >= 0 and o['y'] >= 0 for o in outputs), outputs
@@ -22,7 +22,7 @@ def verify(env, metrics, core, scene, login_user, presentation, keyboard, pointe
     results = []
     connector = None
     if hotplug:
-        connector = Path('/sys/class/drm/card0-Virtual-2')
+        connector = Path('/sys/class/drm/card0-Virtual-'+('1' if hotplug_primary else '2'))
         device = (connector.parent/'card0'/'device').resolve()
         identity = dict(line.split('=', 1) for line in (device/'uevent').read_text().splitlines() if '=' in line)
         assert os.geteuid() == 0 and (device/'driver').resolve().name == 'virtio-pci'
@@ -69,19 +69,21 @@ def verify(env, metrics, core, scene, login_user, presentation, keyboard, pointe
             activity = core('presentation.get')['activity_id']
             primary_bar = next(layer['id'] for layer in scene()['system_layers'] if layer['namespace'] == 'agentos-system-bar' and layer['mapped'])
             first, second = sorted(outputs, key=lambda o: o['x'])
-            phases = [('first', first), ('second', second)] + ([('removed', first), ('reconnected', second)] if hotplug else []) + [('return', first)]
+            survivor, removed = (second, first) if hotplug_primary else (first, second)
+            phases = [('first', survivor), ('second', removed)] + ([('removed', survivor), ('reconnected', removed)] if hotplug else []) + [('return', survivor)]
             for phase, output in phases:
                 if phase in ('removed', 'reconnected'):
                     preferred = next(w['outputs'] for w in scene()['shared']['workspaces'].values() if w['activity_id'] == activity)
                     connector_state('off' if phase == 'removed' else 'on')
-                    expected = {'Virtual-1'} if phase == 'removed' else {'Virtual-1', 'Virtual-2'}
+                    expected = {survivor['name']} if phase == 'removed' else {'Virtual-1', 'Virtual-2'}
                     wait(lambda: {o['name'] for o in scene()['outputs']} == expected, 'Connector change was not published: '+phase)
                     observed = scene()
-                    assert any(layer['id'] == primary_bar and layer['mapped'] for layer in observed['system_layers']), 'Unchanged primary system bar lost on '+phase
+                    output = next(o for o in observed['outputs'] if o['name'] == output['name'])
+                    assert any(layer['id'] == primary_bar and layer['mapped'] for layer in observed['system_layers']), 'Session system bar lost on '+phase
                     assert window() and target['id'] in observed['shared']['identities'], 'Open work identity lost on '+phase
                     if phase == 'removed':
                         px, py = observed['pointer_location']
-                        assert first['x'] <= px < first['x']+first['width'] and first['y'] <= py < first['y']+first['height'], 'Pointer not recovered after removal: '+json.dumps(observed['pointer_location'])
+                        assert output['x'] <= px < output['x']+output['width'] and output['y'] <= py < output['y']+output['height'], 'Pointer not recovered after removal: '+json.dumps(observed['pointer_location'])
                     print('Connector recovery state: '+json.dumps({'phase':phase, 'outputs':observed['outputs'], 'window':window(), 'pointer':observed['pointer_location'], 'primary_bar':primary_bar}), flush=True)
 
                 if phase not in ('removed', 'reconnected'):
@@ -127,7 +129,8 @@ def verify(env, metrics, core, scene, login_user, presentation, keyboard, pointe
                 height = max(o['y']+o['height'] for o in live_outputs)
                 bar = next(layer for layer in scene()['system_layers'] if layer['namespace'] == 'agentos-system-bar' and layer['mapped'])
                 bg = bar['geometry']
-                pointer.click(bg['x']+bg['width']//2, bg['y']+bg['height']//2, width, height)
+                bar_output = next(o for o in live_outputs if o['name'] == bar['output'])
+                pointer.click(bar_output['x']+bg['x']+bg['width']//2, bar_output['y']+bg['y']+bg['height']//2, width, height)
                 wait(lambda: scene()['seat_focus'] == bar['id'], 'System bar did not take deliberate pointer focus')
                 pointer.click(g['x']+16, g['y']+16, width, height)
                 def pointer_focused():
