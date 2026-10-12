@@ -1,0 +1,3730 @@
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push less than a minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Native dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Wayland dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build and policy tests
+  * Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push less than a minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Native dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Wayland dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build and policy tests
+  * Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push less than a minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Native dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Wayland dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build and policy tests
+  * Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push less than a minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Native dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Wayland dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build and policy tests
+  * Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push less than a minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Native dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Wayland dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build and policy tests
+  * Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push less than a minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Native dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Wayland dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build and policy tests
+  * Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push less than a minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Native dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Wayland dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build and policy tests
+  * Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push less than a minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Native dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Wayland dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build and policy tests
+  * Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push less than a minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Native dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Wayland dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build and policy tests
+  * Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 1 minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Wayland dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build and policy tests
+  * Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 1 minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  * Wayland dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build and policy tests
+  * Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 1 minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build and policy tests
+  * Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 1 minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  * Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build and policy tests
+  * Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 1 minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build and policy tests
+  * Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 1 minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build and policy tests
+  * Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 1 minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build and policy tests
+  * Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 1 minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build and policy tests
+  * Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 1 minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build and policy tests
+  * Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 1 minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 1 minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 1 minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 1 minute ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  * Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 2 minutes ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* contracts (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  * Authenticated presentation and callback IPC
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 2 minutes ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 2 minutes ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 2 minutes ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  * Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 2 minutes ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 2 minutes ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 2 minutes ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 2 minutes ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  * Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 2 minutes ago
+
+JOBS
+* native (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  * Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 2 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 2 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 2 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 2 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 2 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 2 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 3 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  * Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 3 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 3 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 3 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 3 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 3 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 3 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 3 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 3 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 3 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 3 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 3 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 3 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 3 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 3 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 4 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 4 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 4 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 4 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 4 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 4 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 4 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 4 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 4 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 4 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 4 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 4 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 4 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 4 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 4 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 4 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 5 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 5 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 5 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 5 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 5 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 5 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 5 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 5 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 5 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 5 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 5 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 5 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 5 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 5 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 5 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 6 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 6 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 6 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 6 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  * Full graphical login lifecycle and staged release
+  * Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  * Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  * Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+Refreshing run status every 3 seconds. Press Ctrl+C to quit.
+
+* codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 6 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+* compositor (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  ✓ Full graphical login lifecycle and staged release
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+✓ codex/file-target-identity Linux runtime contracts · 38218495023
+Triggered via push about 6 minutes ago
+
+JOBS
+✓ native in 2m29s (ID 114708780585)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Native dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build native desktop
+  ✓ Native transport with real broker and PTY screen keeper
+  ✓ Real native rendering and interaction
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ contracts in 1m56s (ID 114708780747)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Linux test identity and toolchain
+  ✓ Python and Rust contracts
+  ✓ Authenticated presentation and callback IPC
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+✓ compositor in 6m11s (ID 114708780896)
+  ✓ Set up job
+  ✓ Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Wayland dependencies
+  ✓ Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Build and policy tests
+  ✓ Direct backend startup failure and cleanup
+  ✓ Native and conventional clients in agentOS compositor
+  ✓ Installed native approval journey against systemd broker
+  ✓ Full graphical login lifecycle and staged release
+  ✓ Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+  ✓ Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+  ✓ Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+  ✓ Complete job
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+contracts: .github#2
+
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830, actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+compositor: .github#2
+
