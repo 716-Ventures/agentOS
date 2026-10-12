@@ -1,0 +1,1 @@
+Intermediate 8bd651 runtime preserves the primary system bar and immediately clamps the pointer to Virtual-1. The initial test then wrongly required floating geometry during missing-output recovery, whose reachable-view overview intentionally maximizes the selected view. This failed fixture is retained; it is not a complete hotplug qualification.

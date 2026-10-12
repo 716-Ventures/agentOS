@@ -294,7 +294,7 @@ def assistive():
         print(json.dumps(response),flush=True)
 
 
-def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False,presentation_feedback=False,native_feedback=False,native_feedback_load=False,table_input=False,focus_transfers=1,screen_reader=False,multi_output=False):
+def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False,presentation_feedback=False,native_feedback=False,native_feedback_load=False,table_input=False,focus_transfers=1,screen_reader=False,multi_output=False,multi_output_hotplug=False):
     subprocess.run(['modprobe','uinput'],check=True)
     # Join only this test session's accessibility bus; never inspect other users.
     bus=None;observer_runtime=None;wayland=None;deadline=time.monotonic()+10
@@ -396,7 +396,7 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
             return
         if multi_output:
             import direct_multi_output_probe
-            direct_multi_output_probe.verify(env,metrics,core,scene,login_user,presentation,keyboard,pointer)
+            direct_multi_output_probe.verify(env,metrics,core,scene,login_user,presentation,keyboard,pointer,hotplug=multi_output_hotplug)
             return
         if presentation_feedback:
             import direct_presentation_probe

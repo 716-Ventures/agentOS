@@ -1,0 +1,1 @@
+Installed 3be428 runtime: 40 named input-triggered frame receipts passed before connector removal. Removing Virtual-2 also lost the mapped system bar on unchanged Virtual-1. The retained original probe and raw failure show the assertion. Guest/app stopped and config/inodes restored.

@@ -54,6 +54,8 @@ smithay::render_elements! {
     Memory=MemoryRenderBufferRenderElement<R>,
 }
 struct Head {
+    connector: connector::Handle,
+    mode: smithay::reexports::drm::control::Mode,
     output: Output,
     global: GlobalId,
     scanout: Scanout,
@@ -79,10 +81,10 @@ impl Device {
         }
     }
     fn scan(&mut self, data: &mut CalloopData) -> Result<(), Box<dyn std::error::Error>> {
-        self.disconnect(data);
         let resources = self.drm.resource_handles()?;
-        let mut used = HashSet::new();
-        let mut x = 0;
+        // Discover completely before retiring heads: a failed DRM query must
+        // not tear down the still-valid desktop and its shell layer maps.
+        let mut discovered = Vec::new();
         for handle in resources.connectors() {
             let connector = self.drm.get_connector(*handle, true)?;
             if connector.state() != connector::State::Connected {
@@ -114,10 +116,35 @@ impl Device {
                     candidates.extend(resources.filter_crtcs(encoder.possible_crtcs()));
                 }
             }
+            discovered.push((*handle, connector, name, preference, mode, candidates));
+        }
+        // wl_output identity owns shell layer maps and client bindings. Keep
+        // unchanged heads (including in-flight frames) when another connector
+        // changes, rather than destroying every output on each udev event.
+        self.heads.retain(|_, head| {
+            let keep = discovered.iter().any(|(connector, _, _, _, mode, _)|
+                head.connector == *connector && head.mode == *mode);
+            if !keep {
+                data.state.space.unmap_output(&head.output);
+                data.display_handle.remove_global::<Smallvil>(head.global.clone());
+            }
+            keep
+        });
+        let mut used: HashSet<_> = self.heads.keys().copied().collect();
+        let mut x = 0;
+        for (handle, connector, name, preference, mode, candidates) in discovered {
+            let wl_mode = Mode::from(mode);
+            let position = (preference.x.unwrap_or(x), preference.y.unwrap_or(0));
+            x = position.0 + preference.logical_size(wl_mode.size).w;
+            if let Some(head) = self.heads.values_mut().find(|head| head.connector == handle) {
+                head.output.change_current_state(None, None, None, Some(position.into()));
+                data.state.space.map_output(&head.output, position);
+                continue;
+            }
             let Some(crtc) = candidates.into_iter().find(|c| !used.contains(c)) else {
                 continue;
             };
-            let surface = match self.drm.create_surface(crtc, mode, &[*handle]) {
+            let surface = match self.drm.create_surface(crtc, mode, &[handle]) {
                 Ok(surface) => surface,
                 Err(error) => {
                     eprintln!("Cannot configure connector {handle:?}: {error}");
@@ -154,8 +181,6 @@ impl Device {
                 },
             );
             let global = output.create_global::<Smallvil>(&data.display_handle);
-            let wl_mode = Mode::from(mode);
-            let position = (preference.x.unwrap_or(x), preference.y.unwrap_or(0));
             output.change_current_state(
                 Some(wl_mode),
                 Some(preference.transform.native()),
@@ -164,11 +189,12 @@ impl Device {
             );
             output.set_preferred(wl_mode);
             data.state.space.map_output(&output, position);
-            x = position.0 + preference.logical_size(wl_mode.size).w;
             let damage = OutputDamageTracker::from_output(&output);
             self.heads.insert(
                 crtc,
                 Head {
+                    connector: handle,
+                    mode,
                     output,
                     global,
                     scanout,
@@ -178,6 +204,8 @@ impl Device {
             );
             used.insert(crtc);
         }
+        data.state.arrange();
+        data.state.reconcile_pointer();
         Ok(())
     }
     fn render(&mut self, data: &mut CalloopData) {
