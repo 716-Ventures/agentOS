@@ -1,0 +1,160 @@
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+   Compiling agent-os-compositor v0.1.0 (/home/developer/agent-os-source/native-compositor)
+warning: function `project` is never used
+ --> src/pressure.rs:5:8
+  |
+5 | pub fn project(
+  |        ^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: `agent-os-compositor` (bin "agent-os-compositor") generated 1 warning
+    Finished `dev` profile [unoptimized] target(s) in 6.32s
+    Finished `dev` profile [unoptimized] target(s) in 0.06s
+dbus-daemon[1288]: [session uid=1000 pid=1288 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=1338 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[1288]: [session uid=1000 pid=1288 pidfd=5] Successfully activated service 'org.a11y.Bus'
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+CHECK: selected message status retains snapshot and request draft across background refresh
+CHECK: selected voice status retains snapshot and request draft across background refresh
+CHECK: selected model status retains snapshot and request draft across background refresh
+CHECK: deliberate local message selection replaces the launcher's earlier context without replacing its selected snapshot
+CHECK: deliberate local voice selection replaces the launcher's earlier context without replacing its selected snapshot
+dbus-daemon[1358]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=1338 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[1358]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+CHECK: mapped native surface
+CHECK: authenticated immutable image resource and native texture
+CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+CHECK: native PTY renderer remains detached without running authorized work
+CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+CHECK: reference intent, revision and target disappearance/reappearance
+CHECK: selected core work context retains exact row text and job/activity identity without using another output page
+CHECK: selected broker work context retains exact row text and job/activity identity without using another output page
+CHECK: virtualized work history with stable identities and recycled controls
+CHECK: selection and live binding preserved
+CHECK: typed numeric progress and invalid-range availability
+CHECK: local edit preserved
+CHECK: reordered retained widgets
+CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+PASS: agentOS Wayland compositor renders native and conventional apps, exact revisions, float/maximize/undo, no focus stealing
+PASS: native test core and private display cleaned up
+PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+dbus-daemon[1510]: [session uid=1000 pid=1510 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=1705 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[1510]: [session uid=1000 pid=1510 pidfd=5] Successfully activated service 'org.a11y.Bus'
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+CHECK: selected message status retains snapshot and request draft across background refresh
+CHECK: selected voice status retains snapshot and request draft across background refresh
+CHECK: selected model status retains snapshot and request draft across background refresh
+CHECK: deliberate local message selection replaces the launcher's earlier context without replacing its selected snapshot
+CHECK: deliberate local voice selection replaces the launcher's earlier context without replacing its selected snapshot
+dbus-daemon[1724]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=1705 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[1724]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+CHECK: mapped native surface
+CHECK: authenticated immutable image resource and native texture
+CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+CHECK: native PTY renderer remains detached without running authorized work
+CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+CHECK: reference intent, revision and target disappearance/reappearance
+CHECK: selected core work context retains exact row text and job/activity identity without using another output page
+CHECK: selected broker work context retains exact row text and job/activity identity without using another output page
+CHECK: virtualized work history with stable identities and recycled controls
+CHECK: selection and live binding preserved
+CHECK: typed numeric progress and invalid-range availability
+CHECK: local edit preserved
+CHECK: reordered retained widgets
+CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+PASS: configured unbuffered Wayland toplevel never enters durable placement
+PASS: measured minimum sizes, viewport edges, preserved hidden geometry, activity restore and unchanged preferred placement
+PASS: explicit returning-process association, atomic transient-placement removal, retained identity/binding and idempotent receipt
+PASS: live conventional window metadata, typed source binding and source discovery
+PASS: simulated output loss, temporary reachable projection, preserved placement and explicit recovery
+PASS: authenticated native identity, conventional registration, durable shared layout/focus, stale revision rejection, actual float/maximize rendering and journal undo
+PASS: agentOS Wayland compositor renders native and conventional apps, exact revisions, float/maximize/undo, no focus stealing
+PASS: native test core and private display cleaned up
+PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+dbus-daemon[2688]: [session uid=1000 pid=2688 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.3' (uid=1000 pid=2765 comm="/tmp/agentos-session-test-kfrzx4b0/bin/agent-os-de")
+dbus-daemon[2688]: [session uid=1000 pid=2688 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[2789]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=2765 comm="/tmp/agentos-session-test-kfrzx4b0/bin/agent-os-de")
+dbus-daemon[2789]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+dbus-daemon[2688]: [session uid=1000 pid=2688 pidfd=5] Activating service name='ca.desrt.dconf' requested by ':1.4' (uid=1000 pid=2783 comm="/usr/libexec/at-spi-bus-launcher")
+dbus-daemon[2688]: [session uid=1000 pid=2688 pidfd=5] Successfully activated service 'ca.desrt.dconf'
+PASS: session-owned Orca initializes speech and announces the focused native field
+
+(process:2689): atspi-WARNING **: 00:28:11.276: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:2689): atspi-WARNING **: 00:28:11.536: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: session-owned Orca sends the focused field error and cleared-valid state to speech without changing input or drafts; physical audio and braille remain unqualified
+
+(process:2689): atspi-WARNING **: 00:28:23.543: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:2689): atspi-WARNING **: 00:28:23.812: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: real Orca error/clear speech retains DocumentEditor@1 focus, value and exact draft without Save
+
+(process:2689): atspi-WARNING **: 00:28:29.305: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:2689): atspi-WARNING **: 00:28:29.539: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: real Orca error/clear speech retains Choice@1 focus, value and exact draft without Save
+
+(process:2689): atspi-WARNING **: 00:28:32.254: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:2689): atspi-WARNING **: 00:28:32.495: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: real Orca error/clear speech retains Toggle@1 focus, value and exact draft without Save
+Reader current notice: {"name": "", "role": "status bar", "text": "Current value:\nReader result outcome\nfailed"}
+PASS: actual Orca announces changed result job outcome once while selected snapshot, focus and exact field draft persist
+Reader current notice: {"name": "", "role": "status bar", "text": "Current value:\nReader failure outcome\nfailed"}
+PASS: actual Orca announces changed failure job outcome once while selected snapshot, focus and exact field draft persist
+Reader current notice: {"name": "", "role": "status bar", "text": "Current value:\nfailed"}
+PASS: actual Orca announces changed status job outcome once while selected snapshot, focus and exact field draft persist
+PASS: trusted Ctrl+C copies the selected old Status through the Wayland clipboard after its live job has failed
+
+(process:2689): atspi-WARNING **: 00:29:11.467: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:2689): atspi-WARNING **: 00:29:11.781: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:2689): atspi-WARNING **: 00:29:13.175: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:2689): atspi-WARNING **: 00:29:13.384: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:2689): atspi-WARNING **: 00:29:14.537: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI inline validation exposes literal error relation, preserves durable Unicode draft, rejects invalid transactions and clears without implicit Save
+PASS: independent AT-SPI toggle activation reaches the real durable draft; feedback and clearing retain the boolean without Save; scoped Discard restores committed state
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 0, "committed": "First"}
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 1, "committed": "First"}
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 2, "committed": "First"}
+PASS: independent agentOS Choice retains its field-plus-option name across three rendered feedback revisions
+
+(process:2689): atspi-WARNING **: 00:29:16.102: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:2689): atspi-WARNING **: 00:29:16.157: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:2689): atspi-WARNING **: 00:29:16.618: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:2689): atspi-WARNING **: 00:29:16.674: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: local callback parse/range errors relate to the exact retained field, never dispatch or Save, clear on edit and retry once with registered typed values
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: owned reader and speech processes reaped after normal logout
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+Requested orderly guest shutdown. Check status before restarting.
+{"started_at": "2026-10-12T00:27:32.137299+00:00", "source_revision": "ca4a112986464b5a70e58544bbae51620d911a59", "source_changes": [" M outputs/native-shell/Cargo.lock", " M outputs/native-shell/Cargo.toml", " M outputs/native-shell/src/status_projection.rs", " M outputs/native-shell/tests/accessibility.py"], "source_archive_sha256": "003418019f24fab37b0ce1d646ee9c0afefff10da767cd0754f4eff79b77fc0d", "passed": true, "failed_announcement_speech": ["00:28:39.879951 - SPEECH OUTPUT: 'Reader result outcome: failed'{'established': 'False'}", "00:28:43.411442 - SPEECH OUTPUT: 'Reader failure outcome: failed'{'established': 'False'}", "00:28:46.381872 - SPEECH OUTPUT: 'failed'{'established': 'False'}"], "raw_speech_sha256": "f84e8cc01dae9d3be02f412beeadc8c1f3dc2a6cf78375ac9d1d3e2106db02c1", "owned_utm_closed": true, "finished_at": "2026-10-12T00:29:22.202902+00:00"}

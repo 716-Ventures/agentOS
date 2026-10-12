@@ -1,0 +1,20 @@
+{
+  "started_at": "2026-10-12T00:27:32.137299+00:00",
+  "source_revision": "ca4a112986464b5a70e58544bbae51620d911a59",
+  "source_changes": [
+    " M outputs/native-shell/Cargo.lock",
+    " M outputs/native-shell/Cargo.toml",
+    " M outputs/native-shell/src/status_projection.rs",
+    " M outputs/native-shell/tests/accessibility.py"
+  ],
+  "source_archive_sha256": "003418019f24fab37b0ce1d646ee9c0afefff10da767cd0754f4eff79b77fc0d",
+  "passed": true,
+  "failed_announcement_speech": [
+    "00:28:39.879951 - SPEECH OUTPUT: 'Reader result outcome: failed'{'established': 'False'}",
+    "00:28:43.411442 - SPEECH OUTPUT: 'Reader failure outcome: failed'{'established': 'False'}",
+    "00:28:46.381872 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
+  ],
+  "raw_speech_sha256": "f84e8cc01dae9d3be02f412beeadc8c1f3dc2a6cf78375ac9d1d3e2106db02c1",
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-12T00:29:22.202902+00:00"
+}

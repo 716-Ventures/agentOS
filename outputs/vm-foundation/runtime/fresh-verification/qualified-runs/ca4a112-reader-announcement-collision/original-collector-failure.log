@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/tmp/agentos-capture-chrome-reader.py", line 20, in <module>
+    assert len(spoken)==1,spoken
+AssertionError: []

@@ -1,0 +1,3 @@
+PASS: real ARM64 graphical release a49cf79b34dd9c3ee8ffa54e40e6f34f59ef9b16876ade37865a9a9ff66fc7ac, 188 dependencies with notices, complete integrity manifest
+PASS: signed real ARM64 graphical bundle verifies and stages without activation or user state
+PASS: HTTPS runtime download verifies and stages real signed ELFs without activation; temporary download removed

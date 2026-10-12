@@ -1,0 +1,21 @@
+{
+  "result": "pass",
+  "source_archive_sha256": "003418019f24fab37b0ce1d646ee9c0afefff10da767cd0754f4eff79b77fc0d",
+  "ui_revision": "678bedabfcfde0be007356ea20245dfcfea1bef3",
+  "ui_version": "0.1.0-alpha.43",
+  "native_unit_results": "36 passed / 7 ignored",
+  "four_native_profiles": "pass in initial.log",
+  "two_mixed_compositor_profiles": "pass in completion.log",
+  "installed_reader": "pass with exact announcement matching",
+  "failed_announcement_speech": [
+    "00:28:39.879951 - SPEECH OUTPUT: 'Reader result outcome: failed'{'established': 'False'}",
+    "00:28:43.411442 - SPEECH OUTPUT: 'Reader failure outcome: failed'{'established': 'False'}",
+    "00:28:46.381872 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
+  ],
+  "inactive_monitor_failed_announcement_count": 0,
+  "baseline": "../ca4a112-reader-announcement-collision/exact-speech-baseline.json",
+  "fixture_failure": "Initial targeted runner omitted cleaned compositor debug executable; built exact source before completing remaining checks. Initial attempt and owned cleanup retained.",
+  "guest_and_owned_app_closed": true,
+  "full70": "pending; ca4a112 reported 70 passes but contained false-positive reader assertion and is not promoted",
+  "physical_audio_and_braille": false
+}

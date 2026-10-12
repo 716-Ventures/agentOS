@@ -1,0 +1,11 @@
+{
+  "source_revision": "ca4a112986464b5a70e58544bbae51620d911a59",
+  "runtime_release": "72767b7ee940862f8196831eb70b2c1b17fb6ae1511e4c3c75c5dce5567279fc",
+  "automated_suite": "70 checks reported pass, guest/app closed",
+  "qualification": "held: raw installed speech disproves exact Status announcement claim",
+  "observed": "Inactive Agent Monitor work rows emitted core failed announcements including raw command text. Exact standalone failed announcement absent. Existing fixture matched unrelated work-row failed speech.",
+  "ci_run": 38186518156,
+  "ci": "success",
+  "previous_qualified_runtime": "921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
+  "previous_qualified_image": "candidate-v19"
+}

@@ -506,12 +506,13 @@ def verify_reader_outcomes(call, speech_log, outcomes, database):
             for line in speech_log.read_text(errors='replace')[baseline:].splitlines():
                 if 'START ' in line and 'OBJECT EVENT ' in line:
                     active='OBJECT:ANNOUNCEMENT' in line
-                if active and 'SPEECH OUTPUT:' in line and announcement in line:
+                if active and ('SPEECH OUTPUT: '+repr(announcement)+'{') in line:
                     spoken.append(line)
                 if 'END ' in line and 'OBJECT EVENT ' in line:active=False
             return spoken
         wait(lambda:announcements(),'Orca did not announce changed selected '+key+' outcome')
         if key=='status':
+            assert "SPEECH OUTPUT: 'core · failed" not in speech_log.read_text(errors='replace')[baseline:], 'Inactive monitor work rows competed with the selected Status announcement'
             stroke('Ctrl');stroke('c');stroke('Ctrl on')
         stroke('Right')
         wait(lambda:text(message)=='failed','Reader outcome did not reconcile after deselection')

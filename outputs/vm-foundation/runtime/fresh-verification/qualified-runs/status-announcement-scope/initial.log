@@ -1,0 +1,645 @@
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+Dependency profile and installed versions unchanged.
+Verified offline speech assets: 9f796231bf027914973e24315967f66a2698220f2e40420d87155963793be634
+     Removed 0 files
+     Removed 8 files, 9.1MiB total
+   Compiling agent-os-core v0.5.0 (/home/developer/agent-os-source)
+    Finished `release` profile [optimized] target(s) in 7.86s
+    Updating git repository `https://github.com/716-Ventures/716-ui`
+     Removed 0 files
+     Removed 9 files, 7.3MiB total
+   Compiling seven-sixteen-ui v0.1.0-alpha.43 (https://github.com/716-Ventures/716-ui?rev=678bedabfcfde0be007356ea20245dfcfea1bef3#678bedab)
+   Compiling agent-os-desktop v0.1.0-alpha.1 (/home/developer/agent-os-source/native-shell)
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+ --> src/document_dialog.rs:8:11
+  |
+8 | ) -> gtk::FileChooserNative {
+  |           ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:10:23
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:61:23
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:10:42
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:11:10
+   |
+11 |         .title(if save {
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:16:10
+   |
+16 |         .action(if save {
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:21:10
+   |
+21 |         .accept_label(if save { "Export" } else { "Import" })
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:22:10
+   |
+22 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:23:10
+   |
+23 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:24:10
+   |
+24 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+  --> src/document_dialog.rs:27:16
+   |
+27 |         dialog.set_current_name("document.txt");
+   |                ^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:31:40
+   |
+31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:61:42
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:62:10
+   |
+62 |         .title("Choose existing text file to review")
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:63:10
+   |
+63 |         .action(gtk::FileChooserAction::Open)
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:64:10
+   |
+64 |         .accept_label("Review replacement")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:65:10
+   |
+65 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:66:10
+   |
+66 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:67:10
+   |
+67 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:72:40
+   |
+72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: `agent-os-desktop` (bin "agent-os-desktop") generated 20 warnings
+    Finished `release` profile [optimized] target(s) in 11.47s
+     Removed 0 files
+     Removed 9 files, 21.9MiB total
+   Compiling agent-os-compositor v0.1.0 (/home/developer/agent-os-source/native-compositor)
+warning: function `project` is never used
+ --> src/pressure.rs:5:8
+  |
+5 | pub fn project(
+  |        ^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: `agent-os-compositor` (bin "agent-os-compositor") generated 1 warning
+    Finished `release` profile [optimized] target(s) in 13.78s
+Collected dependency notices: 188
+Installed and healthy: b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679
+Installed. Reconnect your login session for group membership, then run agent-os.
+   Compiling seven-sixteen-ui v0.1.0-alpha.43 (https://github.com/716-Ventures/716-ui?rev=678bedabfcfde0be007356ea20245dfcfea1bef3#678bedab)
+   Compiling agent-os-desktop v0.1.0-alpha.1 (/home/developer/agent-os-source/native-shell)
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+ --> src/document_dialog.rs:8:11
+  |
+8 | ) -> gtk::FileChooserNative {
+  |           ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:10:23
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:61:23
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:10:42
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:11:10
+   |
+11 |         .title(if save {
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:16:10
+   |
+16 |         .action(if save {
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:21:10
+   |
+21 |         .accept_label(if save { "Export" } else { "Import" })
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:22:10
+   |
+22 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:23:10
+   |
+23 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:24:10
+   |
+24 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+  --> src/document_dialog.rs:27:16
+   |
+27 |         dialog.set_current_name("document.txt");
+   |                ^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:31:40
+   |
+31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:61:42
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:62:10
+   |
+62 |         .title("Choose existing text file to review")
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:63:10
+   |
+63 |         .action(gtk::FileChooserAction::Open)
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:64:10
+   |
+64 |         .accept_label("Review replacement")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:65:10
+   |
+65 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:66:10
+   |
+66 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:67:10
+   |
+67 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:72:40
+   |
+72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_file`: Since 4.10
+   --> src/document_dialog.rs:308:20
+    |
+308 |             dialog.set_file(&gtk::gio::File::for_path(&path)).unwrap();
+    |                    ^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+   --> src/document_dialog.rs:310:26
+    |
+310 |             while dialog.file().and_then(|file| file.path()).as_ref() != Some(&path) {
+    |                          ^^^^
+
+warning: `agent-os-desktop` (bin "agent-os-desktop" test) generated 22 warnings
+    Finished `test` profile [unoptimized] target(s) in 4.94s
+     Running unittests src/main.rs (native-shell/target/debug/deps/agent_os_desktop-5a9d9cb94b44b4cd)
+
+running 43 tests
+test broker_controls::tests::stored_input_preview_matches_the_frozen_proposal_and_byte_count ... ok
+test action_parameters::tests::edited_parameters_are_bounded_data_and_cannot_select_a_command_or_target ... ok
+test broker_controls::tests::continuation_is_a_typed_existing_job_reference_without_command_text ... ok
+test broker_controls::tests::stale_review_cannot_authorize_changed_command_or_input ... ok
+test document_dialog::initial_import_tests::accepted_file_selection_keeps_its_optional_activity_context ... ignored
+test broker_pages::tests::pages_scope_and_epoch_restarts_preserve_one_consistent_history ... ok
+test controls::context_tests::request_context_only_replaces_frozen_source_for_explicit_local_status ... ok
+test feedback_metrics::tests::key_clock_wrap_and_millisecond_quantization_are_preserved ... ok
+test feedback_metrics::tests::unknown_clock_future_input_and_invalid_receipts_do_not_become_fast_samples ... ok
+test draft_cache::tests::corrupt_or_oversized_fields_do_not_become_recovered_edits ... ok
+test input_context::tests::application_context_rejects_changed_disconnected_moved_or_forged_referents ... ok
+test draft_cache::tests::private_recovery_roundtrip_preserves_revision_and_unicode ... ok
+test input_context::tests::real_core_application_context_rechecks_registered_revision_and_connection ... ignored
+test input_context::tests::revoked_voice_and_cross_activity_context_stop_before_source_lookup ... ok
+test input_context::tests::application_context_uses_authenticated_workspace_identity_never_a_title_match ... ok
+test input_context::tests::selected_object_context_keeps_original_content_and_rejects_removed_or_moved_targets ... ok
+test presentation_pages::cache_tests::errors_keep_the_previous_consistent_cache_and_cancellation_sends_nothing ... ok
+test presentation_pages::cache_tests::unchanged_documents_are_not_refetched_and_tombstones_remove_old_views ... ok
+test presentation_pages::tests::retries_from_scratch_after_interleaved_edits ... ok
+test presentation_pages::tests::cancellation_and_nonprogressing_cursors_stop_reads ... ok
+test pty_transport::tests::real_broker_terminal_round_trip_and_reattach ... ignored, requires isolated Linux tmux broker fixture
+test log_view::tests::pages_keep_identity_and_retry_the_same_offset_after_disconnect ... ok
+test pty_view::tests::manual_detach_restores_attach_without_a_source_refresh ... ignored
+test pty_transport::tests::terminal_pages_preserve_raw_bytes_and_require_exact_cursor_boundaries ... ok
+test reconcile::tests::confirmed_local_values_advance_without_granting_other_mutations ... ok
+test log_view::tests::live_follow_refreshes_the_tail_and_selection_can_freeze_its_page ... ok
+test reconcile::tests::unrelated_text_can_advance_but_fields_structure_and_authority_stay_frozen ... ok
+test state_pages::tests::cancellation_and_invalid_cursors_stop_paging ... ok
+test state_pages::tests::scopes_jobs_and_restarts_after_interleaved_changes ... ok
+test timings::tests::disabled_diagnostics_do_not_collect_stages_or_files ... ok
+test timings::tests::percentiles_are_bounded_recent_samples_and_cumulative_mean_is_explicit ... ok
+test reconcile::tests::feedback_can_change_without_authorizing_text_structure_or_actions ... ok
+test transport::action_field_tests::callbacks_use_local_then_recovered_then_committed_editable_values ... ok
+test transport::draft_revision_tests::save_refuses_a_revision_the_user_has_not_seen_and_retains_the_local_draft ... ok
+test transport::draft_revision_tests::reviewed_save_rejects_a_changed_draft_without_committing_and_ends_its_lease ... ok
+test transport::initial_document_tests::an_implicit_document_activity_is_created_once_and_reused ... ok
+test transport::draft_revision_tests::unfocused_edit_uses_a_temporary_lease_and_preserves_conflicting_drafts ... ok
+test transport::initial_document_tests::import_into_an_empty_core_validates_before_creating_an_activity ... ignored
+test transport::initial_document_tests::initial_typed_requests_validate_before_creating_and_never_launch_on_broker_failure ... ignored
+test transport::initial_document_tests::queued_new_documents_reuse_the_confirmed_activity ... ignored
+test transport::initial_document_tests::an_unconfirmed_activity_creation_is_not_retried_or_used ... ok
+test status_projection::tests::host_observations_preserve_unicode_and_bound_display_without_nul ... ok
+test pty_transport::tests::attachment_retries_only_unwritten_input_and_detaches_on_drop ... ok
+
+test result: ok. 36 passed; 0 failed; 7 ignored; 0 measured; 0 filtered out; finished in 0.83s
+
+   Compiling agent-os-desktop v0.1.0-alpha.1 (/home/developer/agent-os-source/native-shell)
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+ --> src/document_dialog.rs:8:11
+  |
+8 | ) -> gtk::FileChooserNative {
+  |           ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:10:23
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:61:23
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:10:42
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:11:10
+   |
+11 |         .title(if save {
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:16:10
+   |
+16 |         .action(if save {
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:21:10
+   |
+21 |         .accept_label(if save { "Export" } else { "Import" })
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:22:10
+   |
+22 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:23:10
+   |
+23 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:24:10
+   |
+24 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+  --> src/document_dialog.rs:27:16
+   |
+27 |         dialog.set_current_name("document.txt");
+   |                ^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:31:40
+   |
+31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:61:42
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:62:10
+   |
+62 |         .title("Choose existing text file to review")
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:63:10
+   |
+63 |         .action(gtk::FileChooserAction::Open)
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:64:10
+   |
+64 |         .accept_label("Review replacement")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:65:10
+   |
+65 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:66:10
+   |
+66 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:67:10
+   |
+67 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:72:40
+   |
+72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: `agent-os-desktop` (bin "agent-os-desktop") generated 20 warnings
+    Finished `dev` profile [unoptimized] target(s) in 4.39s
+   Compiling agent-os-compositor v0.1.0 (/home/developer/agent-os-source/native-compositor)
+    Finished `dev` profile [unoptimized] target(s) in 0.72s
+dbus-daemon[3585]: [session uid=1000 pid=3585 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=3622 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[3585]: [session uid=1000 pid=3585 pidfd=5] Successfully activated service 'org.a11y.Bus'
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+CHECK: selected message status retains snapshot and request draft across background refresh
+CHECK: selected voice status retains snapshot and request draft across background refresh
+CHECK: selected model status retains snapshot and request draft across background refresh
+CHECK: deliberate local message selection replaces the launcher's earlier context without replacing its selected snapshot
+CHECK: deliberate local voice selection replaces the launcher's earlier context without replacing its selected snapshot
+dbus-daemon[3641]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=3622 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[3641]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+CHECK: mapped native surface
+CHECK: authenticated immutable image resource and native texture
+CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+CHECK: native PTY renderer remains detached without running authorized work
+CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+CHECK: reference intent, revision and target disappearance/reappearance
+CHECK: selected core work context retains exact row text and job/activity identity without using another output page
+CHECK: selected broker work context retains exact row text and job/activity identity without using another output page
+CHECK: virtualized work history with stable identities and recycled controls
+CHECK: selection and live binding preserved
+CHECK: typed numeric progress and invalid-range availability
+CHECK: local edit preserved
+CHECK: reordered retained widgets
+CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+PASS: native test core and private display cleaned up
+PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+dbus-daemon[3725]: [session uid=1000 pid=3725 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=3746 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[3725]: [session uid=1000 pid=3725 pidfd=5] Successfully activated service 'org.a11y.Bus'
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+CHECK: selected message status retains snapshot and request draft across background refresh
+CHECK: selected voice status retains snapshot and request draft across background refresh
+CHECK: selected model status retains snapshot and request draft across background refresh
+CHECK: deliberate local message selection replaces the launcher's earlier context without replacing its selected snapshot
+CHECK: deliberate local voice selection replaces the launcher's earlier context without replacing its selected snapshot
+dbus-daemon[3781]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=3746 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[3781]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+CHECK: mapped native surface
+CHECK: authenticated immutable image resource and native texture
+CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+CHECK: native PTY renderer remains detached without running authorized work
+CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+CHECK: reference intent, revision and target disappearance/reappearance
+CHECK: selected core work context retains exact row text and job/activity identity without using another output page
+CHECK: selected broker work context retains exact row text and job/activity identity without using another output page
+CHECK: virtualized work history with stable identities and recycled controls
+CHECK: selection and live binding preserved
+CHECK: typed numeric progress and invalid-range availability
+CHECK: local edit preserved
+CHECK: reordered retained widgets
+CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+PASS: native test core and private display cleaned up
+PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+dbus-daemon[3850]: [session uid=1000 pid=3850 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=3886 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[3850]: [session uid=1000 pid=3850 pidfd=5] Successfully activated service 'org.a11y.Bus'
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+CHECK: selected message status retains snapshot and request draft across background refresh
+CHECK: selected voice status retains snapshot and request draft across background refresh
+CHECK: selected model status retains snapshot and request draft across background refresh
+CHECK: deliberate local message selection replaces the launcher's earlier context without replacing its selected snapshot
+CHECK: deliberate local voice selection replaces the launcher's earlier context without replacing its selected snapshot
+dbus-daemon[3905]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=3886 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[3905]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+CHECK: mapped native surface
+CHECK: authenticated immutable image resource and native texture
+CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+CHECK: native PTY renderer remains detached without running authorized work
+CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+CHECK: reference intent, revision and target disappearance/reappearance
+CHECK: selected core work context retains exact row text and job/activity identity without using another output page
+CHECK: selected broker work context retains exact row text and job/activity identity without using another output page
+CHECK: virtualized work history with stable identities and recycled controls
+CHECK: selection and live binding preserved
+CHECK: typed numeric progress and invalid-range availability
+CHECK: local edit preserved
+CHECK: reordered retained widgets
+CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+PASS: native test core and private display cleaned up
+PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+dbus-daemon[3989]: [session uid=1000 pid=3989 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=4010 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[3989]: [session uid=1000 pid=3989 pidfd=5] Successfully activated service 'org.a11y.Bus'
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+CHECK: selected message status retains snapshot and request draft across background refresh
+CHECK: selected voice status retains snapshot and request draft across background refresh
+CHECK: selected model status retains snapshot and request draft across background refresh
+CHECK: deliberate local message selection replaces the launcher's earlier context without replacing its selected snapshot
+CHECK: deliberate local voice selection replaces the launcher's earlier context without replacing its selected snapshot
+dbus-daemon[4029]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=4010 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[4029]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+CHECK: mapped native surface
+CHECK: authenticated immutable image resource and native texture
+CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+CHECK: native PTY renderer remains detached without running authorized work
+CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+CHECK: reference intent, revision and target disappearance/reappearance
+CHECK: selected core work context retains exact row text and job/activity identity without using another output page
+CHECK: selected broker work context retains exact row text and job/activity identity without using another output page
+CHECK: virtualized work history with stable identities and recycled controls
+CHECK: selection and live binding preserved
+CHECK: typed numeric progress and invalid-range availability
+CHECK: local edit preserved
+CHECK: reordered retained widgets
+CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+PASS: native test core and private display cleaned up
+PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim
+Traceback (most recent call last):
+  File "/home/developer/agent-os-source/native-shell/tests/native_desktop.py", line 111, in <module>
+    nested=subprocess.Popen([str(ROOT.parent/'native-compositor/target/debug/agent-os-compositor')],env={**env,**({'AGENT_OS_COMPOSITOR_CORE':str(endpoint)} if shared else {}),'LIBGL_ALWAYS_SOFTWARE':'1','WINIT_UNIX_BACKEND':'wayland'},stdout=nestedlog,stderr=subprocess.STDOUT,start_new_session=True)
+  File "/usr/lib/python3.13/subprocess.py", line 1039, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 1972, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/developer/agent-os-source/native-compositor/target/debug/agent-os-compositor'
+Requested orderly guest shutdown. Check status before restarting.
+{"started_at": "2026-10-12T00:26:07.132946+00:00", "source_revision": "ca4a112986464b5a70e58544bbae51620d911a59", "source_changes": [" M outputs/native-shell/Cargo.lock", " M outputs/native-shell/Cargo.toml", " M outputs/native-shell/src/status_projection.rs", " M outputs/native-shell/tests/accessibility.py"], "source_archive_sha256": "003418019f24fab37b0ce1d646ee9c0afefff10da767cd0754f4eff79b77fc0d", "passed": false, "owned_utm_closed": true, "finished_at": "2026-10-12T00:27:19.720289+00:00"}
+Traceback (most recent call last):
+  File "/tmp/agentos-status-quiet-targeted.py", line 14, in <module>
+    for flags in ('--compositor','--compositor --shared'):vm.ssh('cd /home/developer/agent-os-source && dbus-run-session -- python3 native-shell/tests/native_desktop.py '+flags,check=True,timeout=180)
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/vm.py", line 309, in ssh
+    return subprocess.run(ssh_args() + [command], **kwargs)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ssh', '-p', '22221', '-i', '/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/id_ed25519', '-o', 'IdentitiesOnly=yes', '-o', 'StrictHostKeyChecking=accept-new', '-o', 'UserKnownHostsFile=/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/known_hosts', '-o', 'ConnectTimeout=3', '-o', 'BatchMode=yes', '-o', 'LogLevel=ERROR', 'developer@127.0.0.1', 'cd /home/developer/agent-os-source && dbus-run-session -- python3 native-shell/tests/native_desktop.py --compositor']' returned non-zero exit status 1.

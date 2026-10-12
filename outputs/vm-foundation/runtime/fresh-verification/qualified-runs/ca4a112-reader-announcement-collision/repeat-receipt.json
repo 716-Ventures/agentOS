@@ -1,0 +1,14 @@
+{
+  "started_at": "2026-10-12T00:19:27.587611+00:00",
+  "source_revision": "ca4a112986464b5a70e58544bbae51620d911a59",
+  "passed": false,
+  "failed_announcement_speech": [
+    "00:20:10.131446 - SPEECH OUTPUT: 'Reader result outcome: failed'{'established': 'False'}",
+    "00:20:13.722637 - SPEECH OUTPUT: 'Reader failure outcome: failed'{'established': 'False'}",
+    "00:20:13.732117 - SPEECH OUTPUT: 'core \u00b7 failed",
+    "00:20:16.772875 - SPEECH OUTPUT: 'core \u00b7 failed"
+  ],
+  "raw_speech_sha256": "2639833045282733f5a094152430fb06455191abf46d91b45fd0c4d93531b66d",
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-12T00:20:57.195541+00:00"
+}

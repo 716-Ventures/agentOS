@@ -1,5 +1,6 @@
 //! Adapt bounded host observations to the released StatusView contract.
-use super::ui;
+use super::{gtk, ui};
+use gtk::prelude::*;
 use std::borrow::Cow;
 
 const MAX_BYTES: usize = 65_536;
@@ -25,7 +26,13 @@ fn literal(value: &str) -> Cow<'_, str> {
 }
 
 pub fn update(view: &ui::StatusView, value: &str) {
-    view.reconcile(&literal(value))
+    // Host chrome is a second projection of domain state. Inactive launcher
+    // and monitor windows must not compete with the active surface's reader
+    // announcements. Keep their text/selection current without unmapping them.
+    let announce = view.widget.root()
+        .and_then(|root| root.downcast::<gtk::Window>().ok())
+        .is_some_and(|window| window.is_active());
+    view.reconcile_with_announcement(&literal(value), announce)
         .expect("Normalized status must satisfy the pinned StatusView text contract");
 }
 
