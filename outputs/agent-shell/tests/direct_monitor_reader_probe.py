@@ -83,8 +83,29 @@ def verify(log, keyboard, pointer, snapshot, scene, request, output, activity, r
         until(lambda:(lambda s:s['text']==expected and s['selection'] is None and not s['current'])(work()),'Monitor deselection did not adopt the latest state')
         time.sleep(.8)
         assert len(announcements())==1,'Unchanged Monitor refresh/deselection repeated speech'
+        retained_point=work()['point']
         keyboard.chord(29,56,111) # agentOS close-view shortcut; close only the utility window.
         until(lambda:window() is None,'Monitor close did not release its window')
+        # Do not query AT-SPI after reopening until actual speech proves the
+        # retained status is readable. Tree observation can refresh stale caches.
+        for cycle in range(3):
+            baseline_reopen=len(log.read_text(errors='replace'))
+            pointer.click(bar['x']+button[0],bar['y']+button[1],output['width'],output['height'])
+            until(placed_window,'Monitor did not reopen at cycle '+str(cycle))
+            time.sleep(.3)
+            point(retained_point)
+            keyboard.chord(15);keyboard.chord(42,15) # Real focus traversal back to the retained work text.
+            def reopened_speech():
+                recent=log.read_text(errors='replace')[baseline_reopen:]
+                for chunk in recent.split('SPEECH OUTPUT:')[1:]:
+                    utterance, complete, _=chunk.partition("'{'established':")
+                    if complete and utterance.startswith(" 'core · failed\n") and marker in utterance:return True
+                return False
+            until(reopened_speech,'Orca did not read the reopened Monitor work at cycle '+str(cycle),15)
+            current=work()
+            assert current['text']==expected and current['active'] and current['focused'],current
+            keyboard.chord(29,56,111)
+            until(lambda:window() is None,'Reopened Monitor did not close')
         restore_editor()
         until(lambda:snapshot()['focused'],'Monitor clipboard receiver did not receive focus')
         keyboard.chord(29,47)
@@ -94,7 +115,7 @@ def verify(log, keyboard, pointer, snapshot, scene, request, output, activity, r
             raise
         keyboard.chord(29,30);keyboard.chord(14)
         until(lambda:snapshot()['text']=='','Monitor clipboard fixture did not clear its unrelated editor draft')
-        return {'job_id':job,'active_monitor':True,'selected_snapshot_preserved':True,'current_failure_visible':True,'failure_announcements':1,'deselection_adopts_latest':True,'trusted_clipboard_roundtrip':True}
+        return {'job_id':job,'active_monitor':True,'selected_snapshot_preserved':True,'current_failure_visible':True,'failure_announcements':1,'deselection_adopts_latest':True,'trusted_clipboard_roundtrip':True,'reader_announced_reopens':3}
     finally:
         if job is not None:
             state=next((j for j in request({'op':'snapshot'})['jobs'] if j['id']==job),None)

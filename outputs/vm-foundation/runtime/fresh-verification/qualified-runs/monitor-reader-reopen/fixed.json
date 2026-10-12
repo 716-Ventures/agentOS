@@ -1,0 +1,29 @@
+{
+  "started_at": "2026-10-12T02:38:12.219322+00:00",
+  "passed": true,
+  "source_archive_sha256": "aae7bd3f83939823c5c64c4dadfd115c231b8dbaeed8824fd42b11b670556833",
+  "checks": [
+    "native-build",
+    "native-dark-1",
+    "native-dark-2",
+    "native-light-1",
+    "native-light-2",
+    "native-compositor",
+    "native-shared",
+    "reader"
+  ],
+  "deployment": {
+    "created_at": "2026-10-12T02:38:25.586575+00:00",
+    "source_archive_sha256": "aae7bd3f83939823c5c64c4dadfd115c231b8dbaeed8824fd42b11b670556833",
+    "repository_revision": "58b549097c0242af15a1180b10cbd6497e0f37e7",
+    "source_changes": [
+      " M outputs/agent-shell/tests/direct_monitor_reader_probe.py",
+      " M outputs/native-shell/src/controls.rs"
+    ],
+    "installed": true
+  },
+  "runtime_release": "3cb57dd863298f61cc67c52c288c28c6472a75e168104f500d9fe6c4eb2ec412",
+  "reader_raw_sha256": "486099ea6d675da83afccaf44c92a8d2be3346f2c719d5d7ba6d6463fe7f1f72",
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-12T02:40:52.055340+00:00"
+}

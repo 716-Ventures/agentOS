@@ -1,0 +1,12 @@
+{
+  "started_at": "2026-10-12T02:36:04.099753+00:00",
+  "source_revision": "58b549097c0242af15a1180b10cbd6497e0f37e7",
+  "source_changes": [],
+  "source_archive_sha256": "f11c703fe6dd6352a5bea694bea94e9119014f2014b58e2f7a827afb6df16512",
+  "passed": false,
+  "original_test_sha256": "3f380c9ee33038b707a12fe608fde4ba160f8f7e3062e12dc23ffc66ab69e2ca",
+  "probe_sha256": "94d6696586dd1ea6aafc5ea5e2efbb38e6f29007588a94609d570b78ae2ebb2f",
+  "original_test_restored": true,
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-12T02:36:58.294213+00:00"
+}

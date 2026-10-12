@@ -362,7 +362,12 @@ impl Controls {
             .build();
         monitor.add_css_class("seven-ui");
         monitor.connect_close_request(|window| {
+            // A remapped GTK window gets a new AT-SPI identity. Unroot the
+            // retained controls so readers cannot follow a dead frame parent.
+            let content = window.child();
+            window.set_child(gtk::Widget::NONE);
             window.set_visible(false);
+            window.set_child(content.as_ref());
             glib::Propagation::Stop
         });
         let import_activity = activity.clone();

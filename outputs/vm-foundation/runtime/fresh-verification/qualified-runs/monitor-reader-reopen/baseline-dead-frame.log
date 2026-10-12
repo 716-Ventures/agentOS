@@ -1,0 +1,13 @@
+02:36:35.623232 - EVENT MANAGER: Processing object:state-changed:focused: script for event is active
+02:36:35.623260 - FOCUS MANAGER: Locus of focus is [frame: 'Agent Monitor' (0xffff84209900)]
+02:36:35.623404 - SCRIPT UTILITIES: [frame: 'Agent Monitor' (0xffff843d5340)] is top-level object for: [label: 'core · failed\n/usr/bin/python3 -u -c... p.exists() else 0) /var/lib/agent-os-runtime/monitor-reader-2c5a5b6f70f9 monitor-reader-2c5a5b6f70f9 (290 chars.)' (0xffff85478c40)]
+02:36:35.623506 - SCRIPT UTILITIES: [label: 'core · failed\n/usr/bin/python3 -u -c... p.exists() else 0) /var/lib/agent-os-runtime/monitor-reader-2c5a5b6f70f9 monitor-reader-2c5a5b6f70f9 (290 chars.)' (0xffff85478c40)] is in frame [frame: 'Agent Monitor' (0xffff843d5340)] and dialog None
+02:36:35.623545 - AXObject: Clearing AT-SPI cache on [frame: 'Agent Monitor' (0xffff843d5340)] Recursive: False. Reason: Checking if window can be the active window
+02:36:35.624241 - AXObject: Exception in get_role_name: atspi_error: Object does not exist at path “/com/agentos/Desktop/a11y/26bce872_c411_4a8d_be3c_d597fa13e26e” (1)
+02:36:35.624257 - AXObject: Adding to known dead objects ax_utilities_debugging._accessible_as_string:73 > ax_object.get_role_name:742 > ax_object.handle_error:362 > ax_object._set_known_dead_status:329
+02:36:35.625195 - AXUtilities: [DEAD (0xffff843d5340)] from [application: 'agent-os-desktop' (0xffff854bbf40)] lacks active state
+TOTAL PROCESSING TIME: 0.0157
+^^^^^ FINISHED HIGH -PRIORITY OBJECT EVENT OBJECT:STATE-CHANGED:FOCUSED ^^^^^
+
+02:36:37.159067 - AXCacheManager: Invalidating caches Generator.description, Generator.image-description, Generator.static-text, Generator.text-substring, Generator.text-line, Generator.text, Generator.text-expanding-eocs, Generator.descendants, Generator.nesting-level, Generator.tree-item-level, Generator.is-nameless-toggle, Generator.is-description-used-for-name, Generator.is-description-used-for-static-text Reason: Automatic interval-based clearing.
+02:36:39.161299 - AXCacheManager: Invalidating caches Generator.description, Generator.image-description, Generator.static-text, Generator.text-substring, Generator.text-line, Generator.text, Generator.text-expanding-eocs, Generator.descendants, Generator.nesting-level, Generator.tree-item-level, Generator.is-nameless-toggle, Generator.is-description-used-for-name, Generator.is-description-used-for-static-text Reason: Automatic interval-based clearing.
