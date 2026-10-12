@@ -1,0 +1,6 @@
+{
+  "source": "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/candidate-v23-interrupted-1791798834593573000-disk.qcow2",
+  "source_sha256": "03f7827f59afb2b31245bb2be2b249a8a43a9401629f097d1b56dd7ebc744254",
+  "copy_sha256": "03f7827f59afb2b31245bb2be2b249a8a43a9401629f097d1b56dd7ebc744254",
+  "resumes_completed_firstboot_and_twelve_direct_profiles": true
+}

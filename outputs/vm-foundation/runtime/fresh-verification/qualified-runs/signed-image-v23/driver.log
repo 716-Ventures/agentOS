@@ -1,0 +1,34 @@
+Verified signed image and VM configuration: outputs/vm-foundation/runtime/release-artifacts/candidate-v23.utm
+Qualification step: agentos-image-v23-swap-attempt3.py
+Exact owned UTM application exit verified
+Prepared exact clone of preserved first-attempt image copy; original remains retained
+UTM guest started; SSH is forwarded on localhost:22221.
+Qualification step: agentos-image-v23-check-transport.py
+Confirmed distribution SSH disabled/inactive after restart; qualification transport started via guest agent
+Qualification step: agentos-image-v23-pointer-overlay.py
+Applied and hash-verified test-only pointer spacing overlay; installed runtime unchanged
+Qualification step: agentos-image-v23-output-restoration.py
+Requested orderly guest shutdown. Check status before restarting.
+Exact owned UTM application exit verified
+UTM guest started; SSH is forwarded on localhost:22221.
+Requested orderly guest shutdown. Check status before restarting.
+Exact owned UTM application exit verified
+UTM guest started; SSH is forwarded on localhost:22221.
+Fresh signed image passes all four virtual output restoration modes; original one-head configuration restored
+Qualification step: agentos-image-v23-lifecycle-attempt3.py
+Before reboot: {"result": "pass", "boot_id": "8b283457-7ebf-4ba0-abf8-d6cebb929bc4", "runtime": "39d7a11c50ebb9522ae97c4badfa2fa221c6d3c4a1fd4d459a250a241c32af25", "uid": 1000, "activity": 1, "file_persisted": true, "healthy_services": ["active", "active", "active", "active", "active", "active"], "network_interfaces": ["lo", "enp0s1"]}
+After reboot: {"result": "pass", "boot_id": "8eb9d6b6-eed7-4bc8-85dd-8a5f15ae98a1", "runtime": "39d7a11c50ebb9522ae97c4badfa2fa221c6d3c4a1fd4d459a250a241c32af25", "uid": 1000, "activity": 1, "file_persisted": true, "healthy_services": ["active", "active", "active", "active", "active", "active"], "network_interfaces": ["lo", "enp0s1"]}
+Exact owned UTM application exit verified
+UTM guest started; check readiness through its console or guest agent.
+Offline cold boot: {"result": "pass", "boot_id": "fd78a338-fe7c-419f-a7c8-1238afd6bee9", "runtime": "39d7a11c50ebb9522ae97c4badfa2fa221c6d3c4a1fd4d459a250a241c32af25", "uid": 1000, "activity": 1, "file_persisted": true, "healthy_services": ["active", "active", "active", "active", "active", "active"], "network_interfaces": ["lo"]}
+Offline browser handoff: {"result": "pass", "checks": ["system HTTP/HTTPS handler", "actual native Link action", "GIO launch with isolated profile", "real Firefox local page retrieval and title", "conventional shared identity", "durable focus/maximize", "browser disconnect"], "not_tested": ["physical input", "remote website compatibility", "hardware acceleration", "mailto account/client"], "firefox_debian_version": "153.4.0esr-1~deb13u1", "installed_executables": true, "cleanup_verified": true}
+PASS: offline cold-boot image reader commands and rescue VT work without network or models
+Offline launcher actual request announcements: 10 raw SHA-256: d5235dfb5705f819d956f569aa2237e8c15e6fc83987856ef972f188ec95f215
+PASS: offline installed Status selection, lease, clipboard and single actual announcement; all four validation controls and Result/Error speech
+PASS: offline image display zoom, keyboard and session-owned reader work without network or models
+Activation failure and resume: {"result": "pass", "checks": ["real activation failure retains setup journal", "TTY 2 rescue remains active", "resume preserves account UID and password", "ready only after healthy activation", "all six services recover without models or network"]}
+Exact owned UTM application exit verified
+Exact owned UTM application exit verified
+Development disk/config/EFI restored; qualification VM stopped
+Original development disk/EFI identities and configuration restored; owned UTM app closed
+Verified signed image and VM configuration: outputs/vm-foundation/runtime/release-artifacts/candidate-v23.utm

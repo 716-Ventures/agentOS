@@ -1,0 +1,457 @@
+No development seed or additional disk attached: [{'name': 'vda', 'type': 'disk', 'label': None, 'children': [{'name': 'vda1', 'type': 'part', 'label': None}, {'name': 'vda15', 'type': 'part', 'label': None}]}]
+active
+active
+active
+active
+active
+active
+{
+  "release": {
+    "name": "agentOS",
+    "version": "0.7.0-dev",
+    "milestone": "Experimental native desktop",
+    "runtime_release": "39d7a11c50ebb9522ae97c4badfa2fa221c6d3c4a1fd4d459a250a241c32af25",
+    "agent_runtime": "Gateway agent with general execution and filesystem broker; Jev typed effect advisory",
+    "voice": "Offline English recognition and reviewed microphone input"
+  },
+  "kernel": "6.12.107+deb13-arm64",
+  "architecture": "aarch64",
+  "pid1": "systemd",
+  "boot_id": "b344cd4e-a3f1-454e-8ed9-2202a65ecc00",
+  "recorded_boots": 1,
+  "foundation_service": "active",
+  "root_mount": "/dev/vda1 ext4 rw,relatime,discard,errors=remount-ro",
+  "network": [
+    {
+      "ifindex": 1,
+      "ifname": "lo",
+      "flags": [
+        "LOOPBACK",
+        "UP",
+        "LOWER_UP"
+      ],
+      "mtu": 65536,
+      "qdisc": "noqueue",
+      "operstate": "UNKNOWN",
+      "group": "default",
+      "txqlen": 1000,
+      "link_type": "loopback",
+      "address": "00:00:00:00:00:00",
+      "broadcast": "00:00:00:00:00:00",
+      "addr_info": [
+        {
+          "family": "inet",
+          "local": "127.0.0.1",
+          "prefixlen": 8,
+          "scope": "host",
+          "label": "lo",
+          "valid_life_time": 4294967295,
+          "preferred_life_time": 4294967295
+        },
+        {
+          "family": "inet6",
+          "local": "::1",
+          "prefixlen": 128,
+          "scope": "host",
+          "noprefixroute": true,
+          "valid_life_time": 4294967295,
+          "preferred_life_time": 4294967295
+        }
+      ]
+    },
+    {
+      "ifindex": 2,
+      "ifname": "enp0s1",
+      "flags": [
+        "BROADCAST",
+        "MULTICAST",
+        "UP",
+        "LOWER_UP"
+      ],
+      "mtu": 1500,
+      "qdisc": "fq_codel",
+      "operstate": "UP",
+      "group": "default",
+      "txqlen": 1000,
+      "link_type": "ether",
+      "address": "02:8a:3d:88:93:79",
+      "broadcast": "ff:ff:ff:ff:ff:ff",
+      "altnames": [
+        "enx028a3d889379"
+      ],
+      "addr_info": [
+        {
+          "family": "inet",
+          "local": "10.0.2.15",
+          "prefixlen": 24,
+          "metric": 1024,
+          "broadcast": "10.0.2.255",
+          "scope": "global",
+          "dynamic": true,
+          "label": "enp0s1",
+          "valid_life_time": 86394,
+          "preferred_life_time": 86394
+        },
+        {
+          "family": "inet6",
+          "local": "fec0::8a:3dff:fe88:9379",
+          "prefixlen": 64,
+          "scope": "site",
+          "dynamic": true,
+          "mngtmpaddr": true,
+          "noprefixroute": true,
+          "valid_life_time": 86397,
+          "preferred_life_time": 14397
+        },
+        {
+          "family": "inet6",
+          "local": "fe80::8a:3dff:fe88:9379",
+          "prefixlen": 64,
+          "scope": "link",
+          "protocol": "kernel_ll",
+          "valid_life_time": 4294967295,
+          "preferred_life_time": 4294967295
+        }
+      ]
+    }
+  ]
+}
+Verified and staged: a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c
+Activate with: sudo agent-os-update --activate a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c
+Installed and healthy: a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c
+Installed and healthy: 39d7a11c50ebb9522ae97c4badfa2fa221c6d3c4a1fd4d459a250a241c32af25
+Installed and healthy: 39d7a11c50ebb9522ae97c4badfa2fa221c6d3c4a1fd4d459a250a241c32af25
+Saved activity identity: 1
+Activity persisted through signed activation and rollback
+Input fixture device: event5 ['ID_INPUT=1', 'ID_INPUT_MOUSE=1']
+Input fixture device: event4 ['ID_INPUT=1', 'ID_INPUT_KEY=1', 'ID_INPUT_KEYBOARD=1']
+PASS: kernel Ctrl+Alt+Space opens temporary launcher; Escape and Ctrl+Alt+Delete close it, preserving work and restoring typing
+PASS: two kernel keyboards retain merged Shift and reject OSK input after partial release/removal; last release/removal restores lowercase, balanced keys and focus
+PASS: kernel on-screen keyboard shortcut/pointer typing, Shift/edit, held physical key isolation, focus retention and work-area restoration
+PASS: kernel display zoom changes logical geometry, scaled pointer typing, wheel access to modifier/edit keys and keyboard dismissal work; zoom-out and exact reset preserve focus and workspace
+
+Session terminated, killing shell... ...killed.
+PASS: direct kernel/libinput keyboard, absolute pointer, GTK clipboard, grouped undo/redo, retained draft and deliberate Save
+PASS: direct kernel workspace resize, move, maximize, restore and presentation undo preserve saved document
+PASS: direct kernel titlebar drag, focus cycling, VT shortcut/resume and close-view; native assistive undo restores exact saved document
+PASS: real Wayland primary middle-paste and COPY drag/drop; Unicode handoff, grouped undo and oversized rejection preserve saved document
+Started agentos-display-test-e2fb9e19433c467d8b4dd7606358bd04.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 2.
+pam_unix(login:session): session opened for user verifier(uid=1000) by verifier(uid=0)
+agentos-display-test-e2fb9e19433c467d8b4dd7606358bd04.service: Deactivated successfully.
+
+{"result": "pass", "fresh_profile_qualified": false, "binary_directory": "/usr/local/bin", "outputs": [{"height": 800, "name": "Virtual-1", "scale": 1.0, "transform": "Normal", "width": 1280, "x": 0, "y": 0}], "metrics": [{"format": 1, "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence", "pid": 1335, "sample_limit_per_stage": 256, "stages": {"compositor.direct_render_attempt": {"discarded": 0, "max_recent_ms": 1.716029, "mean_all_ms": 0.44337888495276667, "p50_recent_ms": 0.22451400000000002, "p95_recent_ms": 0.34869300000000003, "retained": 256, "samples_total": 2964}}}], "native_feedback": [], "frames_before_vt": 31, "frames_after_vt": 32, "checks": ["private native system bar", "KMS output discovery", "shared core connection", "VT switch and resume", "orderly shutdown", "session directory cleanup", "owned login scope cleanup", "session-local display zoom and exact reset", "scaled kernel pointer typing and keyboard dismissal", "scaled kernel wheel access to modifier and editing keys", "trusted on-screen keyboard pointer typing and editing", "physical held-key isolation and balanced virtual chords", "keyboard seat focus retention and workspace restoration", "kernel keyboard and absolute pointer", "clipboard copy/paste", "undo/redo", "retained draft", "deliberate pointer Save", "kernel workspace move/resize/maximize/restore/undo", "native titlebar drag with durable placement", "kernel focus cycling", "kernel VT shortcut and acknowledged resume", "kernel close and native assistive undo", "focused primary middle-paste across Wayland clients", "Unicode COPY drag/drop and grouped undo", "oversized drop rejection", "drag icon rendering and release cleanup"], "screen_keyboard_input_qualified": true, "multiple_keyboard_input_qualified": true, "forced_session_stop_qualified": false, "screen_reader_input_qualified": false, "table_input_qualified": false, "collection_input_qualified": null, "terminal_input_qualified": false, "terminal_ime_qualified": false, "presentation_feedback_qualified": false, "multi_output_qualified": false, "virtual_shell_hotplug_qualified": false, "virtual_explicit_output_restoration_qualified": false, "virtual_output_hotplug_qualified": false, "virtual_primary_output_hotplug_qualified": false, "virtual_all_outputs_removed_qualified": false, "native_feedback_qualified": false, "native_feedback_load_qualified": false, "output_transform_qualified": null, "focus_transfer_cycles": 1, "not_tested": ["physical input", "physical connector hotplug", "physical GPU presentation"]}
+Input fixture device: event5 ['ID_INPUT=1', 'ID_INPUT_MOUSE=1']
+Input fixture device: event4 ['ID_INPUT=1', 'ID_INPUT_KEY=1', 'ID_INPUT_KEYBOARD=1']
+PASS: kernel Ctrl+Alt+Space opens temporary launcher; Escape and Ctrl+Alt+Delete close it, preserving work and restoring typing
+PASS: two kernel keyboards retain merged Shift and reject OSK input after partial release/removal; last release/removal restores lowercase, balanced keys and focus
+PASS: kernel on-screen keyboard shortcut/pointer typing, Shift/edit, held physical key isolation, focus retention and work-area restoration
+PASS: kernel display zoom changes logical geometry, scaled pointer typing, wheel access to modifier/edit keys and keyboard dismissal work; zoom-out and exact reset preserve focus and workspace
+
+Session terminated, killing shell... ...killed.
+PASS: direct kernel/libinput keyboard, absolute pointer, GTK clipboard, grouped undo/redo, retained draft and deliberate Save
+PASS: direct kernel workspace resize, move, maximize, restore and presentation undo preserve saved document
+PASS: direct kernel titlebar drag, focus cycling, VT shortcut/resume and close-view; native assistive undo restores exact saved document
+PASS: real Wayland primary middle-paste and COPY drag/drop; Unicode handoff, grouped undo and oversized rejection preserve saved document
+Started agentos-display-test-fa67acbd9b0844d19ed76080cf354bb1.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 3.
+pam_unix(login:session): session opened for user verifier(uid=1000) by verifier(uid=0)
+agentos-display-test-fa67acbd9b0844d19ed76080cf354bb1.service: Deactivated successfully.
+
+{"result": "pass", "fresh_profile_qualified": true, "binary_directory": "/usr/local/bin", "outputs": [{"height": 800, "name": "Virtual-1", "scale": 1.0, "transform": "Normal", "width": 1280, "x": 0, "y": 0}], "metrics": [{"format": 1, "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence", "pid": 5099, "sample_limit_per_stage": 256, "stages": {"compositor.direct_render_attempt": {"discarded": 0, "max_recent_ms": 0.48108500000000004, "mean_all_ms": 0.4392031827550674, "p50_recent_ms": 0.23808400000000002, "p95_recent_ms": 0.34270999999999996, "retained": 256, "samples_total": 2911}}}], "native_feedback": [], "frames_before_vt": 20, "frames_after_vt": 21, "checks": ["private native system bar", "KMS output discovery", "shared core connection", "VT switch and resume", "orderly shutdown", "session directory cleanup", "owned login scope cleanup", "session-local display zoom and exact reset", "scaled kernel pointer typing and keyboard dismissal", "scaled kernel wheel access to modifier and editing keys", "trusted on-screen keyboard pointer typing and editing", "physical held-key isolation and balanced virtual chords", "keyboard seat focus retention and workspace restoration", "kernel keyboard and absolute pointer", "clipboard copy/paste", "undo/redo", "retained draft", "deliberate pointer Save", "kernel workspace move/resize/maximize/restore/undo", "native titlebar drag with durable placement", "kernel focus cycling", "kernel VT shortcut and acknowledged resume", "kernel close and native assistive undo", "focused primary middle-paste across Wayland clients", "Unicode COPY drag/drop and grouped undo", "oversized drop rejection", "drag icon rendering and release cleanup"], "screen_keyboard_input_qualified": true, "multiple_keyboard_input_qualified": true, "forced_session_stop_qualified": false, "screen_reader_input_qualified": false, "table_input_qualified": false, "collection_input_qualified": null, "terminal_input_qualified": false, "terminal_ime_qualified": false, "presentation_feedback_qualified": false, "multi_output_qualified": false, "virtual_shell_hotplug_qualified": false, "virtual_explicit_output_restoration_qualified": false, "virtual_output_hotplug_qualified": false, "virtual_primary_output_hotplug_qualified": false, "virtual_all_outputs_removed_qualified": false, "native_feedback_qualified": false, "native_feedback_load_qualified": false, "output_transform_qualified": null, "focus_transfer_cycles": 1, "not_tested": ["physical input", "physical connector hotplug", "physical GPU presentation"]}
+Started session-15.scope - Session 15 of User verifier.
+[2m2026-10-12T09:47:56.314162Z[0m [32m INFO[0m [1minput_seat[0m[1m{[0m[3mname[0m[2m=[0m"winit"[1m}[0m[2m:[0m[1madd_keyboard[0m[1m{[0m[3mxkb_config[0m[2m=[0mXkbConfig { rules: "", model: "", layout: "", variant: "", options: None } [3mrepeat_delay[0m[2m=[0m200 [3mrepeat_rate[0m[2m=[0m25[1m}[0m[2m:[0m[1minput_keyboard[0m[2m:[0m [2msmithay::input::keyboard[0m[2m:[0m Initializing a xkbcommon handler with keymap query
+[2m2026-10-12T09:47:56.315820Z[0m [32m INFO[0m [1minput_seat[0m[1m{[0m[3mname[0m[2m=[0m"winit"[1m}[0m[2m:[0m[1madd_keyboard[0m[1m{[0m[3mxkb_config[0m[2m=[0mXkbConfig { rules: "", model: "", layout: "", variant: "", options: None } [3mrepeat_delay[0m[2m=[0m200 [3mrepeat_rate[0m[2m=[0m25[1m}[0m[2m:[0m[1minput_keyboard[0m[2m:[0m [2msmithay::input::keyboard[0m[2m:[0m Loaded Keymap [3mname[0m[2m=[0m"English (US)"
+[2m2026-10-12T09:47:56.316329Z[0m [32m INFO[0m [2msmithay::wayland::socket[0m[2m:[0m Created new socket [3mname[0m[2m=[0mSome("wayland-1")
+[2m2026-10-12T09:47:56.319617Z[0m [33m WARN[0m [2msmithay::backend::drm::device::fd[0m[2m:[0m Unable to become drm master, assuming unprivileged mode
+[2m2026-10-12T09:47:56.319632Z[0m [32m INFO[0m [2msmithay::backend::drm::device[0m[2m:[0m DrmDevice initializing
+[2m2026-10-12T09:47:56.339039Z[0m [32m INFO[0m [2msmithay::backend::egl::display[0m[2m:[0m Successfully selected EGL platform: PLATFORM_GBM_KHR
+[2m2026-10-12T09:47:56.339403Z[0m [32m INFO[0m [2msmithay::backend::egl::display[0m[2m:[0m EGL Initialized
+[2m2026-10-12T09:47:56.339411Z[0m [32m INFO[0m [2msmithay::backend::egl::display[0m[2m:[0m EGL Version: (1, 5)
+[2m2026-10-12T09:47:56.339417Z[0m [32m INFO[0m [2msmithay::backend::egl::display[0m[2m:[0m Supported EGL display extensions: ["EGL_ANDROID_blob_cache", "EGL_ANDROID_native_fence_sync", "EGL_EXT_buffer_age", "EGL_EXT_config_select_group", "EGL_EXT_image_dma_buf_import", "EGL_EXT_image_dma_buf_import_modifiers", "EGL_EXT_surface_compression", "EGL_KHR_cl_event2", "EGL_KHR_config_attribs", "EGL_KHR_context_flush_control", "EGL_KHR_create_context", "EGL_KHR_create_context_no_error", "EGL_KHR_fence_sync", "EGL_KHR_get_all_proc_addresses", "EGL_KHR_gl_colorspace", "EGL_KHR_gl_renderbuffer_image", "EGL_KHR_gl_texture_2D_image", "EGL_KHR_gl_texture_3D_image", "EGL_KHR_gl_texture_cubemap_image", "EGL_KHR_image", "EGL_KHR_image_base", "EGL_KHR_image_pixmap", "EGL_KHR_no_config_context", "EGL_KHR_reusable_sync", "EGL_KHR_surfaceless_context", "EGL_EXT_pixel_format_float", "EGL_KHR_wait_sync", "EGL_MESA_configless_context", "EGL_MESA_drm_image", "EGL_MESA_gl_interop", "EGL_MESA_image_dma_buf_export", "EGL_MESA_query_driver", "EGL_MESA_x11_native_visual_id", "EGL_WL_bind_wayland_display", ""]
+[2m2026-10-12T09:47:56.340027Z[0m [32m INFO[0m [1megl[0m[1m{[0m[3mnative[0m[2m=[0m"/dev/dri/card0" [3mplatform[0m[2m=[0m"PLATFORM_GBM_KHR" [3mversion[0m[2m=[0m(1, 5)[1m}[0m[2m:[0m[1megl_context[0m[1m{[0m[3mptr[0m[2m=[0m187651713978912[1m}[0m[2m:[0m [2msmithay::backend::egl::context[0m[2m:[0m EGL context created [3mpriority[0m[2m=[0mNone
+[2m2026-10-12T09:47:56.340691Z[0m [32m INFO[0m [1megl[0m[1m{[0m[3mnative[0m[2m=[0m"/dev/dri/card0" [3mplatform[0m[2m=[0m"PLATFORM_GBM_KHR" [3mversion[0m[2m=[0m(1, 5)[1m}[0m[2m:[0m[1megl_context[0m[1m{[0m[3mptr[0m[2m=[0m187651713978912[1m}[0m[2m:[0m[1mrenderer_gles2[0m[2m:[0m [2msmithay::backend::renderer::gles[0m[2m:[0m Initializing OpenGL ES Renderer
+[2m2026-10-12T09:47:56.340699Z[0m [32m INFO[0m [1megl[0m[1m{[0m[3mnative[0m[2m=[0m"/dev/dri/card0" [3mplatform[0m[2m=[0m"PLATFORM_GBM_KHR" [3mversion[0m[2m=[0m(1, 5)[1m}[0m[2m:[0m[1megl_context[0m[1m{[0m[3mptr[0m[2m=[0m187651713978912[1m}[0m[2m:[0m[1mrenderer_gles2[0m[2m:[0m [2msmithay::backend::renderer::gles[0m[2m:[0m GL Version: "OpenGL ES 3.0 Mesa 25.0.7-2+deb13u1"
+[2m2026-10-12T09:47:56.340702Z[0m [32m INFO[0m [1megl[0m[1m{[0m[3mnative[0m[2m=[0m"/dev/dri/card0" [3mplatform[0m[2m=[0m"PLATFORM_GBM_KHR" [3mversion[0m[2m=[0m(1, 5)[1m}[0m[2m:[0m[1megl_context[0m[1m{[0m[3mptr[0m[2m=[0m187651713978912[1m}[0m[2m:[0m[1mrenderer_gles2[0m[2m:[0m [2msmithay::backend::renderer::gles[0m[2m:[0m GL Vendor: "Mesa"
+[2m2026-10-12T09:47:56.340704Z[0m [32m INFO[0m [1megl[0m[1m{[0m[3mnative[0m[2m=[0m"/dev/dri/card0" [3mplatform[0m[2m=[0m"PLATFORM_GBM_KHR" [3mversion[0m[2m=[0m(1, 5)[1m}[0m[2m:[0m[1megl_context[0m[1m{[0m[3mptr[0m[2m=[0m187651713978912[1m}[0m[2m:[0m[1mrenderer_gles2[0m[2m:[0m [2msmithay::backend::renderer::gles[0m[2m:[0m GL Renderer: "virgl (ANGLE (Apple, Apple M2 Ultra, OpenGL 4.1 Metal - 91.7))"
+[2m2026-10-12T09:47:56.340706Z[0m [32m INFO[0m [1megl[0m[1m{[0m[3mnative[0m[2m=[0m"/dev/dri/card0" [3mplatform[0m[2m=[0m"PLATFORM_GBM_KHR" [3mversion[0m[2m=[0m(1, 5)[1m}[0m[2m:[0m[1megl_context[0m[1m{[0m[3mptr[0m[2m=[0m187651713978912[1m}[0m[2m:[0m[1mrenderer_gles2[0m[2m:[0m [2msmithay::backend::renderer::gles[0m[2m:[0m Supported GL Extensions: ["GL_EXT_blend_minmax", "GL_EXT_multi_draw_arrays", "GL_EXT_texture_filter_anisotropic", "GL_EXT_texture_compression_s3tc", "GL_EXT_texture_compression_dxt1", "GL_EXT_texture_compression_rgtc", "GL_EXT_texture_format_BGRA8888", "GL_OES_compressed_ETC1_RGB8_texture", "GL_OES_depth24", "GL_OES_element_index_uint", "GL_OES_fbo_render_mipmap", "GL_OES_mapbuffer", "GL_OES_rgb8_rgba8", "GL_OES_standard_derivatives", "GL_OES_stencil8", "GL_OES_texture_3D", "GL_OES_texture_float", "GL_OES_texture_float_linear", "GL_OES_texture_half_float", "GL_OES_texture_half_float_linear", "GL_OES_texture_npot", "GL_OES_vertex_half_float", "GL_EXT_draw_instanced", "GL_EXT_texture_sRGB_decode", "GL_OES_EGL_image", "GL_OES_depth_texture", "GL_OES_packed_depth_stencil", "GL_EXT_texture_type_2_10_10_10_REV", "GL_OES_get_program_binary", "GL_APPLE_texture_max_level", "GL_EXT_discard_framebuffer", "GL_EXT_read_format_bgra", "GL_EXT_texture_storage", "GL_NV_pack_subimage", "GL_EXT_frag_depth", "GL_NV_fbo_color_attachments", "GL_OES_EGL_image_external", "GL_OES_EGL_sync", "GL_OES_vertex_array_object", "GL_ANGLE_pack_reverse_row_order", "GL_ANGLE_texture_compression_dxt3", "GL_ANGLE_texture_compression_dxt5", "GL_EXT_occlusion_query_boolean", "GL_EXT_texture_rg", "GL_EXT_unpack_subimage", "GL_NV_draw_buffers", "GL_NV_read_buffer", "GL_NV_read_depth", "GL_NV_read_depth_stencil", "GL_NV_read_stencil", "GL_APPLE_sync", "GL_EXT_draw_buffers", "GL_EXT_instanced_arrays", "GL_EXT_map_buffer_range", "GL_EXT_shadow_samplers", "GL_KHR_debug", "GL_KHR_texture_compression_astc_ldr", "GL_NV_generate_mipmap_sRGB", "GL_NV_pixel_buffer_object", "GL_OES_depth_texture_cube_map", "GL_OES_required_internalformat", "GL_OES_surfaceless_context", "GL_EXT_color_buffer_float", "GL_EXT_debug_label", "GL_EXT_sRGB_write_control", "GL_EXT_separate_shader_objects", "GL_EXT_shader_integer_mix", "GL_EXT_base_instance", "GL_EXT_compressed_ETC1_RGB8_sub_texture", "GL_EXT_draw_buffers_indexed", "GL_EXT_draw_elements_base_vertex", "GL_EXT_render_snorm", "GL_EXT_texture_border_clamp", "GL_KHR_context_flush_control", "GL_OES_draw_buffers_indexed", "GL_OES_draw_elements_base_vertex", "GL_OES_texture_border_clamp", "GL_EXT_blend_func_extended", "GL_EXT_float_blend", "GL_KHR_no_error", "GL_KHR_texture_compression_astc_sliced_3d", "GL_OES_EGL_image_external_essl3", "GL_EXT_conservative_depth", "GL_EXT_disjoint_timer_query", "GL_EXT_texture_compression_s3tc_srgb", "GL_MESA_shader_integer_functions", "GL_EXT_color_buffer_half_float", "GL_EXT_texture_compression_bptc", "GL_KHR_parallel_shader_compile", "GL_EXT_EGL_image_storage", "GL_MESA_framebuffer_flip_y", "GL_EXT_depth_clamp", "GL_MESA_sampler_objects", "GL_EXT_EGL_image_storage_compression", "GL_EXT_texture_storage_compression", "GL_MESA_bgra", ""]
+[2m2026-10-12T09:47:56.345429Z[0m [32m INFO[0m [1mdrm_atomic[0m[2m:[0m[1mcreate_surface[0m[1m{[0m[3mcrtc[0m[2m=[0mcrtc::Handle(36) [3mmode[0m[2m=[0mMode { name: "1280x800", clock: 107300, size: (1280, 800), hsync: (1600, 1638, 1728), vsync: (804, 808, 828), hskew: 0, vscan: 0, vrefresh: 75, mode_type: ModeTypeFlags(PREFERRED | DRIVER) } [3mconnectors[0m[2m=[0m[connector::Handle(37)][1m}[0m[2m:[0m[1mdrm_atomic[0m[1m{[0m[3mcrtc[0m[2m=[0mcrtc::Handle(36)[1m}[0m[2m:[0m [2msmithay::backend::drm::surface::atomic[0m[2m:[0m Initializing drm surface (crtc::Handle(36):plane::Handle(32)) with mode Mode { name: "1280x800", clock: 107300, size: (1280, 800), hsync: (1600, 1638, 1728), vsync: (804, 808, 828), hskew: 0, vscan: 0, vrefresh: 75, mode_type: ModeTypeFlags(PREFERRED | DRIVER) } and connectors [connector::Handle(37)]
+[2m2026-10-12T09:47:56.346817Z[0m [32m INFO[0m [1mnew[0m[1m{[0m[3mname[0m[2m=[0m"Virtual-1" [3mphysical[0m[2m=[0mPhysicalProperties { size: Size<smithay::utils::geometry::Raw> { w: 320, h: 200 }, subpixel: Unknown, make: "DRM", model: "Virtual" }[1m}[0m[2m:[0m [2msmithay::output[0m[2m:[0m Creating new Output [3mname[0m[2m=[0m"Virtual-1"
+[2m2026-10-12T09:47:56.346877Z[0m [32m INFO[0m [2msmithay::wayland::output[0m[2m:[0m Creating new wl_output [3moutput[0m[2m=[0m"Virtual-1"
+[2m2026-10-12T09:47:56.680536Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Initializing a libinput backend
+{"control_socket":"/run/user/1000/agentos-session-sxv2aao5/agentos-compositor-9040.sock","wayland_display":"wayland-1"}
+[2m2026-10-12T09:47:56.687333Z[0m [32m INFO[0m [2msmithay::backend::drm::surface::atomic[0m[2m:[0m Adding connector: Virtual
+[2m2026-10-12T09:47:56.699874Z[0m [32m INFO[0m [2msmithay::backend::drm::surface::atomic[0m[2m:[0m Setting new mode: "1280x800"
+[2m2026-10-12T09:47:56.699953Z[0m [33m WARN[0m [2msmithay::backend::drm::surface::atomic[0m[2m:[0m Failed to destroy old mode property blob: No such file or directory (os error 2)
+dbus-daemon[9038]: [session uid=1000 pid=9038 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=9060 comm="/usr/local/bin/agent-os-desktop --socket /run/agen")
+dbus-daemon[9038]: [session uid=1000 pid=9038 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[9080]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=9060 comm="/usr/local/bin/agent-os-desktop --socket /run/agen")
+dbus-daemon[9080]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+[2m2026-10-12T09:47:56.938246Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event0"
+[2m2026-10-12T09:47:56.938271Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event1"
+[2m2026-10-12T09:47:56.938273Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event2"
+[2m2026-10-12T09:47:56.938275Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event3"
+[2m2026-10-12T09:47:56.938276Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event0"
+[2m2026-10-12T09:47:56.938299Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event2"
+[2m2026-10-12T09:47:56.938330Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event3"
+[2m2026-10-12T09:47:56.972968Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event1"
+Direct output Virtual-1 frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Permission denied (os error 13))
+dbus-daemon[9038]:
+dbus-daemon[9080]:
+[session uid=1000 pid=9038 pidfd=5] Reloaded configuration
+Reloaded configuration
+
+Started agentos-display-test-a6481ea575a944758e26590ba7ad9c84.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct.
+pam_unix(login:session): session opened for user verifier(uid=1000) by verifier(uid=0)
+Stopping agentos-display-test-a6481ea575a944758e26590ba7ad9c84.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct...
+agentos-display-test-a6481ea575a944758e26590ba7ad9c84.service: Deactivated successfully.
+Stopped agentos-display-test-a6481ea575a944758e26590ba7ad9c84.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct.
+
+{"result": "pass", "fresh_profile_qualified": false, "binary_directory": "/usr/local/bin", "outputs": [{"height": 800, "name": "Virtual-1", "scale": 1.0, "transform": "Normal", "width": 1280, "x": 0, "y": 0}], "metrics": [{"format": 1, "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence", "pid": 9040, "sample_limit_per_stage": 256, "stages": {"compositor.direct_render_attempt": {"discarded": 0, "max_recent_ms": 26.559528999999998, "mean_all_ms": 0.7563300975609754, "p50_recent_ms": 0.000583, "p95_recent_ms": 1.307418, "retained": 41, "samples_total": 41}}}], "native_feedback": [], "frames_before_vt": 9, "frames_after_vt": 10, "checks": ["private native system bar", "KMS output discovery", "shared core connection", "VT switch and resume", "forced systemd stop", "session directory cleanup", "owned login scope cleanup"], "screen_keyboard_input_qualified": false, "multiple_keyboard_input_qualified": false, "forced_session_stop_qualified": true, "screen_reader_input_qualified": false, "table_input_qualified": false, "collection_input_qualified": null, "terminal_input_qualified": false, "terminal_ime_qualified": false, "presentation_feedback_qualified": false, "multi_output_qualified": false, "virtual_shell_hotplug_qualified": false, "virtual_explicit_output_restoration_qualified": false, "virtual_output_hotplug_qualified": false, "virtual_primary_output_hotplug_qualified": false, "virtual_all_outputs_removed_qualified": false, "native_feedback_qualified": false, "native_feedback_load_qualified": false, "output_transform_qualified": null, "focus_transfer_cycles": null, "not_tested": ["physical input", "physical connector hotplug", "physical GPU presentation"]}
+Input fixture device: event5 ['ID_INPUT=1', 'ID_INPUT_MOUSE=1']
+Input fixture device: event4 ['ID_INPUT=1', 'ID_INPUT_KEY=1', 'ID_INPUT_KEYBOARD=1']
+CHECK: collection placement {"expected": {"x": 0, "y": 60, "width": 900, "height": 400}, "observed": [{"geometry": {"height": 600, "width": 720, "x": 280, "y": 130}, "xdg": {"acked_activated": false, "acked_serial": 16, "acked_size": [720, 600], "client_geometry": {"height": 600, "width": 720, "x": 14, "y": 12}, "client_max_size": [0, 0], "client_min_size": [152, 174], "committed_activated": false, "committed_serial": 16, "committed_size": [720, 600], "configured": true, "pending_configures": [], "pending_count": 0, "server_pending_activated": false, "server_pending_size": [720, 600]}, "work_areas": [{"height": 740, "width": 1280, "x": 0, "y": 60}]}, {"geometry": {"height": 600, "width": 720, "x": 0, "y": 60}, "xdg": {"acked_activated": false, "acked_serial": 16, "acked_size": [720, 600], "client_geometry": {"height": 600, "width": 720, "x": 14, "y": 12}, "client_max_size": [0, 0], "client_min_size": [152, 174], "committed_activated": false, "committed_serial": 16, "committed_size": [720, 600], "configured": true, "pending_configures": [{"serial": 17, "size": [900, 400]}], "pending_count": 1, "server_pending_activated": false, "server_pending_size": [900, 400]}, "work_areas": [{"height": 740, "width": 1280, "x": 0, "y": 60}]}, {"geometry": {"height": 400, "width": 900, "x": 0, "y": 60}, "xdg": {"acked_activated": false, "acked_serial": 17, "acked_size": [900, 400], "client_geometry": {"height": 400, "width": 900, "x": 14, "y": 12}, "client_max_size": [0, 0], "client_min_size": [152, 174], "committed_activated": false, "committed_serial": 17, "committed_size": [900, 400], "configured": true, "pending_configures": [], "pending_count": 0, "server_pending_activated": false, "server_pending_size": [900, 400]}, "work_areas": [{"height": 740, "width": 1280, "x": 0, "y": 60}]}]}
+CHECK: collection placement {"expected": {"x": 980, "y": 60, "width": 300, "height": 400}, "observed": [{"geometry": {"height": 600, "width": 720, "x": 280, "y": 130}, "xdg": {"acked_activated": false, "acked_serial": 20, "acked_size": [720, 600], "client_geometry": {"height": 600, "width": 720, "x": 14, "y": 12}, "client_max_size": [0, 0], "client_min_size": [280, 215], "committed_activated": false, "committed_serial": 20, "committed_size": [720, 600], "configured": true, "pending_configures": [], "pending_count": 0, "server_pending_activated": false, "server_pending_size": [720, 600]}, "work_areas": [{"height": 740, "width": 1280, "x": 0, "y": 60}]}, {"geometry": {"height": 400, "width": 300, "x": 980, "y": 60}, "xdg": {"acked_activated": false, "acked_serial": 21, "acked_size": [300, 400], "client_geometry": {"height": 400, "width": 300, "x": 14, "y": 12}, "client_max_size": [0, 0], "client_min_size": [280, 215], "committed_activated": false, "committed_serial": 21, "committed_size": [300, 400], "configured": true, "pending_configures": [], "pending_count": 0, "server_pending_activated": false, "server_pending_size": [300, 400]}, "work_areas": [{"height": 740, "width": 1280, "x": 0, "y": 60}]}]}
+
+Session terminated, killing shell... ...killed.
+PASS: installed Table@1 acknowledged activation/deactivation without geometry changes, kernel pointer/keyboard selection, Ctrl+C, Shift+F10/secondary menu, exact separate-client Unicode clipboard, focused refresh rejection, key-preserved reorder/update after focus release, empty-selection Copy rejection, row removal and focus restoration
+Started agentos-display-test-401a3bbd3cab48279222595de45611a1.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 4.
+pam_unix(login:session): session opened for user verifier(uid=1000) by verifier(uid=0)
+agentos-display-test-401a3bbd3cab48279222595de45611a1.service: Deactivated successfully.
+
+{"result": "pass", "fresh_profile_qualified": false, "binary_directory": "/usr/local/bin", "outputs": [{"height": 800, "name": "Virtual-1", "scale": 1.0, "transform": "Normal", "width": 1280, "x": 0, "y": 0}], "metrics": [{"format": 1, "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence", "pid": 9337, "sample_limit_per_stage": 256, "stages": {"compositor.direct_render_attempt": {"discarded": 0, "max_recent_ms": 0.9213749999999999, "mean_all_ms": 0.39085885691446814, "p50_recent_ms": 0.26225, "p95_recent_ms": 0.4075, "retained": 256, "samples_total": 1251}}}], "native_feedback": [], "frames_before_vt": 9, "frames_after_vt": 16, "checks": ["private native system bar", "KMS output discovery", "shared core connection", "VT switch and resume", "orderly shutdown", "session directory cleanup", "owned login scope cleanup", "kernel Table@1 pointer and keyboard row selection", "Ctrl+C and accessible Shift+F10/secondary clipboard menus", "separate-client exact Unicode row text", "focused refresh rejection and key-based selection across background reorder/update", "empty-selection Copy rejection, row removal and local menu focus restoration"], "screen_keyboard_input_qualified": false, "multiple_keyboard_input_qualified": false, "forced_session_stop_qualified": false, "screen_reader_input_qualified": false, "table_input_qualified": true, "collection_input_qualified": "Table@1", "terminal_input_qualified": false, "terminal_ime_qualified": false, "presentation_feedback_qualified": false, "multi_output_qualified": false, "virtual_shell_hotplug_qualified": false, "virtual_explicit_output_restoration_qualified": false, "virtual_output_hotplug_qualified": false, "virtual_primary_output_hotplug_qualified": false, "virtual_all_outputs_removed_qualified": false, "native_feedback_qualified": false, "native_feedback_load_qualified": false, "output_transform_qualified": null, "focus_transfer_cycles": null, "not_tested": ["physical input", "physical connector hotplug", "physical GPU presentation"]}
+Input fixture device: event5 ['ID_INPUT=1', 'ID_INPUT_MOUSE=1']
+Input fixture device: event4 ['ID_INPUT=1', 'ID_INPUT_KEY=1', 'ID_INPUT_KEYBOARD=1']
+CHECK: collection placement {"expected": {"x": 0, "y": 60, "width": 900, "height": 400}, "observed": [{"geometry": {"height": 600, "width": 720, "x": 280, "y": 130}, "xdg": {"acked_activated": false, "acked_serial": 16, "acked_size": [720, 600], "client_geometry": {"height": 600, "width": 720, "x": 14, "y": 12}, "client_max_size": [0, 0], "client_min_size": [152, 174], "committed_activated": false, "committed_serial": 16, "committed_size": [720, 600], "configured": true, "pending_configures": [], "pending_count": 0, "server_pending_activated": false, "server_pending_size": [720, 600]}, "work_areas": [{"height": 740, "width": 1280, "x": 0, "y": 60}]}, {"geometry": {"height": 400, "width": 900, "x": 0, "y": 60}, "xdg": {"acked_activated": false, "acked_serial": 17, "acked_size": [900, 400], "client_geometry": {"height": 400, "width": 900, "x": 14, "y": 12}, "client_max_size": [0, 0], "client_min_size": [152, 174], "committed_activated": false, "committed_serial": 17, "committed_size": [900, 400], "configured": true, "pending_configures": [], "pending_count": 0, "server_pending_activated": false, "server_pending_size": [900, 400]}, "work_areas": [{"height": 740, "width": 1280, "x": 0, "y": 60}]}]}
+CHECK: collection placement {"expected": {"x": 980, "y": 60, "width": 300, "height": 400}, "observed": [{"geometry": {"height": 600, "width": 720, "x": 280, "y": 130}, "xdg": {"acked_activated": false, "acked_serial": 20, "acked_size": [720, 600], "client_geometry": {"height": 600, "width": 720, "x": 14, "y": 12}, "client_max_size": [0, 0], "client_min_size": [280, 215], "committed_activated": false, "committed_serial": 20, "committed_size": [720, 600], "configured": true, "pending_configures": [], "pending_count": 0, "server_pending_activated": false, "server_pending_size": [720, 600]}, "work_areas": [{"height": 740, "width": 1280, "x": 0, "y": 60}]}, {"geometry": {"height": 400, "width": 300, "x": 980, "y": 60}, "xdg": {"acked_activated": false, "acked_serial": 21, "acked_size": [300, 400], "client_geometry": {"height": 400, "width": 300, "x": 14, "y": 12}, "client_max_size": [0, 0], "client_min_size": [280, 215], "committed_activated": false, "committed_serial": 21, "committed_size": [300, 400], "configured": true, "pending_configures": [], "pending_count": 0, "server_pending_activated": false, "server_pending_size": [300, 400]}, "work_areas": [{"height": 740, "width": 1280, "x": 0, "y": 60}]}]}
+
+Session terminated, killing shell... ...killed.
+PASS: installed List@1 acknowledged activation/deactivation without geometry changes, kernel pointer/keyboard selection, Ctrl+C, Shift+F10/secondary menu, exact separate-client Unicode clipboard, focused refresh rejection, key-preserved reorder/update after focus release, empty-selection Copy rejection, row removal and focus restoration
+Started agentos-display-test-54c46cc6efa54368a1b6ac4b625a96ee.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 5.
+pam_unix(login:session): session opened for user verifier(uid=1000) by verifier(uid=0)
+agentos-display-test-54c46cc6efa54368a1b6ac4b625a96ee.service: Deactivated successfully.
+
+{"result": "pass", "fresh_profile_qualified": false, "binary_directory": "/usr/local/bin", "outputs": [{"height": 800, "name": "Virtual-1", "scale": 1.0, "transform": "Normal", "width": 1280, "x": 0, "y": 0}], "metrics": [{"format": 1, "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence", "pid": 11377, "sample_limit_per_stage": 256, "stages": {"compositor.direct_render_attempt": {"discarded": 0, "max_recent_ms": 0.957417, "mean_all_ms": 0.389288380553227, "p50_recent_ms": 0.242708, "p95_recent_ms": 0.377, "retained": 256, "samples_total": 1193}}}], "native_feedback": [], "frames_before_vt": 13, "frames_after_vt": 16, "checks": ["private native system bar", "KMS output discovery", "shared core connection", "VT switch and resume", "orderly shutdown", "session directory cleanup", "owned login scope cleanup", "kernel List@1 pointer and keyboard row selection", "Ctrl+C and accessible Shift+F10/secondary clipboard menus", "separate-client exact Unicode row text", "focused refresh rejection and key-based selection across background reorder/update", "empty-selection Copy rejection, row removal and local menu focus restoration"], "screen_keyboard_input_qualified": false, "multiple_keyboard_input_qualified": false, "forced_session_stop_qualified": false, "screen_reader_input_qualified": false, "table_input_qualified": false, "collection_input_qualified": "List@1", "terminal_input_qualified": false, "terminal_ime_qualified": false, "presentation_feedback_qualified": false, "multi_output_qualified": false, "virtual_shell_hotplug_qualified": false, "virtual_explicit_output_restoration_qualified": false, "virtual_output_hotplug_qualified": false, "virtual_primary_output_hotplug_qualified": false, "virtual_all_outputs_removed_qualified": false, "native_feedback_qualified": false, "native_feedback_load_qualified": false, "output_transform_qualified": null, "focus_transfer_cycles": null, "not_tested": ["physical input", "physical connector hotplug", "physical GPU presentation"]}
+Input fixture device: event5 ['ID_INPUT=1', 'ID_INPUT_MOUSE=1']
+Input fixture device: event4 ['ID_INPUT=1', 'ID_INPUT_KEY=1', 'ID_INPUT_KEYBOARD=1']
+CHECK: collection placement {"expected": {"x": 0, "y": 60, "width": 900, "height": 400}, "observed": [{"geometry": {"height": 400, "width": 900, "x": 0, "y": 60}, "xdg": {"acked_activated": false, "acked_serial": 17, "acked_size": [900, 400], "client_geometry": {"height": 400, "width": 900, "x": 14, "y": 12}, "client_max_size": [0, 0], "client_min_size": [152, 174], "committed_activated": false, "committed_serial": 17, "committed_size": [900, 400], "configured": true, "pending_configures": [], "pending_count": 0, "server_pending_activated": false, "server_pending_size": [900, 400]}, "work_areas": [{"height": 740, "width": 1280, "x": 0, "y": 60}]}]}
+CHECK: collection placement {"expected": {"x": 980, "y": 60, "width": 300, "height": 400}, "observed": [{"geometry": {"height": 400, "width": 300, "x": 980, "y": 60}, "xdg": {"acked_activated": false, "acked_serial": 21, "acked_size": [300, 400], "client_geometry": {"height": 400, "width": 300, "x": 14, "y": 12}, "client_max_size": [0, 0], "client_min_size": [280, 215], "committed_activated": false, "committed_serial": 21, "committed_size": [300, 400], "configured": true, "pending_configures": [], "pending_count": 0, "server_pending_activated": false, "server_pending_size": [300, 400]}, "work_areas": [{"height": 740, "width": 1280, "x": 0, "y": 60}]}]}
+
+Session terminated, killing shell... ...killed.
+PASS: installed KeyValue@1 acknowledged activation/deactivation without geometry changes, kernel pointer/keyboard selection, Ctrl+C, Shift+F10/secondary menu, exact separate-client Unicode clipboard, focused refresh rejection, key-preserved reorder/update after focus release, empty-selection Copy rejection, row removal and focus restoration
+Started agentos-display-test-6465e7deea834c14985baaac1ab18d35.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 6.
+pam_unix(login:session): session opened for user verifier(uid=1000) by verifier(uid=0)
+agentos-display-test-6465e7deea834c14985baaac1ab18d35.service: Deactivated successfully.
+
+{"result": "pass", "fresh_profile_qualified": false, "binary_directory": "/usr/local/bin", "outputs": [{"height": 800, "name": "Virtual-1", "scale": 1.0, "transform": "Normal", "width": 1280, "x": 0, "y": 0}], "metrics": [{"format": 1, "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence", "pid": 13367, "sample_limit_per_stage": 256, "stages": {"compositor.direct_render_attempt": {"discarded": 0, "max_recent_ms": 0.452625, "mean_all_ms": 0.40288856897959174, "p50_recent_ms": 0.23399999999999999, "p95_recent_ms": 0.35525, "retained": 256, "samples_total": 1225}}}], "native_feedback": [], "frames_before_vt": 10, "frames_after_vt": 19, "checks": ["private native system bar", "KMS output discovery", "shared core connection", "VT switch and resume", "orderly shutdown", "session directory cleanup", "owned login scope cleanup", "kernel KeyValue@1 pointer and keyboard row selection", "Ctrl+C and accessible Shift+F10/secondary clipboard menus", "separate-client exact Unicode row text", "focused refresh rejection and key-based selection across background reorder/update", "empty-selection Copy rejection, row removal and local menu focus restoration"], "screen_keyboard_input_qualified": false, "multiple_keyboard_input_qualified": false, "forced_session_stop_qualified": false, "screen_reader_input_qualified": false, "table_input_qualified": false, "collection_input_qualified": "KeyValue@1", "terminal_input_qualified": false, "terminal_ime_qualified": false, "presentation_feedback_qualified": false, "multi_output_qualified": false, "virtual_shell_hotplug_qualified": false, "virtual_explicit_output_restoration_qualified": false, "virtual_output_hotplug_qualified": false, "virtual_primary_output_hotplug_qualified": false, "virtual_all_outputs_removed_qualified": false, "native_feedback_qualified": false, "native_feedback_load_qualified": false, "output_transform_qualified": null, "focus_transfer_cycles": null, "not_tested": ["physical input", "physical connector hotplug", "physical GPU presentation"]}
+Input fixture device: event5 ['ID_INPUT=1', 'ID_INPUT_MOUSE=1']
+Input fixture device: event4 ['ID_INPUT=1', 'ID_INPUT_KEY=1', 'ID_INPUT_KEYBOARD=1']
+CHECK: terminal peer geometry {"expected": {"x": 980, "y": 60, "width": 300, "height": 220}, "observed": [{"height": 600, "width": 720, "x": 280, "y": 130}, {"height": 600, "width": 720, "x": 980, "y": 60}, {"height": 220, "width": 300, "x": 980, "y": 60}], "registration_seconds": 0.5316886839999881, "placement_seconds": 0.11145427200000313, "geometry_seconds": 0.13030789900000173, "placement_status": "committed"}
+PASS: installed native VTE kernel keyboard, pointer selection/copy, Unicode Wayland clipboard, accessible context-menu copy/paste, program interrupt and detached-input rejection
+
+Session terminated, killing shell... ...killed.
+Started agentos-display-test-b16f54fb2d16448d8c320f43d205d401.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 7.
+pam_unix(login:session): session opened for user verifier(uid=1000) by verifier(uid=0)
+agentos-display-test-b16f54fb2d16448d8c320f43d205d401.service: Deactivated successfully.
+
+{"result": "pass", "fresh_profile_qualified": false, "binary_directory": "/usr/local/bin", "outputs": [{"height": 800, "name": "Virtual-1", "scale": 1.0, "transform": "Normal", "width": 1280, "x": 0, "y": 0}], "metrics": [{"format": 1, "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence", "pid": 15116, "sample_limit_per_stage": 256, "stages": {"compositor.direct_render_attempt": {"discarded": 0, "max_recent_ms": 2.213959, "mean_all_ms": 0.36512453571428577, "p50_recent_ms": 0.242792, "p95_recent_ms": 0.602167, "retained": 256, "samples_total": 1288}}}], "native_feedback": [], "frames_before_vt": 10, "frames_after_vt": 11, "checks": ["private native system bar", "KMS output discovery", "shared core connection", "VT switch and resume", "orderly shutdown", "session directory cleanup", "owned login scope cleanup", "kernel keyboard and absolute pointer in VTE", "Unicode Wayland clipboard to PTY", "explicit native detach and reattach", "kernel pointer selection and exact Unicode line copy", "accessible secondary-click and Shift+F10 clipboard menus", "closed-popup seat focus and first absolute pointer motion", "detached menu Paste disabled and input rejected", "ordinary Ctrl+C program interruption"], "screen_keyboard_input_qualified": false, "multiple_keyboard_input_qualified": false, "forced_session_stop_qualified": false, "screen_reader_input_qualified": false, "table_input_qualified": false, "collection_input_qualified": null, "terminal_input_qualified": true, "terminal_ime_qualified": false, "presentation_feedback_qualified": false, "multi_output_qualified": false, "virtual_shell_hotplug_qualified": false, "virtual_explicit_output_restoration_qualified": false, "virtual_output_hotplug_qualified": false, "virtual_primary_output_hotplug_qualified": false, "virtual_all_outputs_removed_qualified": false, "native_feedback_qualified": false, "native_feedback_load_qualified": false, "output_transform_qualified": null, "focus_transfer_cycles": null, "not_tested": ["physical input", "physical connector hotplug", "physical GPU presentation"]}
+Input fixture device: event5 ['ID_INPUT=1', 'ID_INPUT_MOUSE=1']
+Input fixture device: event4 ['ID_INPUT=1', 'ID_INPUT_KEY=1', 'ID_INPUT_KEYBOARD=1']
+PASS: installed VTE Wayland IME preedit/Unicode commit, concurrent native rendering, detached-input rejection and no reattach replay
+PASS: input-method crash during preedit preserves the desktop, attached program and ordinary kernel typing without replaying composition
+
+Session terminated, killing shell... ...killed.
+Started agentos-display-test-dcc327054e604dd68c86d7a9afab15bf.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 8.
+pam_unix(login:session): session opened for user verifier(uid=1000) by verifier(uid=0)
+agentos-display-test-dcc327054e604dd68c86d7a9afab15bf.service: Deactivated successfully.
+
+{"result": "pass", "fresh_profile_qualified": false, "binary_directory": "/usr/local/bin", "outputs": [{"height": 800, "name": "Virtual-1", "scale": 1.0, "transform": "Normal", "width": 1280, "x": 0, "y": 0}], "metrics": [{"format": 1, "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence", "pid": 17413, "sample_limit_per_stage": 256, "stages": {"compositor.direct_render_attempt": {"discarded": 0, "max_recent_ms": 1.397667, "mean_all_ms": 0.26461649931600534, "p50_recent_ms": 0.187959, "p95_recent_ms": 0.5269590000000001, "retained": 256, "samples_total": 731}}}], "native_feedback": [], "frames_before_vt": 9, "frames_after_vt": 12, "checks": ["private native system bar", "KMS output discovery", "shared core connection", "VT switch and resume", "orderly shutdown", "session directory cleanup", "owned login scope cleanup", "kernel keyboard and absolute pointer in VTE", "trusted Wayland IME preedit and Unicode commit", "concurrent native rendering during VTE composition", "detached IME commit rejected without reattach replay"], "screen_keyboard_input_qualified": false, "multiple_keyboard_input_qualified": false, "forced_session_stop_qualified": false, "screen_reader_input_qualified": false, "table_input_qualified": false, "collection_input_qualified": null, "terminal_input_qualified": true, "terminal_ime_qualified": true, "presentation_feedback_qualified": false, "multi_output_qualified": false, "virtual_shell_hotplug_qualified": false, "virtual_explicit_output_restoration_qualified": false, "virtual_output_hotplug_qualified": false, "virtual_primary_output_hotplug_qualified": false, "virtual_all_outputs_removed_qualified": false, "native_feedback_qualified": false, "native_feedback_load_qualified": false, "output_transform_qualified": null, "focus_transfer_cycles": null, "not_tested": ["physical input", "physical connector hotplug", "physical GPU presentation"]}
+Input fixture device: event5 ['ID_INPUT=1', 'ID_INPUT_MOUSE=1']
+Input fixture device: event4 ['ID_INPUT=1', 'ID_INPUT_KEY=1', 'ID_INPUT_KEYBOARD=1']
+Native GTK input-to-presentation measurement {"clock_id": 1, "discarded": 0, "format": 1, "invalid": 0, "max_ms": 41, "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification", "p50_ms": 30, "p95_ms": 36, "pending": 0, "presented": 20, "requested": 20, "sample_limit": 256, "profile": "idle editor", "measurement_seconds": 2.83, "completed_frames_between_observer_snapshots": 197, "input_frame_wakeups_between_observer_snapshots": 20}
+PASS: native GTK editor kernel input-to-presentation {"clock_id": 1, "discarded": 0, "format": 1, "invalid": 0, "max_ms": 41, "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification", "p50_ms": 30, "p95_ms": 36, "pending": 0, "presented": 20, "requested": 20, "sample_limit": 256, "profile": "idle editor", "measurement_seconds": 2.83, "completed_frames_between_observer_snapshots": 197, "input_frame_wakeups_between_observer_snapshots": 20}
+Native GTK receipt progression [{"sample": 1, "text_observed_ms": 134.04, "receipt_observed_ms": 134.251, "p50_ms": 24, "p95_ms": 24, "max_ms": 24}, {"sample": 2, "text_observed_ms": 138.27, "receipt_observed_ms": 138.39, "p50_ms": 24, "p95_ms": 25, "max_ms": 25}, {"sample": 3, "text_observed_ms": 138.584, "receipt_observed_ms": 138.758, "p50_ms": 24, "p95_ms": 25, "max_ms": 25}, {"sample": 4, "text_observed_ms": 140.22, "receipt_observed_ms": 140.347, "p50_ms": 24, "p95_ms": 41, "max_ms": 41}, {"sample": 5, "text_observed_ms": 145.1, "receipt_observed_ms": 145.23, "p50_ms": 25, "p95_ms": 41, "max_ms": 41}, {"sample": 6, "text_observed_ms": 147.382, "receipt_observed_ms": 147.517, "p50_ms": 25, "p95_ms": 41, "max_ms": 41}, {"sample": 7, "text_observed_ms": 135.805, "receipt_observed_ms": 135.927, "p50_ms": 25, "p95_ms": 41, "max_ms": 41}, {"sample": 8, "text_observed_ms": 139.101, "receipt_observed_ms": 139.23, "p50_ms": 25, "p95_ms": 41, "max_ms": 41}, {"sample": 9, "text_observed_ms": 138.834, "receipt_observed_ms": 138.977, "p50_ms": 25, "p95_ms": 41, "max_ms": 41}, {"sample": 10, "text_observed_ms": 141.8, "receipt_observed_ms": 141.929, "p50_ms": 25, "p95_ms": 41, "max_ms": 41}, {"sample": 11, "text_observed_ms": 136.605, "receipt_observed_ms": 136.738, "p50_ms": 32, "p95_ms": 41, "max_ms": 41}, {"sample": 12, "text_observed_ms": 143.683, "receipt_observed_ms": 143.812, "p50_ms": 32, "p95_ms": 41, "max_ms": 41}, {"sample": 13, "text_observed_ms": 133.831, "receipt_observed_ms": 133.967, "p50_ms": 32, "p95_ms": 41, "max_ms": 41}, {"sample": 14, "text_observed_ms": 134.283, "receipt_observed_ms": 134.417, "p50_ms": 26, "p95_ms": 41, "max_ms": 41}, {"sample": 15, "text_observed_ms": 136.225, "receipt_observed_ms": 136.354, "p50_ms": 26, "p95_ms": 41, "max_ms": 41}, {"sample": 16, "text_observed_ms": 162.886, "receipt_observed_ms": 163.016, "p50_ms": 26, "p95_ms": 41, "max_ms": 41}, {"sample": 17, "text_observed_ms": 135.23, "receipt_observed_ms": 135.364, "p50_ms": 29, "p95_ms": 41, "max_ms": 41}, {"sample": 18, "text_observed_ms": 139.983, "receipt_observed_ms": 140.136, "p50_ms": 29, "p95_ms": 41, "max_ms": 41}, {"sample": 19, "text_observed_ms": 138.404, "receipt_observed_ms": 138.549, "p50_ms": 30, "p95_ms": 41, "max_ms": 41}, {"sample": 20, "text_observed_ms": 137.955, "receipt_observed_ms": 138.085, "p50_ms": 30, "p95_ms": 36, "max_ms": 41}]
+
+Session terminated, killing shell... ...killed.
+Started agentos-display-test-cc6288ffc2744c47af647c41982b4916.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 9.
+pam_unix(login:session): session opened for user verifier(uid=1000) by verifier(uid=0)
+agentos-display-test-cc6288ffc2744c47af647c41982b4916.service: Deactivated successfully.
+
+{"result": "pass", "fresh_profile_qualified": false, "binary_directory": "/usr/local/bin", "outputs": [{"height": 800, "name": "Virtual-1", "scale": 1.0, "transform": "Normal", "width": 1280, "x": 0, "y": 0}], "metrics": [{"format": 1, "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence", "pid": 18756, "sample_limit_per_stage": 256, "stages": {"compositor.direct_render_attempt": {"discarded": 0, "max_recent_ms": 1.8931580000000001, "mean_all_ms": 0.3246286046511629, "p50_recent_ms": 0.096122, "p95_recent_ms": 1.54575, "retained": 256, "samples_total": 516}}}], "native_feedback": [{"clock_id": 1, "discarded": 0, "format": 1, "invalid": 0, "max_ms": 41, "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification", "p50_ms": 30, "p95_ms": 36, "pending": 0, "presented": 20, "requested": 20, "sample_limit": 256}], "frames_before_vt": 12, "frames_after_vt": 13, "checks": ["private native system bar", "KMS output discovery", "shared core connection", "VT switch and resume", "orderly shutdown", "session directory cleanup", "owned login scope cleanup", "native GTK editor kernel key-to-presentation receipts, 20 sequential samples"], "screen_keyboard_input_qualified": false, "multiple_keyboard_input_qualified": false, "forced_session_stop_qualified": false, "screen_reader_input_qualified": false, "table_input_qualified": false, "collection_input_qualified": null, "terminal_input_qualified": false, "terminal_ime_qualified": false, "presentation_feedback_qualified": false, "multi_output_qualified": false, "virtual_shell_hotplug_qualified": false, "virtual_explicit_output_restoration_qualified": false, "virtual_output_hotplug_qualified": false, "virtual_primary_output_hotplug_qualified": false, "virtual_all_outputs_removed_qualified": false, "native_feedback_qualified": true, "native_feedback_load_qualified": false, "output_transform_qualified": null, "focus_transfer_cycles": null, "not_tested": ["physical input", "physical connector hotplug", "physical GPU presentation"]}
+Input fixture device: event5 ['ID_INPUT=1', 'ID_INPUT_MOUSE=1']
+Input fixture device: event4 ['ID_INPUT=1', 'ID_INPUT_KEY=1', 'ID_INPUT_KEYBOARD=1']
+Native GTK input-to-presentation measurement {"clock_id": 1, "discarded": 0, "format": 1, "invalid": 0, "max_ms": 40, "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification", "p50_ms": 29, "p95_ms": 38, "pending": 0, "presented": 20, "requested": 20, "sample_limit": 256, "profile": "two concurrent broker CPU jobs", "job_cpu_usage_usec": [1618612, 1615757], "measurement_seconds": 1.669, "completed_frames_between_observer_snapshots": 103, "input_frame_wakeups_between_observer_snapshots": 20}
+PASS: native GTK editor kernel input-to-presentation {"clock_id": 1, "discarded": 0, "format": 1, "invalid": 0, "max_ms": 40, "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification", "p50_ms": 29, "p95_ms": 38, "pending": 0, "presented": 20, "requested": 20, "sample_limit": 256, "profile": "two concurrent broker CPU jobs", "job_cpu_usage_usec": [1618612, 1615757], "measurement_seconds": 1.669, "completed_frames_between_observer_snapshots": 103, "input_frame_wakeups_between_observer_snapshots": 20}
+Native GTK receipt progression [{"sample": 1, "text_observed_ms": 94.767, "receipt_observed_ms": 94.979, "p50_ms": 26, "p95_ms": 26, "max_ms": 26}, {"sample": 2, "text_observed_ms": 70.219, "receipt_observed_ms": 70.336, "p50_ms": 24, "p95_ms": 26, "max_ms": 26}, {"sample": 3, "text_observed_ms": 70.332, "receipt_observed_ms": 70.443, "p50_ms": 26, "p95_ms": 34, "max_ms": 34}, {"sample": 4, "text_observed_ms": 67.244, "receipt_observed_ms": 67.369, "p50_ms": 26, "p95_ms": 34, "max_ms": 34}, {"sample": 5, "text_observed_ms": 68.358, "receipt_observed_ms": 68.476, "p50_ms": 27, "p95_ms": 34, "max_ms": 34}, {"sample": 6, "text_observed_ms": 68.394, "receipt_observed_ms": 68.521, "p50_ms": 26, "p95_ms": 34, "max_ms": 34}, {"sample": 7, "text_observed_ms": 73.233, "receipt_observed_ms": 73.344, "p50_ms": 27, "p95_ms": 40, "max_ms": 40}, {"sample": 8, "text_observed_ms": 68.769, "receipt_observed_ms": 68.889, "p50_ms": 27, "p95_ms": 40, "max_ms": 40}, {"sample": 9, "text_observed_ms": 66.468, "receipt_observed_ms": 66.599, "p50_ms": 27, "p95_ms": 40, "max_ms": 40}, {"sample": 10, "text_observed_ms": 71.694, "receipt_observed_ms": 71.824, "p50_ms": 27, "p95_ms": 40, "max_ms": 40}, {"sample": 11, "text_observed_ms": 95.614, "receipt_observed_ms": 95.737, "p50_ms": 27, "p95_ms": 40, "max_ms": 40}, {"sample": 12, "text_observed_ms": 91.614, "receipt_observed_ms": 91.83, "p50_ms": 27, "p95_ms": 40, "max_ms": 40}, {"sample": 13, "text_observed_ms": 92.919, "receipt_observed_ms": 93.06, "p50_ms": 29, "p95_ms": 40, "max_ms": 40}, {"sample": 14, "text_observed_ms": 96.248, "receipt_observed_ms": 96.367, "p50_ms": 27, "p95_ms": 40, "max_ms": 40}, {"sample": 15, "text_observed_ms": 72.646, "receipt_observed_ms": 72.76, "p50_ms": 29, "p95_ms": 40, "max_ms": 40}, {"sample": 16, "text_observed_ms": 93.904, "receipt_observed_ms": 94.028, "p50_ms": 29, "p95_ms": 40, "max_ms": 40}, {"sample": 17, "text_observed_ms": 94.763, "receipt_observed_ms": 94.887, "p50_ms": 29, "p95_ms": 40, "max_ms": 40}, {"sample": 18, "text_observed_ms": 70.094, "receipt_observed_ms": 70.2, "p50_ms": 29, "p95_ms": 40, "max_ms": 40}, {"sample": 19, "text_observed_ms": 92.171, "receipt_observed_ms": 92.296, "p50_ms": 29, "p95_ms": 40, "max_ms": 40}, {"sample": 20, "text_observed_ms": 71.251, "receipt_observed_ms": 71.358, "p50_ms": 29, "p95_ms": 38, "max_ms": 40}]
+
+Session terminated, killing shell... ...killed.
+Started agentos-display-test-c32664406d7f46ef9c887a4c4a667d24.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 10.
+pam_unix(login:session): session opened for user verifier(uid=1000) by verifier(uid=0)
+agentos-display-test-c32664406d7f46ef9c887a4c4a667d24.service: Deactivated successfully.
+
+{"result": "pass", "fresh_profile_qualified": false, "binary_directory": "/usr/local/bin", "outputs": [{"height": 800, "name": "Virtual-1", "scale": 1.0, "transform": "Normal", "width": 1280, "x": 0, "y": 0}], "metrics": [{"format": 1, "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence", "pid": 19523, "sample_limit_per_stage": 256, "stages": {"compositor.direct_render_attempt": {"discarded": 0, "max_recent_ms": 5.210004, "mean_all_ms": 0.3244086883116882, "p50_recent_ms": 0.109497, "p95_recent_ms": 1.4044260000000002, "retained": 256, "samples_total": 462}}}], "native_feedback": [{"clock_id": 1, "discarded": 0, "format": 1, "invalid": 0, "max_ms": 40, "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification", "p50_ms": 29, "p95_ms": 38, "pending": 0, "presented": 20, "requested": 20, "sample_limit": 256}], "frames_before_vt": 12, "frames_after_vt": 13, "checks": ["private native system bar", "KMS output discovery", "shared core connection", "VT switch and resume", "orderly shutdown", "session directory cleanup", "owned login scope cleanup", "native GTK editor kernel key-to-presentation receipts, 20 sequential samples", "two distinct concurrent broker CPU jobs with measured CPU consumption", "owned CPU work cancellation and unit cleanup"], "screen_keyboard_input_qualified": false, "multiple_keyboard_input_qualified": false, "forced_session_stop_qualified": false, "screen_reader_input_qualified": false, "table_input_qualified": false, "collection_input_qualified": null, "terminal_input_qualified": false, "terminal_ime_qualified": false, "presentation_feedback_qualified": false, "multi_output_qualified": false, "virtual_shell_hotplug_qualified": false, "virtual_explicit_output_restoration_qualified": false, "virtual_output_hotplug_qualified": false, "virtual_primary_output_hotplug_qualified": false, "virtual_all_outputs_removed_qualified": false, "native_feedback_qualified": true, "native_feedback_load_qualified": true, "output_transform_qualified": null, "focus_transfer_cycles": null, "not_tested": ["physical input", "physical connector hotplug", "physical GPU presentation"]}
+Input fixture device: event5 ['ID_INPUT=1', 'ID_INPUT_MOUSE=1']
+Input fixture device: event4 ['ID_INPUT=1', 'ID_INPUT_KEY=1', 'ID_INPUT_KEYBOARD=1']
+Initial presentation receipt observation {"receipt": {"flags": 7, "id": 2, "key_time_ms": null, "kind": "presented", "outputs": ["Virtual-1"], "refresh_ns": 13334400, "sequence": 0, "time_ns": 253162650000}, "observed_ns": 253163268249, "age_ms": 0.618249}
+Initial receipt age after workspace focus ms: 470.600548
+Presentation receipt measurement: {"meaning": "Synthetic Wayland client kernel-event to virtual KMS presentation receipt; not native GTK or physical display latency", "samples": 20, "p50_ms": 23, "p95_ms": 37, "max_ms": 46, "clock": "CLOCK_MONOTONIC", "timestamp_quantization_ms": 1, "target_ms": 50, "target_met": true}
+PASS: actual virtual KMS presentation receipts, monotonic timestamps, kernel key-triggered frames, superseded discard and unmap
+
+Session terminated, killing shell... ...killed.
+Started agentos-display-test-76eeaa99aa644942bb6075d6966002bd.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 11.
+pam_unix(login:session): session opened for user verifier(uid=1000) by verifier(uid=0)
+agentos-display-test-76eeaa99aa644942bb6075d6966002bd.service: Deactivated successfully.
+
+{"result": "pass", "fresh_profile_qualified": false, "binary_directory": "/usr/local/bin", "outputs": [{"height": 800, "name": "Virtual-1", "scale": 1.0, "transform": "Normal", "width": 1280, "x": 0, "y": 0}], "metrics": [{"format": 1, "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence", "pid": 20307, "sample_limit_per_stage": 256, "stages": {"compositor.direct_render_attempt": {"discarded": 0, "max_recent_ms": 2.9038139999999997, "mean_all_ms": 0.35664348300970883, "p50_recent_ms": 0.222745, "p95_recent_ms": 0.7018610000000001, "retained": 256, "samples_total": 412}}}], "native_feedback": [], "frames_before_vt": 11, "frames_after_vt": 12, "checks": ["private native system bar", "KMS output discovery", "shared core connection", "VT switch and resume", "orderly shutdown", "session directory cleanup", "owned login scope cleanup", "Wayland presentation timestamps from completed virtual KMS frames", "kernel key-triggered content feedback", "superseded frame discard and unmap"], "screen_keyboard_input_qualified": false, "multiple_keyboard_input_qualified": false, "forced_session_stop_qualified": false, "screen_reader_input_qualified": false, "table_input_qualified": false, "collection_input_qualified": null, "terminal_input_qualified": false, "terminal_ime_qualified": false, "presentation_feedback_qualified": true, "multi_output_qualified": false, "virtual_shell_hotplug_qualified": false, "virtual_explicit_output_restoration_qualified": false, "virtual_output_hotplug_qualified": false, "virtual_primary_output_hotplug_qualified": false, "virtual_all_outputs_removed_qualified": false, "native_feedback_qualified": false, "native_feedback_load_qualified": false, "output_transform_qualified": null, "focus_transfer_cycles": null, "not_tested": ["physical input", "physical connector hotplug", "physical GPU presentation"]}
+Input fixture device: event5 ['ID_INPUT=1', 'ID_INPUT_MOUSE=1']
+Input fixture device: event4 ['ID_INPUT=1', 'ID_INPUT_KEY=1', 'ID_INPUT_KEYBOARD=1']
+PASS: kernel Ctrl+Alt+Space opens temporary launcher; Escape and Ctrl+Alt+Delete close it, preserving work and restoring typing
+PASS: active Monitor reader selection {"job_id": 1, "active_monitor": true, "selected_snapshot_preserved": true, "current_failure_visible": true, "failure_announcements": 1, "deselection_adopts_latest": true, "trusted_clipboard_roundtrip": true, "reader_announced_reopens": 3}
+PASS: ten reader-announced launcher reopens after shortcut bursts retain the focused unsent request draft
+PASS: same-user control client cannot replace the registered reader
+PASS: a same-user process claiming the Orca monitor name cannot access keyboard input
+PASS: session-owned Orca announces launcher/editor/Save/Discard; kernel learn-mode enter/exit isolates grabs, restores typing and completes edit/save/correction/discard; rescue VT remains reachable during a full grab; reader stop releases active grabs and preserves typing; unrelated and spoofed monitor access denied
+
+Session terminated, killing shell... ...killed.
+Started agentos-display-test-932530f4a2df47109c71615dc540f5a7.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 12 --screen-reader.
+pam_unix(login:session): session opened for user verifier(uid=1000) by verifier(uid=0)
+agentos-display-test-932530f4a2df47109c71615dc540f5a7.service: Deactivated successfully.
+
+{"result": "pass", "fresh_profile_qualified": false, "binary_directory": "/usr/local/bin", "outputs": [{"height": 800, "name": "Virtual-1", "scale": 1.0, "transform": "Normal", "width": 1280, "x": 0, "y": 0}], "metrics": [{"format": 1, "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence", "pid": 20974, "sample_limit_per_stage": 256, "stages": {"compositor.direct_render_attempt": {"discarded": 0, "max_recent_ms": 4.944764, "mean_all_ms": 0.4665074047244092, "p50_recent_ms": 0.173873, "p95_recent_ms": 1.393356, "retained": 256, "samples_total": 1905}}}], "native_feedback": [], "frames_before_vt": 20, "frames_after_vt": 21, "checks": ["private native system bar", "KMS output discovery", "shared core connection", "VT switch and resume", "orderly shutdown", "session directory cleanup", "owned login scope cleanup", "session-owned Orca field announcement", "kernel Orca learn-mode enter/exit", "assistive grab isolation and ordinary typing restoration"], "screen_keyboard_input_qualified": false, "multiple_keyboard_input_qualified": false, "forced_session_stop_qualified": false, "screen_reader_input_qualified": true, "table_input_qualified": false, "collection_input_qualified": null, "terminal_input_qualified": false, "terminal_ime_qualified": false, "presentation_feedback_qualified": false, "multi_output_qualified": false, "virtual_shell_hotplug_qualified": false, "virtual_explicit_output_restoration_qualified": false, "virtual_output_hotplug_qualified": false, "virtual_primary_output_hotplug_qualified": false, "virtual_all_outputs_removed_qualified": false, "native_feedback_qualified": false, "native_feedback_load_qualified": false, "output_transform_qualified": null, "focus_transfer_cycles": 1, "not_tested": ["physical input", "physical connector hotplug", "physical GPU presentation", "audible speech quality", "braille hardware", "screen-reader pointer location"]}
+dbus-daemon[24672]: [session uid=1000 pid=24672 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.3' (uid=1000 pid=24729 comm="/tmp/agentos-session-test-y2vqat1x/bin/agent-os-de")
+dbus-daemon[24672]: [session uid=1000 pid=24672 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[24758]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=24729 comm="/tmp/agentos-session-test-y2vqat1x/bin/agent-os-de")
+dbus-daemon[24758]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+dbus-daemon[24672]: [session uid=1000 pid=24672 pidfd=5] Activating service name='ca.desrt.dconf' requested by ':1.4' (uid=1000 pid=24751 comm="/usr/libexec/at-spi-bus-launcher")
+dbus-daemon[24672]: [session uid=1000 pid=24672 pidfd=5] Successfully activated service 'ca.desrt.dconf'
+PASS: session-owned Orca initializes speech and announces the focused native field
+
+(process:24673): atspi-WARNING **: 09:51:04.226: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:24673): atspi-WARNING **: 09:51:04.381: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: session-owned Orca sends the focused field error and cleared-valid state to speech without changing input or drafts; physical audio and braille remain unqualified
+
+(process:24673): atspi-WARNING **: 09:51:16.095: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:24673): atspi-WARNING **: 09:51:16.358: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: real Orca error/clear speech retains DocumentEditor@1 focus, value and exact draft without Save
+
+(process:24673): atspi-WARNING **: 09:51:21.538: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:24673): atspi-WARNING **: 09:51:21.827: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: real Orca error/clear speech retains Choice@1 focus, value and exact draft without Save
+
+(process:24673): atspi-WARNING **: 09:51:24.514: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:24673): atspi-WARNING **: 09:51:24.805: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: real Orca error/clear speech retains Toggle@1 focus, value and exact draft without Save
+Reader current notice: {"name": "", "role": "status bar", "text": "Current value:\nReader result outcome\nfailed"}
+PASS: actual Orca announces changed result job outcome once while selected snapshot, focus and exact field draft persist
+Reader current notice: {"name": "", "role": "status bar", "text": "Current value:\nReader failure outcome\nfailed"}
+PASS: actual Orca announces changed failure job outcome once while selected snapshot, focus and exact field draft persist
+Reader current notice: {"name": "", "role": "status bar", "text": "Current value:\nfailed"}
+PASS: actual Orca announces changed status job outcome once while selected snapshot, focus and exact field draft persist
+PASS: trusted Ctrl+C copies the selected old Status through the Wayland clipboard after its live job has failed
+
+(process:24673): atspi-WARNING **: 09:52:04.307: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:24673): atspi-WARNING **: 09:52:04.625: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:24673): atspi-WARNING **: 09:52:05.943: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:24673): atspi-WARNING **: 09:52:06.202: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:24673): atspi-WARNING **: 09:52:07.079: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI inline validation exposes literal error relation, preserves durable Unicode draft, rejects invalid transactions and clears without implicit Save
+PASS: independent AT-SPI toggle activation reaches the real durable draft; feedback and clearing retain the boolean without Save; scoped Discard restores committed state
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 0, "committed": "First"}
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 1, "committed": "First"}
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 2, "committed": "First"}
+PASS: independent agentOS Choice retains its field-plus-option name across three rendered feedback revisions
+
+(process:24673): atspi-WARNING **: 09:52:08.759: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:24673): atspi-WARNING **: 09:52:08.815: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:24673): atspi-WARNING **: 09:52:09.237: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:24673): atspi-WARNING **: 09:52:09.294: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: local callback parse/range errors relate to the exact retained field, never dispatch or Save, clear on edit and retry once with registered typed values
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: owned reader and speech processes reaped after normal logout
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+dbus-daemon[33614]: [session uid=1000 pid=33614 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.3' (uid=1000 pid=33647 comm="/tmp/agentos-session-test-9fo2k2il/bin/agent-os-de")
+dbus-daemon[33614]: [session uid=1000 pid=33614 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[33673]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=33647 comm="/tmp/agentos-session-test-9fo2k2il/bin/agent-os-de")
+dbus-daemon[33673]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+dbus-daemon[33614]: [session uid=1000 pid=33614 pidfd=5] Activating service name='ca.desrt.dconf' requested by ':1.4' (uid=1000 pid=33667 comm="/usr/libexec/at-spi-bus-launcher")
+dbus-daemon[33614]: [session uid=1000 pid=33614 pidfd=5] Successfully activated service 'ca.desrt.dconf'
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: trusted display zoom changes real output/workspace geometry; doubled zoom preserves keyboard dismissal, local typing and exact reset; same-login control denied
+PASS: session-owned Orca initializes speech and announces the focused native field
+
+(process:33615): atspi-WARNING **: 09:52:23.557: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:33615): atspi-WARNING **: 09:52:23.820: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: session-owned Orca sends the focused field error and cleared-valid state to speech without changing input or drafts; physical audio and braille remain unqualified
+PASS: on-screen Insert+H reaches Orca, learn-mode grab isolates typing and Escape releases it
+
+(process:33615): atspi-WARNING **: 09:52:27.551: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:33615): atspi-WARNING **: 09:52:27.868: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:33615): atspi-WARNING **: 09:52:28.912: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:33615): atspi-WARNING **: 09:52:29.227: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:33615): atspi-WARNING **: 09:52:30.098: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI inline validation exposes literal error relation, preserves durable Unicode draft, rejects invalid transactions and clears without implicit Save
+PASS: independent AT-SPI toggle activation reaches the real durable draft; feedback and clearing retain the boolean without Save; scoped Discard restores committed state
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 0, "committed": "First"}
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 1, "committed": "First"}
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 2, "committed": "First"}
+PASS: independent agentOS Choice retains its field-plus-option name across three rendered feedback revisions
+
+(process:33615): atspi-WARNING **: 09:52:31.454: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:33615): atspi-WARNING **: 09:52:31.507: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:33615): atspi-WARNING **: 09:52:31.966: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:33615): atspi-WARNING **: 09:52:32.019: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: local callback parse/range errors relate to the exact retained field, never dispatch or Save, clear on edit and retry once with registered typed values
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: owned reader and speech processes reaped after normal logout
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer
+dbus-daemon[36106]: [session uid=1000 pid=36106 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.3' (uid=1000 pid=36139 comm="/tmp/agentos-session-test-bi0yyqqh/bin/agent-os-de")
+dbus-daemon[36106]: [session uid=1000 pid=36106 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[36163]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=36139 comm="/tmp/agentos-session-test-bi0yyqqh/bin/agent-os-de")
+dbus-daemon[36163]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+dbus-daemon[36106]: [session uid=1000 pid=36106 pidfd=5] Activating service name='ca.desrt.dconf' requested by ':1.4' (uid=1000 pid=36157 comm="/usr/libexec/at-spi-bus-launcher")
+dbus-daemon[36106]: [session uid=1000 pid=36106 pidfd=5] Successfully activated service 'ca.desrt.dconf'
+PASS: session-owned Orca initializes speech and announces the focused native field
+
+(process:36107): atspi-WARNING **: 09:52:36.446: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:36107): atspi-WARNING **: 09:52:36.705: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: session-owned Orca sends the focused field error and cleared-valid state to speech without changing input or drafts; physical audio and braille remain unqualified
+PASS: owned reader and speech processes reaped after compositor failure
+PASS: abrupt compositor loss maps authenticated surfaces and reaps display host, compositor and renderer
+{"check": "real offline English recognition", "result": {"text": "And so my fellow Americans ask not what your country can do for you. Ask what you can do for your country.", "status": "transcribed", "rms": 0.14789111644117206, "duration_seconds": 10.0, "recognition_seconds": 1.1504214939999997, "engine": "whisper.cpp/1.9.5 tiny.en", "requires_review": true}, "wall_seconds": 1.1643070020000437}
+PASS: zero-signal rejection, explicit capture, owner-bound token, cancellation, no recorder leak
+NOT QUALIFIED: actual host microphone speech, speaker output, accents, background-noise accuracy, hardware
+PASS: system http handler is Firefox ESR
+PASS: system https handler is Firefox ESR
+dbus-daemon[36469]: [session uid=1000 pid=36469 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.1' (uid=1000 pid=36470 comm="python3 native-shell/tests/browser_links.py --inst")
+dbus-daemon[36469]: [session uid=1000 pid=36469 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[36511]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=36470 comm="python3 native-shell/tests/browser_links.py --inst")
+dbus-daemon[36511]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: native Link, real Firefox, shared conventional window, focus/maximize and disconnect
+PASS: browser profile, launch group, native clients, core and private displays cleaned up
+PASS: fresh image refuses saved icon-property rollback without stopping services or changing document/journal; plain legacy controls remain compatible; saved text/choice/toggle validation also refused
+IMAGE_UPDATE_QUALIFIED

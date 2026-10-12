@@ -1,0 +1,21 @@
+{
+  "result": "pass",
+  "checks": [
+    "system HTTP/HTTPS handler",
+    "actual native Link action",
+    "GIO launch with isolated profile",
+    "real Firefox local page retrieval and title",
+    "conventional shared identity",
+    "durable focus/maximize",
+    "browser disconnect"
+  ],
+  "not_tested": [
+    "physical input",
+    "remote website compatibility",
+    "hardware acceleration",
+    "mailto account/client"
+  ],
+  "firefox_debian_version": "153.4.0esr-1~deb13u1",
+  "installed_executables": true,
+  "cleanup_verified": true
+}

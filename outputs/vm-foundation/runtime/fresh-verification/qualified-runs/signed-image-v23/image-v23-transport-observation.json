@@ -1,0 +1,9 @@
+{
+  "before": [
+    "disabled",
+    "inactive"
+  ],
+  "diagnosis": "Qualification fixture started the disabled SSH service only for first boot; VM and installed runtime are healthy.",
+  "recovery": "Start qualification-only SSH via guest agent on each restarted verification boot.",
+  "distribution_ssh_enablement_changed": false
+}

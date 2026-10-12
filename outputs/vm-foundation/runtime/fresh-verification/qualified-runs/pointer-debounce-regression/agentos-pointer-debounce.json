@@ -1,0 +1,1 @@
+{"cases": [{"release_to_next_press_gap_seconds": 0.005, "libinput_button_states": [1, 0], "presses": 1, "releases": 1}, {"release_to_next_press_gap_seconds": 0.045, "libinput_button_states": [1, 0, 1, 0], "presses": 2, "releases": 2}]}

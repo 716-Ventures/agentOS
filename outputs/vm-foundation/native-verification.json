@@ -6291,6 +6291,48 @@
         "difference_from_runtime_pin": "same immutable code and evidence revision"
       },
       "checks": 70
+    },
+    "synthetic_pointer_debounce": {
+      "result": "pass",
+      "scope": "Independent kernel uinput -> real libinput comparison; subsequent image display qualification remains pending.",
+      "baseline_source_revision": "1364822625108213aa7f5e4e72bd3153902254b7",
+      "baseline_fast_presses": 1,
+      "baseline_spaced_presses": 2,
+      "fixed_fast_presses": 2,
+      "unit_regression": "old class fails spacing assertion; fixed class passes both tests",
+      "runtime_changed": false,
+      "click_spacing_seconds": 0.04,
+      "keyboard_presentation_target_ms": 50,
+      "image_first_attempt": "12 direct profiles passed; restarted SSH disabled; display phase not reached",
+      "image_second_attempt": "transport fixture readiness initially failed; resumed driver observed one missing pointer click before any output journey completed",
+      "historical_failure_cause_limit": "Actual libinput pulse collapse independently reproduced; no claim about unrelated historical intermittent focus failures.",
+      "owned_guest_and_app_closed": true,
+      "installed_four_mode_qualification": "pass",
+      "qualification_test_overlay": {
+        "base_qualification_archive_sha256": "93fae9f6a0953d9d45db4d03dc5bc752fede682b9e60134046cfeb2bb40339c0",
+        "base_source_revision": "273d5c1dee9af20acd06023c32307e56c995e781",
+        "overlay_source_revision": "447a787055dcbfb41dd049449f9899eb760b94b2",
+        "path": "tests/direct_input_probe.py",
+        "before_sha256": "fcd201818edb1597428799f8c2e489d69ec97b47e128372fc1c8f075a43bba3c",
+        "after_sha256": "45ca0169c6236d8a4a0118cd1ff571f8aa13e74a5dcb681970ad54b3ee6ea4b4",
+        "runtime_binaries_changed": false,
+        "scope": "Test input spacing only; installed runtime and all other qualification sources unchanged."
+      },
+      "source_ci": {
+        "conclusion": "success",
+        "databaseId": 38233942780,
+        "headSha": "447a787055dcbfb41dd049449f9899eb760b94b2",
+        "status": "completed",
+        "url": "https://github.com/716-Ventures/agentOS/actions/runs/38233942780"
+      },
+      "evidence_directory": "qualified-runs/pointer-debounce-regression"
+    },
+    "signed_v23_image": {
+      "candidate": "candidate-v23",
+      "image_sha256": "9e21d4a4d246d8fd62e81b7dda60c91c280ec7b739f8ab600d8fd6d54f366b61",
+      "runtime_release": "39d7a11c50ebb9522ae97c4badfa2fa221c6d3c4a1fd4d459a250a241c32af25",
+      "record": "image-verification.json",
+      "fresh_account_and_offline_qualification": "pass"
     }
   },
   "observations": [
@@ -6348,7 +6390,8 @@
     "CI 38222358492 stopped in the installed approval test when its custom AT-SPI traversal dereferenced an absent child during widget teardown. This is a test-fixture defect; the common accessibility helper already skips absent children. Search and failure diagnostics now skip only None entries, retaining scoped work matching and missing-control failures. Both new regressions fail against the old search with AttributeError and pass after the guard. Subsequent CI and clean-source full70 qualification are pending; no failed CI source is promoted.",
     "Clean 7206e27 CI passes all jobs, but its VM qualification stops after 47 checks at a one-shot post-Undo compositor identity lookup. GTK text and saved core content had already matched; the fresh-profile keyboard ownership/removal checks passed before that failure. The probe now observes a unique identity and mapped window in the same scene, within the existing eight-second deadline, without replaying Undo. Four unit regressions retain missing/ambiguous-surface failures and test staged registration. Ordinary and fresh-profile installed journeys pass through actual Undo, primary paste and Unicode drag/drop at unchanged runtime 0479ff5. The earlier clean e2bae2c full70 pass remains paired with its failed CI and is not promoted. Both runs and exact owned cleanup are retained. Clean final-source qualification is pending; qualified main remains 08e9973 and signed v22 remains c57b60. Neither Gateway nor Jev is configured, so live inference quality cannot be qualified.",
     "Clean a0808ae CI passes, but its VM run stops after 46 checks when expanded ordinary input completes its assertions at the 90-second watchdog and runtime cleanup fails. That failure remains retained. An independent old-wrapper SIGHUP regression exits -1 and leaves its directory; graceful SIGHUP handling now exits 0, reaps owned children and removes the directory. Forced systemd-stop verification also passes with the PAM scope given its configured 15-second cleanup grace; the earlier 3-second forced fixture failure is retained. Ordinary and fresh-profile installed keyboard/Undo/clipboard/drop journeys pass at targeted runtime 39d7a11. The expanded input watchdog is 120 seconds with a 150-second outer budget; individual interaction deadlines and the 50 ms p95 limit are unchanged. Five session unit tests and 31 VM-tool tests pass. The maintained suite now has 72 checks, adding actual hangup and forced-stop regressions. Clean committed-source full72 and image qualification are pending. Exact owned guest/app cleanup and configuration/disk identities pass; the exact historical watchdog signal sequence remains unestablished.",
-    "Clean source 273d5c1 passes all 72 runtime checks with 716 UI alpha.43 and runtime 39d7a11c50ebb9522ae97c4badfa2fa221c6d3c4a1fd4d459a250a241c32af25. Preferred display return leaves active editing on the recovery display until the human chooses Restore preferred placement in Agent Monitor. Original saved placements, drafts and typing survive; new floating controls remain reachable, the exact trusted renderer authorizes restoration, and stale topology/recovery/activity offers and same-user observer injection are rejected. All 66 compositor tests pass. Session SIGHUP uses graceful teardown; dedicated hangup and forced-systemd-stop regressions verify owned children, session directories and PAM scope cleanup. Expanded ordinary-input journeys have a 120-second whole-journey watchdog and unchanged individual interaction and 50 ms p95 limits. Installed approval searches tolerate absent AT-SPI children, and post-Undo input waits for a unique mapped compositor identity without replaying the action; both fixture regressions and prior failures remain retained. Multi-keyboard ownership and partial/final device removal preserve held modifiers, reject on-screen input until the final release and restore balanced lowercase typing in both ordinary and fresh-profile installed journeys. Immutable shared scenes avoid copying workspace history during rendering and input reads. Mapped collection Copy menus retain interaction leases through GTK activation and root-focus handoffs until dismissal; the identical final native fixture fails with the old handler and passes with the fix. All 36 native Rust tests pass (7 existing ignored). The prior a45fb85 full run stopped at a guarded List update after 49 checks; that failure remains retained without assigning its exact historical cause. An exact clean-source four-mode virtual KMS repeat verifies every deployed source file and 360 named kernel-key frames through secondary, primary and total display loss, plus retained launcher/keyboard identities and actual restoration controls. Native editor p95 is 44 ms idle, 42 ms loaded and 43 ms rotated, with all 60 presentation receipts completed. Installed and direct reader journeys retain three exact-work Monitor reopens before tree inspection and one background failure announcement. Rollback/interruption, reboot, repeat installation, VT resume and exact owned guest/app cleanup pass. CI 38228519983 is green. Signed v22 retains its separately qualified c57b60 runtime pending a new image qualification. Physical audio/braille/input/GPU/hotplug, live providers and full reference conformance remain unqualified; retained historical intermittent failures still have no established cause unless independently demonstrated."
+    "Clean source 273d5c1 passes all 72 runtime checks with 716 UI alpha.43 and runtime 39d7a11c50ebb9522ae97c4badfa2fa221c6d3c4a1fd4d459a250a241c32af25. Preferred display return leaves active editing on the recovery display until the human chooses Restore preferred placement in Agent Monitor. Original saved placements, drafts and typing survive; new floating controls remain reachable, the exact trusted renderer authorizes restoration, and stale topology/recovery/activity offers and same-user observer injection are rejected. All 66 compositor tests pass. Session SIGHUP uses graceful teardown; dedicated hangup and forced-systemd-stop regressions verify owned children, session directories and PAM scope cleanup. Expanded ordinary-input journeys have a 120-second whole-journey watchdog and unchanged individual interaction and 50 ms p95 limits. Installed approval searches tolerate absent AT-SPI children, and post-Undo input waits for a unique mapped compositor identity without replaying the action; both fixture regressions and prior failures remain retained. Multi-keyboard ownership and partial/final device removal preserve held modifiers, reject on-screen input until the final release and restore balanced lowercase typing in both ordinary and fresh-profile installed journeys. Immutable shared scenes avoid copying workspace history during rendering and input reads. Mapped collection Copy menus retain interaction leases through GTK activation and root-focus handoffs until dismissal; the identical final native fixture fails with the old handler and passes with the fix. All 36 native Rust tests pass (7 existing ignored). The prior a45fb85 full run stopped at a guarded List update after 49 checks; that failure remains retained without assigning its exact historical cause. An exact clean-source four-mode virtual KMS repeat verifies every deployed source file and 360 named kernel-key frames through secondary, primary and total display loss, plus retained launcher/keyboard identities and actual restoration controls. Native editor p95 is 44 ms idle, 42 ms loaded and 43 ms rotated, with all 60 presentation receipts completed. Installed and direct reader journeys retain three exact-work Monitor reopens before tree inspection and one background failure announcement. Rollback/interruption, reboot, repeat installation, VT resume and exact owned guest/app cleanup pass. CI 38228519983 is green. Signed v22 retains its separately qualified c57b60 runtime pending a new image qualification. Physical audio/braille/input/GPU/hotplug, live providers and full reference conformance remain unqualified; retained historical intermittent failures still have no established cause unless independently demonstrated.",
+    "Signed candidate-v23 passes fresh account/password sudo, compatible signed update/rollback, all four virtual output recovery/restoration modes with 360 named kernel-key frames and actual native restoration controls, installed keyboard/zoom, collections, VTE/IME, typed button and form-validation accessibility, actual four-control Orca error/clear and Result/Error/Status job-update speech with selection, focus leases and clipboard preservation, browser, reboot, loopback-only cold boot and activation recovery at exact full72 runtime 39d7a11c50ebb9522ae97c4badfa2fa221c6d3c4a1fd4d459a250a241c32af25 (image SHA-256 9e21d4a4d246d8fd62e81b7dda60c91c280ec7b739f8ab600d8fd6d54f366b61). Original disk/EFI inode identities and config bytes restored; test SSH/sudo authority and password file removed; owned guest/app stopped and unbooted signature reverified. Online and offline installed launcher reopens preserve the unsent draft and actual request speech after shortcut bursts. The failed v17 image, prior qualified v22/v21/v19/v18/v16 images and unresolved historical observations remain distinct."
   ],
   "owned_utm_app_closed": true,
   "full_run_evidence": {
@@ -7199,7 +7242,8 @@
     "signed_v19_image_ui": "v0.1.0-alpha.42",
     "signed_v20_image_ui": "v0.1.0-alpha.43",
     "signed_v21_image_ui": "v0.1.0-alpha.43",
-    "signed_v22_image_ui": "v0.1.0-alpha.43"
+    "signed_v22_image_ui": "v0.1.0-alpha.43",
+    "signed_v23_image_ui": "v0.1.0-alpha.43"
   },
   "utm_application_ownership": {
     "status": "launch-boundary identity guard verified by isolated tests, real launch/exit probe and full reproduction",

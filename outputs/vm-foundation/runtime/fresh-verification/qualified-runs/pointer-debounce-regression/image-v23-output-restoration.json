@@ -1,0 +1,10 @@
+{
+  "original_config_sha256": "11f4fe7f4bd8a28e75c307bcc92c110de684ba26bceb2e33fa8f65c2eb35fd71",
+  "physical_hotplug_qualified": false,
+  "installed_runtime": "39d7a11c50ebb9522ae97c4badfa2fa221c6d3c4a1fd4d459a250a241c32af25",
+  "result": "failed",
+  "original_config_restored": true,
+  "image_disk_efi_inodes_preserved": true,
+  "temporary_two_head_guest_stopped": true,
+  "temporary_owned_utm_closed": true
+}

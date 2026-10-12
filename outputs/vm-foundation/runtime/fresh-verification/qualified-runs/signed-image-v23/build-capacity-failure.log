@@ -1,0 +1,32 @@
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+Exact redundant v22 guest build copy removed; qualified host image retained
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda1        79G   35G   41G  47% /
+   Compiling agent-os-compositor v0.1.0 (/home/developer/agent-os-source/native-compositor)
+    Finished `dev` profile [unoptimized] target(s) in 1.02s
+Traceback (most recent call last):
+  File "/home/developer/agentos-image-inputs/vm-foundation/build_release_image.py", line 299, in <module>
+    if __name__ == '__main__': main()
+                               ~~~~^^
+  File "/home/developer/agentos-image-inputs/vm-foundation/build_release_image.py", line 260, in main
+    require_build_space(output.parent)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/home/developer/agentos-image-inputs/vm-foundation/build_release_image.py", line 31, in require_build_space
+    raise ValueError(
+    ...<2 lines>...
+        'completed QCOW2 together, even with --compress.')
+ValueError: Image build needs at least 41.0 GiB free on /home/developer/agentos-image-inputs; found 40.4 GiB. Allow space for the raw disk and completed QCOW2 together, even with --compress.
+Requested orderly guest shutdown. Check status before restarting.
+Exact owned UTM application exit verified
+Owned image-builder guest and exact UTM app stopped
+Traceback (most recent call last):
+  File "/tmp/agentos-build-current-image-v23.py", line 69, in <module>
+    vm.ssh('sudo -n python3 /home/developer/agentos-image-inputs/vm-foundation/build_release_image.py --dedicated-builder --compress --base /home/developer/agentos-image-inputs/base.qcow2 --output /home/developer/agentos-image-inputs/agentos-release-v23.qcow2 --bootstrap /home/developer/agent-os-source/bootstrap.py --update-key /home/developer/agentos-image-inputs/update-signing-key.pem',check=True)
+  File "/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/vm.py", line 309, in ssh
+    return subprocess.run(ssh_args() + [command], **kwargs)
+  File "/private/tmp/agentos_image_owned_utm.py", line 25, in run
+    return original_run(args,*positional,**kwargs)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ssh', '-p', '22221', '-i', '/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/id_ed25519', '-o', 'IdentitiesOnly=yes', '-o', 'StrictHostKeyChecking=accept-new', '-o', 'UserKnownHostsFile=/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/known_hosts', '-o', 'ConnectTimeout=3', '-o', 'BatchMode=yes', '-o', 'LogLevel=ERROR', 'developer@127.0.0.1', 'sudo -n python3 /home/developer/agentos-image-inputs/vm-foundation/build_release_image.py --dedicated-builder --compress --base /home/developer/agentos-image-inputs/base.qcow2 --output /home/developer/agentos-image-inputs/agentos-release-v23.qcow2 --bootstrap /home/developer/agent-os-source/bootstrap.py --update-key /home/developer/agentos-image-inputs/update-signing-key.pem']' returned non-zero exit status 1.

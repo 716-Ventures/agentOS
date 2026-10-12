@@ -1,0 +1,10 @@
+{
+  "base_qualification_archive_sha256": "93fae9f6a0953d9d45db4d03dc5bc752fede682b9e60134046cfeb2bb40339c0",
+  "base_source_revision": "273d5c1dee9af20acd06023c32307e56c995e781",
+  "overlay_source_revision": "447a787055dcbfb41dd049449f9899eb760b94b2",
+  "path": "tests/direct_input_probe.py",
+  "before_sha256": "fcd201818edb1597428799f8c2e489d69ec97b47e128372fc1c8f075a43bba3c",
+  "after_sha256": "45ca0169c6236d8a4a0118cd1ff571f8aa13e74a5dcb681970ad54b3ee6ea4b4",
+  "runtime_binaries_changed": false,
+  "scope": "Test input spacing only; installed runtime and all other qualification sources unchanged."
+}

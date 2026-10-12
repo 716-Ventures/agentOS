@@ -1,0 +1,16 @@
+{
+  "result": "pass",
+  "scope": "Independent kernel uinput -> real libinput comparison; subsequent image display qualification remains pending.",
+  "baseline_source_revision": "1364822625108213aa7f5e4e72bd3153902254b7",
+  "baseline_fast_presses": 1,
+  "baseline_spaced_presses": 2,
+  "fixed_fast_presses": 2,
+  "unit_regression": "old class fails spacing assertion; fixed class passes both tests",
+  "runtime_changed": false,
+  "click_spacing_seconds": 0.04,
+  "keyboard_presentation_target_ms": 50,
+  "image_first_attempt": "12 direct profiles passed; restarted SSH disabled; display phase not reached",
+  "image_second_attempt": "transport fixture readiness initially failed; resumed driver observed one missing pointer click before any output journey completed",
+  "historical_failure_cause_limit": "Actual libinput pulse collapse independently reproduced; no claim about unrelated historical intermittent focus failures.",
+  "owned_guest_and_app_closed": true
+}
