@@ -1,0 +1,10 @@
+{
+  "started_at": "2026-10-12T01:56:55.291468+00:00",
+  "passed": true,
+  "test_files": {
+    "controls.rs": "2a9e2d9071cc6a96c4547031a7eb00da757e3f6d82701ba1477e4e36165ff374",
+    "verification.rs": "c7e4a61309a146ef1cfc59cd6bef56b7b54b3ed2ff4386a5ba1b0b649f0c7241"
+  },
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-12T01:57:16.699081+00:00"
+}

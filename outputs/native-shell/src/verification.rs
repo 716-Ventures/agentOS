@@ -491,6 +491,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         }
         input_context::verify(app,&frame,&commands,&drafts);
         println!("CHECK: typed request preserves immutable selected context; reopening captures the new selection");
+        controls.verify_activity_chooser(&frame,&commands);
         controls.verify_status_updates(&frame,&commands);
         let local_contexts = controls.verify_local_status_requests(&frame, &commands);
         let local_requests = rx.try_iter().collect::<Vec<_>>();

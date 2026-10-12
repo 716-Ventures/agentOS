@@ -27,7 +27,7 @@ def verify(metrics, core, login_user, keyboard, wait_text, load=False, scene=Non
     def receipt():
         reports=[json.loads(p.read_text()) for p in metrics.glob('feedback-*.json')]
         return next((r for r in reports if r['requested']),None)
-    jobs=[]
+    jobs=[];progression=[]
     try:
         if load:
             activity=int(core('presentation.get')['activity_id'])
@@ -46,14 +46,17 @@ def verify(metrics, core, login_user, keyboard, wait_text, load=False, scene=Non
         frames_before=initial_scene.get('direct_frames_presented')
         wakes_before=initial_scene.get('input_frame_wakeups',0)
         for index in range(20):
+            sent=time.monotonic_ns()
             keyboard.chord(30)
             wait_text(lambda value:value['text']=='a'*(index+1))
+            text_seen=time.monotonic_ns()
             deadline=time.monotonic()+5
             while True:
                 report=receipt()
                 if report and report['presented']==index+1:break
                 if time.monotonic()>deadline:raise RuntimeError('Native GTK presentation receipt missing: '+repr(report))
                 time.sleep(.01)
+            progression.append({'sample':index+1,'text_observed_ms':round((text_seen-sent)/1e6,3),'receipt_observed_ms':round((time.monotonic_ns()-sent)/1e6,3),'p50_ms':report['p50_ms'],'p95_ms':report['p95_ms'],'max_ms':report['max_ms']})
             assert report['requested']==index+1 and report['discarded']==0 and report['invalid']==0 and report['pending']==0,report
         if load:
             usage=[cpu_usage(job)-before[job] for job in jobs]
@@ -71,6 +74,9 @@ def verify(metrics, core, login_user, keyboard, wait_text, load=False, scene=Non
         assert report['p95_ms']<=50,report
         print('PASS: native GTK editor kernel input-to-presentation '+json.dumps(report),flush=True)
     finally:
+        # Preserve content-free observation timing even when the acceptance
+        # assertion fails; these observer durations are not display latencies.
+        print('Native GTK receipt progression '+json.dumps(progression),flush=True)
         errors=[]
         for job in jobs:
             try:

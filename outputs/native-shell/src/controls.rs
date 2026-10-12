@@ -18,6 +18,7 @@ pub struct Controls {
     chooser: gtk::DropDown,
     choices: Rc<RefCell<Vec<String>>>,
     chooser_model: gtk::StringList,
+    activity_rows: Value,
     changing: Rc<Cell<bool>>,
     monitor: gtk::ApplicationWindow,
     pub monitor_content: gtk::Box,
@@ -383,6 +384,7 @@ impl Controls {
             chooser,
             choices,
             chooser_model,
+            activity_rows: Value::Null,
             changing,
             monitor,
             monitor_content,
@@ -428,6 +430,37 @@ impl Controls {
         self.workspace.verify(frame);
 
         self.present();
+    }
+    pub fn verify_activity_chooser(&mut self, frame: &Frame, commands: &Sender<Command>) {
+        let mut observed = frame.clone();
+        let rows = (1..=2000).map(|id| json!({"id":id,"name":format!("Activity {id}")})).collect::<Vec<_>>();
+        observed.core["activities"] = json!(rows);
+        observed.activity = Some("2000".into());
+        let chooser = self.chooser.clone();
+        self.update(&observed, commands);
+        assert_eq!(self.chooser.selected(), 1999);
+        assert_eq!(self.chooser_model.n_items(), 2000);
+        let started = std::time::Instant::now();
+        for _ in 0..50 { self.update(&observed, commands); }
+        println!("Activity chooser unchanged-history CPU measurement {}", json!({"activities":2000,"updates":50,"total_ms":started.elapsed().as_secs_f64()*1000.0,"meaning":"Synthetic host update CPU duration; not input-to-display latency"}));
+        observed.core["activities"][1999]["name"] = json!("Renamed λ 日本語");
+        self.update(&observed, commands);
+        assert_eq!(self.chooser_model.string(1999).as_deref(), Some("Renamed λ 日本語"));
+        observed.core["activities"].as_array_mut().unwrap().reverse();
+        self.update(&observed, commands);
+        assert_eq!(self.chooser.selected(), 0);
+        assert_eq!(self.choices.borrow()[0], "2000");
+        assert_eq!(self.chooser_model.string(0).as_deref(), Some("Renamed λ 日本語"));
+        observed.core["activities"].as_array_mut().unwrap().remove(1999);
+        self.update(&observed, commands);
+        assert_eq!(self.chooser.selected(), 0);
+        assert_eq!(self.chooser_model.n_items(), 1999);
+        observed.activity = Some("1999".into());
+        self.update(&observed, commands);
+        assert_eq!(self.chooser.selected(), 1);
+        assert_eq!(self.chooser, chooser);
+        self.update(frame, commands);
+        println!("CHECK: large activity history retains chooser identity and current names/selection across rename, reorder, removal and activity switching");
     }
     pub fn verify_status_updates(&mut self, frame: &Frame, commands: &Sender<Command>) {
         let original_voice = self.voice.state.lock().unwrap().clone();
@@ -792,34 +825,29 @@ impl Controls {
             self.review.present();
         }
 
-        let activities = frame.core["activities"]
-            .as_array()
-            .cloned()
-            .unwrap_or_default();
-        let ids = activities
-            .iter()
-            .map(|a| a["id"].to_string())
-            .collect::<Vec<_>>();
-        let names = activities
-            .iter()
-            .map(|a| a["name"].as_str().unwrap_or("Activity"))
-            .collect::<Vec<_>>();
         self.changing.set(true);
-        if *self.choices.borrow() != ids
-            || (0..self.chooser_model.n_items())
-                .map(|i| self.chooser_model.string(i).unwrap().to_string())
-                .collect::<Vec<_>>()
-                != names
-        {
-            self.chooser_model
-                .splice(0, self.chooser_model.n_items(), &names);
-            *self.choices.borrow_mut() = ids.clone();
+        let rows = &frame.core["activities"];
+        // A poll often carries the same history. Keep native model reads and
+        // row allocation off the input thread until the observed rows change.
+        if &self.activity_rows != rows {
+            let ids = rows.as_array().into_iter().flatten()
+                .map(|a| a["id"].to_string()).collect::<Vec<_>>();
+            let names = rows.as_array().into_iter().flatten()
+                .map(|a| a["name"].as_str().unwrap_or("Activity")).collect::<Vec<_>>();
+            if *self.choices.borrow() != ids
+                || (0..self.chooser_model.n_items())
+                    .map(|i| self.chooser_model.string(i).unwrap().to_string())
+                    .collect::<Vec<_>>() != names
+            {
+                self.chooser_model.splice(0, self.chooser_model.n_items(), &names);
+                *self.choices.borrow_mut() = ids;
+            }
+            self.activity_rows = rows.clone();
         }
         self.chooser.set_selected(
-            ids.iter()
+            self.choices.borrow().iter()
                 .position(|id| Some(id) == frame.activity.as_ref())
-                .map(|i| i as u32)
-                .unwrap_or(gtk::INVALID_LIST_POSITION),
+                .map(|i| i as u32).unwrap_or(gtk::INVALID_LIST_POSITION),
         );
         self.changing.set(false);
         status_projection::update(&self.message,

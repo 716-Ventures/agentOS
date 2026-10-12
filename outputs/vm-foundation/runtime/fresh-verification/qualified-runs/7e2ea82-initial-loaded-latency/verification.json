@@ -1,0 +1,16 @@
+{
+  "result": "failed",
+  "clean_source_revision": "7e2ea827a78c1d2db6a48709e5f7ddfad64342d1",
+  "source_archive_sha256": "a63e210688a16694b0e1e65b3d7658a464c7aec17469cc1a8eb09b45d186af52",
+  "completed_checks": 54,
+  "failed_check": "direct-native-feedback-load",
+  "p95_ms": 74,
+  "max_ms": 75,
+  "presented": 20,
+  "invalid": 0,
+  "discarded": 0,
+  "pending": 0,
+  "unchanged_acceptance_p95_ms": 50,
+  "owned_guest_app_closed": true,
+  "cause": "Not established. Functional Monitor and direct human restore checks passed, but the complete runtime is not promoted."
+}

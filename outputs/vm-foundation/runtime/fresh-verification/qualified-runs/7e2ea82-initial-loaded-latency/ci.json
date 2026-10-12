@@ -1,0 +1,289 @@
+{
+  "conclusion": "success",
+  "databaseId": 38192483683,
+  "headSha": "7e2ea827a78c1d2db6a48709e5f7ddfad64342d1",
+  "jobs": [
+    {
+      "completedAt": "2026-10-12T01:37:27Z",
+      "conclusion": "success",
+      "databaseId": 114628009047,
+      "name": "contracts",
+      "startedAt": "2026-10-12T01:35:40Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-12T01:35:41Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-12T01:35:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:35:46Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "startedAt": "2026-10-12T01:35:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:35:59Z",
+          "conclusion": "success",
+          "name": "Linux test identity and toolchain",
+          "number": 3,
+          "startedAt": "2026-10-12T01:35:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:37:23Z",
+          "conclusion": "success",
+          "name": "Python and Rust contracts",
+          "number": 4,
+          "startedAt": "2026-10-12T01:35:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:37:25Z",
+          "conclusion": "success",
+          "name": "Authenticated presentation and callback IPC",
+          "number": 5,
+          "startedAt": "2026-10-12T01:37:23Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:37:25Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 10,
+          "startedAt": "2026-10-12T01:37:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:37:25Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 11,
+          "startedAt": "2026-10-12T01:37:25Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/716-Ventures/agentOS/actions/runs/38192483683/job/114628009047"
+    },
+    {
+      "completedAt": "2026-10-12T01:38:22Z",
+      "conclusion": "success",
+      "databaseId": 114628009170,
+      "name": "native",
+      "startedAt": "2026-10-12T01:35:40Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-12T01:35:41Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-12T01:35:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:35:46Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "startedAt": "2026-10-12T01:35:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:36:50Z",
+          "conclusion": "success",
+          "name": "Native dependencies",
+          "number": 3,
+          "startedAt": "2026-10-12T01:35:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:36:52Z",
+          "conclusion": "success",
+          "name": "Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830",
+          "number": 4,
+          "startedAt": "2026-10-12T01:36:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:38:00Z",
+          "conclusion": "success",
+          "name": "Build native desktop",
+          "number": 5,
+          "startedAt": "2026-10-12T01:36:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:38:02Z",
+          "conclusion": "success",
+          "name": "Native transport with real broker and PTY screen keeper",
+          "number": 6,
+          "startedAt": "2026-10-12T01:38:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:38:18Z",
+          "conclusion": "success",
+          "name": "Real native rendering and interaction",
+          "number": 7,
+          "startedAt": "2026-10-12T01:38:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:38:19Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 8,
+          "startedAt": "2026-10-12T01:38:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:38:20Z",
+          "conclusion": "success",
+          "name": "Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830",
+          "number": 15,
+          "startedAt": "2026-10-12T01:38:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:38:20Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 16,
+          "startedAt": "2026-10-12T01:38:20Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:38:20Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 17,
+          "startedAt": "2026-10-12T01:38:20Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/716-Ventures/agentOS/actions/runs/38192483683/job/114628009170"
+    },
+    {
+      "completedAt": "2026-10-12T01:41:31Z",
+      "conclusion": "success",
+      "databaseId": 114628009214,
+      "name": "compositor",
+      "startedAt": "2026-10-12T01:35:40Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-12T01:35:41Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-12T01:35:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:35:46Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "startedAt": "2026-10-12T01:35:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:36:37Z",
+          "conclusion": "success",
+          "name": "Wayland dependencies",
+          "number": 3,
+          "startedAt": "2026-10-12T01:35:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:36:44Z",
+          "conclusion": "success",
+          "name": "Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830",
+          "number": 4,
+          "startedAt": "2026-10-12T01:36:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:37:03Z",
+          "conclusion": "success",
+          "name": "Build and policy tests",
+          "number": 5,
+          "startedAt": "2026-10-12T01:36:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:37:03Z",
+          "conclusion": "success",
+          "name": "Direct backend startup failure and cleanup",
+          "number": 6,
+          "startedAt": "2026-10-12T01:37:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:37:57Z",
+          "conclusion": "success",
+          "name": "Native and conventional clients in agentOS compositor",
+          "number": 7,
+          "startedAt": "2026-10-12T01:37:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:38:33Z",
+          "conclusion": "success",
+          "name": "Installed native approval journey against systemd broker",
+          "number": 8,
+          "startedAt": "2026-10-12T01:37:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:41:28Z",
+          "conclusion": "success",
+          "name": "Full graphical login lifecycle and staged release",
+          "number": 9,
+          "startedAt": "2026-10-12T01:38:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:41:29Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 10,
+          "startedAt": "2026-10-12T01:41:28Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:41:29Z",
+          "conclusion": "success",
+          "name": "Post Run actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830",
+          "number": 19,
+          "startedAt": "2026-10-12T01:41:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:41:30Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 20,
+          "startedAt": "2026-10-12T01:41:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-12T01:41:30Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 21,
+          "startedAt": "2026-10-12T01:41:30Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/716-Ventures/agentOS/actions/runs/38192483683/job/114628009214"
+    }
+  ],
+  "status": "completed"
+}

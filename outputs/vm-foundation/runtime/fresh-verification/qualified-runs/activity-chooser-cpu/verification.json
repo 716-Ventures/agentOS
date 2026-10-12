@@ -1,0 +1,102 @@
+{
+  "result": "targeted-pass",
+  "runtime_release": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
+  "source_archive_sha256": "f11c703fe6dd6352a5bea694bea94e9119014f2014b58e2f7a827afb6df16512",
+  "baseline_cpu": {
+    "activities": 2000,
+    "meaning": "Synthetic host update CPU duration; not input-to-display latency",
+    "total_ms": 90.49312499999999,
+    "updates": 50
+  },
+  "cached_cpu": {
+    "native-dark-1": {
+      "activities": 2000,
+      "meaning": "Synthetic host update CPU duration; not input-to-display latency",
+      "total_ms": 31.315136,
+      "updates": 50
+    },
+    "native-dark-2": {
+      "activities": 2000,
+      "meaning": "Synthetic host update CPU duration; not input-to-display latency",
+      "total_ms": 31.990549,
+      "updates": 50
+    },
+    "native-light-1": {
+      "activities": 2000,
+      "meaning": "Synthetic host update CPU duration; not input-to-display latency",
+      "total_ms": 37.268747999999995,
+      "updates": 50
+    },
+    "native-light-2": {
+      "activities": 2000,
+      "meaning": "Synthetic host update CPU duration; not input-to-display latency",
+      "total_ms": 32.118303,
+      "updates": 50
+    },
+    "native-compositor": {
+      "activities": 2000,
+      "meaning": "Synthetic host update CPU duration; not input-to-display latency",
+      "total_ms": 32.161837999999996,
+      "updates": 50
+    },
+    "native-shared": {
+      "activities": 2000,
+      "meaning": "Synthetic host update CPU duration; not input-to-display latency",
+      "total_ms": 32.689091000000005,
+      "updates": 50
+    }
+  },
+  "change": "Compare observed activity rows before allocating chooser rows or rereading the GTK model. Always reconcile the separately observed active activity.",
+  "behavior": [
+    "same GTK chooser identity",
+    "rename reflects latest label",
+    "reorder retains selected activity ID",
+    "unselected removal preserves selection",
+    "activity switching updates selection with otherwise unchanged rows"
+  ],
+  "latency": {
+    "loaded": {
+      "clock_id": 1,
+      "discarded": 0,
+      "format": 1,
+      "invalid": 0,
+      "max_ms": 42,
+      "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+      "p50_ms": 34,
+      "p95_ms": 41,
+      "pending": 0,
+      "presented": 20,
+      "requested": 20,
+      "sample_limit": 256,
+      "profile": "two concurrent broker CPU jobs",
+      "job_cpu_usage_usec": [
+        2428012,
+        2602916
+      ],
+      "measurement_seconds": 3.054,
+      "completed_frames_between_observer_snapshots": 164,
+      "input_frame_wakeups_between_observer_snapshots": 20
+    },
+    "idle": {
+      "clock_id": 1,
+      "discarded": 0,
+      "format": 1,
+      "invalid": 0,
+      "max_ms": 52,
+      "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+      "p50_ms": 29,
+      "p95_ms": 45,
+      "pending": 0,
+      "presented": 20,
+      "requested": 20,
+      "sample_limit": 256,
+      "profile": "idle editor",
+      "measurement_seconds": 3.44,
+      "completed_frames_between_observer_snapshots": 205,
+      "input_frame_wakeups_between_observer_snapshots": 20
+    }
+  },
+  "latency_cause_limit": "Initial clean 7e2ea82 full run failed loaded p95 at 74 ms; unchanged installed native/compositor probes subsequently measured 50 ms loaded/45 ms idle. Cache cost reduction is independently measured; the historical 74 ms mechanism remains unestablished. No complete qualification or promotion is claimed here.",
+  "retained_invalid_selection_fixture": "The first synthetic chooser fixture expected a missing selected activity to yield GTK INVALID_LIST_POSITION; GTK kept the first item selected. The fixture now removes an unselected row and verifies selection preservation. This is not claimed as a production bug reproducer.",
+  "full_source_qualification": "Pending complete clean committed-source 70-check run and CI. Signed v20 retains its distinct qualified runtime."
+}

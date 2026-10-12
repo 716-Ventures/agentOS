@@ -1,0 +1,32 @@
+{
+  "started_at": "2026-10-12T01:58:53.688069+00:00",
+  "passed": true,
+  "source_archive_sha256": "f11c703fe6dd6352a5bea694bea94e9119014f2014b58e2f7a827afb6df16512",
+  "checks": [
+    "native-build",
+    "native-dark-1",
+    "native-dark-2",
+    "native-light-1",
+    "native-light-2",
+    "native-compositor",
+    "native-shared",
+    "reader",
+    "loaded",
+    "idle"
+  ],
+  "deployment": {
+    "created_at": "2026-10-12T01:59:07.061136+00:00",
+    "source_archive_sha256": "f11c703fe6dd6352a5bea694bea94e9119014f2014b58e2f7a827afb6df16512",
+    "repository_revision": "7e2ea827a78c1d2db6a48709e5f7ddfad64342d1",
+    "source_changes": [
+      " M outputs/agent-shell/tests/direct_native_feedback.py",
+      " M outputs/native-shell/src/controls.rs",
+      " M outputs/native-shell/src/verification.rs"
+    ],
+    "installed": true
+  },
+  "runtime_release": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
+  "reader_raw_sha256": "0ac3af1104029bf41bd4a1d412f239b59b5d409f08f8e0192d2ba1a94e105dba",
+  "owned_utm_closed": true,
+  "finished_at": "2026-10-12T02:01:55.899706+00:00"
+}

@@ -1,0 +1,106 @@
+Input fixture device: event5 ['ID_INPUT=1', 'ID_INPUT_MOUSE=1']
+Input fixture device: event4 ['ID_INPUT=1', 'ID_INPUT_KEY=1', 'ID_INPUT_KEYBOARD=1']
+Native GTK input-to-presentation measurement {"clock_id": 1, "discarded": 0, "format": 1, "invalid": 0, "max_ms": 75, "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification", "p50_ms": 33, "p95_ms": 74, "pending": 0, "presented": 20, "requested": 20, "sample_limit": 256, "profile": "two concurrent broker CPU jobs", "job_cpu_usage_usec": [1938103, 2030040], "measurement_seconds": 2.457, "completed_frames_between_observer_snapshots": 124, "input_frame_wakeups_between_observer_snapshots": 19}
+
+Session terminated, killing shell... ...killed.
+{"control_socket":"/run/user/1000/agentos-session-72298e8l/agentos-compositor-74286.sock","wayland_display":"wayland-1"}
+[2m2026-10-12T00:42:09.575276Z[0m [32m INFO[0m [2msmithay::backend::drm::surface::atomic[0m[2m:[0m Adding connector: Virtual
+[2m2026-10-12T00:42:09.575312Z[0m [32m INFO[0m [2msmithay::backend::drm::surface::atomic[0m[2m:[0m Setting new mode: "1280x800"
+[2m2026-10-12T00:42:09.575343Z[0m [33m WARN[0m [2msmithay::backend::drm::surface::atomic[0m[2m:[0m Failed to destroy old mode property blob: No such file or directory (os error 2)
+dbus-daemon[74284]: [session uid=1000 pid=74284 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=74290 comm="/usr/local/bin/agent-os-desktop --socket /run/agen")
+dbus-daemon[74284]: [session uid=1000 pid=74284 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[74317]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=74290 comm="/usr/local/bin/agent-os-desktop --socket /run/agen")
+dbus-daemon[74317]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+[2m2026-10-12T00:42:09.887287Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event0"
+[2m2026-10-12T00:42:09.887307Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event1"
+[2m2026-10-12T00:42:09.887309Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event2"
+[2m2026-10-12T00:42:09.887311Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event3"
+[2m2026-10-12T00:42:09.887312Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event3"
+[2m2026-10-12T00:42:09.887350Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event0"
+[2m2026-10-12T00:42:09.887358Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event1"
+[2m2026-10-12T00:42:09.887381Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event2"
+[2m2026-10-12T00:42:11.973942Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event0"
+[2m2026-10-12T00:42:11.973957Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event1"
+[2m2026-10-12T00:42:11.973959Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event2"
+[2m2026-10-12T00:42:11.973960Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event3"
+[2m2026-10-12T00:42:12.026556Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event4"
+[2m2026-10-12T00:42:12.033913Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event5"
+[2m2026-10-12T00:42:16.292521Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event5"
+[2m2026-10-12T00:42:16.435369Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event4"
+[2m2026-10-12T00:42:18.716450Z[0m [33m WARN[0m [1mdrm_atomic[0m[2m:[0m[1mcreate_surface[0m[1m{[0m[3mcrtc[0m[2m=[0mcrtc::Handle(36) [3mmode[0m[2m=[0mMode { name: "1280x800", clock: 107300, size: (1280, 800), hsync: (1600, 1638, 1728), vsync: (804, 808, 828), hskew: 0, vscan: 0, vrefresh: 75, mode_type: ModeTypeFlags(PREFERRED | DRIVER) } [3mconnectors[0m[2m=[0m[connector::Handle(37)][1m}[0m[2m:[0m[1mdrm_atomic[0m[1m{[0m[3mcrtc[0m[2m=[0mcrtc::Handle(36)[1m}[0m[2m:[0m [2msmithay::backend::drm::surface::atomic[0m[2m:[0m Unable to clear state: DRM access error: Failed to commit on clear_state on device `Some("/dev/dri/card0")` (Permission denied (os error 13))
+[2m2026-10-12T00:42:18.716486Z[0m [31mERROR[0m [1mdrm_atomic[0m[2m:[0m [2msmithay::backend::drm::device::atomic[0m[2m:[0m Failed to restore previous state. Error: Permission denied (os error 13)
+[2m2026-10-12T00:42:18.716494Z[0m [32m INFO[0m [2msmithay::backend::drm::device::fd[0m[2m:[0m Dropping device: Some("/dev/dri/card0")
+dbus-daemon[74317]: Reloaded configuration
+session-71.scope: Killed unit cgroup with SIGKILL on client request.
+session-71.scope: Deactivated successfully.
+session-71.scope: Consumed 11.316s CPU time, 252.3M memory peak.
+Started session-71.scope - Session 71 of User developer.
+[2m2026-10-12T01:47:37.343910Z[0m [32m INFO[0m [1minput_seat[0m[1m{[0m[3mname[0m[2m=[0m"winit"[1m}[0m[2m:[0m[1madd_keyboard[0m[1m{[0m[3mxkb_config[0m[2m=[0mXkbConfig { rules: "", model: "", layout: "", variant: "", options: None } [3mrepeat_delay[0m[2m=[0m200 [3mrepeat_rate[0m[2m=[0m25[1m}[0m[2m:[0m[1minput_keyboard[0m[2m:[0m [2msmithay::input::keyboard[0m[2m:[0m Initializing a xkbcommon handler with keymap query
+[2m2026-10-12T01:47:37.345587Z[0m [32m INFO[0m [1minput_seat[0m[1m{[0m[3mname[0m[2m=[0m"winit"[1m}[0m[2m:[0m[1madd_keyboard[0m[1m{[0m[3mxkb_config[0m[2m=[0mXkbConfig { rules: "", model: "", layout: "", variant: "", options: None } [3mrepeat_delay[0m[2m=[0m200 [3mrepeat_rate[0m[2m=[0m25[1m}[0m[2m:[0m[1minput_keyboard[0m[2m:[0m [2msmithay::input::keyboard[0m[2m:[0m Loaded Keymap [3mname[0m[2m=[0m"English (US)"
+[2m2026-10-12T01:47:37.346091Z[0m [32m INFO[0m [2msmithay::wayland::socket[0m[2m:[0m Created new socket [3mname[0m[2m=[0mSome("wayland-1")
+[2m2026-10-12T01:47:37.348978Z[0m [33m WARN[0m [2msmithay::backend::drm::device::fd[0m[2m:[0m Unable to become drm master, assuming unprivileged mode
+[2m2026-10-12T01:47:37.348988Z[0m [32m INFO[0m [2msmithay::backend::drm::device[0m[2m:[0m DrmDevice initializing
+[2m2026-10-12T01:47:37.366732Z[0m [32m INFO[0m [2msmithay::backend::egl::display[0m[2m:[0m Successfully selected EGL platform: PLATFORM_GBM_KHR
+[2m2026-10-12T01:47:37.367125Z[0m [32m INFO[0m [2msmithay::backend::egl::display[0m[2m:[0m EGL Initialized
+[2m2026-10-12T01:47:37.367135Z[0m [32m INFO[0m [2msmithay::backend::egl::display[0m[2m:[0m EGL Version: (1, 5)
+[2m2026-10-12T01:47:37.367142Z[0m [32m INFO[0m [2msmithay::backend::egl::display[0m[2m:[0m Supported EGL display extensions: ["EGL_ANDROID_blob_cache", "EGL_ANDROID_native_fence_sync", "EGL_EXT_buffer_age", "EGL_EXT_config_select_group", "EGL_EXT_image_dma_buf_import", "EGL_EXT_image_dma_buf_import_modifiers", "EGL_EXT_surface_compression", "EGL_KHR_cl_event2", "EGL_KHR_config_attribs", "EGL_KHR_context_flush_control", "EGL_KHR_create_context", "EGL_KHR_create_context_no_error", "EGL_KHR_fence_sync", "EGL_KHR_get_all_proc_addresses", "EGL_KHR_gl_colorspace", "EGL_KHR_gl_renderbuffer_image", "EGL_KHR_gl_texture_2D_image", "EGL_KHR_gl_texture_3D_image", "EGL_KHR_gl_texture_cubemap_image", "EGL_KHR_image", "EGL_KHR_image_base", "EGL_KHR_image_pixmap", "EGL_KHR_no_config_context", "EGL_KHR_reusable_sync", "EGL_KHR_surfaceless_context", "EGL_EXT_pixel_format_float", "EGL_KHR_wait_sync", "EGL_MESA_configless_context", "EGL_MESA_drm_image", "EGL_MESA_gl_interop", "EGL_MESA_image_dma_buf_export", "EGL_MESA_query_driver", "EGL_MESA_x11_native_visual_id", "EGL_WL_bind_wayland_display", ""]
+[2m2026-10-12T01:47:37.368000Z[0m [32m INFO[0m [1megl[0m[1m{[0m[3mnative[0m[2m=[0m"/dev/dri/card0" [3mplatform[0m[2m=[0m"PLATFORM_GBM_KHR" [3mversion[0m[2m=[0m(1, 5)[1m}[0m[2m:[0m[1megl_context[0m[1m{[0m[3mptr[0m[2m=[0m187650764104048[1m}[0m[2m:[0m [2msmithay::backend::egl::context[0m[2m:[0m EGL context created [3mpriority[0m[2m=[0mNone
+[2m2026-10-12T01:47:37.368696Z[0m [32m INFO[0m [1megl[0m[1m{[0m[3mnative[0m[2m=[0m"/dev/dri/card0" [3mplatform[0m[2m=[0m"PLATFORM_GBM_KHR" [3mversion[0m[2m=[0m(1, 5)[1m}[0m[2m:[0m[1megl_context[0m[1m{[0m[3mptr[0m[2m=[0m187650764104048[1m}[0m[2m:[0m[1mrenderer_gles2[0m[2m:[0m [2msmithay::backend::renderer::gles[0m[2m:[0m Initializing OpenGL ES Renderer
+[2m2026-10-12T01:47:37.368707Z[0m [32m INFO[0m [1megl[0m[1m{[0m[3mnative[0m[2m=[0m"/dev/dri/card0" [3mplatform[0m[2m=[0m"PLATFORM_GBM_KHR" [3mversion[0m[2m=[0m(1, 5)[1m}[0m[2m:[0m[1megl_context[0m[1m{[0m[3mptr[0m[2m=[0m187650764104048[1m}[0m[2m:[0m[1mrenderer_gles2[0m[2m:[0m [2msmithay::backend::renderer::gles[0m[2m:[0m GL Version: "OpenGL ES 3.0 Mesa 25.0.7-2+deb13u1"
+[2m2026-10-12T01:47:37.368710Z[0m [32m INFO[0m [1megl[0m[1m{[0m[3mnative[0m[2m=[0m"/dev/dri/card0" [3mplatform[0m[2m=[0m"PLATFORM_GBM_KHR" [3mversion[0m[2m=[0m(1, 5)[1m}[0m[2m:[0m[1megl_context[0m[1m{[0m[3mptr[0m[2m=[0m187650764104048[1m}[0m[2m:[0m[1mrenderer_gles2[0m[2m:[0m [2msmithay::backend::renderer::gles[0m[2m:[0m GL Vendor: "Mesa"
+[2m2026-10-12T01:47:37.368713Z[0m [32m INFO[0m [1megl[0m[1m{[0m[3mnative[0m[2m=[0m"/dev/dri/card0" [3mplatform[0m[2m=[0m"PLATFORM_GBM_KHR" [3mversion[0m[2m=[0m(1, 5)[1m}[0m[2m:[0m[1megl_context[0m[1m{[0m[3mptr[0m[2m=[0m187650764104048[1m}[0m[2m:[0m[1mrenderer_gles2[0m[2m:[0m [2msmithay::backend::renderer::gles[0m[2m:[0m GL Renderer: "virgl (ANGLE (Apple, Apple M2 Ultra, OpenGL 4.1 Metal - 91.7))"
+[2m2026-10-12T01:47:37.368715Z[0m [32m INFO[0m [1megl[0m[1m{[0m[3mnative[0m[2m=[0m"/dev/dri/card0" [3mplatform[0m[2m=[0m"PLATFORM_GBM_KHR" [3mversion[0m[2m=[0m(1, 5)[1m}[0m[2m:[0m[1megl_context[0m[1m{[0m[3mptr[0m[2m=[0m187650764104048[1m}[0m[2m:[0m[1mrenderer_gles2[0m[2m:[0m [2msmithay::backend::renderer::gles[0m[2m:[0m Supported GL Extensions: ["GL_EXT_blend_minmax", "GL_EXT_multi_draw_arrays", "GL_EXT_texture_filter_anisotropic", "GL_EXT_texture_compression_s3tc", "GL_EXT_texture_compression_dxt1", "GL_EXT_texture_compression_rgtc", "GL_EXT_texture_format_BGRA8888", "GL_OES_compressed_ETC1_RGB8_texture", "GL_OES_depth24", "GL_OES_element_index_uint", "GL_OES_fbo_render_mipmap", "GL_OES_mapbuffer", "GL_OES_rgb8_rgba8", "GL_OES_standard_derivatives", "GL_OES_stencil8", "GL_OES_texture_3D", "GL_OES_texture_float", "GL_OES_texture_float_linear", "GL_OES_texture_half_float", "GL_OES_texture_half_float_linear", "GL_OES_texture_npot", "GL_OES_vertex_half_float", "GL_EXT_draw_instanced", "GL_EXT_texture_sRGB_decode", "GL_OES_EGL_image", "GL_OES_depth_texture", "GL_OES_packed_depth_stencil", "GL_EXT_texture_type_2_10_10_10_REV", "GL_OES_get_program_binary", "GL_APPLE_texture_max_level", "GL_EXT_discard_framebuffer", "GL_EXT_read_format_bgra", "GL_EXT_texture_storage", "GL_NV_pack_subimage", "GL_EXT_frag_depth", "GL_NV_fbo_color_attachments", "GL_OES_EGL_image_external", "GL_OES_EGL_sync", "GL_OES_vertex_array_object", "GL_ANGLE_pack_reverse_row_order", "GL_ANGLE_texture_compression_dxt3", "GL_ANGLE_texture_compression_dxt5", "GL_EXT_occlusion_query_boolean", "GL_EXT_texture_rg", "GL_EXT_unpack_subimage", "GL_NV_draw_buffers", "GL_NV_read_buffer", "GL_NV_read_depth", "GL_NV_read_depth_stencil", "GL_NV_read_stencil", "GL_APPLE_sync", "GL_EXT_draw_buffers", "GL_EXT_instanced_arrays", "GL_EXT_map_buffer_range", "GL_EXT_shadow_samplers", "GL_KHR_debug", "GL_KHR_texture_compression_astc_ldr", "GL_NV_generate_mipmap_sRGB", "GL_NV_pixel_buffer_object", "GL_OES_depth_texture_cube_map", "GL_OES_required_internalformat", "GL_OES_surfaceless_context", "GL_EXT_color_buffer_float", "GL_EXT_debug_label", "GL_EXT_sRGB_write_control", "GL_EXT_separate_shader_objects", "GL_EXT_shader_integer_mix", "GL_EXT_base_instance", "GL_EXT_compressed_ETC1_RGB8_sub_texture", "GL_EXT_draw_buffers_indexed", "GL_EXT_draw_elements_base_vertex", "GL_EXT_render_snorm", "GL_EXT_texture_border_clamp", "GL_KHR_context_flush_control", "GL_OES_draw_buffers_indexed", "GL_OES_draw_elements_base_vertex", "GL_OES_texture_border_clamp", "GL_EXT_blend_func_extended", "GL_EXT_float_blend", "GL_KHR_no_error", "GL_KHR_texture_compression_astc_sliced_3d", "GL_OES_EGL_image_external_essl3", "GL_EXT_conservative_depth", "GL_EXT_disjoint_timer_query", "GL_EXT_texture_compression_s3tc_srgb", "GL_MESA_shader_integer_functions", "GL_EXT_color_buffer_half_float", "GL_EXT_texture_compression_bptc", "GL_KHR_parallel_shader_compile", "GL_EXT_EGL_image_storage", "GL_MESA_framebuffer_flip_y", "GL_EXT_depth_clamp", "GL_MESA_sampler_objects", "GL_EXT_EGL_image_storage_compression", "GL_EXT_texture_storage_compression", "GL_MESA_bgra", ""]
+[2m2026-10-12T01:47:37.374673Z[0m [32m INFO[0m [1mdrm_atomic[0m[2m:[0m[1mcreate_surface[0m[1m{[0m[3mcrtc[0m[2m=[0mcrtc::Handle(36) [3mmode[0m[2m=[0mMode { name: "1280x800", clock: 107300, size: (1280, 800), hsync: (1600, 1638, 1728), vsync: (804, 808, 828), hskew: 0, vscan: 0, vrefresh: 75, mode_type: ModeTypeFlags(PREFERRED | DRIVER) } [3mconnectors[0m[2m=[0m[connector::Handle(37)][1m}[0m[2m:[0m[1mdrm_atomic[0m[1m{[0m[3mcrtc[0m[2m=[0mcrtc::Handle(36)[1m}[0m[2m:[0m [2msmithay::backend::drm::surface::atomic[0m[2m:[0m Initializing drm surface (crtc::Handle(36):plane::Handle(32)) with mode Mode { name: "1280x800", clock: 107300, size: (1280, 800), hsync: (1600, 1638, 1728), vsync: (804, 808, 828), hskew: 0, vscan: 0, vrefresh: 75, mode_type: ModeTypeFlags(PREFERRED | DRIVER) } and connectors [connector::Handle(37)]
+[2m2026-10-12T01:47:37.375213Z[0m [32m INFO[0m [1mnew[0m[1m{[0m[3mname[0m[2m=[0m"Virtual-1" [3mphysical[0m[2m=[0mPhysicalProperties { size: Size<smithay::utils::geometry::Raw> { w: 320, h: 200 }, subpixel: Unknown, make: "DRM", model: "Virtual" }[1m}[0m[2m:[0m [2msmithay::output[0m[2m:[0m Creating new Output [3mname[0m[2m=[0m"Virtual-1"
+[2m2026-10-12T01:47:37.375299Z[0m [32m INFO[0m [2msmithay::wayland::output[0m[2m:[0m Creating new wl_output [3moutput[0m[2m=[0m"Virtual-1"
+[2m2026-10-12T01:47:37.719250Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Initializing a libinput backend
+{"control_socket":"/run/user/1000/agentos-session-_50r2nq5/agentos-compositor-77213.sock","wayland_display":"wayland-1"}
+[2m2026-10-12T01:47:37.738255Z[0m [32m INFO[0m [2msmithay::backend::drm::surface::atomic[0m[2m:[0m Adding connector: Virtual
+[2m2026-10-12T01:47:37.738276Z[0m [32m INFO[0m [2msmithay::backend::drm::surface::atomic[0m[2m:[0m Setting new mode: "1280x800"
+[2m2026-10-12T01:47:37.738303Z[0m [33m WARN[0m [2msmithay::backend::drm::surface::atomic[0m[2m:[0m Failed to destroy old mode property blob: No such file or directory (os error 2)
+dbus-daemon[77211]: [session uid=1000 pid=77211 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=77218 comm="/usr/local/bin/agent-os-desktop --socket /run/agen")
+dbus-daemon[77211]: [session uid=1000 pid=77211 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[77240]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=77218 comm="/usr/local/bin/agent-os-desktop --socket /run/agen")
+dbus-daemon[77240]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+[2m2026-10-12T01:47:38.079837Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event0"
+[2m2026-10-12T01:47:38.079858Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event1"
+[2m2026-10-12T01:47:38.079860Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event2"
+[2m2026-10-12T01:47:38.079862Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event3"
+[2m2026-10-12T01:47:38.079863Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event0"
+[2m2026-10-12T01:47:38.079886Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event1"
+[2m2026-10-12T01:47:38.079917Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event3"
+[2m2026-10-12T01:47:38.079943Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event2"
+Direct output frame failed: The underlying drm surface encounted an error: DRM access error: Page flip commit failed on device `Some("/dev/dri/card0")` (Permission denied (os error 13))
+[2m2026-10-12T01:47:40.209563Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event0"
+[2m2026-10-12T01:47:40.209575Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event1"
+[2m2026-10-12T01:47:40.209577Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event2"
+[2m2026-10-12T01:47:40.209578Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event3"
+[2m2026-10-12T01:47:40.253224Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event5"
+[2m2026-10-12T01:47:40.266875Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m New device "event4"
+[2m2026-10-12T01:47:44.752537Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event5"
+[2m2026-10-12T01:47:44.851931Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m Removed device "event4"
+dbus-daemon[77240]: Reloaded configuration
+dbus-daemon[77211]: [session uid=1000 pid=77211 pidfd=5] Reloaded configuration
+
+Started agentos-display-test-9a4b0d7b8bca4e1f8d6e34cb04a2e18a.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 1896.
+pam_unix(login:session): session opened for user developer(uid=1000) by developer(uid=0)
+Stopping agentos-display-test-9a4b0d7b8bca4e1f8d6e34cb04a2e18a.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 1896...
+agentos-display-test-9a4b0d7b8bca4e1f8d6e34cb04a2e18a.service: Deactivated successfully.
+Stopped agentos-display-test-9a4b0d7b8bca4e1f8d6e34cb04a2e18a.service - [systemd-run] /usr/bin/dbus-run-session -- /usr/local/bin/agent-os-session --backend direct --activity 1896.
+
+Traceback (most recent call last):
+  File "/home/developer/agent-os-source/tests/direct_display_guest.py", line 312, in <module>
+    main()
+    ~~~~^^
+  File "/home/developer/agent-os-source/tests/direct_display_guest.py", line 237, in main
+    direct_input_probe.verify(metrics,snapshot['outputs'][0],core,lambda:control(endpoint,'snapshot'),target,user.pw_name,presentation,terminal_input=args.terminal_input,terminal_ime=args.terminal_ime,presentation_feedback=args.presentation_feedback,native_feedback=args.native_feedback,native_feedback_load=args.native_feedback_load,screen_reader=args.screen_reader_input,table_input=collection_kind,focus_transfers=args.focus_transfers)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/developer/agent-os-source/tests/direct_input_probe.py", line 478, in verify
+    direct_native_feedback.verify(metrics,core,login_user,keyboard,wait,load=native_feedback_load,scene=scene)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/developer/agent-os-source/tests/direct_native_feedback.py", line 71, in verify
+    assert report['p95_ms']<=50,report
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'clock_id': 1, 'discarded': 0, 'format': 1, 'invalid': 0, 'max_ms': 75, 'meaning': 'Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification', 'p50_ms': 33, 'p95_ms': 74, 'pending': 0, 'presented': 20, 'requested': 20, 'sample_limit': 256, 'profile': 'two concurrent broker CPU jobs', 'job_cpu_usage_usec': [1938103, 2030040], 'measurement_seconds': 2.457, 'completed_frames_between_observer_snapshots': 124, 'input_frame_wakeups_between_observer_snapshots': 19}
