@@ -1,0 +1,9 @@
+Installed and healthy: c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce
+Warning: The unit file, source configuration file or drop-ins of agent-os-core.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-layout.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-disk.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-broker.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-ai.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Warning: The unit file, source configuration file or drop-ins of agent-os-voice.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+Installed and healthy: c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce
+{"result": "pass", "checks": ["SIGKILL at stopped recovered from staged release; state and config preserved", "SIGKILL at activated recovered from staged release; state and config preserved"], "provider_calls": "none"}

@@ -1,0 +1,40 @@
+dbus-daemon[12038]: [session uid=1000 pid=12038 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.0' (uid=1000 pid=12061 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[12038]: [session uid=1000 pid=12038 pidfd=5] Successfully activated service 'org.a11y.Bus'
+CHECK: recovered toggle correction and final native control/notice/draft-owner release
+CHECK: choice, text field, multiline and document editor release native owners and shared drafts
+CHECK: focused human Save/Discard resolution applies to text, multiline, document, choice and toggle; later edits use the acknowledged draft revision and background updates preserve input
+CHECK: inline validation preserves text/document/choice/toggle identity, logical focus and draft values; text and error selections defer replacement and unrelated changes remain blocked
+CHECK: local callback feedback preserves field identity, focus, text selection and unsaved draft; selected captions defer, declarative feedback returns and value/revision mismatches stay hidden
+CHECK: retained Choice label updates preserve widget/value/draft identity and defer selected heading replacement until selection ends
+CHECK: unfocused selected Status defers structural replacement while current binding stays visible; deselection applies the replacement
+CHECK: actual native field/editor/Status and Table/List/KeyValue Unicode selections retain stable surface/element/row identities
+CHECK: typed request preserves immutable selected context; reopening captures the new selection
+Activity chooser unchanged-history CPU measurement {"activities":2000,"meaning":"Synthetic host update CPU duration; not input-to-display latency","total_ms":32.265710000000006,"updates":50}
+CHECK: large activity history retains chooser identity and current names/selection across rename, reorder, removal and activity switching
+CHECK: selected message status retains snapshot and request draft across background refresh
+CHECK: selected voice status retains snapshot and request draft across background refresh
+CHECK: selected model status retains snapshot and request draft across background refresh
+CHECK: deliberate local message selection replaces the launcher's earlier context without replacing its selected snapshot
+CHECK: deliberate local voice selection replaces the launcher's earlier context without replacing its selected snapshot
+dbus-daemon[12096]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=12061 comm="/home/developer/agent-os-source/native-shell/targe")
+dbus-daemon[12096]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+CHECK: file replacement requires completed review and deliberate human action with exact revision/hash
+CHECK: latest value/draft comparison and deliberate save capture exact reviewed document and draft revisions
+CHECK: mapped native surface
+CHECK: authenticated immutable image resource and native texture
+CHECK: native VTE contextual selection preserves exact Unicode without reading or replacing the clipboard
+CHECK: native PTY renderer remains detached without running authorized work
+CHECK: selected outcome retains snapshot while current failure/disconnection stays visible and reconciles after deselection
+CHECK: reference intent, revision and target disappearance/reappearance
+CHECK: selected core work context retains exact row text and job/activity identity without using another output page
+CHECK: selected broker work context retains exact row text and job/activity identity without using another output page
+CHECK: virtualized work history with stable identities and recycled controls
+CHECK: selection and live binding preserved
+CHECK: typed numeric progress and invalid-range availability
+CHECK: local edit preserved
+CHECK: reordered retained widgets
+CHECK: bounded button styles retain identity, focus and guarded action revision; invalid frames clear dispatch and recover safely
+PASS: real core IPC, native catalog rendering, Unicode selection, live source updates, preserved drafts, keyed reordering, scoped action dispatch, offline retained view
+PASS: native test core and private display cleaned up
+PASS: bounded aggregate update/render diagnostics; no input-to-display latency claim

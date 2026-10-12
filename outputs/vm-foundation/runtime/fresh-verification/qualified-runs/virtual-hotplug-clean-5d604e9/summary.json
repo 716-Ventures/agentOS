@@ -1,0 +1,3459 @@
+{
+  "started_at": "2026-10-12T05:22:25.254276+00:00",
+  "original_config_sha256": "b2ba8798840483e3a9d810658eb84e69eba42cfadd6460844f3e3d91e38cd186",
+  "purpose": "Exact clean-source secondary, primary and all-output synthetic connector recovery; not physical hotplug",
+  "source_revision": "5d604e9573f8c9746010fa9b0a0d04a4642a0720",
+  "source_archive_sha256": "953a80f83840fd06a32b324bed4b1e10d186346318c29784dc23f33f82cd4328",
+  "installed_runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
+  "source_clean": true,
+  "connectors": [
+    {
+      "name": "card0-Virtual-1",
+      "status": "connected",
+      "modes": [
+        "1280x800",
+        "5120x2160",
+        "4096x2160",
+        "3840x2160",
+        "3840x2160",
+        "3840x2160",
+        "1920x1440",
+        "2560x1080",
+        "1856x1392",
+        "1792x1344",
+        "2048x1152",
+        "1920x1200",
+        "1920x1080",
+        "1920x1080",
+        "1600x1200",
+        "1680x1050",
+        "1400x1050",
+        "1280x1024",
+        "1440x900",
+        "1280x960",
+        "1360x768",
+        "1280x768",
+        "1024x768",
+        "800x600",
+        "640x480",
+        "640x480"
+      ],
+      "enabled": "enabled"
+    },
+    {
+      "name": "card0-Virtual-2",
+      "status": "disconnected",
+      "modes": [],
+      "enabled": "disabled"
+    }
+  ],
+  "two_connectors_observed": true,
+  "virtual_kms": {
+    "virtual_gpu_pci_identity": {
+      "DRIVER": "virtio-pci",
+      "PCI_CLASS": "38000",
+      "PCI_ID": "1AF4:1050",
+      "PCI_SUBSYS_ID": "1AF4:1100",
+      "PCI_SLOT_NAME": "0000:00:02.0",
+      "MODALIAS": "pci:v00001AF4d00001050sv00001AF4sd00001100bc03sc80i00"
+    },
+    "original_second_connector_status": "disconnected",
+    "synthetic_connector_force": true,
+    "physical_hotplug_qualified": false,
+    "cases": [
+      {
+        "mode": "--multi-output-hotplug",
+        "kms_session": {
+          "result": "pass",
+          "fresh_profile_qualified": false,
+          "binary_directory": "/usr/local/bin",
+          "outputs": [
+            {
+              "height": 800,
+              "name": "Virtual-1",
+              "scale": 1.0,
+              "transform": "Normal",
+              "width": 1280,
+              "x": 0,
+              "y": 0
+            },
+            {
+              "height": 768,
+              "name": "Virtual-2",
+              "scale": 1.0,
+              "transform": "Normal",
+              "width": 1024,
+              "x": 1280,
+              "y": 0
+            }
+          ],
+          "metrics": [
+            {
+              "format": 1,
+              "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence",
+              "pid": 1165,
+              "sample_limit_per_stage": 256,
+              "stages": {
+                "compositor.direct_render_attempt": {
+                  "discarded": 0,
+                  "max_recent_ms": 10.554625,
+                  "mean_all_ms": 2.3999722255676175,
+                  "p50_recent_ms": 2.045084,
+                  "p95_recent_ms": 4.296291,
+                  "retained": 256,
+                  "samples_total": 2026
+                }
+              }
+            }
+          ],
+          "native_feedback": [],
+          "frames_before_vt": 67,
+          "frames_after_vt": 85,
+          "checks": [
+            "private native system bar",
+            "KMS output discovery",
+            "shared core connection",
+            "VT switch and resume",
+            "orderly shutdown",
+            "session directory cleanup",
+            "owned login scope cleanup",
+            "two virtual KMS outputs with named frame receipts",
+            "kernel pointer focus on both displays and return movement",
+            "100 kernel keyboard-triggered presented frames, including connector recovery",
+            "guarded virtual connector removal and reconnection",
+            "surviving system bar and workspace identity",
+            "pointer recovery without new input"
+          ],
+          "screen_keyboard_input_qualified": false,
+          "screen_reader_input_qualified": false,
+          "table_input_qualified": false,
+          "collection_input_qualified": null,
+          "terminal_input_qualified": false,
+          "terminal_ime_qualified": false,
+          "presentation_feedback_qualified": false,
+          "multi_output_qualified": true,
+          "virtual_output_hotplug_qualified": true,
+          "virtual_primary_output_hotplug_qualified": false,
+          "virtual_all_outputs_removed_qualified": false,
+          "native_feedback_qualified": false,
+          "native_feedback_load_qualified": false,
+          "output_transform_qualified": null,
+          "focus_transfer_cycles": null,
+          "not_tested": [
+            "physical input",
+            "physical connector hotplug",
+            "physical GPU presentation"
+          ]
+        }
+      },
+      {
+        "mode": "--multi-output-hotplug-all",
+        "kms_session": {
+          "result": "pass",
+          "fresh_profile_qualified": false,
+          "binary_directory": "/usr/local/bin",
+          "outputs": [
+            {
+              "height": 800,
+              "name": "Virtual-1",
+              "scale": 1.0,
+              "transform": "Normal",
+              "width": 1280,
+              "x": 0,
+              "y": 0
+            },
+            {
+              "height": 768,
+              "name": "Virtual-2",
+              "scale": 1.0,
+              "transform": "Normal",
+              "width": 1024,
+              "x": 1280,
+              "y": 0
+            }
+          ],
+          "metrics": [
+            {
+              "format": 1,
+              "meaning": "CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence",
+              "pid": 5563,
+              "sample_limit_per_stage": 256,
+              "stages": {
+                "compositor.direct_render_attempt": {
+                  "discarded": 0,
+                  "max_recent_ms": 10.890135,
+                  "mean_all_ms": 2.4173113104371096,
+                  "p50_recent_ms": 2.218399,
+                  "p95_recent_ms": 4.603168999999999,
+                  "retained": 256,
+                  "samples_total": 2242
+                }
+              }
+            }
+          ],
+          "native_feedback": [],
+          "frames_before_vt": 58,
+          "frames_after_vt": 70,
+          "checks": [
+            "private native system bar",
+            "KMS output discovery",
+            "shared core connection",
+            "VT switch and resume",
+            "orderly shutdown",
+            "session directory cleanup",
+            "owned login scope cleanup",
+            "two virtual KMS outputs with named frame receipts",
+            "kernel pointer focus on both displays and return movement",
+            "140 kernel keyboard-triggered presented frames, including total display recovery",
+            "guarded virtual connector removal and reconnection",
+            "surviving system bar and workspace identity",
+            "pointer recovery without new input"
+          ],
+          "screen_keyboard_input_qualified": false,
+          "screen_reader_input_qualified": false,
+          "table_input_qualified": false,
+          "collection_input_qualified": null,
+          "terminal_input_qualified": false,
+          "terminal_ime_qualified": false,
+          "presentation_feedback_qualified": false,
+          "multi_output_qualified": true,
+          "virtual_output_hotplug_qualified": true,
+          "virtual_primary_output_hotplug_qualified": true,
+          "virtual_all_outputs_removed_qualified": true,
+          "native_feedback_qualified": false,
+          "native_feedback_load_qualified": false,
+          "output_transform_qualified": null,
+          "focus_transfer_cycles": null,
+          "not_tested": [
+            "physical input",
+            "physical connector hotplug",
+            "physical GPU presentation"
+          ]
+        }
+      }
+    ],
+    "forced_status": "connected",
+    "forced_modes": [
+      "1024x768",
+      "4096x2160",
+      "4096x2160",
+      "2560x1600",
+      "2560x1600",
+      "1920x1440",
+      "1856x1392",
+      "1792x1344",
+      "2048x1152",
+      "1920x1200",
+      "1920x1200",
+      "1920x1080",
+      "1600x1200",
+      "1680x1050",
+      "1680x1050",
+      "1400x1050",
+      "1400x1050",
+      "1600x900",
+      "1280x1024",
+      "1440x900",
+      "1440x900",
+      "1280x960",
+      "1366x768",
+      "1366x768",
+      "1360x768",
+      "1280x800",
+      "1280x800",
+      "1280x768",
+      "1280x768",
+      "1280x720",
+      "800x600",
+      "800x600",
+      "848x480",
+      "640x480"
+    ],
+    "restored_second_connector_status": "disconnected"
+  },
+  "owned_utm_closed": true,
+  "original_disk_efi_inodes_preserved": true,
+  "original_config_restored": true,
+  "journeys": [
+    {
+      "case": 0,
+      "named_key_frames": 100,
+      "journeys": [
+        {
+          "phase": "first",
+          "output": {
+            "height": 800,
+            "name": "Virtual-1",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1280,
+            "x": 0,
+            "y": 0
+          },
+          "placement": {
+            "height": 64,
+            "width": 64,
+            "x": 100,
+            "y": 180
+          },
+          "pointer": [
+            116.015625,
+            195.99609375
+          ],
+          "receipts": [
+            {
+              "flags": 7,
+              "id": 3,
+              "key_time_ms": 16418,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 16441818000
+            },
+            {
+              "flags": 7,
+              "id": 4,
+              "key_time_ms": 16457,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 16480673000
+            },
+            {
+              "flags": 7,
+              "id": 5,
+              "key_time_ms": 16504,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 16521713000
+            },
+            {
+              "flags": 7,
+              "id": 6,
+              "key_time_ms": 16534,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 16548090000
+            },
+            {
+              "flags": 7,
+              "id": 7,
+              "key_time_ms": 16561,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 16589063000
+            },
+            {
+              "flags": 7,
+              "id": 8,
+              "key_time_ms": 16592,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 16613779000
+            },
+            {
+              "flags": 7,
+              "id": 9,
+              "key_time_ms": 16619,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 16639827000
+            },
+            {
+              "flags": 7,
+              "id": 10,
+              "key_time_ms": 16647,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 16667004000
+            },
+            {
+              "flags": 7,
+              "id": 11,
+              "key_time_ms": 16674,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 16681716000
+            },
+            {
+              "flags": 7,
+              "id": 12,
+              "key_time_ms": 16703,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 16720142000
+            },
+            {
+              "flags": 7,
+              "id": 13,
+              "key_time_ms": 16736,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 16762913000
+            },
+            {
+              "flags": 7,
+              "id": 14,
+              "key_time_ms": 16766,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 16787301000
+            },
+            {
+              "flags": 7,
+              "id": 15,
+              "key_time_ms": 16794,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 16813870000
+            },
+            {
+              "flags": 7,
+              "id": 16,
+              "key_time_ms": 16829,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 16852121000
+            },
+            {
+              "flags": 7,
+              "id": 17,
+              "key_time_ms": 16861,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 16880485000
+            },
+            {
+              "flags": 7,
+              "id": 18,
+              "key_time_ms": 16892,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 16907956000
+            },
+            {
+              "flags": 7,
+              "id": 19,
+              "key_time_ms": 16922,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 16949647000
+            },
+            {
+              "flags": 7,
+              "id": 20,
+              "key_time_ms": 16954,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 16975821000
+            },
+            {
+              "flags": 7,
+              "id": 21,
+              "key_time_ms": 16982,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 16989722000
+            },
+            {
+              "flags": 7,
+              "id": 22,
+              "key_time_ms": 17012,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 17040495000
+            }
+          ]
+        },
+        {
+          "phase": "second",
+          "output": {
+            "height": 768,
+            "name": "Virtual-2",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1024,
+            "x": 1280,
+            "y": 0
+          },
+          "placement": {
+            "height": 64,
+            "width": 64,
+            "x": 1380,
+            "y": 120
+          },
+          "pointer": [
+            1395.984375,
+            135.99853515625
+          ],
+          "receipts": [
+            {
+              "flags": 7,
+              "id": 23,
+              "key_time_ms": 19784,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 19814114000
+            },
+            {
+              "flags": 7,
+              "id": 24,
+              "key_time_ms": 19819,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 19837861000
+            },
+            {
+              "flags": 7,
+              "id": 25,
+              "key_time_ms": 19849,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 19881335000
+            },
+            {
+              "flags": 7,
+              "id": 26,
+              "key_time_ms": 19903,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 19934382000
+            },
+            {
+              "flags": 7,
+              "id": 27,
+              "key_time_ms": 19957,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 19984539000
+            },
+            {
+              "flags": 7,
+              "id": 28,
+              "key_time_ms": 19990,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 20011465000
+            },
+            {
+              "flags": 7,
+              "id": 29,
+              "key_time_ms": 20023,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 20052434000
+            },
+            {
+              "flags": 7,
+              "id": 30,
+              "key_time_ms": 20075,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 20107971000
+            },
+            {
+              "flags": 7,
+              "id": 31,
+              "key_time_ms": 20130,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 20161138000
+            },
+            {
+              "flags": 7,
+              "id": 32,
+              "key_time_ms": 20188,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 20214860000
+            },
+            {
+              "flags": 7,
+              "id": 33,
+              "key_time_ms": 20243,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 20267861000
+            },
+            {
+              "flags": 7,
+              "id": 34,
+              "key_time_ms": 20273,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 20294511000
+            },
+            {
+              "flags": 7,
+              "id": 35,
+              "key_time_ms": 20303,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 20320227000
+            },
+            {
+              "flags": 7,
+              "id": 36,
+              "key_time_ms": 20346,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 20374945000
+            },
+            {
+              "flags": 7,
+              "id": 37,
+              "key_time_ms": 20403,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 20427180000
+            },
+            {
+              "flags": 7,
+              "id": 38,
+              "key_time_ms": 20443,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 20481537000
+            },
+            {
+              "flags": 7,
+              "id": 39,
+              "key_time_ms": 20500,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 20517971000
+            },
+            {
+              "flags": 7,
+              "id": 40,
+              "key_time_ms": 20531,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 20561415000
+            },
+            {
+              "flags": 7,
+              "id": 41,
+              "key_time_ms": 20586,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 20614305000
+            },
+            {
+              "flags": 7,
+              "id": 42,
+              "key_time_ms": 20643,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 20667909000
+            }
+          ]
+        },
+        {
+          "phase": "removed",
+          "output": {
+            "height": 800,
+            "name": "Virtual-1",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1280,
+            "x": 0,
+            "y": 0
+          },
+          "placement": {
+            "height": 64,
+            "width": 64,
+            "x": 0,
+            "y": 60
+          },
+          "pointer": [
+            15.99609375,
+            76.0009765625
+          ],
+          "receipts": [
+            {
+              "flags": 7,
+              "id": 43,
+              "key_time_ms": 23852,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 23874530000
+            },
+            {
+              "flags": 7,
+              "id": 44,
+              "key_time_ms": 23883,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 23917863000
+            },
+            {
+              "flags": 7,
+              "id": 45,
+              "key_time_ms": 23942,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 23974055000
+            },
+            {
+              "flags": 7,
+              "id": 46,
+              "key_time_ms": 24001,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 24022299000
+            },
+            {
+              "flags": 7,
+              "id": 47,
+              "key_time_ms": 24052,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 24079797000
+            },
+            {
+              "flags": 7,
+              "id": 48,
+              "key_time_ms": 24093,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 24133939000
+            },
+            {
+              "flags": 7,
+              "id": 49,
+              "key_time_ms": 24151,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 24172609000
+            },
+            {
+              "flags": 7,
+              "id": 50,
+              "key_time_ms": 24187,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 24223318000
+            },
+            {
+              "flags": 7,
+              "id": 51,
+              "key_time_ms": 24242,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 24278408000
+            },
+            {
+              "flags": 7,
+              "id": 52,
+              "key_time_ms": 24297,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 24337439000
+            },
+            {
+              "flags": 7,
+              "id": 53,
+              "key_time_ms": 24357,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 24385453000
+            },
+            {
+              "flags": 7,
+              "id": 54,
+              "key_time_ms": 24417,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 24444905000
+            },
+            {
+              "flags": 7,
+              "id": 55,
+              "key_time_ms": 24454,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 24494482000
+            },
+            {
+              "flags": 7,
+              "id": 56,
+              "key_time_ms": 24510,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 24544326000
+            },
+            {
+              "flags": 7,
+              "id": 57,
+              "key_time_ms": 24566,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 24598561000
+            },
+            {
+              "flags": 7,
+              "id": 58,
+              "key_time_ms": 24611,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 24640737000
+            },
+            {
+              "flags": 7,
+              "id": 59,
+              "key_time_ms": 24673,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 24703664000
+            },
+            {
+              "flags": 7,
+              "id": 60,
+              "key_time_ms": 24736,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 24758162000
+            },
+            {
+              "flags": 7,
+              "id": 61,
+              "key_time_ms": 24772,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 24811582000
+            },
+            {
+              "flags": 7,
+              "id": 62,
+              "key_time_ms": 24830,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 24866441000
+            }
+          ]
+        },
+        {
+          "phase": "reconnected",
+          "output": {
+            "height": 768,
+            "name": "Virtual-2",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1024,
+            "x": 1280,
+            "y": 0
+          },
+          "placement": {
+            "height": 64,
+            "width": 64,
+            "x": 1380,
+            "y": 120
+          },
+          "pointer": [
+            1395.984375,
+            135.99853515625
+          ],
+          "receipts": [
+            {
+              "flags": 7,
+              "id": 63,
+              "key_time_ms": 28246,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 28275243000
+            },
+            {
+              "flags": 7,
+              "id": 64,
+              "key_time_ms": 28309,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 28326518000
+            },
+            {
+              "flags": 7,
+              "id": 65,
+              "key_time_ms": 28343,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 28380199000
+            },
+            {
+              "flags": 7,
+              "id": 66,
+              "key_time_ms": 28402,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 28418851000
+            },
+            {
+              "flags": 7,
+              "id": 67,
+              "key_time_ms": 28437,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 28461480000
+            },
+            {
+              "flags": 7,
+              "id": 68,
+              "key_time_ms": 28472,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 28504158000
+            },
+            {
+              "flags": 7,
+              "id": 69,
+              "key_time_ms": 28531,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 28568447000
+            },
+            {
+              "flags": 7,
+              "id": 70,
+              "key_time_ms": 28578,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 28621755000
+            },
+            {
+              "flags": 7,
+              "id": 71,
+              "key_time_ms": 28645,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 28675269000
+            },
+            {
+              "flags": 7,
+              "id": 72,
+              "key_time_ms": 28683,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 28699735000
+            },
+            {
+              "flags": 7,
+              "id": 73,
+              "key_time_ms": 28721,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 28741653000
+            },
+            {
+              "flags": 7,
+              "id": 74,
+              "key_time_ms": 28760,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 28784132000
+            },
+            {
+              "flags": 7,
+              "id": 75,
+              "key_time_ms": 28798,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 28835200000
+            },
+            {
+              "flags": 7,
+              "id": 76,
+              "key_time_ms": 28864,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 28889007000
+            },
+            {
+              "flags": 7,
+              "id": 77,
+              "key_time_ms": 28901,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 28940382000
+            },
+            {
+              "flags": 7,
+              "id": 78,
+              "key_time_ms": 28962,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 28993950000
+            },
+            {
+              "flags": 7,
+              "id": 79,
+              "key_time_ms": 29026,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 29046676000
+            },
+            {
+              "flags": 7,
+              "id": 80,
+              "key_time_ms": 29067,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 29090635000
+            },
+            {
+              "flags": 7,
+              "id": 81,
+              "key_time_ms": 29119,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 29142116000
+            },
+            {
+              "flags": 7,
+              "id": 82,
+              "key_time_ms": 29166,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 29195787000
+            }
+          ]
+        },
+        {
+          "phase": "return",
+          "output": {
+            "height": 800,
+            "name": "Virtual-1",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1280,
+            "x": 0,
+            "y": 0
+          },
+          "placement": {
+            "height": 64,
+            "width": 64,
+            "x": 100,
+            "y": 180
+          },
+          "pointer": [
+            116.015625,
+            195.99609375
+          ],
+          "receipts": [
+            {
+              "flags": 7,
+              "id": 83,
+              "key_time_ms": 31789,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 31809971000
+            },
+            {
+              "flags": 7,
+              "id": 84,
+              "key_time_ms": 31825,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 31837462000
+            },
+            {
+              "flags": 7,
+              "id": 85,
+              "key_time_ms": 31859,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 31888709000
+            },
+            {
+              "flags": 7,
+              "id": 86,
+              "key_time_ms": 31922,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 31943293000
+            },
+            {
+              "flags": 7,
+              "id": 87,
+              "key_time_ms": 31963,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 31983053000
+            },
+            {
+              "flags": 7,
+              "id": 88,
+              "key_time_ms": 32001,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 32036518000
+            },
+            {
+              "flags": 7,
+              "id": 89,
+              "key_time_ms": 32067,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 32078584000
+            },
+            {
+              "flags": 7,
+              "id": 90,
+              "key_time_ms": 32112,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 32143319000
+            },
+            {
+              "flags": 7,
+              "id": 91,
+              "key_time_ms": 32157,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 32170610000
+            },
+            {
+              "flags": 7,
+              "id": 92,
+              "key_time_ms": 32195,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 32221463000
+            },
+            {
+              "flags": 7,
+              "id": 93,
+              "key_time_ms": 32232,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 32248533000
+            },
+            {
+              "flags": 7,
+              "id": 94,
+              "key_time_ms": 32268,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 32278368000
+            },
+            {
+              "flags": 7,
+              "id": 95,
+              "key_time_ms": 32305,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 32317668000
+            },
+            {
+              "flags": 7,
+              "id": 96,
+              "key_time_ms": 32351,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 32358967000
+            },
+            {
+              "flags": 7,
+              "id": 97,
+              "key_time_ms": 32404,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 32413755000
+            },
+            {
+              "flags": 7,
+              "id": 98,
+              "key_time_ms": 32452,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 32476617000
+            },
+            {
+              "flags": 7,
+              "id": 99,
+              "key_time_ms": 32490,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 32503922000
+            },
+            {
+              "flags": 7,
+              "id": 100,
+              "key_time_ms": 32527,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 32545008000
+            },
+            {
+              "flags": 7,
+              "id": 101,
+              "key_time_ms": 32566,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 32585441000
+            },
+            {
+              "flags": 7,
+              "id": 102,
+              "key_time_ms": 32615,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 32624726000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case": 1,
+      "named_key_frames": 140,
+      "journeys": [
+        {
+          "phase": "first",
+          "output": {
+            "height": 768,
+            "name": "Virtual-2",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1024,
+            "x": 1280,
+            "y": 0
+          },
+          "placement": {
+            "height": 64,
+            "width": 64,
+            "x": 1380,
+            "y": 120
+          },
+          "pointer": [
+            1395.984375,
+            135.99853515625
+          ],
+          "receipts": [
+            {
+              "flags": 7,
+              "id": 3,
+              "key_time_ms": 47631,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 47651909000
+            },
+            {
+              "flags": 7,
+              "id": 4,
+              "key_time_ms": 47657,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 47678512000
+            },
+            {
+              "flags": 7,
+              "id": 5,
+              "key_time_ms": 47685,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 47692612000
+            },
+            {
+              "flags": 7,
+              "id": 6,
+              "key_time_ms": 47712,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 47745400000
+            },
+            {
+              "flags": 7,
+              "id": 7,
+              "key_time_ms": 47764,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 47772166000
+            },
+            {
+              "flags": 7,
+              "id": 8,
+              "key_time_ms": 47791,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 47809293000
+            },
+            {
+              "flags": 7,
+              "id": 9,
+              "key_time_ms": 47817,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 47825531000
+            },
+            {
+              "flags": 7,
+              "id": 10,
+              "key_time_ms": 47844,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 47880080000
+            },
+            {
+              "flags": 7,
+              "id": 11,
+              "key_time_ms": 47895,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 47906021000
+            },
+            {
+              "flags": 7,
+              "id": 12,
+              "key_time_ms": 47924,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 47959032000
+            },
+            {
+              "flags": 7,
+              "id": 13,
+              "key_time_ms": 47976,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 48011982000
+            },
+            {
+              "flags": 7,
+              "id": 14,
+              "key_time_ms": 48027,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 48051887000
+            },
+            {
+              "flags": 7,
+              "id": 15,
+              "key_time_ms": 48056,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 48078507000
+            },
+            {
+              "flags": 7,
+              "id": 16,
+              "key_time_ms": 48086,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 48092828000
+            },
+            {
+              "flags": 7,
+              "id": 17,
+              "key_time_ms": 48113,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 48132089000
+            },
+            {
+              "flags": 7,
+              "id": 18,
+              "key_time_ms": 48146,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 48176459000
+            },
+            {
+              "flags": 7,
+              "id": 19,
+              "key_time_ms": 48200,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 48225794000
+            },
+            {
+              "flags": 7,
+              "id": 20,
+              "key_time_ms": 48231,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 48250112000
+            },
+            {
+              "flags": 7,
+              "id": 21,
+              "key_time_ms": 48260,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 48278657000
+            },
+            {
+              "flags": 7,
+              "id": 22,
+              "key_time_ms": 48289,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 48306432000
+            }
+          ]
+        },
+        {
+          "phase": "second",
+          "output": {
+            "height": 800,
+            "name": "Virtual-1",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1280,
+            "x": 0,
+            "y": 0
+          },
+          "placement": {
+            "height": 64,
+            "width": 64,
+            "x": 100,
+            "y": 180
+          },
+          "pointer": [
+            116.015625,
+            195.99609375
+          ],
+          "receipts": [
+            {
+              "flags": 7,
+              "id": 23,
+              "key_time_ms": 50800,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 50825185000
+            },
+            {
+              "flags": 7,
+              "id": 24,
+              "key_time_ms": 50832,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 50851843000
+            },
+            {
+              "flags": 7,
+              "id": 25,
+              "key_time_ms": 50867,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 50905768000
+            },
+            {
+              "flags": 7,
+              "id": 26,
+              "key_time_ms": 50920,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 50956171000
+            },
+            {
+              "flags": 7,
+              "id": 27,
+              "key_time_ms": 50974,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 50996622000
+            },
+            {
+              "flags": 7,
+              "id": 28,
+              "key_time_ms": 51006,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 51038469000
+            },
+            {
+              "flags": 7,
+              "id": 29,
+              "key_time_ms": 51076,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 51093848000
+            },
+            {
+              "flags": 7,
+              "id": 30,
+              "key_time_ms": 51122,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 51145676000
+            },
+            {
+              "flags": 7,
+              "id": 31,
+              "key_time_ms": 51153,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 51171942000
+            },
+            {
+              "flags": 7,
+              "id": 32,
+              "key_time_ms": 51194,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 51225360000
+            },
+            {
+              "flags": 7,
+              "id": 33,
+              "key_time_ms": 51249,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 51278897000
+            },
+            {
+              "flags": 7,
+              "id": 34,
+              "key_time_ms": 51306,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 51329613000
+            },
+            {
+              "flags": 7,
+              "id": 35,
+              "key_time_ms": 51346,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 51371821000
+            },
+            {
+              "flags": 7,
+              "id": 36,
+              "key_time_ms": 51381,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 51425181000
+            },
+            {
+              "flags": 7,
+              "id": 37,
+              "key_time_ms": 51455,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 51476356000
+            },
+            {
+              "flags": 7,
+              "id": 38,
+              "key_time_ms": 51488,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 51517108000
+            },
+            {
+              "flags": 7,
+              "id": 39,
+              "key_time_ms": 51547,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 51571716000
+            },
+            {
+              "flags": 7,
+              "id": 40,
+              "key_time_ms": 51577,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 51598475000
+            },
+            {
+              "flags": 7,
+              "id": 41,
+              "key_time_ms": 51609,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 51638534000
+            },
+            {
+              "flags": 7,
+              "id": 42,
+              "key_time_ms": 51667,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 13334400,
+              "sequence": 0,
+              "time_ns": 51691855000
+            }
+          ]
+        },
+        {
+          "phase": "removed",
+          "output": {
+            "height": 768,
+            "name": "Virtual-2",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1024,
+            "x": 0,
+            "y": 0
+          },
+          "placement": {
+            "height": 64,
+            "width": 64,
+            "x": 0,
+            "y": 60
+          },
+          "pointer": [
+            16.0,
+            75.99609375
+          ],
+          "receipts": [
+            {
+              "flags": 7,
+              "id": 43,
+              "key_time_ms": 54665,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 54697995000
+            },
+            {
+              "flags": 7,
+              "id": 44,
+              "key_time_ms": 54721,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 54745814000
+            },
+            {
+              "flags": 7,
+              "id": 45,
+              "key_time_ms": 54757,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 54783146000
+            },
+            {
+              "flags": 7,
+              "id": 46,
+              "key_time_ms": 54790,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 54815806000
+            },
+            {
+              "flags": 7,
+              "id": 47,
+              "key_time_ms": 54823,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 54845611000
+            },
+            {
+              "flags": 7,
+              "id": 48,
+              "key_time_ms": 54853,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 54877800000
+            },
+            {
+              "flags": 7,
+              "id": 49,
+              "key_time_ms": 54913,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 54930048000
+            },
+            {
+              "flags": 7,
+              "id": 50,
+              "key_time_ms": 54953,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 54984405000
+            },
+            {
+              "flags": 7,
+              "id": 51,
+              "key_time_ms": 55020,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 55050201000
+            },
+            {
+              "flags": 7,
+              "id": 52,
+              "key_time_ms": 55078,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 55117254000
+            },
+            {
+              "flags": 7,
+              "id": 53,
+              "key_time_ms": 55136,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 55166609000
+            },
+            {
+              "flags": 7,
+              "id": 54,
+              "key_time_ms": 55193,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 55228614000
+            },
+            {
+              "flags": 7,
+              "id": 55,
+              "key_time_ms": 55254,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 55282408000
+            },
+            {
+              "flags": 7,
+              "id": 56,
+              "key_time_ms": 55312,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 55347418000
+            },
+            {
+              "flags": 7,
+              "id": 57,
+              "key_time_ms": 55369,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 55400220000
+            },
+            {
+              "flags": 7,
+              "id": 58,
+              "key_time_ms": 55431,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 55463800000
+            },
+            {
+              "flags": 7,
+              "id": 59,
+              "key_time_ms": 55494,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 55514456000
+            },
+            {
+              "flags": 7,
+              "id": 60,
+              "key_time_ms": 55536,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 55565197000
+            },
+            {
+              "flags": 7,
+              "id": 61,
+              "key_time_ms": 55594,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 55613070000
+            },
+            {
+              "flags": 7,
+              "id": 62,
+              "key_time_ms": 55626,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 55649854000
+            }
+          ]
+        },
+        {
+          "phase": "reconnected",
+          "output": {
+            "height": 800,
+            "name": "Virtual-1",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1280,
+            "x": 0,
+            "y": 0
+          },
+          "placement": {
+            "height": 64,
+            "width": 64,
+            "x": 100,
+            "y": 120
+          },
+          "pointer": [
+            116.015625,
+            135.99853515625
+          ],
+          "receipts": [
+            {
+              "flags": 7,
+              "id": 63,
+              "key_time_ms": 58932,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 58963266000
+            },
+            {
+              "flags": 7,
+              "id": 64,
+              "key_time_ms": 58992,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 59015953000
+            },
+            {
+              "flags": 7,
+              "id": 65,
+              "key_time_ms": 59026,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 59044907000
+            },
+            {
+              "flags": 7,
+              "id": 66,
+              "key_time_ms": 59061,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 59082296000
+            },
+            {
+              "flags": 7,
+              "id": 67,
+              "key_time_ms": 59098,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 59133363000
+            },
+            {
+              "flags": 7,
+              "id": 68,
+              "key_time_ms": 59159,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 59199339000
+            },
+            {
+              "flags": 7,
+              "id": 69,
+              "key_time_ms": 59221,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 59263506000
+            },
+            {
+              "flags": 7,
+              "id": 70,
+              "key_time_ms": 59276,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 59295538000
+            },
+            {
+              "flags": 7,
+              "id": 71,
+              "key_time_ms": 59313,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 59345943000
+            },
+            {
+              "flags": 7,
+              "id": 72,
+              "key_time_ms": 59375,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 59397906000
+            },
+            {
+              "flags": 7,
+              "id": 73,
+              "key_time_ms": 59415,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 59451087000
+            },
+            {
+              "flags": 7,
+              "id": 74,
+              "key_time_ms": 59482,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 59514763000
+            },
+            {
+              "flags": 7,
+              "id": 75,
+              "key_time_ms": 59546,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 59563565000
+            },
+            {
+              "flags": 7,
+              "id": 76,
+              "key_time_ms": 59583,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 59614980000
+            },
+            {
+              "flags": 7,
+              "id": 77,
+              "key_time_ms": 59644,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 59666825000
+            },
+            {
+              "flags": 7,
+              "id": 78,
+              "key_time_ms": 59682,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 59715597000
+            },
+            {
+              "flags": 7,
+              "id": 79,
+              "key_time_ms": 59745,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 59764363000
+            },
+            {
+              "flags": 7,
+              "id": 80,
+              "key_time_ms": 59785,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 59815316000
+            },
+            {
+              "flags": 7,
+              "id": 81,
+              "key_time_ms": 59853,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 59879752000
+            },
+            {
+              "flags": 7,
+              "id": 82,
+              "key_time_ms": 59887,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 59913918000
+            }
+          ]
+        },
+        {
+          "phase": "return",
+          "output": {
+            "height": 768,
+            "name": "Virtual-2",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1024,
+            "x": 1280,
+            "y": 0
+          },
+          "placement": {
+            "height": 64,
+            "width": 64,
+            "x": 1380,
+            "y": 180
+          },
+          "pointer": [
+            1395.984375,
+            195.99609375
+          ],
+          "receipts": [
+            {
+              "flags": 7,
+              "id": 83,
+              "key_time_ms": 62258,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 62271852000
+            },
+            {
+              "flags": 7,
+              "id": 84,
+              "key_time_ms": 62294,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 62313804000
+            },
+            {
+              "flags": 7,
+              "id": 85,
+              "key_time_ms": 62328,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 62352320000
+            },
+            {
+              "flags": 7,
+              "id": 86,
+              "key_time_ms": 62363,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 62369341000
+            },
+            {
+              "flags": 7,
+              "id": 87,
+              "key_time_ms": 62399,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 62418779000
+            },
+            {
+              "flags": 7,
+              "id": 88,
+              "key_time_ms": 62438,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 62466678000
+            },
+            {
+              "flags": 7,
+              "id": 89,
+              "key_time_ms": 62476,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 62487030000
+            },
+            {
+              "flags": 7,
+              "id": 90,
+              "key_time_ms": 62519,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 62541332000
+            },
+            {
+              "flags": 7,
+              "id": 91,
+              "key_time_ms": 62578,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 62587042000
+            },
+            {
+              "flags": 7,
+              "id": 92,
+              "key_time_ms": 62619,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 62649722000
+            },
+            {
+              "flags": 7,
+              "id": 93,
+              "key_time_ms": 62673,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 62688650000
+            },
+            {
+              "flags": 7,
+              "id": 94,
+              "key_time_ms": 62721,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 62749593000
+            },
+            {
+              "flags": 7,
+              "id": 95,
+              "key_time_ms": 62780,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 62793844000
+            },
+            {
+              "flags": 7,
+              "id": 96,
+              "key_time_ms": 62831,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 62865220000
+            },
+            {
+              "flags": 7,
+              "id": 97,
+              "key_time_ms": 62907,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 62932265000
+            },
+            {
+              "flags": 7,
+              "id": 98,
+              "key_time_ms": 62951,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 62969129000
+            },
+            {
+              "flags": 7,
+              "id": 99,
+              "key_time_ms": 62998,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 63019265000
+            },
+            {
+              "flags": 7,
+              "id": 100,
+              "key_time_ms": 63038,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 63052259000
+            },
+            {
+              "flags": 7,
+              "id": 101,
+              "key_time_ms": 63074,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 63087137000
+            },
+            {
+              "flags": 7,
+              "id": 102,
+              "key_time_ms": 63129,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 63150166000
+            }
+          ]
+        },
+        {
+          "phase": "all-removed",
+          "output": {
+            "height": 800,
+            "name": "Virtual-1",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1280,
+            "x": 0,
+            "y": 0
+          },
+          "placement": {
+            "height": 64,
+            "width": 64,
+            "x": 0,
+            "y": 60
+          },
+          "pointer": [
+            15.99609375,
+            76.0009765625
+          ],
+          "receipts": [
+            {
+              "flags": 7,
+              "id": 103,
+              "key_time_ms": 66588,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 66608258000
+            },
+            {
+              "flags": 7,
+              "id": 104,
+              "key_time_ms": 66630,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 66675454000
+            },
+            {
+              "flags": 7,
+              "id": 105,
+              "key_time_ms": 66695,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 66738355000
+            },
+            {
+              "flags": 7,
+              "id": 106,
+              "key_time_ms": 66761,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 66791516000
+            },
+            {
+              "flags": 7,
+              "id": 107,
+              "key_time_ms": 66823,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 66858155000
+            },
+            {
+              "flags": 7,
+              "id": 108,
+              "key_time_ms": 66883,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 66925619000
+            },
+            {
+              "flags": 7,
+              "id": 109,
+              "key_time_ms": 66957,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 66992763000
+            },
+            {
+              "flags": 7,
+              "id": 110,
+              "key_time_ms": 67019,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 67055910000
+            },
+            {
+              "flags": 7,
+              "id": 111,
+              "key_time_ms": 67085,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 67109421000
+            },
+            {
+              "flags": 7,
+              "id": 112,
+              "key_time_ms": 67123,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 67180182000
+            },
+            {
+              "flags": 7,
+              "id": 113,
+              "key_time_ms": 67204,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 67243034000
+            },
+            {
+              "flags": 7,
+              "id": 114,
+              "key_time_ms": 67272,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 67309427000
+            },
+            {
+              "flags": 7,
+              "id": 115,
+              "key_time_ms": 67337,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 67376760000
+            },
+            {
+              "flags": 7,
+              "id": 116,
+              "key_time_ms": 67415,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 67443452000
+            },
+            {
+              "flags": 7,
+              "id": 117,
+              "key_time_ms": 67484,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 67511163000
+            },
+            {
+              "flags": 7,
+              "id": 118,
+              "key_time_ms": 67538,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 67575612000
+            },
+            {
+              "flags": 7,
+              "id": 119,
+              "key_time_ms": 67604,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 67625480000
+            },
+            {
+              "flags": 7,
+              "id": 120,
+              "key_time_ms": 67648,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 67692860000
+            },
+            {
+              "flags": 7,
+              "id": 121,
+              "key_time_ms": 67720,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 67745983000
+            },
+            {
+              "flags": 7,
+              "id": 122,
+              "key_time_ms": 67772,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-1"
+              ],
+              "refresh_ns": 16678063,
+              "sequence": 0,
+              "time_ns": 67790955000
+            }
+          ]
+        },
+        {
+          "phase": "all-reconnected",
+          "output": {
+            "height": 768,
+            "name": "Virtual-2",
+            "scale": 1.0,
+            "transform": "Normal",
+            "width": 1024,
+            "x": 1280,
+            "y": 0
+          },
+          "placement": {
+            "height": 64,
+            "width": 64,
+            "x": 1380,
+            "y": 120
+          },
+          "pointer": [
+            1395.984375,
+            135.99853515625
+          ],
+          "receipts": [
+            {
+              "flags": 7,
+              "id": 123,
+              "key_time_ms": 70810,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 70820266000
+            },
+            {
+              "flags": 7,
+              "id": 124,
+              "key_time_ms": 70853,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 70881576000
+            },
+            {
+              "flags": 7,
+              "id": 125,
+              "key_time_ms": 70921,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 70946570000
+            },
+            {
+              "flags": 7,
+              "id": 126,
+              "key_time_ms": 70970,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 71001880000
+            },
+            {
+              "flags": 7,
+              "id": 127,
+              "key_time_ms": 71012,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 71019935000
+            },
+            {
+              "flags": 7,
+              "id": 128,
+              "key_time_ms": 71054,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 71081703000
+            },
+            {
+              "flags": 7,
+              "id": 129,
+              "key_time_ms": 71101,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 71121040000
+            },
+            {
+              "flags": 7,
+              "id": 130,
+              "key_time_ms": 71164,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 71188445000
+            },
+            {
+              "flags": 7,
+              "id": 131,
+              "key_time_ms": 71217,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 71250769000
+            },
+            {
+              "flags": 7,
+              "id": 132,
+              "key_time_ms": 71297,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 71320151000
+            },
+            {
+              "flags": 7,
+              "id": 133,
+              "key_time_ms": 71338,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 71353669000
+            },
+            {
+              "flags": 7,
+              "id": 134,
+              "key_time_ms": 71394,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 71414744000
+            },
+            {
+              "flags": 7,
+              "id": 135,
+              "key_time_ms": 71451,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 71484385000
+            },
+            {
+              "flags": 7,
+              "id": 136,
+              "key_time_ms": 71537,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 71554036000
+            },
+            {
+              "flags": 7,
+              "id": 137,
+              "key_time_ms": 71584,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 71618482000
+            },
+            {
+              "flags": 7,
+              "id": 138,
+              "key_time_ms": 71650,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 71684841000
+            },
+            {
+              "flags": 7,
+              "id": 139,
+              "key_time_ms": 71708,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 71719755000
+            },
+            {
+              "flags": 7,
+              "id": 140,
+              "key_time_ms": 71758,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 71784437000
+            },
+            {
+              "flags": 7,
+              "id": 141,
+              "key_time_ms": 71808,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 71849437000
+            },
+            {
+              "flags": 7,
+              "id": 142,
+              "key_time_ms": 71880,
+              "kind": "presented",
+              "outputs": [
+                "Virtual-2"
+              ],
+              "refresh_ns": 16665556,
+              "sequence": 0,
+              "time_ns": 71886874000
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

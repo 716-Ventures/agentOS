@@ -1,0 +1,6 @@
+dbus-daemon[9755]: [session uid=1000 pid=9755 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.1' (uid=1000 pid=9757 comm="python3 native-shell/tests/installed_broker.py")
+dbus-daemon[9755]: [session uid=1000 pid=9755 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[9783]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=9757 comm="python3 native-shell/tests/installed_broker.py")
+dbus-daemon[9783]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+PASS: installed native AT-SPI review, exact root input preview, deliberate approval, rejection and direct systemd stop without models
