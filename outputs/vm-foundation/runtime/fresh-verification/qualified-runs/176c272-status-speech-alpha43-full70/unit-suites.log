@@ -1,0 +1,172 @@
+.....................................     Removed 18 files, 22.3MiB total
+     Removed 8 files, 1.0MiB total
+   Compiling agentos-cache-fixture v0.1.0 (/tmp/agentos-cache-regression-44zhzx6_)
+    Finished `release` profile [optimized] target(s) in 0.07s
+........................................................................./usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf2a3f10>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf1a4220>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf1a4310>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf1a4400>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.........../usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf512b60>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf1a49a0>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf1a4b80>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf1a4e50>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.../usr/lib/python3.13/pathlib/_local.py:277: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf5123e0>
+  @property
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/pathlib/_local.py:277: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf1a4e50>
+  @property
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/pathlib/_local.py:277: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf512b60>
+  @property
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/pathlib/_local.py:277: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf1a4310>
+  @property
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/pathlib/_local.py:277: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf1a4f40>
+  @property
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf5123e0>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.../usr/lib/python3.13/unittest/mock.py:799: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf512b60>
+  def __setattr__(self, name, value):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:799: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf1a4f40>
+  def __setattr__(self, name, value):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:799: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf1a5210>
+  def __setattr__(self, name, value):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:799: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf1a4e50>
+  def __setattr__(self, name, value):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:799: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf1a4310>
+  def __setattr__(self, name, value):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:799: ResourceWarning: unclosed database in <sqlite3.Connection object at 0xffffaf1a58a0>
+  def __setattr__(self, name, value):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+...................................................................................Session-owned screen reader started.
+Screen reader stopped (exit 1); desktop controls remain available.
+.Session-owned screen reader started.
+..........................................................................
+----------------------------------------------------------------------
+Ran 286 tests in 1.263s
+
+OK
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: f54377b28d9b78332a38ad8d3e727e06b020c79116c35dda146d944591127058
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: 053d91f750b495b78a6e505c06cd3aeb86c8492f20ae6edf78d9a8266671d99f
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: f9290cca929587683a2f29e1469b48f760cef71f724a90d6a04e4eec0007739a
+Installed and healthy: 0a1ca4afc8b7d7e3133a768f90bca3adaa047f2ef36f484dadbe91a4b47e5649
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: fe9db2e8e50d0b9e9e369546dd2e253cff8724d06c30f61bf097b0d5f441eb7a
+Installed and healthy: fe9db2e8e50d0b9e9e369546dd2e253cff8724d06c30f61bf097b0d5f441eb7a
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: 9bda9c7be8901f916db65412888ced3a379135f2e77fe635db33850fe98c2314
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: 559a66ce8a5e0197635bbb547d694831f3b7d69468fc33378493bdd53bee096a
+Installed and healthy: c9190fcab103efc5ba982e1eabe98142ee7cd42bd0bfb3c2b33ad7e6780cad4d
+Installed and healthy: accfd4660901b81066d7f384aea05ba2357acd14d257edad75191e6c6b5c641c
+Installed and healthy: f4d2a338b90f0edd1fe43e371c9f00c21d37053e025f80e29d48d4acb198dc7f
+Installed and healthy: 8ccf27552d9942597ed671107f2113b14e302fdc10d8b6034c97306568d3899f
+Installed and healthy: eefb3748c5db358172b9aa421f2153464b080ca51eb6e331b8624daf71c317a8
+Installed and healthy: 1b2a5a9792bda21d1560ae99ecc8da3ca7661e108a5466715b11efbd1fad79c3
+Installed and healthy: 01b92b015f2f11e6a9601b31aa837043feaeac3af2498eb58d6f413b8c6ed5af
+Installed and healthy: 17a81e3e33a855b2d3593b46e4952634da4ea4216894e8288fdbe3ad11de4af9
+Installed and healthy: 74ea2d209e7c7e49f5bc3f59d347a8dddef876a31d4461db620402e50238976d
+   Compiling agent-os-core v0.5.0 (/home/developer/agent-os-source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.11s
+     Running unittests src/main.rs (target/debug/deps/agent_os_core-7685d0660c2aa843)
+
+running 65 tests
+test presentation::tests::adversarial_update_cannot_recurse_through_an_editing_lease ... ok
+test presentation::tests::broker_observations_are_scoped_monotonic_and_unwritable_by_presentation_clients ... ok
+test presentation::tests::atomic_rejection_stale_and_deduplicated_receipts ... ok
+test presentation::tests::button_choices_and_dependent_icons_validate_atomically ... ok
+test presentation::tests::closed_identities_cannot_be_recycled_and_undo_keeps_revisions_monotonic ... ok
+test presentation::tests::closing_a_placed_view_keeps_its_draft_and_undo_restores_it ... ok
+test presentation::tests::committing_a_native_draft_is_atomic_scoped_and_idempotent ... ok
+test presentation::tests::closed_view_undo_does_not_resurrect_input_but_preserves_draft_protection ... ok
+test presentation::tests::choice_and_toggle_drafts_are_typed_atomic_and_user_owned ... ok
+test presentation::tests::conventional_reconnect_never_adopts_another_live_compositors_window ... ok
+test presentation::tests::conventional_reconnect_requires_an_unambiguous_authenticated_process_and_dead_host ... ok
+test presentation::tests::conventional_surface_registration_is_host_scoped_and_placeholders_are_durable ... ok
+test presentation::tests::conventional_window_metadata_is_typed_scoped_and_host_observed ... ok
+test presentation::tests::dead_host_connections_do_not_exhaust_capacity_or_inflate_live_snapshots ... ok
+test presentation::tests::document_pages_are_bounded_scoped_and_refuse_mixed_revisions ... ok
+test presentation::tests::direct_workspace_edits_are_atomic_revisioned_and_undoable ... ok
+test presentation::tests::file_metadata_is_typed_private_scoped_and_monotonic ... ok
+test presentation::tests::embedded_terminals_only_reference_registered_same_activity_broker_work ... ok
+test presentation::tests::focused_user_geometry_preserves_another_process_input_and_draft ... ok
+test presentation::tests::image_resources_are_immutable_scoped_human_owned_and_metadata_only_for_models ... ok
+test presentation::tests::human_reconnect_preserves_logical_identity_and_durable_receipt ... ok
+test presentation::tests::inactive_activities_do_not_block_other_views ... ok
+test presentation::tests::labeled_sections_and_scroll_regions_validate_complete_nested_trees ... ok
+test presentation::tests::lists_and_key_value_groups_enforce_exact_cells_and_accessible_labels ... ok
+test presentation::tests::compact_change_pages_preserve_tombstones_and_guard_document_reads ... ok
+test presentation::tests::native_input_and_recovered_drafts_survive_agent_updates ... ok
+test presentation::tests::numeric_bindings_use_the_released_catalog_number_type ... ok
+test presentation::tests::malformed_trees_unknown_fields_and_executable_links_are_rejected ... ok
+test presentation::tests::ordered_subscription_and_reopen_preserve_receipts ... ok
+test presentation::tests::output_resize_disconnect_and_restore_preserve_preferred_work ... ok
+test presentation::tests::renderer_restart_can_recover_a_dead_process_draft_without_waiting_for_timeout ... ok
+test presentation::tests::references_are_scoped_guarded_and_survive_target_closure ... ok
+test presentation::tests::repeated_image_references_share_an_aggregate_decoded_pixel_budget ... ok
+test presentation::tests::result_and_error_content_is_bounded_typed_and_source_bindable ... ok
+test presentation::tests::rich_text_and_chart_literals_reject_unbounded_or_executable_shapes ... ok
+test presentation::tests::shared_document_edits_persist_only_through_guarded_human_draft_commit ... ok
+test presentation::tests::table_documents_validate_keyed_rows_before_native_allocation ... ok
+test presentation::tests::typed_source_bindings_are_live_and_cross_activity_access_is_rejected ... ok
+test presentation::tests::tabs_and_splits_require_complete_bounded_labeled_children ... ok
+test presentation::tests::undo_is_compensating_idempotent_and_rejects_divergence ... ok
+test presentation::tests::unused_image_release_is_human_owned_in_use_guarded_and_never_rebinds_an_identity ... ok
+test presentation::tests::workspace_enforces_outputs_placements_sizes_focus_and_provenance ... ok
+test presentation::tests::workspace_undo_preserves_new_focus_but_refuses_new_placement ... ok
+test presentation_actions::tests::defaults_are_stable_user_scoped_discoverable_and_keep_revocation ... ok
+test presentation_actions::tests::interrupted_callback_stays_unknown_until_observed_and_is_never_replayed ... ok
+test presentation_actions::tests::only_core_issued_scoped_callbacks_are_available ... ok
+test presentation_actions::tests::output_parameters_are_typed_bounded_and_cannot_change_the_target ... ok
+test presentation_actions::tests::retries_never_execute_a_callback_twice_and_changed_payloads_fail ... ok
+test presentation_actions::tests::stale_or_revoked_callbacks_do_not_allocate_execution_receipts ... ok
+test presentation_external_actions::tests::broker_adapter_sends_fixed_target_revision_and_activity_only ... ok
+test presentation_external_actions::tests::fixed_adapters_are_scoped_user_owned_revocable_and_receipted ... ok
+test tests::activities_and_history_survive_reopen ... ok
+test presentation::tests::validation_feedback_is_atomic_bounded_and_never_resolves_a_draft ... ok
+test presentation::tests::document_page_byte_budget_keeps_large_collections_bounded ... ok
+test tests::cancellation_is_idempotent_and_finishes_the_job ... ok
+test tests::invalid_commands_create_no_jobs ... ok
+test tests::log_pages_preserve_unicode_across_every_byte_boundary ... ok
+test tests::packaged_component_capabilities_match_the_validator ... ok
+test tests::removing_an_activity_preserves_files_and_can_be_reversed ... ok
+test tests::restart_marks_unfinished_jobs_without_replaying_them ... ok
+test tests::execution_records_real_exit_output_and_spawn_failure ... ok
+test tests::stale_mutations_leave_state_unchanged ... ok
+test presentation::tests::legacy_snapshot_and_subscription_require_bounded_reads_without_skipping_events ... ok
+test tests::event_history_pages_are_complete_scoped_and_byte_bounded ... ok
+test tests::runtime_pages_bound_bytes_preserve_history_and_reject_mixed_revisions ... ok
+
+test result: ok. 65 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.22s
+

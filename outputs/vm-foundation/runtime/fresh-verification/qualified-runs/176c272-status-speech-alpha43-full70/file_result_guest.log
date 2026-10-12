@@ -1,0 +1,1 @@
+{"result": "pass", "checks": ["Full content and hash: ASCII", "Full content and hash: CJK", "Full content and hash: emoji"], "provider_calls": "fixtures; no live model inference"}
