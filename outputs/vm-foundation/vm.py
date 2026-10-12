@@ -143,6 +143,13 @@ def bundle():
     ident = str(uuid.uuid4()).upper()
     config['Information']['UUID'] = ident
     config['Information']['Name'] = 'agentOS '+RUN.name
+    # Render at the Mac's pixel density; Wayland scale preserves a 1280×800
+    # logical workspace instead of stretching a low-resolution framebuffer.
+    config['Display'][0]['NativeResolution'] = True
+    config['QEMU']['AdditionalArguments'].extend([
+        '-global', 'virtio-gpu-gl-pci.xres=2560',
+        '-global', 'virtio-gpu-gl-pci.yres=1600',
+    ])
     config['System']['CPUCount'] = LOCK['cpus']
     config['System']['MemorySize'] = LOCK['memory_mib']
     config['Network'][0]['MacAddress'] = '02:' + ':'.join(f'{v:02X}' for v in secrets.token_bytes(5))
@@ -198,6 +205,9 @@ def prepare(source=None):
     files = []
     def write(path, content, permissions='0644'):
         files.append({'path': path, 'content': content, 'permissions': permissions, 'owner': 'root:root'})
+    files.append({'path':'/home/developer/.config/agentos/outputs.json',
+                  'content':json.dumps({'outputs':{'Virtual-1':{'scale':2}}})+'\n',
+                  'permissions':'0600','owner':'developer:developer','defer':True})
     write('/etc/agent-os/release.json', json.dumps(build, indent=2) + '\n')
     write('/etc/motd', '\nAgent OS | Linux development foundation | M0\n'
           'Full ARM64 Linux guest. Agent and voice integration are not implemented yet.\n'

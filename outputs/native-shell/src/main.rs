@@ -765,7 +765,7 @@ impl Surface {
             .child(&content)
             .build();
         window.add_css_class("seven-ui");
-        let header=gtk::HeaderBar::new();header.set_decoration_layout(Some(":maximize,close"));window.set_titlebar(Some(&header));
+        desktop_theme::titlebar(&window);
         scroll.set_margin_top(24);
         scroll.set_margin_bottom(24);
         scroll.set_margin_start(24);
@@ -1587,7 +1587,7 @@ fn main() {
             let frame = backend.frame.lock().unwrap().clone();
             if let Ok(now) = glib::DateTime::now_local() {
                 if let Ok(text) = now.format("%a %e %b · %H:%M") {
-                    clock.set_text(&text);
+                    if clock.text().as_str()!=text.as_str() {clock.set_text(&text);}
                 }
             }
             let connection = if frame.connected {

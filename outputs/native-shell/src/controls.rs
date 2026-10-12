@@ -414,11 +414,7 @@ impl Controls {
                 surface.set_application_id("agentos.monitor");
             }
         });
-        let header = gtk::HeaderBar::new();
-        let title=ui::text("Agent Monitor",false);title.set_selectable(false);
-        header.set_title_widget(Some(&title));
-        header.set_decoration_layout(Some(":maximize,close"));
-        monitor.set_titlebar(Some(&header));
+        desktop_theme::titlebar(&monitor);
         monitor.connect_close_request(|window| {
             // A remapped GTK window gets a new AT-SPI identity. Unroot the
             // retained controls so readers cannot follow a dead frame parent.

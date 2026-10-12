@@ -1066,7 +1066,11 @@ fn metadata(db: &Connection, value: &Value) -> Result<Value> {
             "Presentation changed while reading pages",
         ));
     }
+    let connected_only=match value.get("connected_only") {
+        None=>false,Some(Value::Bool(value))=>*value,_=>return Err(invalid("Invalid connected-only filter")),
+    };
     let mut referenced = BTreeSet::new();
+    if !connected_only {
     let mut q=db.prepare("SELECT body FROM presentation_documents WHERE json_type(body,'$.workspace_id')='text' AND (?1 IS NULL OR json_extract(body,'$.activity_id')=?1)").map_err(db_error)?;
     let rows = q
         .query_map([activity], |r| r.get::<_, String>(0))
@@ -1077,6 +1081,7 @@ fn metadata(db: &Connection, value: &Value) -> Result<Value> {
         {
             referenced.extend(workspace::surfaces(&workspace));
         }
+    }
     }
     let state = json!({"protocol":PROTOCOL,"catalog_revision":CATALOG,"event_cursor":cursor,"host_surfaces":crate::presentation_hosts::snapshot_for(db,&referenced,activity)?,"renderers":crate::presentation_hosts::renderers_for(db,activity)?,"outputs":crate::presentation_outputs::list(db,&json!({"limit":64,"connected_only":true}))?});
     if state.to_string().len() > TRANSACTION_LIMIT {
@@ -4101,6 +4106,9 @@ mod tests {
             snapshot["documents"]["workspace-a"]["outputs"]["output-a"]["tiles"]["surface_id"],
             "app-fixture"
         );
+        let live=metadata(&db,&json!({"connected_only":true})).unwrap();
+        assert!(live["host_surfaces"].get("app-fixture").is_none(),"Live compositor metadata must exclude retired referenced windows");
+        assert!(metadata(&db,&json!({"connected_only":"yes"})).is_err());
         let mut disconnect = registration.clone();
         disconnect["connected"] = json!(false);
         handle(&mut db, &disconnect, &root).unwrap();

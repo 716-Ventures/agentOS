@@ -253,6 +253,7 @@ fn run(
     stop: Arc<AtomicBool>,
 ) {
     let mut resource_cache = BTreeMap::<(String, String), Arc<Vec<u8>>>::new();
+    let mut runtime_cache = super::state_pages::Cache::default();
     let mut presentation_cache = super::presentation_pages::Cache::default();
     let mut output_view = None::<super::log_view::LogView>;
     let mut leases = BTreeMap::<(String, String), Instant>::new();
@@ -579,11 +580,10 @@ fn run(
                 next.host_surfaces = state["host_surfaces"].clone();
                 next.outputs = state["outputs"].clone();
                 if let Some(path) = std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET") {
-                    next.compositor = request(&PathBuf::from(path), &json!({"op":"snapshot"}))
-                        .map(|v| v["shared"].clone())
+                    next.compositor = request(&PathBuf::from(path), &json!({"op":"desktop.status"}))
                         .unwrap_or_else(|error| json!({"unavailable":error}));
                 }
-                next.core = super::state_pages::read(
+                next.core = runtime_cache.read(
                     |query| request(&socket, query),
                     activity.as_ref().and_then(|id| id.parse().ok()),
                     || stop.load(Ordering::Relaxed),

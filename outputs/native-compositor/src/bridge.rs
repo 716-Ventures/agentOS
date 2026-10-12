@@ -18,6 +18,8 @@ use std::{
 mod grabs;
 #[path = "../../native-shell/src/presentation_pages.rs"]
 mod pages;
+#[path = "../../native-shell/src/state_pages.rs"]
+mod runtime_pages;
 #[derive(Clone, Debug, PartialEq)]
 pub struct Observed {
     pub id: String,
@@ -68,7 +70,7 @@ pub struct OutputObservation {
     pub area: Rect,
     pub metadata: Value,
 }
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 struct Observation {
     windows: Vec<Observed>,
     outputs: Vec<OutputObservation>,
@@ -153,7 +155,9 @@ impl Bridge {
             let mut input_error = None::<(String, std::time::Instant)>;
             let mut published = BTreeMap::new();
             let mut output_areas = BTreeMap::<String, OutputObservation>::new();
-            let mut document_cache = pages::Cache::default();
+            let mut projected: Option<(Arc<Value>,Observation,Option<String>)> = None;
+            let mut document_cache = pages::Cache::live();
+            let mut runtime_cache = runtime_pages::Cache::default();
             let mut recovery = crate::output_recovery::Recovery::default();
             let mut selected_activity = None::<String>;
             // A switch can precede restoration in this batch, before Recovery
@@ -250,12 +254,15 @@ impl Bridge {
                 grabs.renew(&socket);
                 let observed = input.lock().unwrap().clone();
                 if let Some(observed) = observed {
-                    let result = (|| -> Result<Scene, String> {
+                    let result = (|| -> Result<Option<Scene>, String> {
                         let mut state = document_cache.read(
                             |value| call(&socket, value),
                             None,
                             || stopping.load(Ordering::Relaxed),
                         )?;
+                        if input_error.is_none() && output.snapshot().error.is_none() && observed.windows.iter().all(|window|output.snapshot().identities.contains_key(&window.id)) && projected.as_ref().is_some_and(|(prior,observation,activity)|Arc::ptr_eq(prior,&state) && observation==&observed && activity==&selected_activity) {
+                            return Ok(None);
+                        }
                         let current_outputs = observed
                             .outputs
                             .iter()
@@ -279,7 +286,7 @@ impl Bridge {
                         let primary = observed.outputs.first().ok_or("No connected outputs")?;
                         let primary_id = primary.id.as_str();
                         let primary_area = primary.area;
-                        let activities = call(&socket, &json!({"op":"snapshot"}))?;
+                        let activities = runtime_cache.read(|query| call(&socket,query), None, || stopping.load(Ordering::Relaxed))?;
                         let available = activities["activities"]
                             .as_array()
                             .ok_or("No active activity")?;
@@ -391,10 +398,14 @@ impl Bridge {
                                     json!({"tiles":null,"floating":[],"maximized":null});
                             }
                             let (controls, surfaces): (Vec<_>, Vec<_>) = surfaces.into_iter().partition(|surface| {
-                                observed.windows.iter().any(|window| system_monitor(window) && identities.get(&window.id)==Some(surface))
+                                observed.windows.iter().any(|window| system_floating(window) && identities.get(&window.id)==Some(surface))
                             });
                             place_new_views(&mut doc, primary_id, primary_area, surfaces);
-                            place_controls(&mut doc, primary_id, primary_area, controls);
+                            for surface in controls {
+                                let welcome=observed.windows.iter().any(|window|window.app_id=="agentos.welcome" && identities.get(&window.id)==Some(&surface));
+                                if welcome {place_control(&mut doc,primary_id,primary_area,surface,(560,320));}
+                                else {place_controls(&mut doc,primary_id,primary_area,vec![surface]);}
+                            }
                             counter += 1;
                             if let Err(error) =
                                 put(&socket, &doc, expected, &format!("host-{prefix}-{counter}"))
@@ -498,10 +509,12 @@ impl Bridge {
                             next.overview["restoration"]=offer;
                             next.overview["reason"]=json!("A preferred display is available. Work stays here until you restore preferred placement in Agent Monitor.");
                         }
-                        Ok(next)
+                        projected=Some((state,observed.clone(),selected_activity.clone()));
+                        Ok(Some(next))
                     })();
                     match result {
-                        Ok(next) => output.publish(next),
+                        Ok(Some(next)) => output.publish(next),
+                        Ok(None) => {},
                         Err(e) => output.set_error(e),
                     }
                 }
@@ -706,16 +719,20 @@ fn placed_surfaces(state: &Value) -> BTreeSet<String> {
 // Preserve every existing placement when a human has constrained the workspace.
 // New windows still need durable geometry so they can be focused and managed.
 fn system_monitor(window: &Observed) -> bool {window.system_control && window.app_id=="agentos.monitor"}
+fn system_floating(window: &Observed) -> bool {system_monitor(window) || (window.system_control && window.app_id=="agentos.welcome") }
 
 /// A host-authenticated monitor opens over existing work. This preference is
 /// applied once; subsequent human placement and saved workspace state win.
 fn place_controls(doc: &mut Value, output: &str, area: Rect, surfaces: Vec<String>) {
     for surface in surfaces {
-        let width=area.width.min(920).max(1); let height=area.height.min(755).max(1);
+        place_control(doc,output,area,surface,(920,755));
+    }
+}
+fn place_control(doc:&mut Value,output:&str,area:Rect,surface:String,size:(i32,i32)) {
+        let width=area.width.min(size.0).max(1); let height=area.height.min(size.1).max(1);
         doc["outputs"][output]["floating"].as_array_mut().unwrap().push(json!({
             "surface_id":surface,"x":(area.width-width)/2,"y":(area.height-height)/2,"width":width,"height":height
         }));
-    }
 }
 fn place_new_views(doc: &mut Value, output: &str, area: Rect, surfaces: Vec<String>) {
     let constrained = doc["constraints"]

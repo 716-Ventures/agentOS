@@ -225,3 +225,24 @@ Clean source e241504 passes all 70 runtime checks with 716 UI alpha.43 and runti
 Clean source 273d5c1 passes all 72 runtime checks with 716 UI alpha.43 and runtime 39d7a11c50ebb9522ae97c4badfa2fa221c6d3c4a1fd4d459a250a241c32af25. Preferred display return leaves active editing on the recovery display until the human chooses Restore preferred placement in Agent Monitor. Original saved placements, drafts and typing survive; new floating controls remain reachable, the exact trusted renderer authorizes restoration, and stale topology/recovery/activity offers and same-user observer injection are rejected. All 66 compositor tests pass. Session SIGHUP uses graceful teardown; dedicated hangup and forced-systemd-stop regressions verify owned children, session directories and PAM scope cleanup. Expanded ordinary-input journeys have a 120-second whole-journey watchdog and unchanged individual interaction and 50 ms p95 limits. Installed approval searches tolerate absent AT-SPI children, and post-Undo input waits for a unique mapped compositor identity without replaying the action; both fixture regressions and prior failures remain retained. Multi-keyboard ownership and partial/final device removal preserve held modifiers, reject on-screen input until the final release and restore balanced lowercase typing in both ordinary and fresh-profile installed journeys. Immutable shared scenes avoid copying workspace history during rendering and input reads. Mapped collection Copy menus retain interaction leases through GTK activation and root-focus handoffs until dismissal; the identical final native fixture fails with the old handler and passes with the fix. All 36 native Rust tests pass (7 existing ignored). The prior a45fb85 full run stopped at a guarded List update after 49 checks; that failure remains retained without assigning its exact historical cause. An exact clean-source four-mode virtual KMS repeat verifies every deployed source file and 360 named kernel-key frames through secondary, primary and total display loss, plus retained launcher/keyboard identities and actual restoration controls. Native editor p95 is 44 ms idle, 42 ms loaded and 43 ms rotated, with all 60 presentation receipts completed. Installed and direct reader journeys retain three exact-work Monitor reopens before tree inspection and one background failure announcement. Rollback/interruption, reboot, repeat installation, VT resume and exact owned guest/app cleanup pass. CI 38228519983 is green. Signed v22 retains its separately qualified c57b60 runtime pending a new image qualification. Physical audio/braille/input/GPU/hotplug, live providers and full reference conformance remain unqualified; retained historical intermittent failures still have no established cause unless independently demonstrated.
 
 Signed candidate-v23 passes fresh account/password sudo, compatible signed update/rollback, all four virtual output recovery/restoration modes with 360 named kernel-key frames and actual native restoration controls, installed keyboard/zoom, collections, VTE/IME, typed button and form-validation accessibility, actual four-control Orca error/clear and Result/Error/Status job-update speech with selection, focus leases and clipboard preservation, browser, reboot, loopback-only cold boot and activation recovery at exact full72 runtime 39d7a11c50ebb9522ae97c4badfa2fa221c6d3c4a1fd4d459a250a241c32af25 (image SHA-256 9e21d4a4d246d8fd62e81b7dda60c91c280ec7b739f8ab600d8fd6d54f366b61). Original disk/EFI inode identities and config bytes restored; test SSH/sudo authority and password file removed; owned guest/app stopped and unbooted signature reverified. Online and offline installed launcher reopens preserve the unsent draft and actual request speech after shortcut bursts. The failed v17 image, prior qualified v22/v21/v19/v18/v16 images and unresolved historical observations remain distinct.
+
+### Retina desktop rendering
+
+New development bundles use a 2560×1600 virtual framebuffer, UTM native-resolution
+presentation, and Wayland output scale 2. The logical workspace remains 1280×800;
+text and window edges have four times the pixels instead of being enlarged by UTM.
+The guest preference is `/home/developer/.config/agentos/outputs.json`:
+
+```json
+{"outputs":{"Virtual-1":{"scale":2}}}
+```
+
+For an existing development bundle, preserve any other output preferences and add
+that scale to `Virtual-1`. Shut down the guest and quit UTM before editing its
+`config.plist` (UTM retains an in-memory copy). Set `Display[0].NativeResolution`
+to true and append these strings to `QEMU.AdditionalArguments`:
+`-global`, `virtio-gpu-gl-pci.xres=2560`, `-global`,
+`virtio-gpu-gl-pci.yres=1600`. Reopen the bundle. Verify the compositor reports
+2560×1600 pixels and output scale 2; increasing the font size alone does not fix
+framebuffer scaling. This development profile does not change physical-display
+preferences or the signed release image.

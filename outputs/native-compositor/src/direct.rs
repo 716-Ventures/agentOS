@@ -317,13 +317,18 @@ impl Device {
                     &mut head.damage,
                     [0.1, 0.1, 0.1, 1.0],
                 )?;
-                let feedback = crate::presentation_feedback::collect(
+                // A static desktop has no scanout work. Keep delivering frame
+                // callbacks below, but do not submit identical buffers to DRM.
+                let damaged = result.damage.is_some();
+                let feedback = if damaged { Some(crate::presentation_feedback::collect(
                     &data.state, &head.output, &result.states,
-                );
+                )) } else { None };
                 let sync = result.sync;
                 drop(target);
-                head.scanout.queue_buffer(Some(sync), None, feedback)?;
-                head.pending = true;
+                if let Some(feedback) = feedback {
+                    head.scanout.queue_buffer(Some(sync), None, feedback)?;
+                    head.pending = true;
+                }
                 if icon_rendered {
                     data.state.drag_icon_render_submissions =
                         data.state.drag_icon_render_submissions.saturating_add(1);

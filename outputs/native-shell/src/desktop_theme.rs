@@ -19,6 +19,18 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
     };
     let css = format!(
         r#"
+    window.seven-ui {{ background: {bg}; color: {fg}; font-family: Commissioner, Inter, sans-serif; font-size: {font_size}px; border-radius: 12px; }}
+    window.seven-ui decoration {{ border-radius: 12px; border: none; box-shadow: 0 12px 30px rgba(0,0,0,0.28); }}
+    window.seven-ui:backdrop decoration {{ box-shadow: 0 6px 16px rgba(0,0,0,0.16); }}
+    window.seven-ui headerbar {{ background: {bg}; background-image: none; color: {fg}; min-height: 38px; padding: 0 12px; border: none; border-bottom: 1px solid {line}; box-shadow: none; border-radius: 12px 12px 0 0; }}
+    window.seven-ui headerbar .title {{ font-size: 13px; font-weight: 600; }}
+    window.seven-ui headerbar button.desktop-window-control {{ min-width: 12px; min-height: 12px; padding: 0; margin: 0; border: none; border-radius: 100%; box-shadow: none; background-image: none; }}
+    window.seven-ui headerbar button.desktop-close {{ background: #ed6a5e; }}
+    window.seven-ui headerbar button.desktop-maximize {{ background: #61c454; }}
+    window.seven-ui headerbar button.desktop-window-control image {{ opacity: 0; -gtk-icon-size: 10px; }}
+    window.seven-ui headerbar button.desktop-window-control:hover image, window.seven-ui headerbar button.desktop-window-control:focus-visible image {{ opacity: 1; }}
+    window.seven-ui:backdrop headerbar button.desktop-window-control {{ background: {line}; }}
+    window.seven-ui headerbar button.desktop-window-control:focus-visible {{ outline: 2px solid #527dab; outline-offset: 3px; }}
     window.agentos-monitor, window.agentos-launcher {{ background: {bg}; color: {fg}; font-family: Commissioner, Inter, sans-serif; font-size: {font_size}px; }}
     .agentos-monitor label {{ color: {fg}; }}
     .agentos-monitor headerbar {{ background: {bg}; color: {muted}; border-bottom: 1px solid {line}; box-shadow: none; }}
@@ -38,7 +50,7 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
     .agentos-monitor .token-count {{ font-feature-settings: 'tnum'; }}
     .agentos-monitor expander > title {{ color: {muted}; padding: 8px 0; }}
     window.agentos-system-bar, .agentos-system-bar, window.agentos-wallpaper {{ background: transparent; background-image: none; box-shadow: none; border: none; }}
-    .agentos-system-bar label, .agentos-system-bar button {{ color: #ffffff; font-family: Commissioner, Inter, sans-serif; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.85); }}
+    .agentos-system-bar label, .agentos-system-bar button {{ color: #ffffff; font-family: Commissioner, Inter, sans-serif; font-weight: 500; text-shadow: 0 1px 1px rgba(0,0,0,0.55); }}
     .agentos-system-bar button {{ background: transparent; border: none; box-shadow: none; min-height: 0; padding: 4px 8px; }}
     .agentos-system-bar button:hover {{ text-decoration: underline; }}
     .agentos-system-bar button:focus-visible {{ outline: 2px solid #ffffff; outline-offset: 2px; }}
@@ -122,4 +134,23 @@ pub fn signed_in_name() -> String {
         }
     }
     std::env::var("USER").unwrap_or_else(|_| "Local user".into())
+}
+
+/// Shared client-side chrome: native move, resize, maximize and close semantics.
+pub fn titlebar(window: &gtk::ApplicationWindow) {
+    let header=gtk::HeaderBar::new();
+    header.set_show_title_buttons(false);
+    let controls=gtk::Box::new(gtk::Orientation::Horizontal,8);
+    controls.set_valign(gtk::Align::Center);
+    for (class,icon,label) in [("desktop-close","window-close-symbolic","Close window"),("desktop-maximize","window-maximize-symbolic","Maximize window")] {
+        let image=gtk::Image::from_icon_name(icon);image.set_pixel_size(10);
+        let button=gtk::Button::builder().child(&image).tooltip_text(label).valign(gtk::Align::Center).build();
+        button.add_css_class("desktop-window-control");button.add_css_class(class);
+        button.update_property(&[gtk::accessible::Property::Label(label)]);
+        let target=window.downgrade();
+        button.connect_clicked(move |_| {if let Some(window)=target.upgrade() {if class=="desktop-close" {window.close();}else if window.is_maximized() {window.unmaximize();}else {window.maximize();}}});
+        controls.append(&button);
+    }
+    header.pack_start(&controls);
+    window.set_titlebar(Some(&header));
 }

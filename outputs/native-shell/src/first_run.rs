@@ -22,7 +22,7 @@ pub fn present(app: &gtk::Application, commands: Sender<Command>) {
     content.set_margin_top(24);
     content.set_margin_bottom(24);
     let title=ui::text("Welcome to agentOS",true);title.set_selectable(false);title.add_css_class("desktop-heading");content.append(&title);
-    content.append(&ui::text("Your desktop is ready. Open the launcher to describe what you want to do, or open a document or terminal and get straight to work.",false));
+    content.append(&ui::text("Describe what you want to do in the launcher, or open a document or terminal and get straight to work.",false));
     content.append(&ui::text("Connect your model providers and check your microphone in Setup. Agents shows your agents, their progress and usage.",false));
     let setup = ui::button("Open setup", ButtonVariant::Primary, false);
     let later = ui::button("Continue to desktop", ButtonVariant::Outline, false);
@@ -35,6 +35,12 @@ pub fn present(app: &gtk::Application, commands: Sender<Command>) {
         .build();
     window.add_css_class("seven-ui");
     window.add_css_class("agentos-launcher");
+    desktop_theme::titlebar(&window);
+    window.connect_map(|window| {
+        if let Some(surface)=window.surface().and_then(|surface|surface.downcast::<gdk4_wayland::WaylandToplevel>().ok()) {
+            surface.set_application_id("agentos.welcome");
+        }
+    });
     let welcome = window.clone();
     setup.connect_clicked(move |_| {
         let _ = commands.send(Command::Setup);

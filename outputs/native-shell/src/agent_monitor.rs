@@ -387,7 +387,7 @@ impl Monitor {
             .as_object()
             .map(|m| m.values().collect::<Vec<_>>())
             .unwrap_or_default();
-        self.summary.set_text(&format!(
+        set_label(&self.summary, &format!(
             "{} agents · {} working\n{} usage: {} tokens",
             agents.len(),
             working,

@@ -106,29 +106,27 @@ mod tests {
 /// Retain the last consistent documents while refreshing live metadata separately.
 #[derive(Default)]
 pub struct Cache {
+    live_only: bool,
     scope: Option<String>,
-    state: Option<Value>,
+    state: Option<std::sync::Arc<Value>>,
 }
 impl Cache {
+    pub fn live() -> Self {Self {live_only:true,..Self::default()}}
     pub fn read(
         &mut self,
         mut request: impl FnMut(&Value) -> Result<Value, String>,
         activity: Option<&str>,
         stopped: impl Fn() -> bool,
-    ) -> Result<Value, String> {
+    ) -> Result<std::sync::Arc<Value>, String> {
         if self.state.is_none() || self.scope.as_deref() != activity {
-            let state = read(&mut request, activity, &stopped)?;
+            let state = std::sync::Arc::new(read(&mut request, activity, &stopped)?);
             self.scope = activity.map(str::to_owned);
             self.state = Some(state.clone());
             return Ok(state);
         }
         for attempt in 0..3 {
-            let result = (|| -> Result<Value, String> {
+            let result = (|| -> Result<std::sync::Arc<Value>, String> {
                 let old = self.state.as_ref().unwrap();
-                let mut documents = old["documents"]
-                    .as_object()
-                    .ok_or("Invalid cached documents")?
-                    .clone();
                 let mut after = old["event_cursor"]
                     .as_i64()
                     .ok_or("Invalid cached cursor")?;
@@ -180,6 +178,17 @@ impl Cache {
                         _ => return Err("Invalid change journal continuation".into()),
                     }
                 }
+                // Refresh live metadata, but retain the large immutable document
+                // history when neither its journal nor that metadata changed.
+                let mut query = json!({"op":"presentation.metadata","expected_cursor":target});
+                if let Some(activity) = activity {query["activity_id"]=json!(activity);}
+                if self.live_only {query["connected_only"]=json!(true);}
+                let mut state=request(&query)?;
+                if state["event_cursor"].as_i64()!=target {return Err("resync_required".into());}
+                if changed.is_empty() && old["event_cursor"].as_i64()==target && state.as_object().is_some_and(|fields|fields.iter().all(|(key,value)|old.get(key)==Some(value))) {
+                    return Ok(old.clone());
+                }
+                let mut documents=old["documents"].as_object().ok_or("Invalid cached documents")?.clone();
                 for (id, revision) in changed {
                     if stopped() {
                         return Err("Presentation read cancelled".into());
@@ -206,16 +215,8 @@ impl Cache {
                 if stopped() {
                     return Err("Presentation read cancelled".into());
                 }
-                let mut query = json!({"op":"presentation.metadata","expected_cursor":target});
-                if let Some(activity) = activity {
-                    query["activity_id"] = json!(activity);
-                }
-                let mut state = request(&query)?;
-                if state["event_cursor"].as_i64() != target {
-                    return Err("resync_required".into());
-                }
                 state["documents"] = json!(documents);
-                Ok(state)
+                Ok(std::sync::Arc::new(state))
             })();
             match result {
                 Ok(state) => {
@@ -228,7 +229,7 @@ impl Cache {
                     }
                     // A restored database can have an earlier cursor. Rebuild the cache
                     // only from a complete consistent scan, never from partial changes.
-                    let state = read(&mut request, activity, &stopped)?;
+                    let state = std::sync::Arc::new(read(&mut request, activity, &stopped)?);
                     self.state = Some(state.clone());
                     return Ok(state);
                 }
@@ -245,9 +246,10 @@ mod cache_tests {
     #[test]
     fn unchanged_documents_are_not_refetched_and_tombstones_remove_old_views() {
         let mut cache = Cache {
+            live_only:false,
             scope: Some("1".into()),
             state: Some(
-                json!({"event_cursor":1,"documents":{"a":{"revision":0},"gone":{"revision":0}}}),
+                std::sync::Arc::new(json!({"event_cursor":1,"documents":{"a":{"revision":0},"gone":{"revision":0}}})),
             ),
         };
         let mut calls = Vec::new();
@@ -266,8 +268,8 @@ mod cache_tests {
             calls,
             vec![
                 "presentation.changes",
-                "presentation.get",
-                "presentation.metadata"
+                "presentation.metadata",
+                "presentation.get"
             ]
         );
         let state = cache
@@ -289,10 +291,29 @@ mod cache_tests {
         assert_eq!(state["host_surfaces"][0], "new live metadata");
     }
     #[test]
+    fn idle_poll_shares_history_but_live_metadata_invalidates_it() {
+        let retained=std::sync::Arc::new(json!({"event_cursor":1,"documents":{"history":{}},"host_surfaces":{}}));
+        let mut cache=Cache{live_only:false,scope:None,state:Some(retained.clone())};
+        let unchanged=cache.read(|q| match q["op"].as_str().unwrap() {
+            "presentation.changes"=>Ok(json!({"events":[],"latest_cursor":1,"next_cursor":1,"has_more":false})),
+            "presentation.metadata"=>Ok(json!({"event_cursor":1,"host_surfaces":{}})),
+            _=>panic!("Idle history transferred"),
+        },None,||false).unwrap();
+        assert!(std::sync::Arc::ptr_eq(&retained,&unchanged));
+        let changed=cache.read(|q| match q["op"].as_str().unwrap() {
+            "presentation.changes"=>Ok(json!({"events":[],"latest_cursor":1,"next_cursor":1,"has_more":false})),
+            "presentation.metadata"=>Ok(json!({"event_cursor":1,"host_surfaces":{"peer":"unavailable"}})),
+            _=>panic!("Unchanged document refetched"),
+        },None,||false).unwrap();
+        assert!(!std::sync::Arc::ptr_eq(&retained,&changed));
+        assert_eq!(changed["documents"],retained["documents"]);
+    }
+    #[test]
     fn errors_keep_the_previous_consistent_cache_and_cancellation_sends_nothing() {
         let mut cache = Cache {
+            live_only:false,
             scope: None,
-            state: Some(json!({"event_cursor":1,"documents":{"a":{}}})),
+            state: Some(std::sync::Arc::new(json!({"event_cursor":1,"documents":{"a":{}}}))),
         };
         let old = cache.state.clone();
         assert!(cache
