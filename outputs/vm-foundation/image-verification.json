@@ -1,7 +1,7 @@
 {
-  "verified_at": "2026-10-12T02:35:45.188730+00:00",
+  "verified_at": "2026-10-12T05:38:11.251400+00:00",
   "result": "pass",
-  "candidate_name": "candidate-v21",
+  "candidate_name": "candidate-v22",
   "image": {
     "architecture": "arm64",
     "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -21,9 +21,9 @@
       "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
       "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
     },
-    "image_sha256": "0d7a795766224a9cb34cc7c8f82743996f1c7c49a3f1bdc871c32184d48f06b3",
+    "image_sha256": "56a74dd588b099ca600f31e591470d39c92bee35336573627998cb69ec7e58c0",
     "name": "agentOS experimental native image",
-    "runtime_release": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
+    "runtime_release": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
     "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
     "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
   },
@@ -69,27 +69,11 @@
     "saved TextField/Choice/Toggle validation refuses actual signed older-runtime activation without changing live service identities, document, journal or current release; plain legacy controls remain compatible",
     "independent AT-SPI Toggle draft/error/clear/Discard through installed runtime; Choice field-plus-option names retained through real installed feedback revisions",
     "saved property incompatibility refuses actual signed older-runtime activation with live services, document and journal unchanged; plain legacy controls stay compatible",
-    "typed Button variant/size/icon changes preserve accessible names and disabled host action state through real installed core transactions",
-    "nested Lucide/shadcn/provenance dependency notices retained in the complete immutable runtime integrity manifest",
-    "saved TextField/Choice/Toggle validation refuses actual signed older-runtime activation without changing live service identities, document, journal or current release; plain legacy controls remain compatible",
-    "independent AT-SPI Toggle draft/error/clear/Discard through installed runtime; Choice field-plus-option names retained through real installed feedback revisions",
-    "saved property incompatibility refuses actual signed older-runtime activation with live services, document and journal unchanged; plain legacy controls stay compatible",
-    "typed Button variant/size/icon changes preserve accessible names and disabled host action state through real installed core transactions",
-    "nested Lucide/shadcn/provenance dependency notices retained in the complete immutable runtime integrity manifest",
     "Actual installed Orca error/clear speech for TextField, DocumentEditor, Choice and Toggle through trusted keyboard navigation; exact draft preservation and scoped explicit Discard",
     "Actual installed Result/Error failed-job speech preserves selected older text, focus and exact field drafts, with one announcement across refresh and deselection",
-    "Actual installed Orca error/clear speech for TextField, DocumentEditor, Choice and Toggle through trusted keyboard navigation; exact draft preservation and scoped explicit Discard",
     "Online and offline installed Orca announce ten launcher reopens after shortcut bursts, retain unsent draft, and complete reader commands/rescue VT",
     "Online and offline installed Status failure stays visible beside selected older text; real focus lease and exact draft persist; one actual background speech announcement; trusted Ctrl+C Wayland clipboard roundtrip",
-    "Actual installed Orca error/clear speech for TextField, DocumentEditor, Choice and Toggle through trusted keyboard navigation; exact draft preservation and scoped explicit Discard",
-    "Online and offline installed Orca announce ten launcher reopens after shortcut bursts, retain unsent draft, and complete reader commands/rescue VT",
-    "Online and offline installed Status failure stays visible beside selected older text; real focus lease and exact draft persist; one actual background speech announcement; trusted Ctrl+C Wayland clipboard roundtrip",
-    "Actual installed Orca error/clear speech for TextField, DocumentEditor, Choice and Toggle through trusted keyboard navigation; exact draft preservation and scoped explicit Discard",
-    "Online and offline installed Orca announce ten launcher reopens after shortcut bursts, retain unsent draft, and complete reader commands/rescue VT",
-    "Online and offline installed Status failure stays visible beside selected older text; real focus lease and exact draft persist; one actual background speech announcement; trusted Ctrl+C Wayland clipboard roundtrip",
-    "Actual installed Orca error/clear speech for TextField, DocumentEditor, Choice and Toggle through trusted keyboard navigation; exact draft preservation and scoped explicit Discard",
-    "Online and offline real kernel maximize/restore preserve focused editor lease; active Monitor speaks one failure while retaining selected older text and exact clipboard after close",
-    "Online and offline installed Orca announce ten launcher reopens after shortcut bursts, retain unsent draft, and complete reader commands/rescue VT"
+    "Online and offline real kernel maximize/restore preserve focused editor lease; active Monitor speaks one failure while retaining selected older text and exact clipboard after close"
   ],
   "not_tested": [
     "production signing/distribution authority",
@@ -101,7 +85,7 @@
   ],
   "schema_guard": {
     "result": "pass",
-    "current_runtime": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
+    "current_runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
     "legacy_runtime": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
     "incompatible_icon_refused": true,
     "incompatible_text_choice_toggle_validation_refused": true,
@@ -109,8 +93,8 @@
     "document_and_journal_unchanged": true,
     "plain_legacy_button_compatible": true
   },
-  "schema_guard_fixture_sha256": "8797c12f212d6049c4a329cde6334c75817f1307a0347d52be631175d2aa2ec8",
-  "runtime_source_revision": "b723b9cd171ae4d34f9293ae97469f4ee1fc2d44",
+  "schema_guard_fixture_sha256": "5ba216e2bc07cf2aea6620374ae79437193ea35d21ff2b736c99f28acb5f0f35",
+  "runtime_source_revision": "5d604e9573f8c9746010fa9b0a0d04a4642a0720",
   "runtime_716_ui": "v0.1.0-alpha.43",
   "compatible_rollback_probe": {
     "runtime_release": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
@@ -122,17 +106,17 @@
   },
   "lifecycle": {
     "offline_status_reader_qualified": true,
-    "offline_status_raw_speech_sha256": "948e0ea633e1f00f1e4fd2d4b77788d82381438e547e312e02db4e02e86f6afc",
+    "offline_status_raw_speech_sha256": "5fb967ad9a58a972c1c468df67bc1ab08ca17a33a920b300725314e233bd5691",
     "offline_status_announcement_speech": [
-      "02:33:46.422819 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
+      "05:36:21.219447 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
     ],
     "offline_launcher_request_announcements": 10,
-    "offline_launcher_raw_speech_sha256": "ec81469261693bda51267dba37a7f08d3b971d611df703fd49f8bb777369c6ef",
+    "offline_launcher_raw_speech_sha256": "a005401ccd5f18c83e8d82951cc67082fadc02badc493b7f21117fc056d0c8ba",
     "result": "pass",
     "before": {
       "result": "pass",
-      "boot_id": "0bacf3bb-ddd2-4541-a507-838827fc6a78",
-      "runtime": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
+      "boot_id": "81fecdb3-c398-49a3-bd8b-f2da7cc74359",
+      "runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
       "uid": 1000,
       "activity": 1,
       "file_persisted": true,
@@ -151,8 +135,8 @@
     },
     "reboot": {
       "result": "pass",
-      "boot_id": "b896249e-4414-409d-b133-4518d73440d5",
-      "runtime": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
+      "boot_id": "182c914c-48cb-4596-beb4-a03f4e8fc841",
+      "runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
       "uid": 1000,
       "activity": 1,
       "file_persisted": true,
@@ -171,8 +155,8 @@
     },
     "offline": {
       "result": "pass",
-      "boot_id": "9a5f109c-4695-427d-b0af-42c8a2c0188f",
-      "runtime": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
+      "boot_id": "32fe2ea7-d2e2-4379-ad2e-9fd44f947bd4",
+      "runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
       "uid": 1000,
       "activity": 1,
       "file_persisted": true,
@@ -221,11 +205,11 @@
     },
     "offline_screen_reader_qualified": true,
     "offline_display_zoom_and_keyboard_qualified": true,
-    "final_offline_runtime": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
+    "final_offline_runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
     "development_disk_restored": true,
     "guest_stopped": true
   },
-  "factory_source_revision": "da52fd6ed9dc083c36389c4a9e971bf8d8a143fc",
+  "factory_source_revision": "0d3274b3b3f20ac1a2c7ca29746703f7305d89aa",
   "browser": {
     "result": "pass",
     "checks": [
@@ -249,37 +233,43 @@
   },
   "qualification_observations": [
     "Fresh local account and password-protected sudo passed before qualification-only SSH and sudo fixtures were installed.",
-    "The exact clean-source full70 runtime was reused; no development seed or additional disk attached.",
+    "The exact clean-source 5d604e9 full70 runtime was reused, including connector recovery and shared activation fixes; no development seed or additional disk attached.",
     "Installed direct keyboard/zoom, collections, VTE/IME, reader and typed-button accessibility checks passed on original image binaries.",
-    "Passing qualification does not resolve historical PRIMARY-focus, collection geometry or intermittent Ubuntu accessible Save observations."
+    "Passing qualification does not resolve historical PRIMARY-focus, collection geometry, accessible Save, or the 3dce649 focused List refresh observation; the activation defect has independent negative evidence."
   ],
-  "direct_input_test_sha256": "3ee74a9d55bbe89f095d89c1eced9d63eff00db72248a89de5163e7ac667ab4a",
+  "direct_input_test_sha256": "7f28ada1453ab25b655b3c704e66e241921d8818c8e138847dac8238c8e6f480",
   "terminal_input_test_sha256": "704f7883530c72948e340ab04c9677436f2739c437bd38c1f003d3ce4b80cb2d",
-  "collection_input_test_sha256": "52c38d3ffb1d91dd8b3d3b3c478691106adbfceba46d747ac5ed32cee1d353ba",
+  "collection_input_test_sha256": "7d7951601112afba97791c9dfa0f9f96aff9ec4244228345b27af36966eb6b0e",
   "zoom_test_sha256": "faecc8013b71915ff93fd223c0e31ad59e782fd27949b6ee3ecb8da1452a7468",
   "native_session_test_sha256": "9f4e7734276893fc8d63ae958bd660a11202d4ce640fe8047fc7298df44bab51",
-  "qualification_log_sha256": "3e903f16be68d6e42003b158769a84c1468526be64c145cfdeacc6afc85f1ad5",
-  "driver_log_sha256": "3d33db5fe436c815f0b44e2c4142126a73e0204bbb7183b326e027687f468434",
-  "build_log_sha256": "0bbe104419b1f3b775d8b502dbfc46b2d6dfaead336d0d5657a879addd5fe05e",
-  "full_reproduction_runtime": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
+  "qualification_log_sha256": "9b2ef7ca60631cf9c71d67a5ef17d97f243411312bea778cd8e409e914680bbe",
+  "driver_log_sha256": "d6b98ace17bbe5c6689ad474c759091380aa78207233edb6b766e93a51c444c8",
+  "build_log_sha256": "2eca077d2932d9ee0ee249ca66d2f6e8aff4455608d7d91b88f99b3f3eb2d27c",
+  "full_reproduction_runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
   "full_reproduction_check_count": 70,
+  "verified_source_record_ci": {
+    "conclusion": "success",
+    "headSha": "0d3274b3b3f20ac1a2c7ca29746703f7305d89aa",
+    "status": "completed",
+    "url": "https://github.com/716-Ventures/agentOS/actions/runs/38207783789"
+  },
   "native_input_presentation_profiles": [
     {
       "clock_id": 1,
       "discarded": 0,
       "format": 1,
       "invalid": 0,
-      "max_ms": 35,
+      "max_ms": 44,
       "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-      "p50_ms": 29,
-      "p95_ms": 35,
+      "p50_ms": 28,
+      "p95_ms": 41,
       "pending": 0,
       "presented": 20,
       "requested": 20,
       "sample_limit": 256,
       "profile": "idle editor",
       "measurement_seconds": 2.839,
-      "completed_frames_between_observer_snapshots": 190,
+      "completed_frames_between_observer_snapshots": 188,
       "input_frame_wakeups_between_observer_snapshots": 20
     },
     {
@@ -287,21 +277,21 @@
       "discarded": 0,
       "format": 1,
       "invalid": 0,
-      "max_ms": 51,
+      "max_ms": 42,
       "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-      "p50_ms": 30,
-      "p95_ms": 44,
+      "p50_ms": 31,
+      "p95_ms": 38,
       "pending": 0,
       "presented": 20,
       "requested": 20,
       "sample_limit": 256,
       "profile": "two concurrent broker CPU jobs",
       "job_cpu_usage_usec": [
-        1521182,
-        1527099
+        1595433,
+        1591323
       ],
-      "measurement_seconds": 1.577,
-      "completed_frames_between_observer_snapshots": 92,
+      "measurement_seconds": 1.648,
+      "completed_frames_between_observer_snapshots": 100,
       "input_frame_wakeups_between_observer_snapshots": 20
     }
   ],
@@ -392,21 +382,21 @@
     }
   ],
   "binary_equivalence": {
-    "factory_source_revision": "da52fd6ed9dc083c36389c4a9e971bf8d8a143fc",
-    "runtime_source_revision": "b723b9cd171ae4d34f9293ae97469f4ee1fc2d44",
-    "source_archive_sha256": "f11c703fe6dd6352a5bea694bea94e9119014f2014b58e2f7a827afb6df16512",
-    "qualified_runtime": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
-    "image_runtime": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
+    "factory_source_revision": "0d3274b3b3f20ac1a2c7ca29746703f7305d89aa",
+    "runtime_source_revision": "5d604e9573f8c9746010fa9b0a0d04a4642a0720",
+    "source_archive_sha256": "953a80f83840fd06a32b324bed4b1e10d186346318c29784dc23f33f82cd4328",
+    "qualified_runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
+    "image_runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
     "binaries": {
       "agent-os-core": "27607a58076d3b567bf6106112c2d1246165709b0551b8dc859cd41c8ba36432",
-      "native/agent-os-desktop": "394e7e9117b191e86574ee989df093b9f3218a8db6f04f5f350c984d36354199",
-      "native/agent-os-compositor": "c921d68d8928410cb8dc540c0a876e539eee2fb687ab16a4fcbc0ef8b378e607"
+      "native/agent-os-desktop": "0bbe824d57980f9bc45d4bf48ce293d45cb77d78ceb2fe0a939a7d54e2882b5f",
+      "native/agent-os-compositor": "6dea84461ca29592d45ac343b3e7be8b32cbf89b5e8d15b0c0fa21105ffb9864"
     }
   },
-  "previous_v20_image": {
-    "verified_at": "2026-10-12T01:03:44.808345+00:00",
+  "previous_v21_image": {
+    "verified_at": "2026-10-12T02:35:45.188730+00:00",
     "result": "pass",
-    "candidate_name": "candidate-v20",
+    "candidate_name": "candidate-v21",
     "image": {
       "architecture": "arm64",
       "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -426,9 +416,9 @@
         "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
         "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
       },
-      "image_sha256": "d562f88587c763cac3460b8f99d1bf60a4ae66ca3700c748bb769f6914e6dc5e",
+      "image_sha256": "0d7a795766224a9cb34cc7c8f82743996f1c7c49a3f1bdc871c32184d48f06b3",
       "name": "agentOS experimental native image",
-      "runtime_release": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
+      "runtime_release": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
       "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
       "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
     },
@@ -490,6 +480,10 @@
       "Online and offline installed Orca announce ten launcher reopens after shortcut bursts, retain unsent draft, and complete reader commands/rescue VT",
       "Online and offline installed Status failure stays visible beside selected older text; real focus lease and exact draft persist; one actual background speech announcement; trusted Ctrl+C Wayland clipboard roundtrip",
       "Actual installed Orca error/clear speech for TextField, DocumentEditor, Choice and Toggle through trusted keyboard navigation; exact draft preservation and scoped explicit Discard",
+      "Online and offline installed Orca announce ten launcher reopens after shortcut bursts, retain unsent draft, and complete reader commands/rescue VT",
+      "Online and offline installed Status failure stays visible beside selected older text; real focus lease and exact draft persist; one actual background speech announcement; trusted Ctrl+C Wayland clipboard roundtrip",
+      "Actual installed Orca error/clear speech for TextField, DocumentEditor, Choice and Toggle through trusted keyboard navigation; exact draft preservation and scoped explicit Discard",
+      "Online and offline real kernel maximize/restore preserve focused editor lease; active Monitor speaks one failure while retaining selected older text and exact clipboard after close",
       "Online and offline installed Orca announce ten launcher reopens after shortcut bursts, retain unsent draft, and complete reader commands/rescue VT"
     ],
     "not_tested": [
@@ -502,7 +496,7 @@
     ],
     "schema_guard": {
       "result": "pass",
-      "current_runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
+      "current_runtime": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
       "legacy_runtime": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
       "incompatible_icon_refused": true,
       "incompatible_text_choice_toggle_validation_refused": true,
@@ -510,8 +504,8 @@
       "document_and_journal_unchanged": true,
       "plain_legacy_button_compatible": true
     },
-    "schema_guard_fixture_sha256": "b6ae034a835ab2269355f9756ad29cc15ba4dba5022b8408f292bd95fd56c2a2",
-    "runtime_source_revision": "176c2724343263259be67f6b32f45bcfd7ea0893",
+    "schema_guard_fixture_sha256": "8797c12f212d6049c4a329cde6334c75817f1307a0347d52be631175d2aa2ec8",
+    "runtime_source_revision": "b723b9cd171ae4d34f9293ae97469f4ee1fc2d44",
     "runtime_716_ui": "v0.1.0-alpha.43",
     "compatible_rollback_probe": {
       "runtime_release": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
@@ -523,17 +517,17 @@
     },
     "lifecycle": {
       "offline_status_reader_qualified": true,
-      "offline_status_raw_speech_sha256": "a07fa05419887f735998727550d7db418b691ec3e8b6e1e1247c3d9ba0eb99ca",
+      "offline_status_raw_speech_sha256": "948e0ea633e1f00f1e4fd2d4b77788d82381438e547e312e02db4e02e86f6afc",
       "offline_status_announcement_speech": [
-        "01:01:18.402401 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
+        "02:33:46.422819 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
       ],
       "offline_launcher_request_announcements": 10,
-      "offline_launcher_raw_speech_sha256": "e5d114baea888a414e7003ef30982e73b4d21ac191cdc4a99a8f87fe37362b1e",
+      "offline_launcher_raw_speech_sha256": "ec81469261693bda51267dba37a7f08d3b971d611df703fd49f8bb777369c6ef",
       "result": "pass",
       "before": {
         "result": "pass",
-        "boot_id": "d031f877-592f-4dad-8bb2-d6b589ec9ab6",
-        "runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
+        "boot_id": "0bacf3bb-ddd2-4541-a507-838827fc6a78",
+        "runtime": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
         "uid": 1000,
         "activity": 1,
         "file_persisted": true,
@@ -552,8 +546,8 @@
       },
       "reboot": {
         "result": "pass",
-        "boot_id": "cc5a2b19-ee05-4041-913c-791414c8ba04",
-        "runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
+        "boot_id": "b896249e-4414-409d-b133-4518d73440d5",
+        "runtime": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
         "uid": 1000,
         "activity": 1,
         "file_persisted": true,
@@ -572,8 +566,8 @@
       },
       "offline": {
         "result": "pass",
-        "boot_id": "74ae87bb-b1a7-469b-b235-1afc9b1a6e67",
-        "runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
+        "boot_id": "9a5f109c-4695-427d-b0af-42c8a2c0188f",
+        "runtime": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
         "uid": 1000,
         "activity": 1,
         "file_persisted": true,
@@ -622,11 +616,11 @@
       },
       "offline_screen_reader_qualified": true,
       "offline_display_zoom_and_keyboard_qualified": true,
-      "final_offline_runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
+      "final_offline_runtime": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
       "development_disk_restored": true,
       "guest_stopped": true
     },
-    "factory_source_revision": "529a5b3c6cece631f151e1bdcb8454859656cd2d",
+    "factory_source_revision": "da52fd6ed9dc083c36389c4a9e971bf8d8a143fc",
     "browser": {
       "result": "pass",
       "checks": [
@@ -654,15 +648,15 @@
       "Installed direct keyboard/zoom, collections, VTE/IME, reader and typed-button accessibility checks passed on original image binaries.",
       "Passing qualification does not resolve historical PRIMARY-focus, collection geometry or intermittent Ubuntu accessible Save observations."
     ],
-    "direct_input_test_sha256": "bfa28051ce4731d35853de9ead71578b2c7e82cf3a0c3964454cb9e865d1bc75",
+    "direct_input_test_sha256": "3ee74a9d55bbe89f095d89c1eced9d63eff00db72248a89de5163e7ac667ab4a",
     "terminal_input_test_sha256": "704f7883530c72948e340ab04c9677436f2739c437bd38c1f003d3ce4b80cb2d",
     "collection_input_test_sha256": "52c38d3ffb1d91dd8b3d3b3c478691106adbfceba46d747ac5ed32cee1d353ba",
     "zoom_test_sha256": "faecc8013b71915ff93fd223c0e31ad59e782fd27949b6ee3ecb8da1452a7468",
     "native_session_test_sha256": "9f4e7734276893fc8d63ae958bd660a11202d4ce640fe8047fc7298df44bab51",
-    "qualification_log_sha256": "819b857cc57793cebd0a35f68614284545ca2aa774c4befbc35fdba806b7bbb3",
-    "driver_log_sha256": "5c5c203d4f9c617fcdfd0d40901ab0df2616be8afd77563a2a7dcaa0952a74e8",
-    "build_log_sha256": "054aba433157b8e777a091b9bb26900b4b2d1cc5f995b49ff25af403fbfcba7e",
-    "full_reproduction_runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
+    "qualification_log_sha256": "3e903f16be68d6e42003b158769a84c1468526be64c145cfdeacc6afc85f1ad5",
+    "driver_log_sha256": "3d33db5fe436c815f0b44e2c4142126a73e0204bbb7183b326e027687f468434",
+    "build_log_sha256": "0bbe104419b1f3b775d8b502dbfc46b2d6dfaead336d0d5657a879addd5fe05e",
+    "full_reproduction_runtime": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
     "full_reproduction_check_count": 70,
     "native_input_presentation_profiles": [
       {
@@ -670,17 +664,17 @@
         "discarded": 0,
         "format": 1,
         "invalid": 0,
-        "max_ms": 40,
+        "max_ms": 35,
         "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-        "p50_ms": 30,
-        "p95_ms": 39,
+        "p50_ms": 29,
+        "p95_ms": 35,
         "pending": 0,
         "presented": 20,
         "requested": 20,
         "sample_limit": 256,
         "profile": "idle editor",
-        "measurement_seconds": 2.82,
-        "completed_frames_between_observer_snapshots": 189,
+        "measurement_seconds": 2.839,
+        "completed_frames_between_observer_snapshots": 190,
         "input_frame_wakeups_between_observer_snapshots": 20
       },
       {
@@ -688,21 +682,21 @@
         "discarded": 0,
         "format": 1,
         "invalid": 0,
-        "max_ms": 49,
+        "max_ms": 51,
         "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-        "p50_ms": 32,
-        "p95_ms": 45,
+        "p50_ms": 30,
+        "p95_ms": 44,
         "pending": 0,
         "presented": 20,
         "requested": 20,
         "sample_limit": 256,
         "profile": "two concurrent broker CPU jobs",
         "job_cpu_usage_usec": [
-          1487883,
-          1495287
+          1521182,
+          1527099
         ],
-        "measurement_seconds": 1.547,
-        "completed_frames_between_observer_snapshots": 94,
+        "measurement_seconds": 1.577,
+        "completed_frames_between_observer_snapshots": 92,
         "input_frame_wakeups_between_observer_snapshots": 20
       }
     ],
@@ -793,21 +787,21 @@
       }
     ],
     "binary_equivalence": {
-      "factory_source_revision": "529a5b3c6cece631f151e1bdcb8454859656cd2d",
-      "runtime_source_revision": "176c2724343263259be67f6b32f45bcfd7ea0893",
-      "source_archive_sha256": "003418019f24fab37b0ce1d646ee9c0afefff10da767cd0754f4eff79b77fc0d",
-      "qualified_runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
-      "image_runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
+      "factory_source_revision": "da52fd6ed9dc083c36389c4a9e971bf8d8a143fc",
+      "runtime_source_revision": "b723b9cd171ae4d34f9293ae97469f4ee1fc2d44",
+      "source_archive_sha256": "f11c703fe6dd6352a5bea694bea94e9119014f2014b58e2f7a827afb6df16512",
+      "qualified_runtime": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
+      "image_runtime": "54b3216903a4d3e5f681e129ac6a4dea4624c9393588b197c9a0c5e7f33c9706",
       "binaries": {
-        "agent-os-core": "2c9ef805bffff66766eef3717c5a2223b80ce08ec7338fb0b361533a1656240f",
-        "native/agent-os-desktop": "1f0c0cb1fb2383eb6d02541ef628b977cff93d4c63263a9fa46255f358fb0b8c",
+        "agent-os-core": "27607a58076d3b567bf6106112c2d1246165709b0551b8dc859cd41c8ba36432",
+        "native/agent-os-desktop": "394e7e9117b191e86574ee989df093b9f3218a8db6f04f5f350c984d36354199",
         "native/agent-os-compositor": "c921d68d8928410cb8dc540c0a876e539eee2fb687ab16a4fcbc0ef8b378e607"
       }
     },
-    "previous_v19_image": {
-      "verified_at": "2026-10-11T23:38:00.462480+00:00",
+    "previous_v20_image": {
+      "verified_at": "2026-10-12T01:03:44.808345+00:00",
       "result": "pass",
-      "candidate_name": "candidate-v19",
+      "candidate_name": "candidate-v20",
       "image": {
         "architecture": "arm64",
         "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -827,9 +821,9 @@
           "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
           "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
         },
-        "image_sha256": "5b20416a3dac42218e764db0d27b7137c82f8b7b070a4b8d0c8c352634c5206b",
+        "image_sha256": "d562f88587c763cac3460b8f99d1bf60a4ae66ca3700c748bb769f6914e6dc5e",
         "name": "agentOS experimental native image",
-        "runtime_release": "921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
+        "runtime_release": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
         "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
         "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
       },
@@ -888,6 +882,9 @@
         "Online and offline installed Orca announce ten launcher reopens after shortcut bursts, retain unsent draft, and complete reader commands/rescue VT",
         "Online and offline installed Status failure stays visible beside selected older text; real focus lease and exact draft persist; one actual background speech announcement; trusted Ctrl+C Wayland clipboard roundtrip",
         "Actual installed Orca error/clear speech for TextField, DocumentEditor, Choice and Toggle through trusted keyboard navigation; exact draft preservation and scoped explicit Discard",
+        "Online and offline installed Orca announce ten launcher reopens after shortcut bursts, retain unsent draft, and complete reader commands/rescue VT",
+        "Online and offline installed Status failure stays visible beside selected older text; real focus lease and exact draft persist; one actual background speech announcement; trusted Ctrl+C Wayland clipboard roundtrip",
+        "Actual installed Orca error/clear speech for TextField, DocumentEditor, Choice and Toggle through trusted keyboard navigation; exact draft preservation and scoped explicit Discard",
         "Online and offline installed Orca announce ten launcher reopens after shortcut bursts, retain unsent draft, and complete reader commands/rescue VT"
       ],
       "not_tested": [
@@ -900,7 +897,7 @@
       ],
       "schema_guard": {
         "result": "pass",
-        "current_runtime": "921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
+        "current_runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
         "legacy_runtime": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
         "incompatible_icon_refused": true,
         "incompatible_text_choice_toggle_validation_refused": true,
@@ -908,9 +905,9 @@
         "document_and_journal_unchanged": true,
         "plain_legacy_button_compatible": true
       },
-      "schema_guard_fixture_sha256": "eedfc7b2c914f2c2fb96e80dc38b92e20952802f87908f74d2f27ebe6be4f4cd",
-      "runtime_source_revision": "bb830f3929344342782be02117a82f09df7f3c28",
-      "runtime_716_ui": "v0.1.0-alpha.42",
+      "schema_guard_fixture_sha256": "b6ae034a835ab2269355f9756ad29cc15ba4dba5022b8408f292bd95fd56c2a2",
+      "runtime_source_revision": "176c2724343263259be67f6b32f45bcfd7ea0893",
+      "runtime_716_ui": "v0.1.0-alpha.43",
       "compatible_rollback_probe": {
         "runtime_release": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
         "bundle_sha256": "402e3392bbb5a9dba0dafacdb05f7c668c02f0115975c828e4877a37920159f3"
@@ -921,17 +918,17 @@
       },
       "lifecycle": {
         "offline_status_reader_qualified": true,
-        "offline_status_raw_speech_sha256": "8e2e9b09563109cefb9debf923a81b8145bcde2507dd52cf8373bb64097c1e2a",
+        "offline_status_raw_speech_sha256": "a07fa05419887f735998727550d7db418b691ec3e8b6e1e1247c3d9ba0eb99ca",
         "offline_status_announcement_speech": [
-          "23:35:42.956957 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
+          "01:01:18.402401 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
         ],
         "offline_launcher_request_announcements": 10,
-        "offline_launcher_raw_speech_sha256": "fe94b3ba65b992898b87d17f5fcf497f03022d25520264247407f7803e0d2f55",
+        "offline_launcher_raw_speech_sha256": "e5d114baea888a414e7003ef30982e73b4d21ac191cdc4a99a8f87fe37362b1e",
         "result": "pass",
         "before": {
           "result": "pass",
-          "boot_id": "8e130c4e-fd89-4926-9d8c-f92bcf3434eb",
-          "runtime": "921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
+          "boot_id": "d031f877-592f-4dad-8bb2-d6b589ec9ab6",
+          "runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
           "uid": 1000,
           "activity": 1,
           "file_persisted": true,
@@ -950,8 +947,8 @@
         },
         "reboot": {
           "result": "pass",
-          "boot_id": "fc1ee341-ca5f-4230-996b-87d4348eaef6",
-          "runtime": "921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
+          "boot_id": "cc5a2b19-ee05-4041-913c-791414c8ba04",
+          "runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
           "uid": 1000,
           "activity": 1,
           "file_persisted": true,
@@ -970,8 +967,8 @@
         },
         "offline": {
           "result": "pass",
-          "boot_id": "43944190-10c0-4e9d-bc0d-d21cd01c3f0c",
-          "runtime": "921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
+          "boot_id": "74ae87bb-b1a7-469b-b235-1afc9b1a6e67",
+          "runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
           "uid": 1000,
           "activity": 1,
           "file_persisted": true,
@@ -1020,11 +1017,11 @@
         },
         "offline_screen_reader_qualified": true,
         "offline_display_zoom_and_keyboard_qualified": true,
-        "final_offline_runtime": "921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
+        "final_offline_runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
         "development_disk_restored": true,
         "guest_stopped": true
       },
-      "factory_source_revision": "6e4fa060628778bdd89d40d2c2759a28801e26ec",
+      "factory_source_revision": "529a5b3c6cece631f151e1bdcb8454859656cd2d",
       "browser": {
         "result": "pass",
         "checks": [
@@ -1057,10 +1054,10 @@
       "collection_input_test_sha256": "52c38d3ffb1d91dd8b3d3b3c478691106adbfceba46d747ac5ed32cee1d353ba",
       "zoom_test_sha256": "faecc8013b71915ff93fd223c0e31ad59e782fd27949b6ee3ecb8da1452a7468",
       "native_session_test_sha256": "9f4e7734276893fc8d63ae958bd660a11202d4ce640fe8047fc7298df44bab51",
-      "qualification_log_sha256": "a49b310b7a6f08d913661a0595266f5d453cd3c43a0e40ef9e10355e551c3fc6",
-      "driver_log_sha256": "02784c4f9f0494bdfda1b846b02e0f6a40d5aa39e2c7aea9d9e760015beb59ac",
-      "build_log_sha256": "7edf7fe5496a14bc2d080170ea26bf2ad5f6691450cedb2832b8b4285c4d274e",
-      "full_reproduction_runtime": "921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
+      "qualification_log_sha256": "819b857cc57793cebd0a35f68614284545ca2aa774c4befbc35fdba806b7bbb3",
+      "driver_log_sha256": "5c5c203d4f9c617fcdfd0d40901ab0df2616be8afd77563a2a7dcaa0952a74e8",
+      "build_log_sha256": "054aba433157b8e777a091b9bb26900b4b2d1cc5f995b49ff25af403fbfcba7e",
+      "full_reproduction_runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
       "full_reproduction_check_count": 70,
       "native_input_presentation_profiles": [
         {
@@ -1068,17 +1065,17 @@
           "discarded": 0,
           "format": 1,
           "invalid": 0,
-          "max_ms": 42,
+          "max_ms": 40,
           "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-          "p50_ms": 28,
+          "p50_ms": 30,
           "p95_ms": 39,
           "pending": 0,
           "presented": 20,
           "requested": 20,
           "sample_limit": 256,
           "profile": "idle editor",
-          "measurement_seconds": 2.834,
-          "completed_frames_between_observer_snapshots": 188,
+          "measurement_seconds": 2.82,
+          "completed_frames_between_observer_snapshots": 189,
           "input_frame_wakeups_between_observer_snapshots": 20
         },
         {
@@ -1086,21 +1083,21 @@
           "discarded": 0,
           "format": 1,
           "invalid": 0,
-          "max_ms": 40,
+          "max_ms": 49,
           "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-          "p50_ms": 31,
-          "p95_ms": 40,
+          "p50_ms": 32,
+          "p95_ms": 45,
           "pending": 0,
           "presented": 20,
           "requested": 20,
           "sample_limit": 256,
           "profile": "two concurrent broker CPU jobs",
           "job_cpu_usage_usec": [
-            1575598,
-            1575550
+            1487883,
+            1495287
           ],
-          "measurement_seconds": 1.643,
-          "completed_frames_between_observer_snapshots": 100,
+          "measurement_seconds": 1.547,
+          "completed_frames_between_observer_snapshots": 94,
           "input_frame_wakeups_between_observer_snapshots": 20
         }
       ],
@@ -1191,21 +1188,21 @@
         }
       ],
       "binary_equivalence": {
-        "factory_source_revision": "6e4fa060628778bdd89d40d2c2759a28801e26ec",
-        "runtime_source_revision": "bb830f3929344342782be02117a82f09df7f3c28",
-        "source_archive_sha256": "d27fc75410dec4bf318488344d8ef69bb5b892e4d7df97704a687bf319359c2d",
-        "qualified_runtime": "921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
-        "image_runtime": "921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
+        "factory_source_revision": "529a5b3c6cece631f151e1bdcb8454859656cd2d",
+        "runtime_source_revision": "176c2724343263259be67f6b32f45bcfd7ea0893",
+        "source_archive_sha256": "003418019f24fab37b0ce1d646ee9c0afefff10da767cd0754f4eff79b77fc0d",
+        "qualified_runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
+        "image_runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
         "binaries": {
           "agent-os-core": "2c9ef805bffff66766eef3717c5a2223b80ce08ec7338fb0b361533a1656240f",
-          "native/agent-os-desktop": "00f2a05fe938e38f6243034934580f1b991d50799c14ae97e9575f3253a4ce84",
+          "native/agent-os-desktop": "1f0c0cb1fb2383eb6d02541ef628b977cff93d4c63263a9fa46255f358fb0b8c",
           "native/agent-os-compositor": "c921d68d8928410cb8dc540c0a876e539eee2fb687ab16a4fcbc0ef8b378e607"
         }
       },
-      "previous_v18_image": {
-        "verified_at": "2026-10-11T22:04:32.565108+00:00",
+      "previous_v19_image": {
+        "verified_at": "2026-10-11T23:38:00.462480+00:00",
         "result": "pass",
-        "candidate_name": "candidate-v18",
+        "candidate_name": "candidate-v19",
         "image": {
           "architecture": "arm64",
           "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -1225,9 +1222,9 @@
             "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
             "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
           },
-          "image_sha256": "e8546385011f8ec91329ca34e24195436e16dda5a39d9b33ab724ed3d95392de",
+          "image_sha256": "5b20416a3dac42218e764db0d27b7137c82f8b7b070a4b8d0c8c352634c5206b",
           "name": "agentOS experimental native image",
-          "runtime_release": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
+          "runtime_release": "921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
           "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
           "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
         },
@@ -1283,6 +1280,9 @@
           "Actual installed Orca error/clear speech for TextField, DocumentEditor, Choice and Toggle through trusted keyboard navigation; exact draft preservation and scoped explicit Discard",
           "Actual installed Result/Error failed-job speech preserves selected older text, focus and exact field drafts, with one announcement across refresh and deselection",
           "Actual installed Orca error/clear speech for TextField, DocumentEditor, Choice and Toggle through trusted keyboard navigation; exact draft preservation and scoped explicit Discard",
+          "Online and offline installed Orca announce ten launcher reopens after shortcut bursts, retain unsent draft, and complete reader commands/rescue VT",
+          "Online and offline installed Status failure stays visible beside selected older text; real focus lease and exact draft persist; one actual background speech announcement; trusted Ctrl+C Wayland clipboard roundtrip",
+          "Actual installed Orca error/clear speech for TextField, DocumentEditor, Choice and Toggle through trusted keyboard navigation; exact draft preservation and scoped explicit Discard",
           "Online and offline installed Orca announce ten launcher reopens after shortcut bursts, retain unsent draft, and complete reader commands/rescue VT"
         ],
         "not_tested": [
@@ -1295,7 +1295,7 @@
         ],
         "schema_guard": {
           "result": "pass",
-          "current_runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
+          "current_runtime": "921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
           "legacy_runtime": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
           "incompatible_icon_refused": true,
           "incompatible_text_choice_toggle_validation_refused": true,
@@ -1303,9 +1303,9 @@
           "document_and_journal_unchanged": true,
           "plain_legacy_button_compatible": true
         },
-        "schema_guard_fixture_sha256": "7baf6e8c652a5afc99f5f8c584964e33e0d8daa57290a48fa4c0843553f53ee0",
-        "runtime_source_revision": "126eddef62c5c4f760796d10fa622b3fde81c23e",
-        "runtime_716_ui": "v0.1.0-alpha.41",
+        "schema_guard_fixture_sha256": "eedfc7b2c914f2c2fb96e80dc38b92e20952802f87908f74d2f27ebe6be4f4cd",
+        "runtime_source_revision": "bb830f3929344342782be02117a82f09df7f3c28",
+        "runtime_716_ui": "v0.1.0-alpha.42",
         "compatible_rollback_probe": {
           "runtime_release": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
           "bundle_sha256": "402e3392bbb5a9dba0dafacdb05f7c668c02f0115975c828e4877a37920159f3"
@@ -1315,13 +1315,18 @@
           "bundle_sha256": "402e3392bbb5a9dba0dafacdb05f7c668c02f0115975c828e4877a37920159f3"
         },
         "lifecycle": {
+          "offline_status_reader_qualified": true,
+          "offline_status_raw_speech_sha256": "8e2e9b09563109cefb9debf923a81b8145bcde2507dd52cf8373bb64097c1e2a",
+          "offline_status_announcement_speech": [
+            "23:35:42.956957 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
+          ],
           "offline_launcher_request_announcements": 10,
-          "offline_launcher_raw_speech_sha256": "fb7d4dab3ea32ebc28cb94e91772829542c51b9b55f2cf98817dbb7b40818ca6",
+          "offline_launcher_raw_speech_sha256": "fe94b3ba65b992898b87d17f5fcf497f03022d25520264247407f7803e0d2f55",
           "result": "pass",
           "before": {
             "result": "pass",
-            "boot_id": "853f6993-4a4f-4cf2-9c53-2d5cf90dc780",
-            "runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
+            "boot_id": "8e130c4e-fd89-4926-9d8c-f92bcf3434eb",
+            "runtime": "921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
             "uid": 1000,
             "activity": 1,
             "file_persisted": true,
@@ -1340,8 +1345,8 @@
           },
           "reboot": {
             "result": "pass",
-            "boot_id": "d8528920-2519-4b81-a3f9-50db59b4ef28",
-            "runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
+            "boot_id": "fc1ee341-ca5f-4230-996b-87d4348eaef6",
+            "runtime": "921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
             "uid": 1000,
             "activity": 1,
             "file_persisted": true,
@@ -1360,8 +1365,8 @@
           },
           "offline": {
             "result": "pass",
-            "boot_id": "fb4a98f4-821f-46ca-8f09-e2449eeccf59",
-            "runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
+            "boot_id": "43944190-10c0-4e9d-bc0d-d21cd01c3f0c",
+            "runtime": "921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
             "uid": 1000,
             "activity": 1,
             "file_persisted": true,
@@ -1410,11 +1415,11 @@
           },
           "offline_screen_reader_qualified": true,
           "offline_display_zoom_and_keyboard_qualified": true,
-          "final_offline_runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
+          "final_offline_runtime": "921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
           "development_disk_restored": true,
           "guest_stopped": true
         },
-        "factory_source_revision": "637ff8a83165f0c07daa0280513a25356ac67900",
+        "factory_source_revision": "6e4fa060628778bdd89d40d2c2759a28801e26ec",
         "browser": {
           "result": "pass",
           "checks": [
@@ -1446,11 +1451,11 @@
         "terminal_input_test_sha256": "704f7883530c72948e340ab04c9677436f2739c437bd38c1f003d3ce4b80cb2d",
         "collection_input_test_sha256": "52c38d3ffb1d91dd8b3d3b3c478691106adbfceba46d747ac5ed32cee1d353ba",
         "zoom_test_sha256": "faecc8013b71915ff93fd223c0e31ad59e782fd27949b6ee3ecb8da1452a7468",
-        "native_session_test_sha256": "4592c2f5cbd0e0e308b1480c685b6ed7f0ddd54fc48ba1d5d155fb1cf52e5839",
-        "qualification_log_sha256": "79d7cd4c6629cedef6ca6d8ff4d32d4eeb93192bcdecb2b6518af58bcdf9f3ff",
-        "driver_log_sha256": "44edbdae60f48b734963f6a9fbaeb51b7ed241d71ca3ca23491f2bec0150aee0",
-        "build_log_sha256": "a175631b67cac1f342ba10ecd4ba996f216530eb3232df6c9fc830ff9bdfc974",
-        "full_reproduction_runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
+        "native_session_test_sha256": "9f4e7734276893fc8d63ae958bd660a11202d4ce640fe8047fc7298df44bab51",
+        "qualification_log_sha256": "a49b310b7a6f08d913661a0595266f5d453cd3c43a0e40ef9e10355e551c3fc6",
+        "driver_log_sha256": "02784c4f9f0494bdfda1b846b02e0f6a40d5aa39e2c7aea9d9e760015beb59ac",
+        "build_log_sha256": "7edf7fe5496a14bc2d080170ea26bf2ad5f6691450cedb2832b8b4285c4d274e",
+        "full_reproduction_runtime": "921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
         "full_reproduction_check_count": 70,
         "native_input_presentation_profiles": [
           {
@@ -1458,17 +1463,17 @@
             "discarded": 0,
             "format": 1,
             "invalid": 0,
-            "max_ms": 40,
+            "max_ms": 42,
             "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-            "p50_ms": 26,
-            "p95_ms": 36,
+            "p50_ms": 28,
+            "p95_ms": 39,
             "pending": 0,
             "presented": 20,
             "requested": 20,
             "sample_limit": 256,
             "profile": "idle editor",
-            "measurement_seconds": 2.802,
-            "completed_frames_between_observer_snapshots": 186,
+            "measurement_seconds": 2.834,
+            "completed_frames_between_observer_snapshots": 188,
             "input_frame_wakeups_between_observer_snapshots": 20
           },
           {
@@ -1478,19 +1483,19 @@
             "invalid": 0,
             "max_ms": 40,
             "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-            "p50_ms": 26,
-            "p95_ms": 38,
+            "p50_ms": 31,
+            "p95_ms": 40,
             "pending": 0,
             "presented": 20,
             "requested": 20,
             "sample_limit": 256,
             "profile": "two concurrent broker CPU jobs",
             "job_cpu_usage_usec": [
-              1415876,
-              1419619
+              1575598,
+              1575550
             ],
-            "measurement_seconds": 1.478,
-            "completed_frames_between_observer_snapshots": 88,
+            "measurement_seconds": 1.643,
+            "completed_frames_between_observer_snapshots": 100,
             "input_frame_wakeups_between_observer_snapshots": 20
           }
         ],
@@ -1581,21 +1586,21 @@
           }
         ],
         "binary_equivalence": {
-          "factory_source_revision": "637ff8a83165f0c07daa0280513a25356ac67900",
-          "runtime_source_revision": "126eddef62c5c4f760796d10fa622b3fde81c23e",
-          "source_archive_sha256": "2f489f00dfbb6e830527144dba2a812e8c38c63a411f0f1e577ad1eb5a82d97d",
-          "qualified_runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
-          "image_runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
+          "factory_source_revision": "6e4fa060628778bdd89d40d2c2759a28801e26ec",
+          "runtime_source_revision": "bb830f3929344342782be02117a82f09df7f3c28",
+          "source_archive_sha256": "d27fc75410dec4bf318488344d8ef69bb5b892e4d7df97704a687bf319359c2d",
+          "qualified_runtime": "921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
+          "image_runtime": "921d85d394e7868ce904c1c49e71f8c8a92377edf50e6ff7da38858419524587",
           "binaries": {
             "agent-os-core": "2c9ef805bffff66766eef3717c5a2223b80ce08ec7338fb0b361533a1656240f",
-            "native/agent-os-desktop": "ed2a84af3eaf9926f0f86f949703e78a87ba6c3fcf8171bd18f50a0724093b0c",
-            "native/agent-os-compositor": "011f799fa9fb8f281b9b513606333786194ff728c683ff963563b57269c7ff4c"
+            "native/agent-os-desktop": "00f2a05fe938e38f6243034934580f1b991d50799c14ae97e9575f3253a4ce84",
+            "native/agent-os-compositor": "c921d68d8928410cb8dc540c0a876e539eee2fb687ab16a4fcbc0ef8b378e607"
           }
         },
-        "previous_v16_image": {
-          "verified_at": "2026-10-11T20:10:04.122134+00:00",
+        "previous_v18_image": {
+          "verified_at": "2026-10-11T22:04:32.565108+00:00",
           "result": "pass",
-          "candidate_name": "candidate-v16",
+          "candidate_name": "candidate-v18",
           "image": {
             "architecture": "arm64",
             "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -1615,9 +1620,9 @@
               "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
               "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
             },
-            "image_sha256": "ace7f46c0a69c32c3dde2ff006e87598359713d70e72803c969c9df98ad7a787",
+            "image_sha256": "e8546385011f8ec91329ca34e24195436e16dda5a39d9b33ab724ed3d95392de",
             "name": "agentOS experimental native image",
-            "runtime_release": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
+            "runtime_release": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
             "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
             "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
           },
@@ -1670,7 +1675,10 @@
             "saved property incompatibility refuses actual signed older-runtime activation with live services, document and journal unchanged; plain legacy controls stay compatible",
             "typed Button variant/size/icon changes preserve accessible names and disabled host action state through real installed core transactions",
             "nested Lucide/shadcn/provenance dependency notices retained in the complete immutable runtime integrity manifest",
-            "Actual installed Orca error/clear speech for TextField, DocumentEditor, Choice and Toggle through trusted keyboard navigation; exact draft preservation and scoped explicit Discard"
+            "Actual installed Orca error/clear speech for TextField, DocumentEditor, Choice and Toggle through trusted keyboard navigation; exact draft preservation and scoped explicit Discard",
+            "Actual installed Result/Error failed-job speech preserves selected older text, focus and exact field drafts, with one announcement across refresh and deselection",
+            "Actual installed Orca error/clear speech for TextField, DocumentEditor, Choice and Toggle through trusted keyboard navigation; exact draft preservation and scoped explicit Discard",
+            "Online and offline installed Orca announce ten launcher reopens after shortcut bursts, retain unsent draft, and complete reader commands/rescue VT"
           ],
           "not_tested": [
             "production signing/distribution authority",
@@ -1682,7 +1690,7 @@
           ],
           "schema_guard": {
             "result": "pass",
-            "current_runtime": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
+            "current_runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
             "legacy_runtime": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
             "incompatible_icon_refused": true,
             "incompatible_text_choice_toggle_validation_refused": true,
@@ -1690,9 +1698,9 @@
             "document_and_journal_unchanged": true,
             "plain_legacy_button_compatible": true
           },
-          "schema_guard_fixture_sha256": "4523a702fa1b12363edbb1628aa49e8ffd4eaaf1aaedf4f06b66eb6e0543a842",
-          "runtime_source_revision": "360b99df0b98dc6bb3178bd5b292a7e9e09d4689",
-          "runtime_716_ui": "v0.1.0-alpha.40",
+          "schema_guard_fixture_sha256": "7baf6e8c652a5afc99f5f8c584964e33e0d8daa57290a48fa4c0843553f53ee0",
+          "runtime_source_revision": "126eddef62c5c4f760796d10fa622b3fde81c23e",
+          "runtime_716_ui": "v0.1.0-alpha.41",
           "compatible_rollback_probe": {
             "runtime_release": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
             "bundle_sha256": "402e3392bbb5a9dba0dafacdb05f7c668c02f0115975c828e4877a37920159f3"
@@ -1702,11 +1710,13 @@
             "bundle_sha256": "402e3392bbb5a9dba0dafacdb05f7c668c02f0115975c828e4877a37920159f3"
           },
           "lifecycle": {
+            "offline_launcher_request_announcements": 10,
+            "offline_launcher_raw_speech_sha256": "fb7d4dab3ea32ebc28cb94e91772829542c51b9b55f2cf98817dbb7b40818ca6",
             "result": "pass",
             "before": {
               "result": "pass",
-              "boot_id": "85f0e153-ad9f-4b0e-926c-e7f29a766176",
-              "runtime": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
+              "boot_id": "853f6993-4a4f-4cf2-9c53-2d5cf90dc780",
+              "runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
               "uid": 1000,
               "activity": 1,
               "file_persisted": true,
@@ -1725,8 +1735,8 @@
             },
             "reboot": {
               "result": "pass",
-              "boot_id": "7ed2c33d-d92f-4d97-a176-7c5056dbfc8c",
-              "runtime": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
+              "boot_id": "d8528920-2519-4b81-a3f9-50db59b4ef28",
+              "runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
               "uid": 1000,
               "activity": 1,
               "file_persisted": true,
@@ -1745,8 +1755,8 @@
             },
             "offline": {
               "result": "pass",
-              "boot_id": "d628d8b1-6042-45f2-8022-299b0ef1a3f7",
-              "runtime": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
+              "boot_id": "fb4a98f4-821f-46ca-8f09-e2449eeccf59",
+              "runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
               "uid": 1000,
               "activity": 1,
               "file_persisted": true,
@@ -1795,11 +1805,11 @@
             },
             "offline_screen_reader_qualified": true,
             "offline_display_zoom_and_keyboard_qualified": true,
-            "final_offline_runtime": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
+            "final_offline_runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
             "development_disk_restored": true,
             "guest_stopped": true
           },
-          "factory_source_revision": "eab6ed8982a4605044fcc8a58c1033e69bc00615",
+          "factory_source_revision": "637ff8a83165f0c07daa0280513a25356ac67900",
           "browser": {
             "result": "pass",
             "checks": [
@@ -1827,15 +1837,15 @@
             "Installed direct keyboard/zoom, collections, VTE/IME, reader and typed-button accessibility checks passed on original image binaries.",
             "Passing qualification does not resolve historical PRIMARY-focus, collection geometry or intermittent Ubuntu accessible Save observations."
           ],
-          "direct_input_test_sha256": "5ca9a06643933ded719ecd118f9febccb1187c81405a0f1fdf7809c2312aca1f",
+          "direct_input_test_sha256": "bfa28051ce4731d35853de9ead71578b2c7e82cf3a0c3964454cb9e865d1bc75",
           "terminal_input_test_sha256": "704f7883530c72948e340ab04c9677436f2739c437bd38c1f003d3ce4b80cb2d",
           "collection_input_test_sha256": "52c38d3ffb1d91dd8b3d3b3c478691106adbfceba46d747ac5ed32cee1d353ba",
           "zoom_test_sha256": "faecc8013b71915ff93fd223c0e31ad59e782fd27949b6ee3ecb8da1452a7468",
-          "native_session_test_sha256": "3a10821dcc3385530f0fd0c15a5c3c53f23c8f55f6e2e92020aabf24133644a9",
-          "qualification_log_sha256": "62fb02e8eef7f16d39f56ad381817e22f780c4c6ff266e6e86a9342630855cce",
-          "driver_log_sha256": "2f67b721ef5a9fd4393e040422350d1a42d737f26fe1f0190574e06e0482f389",
-          "build_log_sha256": "e0d1b05f88dfe5ad0611305a7fcb36b0cacc15a76282b48a7b96d4078aab2d32",
-          "full_reproduction_runtime": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
+          "native_session_test_sha256": "4592c2f5cbd0e0e308b1480c685b6ed7f0ddd54fc48ba1d5d155fb1cf52e5839",
+          "qualification_log_sha256": "79d7cd4c6629cedef6ca6d8ff4d32d4eeb93192bcdecb2b6518af58bcdf9f3ff",
+          "driver_log_sha256": "44edbdae60f48b734963f6a9fbaeb51b7ed241d71ca3ca23491f2bec0150aee0",
+          "build_log_sha256": "a175631b67cac1f342ba10ecd4ba996f216530eb3232df6c9fc830ff9bdfc974",
+          "full_reproduction_runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
           "full_reproduction_check_count": 70,
           "native_input_presentation_profiles": [
             {
@@ -1843,17 +1853,17 @@
               "discarded": 0,
               "format": 1,
               "invalid": 0,
-              "max_ms": 43,
+              "max_ms": 40,
               "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-              "p50_ms": 29,
-              "p95_ms": 41,
+              "p50_ms": 26,
+              "p95_ms": 36,
               "pending": 0,
               "presented": 20,
               "requested": 20,
               "sample_limit": 256,
               "profile": "idle editor",
-              "measurement_seconds": 2.826,
-              "completed_frames_between_observer_snapshots": 189,
+              "measurement_seconds": 2.802,
+              "completed_frames_between_observer_snapshots": 186,
               "input_frame_wakeups_between_observer_snapshots": 20
             },
             {
@@ -1863,19 +1873,19 @@
               "invalid": 0,
               "max_ms": 40,
               "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-              "p50_ms": 28,
-              "p95_ms": 37,
+              "p50_ms": 26,
+              "p95_ms": 38,
               "pending": 0,
               "presented": 20,
               "requested": 20,
               "sample_limit": 256,
               "profile": "two concurrent broker CPU jobs",
               "job_cpu_usage_usec": [
-                1451547,
-                1450901
+                1415876,
+                1419619
               ],
-              "measurement_seconds": 1.499,
-              "completed_frames_between_observer_snapshots": 90,
+              "measurement_seconds": 1.478,
+              "completed_frames_between_observer_snapshots": 88,
               "input_frame_wakeups_between_observer_snapshots": 20
             }
           ],
@@ -1966,21 +1976,21 @@
             }
           ],
           "binary_equivalence": {
-            "factory_source_revision": "eab6ed8982a4605044fcc8a58c1033e69bc00615",
-            "runtime_source_revision": "360b99df0b98dc6bb3178bd5b292a7e9e09d4689",
-            "source_archive_sha256": "2c534aa063af88c63ae462e80341d7819644c43f1f377758f73fa53982056cda",
-            "qualified_runtime": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
-            "image_runtime": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
+            "factory_source_revision": "637ff8a83165f0c07daa0280513a25356ac67900",
+            "runtime_source_revision": "126eddef62c5c4f760796d10fa622b3fde81c23e",
+            "source_archive_sha256": "2f489f00dfbb6e830527144dba2a812e8c38c63a411f0f1e577ad1eb5a82d97d",
+            "qualified_runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
+            "image_runtime": "3bb553a9a66ccf907f6a7b402aa7792ef6040055213733f9a9cfa05d00459963",
             "binaries": {
-              "agent-os-core": "97db81aba1417600fba423d31b839d6a824600876857bd4a5f7826f560cca99b",
-              "native/agent-os-desktop": "f0d7061e0a152566f2d86bc5dfd6332fcde196e0cd9eee071f66d5cbd14e7de7",
+              "agent-os-core": "2c9ef805bffff66766eef3717c5a2223b80ce08ec7338fb0b361533a1656240f",
+              "native/agent-os-desktop": "ed2a84af3eaf9926f0f86f949703e78a87ba6c3fcf8171bd18f50a0724093b0c",
               "native/agent-os-compositor": "011f799fa9fb8f281b9b513606333786194ff728c683ff963563b57269c7ff4c"
             }
           },
-          "previous_v15_image": {
-            "verified_at": "2026-10-11T18:50:02.943130+00:00",
+          "previous_v16_image": {
+            "verified_at": "2026-10-11T20:10:04.122134+00:00",
             "result": "pass",
-            "candidate_name": "candidate-v15",
+            "candidate_name": "candidate-v16",
             "image": {
               "architecture": "arm64",
               "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -2000,9 +2010,9 @@
                 "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
                 "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
               },
-              "image_sha256": "34b83941912b33ff19e859934e56d8207d2297f8477732b42a68b2ee5f73ba8f",
+              "image_sha256": "ace7f46c0a69c32c3dde2ff006e87598359713d70e72803c969c9df98ad7a787",
               "name": "agentOS experimental native image",
-              "runtime_release": "2f0abf04f083455464a5e0fc505097524a6a0abae1370ff0cc4a7f4ff161a490",
+              "runtime_release": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
               "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
               "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
             },
@@ -2049,7 +2059,13 @@
               "independent AT-SPI Toggle draft/error/clear/Discard through installed runtime; Choice field-plus-option names retained through real installed feedback revisions",
               "saved property incompatibility refuses actual signed older-runtime activation with live services, document and journal unchanged; plain legacy controls stay compatible",
               "typed Button variant/size/icon changes preserve accessible names and disabled host action state through real installed core transactions",
-              "nested Lucide/shadcn/provenance dependency notices retained in the complete immutable runtime integrity manifest"
+              "nested Lucide/shadcn/provenance dependency notices retained in the complete immutable runtime integrity manifest",
+              "saved TextField/Choice/Toggle validation refuses actual signed older-runtime activation without changing live service identities, document, journal or current release; plain legacy controls remain compatible",
+              "independent AT-SPI Toggle draft/error/clear/Discard through installed runtime; Choice field-plus-option names retained through real installed feedback revisions",
+              "saved property incompatibility refuses actual signed older-runtime activation with live services, document and journal unchanged; plain legacy controls stay compatible",
+              "typed Button variant/size/icon changes preserve accessible names and disabled host action state through real installed core transactions",
+              "nested Lucide/shadcn/provenance dependency notices retained in the complete immutable runtime integrity manifest",
+              "Actual installed Orca error/clear speech for TextField, DocumentEditor, Choice and Toggle through trusted keyboard navigation; exact draft preservation and scoped explicit Discard"
             ],
             "not_tested": [
               "production signing/distribution authority",
@@ -2061,7 +2077,7 @@
             ],
             "schema_guard": {
               "result": "pass",
-              "current_runtime": "2f0abf04f083455464a5e0fc505097524a6a0abae1370ff0cc4a7f4ff161a490",
+              "current_runtime": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
               "legacy_runtime": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
               "incompatible_icon_refused": true,
               "incompatible_text_choice_toggle_validation_refused": true,
@@ -2069,9 +2085,9 @@
               "document_and_journal_unchanged": true,
               "plain_legacy_button_compatible": true
             },
-            "schema_guard_fixture_sha256": "e3e0f629cfcda616a7b279550a40b230d1c4a006a225d756ce3953b1b53513b1",
-            "runtime_source_revision": "452cf7efc6127cb92275ff31212527fcbdc7707c",
-            "runtime_716_ui": "v0.1.0-alpha.39",
+            "schema_guard_fixture_sha256": "4523a702fa1b12363edbb1628aa49e8ffd4eaaf1aaedf4f06b66eb6e0543a842",
+            "runtime_source_revision": "360b99df0b98dc6bb3178bd5b292a7e9e09d4689",
+            "runtime_716_ui": "v0.1.0-alpha.40",
             "compatible_rollback_probe": {
               "runtime_release": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
               "bundle_sha256": "402e3392bbb5a9dba0dafacdb05f7c668c02f0115975c828e4877a37920159f3"
@@ -2084,8 +2100,8 @@
               "result": "pass",
               "before": {
                 "result": "pass",
-                "boot_id": "193b5c28-9919-49ed-b422-9a62df80bfe9",
-                "runtime": "2f0abf04f083455464a5e0fc505097524a6a0abae1370ff0cc4a7f4ff161a490",
+                "boot_id": "85f0e153-ad9f-4b0e-926c-e7f29a766176",
+                "runtime": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
                 "uid": 1000,
                 "activity": 1,
                 "file_persisted": true,
@@ -2104,8 +2120,8 @@
               },
               "reboot": {
                 "result": "pass",
-                "boot_id": "64b6c4f8-39dc-4404-8240-e96bcd845877",
-                "runtime": "2f0abf04f083455464a5e0fc505097524a6a0abae1370ff0cc4a7f4ff161a490",
+                "boot_id": "7ed2c33d-d92f-4d97-a176-7c5056dbfc8c",
+                "runtime": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
                 "uid": 1000,
                 "activity": 1,
                 "file_persisted": true,
@@ -2124,8 +2140,8 @@
               },
               "offline": {
                 "result": "pass",
-                "boot_id": "ab25b9be-633f-4dfe-97b0-fa5a4ddaf5c2",
-                "runtime": "2f0abf04f083455464a5e0fc505097524a6a0abae1370ff0cc4a7f4ff161a490",
+                "boot_id": "d628d8b1-6042-45f2-8022-299b0ef1a3f7",
+                "runtime": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
                 "uid": 1000,
                 "activity": 1,
                 "file_persisted": true,
@@ -2174,11 +2190,11 @@
               },
               "offline_screen_reader_qualified": true,
               "offline_display_zoom_and_keyboard_qualified": true,
-              "final_offline_runtime": "2f0abf04f083455464a5e0fc505097524a6a0abae1370ff0cc4a7f4ff161a490",
+              "final_offline_runtime": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
               "development_disk_restored": true,
               "guest_stopped": true
             },
-            "factory_source_revision": "c636382856f12819b03a065981ed1647d7c9e162",
+            "factory_source_revision": "eab6ed8982a4605044fcc8a58c1033e69bc00615",
             "browser": {
               "result": "pass",
               "checks": [
@@ -2210,11 +2226,11 @@
             "terminal_input_test_sha256": "704f7883530c72948e340ab04c9677436f2739c437bd38c1f003d3ce4b80cb2d",
             "collection_input_test_sha256": "52c38d3ffb1d91dd8b3d3b3c478691106adbfceba46d747ac5ed32cee1d353ba",
             "zoom_test_sha256": "faecc8013b71915ff93fd223c0e31ad59e782fd27949b6ee3ecb8da1452a7468",
-            "native_session_test_sha256": "ca82f6df22a19298876c6f5e137b8a8be7a6ac5451ef52e897aedbc3f0e055b1",
-            "qualification_log_sha256": "77b2e2cf53451dd1867a8c18413608fb87ac98aa4f38d48a1e12bea66732aebc",
-            "driver_log_sha256": "95c5fbf7fa152dcba7d0e4c9f85eede035343a873ec3a7f9473ce59593b3ac8d",
-            "build_log_sha256": "82f23388ec4b5c1c020617ba6ee60b2341f770ebb5c242575d85cf68c9fdf639",
-            "full_reproduction_runtime": "2f0abf04f083455464a5e0fc505097524a6a0abae1370ff0cc4a7f4ff161a490",
+            "native_session_test_sha256": "3a10821dcc3385530f0fd0c15a5c3c53f23c8f55f6e2e92020aabf24133644a9",
+            "qualification_log_sha256": "62fb02e8eef7f16d39f56ad381817e22f780c4c6ff266e6e86a9342630855cce",
+            "driver_log_sha256": "2f67b721ef5a9fd4393e040422350d1a42d737f26fe1f0190574e06e0482f389",
+            "build_log_sha256": "e0d1b05f88dfe5ad0611305a7fcb36b0cacc15a76282b48a7b96d4078aab2d32",
+            "full_reproduction_runtime": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
             "full_reproduction_check_count": 70,
             "native_input_presentation_profiles": [
               {
@@ -2222,17 +2238,17 @@
                 "discarded": 0,
                 "format": 1,
                 "invalid": 0,
-                "max_ms": 37,
+                "max_ms": 43,
                 "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-                "p50_ms": 28,
-                "p95_ms": 37,
+                "p50_ms": 29,
+                "p95_ms": 41,
                 "pending": 0,
                 "presented": 20,
                 "requested": 20,
                 "sample_limit": 256,
                 "profile": "idle editor",
-                "measurement_seconds": 2.83,
-                "completed_frames_between_observer_snapshots": 196,
+                "measurement_seconds": 2.826,
+                "completed_frames_between_observer_snapshots": 189,
                 "input_frame_wakeups_between_observer_snapshots": 20
               },
               {
@@ -2242,19 +2258,19 @@
                 "invalid": 0,
                 "max_ms": 40,
                 "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-                "p50_ms": 29,
-                "p95_ms": 40,
+                "p50_ms": 28,
+                "p95_ms": 37,
                 "pending": 0,
                 "presented": 20,
                 "requested": 20,
                 "sample_limit": 256,
                 "profile": "two concurrent broker CPU jobs",
                 "job_cpu_usage_usec": [
-                  1479158,
-                  1483892
+                  1451547,
+                  1450901
                 ],
-                "measurement_seconds": 1.544,
-                "completed_frames_between_observer_snapshots": 100,
+                "measurement_seconds": 1.499,
+                "completed_frames_between_observer_snapshots": 90,
                 "input_frame_wakeups_between_observer_snapshots": 20
               }
             ],
@@ -2345,21 +2361,21 @@
               }
             ],
             "binary_equivalence": {
-              "factory_source_revision": "c636382856f12819b03a065981ed1647d7c9e162",
-              "runtime_source_revision": "452cf7efc6127cb92275ff31212527fcbdc7707c",
-              "source_archive_sha256": "05ee5b0798030d7824a05db3f784fea3486e94d27651e9472473eecbc7a2c95a",
-              "qualified_runtime": "2f0abf04f083455464a5e0fc505097524a6a0abae1370ff0cc4a7f4ff161a490",
-              "image_runtime": "2f0abf04f083455464a5e0fc505097524a6a0abae1370ff0cc4a7f4ff161a490",
+              "factory_source_revision": "eab6ed8982a4605044fcc8a58c1033e69bc00615",
+              "runtime_source_revision": "360b99df0b98dc6bb3178bd5b292a7e9e09d4689",
+              "source_archive_sha256": "2c534aa063af88c63ae462e80341d7819644c43f1f377758f73fa53982056cda",
+              "qualified_runtime": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
+              "image_runtime": "5aafe49cad89c5b209c9275b7313ec5d49054fb7faf6dc41c4c8859e516adb56",
               "binaries": {
-                "agent-os-core": "e81a8f4773e5ef5c8004bd4d6339b301df9c1995c056ba18a41cb6f078dea88f",
-                "native/agent-os-desktop": "a26ec8ddd0323771bd9ff08f33b9ae18ba8db8c47d4bd655a878822966950f93",
+                "agent-os-core": "97db81aba1417600fba423d31b839d6a824600876857bd4a5f7826f560cca99b",
+                "native/agent-os-desktop": "f0d7061e0a152566f2d86bc5dfd6332fcde196e0cd9eee071f66d5cbd14e7de7",
                 "native/agent-os-compositor": "011f799fa9fb8f281b9b513606333786194ff728c683ff963563b57269c7ff4c"
               }
             },
-            "previous_v14_image": {
-              "verified_at": "2026-10-11T16:07:16.193262+00:00",
+            "previous_v15_image": {
+              "verified_at": "2026-10-11T18:50:02.943130+00:00",
               "result": "pass",
-              "candidate_name": "candidate-v14",
+              "candidate_name": "candidate-v15",
               "image": {
                 "architecture": "arm64",
                 "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -2379,9 +2395,9 @@
                   "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
                   "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
                 },
-                "image_sha256": "bca15fc2e32c6461088d8a0c8686dfb37f8333c29b44cb63134624eb7f719463",
+                "image_sha256": "34b83941912b33ff19e859934e56d8207d2297f8477732b42a68b2ee5f73ba8f",
                 "name": "agentOS experimental native image",
-                "runtime_release": "99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf",
+                "runtime_release": "2f0abf04f083455464a5e0fc505097524a6a0abae1370ff0cc4a7f4ff161a490",
                 "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
                 "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
               },
@@ -2423,6 +2439,11 @@
                 "complete clean-source 70-check reproduction and CI passed before image construction",
                 "saved property incompatibility refuses actual signed older-runtime activation with live services, document and journal unchanged; plain legacy button stays compatible",
                 "typed Button variant/size/icon changes preserve accessible names and disabled host action state through real installed core transactions",
+                "nested Lucide/shadcn/provenance dependency notices retained in the complete immutable runtime integrity manifest",
+                "saved TextField/Choice/Toggle validation refuses actual signed older-runtime activation without changing live service identities, document, journal or current release; plain legacy controls remain compatible",
+                "independent AT-SPI Toggle draft/error/clear/Discard through installed runtime; Choice field-plus-option names retained through real installed feedback revisions",
+                "saved property incompatibility refuses actual signed older-runtime activation with live services, document and journal unchanged; plain legacy controls stay compatible",
+                "typed Button variant/size/icon changes preserve accessible names and disabled host action state through real installed core transactions",
                 "nested Lucide/shadcn/provenance dependency notices retained in the complete immutable runtime integrity manifest"
               ],
               "not_tested": [
@@ -2435,16 +2456,17 @@
               ],
               "schema_guard": {
                 "result": "pass",
-                "current_runtime": "99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf",
+                "current_runtime": "2f0abf04f083455464a5e0fc505097524a6a0abae1370ff0cc4a7f4ff161a490",
                 "legacy_runtime": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
                 "incompatible_icon_refused": true,
+                "incompatible_text_choice_toggle_validation_refused": true,
                 "live_service_identities_unchanged": true,
                 "document_and_journal_unchanged": true,
                 "plain_legacy_button_compatible": true
               },
-              "schema_guard_fixture_sha256": "a73d06334da4132a9968a7fdd30aacec69ed1540d3dfba21f16b05f067f3c1cb",
-              "runtime_source_revision": "3b88d50682e3e55b2aaaa5b68f6d4b74ea14430d",
-              "runtime_716_ui": "v0.1.0-alpha.36",
+              "schema_guard_fixture_sha256": "e3e0f629cfcda616a7b279550a40b230d1c4a006a225d756ce3953b1b53513b1",
+              "runtime_source_revision": "452cf7efc6127cb92275ff31212527fcbdc7707c",
+              "runtime_716_ui": "v0.1.0-alpha.39",
               "compatible_rollback_probe": {
                 "runtime_release": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
                 "bundle_sha256": "402e3392bbb5a9dba0dafacdb05f7c668c02f0115975c828e4877a37920159f3"
@@ -2457,8 +2479,8 @@
                 "result": "pass",
                 "before": {
                   "result": "pass",
-                  "boot_id": "cc00d8a6-c82d-496b-9e90-5ee1ee54dd01",
-                  "runtime": "99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf",
+                  "boot_id": "193b5c28-9919-49ed-b422-9a62df80bfe9",
+                  "runtime": "2f0abf04f083455464a5e0fc505097524a6a0abae1370ff0cc4a7f4ff161a490",
                   "uid": 1000,
                   "activity": 1,
                   "file_persisted": true,
@@ -2477,8 +2499,8 @@
                 },
                 "reboot": {
                   "result": "pass",
-                  "boot_id": "3c63d81d-54cd-4260-812d-21520a6999e0",
-                  "runtime": "99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf",
+                  "boot_id": "64b6c4f8-39dc-4404-8240-e96bcd845877",
+                  "runtime": "2f0abf04f083455464a5e0fc505097524a6a0abae1370ff0cc4a7f4ff161a490",
                   "uid": 1000,
                   "activity": 1,
                   "file_persisted": true,
@@ -2497,8 +2519,8 @@
                 },
                 "offline": {
                   "result": "pass",
-                  "boot_id": "6091357f-e2c0-455f-a0a4-23b4e1ebe356",
-                  "runtime": "99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf",
+                  "boot_id": "ab25b9be-633f-4dfe-97b0-fa5a4ddaf5c2",
+                  "runtime": "2f0abf04f083455464a5e0fc505097524a6a0abae1370ff0cc4a7f4ff161a490",
                   "uid": 1000,
                   "activity": 1,
                   "file_persisted": true,
@@ -2547,11 +2569,11 @@
                 },
                 "offline_screen_reader_qualified": true,
                 "offline_display_zoom_and_keyboard_qualified": true,
-                "final_offline_runtime": "99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf",
+                "final_offline_runtime": "2f0abf04f083455464a5e0fc505097524a6a0abae1370ff0cc4a7f4ff161a490",
                 "development_disk_restored": true,
                 "guest_stopped": true
               },
-              "factory_source_revision": "f94e9f7a9c1f8511518a00d1b8b6ffce04a9d91b",
+              "factory_source_revision": "c636382856f12819b03a065981ed1647d7c9e162",
               "browser": {
                 "result": "pass",
                 "checks": [
@@ -2583,11 +2605,11 @@
               "terminal_input_test_sha256": "704f7883530c72948e340ab04c9677436f2739c437bd38c1f003d3ce4b80cb2d",
               "collection_input_test_sha256": "52c38d3ffb1d91dd8b3d3b3c478691106adbfceba46d747ac5ed32cee1d353ba",
               "zoom_test_sha256": "faecc8013b71915ff93fd223c0e31ad59e782fd27949b6ee3ecb8da1452a7468",
-              "native_session_test_sha256": "12975882fc3f328b07e9a1b1700615dcc7009bb81e45e428f8c3363cd46035ba",
-              "qualification_log_sha256": "ce59b7b5a52b912fd7e8e796078986c088dcca092d2c6fe610952e5e02e9c905",
-              "driver_log_sha256": "e05d42fd8a94986efb8153bb498147eb70de739bf0580394ab6710cf1275706b",
-              "build_log_sha256": "5029057a480eb5123369aa5b898750e54d9df9b6eaefcf01b4e7aed30e801a1e",
-              "full_reproduction_runtime": "99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf",
+              "native_session_test_sha256": "ca82f6df22a19298876c6f5e137b8a8be7a6ac5451ef52e897aedbc3f0e055b1",
+              "qualification_log_sha256": "77b2e2cf53451dd1867a8c18413608fb87ac98aa4f38d48a1e12bea66732aebc",
+              "driver_log_sha256": "95c5fbf7fa152dcba7d0e4c9f85eede035343a873ec3a7f9473ce59593b3ac8d",
+              "build_log_sha256": "82f23388ec4b5c1c020617ba6ee60b2341f770ebb5c242575d85cf68c9fdf639",
+              "full_reproduction_runtime": "2f0abf04f083455464a5e0fc505097524a6a0abae1370ff0cc4a7f4ff161a490",
               "full_reproduction_check_count": 70,
               "native_input_presentation_profiles": [
                 {
@@ -2595,17 +2617,17 @@
                   "discarded": 0,
                   "format": 1,
                   "invalid": 0,
-                  "max_ms": 40,
+                  "max_ms": 37,
                   "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-                  "p50_ms": 27,
-                  "p95_ms": 38,
+                  "p50_ms": 28,
+                  "p95_ms": 37,
                   "pending": 0,
                   "presented": 20,
                   "requested": 20,
                   "sample_limit": 256,
                   "profile": "idle editor",
-                  "measurement_seconds": 2.868,
-                  "completed_frames_between_observer_snapshots": 194,
+                  "measurement_seconds": 2.83,
+                  "completed_frames_between_observer_snapshots": 196,
                   "input_frame_wakeups_between_observer_snapshots": 20
                 },
                 {
@@ -2613,22 +2635,22 @@
                   "discarded": 0,
                   "format": 1,
                   "invalid": 0,
-                  "max_ms": 49,
+                  "max_ms": 40,
                   "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-                  "p50_ms": 28,
-                  "p95_ms": 38,
+                  "p50_ms": 29,
+                  "p95_ms": 40,
                   "pending": 0,
                   "presented": 20,
                   "requested": 20,
                   "sample_limit": 256,
                   "profile": "two concurrent broker CPU jobs",
                   "job_cpu_usage_usec": [
-                    1871389,
-                    1871244
+                    1479158,
+                    1483892
                   ],
-                  "measurement_seconds": 1.935,
-                  "completed_frames_between_observer_snapshots": 125,
-                  "input_frame_wakeups_between_observer_snapshots": 19
+                  "measurement_seconds": 1.544,
+                  "completed_frames_between_observer_snapshots": 100,
+                  "input_frame_wakeups_between_observer_snapshots": 20
                 }
               ],
               "collection_input_profiles": [
@@ -2718,21 +2740,21 @@
                 }
               ],
               "binary_equivalence": {
-                "factory_source_revision": "f94e9f7a9c1f8511518a00d1b8b6ffce04a9d91b",
-                "runtime_source_revision": "3b88d50682e3e55b2aaaa5b68f6d4b74ea14430d",
-                "source_archive_sha256": "d01080268daeaa2aca837baec3e79225f4247b52082d0820f5334a7d5de4cc6b",
-                "qualified_runtime": "99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf",
-                "image_runtime": "99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf",
+                "factory_source_revision": "c636382856f12819b03a065981ed1647d7c9e162",
+                "runtime_source_revision": "452cf7efc6127cb92275ff31212527fcbdc7707c",
+                "source_archive_sha256": "05ee5b0798030d7824a05db3f784fea3486e94d27651e9472473eecbc7a2c95a",
+                "qualified_runtime": "2f0abf04f083455464a5e0fc505097524a6a0abae1370ff0cc4a7f4ff161a490",
+                "image_runtime": "2f0abf04f083455464a5e0fc505097524a6a0abae1370ff0cc4a7f4ff161a490",
                 "binaries": {
-                  "agent-os-core": "3eaa6c7cdfd6f3d13a9433025cd67f514290b3fdad367101fe233c4696183d64",
-                  "native/agent-os-desktop": "42a0b462115fb65a75b520694e22abfbecc6a61909ac2d5447a65076afb29222",
+                  "agent-os-core": "e81a8f4773e5ef5c8004bd4d6339b301df9c1995c056ba18a41cb6f078dea88f",
+                  "native/agent-os-desktop": "a26ec8ddd0323771bd9ff08f33b9ae18ba8db8c47d4bd655a878822966950f93",
                   "native/agent-os-compositor": "011f799fa9fb8f281b9b513606333786194ff728c683ff963563b57269c7ff4c"
                 }
               },
-              "previous_v13_image": {
-                "verified_at": "2026-10-11T12:57:47.690002+00:00",
+              "previous_v14_image": {
+                "verified_at": "2026-10-11T16:07:16.193262+00:00",
                 "result": "pass",
-                "candidate_name": "candidate-v13",
+                "candidate_name": "candidate-v14",
                 "image": {
                   "architecture": "arm64",
                   "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -2752,9 +2774,9 @@
                     "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
                     "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
                   },
-                  "image_sha256": "4f6abf61f582fb3a1fcf7d179009bf58b865245717ab9cf41ca6531631574e0f",
+                  "image_sha256": "bca15fc2e32c6461088d8a0c8686dfb37f8333c29b44cb63134624eb7f719463",
                   "name": "agentOS experimental native image",
-                  "runtime_release": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
+                  "runtime_release": "99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf",
                   "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
                   "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
                 },
@@ -2793,7 +2815,10 @@
                   "trusted display zoom changes output geometry; kernel pointer typing, vertical/horizontal wheel key access, balanced modifiers and exact reset pass on first account and private fresh profile",
                   "visible keyboard stays within half of output at every zoom step; native capture matches final layer dimensions",
                   "offline cold boot passes display zoom, on-screen keyboard and session-owned reader without network or models",
-                  "complete clean-source 70-check reproduction and CI passed before image construction"
+                  "complete clean-source 70-check reproduction and CI passed before image construction",
+                  "saved property incompatibility refuses actual signed older-runtime activation with live services, document and journal unchanged; plain legacy button stays compatible",
+                  "typed Button variant/size/icon changes preserve accessible names and disabled host action state through real installed core transactions",
+                  "nested Lucide/shadcn/provenance dependency notices retained in the complete immutable runtime integrity manifest"
                 ],
                 "not_tested": [
                   "production signing/distribution authority",
@@ -2803,8 +2828,18 @@
                   "live Gateway or Jev inference; no configured credentials",
                   "incompatible future state-format migrations"
                 ],
-                "runtime_source_revision": "f2e54996d46594c9635383b850cae2776014d11a",
-                "runtime_716_ui": "v0.1.0-alpha.32",
+                "schema_guard": {
+                  "result": "pass",
+                  "current_runtime": "99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf",
+                  "legacy_runtime": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
+                  "incompatible_icon_refused": true,
+                  "live_service_identities_unchanged": true,
+                  "document_and_journal_unchanged": true,
+                  "plain_legacy_button_compatible": true
+                },
+                "schema_guard_fixture_sha256": "a73d06334da4132a9968a7fdd30aacec69ed1540d3dfba21f16b05f067f3c1cb",
+                "runtime_source_revision": "3b88d50682e3e55b2aaaa5b68f6d4b74ea14430d",
+                "runtime_716_ui": "v0.1.0-alpha.36",
                 "compatible_rollback_probe": {
                   "runtime_release": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
                   "bundle_sha256": "402e3392bbb5a9dba0dafacdb05f7c668c02f0115975c828e4877a37920159f3"
@@ -2817,8 +2852,8 @@
                   "result": "pass",
                   "before": {
                     "result": "pass",
-                    "boot_id": "24582a7a-d3d2-4e65-9a12-6ae63cbed2fb",
-                    "runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
+                    "boot_id": "cc00d8a6-c82d-496b-9e90-5ee1ee54dd01",
+                    "runtime": "99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf",
                     "uid": 1000,
                     "activity": 1,
                     "file_persisted": true,
@@ -2837,8 +2872,8 @@
                   },
                   "reboot": {
                     "result": "pass",
-                    "boot_id": "d201665d-e8b3-4bc2-bee2-19eac1da7bcd",
-                    "runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
+                    "boot_id": "3c63d81d-54cd-4260-812d-21520a6999e0",
+                    "runtime": "99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf",
                     "uid": 1000,
                     "activity": 1,
                     "file_persisted": true,
@@ -2857,8 +2892,8 @@
                   },
                   "offline": {
                     "result": "pass",
-                    "boot_id": "38aff408-5a72-45bf-9797-b23ecf5169a4",
-                    "runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
+                    "boot_id": "6091357f-e2c0-455f-a0a4-23b4e1ebe356",
+                    "runtime": "99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf",
                     "uid": 1000,
                     "activity": 1,
                     "file_persisted": true,
@@ -2907,11 +2942,11 @@
                   },
                   "offline_screen_reader_qualified": true,
                   "offline_display_zoom_and_keyboard_qualified": true,
-                  "final_offline_runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
+                  "final_offline_runtime": "99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf",
                   "development_disk_restored": true,
                   "guest_stopped": true
                 },
-                "factory_source_revision": "227697e0ec2412a6d633f4be84ae8b4b8359df8e",
+                "factory_source_revision": "f94e9f7a9c1f8511518a00d1b8b6ffce04a9d91b",
                 "browser": {
                   "result": "pass",
                   "checks": [
@@ -2934,21 +2969,20 @@
                   "cleanup_verified": true
                 },
                 "qualification_observations": [
-                  "Fresh local account and password sudo passed before qualification-only SSH and sudo fixtures were installed.",
-                  "Exact full70 runtime binaries reused; no development seed or additional disk attached.",
-                  "Both installed keyboard/zoom journeys pass on unmodified image binaries.",
-                  "Earlier v12 height failure is preserved; its artifact has not been relabeled as passing.",
-                  "Historical PRIMARY destination-focus and collection geometry observations retain their own evidence; this passing run does not establish their causes."
+                  "Fresh local account and password-protected sudo passed before qualification-only SSH and sudo fixtures were installed.",
+                  "The exact clean-source full70 runtime was reused; no development seed or additional disk attached.",
+                  "Installed direct keyboard/zoom, collections, VTE/IME, reader and typed-button accessibility checks passed on original image binaries.",
+                  "Passing qualification does not resolve historical PRIMARY-focus, collection geometry or intermittent Ubuntu accessible Save observations."
                 ],
-                "direct_input_test_sha256": "ab0a97f9396350fe5cb5ca5458ea3db396f19acde318dd885f10f7b65f1cc9d1",
+                "direct_input_test_sha256": "5ca9a06643933ded719ecd118f9febccb1187c81405a0f1fdf7809c2312aca1f",
                 "terminal_input_test_sha256": "704f7883530c72948e340ab04c9677436f2739c437bd38c1f003d3ce4b80cb2d",
                 "collection_input_test_sha256": "52c38d3ffb1d91dd8b3d3b3c478691106adbfceba46d747ac5ed32cee1d353ba",
                 "zoom_test_sha256": "faecc8013b71915ff93fd223c0e31ad59e782fd27949b6ee3ecb8da1452a7468",
-                "native_session_test_sha256": "2b049734c16fee139d3c912918366f74f505cb3a89f556d568fdb1ede5ab4ddb",
-                "qualification_log_sha256": "c62b353b1c32842957c59715c6598b20c4a72caaa9bbe3ee532fd67bb86bc795",
-                "driver_log_sha256": "7344dedcb99affb967166c7a6b9f006d2fb1315f7848cf0bf6bf65126d6880e8",
-                "build_log_sha256": "35e70240faf3aa7090e2ee1672364884b61468202200b6908027379e70997692",
-                "full_reproduction_runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
+                "native_session_test_sha256": "12975882fc3f328b07e9a1b1700615dcc7009bb81e45e428f8c3363cd46035ba",
+                "qualification_log_sha256": "ce59b7b5a52b912fd7e8e796078986c088dcca092d2c6fe610952e5e02e9c905",
+                "driver_log_sha256": "e05d42fd8a94986efb8153bb498147eb70de739bf0580394ab6710cf1275706b",
+                "build_log_sha256": "5029057a480eb5123369aa5b898750e54d9df9b6eaefcf01b4e7aed30e801a1e",
+                "full_reproduction_runtime": "99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf",
                 "full_reproduction_check_count": 70,
                 "native_input_presentation_profiles": [
                   {
@@ -2956,17 +2990,17 @@
                     "discarded": 0,
                     "format": 1,
                     "invalid": 0,
-                    "max_ms": 43,
+                    "max_ms": 40,
                     "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
                     "p50_ms": 27,
-                    "p95_ms": 41,
+                    "p95_ms": 38,
                     "pending": 0,
                     "presented": 20,
                     "requested": 20,
                     "sample_limit": 256,
                     "profile": "idle editor",
-                    "measurement_seconds": 2.848,
-                    "completed_frames_between_observer_snapshots": 196,
+                    "measurement_seconds": 2.868,
+                    "completed_frames_between_observer_snapshots": 194,
                     "input_frame_wakeups_between_observer_snapshots": 20
                   },
                   {
@@ -2974,21 +3008,21 @@
                     "discarded": 0,
                     "format": 1,
                     "invalid": 0,
-                    "max_ms": 40,
+                    "max_ms": 49,
                     "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
                     "p50_ms": 28,
-                    "p95_ms": 37,
+                    "p95_ms": 38,
                     "pending": 0,
                     "presented": 20,
                     "requested": 20,
                     "sample_limit": 256,
                     "profile": "two concurrent broker CPU jobs",
                     "job_cpu_usage_usec": [
-                      1407331,
-                      1419941
+                      1871389,
+                      1871244
                     ],
-                    "measurement_seconds": 1.473,
-                    "completed_frames_between_observer_snapshots": 89,
+                    "measurement_seconds": 1.935,
+                    "completed_frames_between_observer_snapshots": 125,
                     "input_frame_wakeups_between_observer_snapshots": 19
                   }
                 ],
@@ -3079,17 +3113,21 @@
                   }
                 ],
                 "binary_equivalence": {
-                  "qualified_runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
-                  "image_runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
+                  "factory_source_revision": "f94e9f7a9c1f8511518a00d1b8b6ffce04a9d91b",
+                  "runtime_source_revision": "3b88d50682e3e55b2aaaa5b68f6d4b74ea14430d",
+                  "source_archive_sha256": "d01080268daeaa2aca837baec3e79225f4247b52082d0820f5334a7d5de4cc6b",
+                  "qualified_runtime": "99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf",
+                  "image_runtime": "99eebefaa36f5112a446ded70e2d770ad306d6f3748574f18f5f9cb902ba1ccf",
                   "binaries": {
-                    "agent-os-core": "2051ea36559b6aa9af596e2f7fba4672971fdb5b788c5fbc492886015263fcfe",
-                    "native/agent-os-desktop": "b58b058732de1ed5f6d0e96b1fe639358cf123f3afe0cb5ddc276a9f28c8f5b9",
-                    "native/agent-os-compositor": "19c1ecb75be374db254e16c591fcce2db5948e68e94239762db883ee2589be9f"
+                    "agent-os-core": "3eaa6c7cdfd6f3d13a9433025cd67f514290b3fdad367101fe233c4696183d64",
+                    "native/agent-os-desktop": "42a0b462115fb65a75b520694e22abfbecc6a61909ac2d5447a65076afb29222",
+                    "native/agent-os-compositor": "011f799fa9fb8f281b9b513606333786194ff728c683ff963563b57269c7ff4c"
                   }
                 },
-                "previous_v11_image": {
-                  "verified_at": "2026-10-11T09:27:10.816336+00:00",
+                "previous_v13_image": {
+                  "verified_at": "2026-10-11T12:57:47.690002+00:00",
                   "result": "pass",
+                  "candidate_name": "candidate-v13",
                   "image": {
                     "architecture": "arm64",
                     "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
@@ -3109,9 +3147,9 @@
                       "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
                       "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
                     },
-                    "image_sha256": "90ac2bc6ec79a9680a9d98c55d06926937256f1ff5c1a64c9e2a7318e8942fc2",
+                    "image_sha256": "4f6abf61f582fb3a1fcf7d179009bf58b865245717ab9cf41ca6531631574e0f",
                     "name": "agentOS experimental native image",
-                    "runtime_release": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+                    "runtime_release": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
                     "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
                     "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
                   },
@@ -3139,7 +3177,6 @@
                     "qualification-only SSH key and sudo authority removed; development disk/config/EFI restored; VM stopped and owned UTM app closed",
                     "original signed distribution remains unbooted",
                     "HTTP/HTTPS Firefox defaults; native Link launches isolated real browser and shared conventional window online and on loopback-only boot",
-                    "image publication reuses completed inode; 19 tooling tests pass including offline lifecycle UUID guards and no uncertain start replay",
                     "separate installed native VTE kernel keyboard/selection, exact Unicode clipboard/menu Copy/Paste, popup focus/motion, detached-input rejection and program interruption",
                     "original development disk and EFI inode identities and exact config restored after verification",
                     "actual completed presentation receipts on the clean installed native GTK editor, idle and during two owned broker CPU jobs",
@@ -3147,7 +3184,11 @@
                     "clean installed Table/List/KeyValue kernel pointer/keyboard row selection, Ctrl+C, visible Shift+F10/secondary menus, exact cross-client Unicode clipboard, protected refresh and key-preserved background updates, cleared selection/removal and restored focus",
                     "session-owned Orca announces native controls; authenticated kernel commands, learn-mode grab/release, Save/Discard and rescue VT pass on the clean image",
                     "reader and speech processes reaped after normal logout and abrupt compositor loss",
-                    "loopback-only cold boot also passes the full installed reader/kernel/VT journey"
+                    "loopback-only cold boot also passes the full installed reader/kernel/VT journey",
+                    "trusted display zoom changes output geometry; kernel pointer typing, vertical/horizontal wheel key access, balanced modifiers and exact reset pass on first account and private fresh profile",
+                    "visible keyboard stays within half of output at every zoom step; native capture matches final layer dimensions",
+                    "offline cold boot passes display zoom, on-screen keyboard and session-owned reader without network or models",
+                    "complete clean-source 70-check reproduction and CI passed before image construction"
                   ],
                   "not_tested": [
                     "production signing/distribution authority",
@@ -3157,18 +3198,22 @@
                     "live Gateway or Jev inference; no configured credentials",
                     "incompatible future state-format migrations"
                   ],
-                  "runtime_source_revision": "ee370fb3047b61fe64c8c91589d5a6a8d5eea0ab",
+                  "runtime_source_revision": "f2e54996d46594c9635383b850cae2776014d11a",
                   "runtime_716_ui": "v0.1.0-alpha.32",
                   "compatible_rollback_probe": {
-                    "release": "3ebc478291575d588f89c5349397c930093233a51eb45c8892611cb38bebdc1f",
-                    "signed_bundle_sha256": "ede34e9cebebf6f393383ef7933c134aa37e215afb2155717abb8a06d91b25ad"
+                    "runtime_release": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
+                    "bundle_sha256": "402e3392bbb5a9dba0dafacdb05f7c668c02f0115975c828e4877a37920159f3"
+                  },
+                  "rollback_fixture": {
+                    "runtime_release": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
+                    "bundle_sha256": "402e3392bbb5a9dba0dafacdb05f7c668c02f0115975c828e4877a37920159f3"
                   },
                   "lifecycle": {
                     "result": "pass",
                     "before": {
                       "result": "pass",
-                      "boot_id": "50fe8e18-a8a3-4818-a6c4-57ea075f423a",
-                      "runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+                      "boot_id": "24582a7a-d3d2-4e65-9a12-6ae63cbed2fb",
+                      "runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
                       "uid": 1000,
                       "activity": 1,
                       "file_persisted": true,
@@ -3187,8 +3232,8 @@
                     },
                     "reboot": {
                       "result": "pass",
-                      "boot_id": "65b53b95-4217-4cd7-87eb-5b7c61a10092",
-                      "runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+                      "boot_id": "d201665d-e8b3-4bc2-bee2-19eac1da7bcd",
+                      "runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
                       "uid": 1000,
                       "activity": 1,
                       "file_persisted": true,
@@ -3207,8 +3252,8 @@
                     },
                     "offline": {
                       "result": "pass",
-                      "boot_id": "20f2facd-fe9a-4cfe-b265-d9b5a3ef8994",
-                      "runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+                      "boot_id": "38aff408-5a72-45bf-9797-b23ecf5169a4",
+                      "runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
                       "uid": 1000,
                       "activity": 1,
                       "file_persisted": true,
@@ -3256,11 +3301,12 @@
                       "cleanup_verified": true
                     },
                     "offline_screen_reader_qualified": true,
-                    "final_offline_runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+                    "offline_display_zoom_and_keyboard_qualified": true,
+                    "final_offline_runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
                     "development_disk_restored": true,
                     "guest_stopped": true
                   },
-                  "factory_source_revision": "ee370fb3047b61fe64c8c91589d5a6a8d5eea0ab",
+                  "factory_source_revision": "227697e0ec2412a6d633f4be84ae8b4b8359df8e",
                   "browser": {
                     "result": "pass",
                     "checks": [
@@ -3283,43 +3329,49 @@
                     "cleanup_verified": true
                   },
                   "qualification_observations": [
-                    "Fresh v11 copy passes first-run, signed update/rollback, native editor/collections/VTE/IME, presentation, reader and speech, browser, reboot, network-free cold boot and failed-activation/account-preserving recovery.",
-                    "The first attempt correctly rejected a legacy signed runtime requiring AT-SPI 2.56 on the pinned 2.62 image. A newly exported, host-signed compatible a879 runtime was used for rollback; the first attempt logs and booted copy remain preserved.",
-                    "Current image runtime differs from the complete 66-check runtime only in package resolution/bootstrap payloads; the three executable hashes match exactly and the changed installation path passes 272 Linux Python tests plus an actual clean base build.",
-                    "Prior v9 PRIMARY focus and intermittent collection geometry observations remain unresolved; successful repeats do not establish their causes.",
-                    "Unbooted signed v10 and v11 distributions are retained separately from test copies. Physical input/audio/GPU, full reference parity, production authority and live providers remain unqualified."
+                    "Fresh local account and password sudo passed before qualification-only SSH and sudo fixtures were installed.",
+                    "Exact full70 runtime binaries reused; no development seed or additional disk attached.",
+                    "Both installed keyboard/zoom journeys pass on unmodified image binaries.",
+                    "Earlier v12 height failure is preserved; its artifact has not been relabeled as passing.",
+                    "Historical PRIMARY destination-focus and collection geometry observations retain their own evidence; this passing run does not establish their causes."
                   ],
-                  "direct_input_test_sha256": "53a886d19ad4ad7ed3af9a507dc8b44b5ca3762a975e15c339ac84f64409c97a",
+                  "direct_input_test_sha256": "ab0a97f9396350fe5cb5ca5458ea3db396f19acde318dd885f10f7b65f1cc9d1",
                   "terminal_input_test_sha256": "704f7883530c72948e340ab04c9677436f2739c437bd38c1f003d3ce4b80cb2d",
-                  "qualification_log_sha256": "15a88cc67c0107a17ab77c4b06bfc89e9f3192fffe60035247e91526c231f3a6",
-                  "full_reproduction_runtime": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
-                  "full_reproduction_check_count": 66,
+                  "collection_input_test_sha256": "52c38d3ffb1d91dd8b3d3b3c478691106adbfceba46d747ac5ed32cee1d353ba",
+                  "zoom_test_sha256": "faecc8013b71915ff93fd223c0e31ad59e782fd27949b6ee3ecb8da1452a7468",
+                  "native_session_test_sha256": "2b049734c16fee139d3c912918366f74f505cb3a89f556d568fdb1ede5ab4ddb",
+                  "qualification_log_sha256": "c62b353b1c32842957c59715c6598b20c4a72caaa9bbe3ee532fd67bb86bc795",
+                  "driver_log_sha256": "7344dedcb99affb967166c7a6b9f006d2fb1315f7848cf0bf6bf65126d6880e8",
+                  "build_log_sha256": "35e70240faf3aa7090e2ee1672364884b61468202200b6908027379e70997692",
+                  "full_reproduction_runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
+                  "full_reproduction_check_count": 70,
                   "native_input_presentation_profiles": [
                     {
                       "clock_id": 1,
                       "discarded": 0,
                       "format": 1,
                       "invalid": 0,
-                      "max_ms": 39,
+                      "max_ms": 43,
                       "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-                      "p50_ms": 28,
-                      "p95_ms": 38,
+                      "p50_ms": 27,
+                      "p95_ms": 41,
                       "pending": 0,
                       "presented": 20,
                       "requested": 20,
                       "sample_limit": 256,
                       "profile": "idle editor",
-                      "measurement_seconds": 2.81,
-                      "completed_frames_between_observer_snapshots": 192
+                      "measurement_seconds": 2.848,
+                      "completed_frames_between_observer_snapshots": 196,
+                      "input_frame_wakeups_between_observer_snapshots": 20
                     },
                     {
                       "clock_id": 1,
                       "discarded": 0,
                       "format": 1,
                       "invalid": 0,
-                      "max_ms": 38,
+                      "max_ms": 40,
                       "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
-                      "p50_ms": 29,
+                      "p50_ms": 28,
                       "p95_ms": 37,
                       "pending": 0,
                       "presented": 20,
@@ -3327,16 +3379,17 @@
                       "sample_limit": 256,
                       "profile": "two concurrent broker CPU jobs",
                       "job_cpu_usage_usec": [
-                        1475809,
-                        1475717
+                        1407331,
+                        1419941
                       ],
-                      "measurement_seconds": 1.529,
-                      "completed_frames_between_observer_snapshots": 99
+                      "measurement_seconds": 1.473,
+                      "completed_frames_between_observer_snapshots": 89,
+                      "input_frame_wakeups_between_observer_snapshots": 19
                     }
                   ],
                   "collection_input_profiles": [
                     {
-                      "component": "Table@1",
+                      "collection_input_qualified": "Table@1",
                       "outputs": [
                         {
                           "height": 800,
@@ -3364,7 +3417,7 @@
                       ]
                     },
                     {
-                      "component": "List@1",
+                      "collection_input_qualified": "List@1",
                       "outputs": [
                         {
                           "height": 800,
@@ -3392,7 +3445,7 @@
                       ]
                     },
                     {
-                      "component": "KeyValue@1",
+                      "collection_input_qualified": "KeyValue@1",
                       "outputs": [
                         {
                           "height": 800,
@@ -3420,18 +3473,28 @@
                       ]
                     }
                   ],
-                  "collection_input_test_sha256": "52c38d3ffb1d91dd8b3d3b3c478691106adbfceba46d747ac5ed32cee1d353ba",
-                  "previous_v10_image": {
+                  "binary_equivalence": {
+                    "qualified_runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
+                    "image_runtime": "30e85503131b11d8d73e0acbb8f717563fde6b7c0a8fd3e664206cf08675fb42",
+                    "binaries": {
+                      "agent-os-core": "2051ea36559b6aa9af596e2f7fba4672971fdb5b788c5fbc492886015263fcfe",
+                      "native/agent-os-desktop": "b58b058732de1ed5f6d0e96b1fe639358cf123f3afe0cb5ddc276a9f28c8f5b9",
+                      "native/agent-os-compositor": "19c1ecb75be374db254e16c591fcce2db5948e68e94239762db883ee2589be9f"
+                    }
+                  },
+                  "previous_v11_image": {
+                    "verified_at": "2026-10-11T09:27:10.816336+00:00",
+                    "result": "pass",
                     "image": {
                       "architecture": "arm64",
                       "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
-                      "bootstrap_sha256": "e60ac4a8f76a106946ad3d91a392be97b7c0671587a75f4c5111d57dfb4c4879",
+                      "bootstrap_sha256": "1df6e4efbc5e9facb674291a06b1eb0b7c47135fa464d29c6491196bff8a0ecd",
                       "builder_sha256": "e1b8102fbd47b1313549445b6fd7792a086c2a883233bdfbf16ff56cfea7a184",
                       "compression": "zlib",
                       "contains_personal_account": false,
                       "contains_provider_credentials": false,
-                      "dependency_manifest_sha256": "d0812f2d560c26cdbc596d445dae73b3f3ec0098e01f7aec44869e7ba17d6b23",
-                      "dependency_profile_sha256": "e76be92153567973abe0df91b2a9c27b3e58cfe306a41337020448471908e923",
+                      "dependency_manifest_sha256": "54cc0a0188cf77cc8d9ae3be5d6735f21a0bf76a1c78815e5ba338a367ec41eb",
+                      "dependency_profile_sha256": "dcbf1c74b06215516ef7135525c88ea00e9605f654e165c372125c535f9cd704",
                       "disk_size": "20G",
                       "first_run_sha256": "8dc0c5b4a0d212667000bb009905458de85125c7fad98e1d876fb2f766471b57",
                       "first_run_unit_sha256": "c4d2376b281a0d5879ce71a15e192ede8598ebc531d58b7dff3203ca66986b09",
@@ -3441,64 +3504,406 @@
                         "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
                         "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
                       },
-                      "image_sha256": "9d86b2b1c3745669b43573fc4011cd8777f2727b982a717b5e55681732abfef4",
+                      "image_sha256": "90ac2bc6ec79a9680a9d98c55d06926937256f1ff5c1a64c9e2a7318e8942fc2",
                       "name": "agentOS experimental native image",
-                      "runtime_release": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
+                      "runtime_release": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
                       "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
                       "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
                     },
-                    "runtime_source_revision": "6b459ea4129524baa253854f07cfedac4d790a86",
-                    "runtime_716_ui": "v0.1.0-alpha.31",
-                    "qualification_observations": [
-                      "Clean v10 qualification includes the exact alpha.31 form-owner fixes and the immutable runtime from all 60 reproduction checks, plus installed collection/editor/VTE/IME, idle/two-broker-CPU-job presentation, browser, offline speech, reboot and failed activation/account-preserving recovery.",
-                      "The prior v6\u2013v9 distributions remain untouched. Only the redundant guest v9 builder output was removed after fresh SHA-256 equality with the retained host distribution.",
-                      "The prior v9 qualification exposed an intermittent primary-transfer destination focus failure. An unchanged instrumented repeat and complete v9 fresh-copy run passed; that observation remains open. Its helper identity/password failures and subsequent exact disk/config/EFI restoration are retained in repository history.",
-                      "An initial compressed v10 conversion ran out of builder space, published no image and cleaned its private temporary directory. The builder now checks a conservative 41 GiB peak-capacity bound before disk/loop creation; all 21 tooling tests pass. The dedicated development test disk was enlarged from 20 to 80 GiB after an exact hash-verified APFS recovery clone; its ext4 filesystem, saved activities, UID and runtime were verified with more than 60 GiB available. The distributed image remains 20 GiB.",
-                      "The new image uses supported zlib-compressed QCOW2 export. Its unbooted signed artifact remains separate from the verification copy."
-                    ]
-                  },
-                  "binary_equivalence": {
-                    "qualified_runtime": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
-                    "image_runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
-                    "binaries": {
-                      "agent-os-core": "2051ea36559b6aa9af596e2f7fba4672971fdb5b788c5fbc492886015263fcfe",
-                      "native/agent-os-desktop": "bc05d9da6fc66da62218ae386bb5232fbc2ae7ce67214031e44764e9162f6765",
-                      "native/agent-os-compositor": "9c60346155ffda618d3d48c1d11c33b0cbda64b1b764882becb80350c8d09fc4"
-                    }
-                  },
-                  "rollback_fixture": {
-                    "runtime_release": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
-                    "bundle_sha256": "402e3392bbb5a9dba0dafacdb05f7c668c02f0115975c828e4877a37920159f3"
-                  },
-                  "prior_incompatible_fixture_refusal": {
-                    "log_sha256": "ebd5a59043443fb9120fb3b8c94959c4cdc160c8b2e4458e52ed9915b37d21c8",
-                    "required_dependency": "at-spi2-core",
-                    "result": "refused before staging or activation"
-                  },
-                  "driver_log_sha256": "ffb10af58f485d98b23933903a982a96f8ab1d652032a6eb065b17b3f1df9e71",
-                  "build_log_sha256": "765518e6848008b119a88e0378e1fdb77c53aab83339a6ccbf9bad7976588b0a"
-                },
-                "retained_v12_failure": {
-                  "candidate": "candidate-v12",
-                  "source_revision": "6695be825f357b6950e2da48fbe612166708f646",
-                  "runtime_release": "de02fdba74bc2e07cc08590a2e06bb2c36c16b4d71a0bdbbd8c096003e1a3a08",
-                  "image_sha256": "d06f576190ca8c001980e8d93cb390500c2b439964933ed1bc3512c5faa27951",
-                  "observed": {
-                    "zoom": 2.0,
-                    "output_logical_size": [
-                      640,
-                      400
+                    "signing_authority": "Development Ed25519 key; not a production release authority",
+                    "checks": [
+                      "new checksum-pinned base disk; no running development disk export",
+                      "qemu-img integrity",
+                      "signed image and exact UTM configuration verification",
+                      "fresh EFI; actual guest block inventory confirms one disk and no development seed",
+                      "local console account creation and password-protected sudo",
+                      "baseline runtime activation and six healthy services",
+                      "standalone DHCP and HTTPS",
+                      "signed update staging leaves current release unchanged",
+                      "signed compatible older-runtime activation and rollback restore image runtime and preserve activity and file",
+                      "image runtime direct KMS, keyboard/pointer, VT, move/resize/undo, close/restore, primary paste and Unicode COPY/oversized DND",
+                      "image runtime real CPU speech recognition, zero-signal rejection, owner-bound capture and recorder cleanup",
+                      "image runtime account/activity/file/service persistence through reboot",
+                      "actual no-network cold boot: only lo, six healthy services",
+                      "real activation failure retains setup journal",
+                      "TTY 2 rescue remains active",
+                      "resume preserves account UID and password",
+                      "ready only after healthy activation",
+                      "all six services recover without models or network",
+                      "latest signed runtime can reactivate offline after setup recovery",
+                      "qualification-only SSH key and sudo authority removed; development disk/config/EFI restored; VM stopped and owned UTM app closed",
+                      "original signed distribution remains unbooted",
+                      "HTTP/HTTPS Firefox defaults; native Link launches isolated real browser and shared conventional window online and on loopback-only boot",
+                      "image publication reuses completed inode; 19 tooling tests pass including offline lifecycle UUID guards and no uncertain start replay",
+                      "separate installed native VTE kernel keyboard/selection, exact Unicode clipboard/menu Copy/Paste, popup focus/motion, detached-input rejection and program interruption",
+                      "original development disk and EFI inode identities and exact config restored after verification",
+                      "actual completed presentation receipts on the clean installed native GTK editor, idle and during two owned broker CPU jobs",
+                      "clean installed VTE trusted IME protocol and separate synthetic Wayland presentation boundaries",
+                      "clean installed Table/List/KeyValue kernel pointer/keyboard row selection, Ctrl+C, visible Shift+F10/secondary menus, exact cross-client Unicode clipboard, protected refresh and key-preserved background updates, cleared selection/removal and restored focus",
+                      "session-owned Orca announces native controls; authenticated kernel commands, learn-mode grab/release, Save/Discard and rescue VT pass on the clean image",
+                      "reader and speech processes reaped after normal logout and abrupt compositor loss",
+                      "loopback-only cold boot also passes the full installed reader/kernel/VT journey"
                     ],
-                    "keyboard_height": 266,
-                    "maximum_expected_height": 200,
-                    "remaining_work_area_height": 74,
-                    "first_run_window_present": true
+                    "not_tested": [
+                      "production signing/distribution authority",
+                      "physical host input or real IME engine",
+                      "microphone/speaker acoustic signal",
+                      "physical GPU/hotplug/multi-output hardware",
+                      "live Gateway or Jev inference; no configured credentials",
+                      "incompatible future state-format migrations"
+                    ],
+                    "runtime_source_revision": "ee370fb3047b61fe64c8c91589d5a6a8d5eea0ab",
+                    "runtime_716_ui": "v0.1.0-alpha.32",
+                    "compatible_rollback_probe": {
+                      "release": "3ebc478291575d588f89c5349397c930093233a51eb45c8892611cb38bebdc1f",
+                      "signed_bundle_sha256": "ede34e9cebebf6f393383ef7933c134aa37e215afb2155717abb8a06d91b25ad"
+                    },
+                    "lifecycle": {
+                      "result": "pass",
+                      "before": {
+                        "result": "pass",
+                        "boot_id": "50fe8e18-a8a3-4818-a6c4-57ea075f423a",
+                        "runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+                        "uid": 1000,
+                        "activity": 1,
+                        "file_persisted": true,
+                        "healthy_services": [
+                          "active",
+                          "active",
+                          "active",
+                          "active",
+                          "active",
+                          "active"
+                        ],
+                        "network_interfaces": [
+                          "lo",
+                          "enp0s1"
+                        ]
+                      },
+                      "reboot": {
+                        "result": "pass",
+                        "boot_id": "65b53b95-4217-4cd7-87eb-5b7c61a10092",
+                        "runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+                        "uid": 1000,
+                        "activity": 1,
+                        "file_persisted": true,
+                        "healthy_services": [
+                          "active",
+                          "active",
+                          "active",
+                          "active",
+                          "active",
+                          "active"
+                        ],
+                        "network_interfaces": [
+                          "lo",
+                          "enp0s1"
+                        ]
+                      },
+                      "offline": {
+                        "result": "pass",
+                        "boot_id": "20f2facd-fe9a-4cfe-b265-d9b5a3ef8994",
+                        "runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+                        "uid": 1000,
+                        "activity": 1,
+                        "file_persisted": true,
+                        "healthy_services": [
+                          "active",
+                          "active",
+                          "active",
+                          "active",
+                          "active",
+                          "active"
+                        ],
+                        "network_interfaces": [
+                          "lo"
+                        ]
+                      },
+                      "activation_resume": {
+                        "result": "pass",
+                        "checks": [
+                          "real activation failure retains setup journal",
+                          "TTY 2 rescue remains active",
+                          "resume preserves account UID and password",
+                          "ready only after healthy activation",
+                          "all six services recover without models or network"
+                        ]
+                      },
+                      "offline_browser": {
+                        "result": "pass",
+                        "checks": [
+                          "system HTTP/HTTPS handler",
+                          "actual native Link action",
+                          "GIO launch with isolated profile",
+                          "real Firefox local page retrieval and title",
+                          "conventional shared identity",
+                          "durable focus/maximize",
+                          "browser disconnect"
+                        ],
+                        "not_tested": [
+                          "physical input",
+                          "remote website compatibility",
+                          "hardware acceleration",
+                          "mailto account/client"
+                        ],
+                        "firefox_debian_version": "153.4.0esr-1~deb13u1",
+                        "installed_executables": true,
+                        "cleanup_verified": true
+                      },
+                      "offline_screen_reader_qualified": true,
+                      "final_offline_runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+                      "development_disk_restored": true,
+                      "guest_stopped": true
+                    },
+                    "factory_source_revision": "ee370fb3047b61fe64c8c91589d5a6a8d5eea0ab",
+                    "browser": {
+                      "result": "pass",
+                      "checks": [
+                        "system HTTP/HTTPS handler",
+                        "actual native Link action",
+                        "GIO launch with isolated profile",
+                        "real Firefox local page retrieval and title",
+                        "conventional shared identity",
+                        "durable focus/maximize",
+                        "browser disconnect"
+                      ],
+                      "not_tested": [
+                        "physical input",
+                        "remote website compatibility",
+                        "hardware acceleration",
+                        "mailto account/client"
+                      ],
+                      "firefox_debian_version": "153.4.0esr-1~deb13u1",
+                      "installed_executables": true,
+                      "cleanup_verified": true
+                    },
+                    "qualification_observations": [
+                      "Fresh v11 copy passes first-run, signed update/rollback, native editor/collections/VTE/IME, presentation, reader and speech, browser, reboot, network-free cold boot and failed-activation/account-preserving recovery.",
+                      "The first attempt correctly rejected a legacy signed runtime requiring AT-SPI 2.56 on the pinned 2.62 image. A newly exported, host-signed compatible a879 runtime was used for rollback; the first attempt logs and booted copy remain preserved.",
+                      "Current image runtime differs from the complete 66-check runtime only in package resolution/bootstrap payloads; the three executable hashes match exactly and the changed installation path passes 272 Linux Python tests plus an actual clean base build.",
+                      "Prior v9 PRIMARY focus and intermittent collection geometry observations remain unresolved; successful repeats do not establish their causes.",
+                      "Unbooted signed v10 and v11 distributions are retained separately from test copies. Physical input/audio/GPU, full reference parity, production authority and live providers remain unqualified."
+                    ],
+                    "direct_input_test_sha256": "53a886d19ad4ad7ed3af9a507dc8b44b5ca3762a975e15c339ac84f64409c97a",
+                    "terminal_input_test_sha256": "704f7883530c72948e340ab04c9677436f2739c437bd38c1f003d3ce4b80cb2d",
+                    "qualification_log_sha256": "15a88cc67c0107a17ab77c4b06bfc89e9f3192fffe60035247e91526c231f3a6",
+                    "full_reproduction_runtime": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
+                    "full_reproduction_check_count": 66,
+                    "native_input_presentation_profiles": [
+                      {
+                        "clock_id": 1,
+                        "discarded": 0,
+                        "format": 1,
+                        "invalid": 0,
+                        "max_ms": 39,
+                        "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+                        "p50_ms": 28,
+                        "p95_ms": 38,
+                        "pending": 0,
+                        "presented": 20,
+                        "requested": 20,
+                        "sample_limit": 256,
+                        "profile": "idle editor",
+                        "measurement_seconds": 2.81,
+                        "completed_frames_between_observer_snapshots": 192
+                      },
+                      {
+                        "clock_id": 1,
+                        "discarded": 0,
+                        "format": 1,
+                        "invalid": 0,
+                        "max_ms": 38,
+                        "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+                        "p50_ms": 29,
+                        "p95_ms": 37,
+                        "pending": 0,
+                        "presented": 20,
+                        "requested": 20,
+                        "sample_limit": 256,
+                        "profile": "two concurrent broker CPU jobs",
+                        "job_cpu_usage_usec": [
+                          1475809,
+                          1475717
+                        ],
+                        "measurement_seconds": 1.529,
+                        "completed_frames_between_observer_snapshots": 99
+                      }
+                    ],
+                    "collection_input_profiles": [
+                      {
+                        "component": "Table@1",
+                        "outputs": [
+                          {
+                            "height": 800,
+                            "name": "Virtual-1",
+                            "scale": 1.0,
+                            "transform": "Normal",
+                            "width": 1280,
+                            "x": 0,
+                            "y": 0
+                          }
+                        ],
+                        "checks": [
+                          "private native system bar",
+                          "KMS output discovery",
+                          "shared core connection",
+                          "VT switch and resume",
+                          "orderly shutdown",
+                          "session directory cleanup",
+                          "owned login scope cleanup",
+                          "kernel Table@1 pointer and keyboard row selection",
+                          "Ctrl+C and accessible Shift+F10/secondary clipboard menus",
+                          "separate-client exact Unicode row text",
+                          "focused refresh rejection and key-based selection across background reorder/update",
+                          "empty-selection Copy rejection, row removal and local menu focus restoration"
+                        ]
+                      },
+                      {
+                        "component": "List@1",
+                        "outputs": [
+                          {
+                            "height": 800,
+                            "name": "Virtual-1",
+                            "scale": 1.0,
+                            "transform": "Normal",
+                            "width": 1280,
+                            "x": 0,
+                            "y": 0
+                          }
+                        ],
+                        "checks": [
+                          "private native system bar",
+                          "KMS output discovery",
+                          "shared core connection",
+                          "VT switch and resume",
+                          "orderly shutdown",
+                          "session directory cleanup",
+                          "owned login scope cleanup",
+                          "kernel List@1 pointer and keyboard row selection",
+                          "Ctrl+C and accessible Shift+F10/secondary clipboard menus",
+                          "separate-client exact Unicode row text",
+                          "focused refresh rejection and key-based selection across background reorder/update",
+                          "empty-selection Copy rejection, row removal and local menu focus restoration"
+                        ]
+                      },
+                      {
+                        "component": "KeyValue@1",
+                        "outputs": [
+                          {
+                            "height": 800,
+                            "name": "Virtual-1",
+                            "scale": 1.0,
+                            "transform": "Normal",
+                            "width": 1280,
+                            "x": 0,
+                            "y": 0
+                          }
+                        ],
+                        "checks": [
+                          "private native system bar",
+                          "KMS output discovery",
+                          "shared core connection",
+                          "VT switch and resume",
+                          "orderly shutdown",
+                          "session directory cleanup",
+                          "owned login scope cleanup",
+                          "kernel KeyValue@1 pointer and keyboard row selection",
+                          "Ctrl+C and accessible Shift+F10/secondary clipboard menus",
+                          "separate-client exact Unicode row text",
+                          "focused refresh rejection and key-based selection across background reorder/update",
+                          "empty-selection Copy rejection, row removal and local menu focus restoration"
+                        ]
+                      }
+                    ],
+                    "collection_input_test_sha256": "52c38d3ffb1d91dd8b3d3b3c478691106adbfceba46d747ac5ed32cee1d353ba",
+                    "previous_v10_image": {
+                      "image": {
+                        "architecture": "arm64",
+                        "base_sha512": "bef60fa5c4f5511cf83fe1ade0279edd5318dccbbb44f14eb0aa7f3b467e038d7a7c0b6f837be0ad1c3b2e06c5ed8e27adfdf0fd111a201b8f4c9347cd414863",
+                        "bootstrap_sha256": "e60ac4a8f76a106946ad3d91a392be97b7c0671587a75f4c5111d57dfb4c4879",
+                        "builder_sha256": "e1b8102fbd47b1313549445b6fd7792a086c2a883233bdfbf16ff56cfea7a184",
+                        "compression": "zlib",
+                        "contains_personal_account": false,
+                        "contains_provider_credentials": false,
+                        "dependency_manifest_sha256": "d0812f2d560c26cdbc596d445dae73b3f3ec0098e01f7aec44869e7ba17d6b23",
+                        "dependency_profile_sha256": "e76be92153567973abe0df91b2a9c27b3e58cfe306a41337020448471908e923",
+                        "disk_size": "20G",
+                        "first_run_sha256": "8dc0c5b4a0d212667000bb009905458de85125c7fad98e1d876fb2f766471b57",
+                        "first_run_unit_sha256": "c4d2376b281a0d5879ce71a15e192ede8598ebc531d58b7dff3203ca66986b09",
+                        "format": 1,
+                        "foundation_sources": {
+                          "agent-os-foundation.service": "e5acc8fbfec78024dfd7fb27fafe615391c7b17672c1b56e235e12023e3b6bd2",
+                          "record-boot.py": "736a89eeb95265b934bf3be4f64841af2e0ecea7daa07f5319c144f8aba87ce9",
+                          "status.py": "390a35380d79b3bc5fd38f5deba99058ce08f4afcc6ce42c2ee6891ba077cc95"
+                        },
+                        "image_sha256": "9d86b2b1c3745669b43573fc4011cd8777f2727b982a717b5e55681732abfef4",
+                        "name": "agentOS experimental native image",
+                        "runtime_release": "2e24dc00c97044addf108d600e3a84f32ce12e66be3404236c4492a682ce5113",
+                        "update_key_sha256": "49694e7bbcb1dccfe6df3da3e18a6229453113c2f09167098672e37c2c3b34bb",
+                        "voice_descriptor_sha256": "dbeddb8d86ae0625959ce8ed45b1d9cc9235bd4bebdf5dfb2281a973b3e8491b"
+                      },
+                      "runtime_source_revision": "6b459ea4129524baa253854f07cfedac4d790a86",
+                      "runtime_716_ui": "v0.1.0-alpha.31",
+                      "qualification_observations": [
+                        "Clean v10 qualification includes the exact alpha.31 form-owner fixes and the immutable runtime from all 60 reproduction checks, plus installed collection/editor/VTE/IME, idle/two-broker-CPU-job presentation, browser, offline speech, reboot and failed activation/account-preserving recovery.",
+                        "The prior v6\u2013v9 distributions remain untouched. Only the redundant guest v9 builder output was removed after fresh SHA-256 equality with the retained host distribution.",
+                        "The prior v9 qualification exposed an intermittent primary-transfer destination focus failure. An unchanged instrumented repeat and complete v9 fresh-copy run passed; that observation remains open. Its helper identity/password failures and subsequent exact disk/config/EFI restoration are retained in repository history.",
+                        "An initial compressed v10 conversion ran out of builder space, published no image and cleaned its private temporary directory. The builder now checks a conservative 41 GiB peak-capacity bound before disk/loop creation; all 21 tooling tests pass. The dedicated development test disk was enlarged from 20 to 80 GiB after an exact hash-verified APFS recovery clone; its ext4 filesystem, saved activities, UID and runtime were verified with more than 60 GiB available. The distributed image remains 20 GiB.",
+                        "The new image uses supported zlib-compressed QCOW2 export. Its unbooted signed artifact remains separate from the verification copy."
+                      ]
+                    },
+                    "binary_equivalence": {
+                      "qualified_runtime": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
+                      "image_runtime": "d56fba93a83d36dad4a3482f07cb5a009a78b24e6afa429594d6ddac04d27283",
+                      "binaries": {
+                        "agent-os-core": "2051ea36559b6aa9af596e2f7fba4672971fdb5b788c5fbc492886015263fcfe",
+                        "native/agent-os-desktop": "bc05d9da6fc66da62218ae386bb5232fbc2ae7ce67214031e44764e9162f6765",
+                        "native/agent-os-compositor": "9c60346155ffda618d3d48c1d11c33b0cbda64b1b764882becb80350c8d09fc4"
+                      }
+                    },
+                    "rollback_fixture": {
+                      "runtime_release": "a879ea562de321f0438a48ec2558e1bf72f5fddb3d86a21a7af76bc0a3eb104c",
+                      "bundle_sha256": "402e3392bbb5a9dba0dafacdb05f7c668c02f0115975c828e4877a37920159f3"
+                    },
+                    "prior_incompatible_fixture_refusal": {
+                      "log_sha256": "ebd5a59043443fb9120fb3b8c94959c4cdc160c8b2e4458e52ed9915b37d21c8",
+                      "required_dependency": "at-spi2-core",
+                      "result": "refused before staging or activation"
+                    },
+                    "driver_log_sha256": "ffb10af58f485d98b23933903a982a96f8ab1d652032a6eb065b17b3f1df9e71",
+                    "build_log_sha256": "765518e6848008b119a88e0378e1fdb77c53aab83339a6ccbf9bad7976588b0a"
                   },
-                  "root_cause": "not yet established",
-                  "evidence": {
-                    "/tmp/agentos-image-v12-retry-qualification.log": "921cfe04742de58bf19affd4c8da025808b08eb08b70b3be7cb6239b7539d761"
+                  "retained_v12_failure": {
+                    "candidate": "candidate-v12",
+                    "source_revision": "6695be825f357b6950e2da48fbe612166708f646",
+                    "runtime_release": "de02fdba74bc2e07cc08590a2e06bb2c36c16b4d71a0bdbbd8c096003e1a3a08",
+                    "image_sha256": "d06f576190ca8c001980e8d93cb390500c2b439964933ed1bc3512c5faa27951",
+                    "observed": {
+                      "zoom": 2.0,
+                      "output_logical_size": [
+                        640,
+                        400
+                      ],
+                      "keyboard_height": 266,
+                      "maximum_expected_height": 200,
+                      "remaining_work_area_height": 74,
+                      "first_run_window_present": true
+                    },
+                    "root_cause": "not yet established",
+                    "evidence": {
+                      "/tmp/agentos-image-v12-retry-qualification.log": "921cfe04742de58bf19affd4c8da025808b08eb08b70b3be7cb6239b7539d761"
+                    },
+                    "qualification_complete": false
                   },
-                  "qualification_complete": false
+                  "cleanup": {
+                    "original_development_disk_and_efi_inodes_restored": true,
+                    "original_configuration_bytes_restored": true,
+                    "qualification_ssh_key_and_sudo_fixture_removed": true,
+                    "firstboot_password_file_removed": true,
+                    "guest_stopped": true,
+                    "owned_utm_app_closed": true,
+                    "unbooted_signed_bundle_reverified": true
+                  }
                 },
                 "cleanup": {
                   "original_development_disk_and_efi_inodes_restored": true,
@@ -3518,7 +3923,25 @@
                 "guest_stopped": true,
                 "owned_utm_app_closed": true,
                 "unbooted_signed_bundle_reverified": true
-              }
+              },
+              "qualification_fixture_patch": {
+                "original_source_archive_sha256": "05ee5b0798030d7824a05db3f784fea3486e94d27651e9472473eecbc7a2c95a",
+                "qualification_source_archive_sha256": "628b45559ab3e274c92e63e89da7fb40003494b08e171649b87e8285e03bc47c",
+                "runtime_code_unchanged": true,
+                "changes": [
+                  {
+                    "member": "native-shell/tests/accessibility.py",
+                    "original_sha256": "817eafc4c8e15c7fdfcc2d248b4dfb9d731fc4b9e6bc18187a3d7596a94f681f",
+                    "patched_sha256": "eaf901955379323dbb3f4f79364dd76e79ef785bb349281489c09f7efec7c04d",
+                    "change": "Keep Toggle fixture owned by temporary session until teardown; preserve workspace/input guard"
+                  }
+                ],
+                "initial_failure": "Temporary Toggle close retiled an unrelated editor protected by active input; production interaction guard correctly rejected transaction",
+                "owned_cleanup": "Initial driver confirms original disk/EFI inodes and configuration restored; owned guest/app closed",
+                "image_qualified": false,
+                "patched_image_qualification": "pass"
+              },
+              "initial_failed_qualification": "qualified-runs/signed-image-v15-initial-failure/"
             },
             "cleanup": {
               "original_development_disk_and_efi_inodes_restored": true,
@@ -3529,24 +3952,61 @@
               "owned_utm_app_closed": true,
               "unbooted_signed_bundle_reverified": true
             },
-            "qualification_fixture_patch": {
-              "original_source_archive_sha256": "05ee5b0798030d7824a05db3f784fea3486e94d27651e9472473eecbc7a2c95a",
-              "qualification_source_archive_sha256": "628b45559ab3e274c92e63e89da7fb40003494b08e171649b87e8285e03bc47c",
-              "runtime_code_unchanged": true,
-              "changes": [
-                {
-                  "member": "native-shell/tests/accessibility.py",
-                  "original_sha256": "817eafc4c8e15c7fdfcc2d248b4dfb9d731fc4b9e6bc18187a3d7596a94f681f",
-                  "patched_sha256": "eaf901955379323dbb3f4f79364dd76e79ef785bb349281489c09f7efec7c04d",
-                  "change": "Keep Toggle fixture owned by temporary session until teardown; preserve workspace/input guard"
-                }
+            "qualification_source_archive_sha256": "2c534aa063af88c63ae462e80341d7819644c43f1f377758f73fa53982056cda",
+            "reader_control_speech": {
+              "log_sha256": "02ea89b11236b5026ec10458f4948e8f0fb8dd00b6ae0d827f83ff78f1b7fb05",
+              "controls": [
+                "TextField@1",
+                "DocumentEditor@1",
+                "Choice@1",
+                "Toggle@1"
               ],
-              "initial_failure": "Temporary Toggle close retiled an unrelated editor protected by active input; production interaction guard correctly rejected transaction",
-              "owned_cleanup": "Initial driver confirms original disk/EFI inodes and configuration restored; owned guest/app closed",
-              "image_qualified": false,
-              "patched_image_qualification": "pass"
+              "physical_audio_and_braille_qualified": false,
+              "tested_packages": {
+                "espeak-ng-data:arm64": "1.52.0+dfsg-5",
+                "libespeak-ng1:arm64": "1.52.0+dfsg-5",
+                "libgtk-4-1:arm64": "4.18.6+ds-2",
+                "orca": "51.0-4~bpo13+1",
+                "speech-dispatcher": "0.12.1-5~bpo13+1",
+                "speech-dispatcher-espeak-ng": "0.12.1-5~bpo13+1"
+              }
             },
-            "initial_failed_qualification": "qualified-runs/signed-image-v15-initial-failure/"
+            "unqualified_candidate_v17": {
+              "result": "fail",
+              "candidate": "candidate-v17",
+              "recorded_at": "2026-10-11T21:17:20.856067+00:00",
+              "image_sha256": "24f395bed7c70c7498bc734cbda0c7910c67ca59ba7baa4ffd38ff319de53a30",
+              "runtime_release": "12baac1fda411b918957f93a7fd78abc341e8d7c48f6418b1fab8153195f0de1",
+              "factory_source_revision": "40218f916e49fb1e15c44ad1cf61fe74d18717eb",
+              "qualified_runtime_source_revision": "e98da357788963f98f67a0b6c93802cfd8b0f628",
+              "failure": "Offline cold-boot direct screen-reader journey did not announce Ask Agent after repeated launcher hide/show. Lifecycle qualification stopped at this failure.",
+              "speech_sha256": "323383abe1b70dfb53d601ed648eb17f1c2d36142b946a86e5c1fa9820abb1c5",
+              "observations": [
+                "All eleven online direct profiles and installed reader controls/outcomes passed before reboot.",
+                "Offline browser handoff passed.",
+                "Speech log contains a new launcher frame and request-field ancestors referring to an earlier, nonexistent launcher frame. Root cause is under investigation."
+              ],
+              "not_completed": [
+                "offline reader commands and rescue VT",
+                "offline display zoom",
+                "activation failure/resume",
+                "qualification authority removal from failed boot copy"
+              ],
+              "qualified_image_remains": "candidate-v16",
+              "original_development_disk_and_efi_restored": true,
+              "owned_utm_closed": true,
+              "failed_boot_copy_authority": "Disposable failed disk/EFI copies were deleted after collecting the original and repeated diagnostic speech logs. Unbooted signed candidate-v17 remains unchanged.",
+              "disposable_copy_cleanup": {
+                "removed": [
+                  "outputs/vm-foundation/runtime/fresh-verification/candidate-v17-interrupted-1791752966724430000-disk.qcow2",
+                  "outputs/vm-foundation/runtime/fresh-verification/candidate-v17-interrupted-1791752966724665000-efi_vars.fd"
+                ],
+                "completed_at": "2026-10-11T21:35:07.455838+00:00",
+                "development_disk_and_efi_untouched": true,
+                "unbooted_signed_v17_retained": true
+              },
+              "evidence": "outputs/vm-foundation/runtime/fresh-verification/qualified-runs/signed-image-v17-failed-offline-reader"
+            }
           },
           "cleanup": {
             "original_development_disk_and_efi_inodes_restored": true,
@@ -3557,9 +4017,14 @@
             "owned_utm_app_closed": true,
             "unbooted_signed_bundle_reverified": true
           },
-          "qualification_source_archive_sha256": "2c534aa063af88c63ae462e80341d7819644c43f1f377758f73fa53982056cda",
+          "qualification_source_archive_sha256": "2f489f00dfbb6e830527144dba2a812e8c38c63a411f0f1e577ad1eb5a82d97d",
           "reader_control_speech": {
-            "log_sha256": "02ea89b11236b5026ec10458f4948e8f0fb8dd00b6ae0d827f83ff78f1b7fb05",
+            "outcome_speech_deduplicated": true,
+            "outcomes": [
+              "Result@1",
+              "Error@1"
+            ],
+            "log_sha256": "fabe66d611d9f1a5d921d9a99836d710b5310532269115afaf992aa1efc3d950",
             "controls": [
               "TextField@1",
               "DocumentEditor@1",
@@ -3576,7 +4041,21 @@
               "speech-dispatcher-espeak-ng": "0.12.1-5~bpo13+1"
             }
           },
-          "unqualified_candidate_v17": {
+          "launcher_reader_speech": {
+            "online": {
+              "request_announcements": 10,
+              "raw_sha256": "ab580db42d1381c7813559f71704d1163102cf3d7b9ebbca85630cce824a172d",
+              "ten_announced_reopens_after_bursts": true,
+              "unsent_request_draft_preserved": true
+            },
+            "offline": {
+              "request_announcements": 10,
+              "raw_sha256": "fb7d4dab3ea32ebc28cb94e91772829542c51b9b55f2cf98817dbb7b40818ca6",
+              "ten_announced_reopens_after_bursts": true,
+              "unsent_request_draft_preserved": true
+            }
+          },
+          "failed_v17_candidate": {
             "result": "fail",
             "candidate": "candidate-v17",
             "recorded_at": "2026-10-11T21:17:20.856067+00:00",
@@ -3611,6 +4090,11 @@
               "unbooted_signed_v17_retained": true
             },
             "evidence": "outputs/vm-foundation/runtime/fresh-verification/qualified-runs/signed-image-v17-failed-offline-reader"
+          },
+          "qualification_collector_failure": {
+            "evidence": "qualified-runs/signed-image-v18-collector-failure/failure.json",
+            "runtime_changes_for_retry": false,
+            "fresh_copy_lifecycle_repeated": true
           }
         },
         "cleanup": {
@@ -3622,14 +4106,14 @@
           "owned_utm_app_closed": true,
           "unbooted_signed_bundle_reverified": true
         },
-        "qualification_source_archive_sha256": "2f489f00dfbb6e830527144dba2a812e8c38c63a411f0f1e577ad1eb5a82d97d",
+        "qualification_source_archive_sha256": "d27fc75410dec4bf318488344d8ef69bb5b892e4d7df97704a687bf319359c2d",
         "reader_control_speech": {
           "outcome_speech_deduplicated": true,
           "outcomes": [
             "Result@1",
             "Error@1"
           ],
-          "log_sha256": "fabe66d611d9f1a5d921d9a99836d710b5310532269115afaf992aa1efc3d950",
+          "log_sha256": "5bb44a58241ef1d60c795c38133173e241ca49edca38736d09fa7d57938ff187",
           "controls": [
             "TextField@1",
             "DocumentEditor@1",
@@ -3646,16 +4130,34 @@
             "speech-dispatcher-espeak-ng": "0.12.1-5~bpo13+1"
           }
         },
+        "selectable_status_reader": {
+          "online": {
+            "raw_speech_sha256": "f63dc72bc64edd16ab9ad18696a110b0bfcd66e3c3283676e0789cac68389a16",
+            "status_announcement_speech": [
+              "23:32:53.946531 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
+            ],
+            "selected_snapshot_focus_lease_and_draft_preserved": true,
+            "trusted_ctrl_c_wayland_clipboard_roundtrip": true
+          },
+          "offline": {
+            "raw_speech_sha256": "8e2e9b09563109cefb9debf923a81b8145bcde2507dd52cf8373bb64097c1e2a",
+            "status_announcement_speech": [
+              "23:35:42.956957 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
+            ],
+            "selected_snapshot_focus_lease_and_draft_preserved": true,
+            "trusted_ctrl_c_wayland_clipboard_roundtrip": true
+          }
+        },
         "launcher_reader_speech": {
           "online": {
             "request_announcements": 10,
-            "raw_sha256": "ab580db42d1381c7813559f71704d1163102cf3d7b9ebbca85630cce824a172d",
+            "raw_sha256": "b378c78270928fb44a751da7da693d6765de3e381151b36055f76c212441859b",
             "ten_announced_reopens_after_bursts": true,
             "unsent_request_draft_preserved": true
           },
           "offline": {
             "request_announcements": 10,
-            "raw_sha256": "fb7d4dab3ea32ebc28cb94e91772829542c51b9b55f2cf98817dbb7b40818ca6",
+            "raw_sha256": "fe94b3ba65b992898b87d17f5fcf497f03022d25520264247407f7803e0d2f55",
             "ten_announced_reopens_after_bursts": true,
             "unsent_request_draft_preserved": true
           }
@@ -3695,11 +4197,6 @@
             "unbooted_signed_v17_retained": true
           },
           "evidence": "outputs/vm-foundation/runtime/fresh-verification/qualified-runs/signed-image-v17-failed-offline-reader"
-        },
-        "qualification_collector_failure": {
-          "evidence": "qualified-runs/signed-image-v18-collector-failure/failure.json",
-          "runtime_changes_for_retry": false,
-          "fresh_copy_lifecycle_repeated": true
         }
       },
       "cleanup": {
@@ -3711,14 +4208,14 @@
         "owned_utm_app_closed": true,
         "unbooted_signed_bundle_reverified": true
       },
-      "qualification_source_archive_sha256": "d27fc75410dec4bf318488344d8ef69bb5b892e4d7df97704a687bf319359c2d",
+      "qualification_source_archive_sha256": "003418019f24fab37b0ce1d646ee9c0afefff10da767cd0754f4eff79b77fc0d",
       "reader_control_speech": {
         "outcome_speech_deduplicated": true,
         "outcomes": [
           "Result@1",
           "Error@1"
         ],
-        "log_sha256": "5bb44a58241ef1d60c795c38133173e241ca49edca38736d09fa7d57938ff187",
+        "log_sha256": "e60cf31e245c7b073584801b2a5f6d85553897425bdd2b320f8de8c890049dc8",
         "controls": [
           "TextField@1",
           "DocumentEditor@1",
@@ -3737,32 +4234,36 @@
       },
       "selectable_status_reader": {
         "online": {
-          "raw_speech_sha256": "f63dc72bc64edd16ab9ad18696a110b0bfcd66e3c3283676e0789cac68389a16",
+          "raw_speech_sha256": "2a3610087ab93cc2f7b78b19f78d000b74535ede7fb392614c909ac346ed54c8",
           "status_announcement_speech": [
-            "23:32:53.946531 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
+            "00:58:33.508248 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
           ],
           "selected_snapshot_focus_lease_and_draft_preserved": true,
           "trusted_ctrl_c_wayland_clipboard_roundtrip": true
         },
         "offline": {
-          "raw_speech_sha256": "8e2e9b09563109cefb9debf923a81b8145bcde2507dd52cf8373bb64097c1e2a",
+          "raw_speech_sha256": "a07fa05419887f735998727550d7db418b691ec3e8b6e1e1247c3d9ba0eb99ca",
           "status_announcement_speech": [
-            "23:35:42.956957 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
+            "01:01:18.402401 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
           ],
           "selected_snapshot_focus_lease_and_draft_preserved": true,
           "trusted_ctrl_c_wayland_clipboard_roundtrip": true
         }
       },
+      "host_status_announcement_scope": {
+        "inactive_host_failure_speech_count": 0,
+        "online_and_offline_exact_status_announcement_once": true
+      },
       "launcher_reader_speech": {
         "online": {
           "request_announcements": 10,
-          "raw_sha256": "b378c78270928fb44a751da7da693d6765de3e381151b36055f76c212441859b",
+          "raw_sha256": "81cd58811cfc4d171b7f086f05307cb28268562ece9d1cc3b756f0381c6127fe",
           "ten_announced_reopens_after_bursts": true,
           "unsent_request_draft_preserved": true
         },
         "offline": {
           "request_announcements": 10,
-          "raw_sha256": "fe94b3ba65b992898b87d17f5fcf497f03022d25520264247407f7803e0d2f55",
+          "raw_sha256": "e5d114baea888a414e7003ef30982e73b4d21ac191cdc4a99a8f87fe37362b1e",
           "ten_announced_reopens_after_bursts": true,
           "unsent_request_draft_preserved": true
         }
@@ -3802,6 +4303,11 @@
           "unbooted_signed_v17_retained": true
         },
         "evidence": "outputs/vm-foundation/runtime/fresh-verification/qualified-runs/signed-image-v17-failed-offline-reader"
+      },
+      "factory_source_ci": {
+        "run": 38189360341,
+        "result": "success",
+        "source_revision": "529a5b3c6cece631f151e1bdcb8454859656cd2d"
       }
     },
     "cleanup": {
@@ -3813,14 +4319,28 @@
       "owned_utm_app_closed": true,
       "unbooted_signed_bundle_reverified": true
     },
-    "qualification_source_archive_sha256": "003418019f24fab37b0ce1d646ee9c0afefff10da767cd0754f4eff79b77fc0d",
+    "qualification_source_archive_sha256": "f11c703fe6dd6352a5bea694bea94e9119014f2014b58e2f7a827afb6df16512",
+    "build_space_recovery": {
+      "initial_attempt": "qualified-runs/signed-image-v21-build-space",
+      "initial_log_sha256": "713ba95db9816ca8699a68de79651ad4248f499fd51884b184a08b61869614e3",
+      "preflight_published_no_candidate": true,
+      "verified_redundant_guest_copy_cleanup": {
+        "removed_duplicate": "/home/developer/agentos-image-inputs/agentos-release-v20.qcow2",
+        "retained_host_image": "candidate-v20.qcow2",
+        "sha256": "d562f88587c763cac3460b8f99d1bf60a4ae66ca3700c748bb769f6914e6dc5e",
+        "removed_bytes": 1828978688,
+        "free_before": 42929639424,
+        "free_after": 44751622144
+      },
+      "retained_signed_v20_host_image_hash_verified": true
+    },
     "reader_control_speech": {
       "outcome_speech_deduplicated": true,
       "outcomes": [
         "Result@1",
         "Error@1"
       ],
-      "log_sha256": "e60cf31e245c7b073584801b2a5f6d85553897425bdd2b320f8de8c890049dc8",
+      "log_sha256": "765451da37de8c24337db9c049116ec42b4165d688851de3fcb8c29c699587a6",
       "controls": [
         "TextField@1",
         "DocumentEditor@1",
@@ -3839,17 +4359,17 @@
     },
     "selectable_status_reader": {
       "online": {
-        "raw_speech_sha256": "2a3610087ab93cc2f7b78b19f78d000b74535ede7fb392614c909ac346ed54c8",
+        "raw_speech_sha256": "3a78b90b2a8b251d3cb7b1ed769b24c0987dcc21af34f8a0ba1e6209bc2c54cd",
         "status_announcement_speech": [
-          "00:58:33.508248 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
+          "02:30:57.750664 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
         ],
         "selected_snapshot_focus_lease_and_draft_preserved": true,
         "trusted_ctrl_c_wayland_clipboard_roundtrip": true
       },
       "offline": {
-        "raw_speech_sha256": "a07fa05419887f735998727550d7db418b691ec3e8b6e1e1247c3d9ba0eb99ca",
+        "raw_speech_sha256": "948e0ea633e1f00f1e4fd2d4b77788d82381438e547e312e02db4e02e86f6afc",
         "status_announcement_speech": [
-          "01:01:18.402401 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
+          "02:33:46.422819 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
         ],
         "selected_snapshot_focus_lease_and_draft_preserved": true,
         "trusted_ctrl_c_wayland_clipboard_roundtrip": true
@@ -3859,16 +4379,36 @@
       "inactive_host_failure_speech_count": 0,
       "online_and_offline_exact_status_announcement_once": true
     },
+    "active_monitor_reader_profiles": {
+      "online": {
+        "job_id": 1,
+        "active_monitor": true,
+        "selected_snapshot_preserved": true,
+        "current_failure_visible": true,
+        "failure_announcements": 1,
+        "deselection_adopts_latest": true,
+        "trusted_clipboard_roundtrip": true
+      },
+      "offline": {
+        "job_id": 2,
+        "active_monitor": true,
+        "selected_snapshot_preserved": true,
+        "current_failure_visible": true,
+        "failure_announcements": 1,
+        "deselection_adopts_latest": true,
+        "trusted_clipboard_roundtrip": true
+      }
+    },
     "launcher_reader_speech": {
       "online": {
         "request_announcements": 10,
-        "raw_sha256": "81cd58811cfc4d171b7f086f05307cb28268562ece9d1cc3b756f0381c6127fe",
+        "raw_sha256": "1b265322adc84ab6438a03becc95aaa486176d6855a1bbca83959e51c502da7e",
         "ten_announced_reopens_after_bursts": true,
         "unsent_request_draft_preserved": true
       },
       "offline": {
         "request_announcements": 10,
-        "raw_sha256": "e5d114baea888a414e7003ef30982e73b4d21ac191cdc4a99a8f87fe37362b1e",
+        "raw_sha256": "ec81469261693bda51267dba37a7f08d3b971d611df703fd49f8bb777369c6ef",
         "ten_announced_reopens_after_bursts": true,
         "unsent_request_draft_preserved": true
       }
@@ -3908,11 +4448,6 @@
         "unbooted_signed_v17_retained": true
       },
       "evidence": "outputs/vm-foundation/runtime/fresh-verification/qualified-runs/signed-image-v17-failed-offline-reader"
-    },
-    "factory_source_ci": {
-      "run": 38189360341,
-      "result": "success",
-      "source_revision": "529a5b3c6cece631f151e1bdcb8454859656cd2d"
     }
   },
   "cleanup": {
@@ -3924,20 +4459,14 @@
     "owned_utm_app_closed": true,
     "unbooted_signed_bundle_reverified": true
   },
-  "qualification_source_archive_sha256": "f11c703fe6dd6352a5bea694bea94e9119014f2014b58e2f7a827afb6df16512",
-  "build_space_recovery": {
-    "initial_attempt": "qualified-runs/signed-image-v21-build-space",
-    "initial_log_sha256": "713ba95db9816ca8699a68de79651ad4248f499fd51884b184a08b61869614e3",
-    "preflight_published_no_candidate": true,
-    "verified_redundant_guest_copy_cleanup": {
-      "removed_duplicate": "/home/developer/agentos-image-inputs/agentos-release-v20.qcow2",
-      "retained_host_image": "candidate-v20.qcow2",
-      "sha256": "d562f88587c763cac3460b8f99d1bf60a4ae66ca3700c748bb769f6914e6dc5e",
-      "removed_bytes": 1828978688,
-      "free_before": 42929639424,
-      "free_after": 44751622144
-    },
-    "retained_signed_v20_host_image_hash_verified": true
+  "qualification_source_archive_sha256": "953a80f83840fd06a32b324bed4b1e10d186346318c29784dc23f33f82cd4328",
+  "verified_redundant_guest_copy_cleanup": {
+    "removed_duplicate": "/home/developer/agentos-image-inputs/agentos-release-v21.qcow2",
+    "retained_host_image": "candidate-v21.qcow2",
+    "sha256": "0d7a795766224a9cb34cc7c8f82743996f1c7c49a3f1bdc871c32184d48f06b3",
+    "removed_bytes": 1828716544,
+    "free_before": 42391638016,
+    "free_after": 44213641216
   },
   "reader_control_speech": {
     "outcome_speech_deduplicated": true,
@@ -3945,7 +4474,7 @@
       "Result@1",
       "Error@1"
     ],
-    "log_sha256": "765451da37de8c24337db9c049116ec42b4165d688851de3fcb8c29c699587a6",
+    "log_sha256": "a03bb9819a6868160e2aa66eb6305f4b18b764f3ab9a582e6a545d785b87aa54",
     "controls": [
       "TextField@1",
       "DocumentEditor@1",
@@ -3964,17 +4493,17 @@
   },
   "selectable_status_reader": {
     "online": {
-      "raw_speech_sha256": "3a78b90b2a8b251d3cb7b1ed769b24c0987dcc21af34f8a0ba1e6209bc2c54cd",
+      "raw_speech_sha256": "4944c9c66f2a2d66a02d07a3dea89b56c93c5eccf4250010dd48c36ea7fea3b8",
       "status_announcement_speech": [
-        "02:30:57.750664 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
+        "05:33:25.782719 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
       ],
       "selected_snapshot_focus_lease_and_draft_preserved": true,
       "trusted_ctrl_c_wayland_clipboard_roundtrip": true
     },
     "offline": {
-      "raw_speech_sha256": "948e0ea633e1f00f1e4fd2d4b77788d82381438e547e312e02db4e02e86f6afc",
+      "raw_speech_sha256": "5fb967ad9a58a972c1c468df67bc1ab08ca17a33a920b300725314e233bd5691",
       "status_announcement_speech": [
-        "02:33:46.422819 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
+        "05:36:21.219447 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
       ],
       "selected_snapshot_focus_lease_and_draft_preserved": true,
       "trusted_ctrl_c_wayland_clipboard_roundtrip": true
@@ -3992,7 +4521,11 @@
       "current_failure_visible": true,
       "failure_announcements": 1,
       "deselection_adopts_latest": true,
-      "trusted_clipboard_roundtrip": true
+      "trusted_clipboard_roundtrip": true,
+      "reader_announced_reopens": 3,
+      "raw_completed_exact_work_utterances": 5,
+      "raw_exact_work_background_announcements": 1,
+      "reopen_speech_before_tree_inspection_verified_by_direct_probe": 3
     },
     "offline": {
       "job_id": 2,
@@ -4001,19 +4534,23 @@
       "current_failure_visible": true,
       "failure_announcements": 1,
       "deselection_adopts_latest": true,
-      "trusted_clipboard_roundtrip": true
+      "trusted_clipboard_roundtrip": true,
+      "reader_announced_reopens": 3,
+      "raw_completed_exact_work_utterances": 5,
+      "raw_exact_work_background_announcements": 1,
+      "reopen_speech_before_tree_inspection_verified_by_direct_probe": 3
     }
   },
   "launcher_reader_speech": {
     "online": {
       "request_announcements": 10,
-      "raw_sha256": "1b265322adc84ab6438a03becc95aaa486176d6855a1bbca83959e51c502da7e",
+      "raw_sha256": "9a162fd057861982c172fcc4448ce1a7fa86037839f5e6d1bc1c80fe5bdfbcd3",
       "ten_announced_reopens_after_bursts": true,
       "unsent_request_draft_preserved": true
     },
     "offline": {
       "request_announcements": 10,
-      "raw_sha256": "ec81469261693bda51267dba37a7f08d3b971d611df703fd49f8bb777369c6ef",
+      "raw_sha256": "a005401ccd5f18c83e8d82951cc67082fadc02badc493b7f21117fc056d0c8ba",
       "ten_announced_reopens_after_bursts": true,
       "unsent_request_draft_preserved": true
     }

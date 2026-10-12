@@ -1,0 +1,12 @@
+{
+  "factory_source_revision": "0d3274b3b3f20ac1a2c7ca29746703f7305d89aa",
+  "runtime_source_revision": "5d604e9573f8c9746010fa9b0a0d04a4642a0720",
+  "source_archive_sha256": "953a80f83840fd06a32b324bed4b1e10d186346318c29784dc23f33f82cd4328",
+  "qualified_runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
+  "image_runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
+  "binaries": {
+    "agent-os-core": "27607a58076d3b567bf6106112c2d1246165709b0551b8dc859cd41c8ba36432",
+    "native/agent-os-desktop": "0bbe824d57980f9bc45d4bf48ce293d45cb77d78ceb2fe0a939a7d54e2882b5f",
+    "native/agent-os-compositor": "6dea84461ca29592d45ac343b3e7be8b32cbf89b5e8d15b0c0fa21105ffb9864"
+  }
+}
