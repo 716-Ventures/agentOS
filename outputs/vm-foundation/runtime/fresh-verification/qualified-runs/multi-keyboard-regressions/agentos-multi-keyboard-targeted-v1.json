@@ -1,0 +1,30 @@
+{
+  "runtime_release": "0479ff58694dbb010dfddb56022e5ab3edf992a5081cc80fdb314cae40cb401b",
+  "cases": [
+    {
+      "argv": [
+        "python3",
+        "/home/developer/agent-os-source/tests/direct_display_guest.py",
+        "--input"
+      ],
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "python3",
+        "/home/developer/agent-os-source/tests/direct_display_guest.py",
+        "--input",
+        "--fresh-profile"
+      ],
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "python3",
+        "/home/developer/agent-os-source/tests/direct_display_guest.py",
+        "--screen-reader-input"
+      ],
+      "returncode": 0
+    }
+  ]
+}

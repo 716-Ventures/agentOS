@@ -1,0 +1,66 @@
+{
+  "targeted": {
+    "source_revision": "81893b56b186cc96d086420a2d53273ea0266d42",
+    "source_clean": false,
+    "deployment": {
+      "created_at": "2026-10-12T08:09:14.243633+00:00",
+      "source_archive_sha256": "9f127fc49dc413542b0f090e6f6208f05cb4736192893ee45f5c6479e2775329",
+      "repository_revision": "81893b56b186cc96d086420a2d53273ea0266d42",
+      "source_changes": [
+        " M outputs/agent-shell/tests/direct_display_guest.py",
+        "A  outputs/agent-shell/tests/direct_multi_keyboard_probe.py",
+        " M outputs/agent-shell/tests/direct_screen_keyboard_probe.py",
+        " M outputs/native-compositor/src/input.rs",
+        " M outputs/native-compositor/src/main.rs",
+        "A  outputs/native-compositor/src/physical_keys.rs",
+        " M outputs/native-compositor/src/state.rs"
+      ],
+      "installed": true
+    },
+    "installed_runtime": "0479ff58694dbb010dfddb56022e5ab3edf992a5081cc80fdb314cae40cb401b",
+    "measurements": {
+      "runtime_release": "0479ff58694dbb010dfddb56022e5ab3edf992a5081cc80fdb314cae40cb401b",
+      "cases": [
+        {
+          "argv": [
+            "python3",
+            "/home/developer/agent-os-source/tests/direct_display_guest.py",
+            "--input"
+          ],
+          "returncode": 0
+        },
+        {
+          "argv": [
+            "python3",
+            "/home/developer/agent-os-source/tests/direct_display_guest.py",
+            "--input",
+            "--fresh-profile"
+          ],
+          "returncode": 0
+        },
+        {
+          "argv": [
+            "python3",
+            "/home/developer/agent-os-source/tests/direct_display_guest.py",
+            "--screen-reader-input"
+          ],
+          "returncode": 0
+        }
+      ]
+    },
+    "owned_utm_closed": true,
+    "original_config_unchanged": true,
+    "original_disk_efi_inodes_preserved": true
+  },
+  "independent_negative_runtime": "08e9973f3330a8727833023912bb4f5961d9e6faaa9a5d23f67e7ea6e9122c10",
+  "independent_negative_marker": "OVERLAPPING_KEYBOARD_MODIFIER_RELEASE",
+  "proven_defect": "Partial release lost physical/Smithay held-key ownership, allowing OSK input while the other keyboard still held Shift. Uppercase physical typing itself was retained by XKB; this is not evidence of lost modifier text.",
+  "compositor_tests_passed": 66,
+  "kernel_journeys": [
+    "ordinary editor including merged Shift/release/removal and OSK isolation",
+    "fresh profile including same multi-keyboard cases",
+    "screen-reader isolation, ordinary input and VT escape"
+  ],
+  "physical_hardware_qualified": false,
+  "clean_source_full70_pending": true
+}

@@ -1,7 +1,8 @@
 use smithay::{
     backend::input::{
-        AbsolutePositionEvent, Axis, AxisSource, ButtonState, Event, InputBackend, InputEvent,
-        KeyState, KeyboardKeyEvent, PointerAxisEvent, PointerButtonEvent, PointerMotionEvent,
+        AbsolutePositionEvent, Axis, AxisSource, ButtonState, Device, Event, InputBackend,
+        InputEvent, KeyState, KeyboardKeyEvent, PointerAxisEvent, PointerButtonEvent,
+        PointerMotionEvent,
     },
     input::{
         keyboard::FilterResult,
@@ -160,12 +161,22 @@ impl Smallvil {
         match event {
             InputEvent::Keyboard { event, .. } => {
                 let code = event.key_code();
-                if event.state() == KeyState::Pressed {
-                    self.physical_keys.insert(code.raw());
-                } else {
-                    self.physical_keys.remove(&code.raw());
+                // Backend count() semantics differ. Device identity keeps
+                // overlapping keys correct for both libinput and nested input.
+                if self.physical_keys.transition(
+                    &event.device().id(),
+                    code.raw(),
+                    event.state() == KeyState::Pressed,
+                ) {
+                    self.process_keyboard(code, event.state(), Event::time_msec(&event));
                 }
-                self.process_keyboard(code, event.state(), Event::time_msec(&event));
+            }
+            InputEvent::DeviceRemoved { device } => {
+                let released = self.physical_keys.remove_device(&device.id());
+                let time = self.start_time.elapsed().as_millis() as u32;
+                for code in released {
+                    self.process_keyboard(code.into(), KeyState::Released, time);
+                }
             }
             InputEvent::PointerMotion { event, .. } => {
                 let Some(pointer) = self.seat.get_pointer() else {

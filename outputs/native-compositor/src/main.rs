@@ -32,6 +32,7 @@ mod output_config;
 mod output_zoom;
 mod output_recovery;
 mod pointer_geometry;
+mod physical_keys;
 mod state;
 mod winit;
 

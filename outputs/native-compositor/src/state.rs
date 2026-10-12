@@ -37,7 +37,7 @@ pub struct Smallvil {
     pub active_launcher: Option<WlSurface>,
     pub shell_identity: Option<(u32, String)>,
     pub shell_return_focus: Option<WlSurface>,
-    pub physical_keys: std::collections::BTreeSet<u32>,
+    pub physical_keys: crate::physical_keys::PhysicalKeys,
     pub suppressed_keys: std::collections::BTreeSet<u32>,
     pub start_time: std::time::Instant,
     pub socket_name: OsString,

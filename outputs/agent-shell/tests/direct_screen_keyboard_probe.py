@@ -41,6 +41,8 @@ def verify(output, scene, target, snapshot, keyboard, pointer, wait):
         assert scene()['keyboard_pressed_count']==1,'OSK released a physical modifier'
     finally:
         keyboard.event(1,42,0);keyboard.sync()
+    import direct_multi_keyboard_probe
+    direct_multi_keyboard_probe.verify(scene,snapshot,keyboard,click,wait)
     keyboard.chord(29,30);keyboard.chord(14)
     wait(lambda value:value['text']=='')
     click('Hide keyboard')
