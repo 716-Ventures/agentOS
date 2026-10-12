@@ -41,6 +41,7 @@ class Device:
     def __init__(self,keyboard,motion_ready=None):
         self.motion_ready=motion_ready
         self.last_click=None
+        self.last_pointer_release=None
         self.fd=os.open('/dev/uinput',os.O_WRONLY|os.O_NONBLOCK)
         try:
             fcntl.ioctl(self.fd,0x40045564,1) # UI_SET_EVBIT EV_KEY
@@ -70,7 +71,14 @@ class Device:
         self.event(3,0,round(x*65535/width));self.event(3,1,round(y*65535/height));self.sync()
         if self.motion_ready:self.motion_ready(x,y)
         else:time.sleep(.1)
+        # libinput debounces switch bounce. Motion acknowledgement can be
+        # faster than that interval; adjacent zero-duration test clicks would
+        # otherwise collapse into one physical press/release.
+        if self.last_pointer_release is not None:
+            remaining=.04-(time.monotonic()-self.last_pointer_release)
+            if remaining>0:time.sleep(remaining)
         self.chord(button)
+        self.last_pointer_release=time.monotonic()
     def drag(self,start,end,width,height,observe=None):
         def move(x,y):
             self.event(3,0,round(x*65535/width));self.event(3,1,round(y*65535/height));self.sync()
