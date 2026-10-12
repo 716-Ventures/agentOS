@@ -1,0 +1,80 @@
+PASS: vm-tool-tests
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+PASS: cloud-init
+PASS: provision
+PASS: unit-suites
+PASS: integration
+PASS: activity_removal
+PASS: broker_integration
+PASS: broker_restart_guest
+PASS: broker_reuse_guest
+PASS: file_result_guest
+PASS: image_preview_guest
+PASS: write_transport_guest
+PASS: layout_guest
+PASS: work_lifecycle_guest
+PASS: terminal_guest
+PASS: terminal_screen_guest
+PASS: presentation_guest
+PASS: broker_sources_guest
+PASS: voice_guest
+PASS: native-build
+PASS: native-broker-pty
+PASS: native-installed-broker
+PASS: direct-backend-cleanup
+PASS: native-light-1
+PASS: native-light-2
+PASS: native-dark-1
+PASS: native-dark-2
+PASS: native-initial-request
+PASS: native-first-document
+PASS: native-queued-documents
+PASS: native-first-import
+PASS: native-small-display
+PASS: native-cpu-contention
+PASS: native-compositor
+PASS: native-shared-workspace
+PASS: native-session-logout
+PASS: native-session-system-bar
+PASS: native-session-ime
+PASS: native-session-ime-editor
+PASS: native-session-ime-failure
+PASS: native-session-screen-keyboard
+PASS: native-session-display-zoom
+PASS: native-session-screen-reader
+PASS: native-session-screen-reader-compositor-loss
+PASS: native-session-host-loss
+PASS: native-session-compositor-loss
+PASS: direct-display-input-vt
+PASS: direct-display-fresh-profile-input
+PASS: direct-display-screen-reader
+PASS: direct-display-list
+PASS: direct-display-keyvalue
+PASS: direct-display-table
+PASS: direct-display-terminal
+PASS: direct-display-terminal-ime
+Requested orderly guest shutdown. Check status before restarting.
+Evidence: /Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/reproduction.json
+Traceback (most recent call last):
+  File "/tmp/agentos-restoration-full70-v1.py", line 21, in <module>
+    runpy.run_path(sys.argv[0],run_name='__main__')
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/runpy.py", line 268, in run_path
+    return _run_module_code(code, init_globals, run_name,
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/runpy.py", line 97, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "outputs/vm-foundation/reproduce.py", line 138, in <module>
+    if __name__=='__main__':main()
+  File "outputs/vm-foundation/reproduce.py", line 97, in main
+    remote('cd /home/developer/agent-os-source && '+command,name,timeout)
+  File "outputs/vm-foundation/reproduce.py", line 82, in remote
+    def remote(command,name,timeout=180):local(vm.ssh_args()+[command],name,timeout)
+  File "outputs/vm-foundation/reproduce.py", line 80, in local
+    with path.open('w') as log:subprocess.run(args,stdout=log,stderr=subprocess.STDOUT,check=True,timeout=timeout)
+  File "/private/tmp/agentos_image_owned_utm.py", line 25, in run
+    return original_run(args,*positional,**kwargs)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ssh', '-p', '22221', '-i', '/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/id_ed25519', '-o', 'IdentitiesOnly=yes', '-o', 'StrictHostKeyChecking=accept-new', '-o', 'UserKnownHostsFile=/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/fresh-verification/known_hosts', '-o', 'ConnectTimeout=3', '-o', 'BatchMode=yes', '-o', 'LogLevel=ERROR', 'developer@127.0.0.1', 'cd /home/developer/agent-os-source && sudo -n python3 tests/direct_display_guest.py --native-feedback-load']' returned non-zero exit status 1.

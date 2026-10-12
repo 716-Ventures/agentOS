@@ -5728,7 +5728,33 @@
       "complete70_pending": true,
       "clean_final_four_mode_repeat_pending": true,
       "physical_hotplug_qualified": false,
-      "source_archive_sha256": "166589a51cad00d65255b6fddc32de7ed5ab4d0f4637d99c397ad70d682b22cc"
+      "source_archive_sha256": "166589a51cad00d65255b6fddc32de7ed5ab4d0f4637d99c397ad70d682b22cc",
+      "complete70_failed_run": {
+        "source_revision": "ea03ce6cd1557f066e912bac295407d7cfa6e79e",
+        "passed_checks": 54,
+        "failed_check": "direct-native-feedback-load",
+        "p95_ms": 58,
+        "limit_ms": 50,
+        "evidence_directory": "qualified-runs/ea03ce6-full70-loaded-latency-failure",
+        "historical_cause_established": false,
+        "unchanged_binary_comparison": "qualified-runs/restoration-latency-unchanged-ab"
+      }
+    },
+    "scene_snapshot_sharing": {
+      "runtime_release": "4c2a38f553aed8ec8d829c81911418319f06096b5f731b36293b6727a23d7e7a",
+      "source_archive_sha256": "869f5a2a7bf52b0c8ee5b0d1f3317b149c02d527f38c0380373c72505351b3dd",
+      "compositor_tests": 62,
+      "candidate_p95_ms": {
+        "loaded": [
+          40,
+          41
+        ],
+        "idle": 36,
+        "rotated": 44
+      },
+      "complete70_pending": true,
+      "evidence_directory": "qualified-runs/scene-sharing-targeted",
+      "owned_utm_closed": true
     }
   },
   "observations": [
@@ -5778,7 +5804,8 @@
     "Signed candidate-v22 passes fresh account/password sudo, compatible signed update/rollback, installed keyboard/zoom, collections, VTE/IME, typed button and form-validation accessibility, actual four-control Orca error/clear and Result/Error/Status job-update speech with selection, focus leases and clipboard preservation, browser, reboot, loopback-only cold boot and activation recovery at exact full70 runtime c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce (image SHA-256 56a74dd588b099ca600f31e591470d39c92bee35336573627998cb69ec7e58c0). Original disk/EFI inode identities and config bytes restored; test SSH/sudo authority and password file removed; owned guest/app stopped and unbooted signature reverified. Online and offline installed launcher reopens preserve the unsent draft and actual request speech after shortcut bursts. The failed v17 image, prior qualified v21/v19/v18/v16 images and unresolved historical observations remain distinct.",
     "A targeted virtual shell recovery journey on unchanged complete70 c57b60 production binaries preserves the same system bar, launcher and on-screen keyboard through primary removal, total display loss, secondary-first return and primary reconnection. Trusted pointer typing reaches the recovered launcher and then the original editor; unsent request/editor drafts, durable output preferences, balanced keys, focus return and released keyboard work-area reservation pass. The fixture also completes 60 named keyboard frames across both outputs after VT resume. Exact owned guest/app cleanup and original config/disk/EFI restoration pass. Test-only source changes are hash-recorded; a clean committed-source repeat is next. This does not qualify physical connector hotplug or per-output shell controls.",
     "Clean committed test source ec1faa2 repeats the live launcher/keyboard virtual connector recovery successfully on the unchanged qualified c57b60 runtime. All production-source bytes match the complete70 source; the four test/document differences and both archive identities are recorded. The same three host layer identities survive primary and total output loss, secondary-first recovery and primary reconnect. Trusted pointer typing, both drafts, durable preferences, editor focus return, balanced keys, keyboard work-area release, 60 named frames after VT resume and exact guest/app/config/disk/EFI cleanup pass. This qualifies synthetic launcher/keyboard layer migration; physical connector use and per-output shell controls remain unqualified.",
-    "Preferred display return now offers explicit restoration in Agent Monitor instead of moving the actively edited document. An independent negative baseline proves the old automatic movement; final candidate runtime e33cf49ba658e780eb61a23056a22e8b2974afa4d31ef294b662f92714a40410 passes 60 compositor tests and the actual kernel-pointer restoration journey, including retained geometry, draft, focus and typing plus same-user observer rejection. Recovery keeps new floating controls reachable. Stale topology, generation and pending activity switches reject old offers. A preceding candidate passes all four virtual KMS modes; complete70 on committed source and an exact final-source four-mode repeat remain pending. The qualified full70 runtime and signed v22 image remain c57b60; physical hardware, live providers and full reference conformance remain unqualified."
+    "Preferred display return now offers explicit restoration in Agent Monitor instead of moving the actively edited document. An independent negative baseline proves the old automatic movement; final candidate runtime e33cf49ba658e780eb61a23056a22e8b2974afa4d31ef294b662f92714a40410 passes 60 compositor tests and the actual kernel-pointer restoration journey, including retained geometry, draft, focus and typing plus same-user observer rejection. Recovery keeps new floating controls reachable. Stale topology, generation and pending activity switches reject old offers. A preceding candidate passes all four virtual KMS modes; complete70 on committed source and an exact final-source four-mode repeat remain pending. The qualified full70 runtime and signed v22 image remain c57b60; physical hardware, live providers and full reference conformance remain unqualified.",
+    "Clean ea03ce6 full qualification stopped after 54 passing checks at loaded editor p95 58 ms against the unchanged 50 ms target. That failure and unchanged-binary comparisons are retained; old and candidate runtimes both showed timing variance, so the historical cause remains unestablished. Immutable shared compositor scenes now avoid copying retained workspace history during arrangement and input reads. All 62 compositor tests pass; targeted candidate runtime 4c2a38 records loaded p95 40/41 ms, idle 36 ms and rotated 44 ms with all 80 candidate presentation receipts complete. Exact owned cleanup and original VM configuration/disk identities pass. Clean committed-source full70 and four-mode output restoration qualification remain pending; the qualified full70 and signed v22 runtime remain c57b60."
   ],
   "owned_utm_app_closed": true,
   "full_run_evidence": {

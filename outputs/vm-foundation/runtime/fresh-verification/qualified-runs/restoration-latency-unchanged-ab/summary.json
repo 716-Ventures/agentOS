@@ -1,0 +1,184 @@
+{
+  "meaning": "Alternating unchanged old c57b60 and candidate e33cf4 native binaries use the identical core under the same two broker CPU jobs. Loaded p95 old52/new51/new45/old42 ms; candidate idle48/rotated49 ms. The original58ms complete-run cause remains unestablished; these results do not support attributing it specifically to restoration. A separate render-thread full-history copy is proven by source and optimized independently.",
+  "measurements": {
+    "source_revision": "ea03ce6cd1557f066e912bac295407d7cfa6e79e",
+    "source_clean": true,
+    "measurements": {
+      "old_runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
+      "candidate_runtime": "e33cf49ba658e780eb61a23056a22e8b2974afa4d31ef294b662f92714a40410",
+      "unchanged_core": "27607a58076d3b567bf6106112c2d1246165709b0551b8dc859cd41c8ba36432",
+      "cases": [
+        {
+          "runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
+          "profile": "load",
+          "returncode": 1,
+          "measurement": {
+            "clock_id": 1,
+            "discarded": 0,
+            "format": 1,
+            "invalid": 0,
+            "max_ms": 56,
+            "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+            "p50_ms": 36,
+            "p95_ms": 52,
+            "pending": 0,
+            "presented": 20,
+            "requested": 20,
+            "sample_limit": 256,
+            "profile": "two concurrent broker CPU jobs",
+            "job_cpu_usage_usec": [
+              2366506,
+              2431904
+            ],
+            "measurement_seconds": 3.006,
+            "completed_frames_between_observer_snapshots": 156,
+            "input_frame_wakeups_between_observer_snapshots": 19
+          }
+        },
+        {
+          "runtime": "e33cf49ba658e780eb61a23056a22e8b2974afa4d31ef294b662f92714a40410",
+          "profile": "load",
+          "returncode": 1,
+          "measurement": {
+            "clock_id": 1,
+            "discarded": 0,
+            "format": 1,
+            "invalid": 0,
+            "max_ms": 51,
+            "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+            "p50_ms": 35,
+            "p95_ms": 51,
+            "pending": 0,
+            "presented": 20,
+            "requested": 20,
+            "sample_limit": 256,
+            "profile": "two concurrent broker CPU jobs",
+            "job_cpu_usage_usec": [
+              1885234,
+              1911580
+            ],
+            "measurement_seconds": 2.547,
+            "completed_frames_between_observer_snapshots": 122,
+            "input_frame_wakeups_between_observer_snapshots": 18
+          }
+        },
+        {
+          "runtime": "e33cf49ba658e780eb61a23056a22e8b2974afa4d31ef294b662f92714a40410",
+          "profile": "load",
+          "returncode": 0,
+          "measurement": {
+            "clock_id": 1,
+            "discarded": 0,
+            "format": 1,
+            "invalid": 0,
+            "max_ms": 56,
+            "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+            "p50_ms": 32,
+            "p95_ms": 45,
+            "pending": 0,
+            "presented": 20,
+            "requested": 20,
+            "sample_limit": 256,
+            "profile": "two concurrent broker CPU jobs",
+            "job_cpu_usage_usec": [
+              1895804,
+              1851332
+            ],
+            "measurement_seconds": 2.509,
+            "completed_frames_between_observer_snapshots": 116,
+            "input_frame_wakeups_between_observer_snapshots": 16
+          }
+        },
+        {
+          "runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
+          "profile": "load",
+          "returncode": 0,
+          "measurement": {
+            "clock_id": 1,
+            "discarded": 0,
+            "format": 1,
+            "invalid": 0,
+            "max_ms": 44,
+            "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+            "p50_ms": 32,
+            "p95_ms": 42,
+            "pending": 0,
+            "presented": 20,
+            "requested": 20,
+            "sample_limit": 256,
+            "profile": "two concurrent broker CPU jobs",
+            "job_cpu_usage_usec": [
+              2494213,
+              2368255
+            ],
+            "measurement_seconds": 3.14,
+            "completed_frames_between_observer_snapshots": 160,
+            "input_frame_wakeups_between_observer_snapshots": 15
+          }
+        },
+        {
+          "runtime": "e33cf49ba658e780eb61a23056a22e8b2974afa4d31ef294b662f92714a40410",
+          "profile": "idle",
+          "returncode": 0,
+          "measurement": {
+            "clock_id": 1,
+            "discarded": 0,
+            "format": 1,
+            "invalid": 0,
+            "max_ms": 57,
+            "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+            "p50_ms": 37,
+            "p95_ms": 48,
+            "pending": 0,
+            "presented": 20,
+            "requested": 20,
+            "sample_limit": 256,
+            "profile": "idle editor",
+            "measurement_seconds": 3.099,
+            "completed_frames_between_observer_snapshots": 173,
+            "input_frame_wakeups_between_observer_snapshots": 19
+          }
+        },
+        {
+          "runtime": "e33cf49ba658e780eb61a23056a22e8b2974afa4d31ef294b662f92714a40410",
+          "profile": "rotated",
+          "returncode": 0,
+          "measurement": {
+            "clock_id": 1,
+            "discarded": 0,
+            "format": 1,
+            "invalid": 0,
+            "max_ms": 50,
+            "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+            "p50_ms": 34,
+            "p95_ms": 49,
+            "pending": 0,
+            "presented": 20,
+            "requested": 20,
+            "sample_limit": 256,
+            "profile": "idle editor",
+            "measurement_seconds": 3.14,
+            "completed_frames_between_observer_snapshots": 183,
+            "input_frame_wakeups_between_observer_snapshots": 18
+          }
+        }
+      ]
+    },
+    "owned_utm_closed": true,
+    "original_config_unchanged": true,
+    "original_disk_efi_inodes_preserved": true
+  },
+  "files_sha256": {
+    "agentos-restore-latency-ab-v1-1.log.gz": "4fda38740541ef57b4bd50f7133de4335d3d4f16e8e268b1ce0a9c71fa6db4ea",
+    "agentos-restore-latency-ab-v1-driver.json": "aa8e4d10aab7858b4a6f2d6c576dac85e39ca912570b58fba149a47451a94aa7",
+    "agentos-restore-latency-ab-v1.json": "dd288e51ec41874275083f90037ad8b69a3af094c2bc7b828ce405df3d21e449",
+    "agentos-restore-latency-ab-v1-3.log.gz": "68f7428218028933cc9957d2c0479034393247981b284bd6e73c1f7284450e9f",
+    "agentos-restore-latency-ab-v1-5.log.gz": "9dd684ed7a53391f529b9108a4e846338dde656ca7b983c15bc0b605763c0960",
+    "agentos-restore-latency-ab-v1-0.log.gz": "bff87d8cbc84cd80005ce1a79cccc53f8a7a813fb41c1b275f15150c8aa0d0f8",
+    "agentos-restore-latency-ab-v1-2.log.gz": "78927a74d13e0a97a6d025faf83b70669d651eccd3f9d4097322de35fb257d26",
+    "agentos-restore-latency-ab-v1.py": "11990099bff19468a5dac3c27c71579e56cb0ea939a966d229d2f5a7d3b76b08",
+    "agentos-restore-latency-ab-v1-guest.log.gz": "17b57e2b98a830dcc0b5817141b9c9df29df7fa286faf0f32e78d19b2db6dcb4",
+    "agentos-restore-latency-ab-v1-driver.log.gz": "ccf90c80f9ba29e3b4e55d7dde54718d1c124d05fea5adf81cae66833527190e",
+    "agentos-restore-latency-ab-v1-4.log.gz": "00b03c2a8fb32b3b0db4f00af1098c4b10f9ca49c6783668b1eccf46b4879f3e"
+  }
+}

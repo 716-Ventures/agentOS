@@ -180,7 +180,7 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
                 let scene = state
                     .bridge
                     .as_ref()
-                    .map(|b| b.scene.lock().unwrap().clone());
+                    .map(|b| b.scene.snapshot());
                 let seat_focus = state
                     .seat
                     .get_keyboard()

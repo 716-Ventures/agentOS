@@ -215,7 +215,7 @@ impl Smallvil {
 
     fn view_area(&self, id: &str) -> Option<smithay::utils::Rectangle<i32, Logical>> {
         if let Some(bridge) = &self.bridge {
-            let scene = bridge.scene.lock().unwrap();
+            let scene = bridge.scene.snapshot();
             if let Some(area) = scene
                 .surface_outputs
                 .get(id)
@@ -238,9 +238,7 @@ impl Smallvil {
             .as_ref()
             .ok_or("Shared compositor required")?
             .scene
-            .lock()
-            .unwrap()
-            .clone();
+            .snapshot();
         let rect = scene.rectangles.get(id).ok_or("Visible view required")?;
         let area = self.view_area(id).ok_or("Output unavailable")?;
         let offset = self.viewport_offsets.entry(id.into()).or_default();
@@ -276,7 +274,7 @@ impl Smallvil {
             return;
         }
         let Some(bridge) = &self.bridge else { return };
-        let scene = bridge.scene.lock().unwrap().clone();
+        let scene = bridge.scene.snapshot();
         let ids = scene.visible.iter().cloned().collect::<Vec<_>>();
         if ids.is_empty() {
             return;
@@ -418,7 +416,7 @@ impl Smallvil {
         let mut placements = self.policy.arrange(area);
         let mut maximized = std::collections::BTreeSet::new();
         if let Some(bridge) = &self.bridge {
-            let scene = bridge.scene.lock().unwrap().clone();
+            let scene = bridge.scene.snapshot();
             for id in scene
                 .identities
                 .keys()
@@ -445,8 +443,8 @@ impl Smallvil {
                     },
                 );
             }
-            maximized = scene.maximized;
-            placements.extend(scene.rectangles);
+            maximized = scene.maximized.clone();
+            placements.extend(scene.rectangles.iter().map(|(id,rect)|(id.clone(),*rect)));
             for (id, preview) in bridge
                 .previews
                 .lock()

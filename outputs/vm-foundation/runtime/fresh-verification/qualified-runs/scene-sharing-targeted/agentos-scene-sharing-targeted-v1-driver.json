@@ -1,0 +1,180 @@
+{
+  "source_revision": "ea03ce6cd1557f066e912bac295407d7cfa6e79e",
+  "source_clean": false,
+  "deployment": {
+    "created_at": "2026-10-12T06:50:40.062052+00:00",
+    "source_archive_sha256": "869f5a2a7bf52b0c8ee5b0d1f3317b149c02d527f38c0380373c72505351b3dd",
+    "repository_revision": "ea03ce6cd1557f066e912bac295407d7cfa6e79e",
+    "source_changes": [
+      " M outputs/native-compositor/src/bridge.rs",
+      " M outputs/native-compositor/src/control.rs",
+      " M outputs/native-compositor/src/state.rs"
+    ],
+    "installed": true
+  },
+  "installed_runtime": "4c2a38f553aed8ec8d829c81911418319f06096b5f731b36293b6727a23d7e7a",
+  "measurements": {
+    "old_runtime": "e33cf49ba658e780eb61a23056a22e8b2974afa4d31ef294b662f92714a40410",
+    "candidate_runtime": "4c2a38f553aed8ec8d829c81911418319f06096b5f731b36293b6727a23d7e7a",
+    "unchanged_core": "27607a58076d3b567bf6106112c2d1246165709b0551b8dc859cd41c8ba36432",
+    "cases": [
+      {
+        "runtime": "e33cf49ba658e780eb61a23056a22e8b2974afa4d31ef294b662f92714a40410",
+        "profile": "load",
+        "returncode": 1,
+        "measurement": {
+          "clock_id": 1,
+          "discarded": 0,
+          "format": 1,
+          "invalid": 0,
+          "max_ms": 61,
+          "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+          "p50_ms": 39,
+          "p95_ms": 52,
+          "pending": 0,
+          "presented": 20,
+          "requested": 20,
+          "sample_limit": 256,
+          "profile": "two concurrent broker CPU jobs",
+          "job_cpu_usage_usec": [
+            1803124,
+            1719440
+          ],
+          "measurement_seconds": 2.339,
+          "completed_frames_between_observer_snapshots": 94,
+          "input_frame_wakeups_between_observer_snapshots": 19
+        }
+      },
+      {
+        "runtime": "4c2a38f553aed8ec8d829c81911418319f06096b5f731b36293b6727a23d7e7a",
+        "profile": "load",
+        "returncode": 0,
+        "measurement": {
+          "clock_id": 1,
+          "discarded": 0,
+          "format": 1,
+          "invalid": 0,
+          "max_ms": 42,
+          "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+          "p50_ms": 32,
+          "p95_ms": 40,
+          "pending": 0,
+          "presented": 20,
+          "requested": 20,
+          "sample_limit": 256,
+          "profile": "two concurrent broker CPU jobs",
+          "job_cpu_usage_usec": [
+            1848359,
+            1848525
+          ],
+          "measurement_seconds": 2.358,
+          "completed_frames_between_observer_snapshots": 128,
+          "input_frame_wakeups_between_observer_snapshots": 17
+        }
+      },
+      {
+        "runtime": "4c2a38f553aed8ec8d829c81911418319f06096b5f731b36293b6727a23d7e7a",
+        "profile": "load",
+        "returncode": 0,
+        "measurement": {
+          "clock_id": 1,
+          "discarded": 0,
+          "format": 1,
+          "invalid": 0,
+          "max_ms": 49,
+          "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+          "p50_ms": 35,
+          "p95_ms": 41,
+          "pending": 0,
+          "presented": 20,
+          "requested": 20,
+          "sample_limit": 256,
+          "profile": "two concurrent broker CPU jobs",
+          "job_cpu_usage_usec": [
+            2132823,
+            2063809
+          ],
+          "measurement_seconds": 2.632,
+          "completed_frames_between_observer_snapshots": 143,
+          "input_frame_wakeups_between_observer_snapshots": 18
+        }
+      },
+      {
+        "runtime": "e33cf49ba658e780eb61a23056a22e8b2974afa4d31ef294b662f92714a40410",
+        "profile": "load",
+        "returncode": 0,
+        "measurement": {
+          "clock_id": 1,
+          "discarded": 0,
+          "format": 1,
+          "invalid": 0,
+          "max_ms": 55,
+          "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+          "p50_ms": 38,
+          "p95_ms": 50,
+          "pending": 0,
+          "presented": 20,
+          "requested": 20,
+          "sample_limit": 256,
+          "profile": "two concurrent broker CPU jobs",
+          "job_cpu_usage_usec": [
+            2203278,
+            2299385
+          ],
+          "measurement_seconds": 2.799,
+          "completed_frames_between_observer_snapshots": 148,
+          "input_frame_wakeups_between_observer_snapshots": 19
+        }
+      },
+      {
+        "runtime": "4c2a38f553aed8ec8d829c81911418319f06096b5f731b36293b6727a23d7e7a",
+        "profile": "idle",
+        "returncode": 0,
+        "measurement": {
+          "clock_id": 1,
+          "discarded": 0,
+          "format": 1,
+          "invalid": 0,
+          "max_ms": 42,
+          "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+          "p50_ms": 31,
+          "p95_ms": 36,
+          "pending": 0,
+          "presented": 20,
+          "requested": 20,
+          "sample_limit": 256,
+          "profile": "idle editor",
+          "measurement_seconds": 2.985,
+          "completed_frames_between_observer_snapshots": 192,
+          "input_frame_wakeups_between_observer_snapshots": 19
+        }
+      },
+      {
+        "runtime": "4c2a38f553aed8ec8d829c81911418319f06096b5f731b36293b6727a23d7e7a",
+        "profile": "rotated",
+        "returncode": 0,
+        "measurement": {
+          "clock_id": 1,
+          "discarded": 0,
+          "format": 1,
+          "invalid": 0,
+          "max_ms": 44,
+          "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+          "p50_ms": 32,
+          "p95_ms": 44,
+          "pending": 0,
+          "presented": 20,
+          "requested": 20,
+          "sample_limit": 256,
+          "profile": "idle editor",
+          "measurement_seconds": 2.968,
+          "completed_frames_between_observer_snapshots": 188,
+          "input_frame_wakeups_between_observer_snapshots": 20
+        }
+      }
+    ]
+  },
+  "owned_utm_closed": true,
+  "original_config_unchanged": true,
+  "original_disk_efi_inodes_preserved": true
+}

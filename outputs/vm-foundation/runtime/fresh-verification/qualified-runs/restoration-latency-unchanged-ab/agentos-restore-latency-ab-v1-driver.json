@@ -1,0 +1,168 @@
+{
+  "source_revision": "ea03ce6cd1557f066e912bac295407d7cfa6e79e",
+  "source_clean": true,
+  "measurements": {
+    "old_runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
+    "candidate_runtime": "e33cf49ba658e780eb61a23056a22e8b2974afa4d31ef294b662f92714a40410",
+    "unchanged_core": "27607a58076d3b567bf6106112c2d1246165709b0551b8dc859cd41c8ba36432",
+    "cases": [
+      {
+        "runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
+        "profile": "load",
+        "returncode": 1,
+        "measurement": {
+          "clock_id": 1,
+          "discarded": 0,
+          "format": 1,
+          "invalid": 0,
+          "max_ms": 56,
+          "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+          "p50_ms": 36,
+          "p95_ms": 52,
+          "pending": 0,
+          "presented": 20,
+          "requested": 20,
+          "sample_limit": 256,
+          "profile": "two concurrent broker CPU jobs",
+          "job_cpu_usage_usec": [
+            2366506,
+            2431904
+          ],
+          "measurement_seconds": 3.006,
+          "completed_frames_between_observer_snapshots": 156,
+          "input_frame_wakeups_between_observer_snapshots": 19
+        }
+      },
+      {
+        "runtime": "e33cf49ba658e780eb61a23056a22e8b2974afa4d31ef294b662f92714a40410",
+        "profile": "load",
+        "returncode": 1,
+        "measurement": {
+          "clock_id": 1,
+          "discarded": 0,
+          "format": 1,
+          "invalid": 0,
+          "max_ms": 51,
+          "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+          "p50_ms": 35,
+          "p95_ms": 51,
+          "pending": 0,
+          "presented": 20,
+          "requested": 20,
+          "sample_limit": 256,
+          "profile": "two concurrent broker CPU jobs",
+          "job_cpu_usage_usec": [
+            1885234,
+            1911580
+          ],
+          "measurement_seconds": 2.547,
+          "completed_frames_between_observer_snapshots": 122,
+          "input_frame_wakeups_between_observer_snapshots": 18
+        }
+      },
+      {
+        "runtime": "e33cf49ba658e780eb61a23056a22e8b2974afa4d31ef294b662f92714a40410",
+        "profile": "load",
+        "returncode": 0,
+        "measurement": {
+          "clock_id": 1,
+          "discarded": 0,
+          "format": 1,
+          "invalid": 0,
+          "max_ms": 56,
+          "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+          "p50_ms": 32,
+          "p95_ms": 45,
+          "pending": 0,
+          "presented": 20,
+          "requested": 20,
+          "sample_limit": 256,
+          "profile": "two concurrent broker CPU jobs",
+          "job_cpu_usage_usec": [
+            1895804,
+            1851332
+          ],
+          "measurement_seconds": 2.509,
+          "completed_frames_between_observer_snapshots": 116,
+          "input_frame_wakeups_between_observer_snapshots": 16
+        }
+      },
+      {
+        "runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
+        "profile": "load",
+        "returncode": 0,
+        "measurement": {
+          "clock_id": 1,
+          "discarded": 0,
+          "format": 1,
+          "invalid": 0,
+          "max_ms": 44,
+          "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+          "p50_ms": 32,
+          "p95_ms": 42,
+          "pending": 0,
+          "presented": 20,
+          "requested": 20,
+          "sample_limit": 256,
+          "profile": "two concurrent broker CPU jobs",
+          "job_cpu_usage_usec": [
+            2494213,
+            2368255
+          ],
+          "measurement_seconds": 3.14,
+          "completed_frames_between_observer_snapshots": 160,
+          "input_frame_wakeups_between_observer_snapshots": 15
+        }
+      },
+      {
+        "runtime": "e33cf49ba658e780eb61a23056a22e8b2974afa4d31ef294b662f92714a40410",
+        "profile": "idle",
+        "returncode": 0,
+        "measurement": {
+          "clock_id": 1,
+          "discarded": 0,
+          "format": 1,
+          "invalid": 0,
+          "max_ms": 57,
+          "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+          "p50_ms": 37,
+          "p95_ms": 48,
+          "pending": 0,
+          "presented": 20,
+          "requested": 20,
+          "sample_limit": 256,
+          "profile": "idle editor",
+          "measurement_seconds": 3.099,
+          "completed_frames_between_observer_snapshots": 173,
+          "input_frame_wakeups_between_observer_snapshots": 19
+        }
+      },
+      {
+        "runtime": "e33cf49ba658e780eb61a23056a22e8b2974afa4d31ef294b662f92714a40410",
+        "profile": "rotated",
+        "returncode": 0,
+        "measurement": {
+          "clock_id": 1,
+          "discarded": 0,
+          "format": 1,
+          "invalid": 0,
+          "max_ms": 50,
+          "meaning": "Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification",
+          "p50_ms": 34,
+          "p95_ms": 49,
+          "pending": 0,
+          "presented": 20,
+          "requested": 20,
+          "sample_limit": 256,
+          "profile": "idle editor",
+          "measurement_seconds": 3.14,
+          "completed_frames_between_observer_snapshots": 183,
+          "input_frame_wakeups_between_observer_snapshots": 18
+        }
+      }
+    ]
+  },
+  "owned_utm_closed": true,
+  "original_config_unchanged": true,
+  "original_disk_efi_inodes_preserved": true
+}

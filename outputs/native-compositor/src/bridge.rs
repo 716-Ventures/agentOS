@@ -41,6 +41,26 @@ pub struct Scene {
     pub overview: Value,
     pub visible: BTreeSet<String>,
 }
+/// Immutable published scenes keep workspace history off the render thread's
+/// copy path. Readers retain one consistent revision while the worker publishes
+/// its successor; only explicit diagnostic errors use copy-on-write.
+#[derive(Clone, Default)]
+pub struct SceneStore(Arc<Mutex<Arc<Scene>>>);
+impl SceneStore {
+    pub fn snapshot(&self) -> Arc<Scene> {
+        self.0.lock().unwrap().clone()
+    }
+    fn publish(&self, scene: Scene) {
+        let next=Arc::new(scene);
+        let retired=std::mem::replace(&mut *self.0.lock().unwrap(),next);
+        // Destruction of a large old history must not hold up a snapshot reader.
+        drop(retired);
+    }
+    fn set_error(&self, error: String) {
+        Arc::make_mut(&mut *self.0.lock().unwrap()).error=Some(error);
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OutputObservation {
     pub id: String,
@@ -107,7 +127,7 @@ fn project_outputs(
 }
 pub struct Bridge {
     observation: Arc<Mutex<Option<Observation>>>,
-    pub scene: Arc<Mutex<Scene>>,
+    pub scene: SceneStore,
     pub commands: SyncSender<Request>,
     stop: Arc<AtomicBool>,
     last_input: Arc<AtomicI64>,
@@ -117,7 +137,7 @@ pub struct Bridge {
 impl Bridge {
     pub fn start(socket: PathBuf) -> Self {
         let observation = Arc::new(Mutex::new(None::<Observation>));
-        let scene = Arc::new(Mutex::new(Scene::default()));
+        let scene = SceneStore::default();
         let stop = Arc::new(AtomicBool::new(false));
         let (commands, rx) = mpsc::sync_channel::<Request>(32);
         let (input, output, stopping) = (observation.clone(), scene.clone(), stop.clone());
@@ -153,7 +173,7 @@ impl Bridge {
                     if req.expired() {
                         continue;
                     }
-                    let scene = output.lock().unwrap().clone();
+                    let scene = output.snapshot();
                     let result = if let Some(result) = grabs.handle(&socket, &scene, &req.value) {
                         result
                     } else {
@@ -218,7 +238,7 @@ impl Bridge {
                     }
                     if let Err(e) = &result {
                         input_error = Some((e.clone(), std::time::Instant::now()));
-                        output.lock().unwrap().error = Some(e.clone());
+                        output.set_error(e.clone());
                     }
                     let response = match result {
                         Ok(value) => json!({"ok":true,"result":value}),
@@ -476,8 +496,8 @@ impl Bridge {
                         Ok(next)
                     })();
                     match result {
-                        Ok(next) => *output.lock().unwrap() = next,
-                        Err(e) => output.lock().unwrap().error = Some(e),
+                        Ok(next) => output.publish(next),
+                        Err(e) => output.set_error(e),
                     }
                 }
                 thread::sleep(Duration::from_millis(100));
@@ -501,7 +521,7 @@ impl Bridge {
     pub fn undo_input(&self) {
         let cursor = self.last_input.load(Ordering::Relaxed);
         if cursor <= 0 {
-            self.scene.lock().unwrap().error = Some("No desktop arrangement to undo".into());
+            self.scene.set_error("No desktop arrangement to undo".into());
             return;
         }
         let stamp = std::time::SystemTime::now()
@@ -510,7 +530,7 @@ impl Bridge {
             .as_nanos();
         let (reply, _) = mpsc::sync_channel(1);
         if self.commands.try_send(Request {peer_pid:None,value:json!({"op":"workspace.undo","event_cursor":cursor,"request_id":format!("keyboard-undo-{}-{stamp}",std::process::id())}),reply,deadline:None}).is_err() {
-            self.scene.lock().unwrap().error=Some("Workspace input queue busy".into());
+            self.scene.set_error("Workspace input queue busy".into());
         }
     }
     pub fn begin_grab(&self, runtime: &str, rect: Rect) {
@@ -547,11 +567,11 @@ impl Bridge {
             .is_err()
         {
             self.previews.lock().unwrap().remove(runtime);
-            self.scene.lock().unwrap().error = Some("Pointer interaction queue busy".into());
+            self.scene.set_error("Pointer interaction queue busy".into());
         }
     }
     pub fn input(&self, runtime: &str, mut edit: Value) {
-        let scene = self.scene.lock().unwrap().clone();
+        let scene = self.scene.snapshot();
         let Some(surface) = scene.identities.get(runtime) else {
             return;
         };
@@ -566,7 +586,7 @@ impl Bridge {
         };
         if edit["kind"] == "float" {
             if let Err(error) = localize_edit(&scene, &mut edit) {
-                self.scene.lock().unwrap().error = Some(error);
+                self.scene.set_error(error);
                 return;
             }
         }
@@ -590,8 +610,7 @@ impl Bridge {
             })
             .is_err()
         {
-            self.scene.lock().unwrap().error =
-                Some("Workspace input queue busy; refresh before retrying".into());
+            self.scene.set_error("Workspace input queue busy; refresh before retrying".into());
         }
     }
     pub fn observe(&self, windows: Vec<Observed>, outputs: Vec<OutputObservation>) {
@@ -940,6 +959,34 @@ mod tests {
         )
         .is_null());
         assert_eq!(rectangles, saved);
+    }
+    #[test]
+    fn published_scenes_share_history_and_keep_each_readers_revision_consistent() {
+        let store=SceneStore::default();
+        store.publish(Scene {focus:Some("editor".into()),workspaces:json!({"revision":1,"draft":"retained"}),..Scene::default()});
+        let original=store.snapshot();
+        assert!(Arc::ptr_eq(&original,&store.snapshot()),"Reading a scene must not copy its workspace history");
+        store.publish(Scene {focus:Some("monitor".into()),workspaces:json!({"revision":2,"draft":"retained"}),..Scene::default()});
+        let successor=store.snapshot();
+        assert!(!Arc::ptr_eq(&original,&successor));
+        assert_eq!(original.focus.as_deref(),Some("editor"));
+        assert_eq!(original.workspaces["revision"],1);
+        assert_eq!(successor.workspaces["revision"],2);
+        store.set_error("Queue busy".into());
+        assert!(successor.error.is_none(),"Error publication must not mutate an in-flight scene");
+        assert_eq!(store.snapshot().error.as_deref(),Some("Queue busy"));
+        assert_eq!(store.snapshot().focus.as_deref(),Some("monitor"));
+    }
+    #[test]
+    fn snapshot_cost_does_not_copy_retained_workspace_history() {
+        let workspaces=(0..1000).map(|i|(format!("workspace-{i}"),json!({"revision":i,"constraints":"x".repeat(1024)}))).collect::<serde_json::Map<_,_>>();
+        let store=SceneStore::default();store.publish(Scene{workspaces:Value::Object(workspaces),..Scene::default()});
+        let original=store.snapshot();
+        let start=std::time::Instant::now();
+        for _ in 0..64 {std::hint::black_box((*original).clone());}
+        let old=start.elapsed();let start=std::time::Instant::now();
+        for _ in 0..64 {let current=store.snapshot();assert!(Arc::ptr_eq(&original,&current));std::hint::black_box(current);}
+        println!("Scene history copy diagnostic: old_64_deep_copies_us={} shared_64_snapshots_us={}",old.as_micros(),start.elapsed().as_micros());
     }
     #[test]
     fn recovery_keeps_new_floating_controls_reachable_above_original_work() {
