@@ -1,0 +1,105 @@
+{
+  "offline_status_reader_qualified": true,
+  "offline_status_raw_speech_sha256": "a07fa05419887f735998727550d7db418b691ec3e8b6e1e1247c3d9ba0eb99ca",
+  "offline_status_announcement_speech": [
+    "01:01:18.402401 - SPEECH OUTPUT: 'failed'{'established': 'False'}"
+  ],
+  "offline_launcher_request_announcements": 10,
+  "offline_launcher_raw_speech_sha256": "e5d114baea888a414e7003ef30982e73b4d21ac191cdc4a99a8f87fe37362b1e",
+  "result": "pass",
+  "before": {
+    "result": "pass",
+    "boot_id": "d031f877-592f-4dad-8bb2-d6b589ec9ab6",
+    "runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
+    "uid": 1000,
+    "activity": 1,
+    "file_persisted": true,
+    "healthy_services": [
+      "active",
+      "active",
+      "active",
+      "active",
+      "active",
+      "active"
+    ],
+    "network_interfaces": [
+      "lo",
+      "enp0s1"
+    ]
+  },
+  "reboot": {
+    "result": "pass",
+    "boot_id": "cc5a2b19-ee05-4041-913c-791414c8ba04",
+    "runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
+    "uid": 1000,
+    "activity": 1,
+    "file_persisted": true,
+    "healthy_services": [
+      "active",
+      "active",
+      "active",
+      "active",
+      "active",
+      "active"
+    ],
+    "network_interfaces": [
+      "lo",
+      "enp0s1"
+    ]
+  },
+  "offline": {
+    "result": "pass",
+    "boot_id": "74ae87bb-b1a7-469b-b235-1afc9b1a6e67",
+    "runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
+    "uid": 1000,
+    "activity": 1,
+    "file_persisted": true,
+    "healthy_services": [
+      "active",
+      "active",
+      "active",
+      "active",
+      "active",
+      "active"
+    ],
+    "network_interfaces": [
+      "lo"
+    ]
+  },
+  "activation_resume": {
+    "result": "pass",
+    "checks": [
+      "real activation failure retains setup journal",
+      "TTY 2 rescue remains active",
+      "resume preserves account UID and password",
+      "ready only after healthy activation",
+      "all six services recover without models or network"
+    ]
+  },
+  "offline_browser": {
+    "result": "pass",
+    "checks": [
+      "system HTTP/HTTPS handler",
+      "actual native Link action",
+      "GIO launch with isolated profile",
+      "real Firefox local page retrieval and title",
+      "conventional shared identity",
+      "durable focus/maximize",
+      "browser disconnect"
+    ],
+    "not_tested": [
+      "physical input",
+      "remote website compatibility",
+      "hardware acceleration",
+      "mailto account/client"
+    ],
+    "firefox_debian_version": "153.4.0esr-1~deb13u1",
+    "installed_executables": true,
+    "cleanup_verified": true
+  },
+  "offline_screen_reader_qualified": true,
+  "offline_display_zoom_and_keyboard_qualified": true,
+  "final_offline_runtime": "b0f51bf0bbb2a6859b977fb836c4341558423a0f53f97407471172bb0cef5679",
+  "development_disk_restored": true,
+  "guest_stopped": true
+}
