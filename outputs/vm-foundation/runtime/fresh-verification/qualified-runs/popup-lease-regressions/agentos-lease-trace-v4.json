@@ -1,0 +1,18 @@
+{
+  "original_runtime": "4c2a38f553aed8ec8d829c81911418319f06096b5f731b36293b6727a23d7e7a",
+  "instrumentation_only": true,
+  "cases": [
+    {
+      "mode": "--list-input",
+      "returncode": 0
+    },
+    {
+      "mode": "--table-input",
+      "returncode": 0
+    },
+    {
+      "mode": "--keyvalue-input",
+      "returncode": 0
+    }
+  ]
+}

@@ -5754,6 +5754,30 @@
       },
       "complete70_pending": true,
       "evidence_directory": "qualified-runs/scene-sharing-targeted",
+      "owned_utm_closed": true,
+      "complete70_failed_run": {
+        "source_revision": "a45fb85d44fd7e4d4bf896bb53651a0a8970839d",
+        "passed_checks": 49,
+        "failed_check": "direct-display-list",
+        "evidence_directory": "qualified-runs/a45fb85-full70-focused-list-failure",
+        "private_ci_run": 38215136743,
+        "private_ci_result": "success",
+        "owned_utm_closed": true
+      }
+    },
+    "mapped_copy_popup_lease": {
+      "evidence_directory": "qualified-runs/popup-lease-regressions",
+      "targeted_runtime": "9a443d1ee0b2c9b13c920a1dd46165c409f0388f4fa4fa194df697ac74cb3996",
+      "targeted_source_archive_sha256": "ac0c70e9247f67a13821a455f7635b7b17d3fc1c8884cb54061f9da47f7b067d",
+      "native_rust_tests": {
+        "passed": 36,
+        "ignored": 7
+      },
+      "native_renderer_and_three_installed_collection_journeys": "pass",
+      "same_final_fixture_old_handler": "MAPPED_COPY_POPUP_LOST_LEASE",
+      "same_final_fixture_new_handler": "pass",
+      "complete70_pending": true,
+      "historical_failed_run_cause_proven": false,
       "owned_utm_closed": true
     }
   },
@@ -5805,7 +5829,8 @@
     "A targeted virtual shell recovery journey on unchanged complete70 c57b60 production binaries preserves the same system bar, launcher and on-screen keyboard through primary removal, total display loss, secondary-first return and primary reconnection. Trusted pointer typing reaches the recovered launcher and then the original editor; unsent request/editor drafts, durable output preferences, balanced keys, focus return and released keyboard work-area reservation pass. The fixture also completes 60 named keyboard frames across both outputs after VT resume. Exact owned guest/app cleanup and original config/disk/EFI restoration pass. Test-only source changes are hash-recorded; a clean committed-source repeat is next. This does not qualify physical connector hotplug or per-output shell controls.",
     "Clean committed test source ec1faa2 repeats the live launcher/keyboard virtual connector recovery successfully on the unchanged qualified c57b60 runtime. All production-source bytes match the complete70 source; the four test/document differences and both archive identities are recorded. The same three host layer identities survive primary and total output loss, secondary-first recovery and primary reconnect. Trusted pointer typing, both drafts, durable preferences, editor focus return, balanced keys, keyboard work-area release, 60 named frames after VT resume and exact guest/app/config/disk/EFI cleanup pass. This qualifies synthetic launcher/keyboard layer migration; physical connector use and per-output shell controls remain unqualified.",
     "Preferred display return now offers explicit restoration in Agent Monitor instead of moving the actively edited document. An independent negative baseline proves the old automatic movement; final candidate runtime e33cf49ba658e780eb61a23056a22e8b2974afa4d31ef294b662f92714a40410 passes 60 compositor tests and the actual kernel-pointer restoration journey, including retained geometry, draft, focus and typing plus same-user observer rejection. Recovery keeps new floating controls reachable. Stale topology, generation and pending activity switches reject old offers. A preceding candidate passes all four virtual KMS modes; complete70 on committed source and an exact final-source four-mode repeat remain pending. The qualified full70 runtime and signed v22 image remain c57b60; physical hardware, live providers and full reference conformance remain unqualified.",
-    "Clean ea03ce6 full qualification stopped after 54 passing checks at loaded editor p95 58 ms against the unchanged 50 ms target. That failure and unchanged-binary comparisons are retained; old and candidate runtimes both showed timing variance, so the historical cause remains unestablished. Immutable shared compositor scenes now avoid copying retained workspace history during arrangement and input reads. All 62 compositor tests pass; targeted candidate runtime 4c2a38 records loaded p95 40/41 ms, idle 36 ms and rotated 44 ms with all 80 candidate presentation receipts complete. Exact owned cleanup and original VM configuration/disk identities pass. Clean committed-source full70 and four-mode output restoration qualification remain pending; the qualified full70 and signed v22 runtime remain c57b60."
+    "Clean ea03ce6 full qualification stopped after 54 passing checks at loaded editor p95 58 ms against the unchanged 50 ms target. That failure and unchanged-binary comparisons are retained; old and candidate runtimes both showed timing variance, so the historical cause remains unestablished. Immutable shared compositor scenes now avoid copying retained workspace history during arrangement and input reads. All 62 compositor tests pass; targeted candidate runtime 4c2a38 records loaded p95 40/41 ms, idle 36 ms and rotated 44 ms with all 80 candidate presentation receipts complete. Exact owned cleanup and original VM configuration/disk identities pass. Clean committed-source full70 and four-mode output restoration qualification remain pending; the qualified full70 and signed v22 runtime remain c57b60.",
+    "Clean a45fb85 full qualification stopped after 49 passing checks when List accepted a guarded update with Copy open; CI 38215136743 passed and the failed run is retained. GTK tracing independently shows parent deactivation while a focused Copy popup remains open, ending the old lease. A final identical native popup fixture fails with the old handler and passes with mapped-popup protection, including release on dismissal. The native renderer and installed List/Table/KeyValue kernel journeys pass at targeted runtime 9a443d, alongside 36 native Rust tests (7 existing ignored). Final fixture setup follows production hook-before-root order; normal grabbing menus remain covered by kernel journeys. Exact historical causes remain unestablished. Clean committed-source full70 and four-mode display restoration remain pending; qualified full70 and signed v22 remain c57b60. Owned guest/app cleanup and original VM configuration/disk identities pass."
   ],
   "owned_utm_app_closed": true,
   "full_run_evidence": {

@@ -1,0 +1,9 @@
+{
+  "original_runtime": "4c2a38f553aed8ec8d829c81911418319f06096b5f731b36293b6727a23d7e7a",
+  "test_only_source_changes": true,
+  "regression": {
+    "returncode": 101,
+    "stdout": "",
+    "stderr": "\nthread 'main' panicked at src/verification.rs:494:5:\nMAPPED_COPY_POPUP_LOST_LEASE: a mapped Copy menu must retain interaction protection through root-focus handoff\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+  }
+}

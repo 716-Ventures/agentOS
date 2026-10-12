@@ -1,0 +1,46 @@
+{
+  "runtime_release": "9a443d1ee0b2c9b13c920a1dd46165c409f0388f4fa4fa194df697ac74cb3996",
+  "cases": [
+    {
+      "argv": [
+        "runuser",
+        "-u",
+        "developer",
+        "--",
+        "dbus-run-session",
+        "--",
+        "python3",
+        "/home/developer/agent-os-source/native-shell/tests/native_desktop.py",
+        "--appearance",
+        "dark",
+        "--text-scale",
+        "1"
+      ],
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "python3",
+        "/home/developer/agent-os-source/tests/direct_display_guest.py",
+        "--list-input"
+      ],
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "python3",
+        "/home/developer/agent-os-source/tests/direct_display_guest.py",
+        "--table-input"
+      ],
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "python3",
+        "/home/developer/agent-os-source/tests/direct_display_guest.py",
+        "--keyvalue-input"
+      ],
+      "returncode": 0
+    }
+  ]
+}

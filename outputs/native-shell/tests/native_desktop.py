@@ -105,6 +105,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                 assert time.monotonic()<deadline,'Display startup timeout'
                 time.sleep(.05)
             command=[str(ROOT/'target/debug/agent-os-desktop'),'--self-test','--socket',str(endpoint),'--capture',str(OUTPUT/'desktop.png')]
+            subprocess.run([command[0],'--self-test-popup-lease'],env=env,check=True,timeout=15)
             if '--compositor' not in sys.argv:subprocess.run(command,env=env,check=True,timeout=30)
             else:
                 with (OUTPUT/'compositor.log').open('w') as nestedlog:

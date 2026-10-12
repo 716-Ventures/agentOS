@@ -1,0 +1,110 @@
+{
+  "targeted": {
+    "source_revision": "a45fb85d44fd7e4d4bf896bb53651a0a8970839d",
+    "source_clean": false,
+    "deployment": {
+      "created_at": "2026-10-12T07:27:25.463983+00:00",
+      "source_archive_sha256": "ac0c70e9247f67a13821a455f7635b7b17d3fc1c8884cb54061f9da47f7b067d",
+      "repository_revision": "a45fb85d44fd7e4d4bf896bb53651a0a8970839d",
+      "source_changes": [
+        "AM outputs/native-shell/src/interaction_lease.rs",
+        " M outputs/native-shell/src/main.rs",
+        " M outputs/native-shell/src/verification.rs",
+        " M outputs/native-shell/tests/native_desktop.py"
+      ],
+      "installed": true
+    },
+    "installed_runtime": "9a443d1ee0b2c9b13c920a1dd46165c409f0388f4fa4fa194df697ac74cb3996",
+    "measurements": {
+      "runtime_release": "9a443d1ee0b2c9b13c920a1dd46165c409f0388f4fa4fa194df697ac74cb3996",
+      "cases": [
+        {
+          "argv": [
+            "runuser",
+            "-u",
+            "developer",
+            "--",
+            "dbus-run-session",
+            "--",
+            "python3",
+            "/home/developer/agent-os-source/native-shell/tests/native_desktop.py",
+            "--appearance",
+            "dark",
+            "--text-scale",
+            "1"
+          ],
+          "returncode": 0
+        },
+        {
+          "argv": [
+            "python3",
+            "/home/developer/agent-os-source/tests/direct_display_guest.py",
+            "--list-input"
+          ],
+          "returncode": 0
+        },
+        {
+          "argv": [
+            "python3",
+            "/home/developer/agent-os-source/tests/direct_display_guest.py",
+            "--table-input"
+          ],
+          "returncode": 0
+        },
+        {
+          "argv": [
+            "python3",
+            "/home/developer/agent-os-source/tests/direct_display_guest.py",
+            "--keyvalue-input"
+          ],
+          "returncode": 0
+        }
+      ]
+    },
+    "owned_utm_closed": true,
+    "original_config_unchanged": true,
+    "original_disk_efi_inodes_preserved": true
+  },
+  "final_fixture_comparison": {
+    "source_revision": "a45fb85d44fd7e4d4bf896bb53651a0a8970839d",
+    "source_clean": false,
+    "comparison": [
+      {
+        "original_runtime": "9a443d1ee0b2c9b13c920a1dd46165c409f0388f4fa4fa194df697ac74cb3996",
+        "test_only_source_changes": true,
+        "regression": {
+          "returncode": 101,
+          "stdout": "",
+          "stderr": "\nthread 'main' panicked at src/verification.rs:495:5:\nMAPPED_COPY_POPUP_LOST_LEASE: a mapped Copy menu must retain interaction protection through root-focus handoff\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+        }
+      },
+      {
+        "original_runtime": "9a443d1ee0b2c9b13c920a1dd46165c409f0388f4fa4fa194df697ac74cb3996",
+        "test_only_source_changes": true,
+        "regression": {
+          "returncode": 0,
+          "stdout": "CHECK: actual mapped Copy popup retains its lease through root-focus handoff and releases after dismissal\n",
+          "stderr": ""
+        }
+      }
+    ],
+    "owned_utm_closed": true,
+    "original_config_unchanged": true,
+    "original_disk_efi_inodes_preserved": true
+  },
+  "final_comparison_source_sha256": [
+    {
+      "native-shell/src/main.rs": "4959e8fc20723f2276cf5ea7cc6022f780bb771fc6180c926fdac82dcc086ef0",
+      "native-shell/src/verification.rs": "6531611b4b6c2b16154c3fd604d5fcf627710b7cab33c2cc6c6cedd702b9e99d"
+    },
+    {
+      "native-shell/src/main.rs": "ae41e87c68ea38c9799d83f2ef5aecd8a9cb176d5765ff2c4c1487389590aa81",
+      "native-shell/src/verification.rs": "6531611b4b6c2b16154c3fd604d5fcf627710b7cab33c2cc6c6cedd702b9e99d",
+      "native-shell/src/interaction_lease.rs": "47bdc22ba558987321ff94d403e6de1f028d1f8de7dfd61ac2823d7e56ecbb33"
+    }
+  ],
+  "metadata_correction": "The raw final-comparison new variant inherited test_only_source_changes=true from the fixture template. It includes the new production interaction_lease module and main.rs hook; only the old variant has test-only changes. Embedded source payloads and hashes above identify both variants.",
+  "scope": "Standalone mapped non-grabbing actual collection popup; normal grabbing menus separately exercised with kernel input in all three installed collection journeys.",
+  "historical_full_run_cause_proven": false,
+  "fixture_failures": "Trace v1 compilation, trace v2/v3 copied-source permissions, baseline v1 child-code placeholder and baseline v2 missing implicit popup grab were fixture failures. Baseline v3 was subsequently refined to hook before root attachment; final comparison uses the same corrected fixture for both handlers."
+}

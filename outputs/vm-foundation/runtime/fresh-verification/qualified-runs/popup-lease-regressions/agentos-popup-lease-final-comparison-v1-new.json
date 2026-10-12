@@ -1,0 +1,9 @@
+{
+  "original_runtime": "9a443d1ee0b2c9b13c920a1dd46165c409f0388f4fa4fa194df697ac74cb3996",
+  "test_only_source_changes": true,
+  "regression": {
+    "returncode": 0,
+    "stdout": "CHECK: actual mapped Copy popup retains its lease through root-focus handoff and releases after dismissal\n",
+    "stderr": ""
+  }
+}

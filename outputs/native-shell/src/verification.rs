@@ -453,6 +453,54 @@ fn verify_container_replacement(
     );
     surface.window.destroy();
 }
+pub fn popup_lease_regression() {
+    gtk::init().unwrap();
+    let mut list=ui::DataList::new("Popup lease fixture",false).unwrap();
+    list.update(&[ui::TableRow{id:"document".into(),cells:vec!["Retained document".into()]}]).unwrap();
+    let window=gtk::Window::builder().title("Popup lease fixture").default_width(400).default_height(240).build();
+    let (commands,events)=mpsc::channel();
+    lease(list.widget.upcast_ref(),"popup-fixture","collection",&commands);
+    window.set_child(Some(&list.widget));
+    let mut widgets=vec![list.widget.clone().upcast::<gtk::Widget>()];
+    let mut popup=None;
+    while let Some(widget)=widgets.pop() {
+        if let Ok(value)=widget.clone().downcast::<gtk::Popover>() {popup=Some(value);break;}
+        let mut child=widget.first_child();
+        while let Some(widget)=child {child=widget.next_sibling();widgets.push(widget);}
+    }
+    let popup=popup.expect("Actual collection Copy popup");
+    // This standalone Wayland fixture has no implicit kernel-input serial.
+    // Kernel collection journeys separately exercise the default grabbing menu.
+    popup.set_autohide(false);
+    let pump=|condition:&dyn Fn()->bool| {
+        let deadline=std::time::Instant::now()+Duration::from_secs(3);
+        loop {
+            for _ in 0..256 {
+                if !glib::MainContext::default().pending(){break;}
+                glib::MainContext::default().iteration(false);
+            }
+            if condition(){break;}
+            assert!(std::time::Instant::now()<deadline,"Popup fixture did not settle");
+            std::thread::sleep(Duration::from_millis(5));
+        }
+    };
+    window.present();pump(&||window.is_mapped());
+    popup.popup();pump(&||popup.is_mapped());
+    // A mapped menu remains an interaction even during root-focus handoff.
+    gtk::prelude::GtkWindowExt::set_focus(&window,None::<&gtk::Widget>);
+    pump(&||gtk::prelude::GtkWindowExt::focus(&window).is_none());
+    assert!(popup.is_mapped(),"Focus handoff must leave the real Copy menu open");
+    let mut held=false;
+    for event in events.try_iter() {if let Command::Lease{begin,..}=event {held=begin;}}
+    assert!(held,"MAPPED_COPY_POPUP_LOST_LEASE: a mapped Copy menu must retain interaction protection through root-focus handoff");
+    popup.popdown();pump(&||!popup.is_mapped());
+    gtk::prelude::GtkWindowExt::set_focus(&window,None::<&gtk::Widget>);
+    for event in events.try_iter() {if let Command::Lease{begin,..}=event {held=begin;}}
+    assert!(!held,"Closed popup without focused content must release its lease");
+    window.destroy();
+    println!("CHECK: actual mapped Copy popup retains its lease through root-focus handoff and releases after dismissal");
+}
+
 pub fn run(socket: PathBuf, capture: Option<String>) {
     let app = gtk::Application::builder()
         .application_id("com.agentos.DesktopVerification")

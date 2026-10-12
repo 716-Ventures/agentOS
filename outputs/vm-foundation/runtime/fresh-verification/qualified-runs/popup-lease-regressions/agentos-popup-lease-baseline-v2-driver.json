@@ -1,0 +1,16 @@
+{
+  "source_revision": "a45fb85d44fd7e4d4bf896bb53651a0a8970839d",
+  "source_clean": false,
+  "diagnostic": {
+    "original_runtime": "4c2a38f553aed8ec8d829c81911418319f06096b5f731b36293b6727a23d7e7a",
+    "test_only_source_changes": true,
+    "regression": {
+      "returncode": 101,
+      "stdout": "",
+      "stderr": "\nthread 'main' panicked at src/verification.rs:479:13:\nPopup fixture did not settle\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    }
+  },
+  "owned_utm_closed": true,
+  "original_config_unchanged": true,
+  "original_disk_efi_inodes_preserved": true
+}
