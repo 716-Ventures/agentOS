@@ -123,6 +123,7 @@ impl Drop for Control {
 }
 fn xdg_diagnostics(surface: &smithay::reexports::wayland_server::protocol::wl_surface::WlSurface) -> Value {
     use smithay::wayland::shell::xdg::{SurfaceCachedState, XdgToplevelSurfaceData};
+    use smithay::reexports::wayland_protocols::xdg::shell::server::xdg_toplevel::State::Activated;
     smithay::wayland::compositor::with_states(surface, |states| {
         let data = states.data_map.get::<XdgToplevelSurfaceData>().unwrap().lock().unwrap();
         let size = |value: Option<smithay::utils::Size<i32, smithay::utils::Logical>>| value.map(|value| json!([value.w, value.h]));
@@ -133,6 +134,9 @@ fn xdg_diagnostics(surface: &smithay::reexports::wayland_server::protocol::wl_su
         json!({"configured":data.configured,"acked_serial":data.configure_serial.map(u32::from),
             "committed_serial":data.current_serial.map(u32::from),"committed_size":size(data.current.size),
             "acked_size":data.last_acked.as_ref().and_then(|state|size(state.size)),
+            "acked_activated":data.last_acked.as_ref().map(|state|state.states.contains(Activated)),
+            "committed_activated":data.current.states.contains(Activated),
+            "server_pending_activated":data.server_pending.as_ref().map(|state|state.states.contains(Activated)),
             "server_pending_size":data.server_pending.as_ref().and_then(|state|size(state.size)),
             "pending_configures":pending,"pending_count":data.pending_configures().len(),
             "client_min_size":[client.min_size.w,client.min_size.h],"client_max_size":[client.max_size.w,client.max_size.h],

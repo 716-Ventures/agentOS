@@ -1,0 +1,15 @@
+dbus-daemon[31658]: [session uid=1000 pid=31658 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.3' (uid=1000 pid=31701 comm="/tmp/agentos-session-test-rbsn290l/bin/agent-os-de")
+dbus-daemon[31658]: [session uid=1000 pid=31658 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[31725]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=31701 comm="/tmp/agentos-session-test-rbsn290l/bin/agent-os-de")
+dbus-daemon[31725]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+dbus-daemon[31658]: [session uid=1000 pid=31658 pidfd=5] Activating service name='ca.desrt.dconf' requested by ':1.4' (uid=1000 pid=31719 comm="/usr/libexec/at-spi-bus-launcher")
+dbus-daemon[31658]: [session uid=1000 pid=31658 pidfd=5] Successfully activated service 'ca.desrt.dconf'
+PASS: session-owned Orca initializes speech and announces the focused native field
+
+(process:31659): atspi-WARNING **: 04:40:58.755: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:31659): atspi-WARNING **: 04:40:59.015: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: session-owned Orca sends the focused field error and cleared-valid state to speech without changing input or drafts; physical audio and braille remain unqualified
+PASS: owned reader and speech processes reaped after compositor failure
+PASS: abrupt compositor loss maps authenticated surfaces and reaps display host, compositor and renderer

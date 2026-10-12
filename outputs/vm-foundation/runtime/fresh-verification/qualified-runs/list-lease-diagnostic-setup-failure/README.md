@@ -1,0 +1,1 @@
+Diagnostic setup failed before the guarded mutation: an overbroad temporary source replacement inserted blocked into place(), where it was undefined. Guest source restored; exact owned app closed. This is not a product failure. The retained guest template is its subsequently corrected version.

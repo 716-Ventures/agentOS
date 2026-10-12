@@ -5453,6 +5453,30 @@
       "physical_hotplug_qualified": false,
       "complete70_pending": true,
       "exact_owned_cleanup_verified": true
+    },
+    "shared_focus_activation": {
+      "negative_evidence_directory": "qualified-runs/shared-focus-activation-baseline",
+      "positive_evidence_directory": "qualified-runs/shared-focus-activation-fixed",
+      "runtime_release": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
+      "compositor_tests_passed": 53,
+      "installed_collection_journeys": [
+        "List@1",
+        "KeyValue@1",
+        "Table@1"
+      ],
+      "complete70_pending": true,
+      "independent_of_unestablished_list_failure": true
+    },
+    "focused_list_full_failure": {
+      "evidence_directory": "qualified-runs/3dce649-full70-focused-list-failure",
+      "passing_checks_before_failure": 49,
+      "source_revision": "3dce649eb21c66050881eb143cc351039c1d2ef5",
+      "runtime_release": "b2386f3145e196771089b92030412dbdbc7a4249e9ed983e956f22ad23d594d1",
+      "not_promoted": true,
+      "historical_mechanism_unestablished": true,
+      "unchanged_diagnostic_passes": 4,
+      "diagnostic_evidence_directory": "qualified-runs/list-lease-diagnostics",
+      "diagnostic_setup_failure": "qualified-runs/list-lease-diagnostic-setup-failure"
     }
   },
   "observations": [

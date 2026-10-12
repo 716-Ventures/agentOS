@@ -72,6 +72,16 @@ def verify(metrics, output, core, scene, login_user, presentation, observe, keyb
         pointer.click(geometry['x'] + point[0], geometry['y'] + point[1], output['width'], output['height'], button=button)
         if button == 272:
             wait(lambda: scene()['seat_focus'] == window(logical)['id'], 'Clipboard fixture did not receive seat focus')
+            def activation_settled():
+                current = scene()
+                focused = next(row for row in current['windows'] if current['shared']['identities'].get(row['id']) == logical)
+                return focused['xdg']['acked_activated'] is True and all(
+                    row['xdg']['acked_activated'] is not True for row in current['windows'] if row['id'] != focused['id'])
+            try:
+                wait(activation_settled, 'Focused collection/peer did not acknowledge activation and peer deactivation without a geometry change')
+            except RuntimeError as exc:
+                current = scene()
+                raise RuntimeError(str(exc)+'; activation diagnostics: '+json.dumps({'seat_focus':current['seat_focus'],'windows':current['windows']})) from exc
 
     def source_click(label):
         point = observe('transfer:' + label)['point']
@@ -140,6 +150,12 @@ def verify(metrics, output, core, scene, login_user, presentation, observe, keyb
                     raise
                 time.sleep(.05)
                 continue
+            if blocked:
+                import sqlite3
+                with sqlite3.connect('file:/var/lib/agent-os-runtime/state.sqlite3?mode=ro',uri=True) as db:
+                    db.execute('PRAGMA query_only=ON')
+                    leases = db.execute('SELECT element,uid,session,expires FROM presentation_leases WHERE document=?',(surface,)).fetchall()
+                print('Unexpected focused collection update: '+json.dumps({'wall':time.time(),'leases':leases,'seat_focus':scene()['seat_focus'],'window':window(surface),'receipt':result}),flush=True)
             assert not blocked, 'Focused Table update bypassed its interaction guard'
             assert result['status'] == 'committed', result
             return
@@ -148,7 +164,7 @@ def verify(metrics, output, core, scene, login_user, presentation, observe, keyb
         point = observe('table-cell:' + label)['point']
         click(surface, point)
         click(surface, point)
-        wait(lambda: observe('table-cell:' + label)['selected'], 'Kernel pointer did not select the Table row')
+        wait(lambda: (lambda state: state['selected'] and state['focused'])(observe('table-cell:' + label)), 'Kernel pointer did not select and focus the Table row')
 
     try:
         document = {'protocol': 'agentos.presentation/1', 'catalog_revision': 'native-core/1', 'surface_id': surface, 'activity_id': activity,
@@ -219,7 +235,7 @@ def verify(metrics, output, core, scene, login_user, presentation, observe, keyb
             return False
         wait(removed, 'Removed collection row remained visible')
         read(' λ 日本語')
-        print('PASS: installed '+kind+' kernel pointer/keyboard selection, Ctrl+C, Shift+F10/secondary menu, exact separate-client Unicode clipboard, focused refresh rejection, key-preserved reorder/update after focus release, empty-selection Copy rejection, row removal and focus restoration')
+        print('PASS: installed '+kind+' acknowledged activation/deactivation without geometry changes, kernel pointer/keyboard selection, Ctrl+C, Shift+F10/secondary menu, exact separate-client Unicode clipboard, focused refresh rejection, key-preserved reorder/update after focus release, empty-selection Copy rejection, row removal and focus restoration')
     finally:
         if peer:
             if peer.poll() is None:

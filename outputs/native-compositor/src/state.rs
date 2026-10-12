@@ -465,6 +465,12 @@ impl Smallvil {
                 }) {
                     self.applied_focus = scene.focus.clone();
                     self.space.raise_element(window, true);
+                    // Space changes pending xdg activation state only. Publish
+                    // both activation and peer deactivation even when every
+                    // window keeps its existing geometry.
+                    self.space.elements().for_each(|window| {
+                        window.toplevel().unwrap().send_pending_configure();
+                    });
                     if let Some(keyboard) = self.seat.get_keyboard() {
                         keyboard.set_focus(
                             self,

@@ -1,0 +1,10 @@
+{
+  "runtime": "/usr/local/lib/agent-os/releases/b2386f3145e196771089b92030412dbdbc7a4249e9ed983e956f22ad23d594d1",
+  "runs": [
+    {
+      "index": 0,
+      "returncode": 1
+    }
+  ],
+  "owned_app_closed": true
+}

@@ -1,0 +1,9 @@
+{
+  "runtime": "/usr/local/lib/agent-os/releases/c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
+  "checks": [
+    "--list-input",
+    "--keyvalue-input",
+    "--table-input"
+  ],
+  "owned_app_closed": true
+}

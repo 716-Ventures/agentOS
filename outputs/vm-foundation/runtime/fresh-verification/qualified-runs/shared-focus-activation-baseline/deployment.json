@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-10-12T04:56:35.342954+00:00",
+  "source_archive_sha256": "6c705f02e1be16df473d015ecb21e2bfbe388a2768df580f8ad30c929ca4623e",
+  "repository_revision": "3dce649eb21c66050881eb143cc351039c1d2ef5",
+  "source_changes": [
+    " M outputs/agent-shell/tests/direct_table_probe.py",
+    " M outputs/native-compositor/src/control.rs"
+  ],
+  "installed": true
+}

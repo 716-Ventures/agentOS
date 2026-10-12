@@ -1,0 +1,1 @@
+Four unchanged b2386f runtime List journeys pass with read-only scoped SQLite lease and AT-SPI focus diagnostics. Both selection and Copy menu had a live native lease before the guarded update; the update was rejected. These diagnostic passes do not establish the cause of the original complete-run failure. Both guest test sources restored and exact owned guest/app stopped.

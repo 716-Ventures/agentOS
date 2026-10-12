@@ -1,0 +1,1 @@
+{"result": "pass", "checks": ["Core, broker and removed-activity work remain visible; broker binding and launch origin persist", "Activity stop ends core and broker work, removes detached child, rejects approval and retains other activity", "Stop generation survives restart; stale requests fail and explicit new work succeeds"], "provider_calls": "fixtures; no live inference"}
