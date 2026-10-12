@@ -1,0 +1,5 @@
+Captured installed raw speech SHA-256 1e168aee909813b2f053238911de8855813d26f36130c34001cc9413e61bc0ef
+Traceback (most recent call last):
+  File "/tmp/agentos-capture-multi-keyboard-reader-v2.py", line 10, in <module>
+    assert 'Traceback (most recent call last):' not in log.read_text(),'Runtime qualification failed before reader evidence collection'
+AssertionError: Runtime qualification failed before reader evidence collection

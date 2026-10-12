@@ -1,0 +1,12 @@
+{
+  "runtime_result": "pass",
+  "passed_checks": 70,
+  "source_revision": "e2bae2c2093cf7697377bafe105d90104bd5364b",
+  "runtime_release": "0479ff58694dbb010dfddb56022e5ab3edf992a5081cc80fdb314cae40cb401b",
+  "ci_result": "failure",
+  "ci_run": 38222358492,
+  "not_promoted": true,
+  "reason": "Installed CI approval fixture crashed on an absent AT-SPI child. Source was not promoted despite the separately recorded VM result. Subsequent fixture guard and deployed-layout regression are independently tested.",
+  "owned_vm_and_app_closed": true,
+  "source_archive_sha256": "fad2ec8092bee67f1f9857625f7307f0c63dc8bb157f47dddcfa6e93c6a5b3ff"
+}

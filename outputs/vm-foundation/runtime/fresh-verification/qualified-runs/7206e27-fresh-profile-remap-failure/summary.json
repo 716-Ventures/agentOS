@@ -1,0 +1,11 @@
+{
+  "source_revision": "7206e27bb1fabf1ef8aae56952bb4285644a647e",
+  "passed_checks": 47,
+  "failed_check": "direct-display-fresh-profile-input",
+  "observed_failure": "StopIteration on one immediate compositor identity lookup after assistive Undo; GTK text and saved core value had already matched.",
+  "historical_permanent_surface_loss_proven": false,
+  "multi_keyboard_journey_passed_before_failure": true,
+  "ci_run": 38223755886,
+  "ci_result": "success",
+  "owned_vm_and_app_closed": true
+}

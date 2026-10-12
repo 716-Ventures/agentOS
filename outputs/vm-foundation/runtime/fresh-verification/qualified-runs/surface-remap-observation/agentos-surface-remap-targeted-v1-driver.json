@@ -1,0 +1,40 @@
+{
+  "source_revision": "7206e27bb1fabf1ef8aae56952bb4285644a647e",
+  "source_clean": false,
+  "deployment": {
+    "created_at": "2026-10-12T08:44:49.116926+00:00",
+    "source_archive_sha256": "9e52a78b814baf6cb90d6329bcab75d2bbfea926221b8c2e586a3f06862e2d1d",
+    "repository_revision": "7206e27bb1fabf1ef8aae56952bb4285644a647e",
+    "source_changes": [
+      " M outputs/agent-shell/tests/direct_input_probe.py",
+      "A  outputs/agent-shell/tests/direct_surface_remap_test.py"
+    ],
+    "installed": true
+  },
+  "installed_runtime": "0479ff58694dbb010dfddb56022e5ab3edf992a5081cc80fdb314cae40cb401b",
+  "measurements": {
+    "runtime_release": "0479ff58694dbb010dfddb56022e5ab3edf992a5081cc80fdb314cae40cb401b",
+    "cases": [
+      {
+        "argv": [
+          "python3",
+          "/home/developer/agent-os-source/tests/direct_display_guest.py",
+          "--input"
+        ],
+        "returncode": 0
+      },
+      {
+        "argv": [
+          "python3",
+          "/home/developer/agent-os-source/tests/direct_display_guest.py",
+          "--input",
+          "--fresh-profile"
+        ],
+        "returncode": 0
+      }
+    ]
+  },
+  "owned_utm_closed": true,
+  "original_config_unchanged": true,
+  "original_disk_efi_inodes_preserved": true
+}

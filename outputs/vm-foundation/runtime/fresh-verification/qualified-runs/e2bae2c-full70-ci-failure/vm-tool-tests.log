@@ -1,0 +1,21 @@
+..Activating the installed agentOS runtime…
+Resuming setup for chris
+Activating the installed agentOS runtime…
+
+Setup complete. Log in as chris.
+Run agent-os for the terminal, or agent-os-session from the local graphical console.
+Provider setup: sudo agent-os-configure. Audio setup: agent-os setup.
+The ordinary shell, sudo and TTY 2 remain available for recovery.
+
+Resuming setup for chris
+...........................Signed UTM bundle: /var/folders/vv/3t36q7f96m7_htd3b7gkn3_40000gn/T/tmpr3ews__9/release.utm
+UTM guest started; SSH is forwarded on localhost:22221.
+UTM guest started; SSH is forwarded on localhost:22221.
+UTM guest started; check readiness through its console or guest agent.
+Requested orderly guest shutdown. Check status before restarting.
+UTM guest: started
+..
+----------------------------------------------------------------------
+Ran 31 tests in 0.414s
+
+OK

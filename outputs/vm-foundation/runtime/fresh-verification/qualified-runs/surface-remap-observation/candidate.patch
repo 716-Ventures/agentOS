@@ -1,0 +1,80 @@
+diff --git a/outputs/agent-shell/tests/direct_input_probe.py b/outputs/agent-shell/tests/direct_input_probe.py
+index 6043bff..193cbb8 100644
+--- a/outputs/agent-shell/tests/direct_input_probe.py
++++ b/outputs/agent-shell/tests/direct_input_probe.py
+@@ -18,6 +18,25 @@ import sys
+ import time
+ 
+ 
++def wait_for_mapped_surface(scene, logical, timeout=8):
++    """GTK/core acknowledgement can precede compositor registration after Undo."""
++    deadline = time.monotonic() + timeout
++    while True:
++        observed = scene()
++        windows = {row['id'] for row in observed['windows']}
++        matches = [ident for ident, surface in observed['shared']['identities'].items()
++                   if surface == logical and ident in windows]
++        if len(matches) == 1:
++            return matches[0]
++        if len(matches) > 1:
++            raise RuntimeError('Ambiguous mapped surface identity: ' + repr(matches))
++        if time.monotonic() >= deadline:
++            raise RuntimeError('Native surface did not map: ' + repr({
++                'surface_id': logical, 'windows': observed['windows'],
++                'identities': observed['shared']['identities']}))
++        time.sleep(.05)
++
++
+ class Device:
+     def __init__(self,keyboard,motion_ready=None):
+         self.motion_ready=motion_ready
+@@ -671,7 +690,7 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
+         print('PASS: direct kernel titlebar drag, focus cycling, VT shortcut/resume and close-view; native assistive undo restores exact saved document')
+         # Transfer from a distinct conventional client, through the compositor.
+         logical=core('presentation.get')['surface_id']
+-        restored_target=next(ident for ident,surface in scene()['shared']['identities'].items() if surface==logical)
++        restored_target=wait_for_mapped_surface(scene,logical)
+         if scene()['seat_focus']==restored_target:
+             keyboard.chord(29,56,15);await_focus(lambda focus:focus is not None and focus!=restored_target)
+         receipts=metrics/'transfer-receipts.json'
+diff --git a/outputs/agent-shell/tests/direct_surface_remap_test.py b/outputs/agent-shell/tests/direct_surface_remap_test.py
+new file mode 100644
+index 0000000..673102f
+--- /dev/null
++++ b/outputs/agent-shell/tests/direct_surface_remap_test.py
+@@ -0,0 +1,35 @@
++# SPDX-License-Identifier: Apache-2.0
++"""Observe one consistent mapped identity before post-Undo kernel input."""
++import unittest
++from unittest.mock import patch
++import direct_input_probe
++
++
++def snapshot(identities, windows):
++    return {'shared': {'identities': identities}, 'windows': [{'id': ident} for ident in windows]}
++
++
++class SurfaceRemapTest(unittest.TestCase):
++    def test_waits_for_identity_and_mapped_window_from_the_same_snapshot(self):
++        states = iter([snapshot({}, []), snapshot({'new': 'editor'}, []),
++                       snapshot({'new': 'editor'}, ['new'])])
++        with patch.object(direct_input_probe.time, 'sleep') as sleep:
++            self.assertEqual(direct_input_probe.wait_for_mapped_surface(lambda: next(states), 'editor'), 'new')
++        self.assertEqual(sleep.call_count, 2)
++
++    def test_old_unmapped_identity_cannot_replace_the_returning_window(self):
++        state = snapshot({'old': 'editor', 'new': 'editor', 'other': 'monitor'}, ['new', 'other'])
++        self.assertEqual(direct_input_probe.wait_for_mapped_surface(lambda: state, 'editor'), 'new')
++
++    def test_missing_surface_still_fails_with_bounded_diagnostics(self):
++        with self.assertRaisesRegex(RuntimeError, 'Native surface did not map:.*editor'):
++            direct_input_probe.wait_for_mapped_surface(lambda: snapshot({}, []), 'editor', timeout=0)
++
++    def test_ambiguous_mapped_identity_is_rejected(self):
++        state = snapshot({'a': 'editor', 'b': 'editor'}, ['a', 'b'])
++        with self.assertRaisesRegex(RuntimeError, 'Ambiguous mapped surface identity'):
++            direct_input_probe.wait_for_mapped_surface(lambda: state, 'editor')
++
++
++if __name__ == '__main__':
++    unittest.main()

@@ -1,0 +1,1 @@
+{"activity": 2284, "passed": true, "checks": ["SO_PEERCRED agent attribution", "typing gate", "shared snapshots", "stale revision rejection", "restart persistence", "durable undo"]}

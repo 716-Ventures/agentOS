@@ -18,6 +18,25 @@ import sys
 import time
 
 
+def wait_for_mapped_surface(scene, logical, timeout=8):
+    """GTK/core acknowledgement can precede compositor registration after Undo."""
+    deadline = time.monotonic() + timeout
+    while True:
+        observed = scene()
+        windows = {row['id'] for row in observed['windows']}
+        matches = [ident for ident, surface in observed['shared']['identities'].items()
+                   if surface == logical and ident in windows]
+        if len(matches) == 1:
+            return matches[0]
+        if len(matches) > 1:
+            raise RuntimeError('Ambiguous mapped surface identity: ' + repr(matches))
+        if time.monotonic() >= deadline:
+            raise RuntimeError('Native surface did not map: ' + repr({
+                'surface_id': logical, 'windows': observed['windows'],
+                'identities': observed['shared']['identities']}))
+        time.sleep(.05)
+
+
 class Device:
     def __init__(self,keyboard,motion_ready=None):
         self.motion_ready=motion_ready
@@ -671,7 +690,7 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
         print('PASS: direct kernel titlebar drag, focus cycling, VT shortcut/resume and close-view; native assistive undo restores exact saved document')
         # Transfer from a distinct conventional client, through the compositor.
         logical=core('presentation.get')['surface_id']
-        restored_target=next(ident for ident,surface in scene()['shared']['identities'].items() if surface==logical)
+        restored_target=wait_for_mapped_surface(scene,logical)
         if scene()['seat_focus']==restored_target:
             keyboard.chord(29,56,15);await_focus(lambda focus:focus is not None and focus!=restored_target)
         receipts=metrics/'transfer-receipts.json'

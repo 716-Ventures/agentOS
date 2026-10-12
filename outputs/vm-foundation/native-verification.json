@@ -6005,7 +6005,19 @@
       "independent_negative_runtime": "08e9973f3330a8727833023912bb4f5961d9e6faaa9a5d23f67e7ea6e9122c10",
       "complete70_pending": true,
       "owned_utm_closed": true,
-      "physical_hardware_qualified": false
+      "physical_hardware_qualified": false,
+      "subsequent_full_run_failure": {
+        "source_revision": "7206e27bb1fabf1ef8aae56952bb4285644a647e",
+        "passed_checks": 47,
+        "failed_check": "direct-display-fresh-profile-input",
+        "observed_failure": "StopIteration on one immediate compositor identity lookup after assistive Undo; GTK text and saved core value had already matched.",
+        "historical_permanent_surface_loss_proven": false,
+        "multi_keyboard_journey_passed_before_failure": true,
+        "ci_run": 38223755886,
+        "ci_result": "success",
+        "owned_vm_and_app_closed": true,
+        "evidence_directory": "qualified-runs/7206e27-fresh-profile-remap-failure"
+      }
     },
     "installed_approval_absent_child": {
       "failed_ci_run": 38222358492,
@@ -6016,7 +6028,32 @@
       "production_code_changed": false,
       "subsequent_ci_and_clean_source_full70_pending": true,
       "evidence_directory": "qualified-runs/installed-control-absent-child",
-      "unit_tests_verified_in_repository_and_deployed_layouts": true
+      "unit_tests_verified_in_repository_and_deployed_layouts": true,
+      "subsequent_ci_verified": true,
+      "private_ci_run": 38223755886,
+      "ci_source_revision": "7206e27bb1fabf1ef8aae56952bb4285644a647e"
+    },
+    "multi_keyboard_first_full70_ci_failure": {
+      "runtime_result": "pass",
+      "passed_checks": 70,
+      "source_revision": "e2bae2c2093cf7697377bafe105d90104bd5364b",
+      "runtime_release": "0479ff58694dbb010dfddb56022e5ab3edf992a5081cc80fdb314cae40cb401b",
+      "ci_result": "failure",
+      "ci_run": 38222358492,
+      "not_promoted": true,
+      "reason": "Installed CI approval fixture crashed on an absent AT-SPI child. Source was not promoted despite the separately recorded VM result. Subsequent fixture guard and deployed-layout regression are independently tested.",
+      "owned_vm_and_app_closed": true,
+      "source_archive_sha256": "fad2ec8092bee67f1f9857625f7307f0c63dc8bb157f47dddcfa6e93c6a5b3ff",
+      "evidence_directory": "qualified-runs/e2bae2c-full70-ci-failure"
+    },
+    "post_undo_mapped_identity": {
+      "evidence_directory": "qualified-runs/surface-remap-observation",
+      "installed_runtime": "0479ff58694dbb010dfddb56022e5ab3edf992a5081cc80fdb314cae40cb401b",
+      "unit_tests_passed": 4,
+      "ordinary_and_fresh_profile_installed_journeys": "pass",
+      "historical_permanent_surface_loss_proven": false,
+      "complete70_pending": true,
+      "owned_utm_closed": true
     }
   },
   "observations": [
@@ -6071,7 +6108,8 @@
     "Clean a45fb85 full qualification stopped after 49 passing checks when List accepted a guarded update with Copy open; CI 38215136743 passed and the failed run is retained. GTK tracing independently shows parent deactivation while a focused Copy popup remains open, ending the old lease. A final identical native popup fixture fails with the old handler and passes with mapped-popup protection, including release on dismissal. The native renderer and installed List/Table/KeyValue kernel journeys pass at targeted runtime 9a443d, alongside 36 native Rust tests (7 existing ignored). Final fixture setup follows production hook-before-root order; normal grabbing menus remain covered by kernel journeys. Exact historical causes remain unestablished. Clean committed-source full70 and four-mode display restoration remain pending; qualified full70 and signed v22 remain c57b60. Owned guest/app cleanup and original VM configuration/disk identities pass.",
     "Clean source e241504 passes all 70 runtime checks with 716 UI alpha.43 and runtime 08e9973f3330a8727833023912bb4f5961d9e6faaa9a5d23f67e7ea6e9122c10. Preferred display return leaves active editing on the recovery display until the human chooses Restore preferred placement in Agent Monitor. Original saved placements, drafts and typing survive; new floating controls remain reachable, the exact trusted renderer authorizes restoration, and stale topology/recovery/activity offers and same-user observer injection are rejected. All 62 compositor tests pass. Immutable shared scenes avoid copying workspace history during rendering and input reads. Mapped collection Copy menus retain interaction leases through GTK activation and root-focus handoffs until dismissal; the identical final native fixture fails with the old handler and passes with the fix. All 36 native Rust tests pass (7 existing ignored). The prior a45fb85 full run stopped at a guarded List update after 49 checks; that failure remains retained without assigning its exact historical cause. An exact clean-source four-mode virtual KMS repeat verifies every deployed source file and 360 named kernel-key frames through secondary, primary and total display loss, plus retained launcher/keyboard identities and actual restoration controls. Native editor p95 is 36 ms idle, 43 ms loaded and 40 ms rotated, with all 60 presentation receipts completed. Installed and direct reader journeys retain three exact-work Monitor reopens before tree inspection and one background failure announcement. Rollback/interruption, reboot, repeat installation, VT resume and exact owned guest/app cleanup pass. CI 38218495023 is green. Signed v22 retains its separately qualified c57b60 runtime pending a new image qualification. Physical audio/braille/input/GPU/hotplug, live providers and full reference conformance remain unqualified; retained historical intermittent failures still have no established cause unless independently demonstrated.",
     "Multiple-keyboard ownership is now tracked per backend device: only the first shared press and final shared release reach the seat, and removal releases only keys no other device holds. The independent old-runtime negative retained uppercase physical typing but incorrectly allowed an on-screen key while the second keyboard still held Shift. The fix passes all 66 compositor tests and installed ordinary/fresh-profile kernel journeys covering partial release, partial and final device removal, rejected OSK input, balanced lowercase recovery and retained focus. The separate kernel reader journey also passes. Exact owned VM/app cleanup and original configuration/disk identities pass. Clean committed-source full70 qualification is pending; the last fully qualified runtime remains 08e9973 and signed v22 remains c57b60. Physical input hardware is unqualified.",
-    "CI 38222358492 stopped in the installed approval test when its custom AT-SPI traversal dereferenced an absent child during widget teardown. This is a test-fixture defect; the common accessibility helper already skips absent children. Search and failure diagnostics now skip only None entries, retaining scoped work matching and missing-control failures. Both new regressions fail against the old search with AttributeError and pass after the guard. Subsequent CI and clean-source full70 qualification are pending; no failed CI source is promoted."
+    "CI 38222358492 stopped in the installed approval test when its custom AT-SPI traversal dereferenced an absent child during widget teardown. This is a test-fixture defect; the common accessibility helper already skips absent children. Search and failure diagnostics now skip only None entries, retaining scoped work matching and missing-control failures. Both new regressions fail against the old search with AttributeError and pass after the guard. Subsequent CI and clean-source full70 qualification are pending; no failed CI source is promoted.",
+    "Clean 7206e27 CI passes all jobs, but its VM qualification stops after 47 checks at a one-shot post-Undo compositor identity lookup. GTK text and saved core content had already matched; the fresh-profile keyboard ownership/removal checks passed before that failure. The probe now observes a unique identity and mapped window in the same scene, within the existing eight-second deadline, without replaying Undo. Four unit regressions retain missing/ambiguous-surface failures and test staged registration. Ordinary and fresh-profile installed journeys pass through actual Undo, primary paste and Unicode drag/drop at unchanged runtime 0479ff5. The earlier clean e2bae2c full70 pass remains paired with its failed CI and is not promoted. Both runs and exact owned cleanup are retained. Clean final-source qualification is pending; qualified main remains 08e9973 and signed v22 remains c57b60. Neither Gateway nor Jev is configured, so live inference quality cannot be qualified."
   ],
   "owned_utm_app_closed": true,
   "full_run_evidence": {

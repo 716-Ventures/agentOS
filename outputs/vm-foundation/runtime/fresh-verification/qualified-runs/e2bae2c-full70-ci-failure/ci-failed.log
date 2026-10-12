@@ -1,0 +1,48 @@
+compositor	Installed native approval journey against systemd broker	﻿2026-10-12T08:17:15.3019713Z ##[group]Run sudo env "PATH=$PATH" "CARGO_HOME=$HOME/.cargo" "RUSTUP_HOME=$HOME/.rustup" GITHUB_ACTIONS=true RUSTUP_TOOLCHAIN=1.85.1 python3 outputs/agent-shell/tests/installed_native_ci.py
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:15.3020960Z ^[[36;1msudo env "PATH=$PATH" "CARGO_HOME=$HOME/.cargo" "RUSTUP_HOME=$HOME/.rustup" GITHUB_ACTIONS=true RUSTUP_TOOLCHAIN=1.85.1 python3 outputs/agent-shell/tests/installed_native_ci.py^[[0m
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:15.3057486Z shell: /usr/bin/bash -e {0}
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:15.3057746Z env:
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:15.3057926Z   RUSTUP_TOOLCHAIN: 1.85.1
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:15.3058140Z ##[endgroup]
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:38.9438234Z Created symlink /etc/systemd/system/multi-user.target.wants/agent-os-core.service → /etc/systemd/system/agent-os-core.service.
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:38.9439502Z Created symlink /etc/systemd/system/multi-user.target.wants/agent-os-broker.service → /etc/systemd/system/agent-os-broker.service.
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:39.3891434Z /etc/sudoers.d/agentos-ci-review: parsed OK
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:39.4111774Z dbus[8441]: Unable to set up transient service directory: XDG_RUNTIME_DIR "/run/user/1001" is owned by uid 1001, not our uid 1002
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:39.7135543Z dbus-daemon[8441]: [session uid=1002 pid=8441] Activating service name='org.a11y.Bus' requested by ':1.1' (uid=1002 pid=8442 comm="python3 /tmp/agentos-installed-ci-_7yeshbv/journey" label="unconfined")
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:39.7178824Z dbus-daemon[8441]: [session uid=1002 pid=8441] Successfully activated service 'org.a11y.Bus'
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:39.7212464Z dbus-daemon[8462]: Activating service name='org.a11y.atspi.Registry' requested by ':1.0' (uid=1002 pid=8442 comm="python3 /tmp/agentos-installed-ci-_7yeshbv/journey" label="unconfined")
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:39.7254121Z dbus-daemon[8462]: Successfully activated service 'org.a11y.atspi.Registry'
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:39.7254704Z SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:39.8286537Z 
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:39.8288544Z (process:8442): dbind-WARNING **: 08:17:39.828: AT-SPI: Error in GetItems, sender=:1.2, error=Object does not exist at path “/org/a11y/atspi/cache”
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.6945423Z Traceback (most recent call last):
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.6946146Z   File "/tmp/agentos-installed-ci-_7yeshbv/journey/tests/installed_broker.py", line 162, in <module>
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.6946623Z     main()
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.6946977Z   File "/tmp/agentos-installed-ci-_7yeshbv/journey/tests/installed_broker.py", line 126, in main
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.6947411Z     click('Agent Monitor')
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.6947802Z   File "/tmp/agentos-installed-ci-_7yeshbv/journey/tests/installed_broker.py", line 99, in click
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.6948256Z     accessibility.activate(button(name, work))
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.6948525Z                            ^^^^^^^^^^^^^^^^^^
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.6948949Z   File "/tmp/agentos-installed-ci-_7yeshbv/journey/tests/installed_broker.py", line 56, in button
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.6949521Z     accessibility.wait(search, 'Actionable installed control missing: ' + name)
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.6950114Z   File "/tmp/agentos-installed-ci-_7yeshbv/journey/tests/accessibility.py", line 15, in wait
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.6950530Z     if predicate():return
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.6950726Z        ^^^^^^^^^^^
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.6951092Z   File "/tmp/agentos-installed-ci-_7yeshbv/journey/tests/installed_broker.py", line 37, in search
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.6951604Z     if (node.name == name and node.getRole() == pyatspi.ROLE_PUSH_BUTTON
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.6951924Z         ^^^^^^^^^
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.6952164Z AttributeError: 'NoneType' object has no attribute 'name'
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.7806636Z Installed and healthy: ad3274e0ccbd177ceb774d2860d55db7c4ad48a11bc5b39e4d4223a14b49ec30
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.7807159Z Stopped installed CI services
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.8131527Z Traceback (most recent call last):
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.8132058Z   File "/home/runner/work/agentOS/agentOS/outputs/agent-shell/tests/installed_native_ci.py", line 114, in <module>
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.8132605Z     main()
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.8133741Z   File "/home/runner/work/agentOS/agentOS/outputs/agent-shell/tests/installed_native_ci.py", line 97, in main
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.8134300Z     run('runuser', '-u', 'developer', '--', 'dbus-run-session', '--',
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.8134866Z   File "/home/runner/work/agentOS/agentOS/outputs/agent-shell/tests/installed_native_ci.py", line 29, in run
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.8135384Z     return subprocess.run(args, check=True, **kwargs)
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.8135676Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.8136185Z   File "/usr/lib/python3.12/subprocess.py", line 571, in run
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.8136531Z     raise CalledProcessError(retcode, process.args,
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.8137391Z subprocess.CalledProcessError: Command '('runuser', '-u', 'developer', '--', 'dbus-run-session', '--', 'python3', '/tmp/agentos-installed-ci-_7yeshbv/journey/tests/installed_broker.py')' returned non-zero exit status 1.
+compositor	Installed native approval journey against systemd broker	2026-10-12T08:17:40.8367426Z ##[error]Process completed with exit code 1.
