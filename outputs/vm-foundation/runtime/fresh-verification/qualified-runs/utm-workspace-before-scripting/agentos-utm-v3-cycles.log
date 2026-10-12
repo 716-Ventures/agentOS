@@ -1,0 +1,13 @@
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+Requested orderly guest shutdown. Check status before restarting.
+PASS: candidate rapid-cold/start/readiness/stop/cleanup cycle 1
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+Requested orderly guest shutdown. Check status before restarting.
+PASS: candidate rapid-cold/start/readiness/stop/cleanup cycle 2
+UTM guest started; SSH is forwarded on localhost:22221.
+Guest login and foundation service are ready.
+Requested orderly guest shutdown. Check status before restarting.
+PASS: candidate rapid-cold/start/readiness/stop/cleanup cycle 3
+{"result": "pass", "candidate": {"argument_parser_revision": "8f4d2753f0e4778c76d5f05ad16c74f707390531", "binary_sha256": "21f4e45e699148ff88f254864983be951e2c11a92a650e9c923f64cd87630a11", "launch_policy": "workspace-before-scripting/3", "source_revision": "048ca7498ea3a374439149d51739d94c5300bcda", "source_sha256": {"LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30", "Scripting/UTMScripting.swift": "40b64b2e8997d310c8f2ee55a05c38440c0374fec60e57fff81b43507d68a0cd", "utmctl/UTMCtl.swift": "007a1ef14182d73fda4d24e52511112fa9801a10ff56d3d067ec096ce759ffe6"}}, "cycles": [{"cycle": 1, "rapid_cold_launches": [{"app_identity": [90644, "Sun Oct 11 23:55:25 2026"], "arguments": "/Applications/UTM.app/Contents/MacOS/UTM -ApplePersistenceIgnoreState YES"}, {"app_identity": [90659, "Sun Oct 11 23:55:27 2026"], "arguments": "/Applications/UTM.app/Contents/MacOS/UTM -ApplePersistenceIgnoreState YES"}], "guest_ready_seconds": 12.643408292, "owned_app_closed": true, "guest_stopped": true, "config_unchanged": true}, {"cycle": 2, "rapid_cold_launches": [{"app_identity": [91054, "Sun Oct 11 23:55:43 2026"], "arguments": "/Applications/UTM.app/Contents/MacOS/UTM -ApplePersistenceIgnoreState YES"}, {"app_identity": [91077, "Sun Oct 11 23:55:45 2026"], "arguments": "/Applications/UTM.app/Contents/MacOS/UTM -ApplePersistenceIgnoreState YES"}], "guest_ready_seconds": 12.646828083000003, "owned_app_closed": true, "guest_stopped": true, "config_unchanged": true}, {"cycle": 3, "rapid_cold_launches": [{"app_identity": [91123, "Sun Oct 11 23:56:01 2026"], "arguments": "/Applications/UTM.app/Contents/MacOS/UTM -ApplePersistenceIgnoreState YES"}, {"app_identity": [91305, "Sun Oct 11 23:56:03 2026"], "arguments": "/Applications/UTM.app/Contents/MacOS/UTM -ApplePersistenceIgnoreState YES"}], "guest_ready_seconds": 12.696140624999998, "owned_app_closed": true, "guest_stopped": true, "config_unchanged": true}], "owned_app_absent": true}

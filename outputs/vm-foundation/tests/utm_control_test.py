@@ -24,12 +24,18 @@ class ControlIntegrity(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError,'symlink'):control.controller(output)
 
     def test_launch_patch_removes_hidden_app_flag_without_changing_library_hide_option(self):
-        source='app.launchFlags = [.defaults, .andHide]\nif environment.hide { library.close() }'
+        source='''        guard let app = SBApplication(url: utmAppUrl) else {
+            throw UTMCtl.APIError.applicationNotFound
+        }
+        app.launchFlags = [.defaults, .andHide]
+if environment.hide { library.close() }'''
         patched=control.patch_launch(source)
         self.assertIn('app.launchFlags = [.defaults]',patched)
         self.assertIn('if environment.hide { library.close() }',patched)
         self.assertNotIn('.andHide',patched)
-        self.assertIn('if !app.isRunning {',patched)
-        self.assertIn('configuration: [.arguments: ["-ApplePersistenceIgnoreState", "YES"]]',patched)
+        self.assertLess(patched.index('NSWorkspace.shared.openApplication'),patched.index('SBApplication(url:'))
+        self.assertNotIn('app.isRunning',patched)
+        self.assertIn('configuration.arguments = ["-ApplePersistenceIgnoreState", "YES"]',patched)
+        self.assertIn('guard completed, let running = launched, !running.isTerminated',patched)
         for invalid in ('changed upstream',source+'\n'+source):
             with self.assertRaises(ValueError):control.patch_launch(invalid)

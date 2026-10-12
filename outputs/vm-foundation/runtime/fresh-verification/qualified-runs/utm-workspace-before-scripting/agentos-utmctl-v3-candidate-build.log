@@ -1,0 +1,40 @@
+Fetching https://github.com/apple/swift-argument-parser from cache
+Fetched https://github.com/apple/swift-argument-parser from cache (0.25s)
+Creating working copy for https://github.com/apple/swift-argument-parser
+Working copy of https://github.com/apple/swift-argument-parser resolved at 8f4d2753f0e4778c76d5f05ad16c74f707390531
+Building for production...
+[Pre-planning 1 / 96]
+[Planning deferred tasks]
+[28 / 47]
+[29 / 48] ArgumentParserToolInfo
+[33 / 51] ArgumentParserToolInfo
+[40 / 52] ArgumentParser
+[49 / 85]
+[54 / 85]
+[57 / 85]
+[58 / 85]
+[62 / 85]
+[64 / 85]
+[67 / 85]
+[70 / 85]
+[72 / 85]
+[73 / 85]
+[74 / 85] ArgumentParser
+[81 / 86] utmctl-product
+[98 / 116]
+[104 / 116]
+[108 / 116]
+[111 / 116]
+/Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/.utmctl-build-j9k_0dtg/Sources/utmctl/UTMCtl.swift:700:1: warning: extension declares a conformance of imported type 'FileHandle' to imported protocol 'TextOutputStream'; this will not behave correctly if the owners of 'Foundation' introduce this conformance in the future
+698 | }
+699 | 
+700 | extension FileHandle: TextOutputStream {
+    | |- warning: extension declares a conformance of imported type 'FileHandle' to imported protocol 'TextOutputStream'; this will not behave correctly if the owners of 'Foundation' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+701 |     private static var newLine = Data("\n".utf8)
+702 |     
+[112 / 116] utmctl-product
+[114 / 116] utmctl-product
+[115 / 116] utmctl-product
+Build complete! (15.82 sec)
+Built controller: /Users/chrisjdavis/development/agentOS/outputs/vm-foundation/runtime/utmctl-control-v3/utmctl

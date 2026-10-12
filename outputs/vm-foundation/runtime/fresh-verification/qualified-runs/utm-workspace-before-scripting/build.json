@@ -1,0 +1,11 @@
+{
+  "argument_parser_revision": "8f4d2753f0e4778c76d5f05ad16c74f707390531",
+  "binary_sha256": "21f4e45e699148ff88f254864983be951e2c11a92a650e9c923f64cd87630a11",
+  "launch_policy": "workspace-before-scripting/3",
+  "source_revision": "048ca7498ea3a374439149d51739d94c5300bcda",
+  "source_sha256": {
+    "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "Scripting/UTMScripting.swift": "40b64b2e8997d310c8f2ee55a05c38440c0374fec60e57fff81b43507d68a0cd",
+    "utmctl/UTMCtl.swift": "007a1ef14182d73fda4d24e52511112fa9801a10ff56d3d067ec096ce759ffe6"
+  }
+}

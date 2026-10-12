@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a pinned UTM controller without its unconditional hidden-app launch flag."""
+"""Build a pinned UTM controller that launches the app before scripting access."""
 import argparse
 import hashlib
 import json
@@ -11,7 +11,7 @@ import tempfile
 import urllib.request
 
 ROOT=Path(__file__).resolve().parent
-OUTPUT=ROOT/'runtime/utmctl-control-v2'
+OUTPUT=ROOT/'runtime/utmctl-control-v3'
 REVISION='048ca7498ea3a374439149d51739d94c5300bcda' # official UTM v4.7.5
 ARGUMENT_PARSER='8f4d2753f0e4778c76d5f05ad16c74f707390531'
 SOURCES={
@@ -19,7 +19,7 @@ SOURCES={
     'Scripting/UTMScripting.swift':'40b64b2e8997d310c8f2ee55a05c38440c0374fec60e57fff81b43507d68a0cd',
     'LICENSE':'cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30',
 }
-POLICY='foreground-no-restoration/2'
+POLICY='workspace-before-scripting/3'
 
 
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -47,15 +47,40 @@ def fetch(name):
 
 
 def patch_launch(source):
-    before='app.launchFlags = [.defaults, .andHide]'
-    if source.count(before)!=1:raise ValueError('UTM launch patch no longer matches the pinned source')
-    return source.replace(before,'''app.launchFlags = [.defaults]
-        // Restoring a previously closed library can leave the scripting delegate
-        // uninitialized. Only a cold app launch needs this per-process setting.
-        if !app.isRunning {
-            _ = try NSWorkspace.shared.launchApplication(at: utmAppUrl, options: [],
-                configuration: [.arguments: ["-ApplePersistenceIgnoreState", "YES"]])
-        }''')
+    before = """        guard let app = SBApplication(url: utmAppUrl) else {
+            throw UTMCtl.APIError.applicationNotFound
+        }
+        app.launchFlags = [.defaults, .andHide]"""
+    if source.count(before) != 1:
+        raise ValueError('UTM launch patch no longer matches the pinned source')
+    after = """        // LaunchServices must receive the no-restoration arguments before
+        // ScriptingBridge can send an event that implicitly launches the app.
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.arguments = ["-ApplePersistenceIgnoreState", "YES"]
+        configuration.activates = NSRunningApplication.runningApplications(
+            withBundleIdentifier: "com.utmapp.UTM").isEmpty
+        var completed = false
+        var launched: NSRunningApplication?
+        var launchError: Error?
+        NSWorkspace.shared.openApplication(at: utmAppUrl, configuration: configuration) { app, error in
+            launched = app
+            launchError = error
+            completed = true
+        }
+        let deadline = Date().addingTimeInterval(8)
+        while !completed && Date() < deadline {
+            _ = RunLoop.current.run(mode: .default, before: Date().addingTimeInterval(0.02))
+        }
+        if let error = launchError { throw error }
+        guard completed, let running = launched, !running.isTerminated else {
+            throw NSError(domain: "AgentOS.UTMControl", code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "UTM application launch did not complete; no VM command was sent"])
+        }
+        guard let app = SBApplication(url: utmAppUrl) else {
+            throw UTMCtl.APIError.applicationNotFound
+        }
+        app.launchFlags = [.defaults]"""
+    return source.replace(before, after)
 
 
 def build(output=OUTPUT):
