@@ -1,0 +1,1 @@
+{"removed_duplicate": "/home/developer/agentos-image-inputs/agentos-release-v20.qcow2", "retained_host_image": "candidate-v20.qcow2", "sha256": "d562f88587c763cac3460b8f99d1bf60a4ae66ca3700c748bb769f6914e6dc5e", "removed_bytes": 1828978688, "free_before": 42929639424, "free_after": 44751622144}
