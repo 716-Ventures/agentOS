@@ -1,8 +1,8 @@
 # Shared layout milestone — Agent OS 0.5
 
-**Graphical successor:** [Native windowing specification v0.1](../agent-os-windowing-specification.md). The API below remains the implemented terminal contract. The new specification defines separate surface-content and workspace documents, catalog discovery, live bindings and atomic cross-document transactions; those extensions are not yet implemented.
+**Graphical successor:** [Native windowing specification](../agent-os-windowing-specification.md). The API below remains the supported terminal layout contract. Separate surface-content and workspace documents, catalog discovery, live bindings and atomic cross-document transactions are implemented by the [native presentation service](PRESENTATION.md). See [current qualification](../implementation-status.md) for verified behavior and remaining work.
 
-The terminal and agent now operate on the same persistent activity layout. This is the presentation control foundation for a future graphical shell; no graphical compositor is installed by this milestone.
+The terminal and agent operate on the same persistent activity layout. This guide describes the original terminal service; the integrated runtime also includes a GTK native renderer and a Wayland compositor with nested and direct-display sessions.
 
 ## Architecture
 
@@ -29,6 +29,6 @@ The reasoning model chooses requested arrangements; deterministic service code v
 
 The live Gateway model called layout_snapshot successfully in this deployment. Its next inference returned HTTP 429, so a complete natural-language layout change has not yet been verified against the live free model. No paid fallback was used.
 
-## Next architectural extension
+## Implemented native extension
 
-Evolve the shared layout service through an adapter to the adopted native presentation contract. Preserve stable surface IDs, activities, revisions, undo and existing terminal operations. Introduce SurfaceDocument for typed content and WorkspaceDocument for tiled/floating placement; extend three-second editing leases into field- and geometry-aware interaction ownership. The current API and six-tile terminal projection remain supported. The graphical service must add catalog negotiation, source subscriptions, atomic transactions, output handling and application reconciliation. Window lifetime, pointer input, accessibility, interactive PTYs and voice remain unimplemented graphical milestones.
+The native presentation service preserves activities, revisions, undo and existing terminal operations while using SurfaceDocument for typed content and WorkspaceDocument for tiled/floating placement. Field- and geometry-aware interaction leases protect local work. Catalog negotiation, source subscriptions, atomic transactions, output handling and application reconciliation are implemented, alongside native window controls, pointer input, accessibility and explicit interactive PTY attachment. The current API and six-tile terminal projection remain supported. The [native shell guide](../native-shell/README.md) describes session controls; the [implementation status](../implementation-status.md) distinguishes VM verification from outstanding physical-device, live-provider and reference-conformance qualification.

@@ -1,0 +1,265 @@
+{
+  "result": "pass",
+  "production_runtime": "c57b60d448d4dac8f12ffac1e210b107cb867c908189dce6b5299dc4e5fb7dce",
+  "production_source_matches_clean_complete70": true,
+  "qualified_production_source_archive_sha256": "953a80f83840fd06a32b324bed4b1e10d186346318c29784dc23f33f82cd4328",
+  "test_source_changes": [
+    " M outputs/agent-shell/LAYOUT.md",
+    " M outputs/agent-shell/tests/direct_display_guest.py",
+    " M outputs/agent-shell/tests/direct_input_probe.py",
+    "A  outputs/agent-shell/tests/direct_shell_hotplug_probe.py"
+  ],
+  "test_source_sha256": {
+    "tests/direct_shell_hotplug_probe.py": "e30b0d679b8af75bb0369f037269a106e647c316e8cbc40c4a39d11e30d35254",
+    "tests/direct_display_guest.py": "67e5fd4ad51b344e5ffab4388edab2c1ff59a2bd985efa253a31643011ec1a46",
+    "tests/direct_input_probe.py": "784531fa7111dce641cb33d739ee719334913f934eda849a9c8b1a2f3562c889",
+    "LAYOUT.md": "4bf972cbc332284809b357b7296cb4cc8725ffdee5f8cbfe9da0399e9cc67323"
+  },
+  "shell_overlay_recovery": [
+    {
+      "phase": "primary-removed",
+      "outputs": [
+        {
+          "height": 768,
+          "name": "Virtual-2",
+          "scale": 1.0,
+          "transform": "Normal",
+          "width": 1024,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "layers": [
+        {
+          "geometry": {
+            "height": 60,
+            "width": 1024,
+            "x": 0,
+            "y": 0
+          },
+          "id": "ObjectId(wl_surface@23[0], 29)",
+          "mapped": true,
+          "namespace": "agentos-system-bar",
+          "output": "Virtual-2",
+          "work_area": {
+            "height": 384,
+            "width": 1024,
+            "x": 0,
+            "y": 60
+          }
+        },
+        {
+          "geometry": {
+            "height": 324,
+            "width": 1024,
+            "x": 0,
+            "y": 444
+          },
+          "id": "ObjectId(wl_surface@35[0], 186)",
+          "mapped": true,
+          "namespace": "agentos-keyboard",
+          "output": "Virtual-2",
+          "work_area": {
+            "height": 384,
+            "width": 1024,
+            "x": 0,
+            "y": 60
+          }
+        },
+        {
+          "geometry": {
+            "height": 600,
+            "width": 800,
+            "x": 112,
+            "y": 60
+          },
+          "id": "ObjectId(wl_surface@45[0], 396)",
+          "mapped": true,
+          "namespace": "agentos-launcher",
+          "output": "Virtual-2",
+          "work_area": {
+            "height": 384,
+            "width": 1024,
+            "x": 0,
+            "y": 60
+          }
+        }
+      ],
+      "seat_focus": "ObjectId(wl_surface@45[0], 396)",
+      "original_layer_ids": {
+        "agentos-system-bar": "ObjectId(wl_surface@23[0], 29)",
+        "agentos-keyboard": "ObjectId(wl_surface@35[0], 186)",
+        "agentos-launcher": "ObjectId(wl_surface@45[0], 396)"
+      },
+      "launcher_appended_text": "a",
+      "editor_text_preserved": true
+    },
+    {
+      "phase": "all-restored-secondary-first",
+      "outputs": [
+        {
+          "height": 768,
+          "name": "Virtual-2",
+          "scale": 1.0,
+          "transform": "Normal",
+          "width": 1024,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "layers": [
+        {
+          "geometry": {
+            "height": 60,
+            "width": 1024,
+            "x": 0,
+            "y": 0
+          },
+          "id": "ObjectId(wl_surface@23[0], 29)",
+          "mapped": true,
+          "namespace": "agentos-system-bar",
+          "output": "Virtual-2",
+          "work_area": {
+            "height": 384,
+            "width": 1024,
+            "x": 0,
+            "y": 60
+          }
+        },
+        {
+          "geometry": {
+            "height": 324,
+            "width": 1024,
+            "x": 0,
+            "y": 444
+          },
+          "id": "ObjectId(wl_surface@35[0], 186)",
+          "mapped": true,
+          "namespace": "agentos-keyboard",
+          "output": "Virtual-2",
+          "work_area": {
+            "height": 384,
+            "width": 1024,
+            "x": 0,
+            "y": 60
+          }
+        },
+        {
+          "geometry": {
+            "height": 600,
+            "width": 800,
+            "x": 112,
+            "y": 60
+          },
+          "id": "ObjectId(wl_surface@45[0], 396)",
+          "mapped": true,
+          "namespace": "agentos-launcher",
+          "output": "Virtual-2",
+          "work_area": {
+            "height": 384,
+            "width": 1024,
+            "x": 0,
+            "y": 60
+          }
+        }
+      ],
+      "seat_focus": "ObjectId(wl_surface@45[0], 396)",
+      "original_layer_ids": {
+        "agentos-system-bar": "ObjectId(wl_surface@23[0], 29)",
+        "agentos-keyboard": "ObjectId(wl_surface@35[0], 186)",
+        "agentos-launcher": "ObjectId(wl_surface@45[0], 396)"
+      },
+      "launcher_appended_text": "aa",
+      "editor_text_preserved": true
+    },
+    {
+      "phase": "primary-reconnected",
+      "outputs": [
+        {
+          "height": 768,
+          "name": "Virtual-2",
+          "scale": 1.0,
+          "transform": "Normal",
+          "width": 1024,
+          "x": 1280,
+          "y": 0
+        },
+        {
+          "height": 800,
+          "name": "Virtual-1",
+          "scale": 1.0,
+          "transform": "Normal",
+          "width": 1280,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "layers": [
+        {
+          "geometry": {
+            "height": 60,
+            "width": 1024,
+            "x": 0,
+            "y": 0
+          },
+          "id": "ObjectId(wl_surface@23[0], 29)",
+          "mapped": true,
+          "namespace": "agentos-system-bar",
+          "output": "Virtual-2",
+          "work_area": {
+            "height": 384,
+            "width": 1024,
+            "x": 1280,
+            "y": 60
+          }
+        },
+        {
+          "geometry": {
+            "height": 324,
+            "width": 1024,
+            "x": 0,
+            "y": 444
+          },
+          "id": "ObjectId(wl_surface@35[0], 186)",
+          "mapped": true,
+          "namespace": "agentos-keyboard",
+          "output": "Virtual-2",
+          "work_area": {
+            "height": 384,
+            "width": 1024,
+            "x": 1280,
+            "y": 60
+          }
+        },
+        {
+          "geometry": {
+            "height": 600,
+            "width": 800,
+            "x": 112,
+            "y": 60
+          },
+          "id": "ObjectId(wl_surface@45[0], 396)",
+          "mapped": true,
+          "namespace": "agentos-launcher",
+          "output": "Virtual-2",
+          "work_area": {
+            "height": 384,
+            "width": 1024,
+            "x": 1280,
+            "y": 60
+          }
+        }
+      ],
+      "seat_focus": "ObjectId(wl_surface@45[0], 396)",
+      "original_layer_ids": {
+        "agentos-system-bar": "ObjectId(wl_surface@23[0], 29)",
+        "agentos-keyboard": "ObjectId(wl_surface@35[0], 186)",
+        "agentos-launcher": "ObjectId(wl_surface@45[0], 396)"
+      },
+      "launcher_appended_text": "aaa",
+      "editor_text_preserved": true
+    }
+  ],
+  "clean_committed_test_repeat_pending": true,
+  "physical_hotplug_qualified": false
+}

@@ -294,7 +294,7 @@ def assistive():
         print(json.dumps(response),flush=True)
 
 
-def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False,presentation_feedback=False,native_feedback=False,native_feedback_load=False,table_input=False,focus_transfers=1,screen_reader=False,multi_output=False,multi_output_hotplug=False,multi_output_hotplug_primary=False,multi_output_hotplug_all=False):
+def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False,presentation_feedback=False,native_feedback=False,native_feedback_load=False,table_input=False,focus_transfers=1,screen_reader=False,multi_output=False,multi_output_shell_hotplug=False,multi_output_hotplug=False,multi_output_hotplug_primary=False,multi_output_hotplug_all=False):
     subprocess.run(['modprobe','uinput'],check=True)
     # Join only this test session's accessibility bus; never inspect other users.
     bus=None;observer_runtime=None;wayland=None;deadline=time.monotonic()+10
@@ -397,6 +397,9 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
         if multi_output:
             import direct_multi_output_probe
             direct_multi_output_probe.verify(env,metrics,core,scene,login_user,presentation,keyboard,pointer,hotplug=multi_output_hotplug,hotplug_primary=multi_output_hotplug_primary,hotplug_all=multi_output_hotplug_all)
+            if multi_output_shell_hotplug:
+                import direct_shell_hotplug_probe
+                direct_shell_hotplug_probe.verify(scene,target,snapshot,keyboard,pointer)
             return
         if presentation_feedback:
             import direct_presentation_probe
