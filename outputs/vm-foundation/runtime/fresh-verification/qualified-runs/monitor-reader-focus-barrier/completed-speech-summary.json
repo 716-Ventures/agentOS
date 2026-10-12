@@ -1,0 +1,11 @@
+{
+  "raw_sha256": "325c959f581d5306090c2f417d0398b06adcde345040bea52b692c74488cb637",
+  "exact_work_navigation_utterances_by_monitor_mapping": [
+    2,
+    2,
+    2,
+    2
+  ],
+  "background_failure_announcements": 1,
+  "marker_required_inside_completed_speech_utterance": true
+}
