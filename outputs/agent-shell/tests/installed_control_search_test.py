@@ -29,7 +29,9 @@ class InstalledControlSearchTest(unittest.TestCase):
     def search(self, root, wait):
         # Load the real search without starting installed services or requiring
         # Linux AT-SPI/GTK bindings on the host unit-test runner.
-        path = Path(__file__).resolve().parents[2] / 'native-shell/tests/installed_broker.py'
+        shell = Path(__file__).resolve().parents[1]
+        native = shell / 'native-shell' if (shell / 'native-shell').is_dir() else shell.parent / 'native-shell'
+        path = native / 'tests/installed_broker.py'
         tree = ast.parse(path.read_text())
         function = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'button')
         namespace = {'pyatspi': SimpleNamespace(

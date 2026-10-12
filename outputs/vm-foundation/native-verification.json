@@ -6015,7 +6015,8 @@
       "fixed_search_unit_tests_passed": 2,
       "production_code_changed": false,
       "subsequent_ci_and_clean_source_full70_pending": true,
-      "evidence_directory": "qualified-runs/installed-control-absent-child"
+      "evidence_directory": "qualified-runs/installed-control-absent-child",
+      "unit_tests_verified_in_repository_and_deployed_layouts": true
     }
   },
   "observations": [
