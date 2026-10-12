@@ -5209,7 +5209,28 @@
       "evidence_directory": "qualified-runs/virtual-multihead-fixed",
       "pointer_baseline_directory": "qualified-runs/virtual-multihead-pointer-baseline",
       "resume_baseline_directory": "qualified-runs/virtual-multihead-resume-baseline",
-      "startup_failure_directory": "qualified-runs/virtual-multihead-startup-failure"
+      "startup_failure_directory": "qualified-runs/virtual-multihead-startup-failure",
+      "first_clean_full70_failure": {
+        "source_revision": "690f0709b422e94ff1529811c81ac495b6629251",
+        "passed_checks": 33,
+        "failed_check": "native-compositor",
+        "evidence_directory": "qualified-runs/690f070-full70-legacy-undo-failure",
+        "meaning": "Legacy Undo revision changed while the GTK self-test mapped/unmapped native windows; guarded rejection was correct",
+        "guest_stopped": true,
+        "owned_app_closed": true
+      }
+    },
+    "legacy_layout_selftest_barrier": {
+      "result": "pass",
+      "evidence_directory": "qualified-runs/legacy-layout-selftest-barrier",
+      "checks": [
+        "legacy",
+        "shared"
+      ],
+      "production_undo_unchanged": true,
+      "mutations_not_retried": true,
+      "fixture_sha256": "d6858b2220d603ec6da6ee724448c37b1212276948492efc8bc66284b953f2df",
+      "historical_undo_failures_explained": false
     }
   },
   "observations": [

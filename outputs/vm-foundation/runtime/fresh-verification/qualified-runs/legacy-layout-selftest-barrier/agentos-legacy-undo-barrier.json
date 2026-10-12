@@ -1,0 +1,9 @@
+{
+  "result": "pass",
+  "checks": [
+    "legacy",
+    "shared"
+  ],
+  "owned_app_closed": true,
+  "guest_stopped": true
+}

@@ -166,7 +166,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                             time.sleep(.02)
                         print('PASS: configured unbuffered Wayland toplevel never enters durable placement')
                     simple=subprocess.Popen(['weston-simple-shm'],env=childenv,stdout=nestedlog,stderr=subprocess.STDOUT,start_new_session=True);applications.append(simple)
-                    state=wait_windows(1);ident=state['windows'][0]['id']
+                    state=wait_windows(1);ident=state['windows'][0]['id'];simple_app_id=state['windows'][0]['app_id']
                     if shared:
                         def wait_shared(predicate):
                             deadline=time.monotonic()+10
@@ -285,6 +285,18 @@ with tempfile.TemporaryDirectory(prefix='agentos-native-') as directory:
                         print('PASS: simulated output loss, temporary reachable projection, preserved placement and explicit recovery')
                         print('PASS: authenticated native identity, conventional registration, durable shared layout/focus, stale revision rejection, actual float/maximize rendering and journal undo')
                     else:
+                        # The GTK self-test opens/closes native windows. Those are
+                        # real layout revisions, so do not race its lifecycle with
+                        # the separate legacy place/undo revision assertions.
+                        assert desktop.wait(timeout=30)==0
+                        deadline=time.monotonic()+5
+                        while True:
+                            state=snapshot()
+                            ids={w['id'] for w in state['windows']}
+                            if (len(ids)==2 and ident in ids and ids==set(state['layout']['order'])
+                                    and all(w['app_id']==simple_app_id for w in state['windows'])):break
+                            assert time.monotonic()<deadline,{'meaning':'Native self-test clients did not unmap before legacy revision checks','scene':state}
+                            time.sleep(.02)
                         revision=state['layout']['revision']
                         assert not control_call({'op':'place','id':ident,'expected_revision':revision-1,'placement':{'mode':'maximized'}})['ok']
                         revision=snapshot()['layout']['revision']

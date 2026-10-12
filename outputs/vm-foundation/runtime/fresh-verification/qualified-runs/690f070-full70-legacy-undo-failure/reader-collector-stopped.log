@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/tmp/agentos-capture-multihead-reader.py", line 10, in <module>
+    assert 'Traceback (most recent call last):' not in log.read_text(),'Runtime qualification failed before reader evidence collection'
+AssertionError: Runtime qualification failed before reader evidence collection
