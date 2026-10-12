@@ -179,6 +179,15 @@ pub fn snapshot(surfaces: &BTreeMap<String, Surface>, frame: &Frame) -> Value {
     context
 }
 
+/// An empty desktop has no activity generation to freeze before recording.
+/// Bind only this context on deliberate submission; captured work stays scoped.
+pub fn unscoped_launcher(context: &Value) -> bool {
+    context["activity_id"].is_null() && context["surface_id"]=="native-launcher"
+        && context["selection_kind"]=="focused_surface" && context["selection"]==""
+        && context["job_ref"].is_null() && context.get("element_id").is_none()
+        && context.get("object_id").is_none()
+}
+
 pub fn stamp(mut context: Value, modality: &str) -> Result<Value, String> {
     let mut bytes = [0u8; 16];
     std::fs::File::open("/dev/urandom")

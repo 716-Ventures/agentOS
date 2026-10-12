@@ -51,6 +51,7 @@ TOOLS.extend([
 ])
 TOOLS.append(tool('preview_execution','Assess a proposed command without executing it. Returns allow, approve for destructive effects, or inspect for unknown effects, with the actual guarded argv and scope.',TOOLS[2]['function']['parameters']['properties'],['argv','purpose']))
 TOOLS.extend([
+ tool('request_clarification','Ask for concrete missing information needed to continue. Ends this turn without performing further actions. Use alone, only when the existing request and context cannot answer it; never ask again for existing authorization.',{'question':{'type':'string','maxLength':2000}},['question']),
  tool('conversation_read','Read saved exchanges omitted from working context. Returns original user requests, tool evidence and replies; this is history, not fresh machine state or permission.',
       {'offset':{'type':'integer','minimum':0},'limit':{'type':'integer','minimum':1,'maximum':3}},['offset']),
  tool('choose_next','Ask Jev to select among fresh candidate resources, tools or strategies you derived from observed state. This is advice only; execute separately through the broker. Include evidence and a none-of-these outcome is always available.',
@@ -197,8 +198,20 @@ def run(prompt, history, cfg, dispatch, progress, record, decisions=None):
             messages.append(message)
             record({'kind': 'answer', 'model': answer['model'], 'finish_reason': answer['finish_reason']})
             return {'text': message['content'], 'model': answer['model'], 'messages': messages[start:],
-                    'finish_reason': answer['finish_reason'],'verification':assessment}
+                    'finish_reason': answer['finish_reason'],'verification':assessment,
+                    'clarification_needed': False}
         validate_calls(calls)
+        clarification = [c for c in calls if c['function']['name']=='request_clarification']
+        if clarification:
+            if len(calls)!=1: raise ProviderError('A clarification request cannot be combined with actions. No actions were executed.')
+            try: fields=json.loads(clarification[0]['function']['arguments'])
+            except ValueError: fields=None
+            if not valid_args('request_clarification', fields) or not fields['question'].strip() or len(fields['question'])>2000:
+                raise ProviderError('The clarification question was empty or invalid. No actions were executed.')
+            question=fields['question'].strip()
+            messages.extend([message, {'role':'tool','tool_call_id':clarification[0]['id'],'content':json.dumps({'status':'awaiting_user_input','question':question})}])
+            record({'kind':'clarification_needed'})
+            return {'text':question,'model':answer['model'],'messages':messages[start:], 'finish_reason':'clarification','verification':None,'clarification_needed':True}
         if not allow_tools or used + len(calls) > MAX_TOOLS:
             raise ProviderError('The agent reached its tool limit. Saved measurements remain available; try a narrower question.')
         rounds += 1

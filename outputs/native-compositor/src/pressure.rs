@@ -171,6 +171,7 @@ mod tests {
             app_id: "".into(),
             uid: 1000,
             session: "1:1".into(),
+            system_control: false,
             min_width,
             min_height: 100,
         };

@@ -3,6 +3,9 @@ mod action_parameters;
 mod broker_controls;
 mod broker_pages;
 mod controls;
+mod desktop_theme;
+mod agent_monitor;
+mod wallpaper;
 mod document_dialog;
 mod draft_cache;
 mod draft_dialog;
@@ -762,6 +765,7 @@ impl Surface {
             .child(&content)
             .build();
         window.add_css_class("seven-ui");
+        let header=gtk::HeaderBar::new();header.set_decoration_layout(Some(":maximize,close"));window.set_titlebar(Some(&header));
         scroll.set_margin_top(24);
         scroll.set_margin_bottom(24);
         scroll.set_margin_start(24);
@@ -1371,6 +1375,7 @@ fn main() {
     let app = gtk::Application::builder()
         .application_id("com.agentos.Desktop")
         .build();
+    let preview = option("--desktop-preview");
     let frontend = backend.clone();
     app.connect_activate(move |app| {
         let display = gtk::gdk::Display::default().expect("A native Wayland display is required");
@@ -1385,26 +1390,42 @@ fn main() {
                 if retained.is_empty() { std::env::remove_var("LD_PRELOAD"); } else { std::env::set_var("LD_PRELOAD", retained); }
             }
         }
+        desktop_theme::register_font();
         apply_preferences(&display);
+        desktop_theme::install(&display, preferences::read()["appearance"] == "light", preferences::read()["text_scale"].as_f64().unwrap_or(1.0));
+        if let Some(path) = &preview {
+            // Explicit verification input; never substitutes for live telemetry.
+            let value: Value = serde_json::from_slice(&std::fs::read(path).expect("Preview snapshot")).expect("Preview JSON");
+            let mut controls = controls::Controls::new(app, frontend.borrow().commands.clone());
+            controls.temporary_launcher();
+            controls.update(&Frame {core:value["core"].clone(),usage:value["usage"].clone(),connected:value["connected"]==true,..Frame::default()}, &frontend.borrow().commands);
+            controls.preview_size(value["width"].as_i64().unwrap_or(1040) as i32, value["height"].as_i64().unwrap_or(680) as i32);
+            controls.present();
+            let app=app.clone();
+            let capture=value["capture"].as_str().expect("Preview capture path").to_owned();
+            glib::timeout_add_local_once(Duration::from_millis(700), move || {assert!(controls.capture_monitor(&capture));controls.close();app.quit();});
+            return;
+        }
         let bar = ui::row(20);
-        bar.add_css_class("seven-ui");
+        bar.add_css_class("agentos-system-bar");
         bar.set_margin_top(12);
         bar.set_margin_bottom(12);
         bar.set_margin_start(20);
         bar.set_margin_end(20);
         let clock = ui::text("", false);
         let user = ui::text(
-            &std::env::var("USER").unwrap_or_else(|_| "Local user".into()),
+            &desktop_theme::signed_in_name(),
             false,
         );
-        let status = ui::button("Connecting…", ButtonVariant::Ghost, false);
-        bar.append(&clock);
+        let status = ui::button("Agents", ButtonVariant::Ghost, false);
         bar.append(&user);
         bar.append(&status);
+        bar.append(&clock);
         let logout=ui::button("End desktop session",ButtonVariant::Outline,false);
         let desktop=app.clone();logout.connect_clicked(move |_|desktop.quit());
         if !trusted { bar.append(&logout); }
         clock.set_selectable(false);
+        clock.set_hexpand(false);
         clock.set_wrap(false);
         clock.set_ellipsize(gtk::pango::EllipsizeMode::End);
         user.set_selectable(false);
@@ -1427,11 +1448,12 @@ fn main() {
         let main = gtk::ApplicationWindow::builder()
             .application(app)
             .title(if trusted { "Agent launcher" } else { "agentOS" })
-            .default_width(800)
-            .default_height(if trusted { 600 } else { 330 })
+            .default_width(if trusted { 720 } else { 800 })
+            .default_height(if trusted { 360 } else { 330 })
             .child(&scroll)
             .build();
         main.add_css_class("seven-ui");
+        main.add_css_class("agentos-launcher");
         let (weak_frontend, weak_surfaces, weak_controls) = (Rc::downgrade(&frontend), Rc::downgrade(&surfaces), Rc::downgrade(&controls));
         controls.borrow().context_provider(Rc::new(move || {
             let (Some(backend),Some(surfaces),Some(controls))=(weak_frontend.upgrade(),weak_surfaces.upgrade(),weak_controls.upgrade()) else {return Value::Null;};
@@ -1440,6 +1462,7 @@ fn main() {
             let captured=controls.borrow().capture_context(context);
             captured
         }));
+        let mut wallpaper = None;
         let mut layer_library = None;
         let mut bar_window = None;
         let mut screen_keyboard = None;
@@ -1448,7 +1471,8 @@ fn main() {
         app.connect_shutdown(move |_| { event_cleanup.borrow_mut().take(); });
         if trusted {
             let window = gtk::ApplicationWindow::builder().application(app).title("agentOS system bar").decorated(false).child(&bar).build();
-            window.add_css_class("seven-ui");
+            window.add_css_class("agentos-system-bar");
+            wallpaper = Some(wallpaper::Backgrounds::new(app, &display));
             match system_bar::configure(&window, false) {
                 Ok(library) => layer_library = Some(library),
                 Err(error) => { eprintln!("System bar unavailable: {error}"); app.quit(); return; }
@@ -1457,7 +1481,7 @@ fn main() {
             main.set_decorated(false);
             let header = ui::row(12);
             header.set_margin_start(20); header.set_margin_end(20); header.set_margin_top(12);
-            let title = ui::text("Agent launcher", true); title.set_selectable(false); title.set_hexpand(true); title.set_xalign(0.0);
+            let title = ui::text("What would you like to do?", true); title.add_css_class("desktop-heading"); title.set_selectable(false); title.set_hexpand(true); title.set_xalign(0.0);
             title.set_ellipsize(gtk::pango::EllipsizeMode::End); title.set_wrap(false);
             let dismiss = ui::button("Close launcher", ButtonVariant::Ghost, false);
             header.append(&title); header.append(&dismiss);
@@ -1490,10 +1514,11 @@ fn main() {
             });
             main.add_controller(key);
             let open = ui::button("Open launcher", ButtonVariant::Primary, false);
+            open.add_css_class("desktop-primary");
             let weak = main.downgrade();
             let focus = controls.clone();
             open.connect_clicked(move |_| { if let Some(window) = weak.upgrade() { focus.borrow().open_launcher(); window.present(); } });
-            controls.borrow().monitor_content.prepend(&open);
+            controls.borrow().monitor_actions.append(&open);
             let keyboard = match screen_keyboard::Keyboard::new(app) {
                 Ok(keyboard) => Rc::new(keyboard),
                 Err(error) => {eprintln!("On-screen keyboard unavailable: {error}");app.quit();return;}
@@ -1511,7 +1536,8 @@ fn main() {
         first_run::present(app,frontend.borrow().commands.clone());
         let voice_cleanup=controls.clone();app.connect_shutdown(move |_|voice_cleanup.borrow().close());
         let opener = controls.clone();
-        status.connect_clicked(move |_| opener.borrow().present());
+        let launcher=main.downgrade();
+        status.connect_clicked(move |_| {if trusted {if let Some(window)=launcher.upgrade(){if window.is_visible(){window.close();}}}opener.borrow().present();});
         let frontend = frontend.clone();
         let application = app.clone();
         let fixture_mode = std::env::var("AGENT_OS_NATIVE_IME_FIXTURE").unwrap_or_default();
@@ -1524,12 +1550,13 @@ fn main() {
         let mut bar_captured = false;
         let mut launcher_captured = false;
         let mut restoration_captured = false;
+        let mut monitor_captured = false;
         glib::timeout_add_local(Duration::from_millis(50), move || {
             // Keep the layer library and system window alive for this session.
-            let _ = (&layer_library, &bar_window, &screen_keyboard);
+            let _ = (&layer_library, &bar_window, &screen_keyboard, &wallpaper);
             if !bar_captured {
                 if let (Some(window), Ok(path)) = (&bar_window, std::env::var("AGENT_OS_SYSTEM_BAR_CAPTURE")) {
-                    if window.width() > 0 && window.height() > 0 && frontend.borrow().frame.lock().unwrap().connected && !clock.text().is_empty() && status.label().as_deref() == Some("Agent Monitor") {
+                    if window.width() > 0 && window.height() > 0 && frontend.borrow().frame.lock().unwrap().connected && !clock.text().is_empty() && status.label().as_deref() == Some("Agents") {
                         let paintable = gtk::WidgetPaintable::new(Some(window));
                         let snapshot = gtk::Snapshot::new();
                         paintable.snapshot(&snapshot, window.width() as f64, window.height() as f64);
@@ -1568,8 +1595,10 @@ fn main() {
             } else {
                 "Connection unavailable"
             };
-            status.set_label(connection);
+            status.set_tooltip_text(Some(connection));
+            status.update_property(&[gtk::accessible::Property::Description(connection)]);
             controls.borrow_mut().update(&frame, &backend.commands);
+            if !monitor_captured && frame.connected {if let Ok(path)=std::env::var("AGENT_OS_MONITOR_CAPTURE") {monitor_captured=controls.borrow().capture_monitor(&path);}}
             if !restoration_captured {
                 if let Ok(path) = std::env::var("AGENT_OS_RESTORATION_CAPTURE") {
                     restoration_captured = controls.borrow().capture_output_restoration(&path);

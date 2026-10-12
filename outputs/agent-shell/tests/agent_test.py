@@ -14,6 +14,15 @@ def answer():
     return {'message':{'role':'assistant','content':'Measured kernel.'},'model':'fixture','finish_reason':'stop'}
 
 class AgentTests(unittest.TestCase):
+    def test_clarification_finishes_without_executing_or_guessing(self):
+        with patch.object(agent,'complete',return_value=call('request_clarification','{"question":"Which project should I use?"}')):
+            used=[]
+            result=agent.run('Open the project',[],{},lambda *args:used.append(args),lambda _:None,lambda _:None)
+        self.assertEqual(used,[])
+        self.assertTrue(result['clarification_needed'])
+        self.assertEqual(result['text'],'Which project should I use?')
+        self.assertEqual(result['messages'][-1]['role'],'tool')
+
     def test_tool_loop_without_jev(self):
         with patch.object(agent,'complete',side_effect=[call(),answer()]) as complete:
             events=[]; used=[]

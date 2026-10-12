@@ -52,7 +52,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-first-document-') as directory:
                     response=json.loads(conn.makefile('rb').readline(4*1024*1024+1))
                     return response.get('result') if response.get('ok') else None
             desktop=subprocess.Popen([str(ROOT/'target/debug/agent-os-desktop'),'--socket',str(endpoint)],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
-            accessibility.activate(accessibility.find('Agent Monitor',pyatspi.ROLE_PUSH_BUTTON))
+            accessibility.activate(accessibility.find('Agents',pyatspi.ROLE_PUSH_BUTTON))
             button=accessibility.find('New document',pyatspi.ROLE_PUSH_BUTTON)
             accessibility.wait(lambda:button.getState().contains(pyatspi.STATE_SENSITIVE),'New document required a prior activity')
             importer=accessibility.find('Import text file…',pyatspi.ROLE_PUSH_BUTTON)

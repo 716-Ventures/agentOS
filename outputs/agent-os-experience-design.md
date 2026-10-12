@@ -1,12 +1,12 @@
 # Agent OS experience direction
 
-Design requirements derived from the founder's principles. The [native windowing specification](agent-os-windowing-specification.md) defines the adopted graphical architecture and normative interaction contracts. This document supplies experience context; no graphical desktop is installed.
+Design requirements derived from the founder's principles. The [native windowing specification](agent-os-windowing-specification.md) defines the adopted graphical architecture and normative interaction contracts. This document supplies experience context. The development runtime now includes the native graphical desktop; the confirmed refinements below govern its composition.
 
 ## Quality bar
 
 The environment should feel composed, responsive and dependable. macOS is a benchmark for coherence and craft, not a template for chrome, iconography or window behavior. An agentic OS should make ordinary work easier, with a distinct identity and equally good direct controls.
 
-The current terminal client supports user-managed tiling, independent views, persistent shared layouts and light/dark themes. The agent and direct controls share revisioned layout operations; see [the implementation contract](agent-shell/LAYOUT.md). PTY-backed shell surfaces and the native graphical environment remain future work.
+The current terminal client supports user-managed tiling, independent views, persistent shared layouts and light/dark themes. The agent and direct controls share revisioned layout operations; see [the implementation contract](agent-shell/LAYOUT.md). The native environment also supports PTY-backed terminal surfaces, conventional applications, typed documents, and tiled or floating placement.
 
 ## Activities and surfaces
 

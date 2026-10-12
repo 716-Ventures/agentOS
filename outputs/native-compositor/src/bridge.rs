@@ -25,6 +25,7 @@ pub struct Observed {
     pub app_id: String,
     pub uid: u32,
     pub session: String,
+    pub system_control: bool,
     pub min_width: i32,
     pub min_height: i32,
 }
@@ -389,7 +390,11 @@ impl Bridge {
                                 doc["outputs"][primary_id] =
                                     json!({"tiles":null,"floating":[],"maximized":null});
                             }
+                            let (controls, surfaces): (Vec<_>, Vec<_>) = surfaces.into_iter().partition(|surface| {
+                                observed.windows.iter().any(|window| system_monitor(window) && identities.get(&window.id)==Some(surface))
+                            });
                             place_new_views(&mut doc, primary_id, primary_area, surfaces);
+                            place_controls(&mut doc, primary_id, primary_area, controls);
                             counter += 1;
                             if let Err(error) =
                                 put(&socket, &doc, expected, &format!("host-{prefix}-{counter}"))
@@ -700,6 +705,18 @@ fn placed_surfaces(state: &Value) -> BTreeSet<String> {
 }
 // Preserve every existing placement when a human has constrained the workspace.
 // New windows still need durable geometry so they can be focused and managed.
+fn system_monitor(window: &Observed) -> bool {window.system_control && window.app_id=="agentos.monitor"}
+
+/// A host-authenticated monitor opens over existing work. This preference is
+/// applied once; subsequent human placement and saved workspace state win.
+fn place_controls(doc: &mut Value, output: &str, area: Rect, surfaces: Vec<String>) {
+    for surface in surfaces {
+        let width=area.width.min(920).max(1); let height=area.height.min(755).max(1);
+        doc["outputs"][output]["floating"].as_array_mut().unwrap().push(json!({
+            "surface_id":surface,"x":(area.width-width)/2,"y":(area.height-height)/2,"width":width,"height":height
+        }));
+    }
+}
 fn place_new_views(doc: &mut Value, output: &str, area: Rect, surfaces: Vec<String>) {
     let constrained = doc["constraints"]
         .as_array()
@@ -867,6 +884,7 @@ mod tests {
                 app_id: "fixture".into(),
                 uid: 1000,
                 session: "1:1".into(),
+                system_control: false,
                 min_width: width,
                 min_height: 32,
             })
@@ -939,7 +957,8 @@ mod tests {
                 app_id: "fixture".into(),
                 uid: 1000,
                 session: "1:1".into(),
-                min_width: 80,
+                system_control: false,
+            min_width: 80,
                 min_height: 32,
             })
             .collect::<Vec<_>>();
@@ -1019,6 +1038,19 @@ mod tests {
         assert!(rects.values().all(|r| r.width >= 320 && r.height >= 400));
     }
     #[test]
+    fn monitor_floats_without_replacing_work_or_focus() {
+        let area=Rect{x:0,y:49,width:1280,height:751};
+        let mut doc=json!({"outputs":{"head":{"tiles":{"kind":"leaf","surface_id":"work"},"floating":[],"maximized":null}},"constraints":[],"focus":{"surface_id":"work"}});
+        let tiles=doc["outputs"]["head"]["tiles"].clone();
+        place_controls(&mut doc,"head",area,vec!["monitor".into()]);
+        assert_eq!(doc["outputs"]["head"]["tiles"],tiles);
+        assert_eq!(doc["focus"]["surface_id"],"work");
+        assert_eq!(doc["outputs"]["head"]["floating"][0]["width"],920);
+        assert_eq!(doc["outputs"]["head"]["floating"][0]["height"],751);
+        let mut window=Observed{id:"w".into(),title:"Agent Monitor".into(),app_id:"agentos.monitor".into(),uid:1000,session:"test".into(),system_control:false,min_width:80,min_height:32};
+        assert!(!system_monitor(&window));window.system_control=true;assert!(system_monitor(&window));
+    }
+    #[test]
     fn new_windows_remain_manageable_in_manually_constrained_workspaces() {
         let original =
             json!({"tiles":{"kind":"leaf","surface_id":"old"},"floating":[],"maximized":null});
@@ -1056,6 +1088,7 @@ mod tests {
             app_id: "agentos.surface.a".into(),
             uid: 1000,
             session: "8:42".into(),
+            system_control: false,
             min_width: 80,
             min_height: 32,
         };

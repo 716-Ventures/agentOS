@@ -622,6 +622,7 @@ pub fn observe(window: &Window) -> crate::bridge::Observed {
         app_id,
         uid,
         session,
+        system_control: surface.client().and_then(|client|client.get_data::<ClientState>().map(|data|data.system_shell)).unwrap_or(false),
         min_width: minimum.w.max(80),
         min_height: minimum.h.max(32),
     }

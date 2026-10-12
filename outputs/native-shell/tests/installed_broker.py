@@ -126,7 +126,8 @@ def main():
                     accessibility.wait(lambda: (runtime / 'installed-broker-test').exists(), 'Private display failed to start')
                     desktop = subprocess.Popen(['/usr/local/bin/agent-os-desktop', '--activity', str(activity)],
                                                env=env, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
-                    click('Agent Monitor')
+                    click('Agents')
+                    accessibility.disclose('Work history and output')
                     click('Review approval', approved)
                     click('Inspect stored input')
                     preview = accessibility.find('Stored operation input', pyatspi.ROLE_TEXT)

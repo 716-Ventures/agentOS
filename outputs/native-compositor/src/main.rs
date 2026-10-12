@@ -136,6 +136,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let _ = req.reply.try_send(serde_json::json!({"ok":false,"error":"Input or command expired; try again"}));
                     continue;
                 }
+                if req.value["op"]=="monitor.present" {
+                    let response=match system_shell::present_monitor(&mut data.state,req.peer_pid) {Ok(())=>serde_json::json!({"ok":true,"result":{}}),Err(error)=>serde_json::json!({"ok":false,"error":error})};
+                    let _=req.reply.try_send(response);continue;
+                }
                 if matches!(req.value["op"].as_str(), Some("keyboard.stroke" | "keyboard.restore_focus" | "display.zoom")) {
                     let response = shell_keyboard::handle(&mut data.state, req.peer_pid, &req.value);
                     let _ = req.reply.try_send(response);

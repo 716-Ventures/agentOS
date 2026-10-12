@@ -174,7 +174,7 @@ def assistive():
                 text=node.queryText()
                 print(json.dumps({'text':text.getText(0,min(text.characterCount,65536)),'focused':node.getState().contains(pyatspi.STATE_FOCUSED)}),flush=True);continue
             if request=='monitor-button':
-                node=find('Agent Monitor',pyatspi.ROLE_PUSH_BUTTON)
+                node=find('Agents',pyatspi.ROLE_PUSH_BUTTON)
                 r=node.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
                 print(json.dumps({'point':[r.x+r.width/2,r.y+r.height/2]}),flush=True);continue
             if request.startswith('monitor-work:'):
@@ -209,7 +209,10 @@ def assistive():
                     except (RuntimeError,LookupError,NotImplementedError):pass
                 print(json.dumps({'nodes':rows}),flush=True);continue
             if request in ('open-monitor','arrange-status','expand-workspace'):
-                control=find('Agent Monitor' if request=='open-monitor' else 'Arrange workspace',pyatspi.ROLE_PUSH_BUTTON if request=='open-monitor' else None)
+                if request!='open-monitor':
+                    section=find('Desktop controls',None)
+                    if not section.getState().contains(pyatspi.STATE_EXPANDED):section.queryAction().doAction(0)
+                control=find('Agents' if request=='open-monitor' else 'Arrange workspace',pyatspi.ROLE_PUSH_BUTTON if request=='open-monitor' else None)
                 response={'expanded':control.getState().contains(pyatspi.STATE_EXPANDED)}
                 if request!='arrange-status':response['requested']=control.queryAction().doAction(0)
                 print(json.dumps(response),flush=True);continue

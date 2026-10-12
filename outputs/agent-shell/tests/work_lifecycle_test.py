@@ -150,3 +150,17 @@ class RequestProvenance(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'no longer active'):
                 assistant.handle(dict(op='ask',activity=1,prompt='Queued fixture',expected_generation=0),None)
         decisions.assert_not_called();run.assert_not_called()
+
+    def test_closed_supervised_request_cannot_reach_inference(self):
+        import socket
+        owned, peer=socket.socketpair()
+        peer.close()
+        try:
+            with tempfile.TemporaryDirectory() as tmp,patch.object(assistant,'STATE',Path(tmp)), \
+                 patch.object(assistant,'config',return_value={}), \
+                 patch.object(assistant,'broker_request',return_value={'generation':1}), \
+                 patch.object(assistant,'Decisions') as decisions,patch.object(assistant,'run_agent') as run:
+                with self.assertRaisesRegex(ValueError,'request was stopped'):
+                    assistant.handle(dict(op='ask',activity=1,prompt='Stopped request',expected_generation=1),owned)
+            decisions.assert_not_called();run.assert_not_called()
+        finally: owned.close()

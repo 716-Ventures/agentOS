@@ -25,12 +25,29 @@ class UsageTests(unittest.TestCase):
         usage.finish(usage.begin(url,{'model':'paid/model'}),.1,{'usage':{}})
         usage.begin(url,{'model':'paid/model'})
         usage.configure({},'default',recover=True)
-        data=usage.read();row=data['models'][key]
+        data=usage.read();row=data['models'][key[0]]
         self.assertEqual((row['attempts'],row['responses'],row['errors'],row['rate_limits'],row['interrupted'],row['active']),(4,2,1,1,1,0))
         self.assertEqual((row['total_tokens'],row['total_reports']),(15,1))
         self.assertNotIn('SECRET',usage.PUBLIC.read_text())
         self.assertNotIn('private',usage.PUBLIC.read_text())
         self.assertEqual(usage.PUBLIC.stat().st_mode & 0o777,0o640)
+    def test_correlated_agents_and_session_keep_missing_usage_unknown(self):
+        url=providers.GATEWAY+'/chat/completions'
+        with usage.request_scope(7, 41):
+            usage.finish(usage.begin(url, {'model':'x'}), .1, {'usage':{'input_tokens':0,'total_tokens':0}})
+        with usage.request_scope(8, 42):
+            usage.finish(usage.begin(url, {'model':'x'}), .1, {'usage':{}})
+        data=usage.read()
+        first=data['agents']['41']['models']['Vercel AI Gateway/x']
+        second=data['agents']['42']['models']['Vercel AI Gateway/x']
+        self.assertEqual(first['input_reports'],1)
+        self.assertEqual(first['input_tokens'],0)
+        self.assertEqual(second['input_reports'],0)
+        self.assertEqual(second['output_reports'],0)
+        session=data['sessions'][data['current_session']]['models']['Vercel AI Gateway/x']
+        self.assertEqual(session['responses'],2)
+        self.assertIsNone(getattr(usage.CONTEXT,'request',None))
+
     def test_gets_not_counted_and_telemetry_failure_nonfatal(self):
         self.assertIsNone(usage.begin(providers.GATEWAY+'/models',None))
         with patch.object(usage,'STATE',Path(self.tmp.name)/'missing'/'state'):

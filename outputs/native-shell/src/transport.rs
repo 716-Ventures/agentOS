@@ -71,6 +71,7 @@ pub struct Frame {
     pub actions: BTreeMap<String, Value>,
     pub drafts: BTreeMap<(String, String), Value>,
     pub core: Value,
+    pub agents: Value,
     pub host_surfaces: Value,
     pub outputs: Value,
     pub compositor: Value,
@@ -79,6 +80,7 @@ pub struct Frame {
     pub usage: Value,
     pub activity: Option<String>,
     pub inspection: Option<super::log_view::Page>,
+    pub submitted_request: Option<i64>,
     pub notice: Option<String>,
     pub connected: bool,
     pub error: Option<String>,
@@ -111,6 +113,7 @@ pub enum Command {
         reference: String,
     },
     OpenTerminal,
+    PresentMonitor,
     ImportDocument {
         activity: Option<String>,
         path: PathBuf,
@@ -345,10 +348,23 @@ fn run(
                     }));
                     continue;
                 }
-                let feedback_only=matches!(&command,Command::ClearFieldFeedback{..});
+                let feedback_only=matches!(&command,Command::ClearFieldFeedback{..}|Command::PresentMonitor);
+                let submitted_request = matches!(&command, Command::Ask {..});
                 let result=match command {
                     Command::Approve(_)|Command::ReviewInput{..}=>unreachable!(),
                     Command::ClearFieldFeedback{..}=>Ok(Value::Null),
+                    Command::PresentMonitor => {
+                        if let Some(path)=std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET") {
+                            let path=PathBuf::from(path);
+                            let mut result=Err("Monitor unavailable".into());
+                            for _ in 0..10 {
+                                result=request(&path,&json!({"op":"monitor.present"}));
+                                if result.is_ok() || stop.load(Ordering::Relaxed) {break;}
+                                thread::sleep(Duration::from_millis(25));
+                            }
+                            result
+                        } else {Ok(Value::Null)}
+                    },
                     Command::Resume(job)=>super::broker_controls::job_id(&job).and_then(|id|request(&broker_socket(),&json!({"op":"poll","job_id":id}))).and_then(|current|super::broker_controls::continuation_request(&current).ok_or("No approved agent request is associated with this work".into())).and_then(|query|request(&socket,&query)),
                     Command::Attach(job)=>super::broker_controls::attach(&job),
                     Command::EmbedTerminal(job)=>{let current=frame.lock().unwrap().clone();embed_terminal(&socket,&current,&job)},
@@ -425,6 +441,9 @@ fn run(
                             };
                             let activity=selected;
                             if let Some(context)=grounding.as_mut() {
+                                if context["modality"]=="voice" && super::input_context::unscoped_launcher(context) {
+                                    context["expected_generation"]=request(&broker_socket(),&json!({"op":"activity_state","activity":activity}))?["generation"].clone();
+                                }
                                 if context["activity_id"].is_null() && context["surface_id"]=="native-launcher" { context["activity_id"]=json!(activity); }
                             }
                             let mut argv=vec!["/usr/bin/python3".to_string(),"-u".into(),"/usr/local/lib/agent-os/services/worker.py".into(),"ask".into(),activity.to_string(),prompt];
@@ -480,6 +499,7 @@ fn run(
                 if !feedback_only { match result {
                     Err(e) => view.error = Some(e),
                     Ok(value) => {
+                        if submitted_request { view.submitted_request = value["id"].as_i64(); }
                         view.error = None;
                         view.notice = Some(
                             if value["observed_target"]["source"]
@@ -569,6 +589,13 @@ fn run(
                     || stop.load(Ordering::Relaxed),
                 )
                 .unwrap_or_else(|e| json!({"unavailable":e}));
+                let previous_agents = frame.lock().unwrap().agents.clone();
+                next.agents = if previous_agents["revision"] == next.core["revision"] && !previous_agents.is_null() {
+                    previous_agents
+                } else {
+                    super::state_pages::read(|query| {let mut query=query.clone();if query["collection"]=="jobs" {query["recent_only"]=json!(true);} request(&socket, &query)}, None, || stop.load(Ordering::Relaxed))
+                        .unwrap_or_else(|error|json!({"unavailable":error}))
+                };
                 next.broker = super::broker_pages::read(
                     |query| request(&broker_socket(), query),
                     activity.as_ref().and_then(|id| id.parse().ok()),
@@ -797,6 +824,7 @@ fn run(
                 if next.error.is_none() {
                     next.error = old.error.take();
                 }
+                next.submitted_request = old.submitted_request;
                 next.inspection = old.inspection.clone();
                 next.notice = old.notice.take();
                 *old = next;
@@ -1448,9 +1476,10 @@ mod initial_document_tests {
         backend.commands.send(Command::Ask{activity:None,prompt:"   ".into(),grounding:Some(context.clone())}).unwrap();
         wait(&backend,|frame|frame.error.is_some());
         assert_eq!(request(&socket,&json!({"op":"snapshot"})).unwrap()["activities"],json!([]));
-        for _ in 0..2 {
+        for modality in ["typed","typed","voice","voice"] {
             backend.frame.lock().unwrap().error=None;
-            backend.commands.send(Command::Ask{activity:None,prompt:"A deliberate typed request".into(),grounding:Some(context.clone())}).unwrap();
+            let mut context=context.clone();context["modality"]=json!(modality);
+            backend.commands.send(Command::Ask{activity:None,prompt:format!("A deliberate {modality} request"),grounding:Some(context)}).unwrap();
             wait(&backend,|frame|frame.error.is_some() && frame.activity.is_some());
             let state=request(&socket,&json!({"op":"snapshot"})).unwrap();
             assert_eq!(state["activities"].as_array().unwrap().len(),1);

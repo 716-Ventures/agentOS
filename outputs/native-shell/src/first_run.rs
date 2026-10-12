@@ -22,19 +22,20 @@ pub fn present(app: &gtk::Application, commands: Sender<Command>) {
     content.set_margin_end(24);
     content.set_margin_top(24);
     content.set_margin_bottom(24);
-    content.append(&ui::text("Welcome to agentOS", false));
-    content.append(&ui::text("Activities keep your work together. Agent Monitor shows actual jobs and provides local stop controls. You can open a terminal and work without a model account.",true));
-    content.append(&ui::text("Setup checks network, microphone, speakers and provider configuration. Microphone tests and model requests start only when you choose them.",true));
+    let title=ui::text("Welcome to agentOS",true);title.set_selectable(false);title.add_css_class("desktop-heading");content.append(&title);
+    content.append(&ui::text("Your desktop is ready. Open the launcher to describe what you want to do, or open a document or terminal and get straight to work.",false));
+    content.append(&ui::text("Connect your model providers and check your microphone in Setup. Agents shows your agents, their progress and usage.",false));
     let setup = ui::button("Open setup", ButtonVariant::Primary, false);
     let later = ui::button("Continue to desktop", ButtonVariant::Outline, false);
-    content.append(&setup);
-    content.append(&later);
+    let actions=ui::row(12);actions.append(&setup);actions.append(&later);content.append(&actions);
     let window = gtk::ApplicationWindow::builder()
         .application(app)
         .title("Welcome to agentOS")
         .default_width(560)
         .child(&content)
         .build();
+    window.add_css_class("seven-ui");
+    window.add_css_class("agentos-launcher");
     let welcome = window.clone();
     setup.connect_clicked(move |_| {
         let _ = commands.send(Command::Setup);

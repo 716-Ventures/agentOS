@@ -59,11 +59,13 @@ impl Voice {
                 let broker: PathBuf = std::env::var("AGENT_OS_BROKER_SOCKET")
                     .unwrap_or_else(|_| "/run/agent-os-broker/api.sock".into())
                     .into();
-                context["expected_generation"] = transport::request(
-                    &broker,
-                    &json!({"op":"activity_state","activity":context["activity_id"]}),
-                )?["generation"]
-                    .clone();
+                if !input_context::unscoped_launcher(&context) {
+                    context["expected_generation"] = transport::request(
+                        &broker,
+                        &json!({"op":"activity_state","activity":context["activity_id"]}),
+                    )?["generation"]
+                        .clone();
+                }
                 call(json!({"op":"capture.start"}))
             })();
             let mut state = current.lock().unwrap();

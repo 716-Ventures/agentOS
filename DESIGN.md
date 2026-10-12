@@ -2,19 +2,21 @@
 
 ## Native graphical direction
 
-The [native windowing specification](outputs/agent-os-windowing-specification.md) is authoritative for the future desktop. The agent composes stable typed elements and workspace arrangements; native components own visual quality, accessibility and immediate interaction. Live bindings reflect authoritative system state. Atomic revisioned updates preserve focus, selection and drafts. Tiling and floating placement share the same environment model; direct controls stay available without inference.
+The [native windowing specification](outputs/agent-os-windowing-specification.md) is authoritative for the desktop. The agent composes stable typed elements and workspace arrangements; native components own visual quality, accessibility and immediate interaction. Live bindings reflect authoritative system state. Atomic revisioned updates preserve focus, selection and drafts. Tiling and floating placement share the same environment model; direct controls stay available without inference.
 
-Both light and dark appearances, a minimal system bar, no dock, the contextual voice/keyboard/pointer launcher and an independent Agent Monitor remain requirements. Generated surfaces use the native token system and component vocabulary, never arbitrary model-generated styling or executable UI code. The native typography, materials and renderer need implementation and visual validation.
+The native desktop implements both light and dark appearances, the approved alpine wallpaper, a transparent system bar, no dock, a contextual launcher and an independent floating Agent Monitor. Commissioner supplies desktop chrome typography. Generated surfaces use 716 UI native components and validated typed documents. The monitor preserves the workspace beneath it and exposes actual agent jobs, model/provider usage, request progress, cancellation and activity history. Missing provider usage is shown as unknown; example agents and token counts from the concepts are not production data.
+
+Desktop verification includes actual composed Wayland scenes in both appearances, launcher draft retention, native input and core lifecycle checks, plus separate synthetic monitor previews for populated, narrow and enlarged-text states. The standalone library owns reusable component conformance; desktop visual verification does not establish complete shadcn parity.
 
 The following sections document the **implemented terminal** design. Terminal palette indices and the six-tile limit do not constrain the graphical specification.
 
 ## Reusable component foundation
 
-[716 UI](https://github.com/716-Ventures/716-ui) is the standalone public native component library, to be consumed by agentOS through versioned releases. The repository currently contains its specification and release groundwork. shadcn is the reference for corresponding component visuals, interaction and motion. Pin a concrete upstream style/theme/revision and verify parity in a standalone component gallery. The library owns reusable controls and tokens; agentOS owns desktop composition and system behavior. See the [library boundary](outputs/agent-os-windowing-specification.md#standalone-component-library--september-19-decision).
+[716 UI](https://github.com/716-Ventures/716-ui) is the standalone public native component library, to be consumed by agentOS through versioned releases. The desktop consumes a pinned versioned release of this library. shadcn is the reference for corresponding component visuals, interaction and motion. Pin a concrete upstream style/theme/revision and verify parity in a standalone component gallery. The library owns reusable controls and tokens; agentOS owns desktop composition and system behavior. See the [library boundary](outputs/agent-os-windowing-specification.md#standalone-component-library--september-19-decision).
 
 ## Surface and intent
 
-The implemented surface is a curses terminal client, not a graphical desktop. It is intended for sustained work in a host terminal alongside other applications. The existing cyan identity is retained in a restrained dark theme; a light theme supports bright environments and user preference. Both are direct controls, independent of model availability.
+The following legacy surface is the curses terminal client. It is intended for sustained work in a host terminal alongside other applications. The existing cyan identity is retained in a restrained dark theme; a light theme supports bright environments and user preference. Both are direct controls, independent of model availability.
 
 ## Palette
 

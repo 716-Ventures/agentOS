@@ -10,6 +10,52 @@ from contextlib import contextmanager
 STATE = Path('/var/lib/agent-os-ai/model-usage.json')
 PUBLIC = Path('/run/agent-os-ai/model-usage.json')
 THREAD_LOCK = threading.RLock()
+CONTEXT = threading.local()
+
+@contextmanager
+def request_scope(activity, job):
+    """Correlation only: the AI service has already validated this request."""
+    previous = getattr(CONTEXT, 'request', None)
+    CONTEXT.request = (activity, job) if type(activity) is int and type(job) is int and activity > 0 and job > 0 else None
+    phase('understanding')
+    try:
+        yield
+    except BaseException:
+        phase('failed')
+        raise
+    finally: CONTEXT.request = previous
+
+
+def phase(value, operation=None):
+    if value not in ('understanding', 'acting', 'clarification_needed', 'completed', 'failed'): return
+    context = getattr(CONTEXT, 'request', None)
+    if context is None: return
+    try:
+        with locked():
+            data = read()
+            agent = data.setdefault('agents', {}).setdefault(str(context[1]), {'activity': context[0], 'job': context[1], 'models': {}})
+            observation = {'phase': value, 'at': now()}
+            if operation is not None: observation['operation'] = str(operation)[:80]
+            agent['phase'] = value
+            events = agent.setdefault('events', [])
+            if not events or {k:v for k,v in events[-1].items() if k!='at'} != {k:v for k,v in observation.items() if k!='at'}:
+                events.append(observation)
+                agent['events'] = events[-12:]
+            write(data)
+    except (OSError, ValueError, TypeError, KeyError):
+        pass
+
+
+def session_id():
+    try: return Path('/proc/sys/kernel/random/boot_id').read_text().strip()
+    except OSError: return 'unknown'
+
+
+def buckets(data, key, agent=None, session=None):
+    result = [data['models'][key]]
+    if agent is not None: result.append(data['agents'][str(agent)]['models'][key])
+    if session is not None: result.append(data['sessions'][session]['models'][key])
+    return result
 
 @contextmanager
 def locked():
@@ -32,6 +78,16 @@ def read():
 
 
 def write(data):
+    # Keep detailed recent request observations bounded; lifetime model totals remain.
+    agents = data.get('agents', {})
+    for key in list(agents):
+        if len(agents) <= 256: break
+        if agents[key].get('phase') in ('completed', 'failed', 'clarification_needed'):
+            del agents[key]
+    sessions = data.get('sessions', {})
+    for key in list(sessions):
+        if len(sessions) <= 8: break
+        if key != data.get('current_session'): del sessions[key]
     data['updated_at'] = now()
     for path in (STATE, PUBLIC):
         temporary = path.with_suffix('.tmp')
@@ -46,15 +102,17 @@ def configure(cfg, default_model, recover=False):
     try:
         with locked():
             data = read()
+            data['current_session'] = session_id()
             data['configuration'] = [
                 {'provider': 'Vercel AI Gateway', 'model': cfg.get('gateway_model', default_model),
                  'configured': bool(cfg.get('gateway_key')), 'role': 'Conversation, reasoning, and tool planning'},
                 {'provider': 'Typesafe', 'model': 'jev-1.13.0', 'configured': bool(cfg.get('jev_key')),
                  'role': 'Action assessment, context, recovery, completion and learning'}]
             if recover:
-                for row in data['models'].values():
-                    row['interrupted'] += row.get('active', 0)
-                    row['active'] = 0
+                for group in [data['models'], *[a['models'] for a in data.get('agents', {}).values()], *[a['models'] for a in data.get('sessions', {}).values()]]:
+                    for row in group.values():
+                        row['interrupted'] += row.get('active', 0)
+                        row['active'] = 0
             write(data)
     except (OSError, ValueError, TypeError, KeyError):
         pass  # Observability must not prevent the agent from operating.
@@ -70,15 +128,24 @@ def begin(url, body):
     try:
         with locked():
             data = read()
-            row = data['models'].setdefault(key, dict(provider=provider, model=model,
+            empty = dict(provider=provider, model=model,
                 attempts=0, responses=0, errors=0, rate_limits=0, interrupted=0, active=0,
                 input_tokens=0, output_tokens=0, total_tokens=0,
-                input_reports=0, output_reports=0, total_reports=0))
-            row['attempts'] += 1
-            row['active'] += 1
-            row['last_at'] = now()
+                input_reports=0, output_reports=0, total_reports=0)
+            data['models'].setdefault(key, dict(empty))
+            context = getattr(CONTEXT, 'request', None)
+            agent = context[1] if context else None
+            session = session_id()
+            data['current_session'] = session
+            data.setdefault('sessions', {}).setdefault(session, {'tracking_since': now(), 'models': {}})['models'].setdefault(key, dict(empty))
+            if agent is not None:
+                data.setdefault('agents', {}).setdefault(str(agent), {'activity': context[0], 'job': agent, 'models': {}})['models'].setdefault(key, dict(empty))
+            for row in buckets(data, key, agent, session):
+                row['attempts'] += 1
+                row['active'] += 1
+                row['last_at'] = now()
             write(data)
-        return key
+        return (key, agent, session) if agent is not None else (key, None, session)
     except (OSError, ValueError, TypeError, KeyError):
         return None
 
@@ -89,28 +156,29 @@ def finish(key, elapsed, response=None, http_status=None):
     try:
         with locked():
             data = read()
-            row = data['models'][key]
-            row['active'] = max(0, row['active'] - 1)
-            row['last_at'] = now()
-            row['last_latency_ms'] = round(elapsed * 1000)
-            row['last_status'] = 'response received' if response is not None else ('HTTP ' + str(http_status) if http_status else 'connection or response error')
-            if response is None:
-                row['errors'] += 1
-                row['rate_limits'] += int(http_status == 429)
-            else:
-                row['responses'] += 1
-                if isinstance(response, dict):
-                    if isinstance(response.get('model'), str):
-                        row['resolved_model'] = response['model'][:160]
-                    usage = response.get('usage')
-                    if isinstance(usage, dict):
-                        for field, aliases in [('input', ('prompt_tokens', 'input_tokens')),
-                                               ('output', ('completion_tokens', 'output_tokens')),
-                                               ('total', ('total_tokens',))]:
-                            value = next((usage[a] for a in aliases if type(usage.get(a)) is int and usage[a] >= 0), None)
-                            if value is not None:
-                                row[field + '_tokens'] += value
-                                row[field + '_reports'] += 1
+            key, agent, session = key if isinstance(key, tuple) else (key, None, None)
+            for row in buckets(data, key, agent, session):
+                row['active'] = max(0, row['active'] - 1)
+                row['last_at'] = now()
+                row['last_latency_ms'] = round(elapsed * 1000)
+                row['last_status'] = 'response received' if response is not None else ('HTTP ' + str(http_status) if http_status else 'connection or response error')
+                if response is None:
+                    row['errors'] += 1
+                    row['rate_limits'] += int(http_status == 429)
+                else:
+                    row['responses'] += 1
+                    if isinstance(response, dict):
+                        if isinstance(response.get('model'), str):
+                            row['resolved_model'] = response['model'][:160]
+                        usage = response.get('usage')
+                        if isinstance(usage, dict):
+                            for field, aliases in [('input', ('prompt_tokens', 'input_tokens')),
+                                                   ('output', ('completion_tokens', 'output_tokens')),
+                                                   ('total', ('total_tokens',))]:
+                                value = next((usage[a] for a in aliases if type(usage.get(a)) is int and usage[a] >= 0), None)
+                                if value is not None:
+                                    row[field + '_tokens'] += value
+                                    row[field + '_reports'] += 1
             write(data)
     except (OSError, ValueError, TypeError, KeyError):
         pass

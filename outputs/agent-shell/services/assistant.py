@@ -90,6 +90,11 @@ def collect_file_result(job):
 
 
 def handle(req, conn):
+    with model_usage.request_scope(req.get("activity"), req.get("core_job_id")):
+        return handle_scoped(req, conn)
+
+
+def handle_scoped(req, conn):
     cfg = config()
     model_usage.configure(cfg, DEFAULT_MODEL)
     if req.get('op') == 'knowledge':
@@ -128,6 +133,14 @@ def handle(req, conn):
         if input_context and generation!=input_context['expected_generation']:raise ValueError('Input generation changed after capture')
         if generation is None:generation=broker_request('activity_state',activity=activity)['generation']
         def check_generation():
+            # Closing the supervised worker connection revokes this turn before
+            # another tool can run, even if the provider reply arrived meanwhile.
+            if isinstance(conn, socket.socket):
+                try:
+                    if not conn.recv(1, socket.MSG_PEEK | socket.MSG_DONTWAIT):
+                        raise ValueError('This request was stopped; no further actions will run')
+                except BlockingIOError:
+                    pass
             if broker_request('activity_state',activity=activity)['generation']!=generation:
                 raise ValueError('Activity work was stopped; this conversation request is no longer active')
         check_generation()
@@ -165,6 +178,11 @@ def handle(req, conn):
         except (RuntimeError,ValueError,OSError):
             history.append({'role':'user','content':'Fresh broker job state is unavailable; inspect before repeating any previous action.'})
         def dispatch(name,args):
+            check_generation()
+            model_usage.phase('acting', name)
+            try: return dispatch_scoped(name,args)
+            finally: model_usage.phase('understanding')
+        def dispatch_scoped(name,args):
             try:
                 if name=='presentation_catalog':return presentation_client.request('catalog.get')
                 if name=='presentation_snapshot':return presentation_client.for_activity(activity)
@@ -241,6 +259,7 @@ def handle(req, conn):
             trace['decisions']=decisions.summary()
             trace['verification']=answer.get('verification')
             trace['status'] = 'completed'
+            model_usage.phase('clarification_needed' if answer.get('clarification_needed') else 'completed')
             if continuation:continuations.finish(continuation,'completed',trace['id'])
             record({'kind': 'completed', 'text': answer['text']})
             emit(conn, 'Answer:\n'+answer['text'] + '\n\nModel: ' + answer['model'])

@@ -119,6 +119,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
             assert any(w['app_id'].startswith('agentos.surface.') for w in state['windows']),state
             layers=wait_for(lambda:(lambda s:s if any(layer['namespace']=='agentos-system-bar' and layer['mapped'] and layer['geometry']['height']>0 for layer in s['system_layers']) else None)(call(control,{'op':'snapshot'})),[core,session])
             bar=next(layer for layer in layers['system_layers'] if layer['namespace']=='agentos-system-bar')
+            assert any(layer['namespace']=='agentos-wallpaper' and layer['mapped'] for layer in layers['system_layers']),layers
             output=layers['outputs'][0]
             assert bar['geometry']['width']==output['width'] and 0<bar['geometry']['height']<output['height']/2,bar
             assert bar['work_area']['y']==output['y']+bar['geometry']['height'],bar
@@ -136,7 +137,8 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                         connection.sendall(json.dumps({'op':operation,'keycode':38,'modifiers':0}).encode()+b'\n')
                         with connection.makefile('rb') as stream:reply=json.loads(stream.readline())
                     assert not reply['ok'] and 'Trusted renderer required' in reply['error'],reply
-                accessibility.activate(accessibility.find('Agent Monitor',pyatspi.ROLE_PUSH_BUTTON))
+                accessibility.activate(accessibility.find('Agents',pyatspi.ROLE_PUSH_BUTTON))
+                accessibility.disclose('Desktop controls')
                 accessibility.activate(accessibility.find('Keyboard',pyatspi.ROLE_PUSH_BUTTON))
                 shown=wait_for(lambda:(lambda state:state if any(layer['namespace']=='agentos-keyboard' and layer['mapped'] for layer in state['system_layers']) else None)(call(control,{'op':'snapshot'})),[core,session])
                 keyboard=next(layer for layer in shown['system_layers'] if layer['namespace']=='agentos-keyboard')
@@ -196,6 +198,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                     conn.connect(str(control));conn.sendall(b'{"op":"display.zoom","direction":1}\n')
                     with conn.makefile('rb') as stream:response=json.loads(stream.readline())
                 assert not response['ok'] and call(control,{'op':'snapshot'})['display_zoom']==denied,response
+                accessibility.disclose('Desktop controls')
                 accessibility.activate(accessibility.find('Keyboard',pyatspi.ROLE_PUSH_BUTTON))
                 def zoomed_keyboard():
                     state=call(control,{'op':'snapshot'})
@@ -258,6 +261,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 # Capture tested speech while that owned directory is still alive.
                 (OUTPUT/'reader-validation-speech.log').write_bytes(reader_log.read_bytes())
                 if screen_keyboard:
+                    accessibility.disclose('Desktop controls')
                     accessibility.activate(accessibility.find('Keyboard',pyatspi.ROLE_PUSH_BUTTON))
                     wait_for(lambda:any(layer['namespace']=='agentos-keyboard' and layer['mapped'] for layer in call(control,{'op':'snapshot'})['system_layers']),[core,session])
                     wait_for(lambda:(lambda r:r and r['verified'] and r['watching'] and r['insert_registered'])(call(control,{'op':'snapshot'})['reader']),[core,session])
@@ -283,7 +287,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
 
             if system_bar:
                 import accessibility,pyatspi
-                accessibility.activate(accessibility.find('Agent Monitor',pyatspi.ROLE_PUSH_BUTTON))
+                accessibility.activate(accessibility.find('Agents',pyatspi.ROLE_PUSH_BUTTON))
                 accessibility.activate(accessibility.find('Open launcher',pyatspi.ROLE_PUSH_BUTTON))
                 def launcher_ready():
                     state=call(control,{'op':'snapshot'})
@@ -366,7 +370,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                     accessibility.verify(lambda value:call(endpoint,value))
             if system_bar:
                 core.terminate();assert core.wait(timeout=5) in (0,-signal.SIGTERM)
-                accessibility.find('Connection unavailable',pyatspi.ROLE_PUSH_BUTTON)
+                accessibility.wait(lambda:accessibility.find('Agents',pyatspi.ROLE_PUSH_BUTTON).description=='Connection unavailable','Offline Agents entry did not expose connection status')
                 accessibility.activate(accessibility.find('Open launcher',pyatspi.ROLE_PUSH_BUTTON))
                 accessibility.wait(lambda:any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in call(control,{'op':'snapshot'})['system_layers']), 'Offline launcher did not map')
                 assert session.poll() is None

@@ -1,6 +1,6 @@
 # Agent OS product context
 
-**Adopted windowing architecture:** [Native windowing specification v0.1](outputs/agent-os-windowing-specification.md). The agent composes typed native surfaces and workspace arrangements through validated transactions. This is the graphical design target; the current implementation remains terminal-based.
+**Adopted windowing architecture:** [Native windowing specification v0.1](outputs/agent-os-windowing-specification.md). The agent composes typed native surfaces and workspace arrangements through validated transactions. The implemented GTK desktop and Smithay compositor render typed native work alongside ordinary applications; the terminal client remains available.
 
 ## Register
 
@@ -12,7 +12,7 @@ The current development environment is used by the founder to test a complete Li
 
 ## Product Purpose
 
-Create an operating system whose agent can understand and act across the environment, using a general system broker. Intelligence begins with input and extends through activities, applications and system services. The current terminal environment is a delivery stage; the intended product includes a custom graphical environment.
+Create an operating system whose agent can understand and act across the environment, using a general system broker. Intelligence begins with input and extends through activities, applications and system services. The current development build includes the custom graphical environment, with a contextual launcher and independent Agent Monitor.
 
 ## Brand Personality
 

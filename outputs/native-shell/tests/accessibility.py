@@ -26,13 +26,18 @@ def find(name,role,root=None):
             node=queue.popleft();visited+=1
             if node is None:continue # AT-SPI can expose an absent child during widget teardown.
             try:
-                if node.name==name and node.getRole()==role:
+                if node.name==name and (role is None or node.getRole()==role):
                     found.append(node);return True
                 queue.extend(node[index] for index in range(min(node.childCount,128)))
             except (RuntimeError,LookupError):pass
         return False
     wait(search,'Accessible control missing: '+name)
     return found[0]
+
+
+def disclose(name):
+    control=find(name,None)
+    if not control.getState().contains(pyatspi.STATE_EXPANDED):activate(control)
 
 
 def text(node):
@@ -328,7 +333,8 @@ def verify_reader_controls(call, speech_log):
             if node.getState().contains(pyatspi.STATE_FOCUSED):return True
             queue.extend(node[i] for i in range(min(node.childCount,32)))
         return False
-    activate(find('Agent Monitor',pyatspi.ROLE_PUSH_BUTTON))
+    activate(find('Agents',pyatspi.ROLE_PUSH_BUTTON))
+    disclose('Desktop controls')
     activate(find('Keyboard',pyatspi.ROLE_PUSH_BUTTON))
     tab=find('Tab',pyatspi.ROLE_PUSH_BUTTON)
     control_modifier=False
@@ -426,7 +432,8 @@ def verify_reader_outcomes(call, speech_log, outcomes, database):
     frame=find('Agent view · Session lifecycle',pyatspi.ROLE_FRAME)
     field=find('Accessible session draft',pyatspi.ROLE_TEXT,root=frame)
     draft=call({'op':'draft.get','surface_id':'session-fixture','element_id':'field'})
-    activate(find('Agent Monitor',pyatspi.ROLE_PUSH_BUTTON))
+    activate(find('Agents',pyatspi.ROLE_PUSH_BUTTON))
+    disclose('Desktop controls')
     activate(find('Keyboard',pyatspi.ROLE_PUSH_BUTTON))
     def stroke(name):
         activate(find(name,pyatspi.ROLE_PUSH_BUTTON))
@@ -574,7 +581,7 @@ def verify_local_form(call, database):
     assert len(receipts())==len(initial)+1,'Corrected callback dispatched more than once'
     result=receipts()[-1][1]
     assert result['status']=='succeeded' and result['observed_target']['text']==content+'\n',result
-    a.activate(a.find('Agent Monitor',pyatspi.ROLE_PUSH_BUTTON))
+    a.activate(a.find('Agents',pyatspi.ROLE_PUSH_BUTTON))
     a.wait(lambda:ime_accessibility.rendered_text(content+'\n'),'Corrected callback output was not displayed')
     assert saved()=='0' and draft()==' 0 ' and a.text(field)==' 0 ','Callback implicitly saved or replaced the local form draft'
     assert call({'op':'presentation.get','document_id':surface})['revision']==0

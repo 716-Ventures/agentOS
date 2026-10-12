@@ -105,7 +105,7 @@ impl WlrLayerShellHandler for Smallvil {
     ) {
         if !matches!(
             (namespace.as_str(), layer),
-            ("agentos-system-bar", Layer::Top) | ("agentos-launcher", Layer::Overlay) | ("agentos-keyboard", Layer::Overlay)
+            ("agentos-wallpaper", Layer::Background) | ("agentos-system-bar", Layer::Top) | ("agentos-launcher", Layer::Overlay) | ("agentos-keyboard", Layer::Overlay)
         ) {
             surface.send_close();
             return;
@@ -364,3 +364,20 @@ fn has_namespace(state: &Smallvil, surface: &WlSurface, namespace: &str) -> bool
 }
 pub fn is_keyboard(state: &Smallvil, surface: &WlSurface) -> bool {has_namespace(state, surface, "agentos-keyboard")}
 pub fn is_bar(state: &Smallvil, surface: &WlSurface) -> bool {has_namespace(state, surface, "agentos-system-bar")}
+
+/// Deliberate native/assistive invocation of the host monitor, independent of
+/// activation tokens that an AT-SPI action does not carry. No arbitrary target.
+pub fn present_monitor(state: &mut Smallvil, peer: Option<u32>) -> Result<(), String> {
+    trusted_renderer(state,peer)?;
+    let window=state.space.elements().find(|window| {
+        let surface=window.toplevel().unwrap().wl_surface();
+        let host=surface.client().and_then(|client|client.get_data::<ClientState>().map(|data|data.system_shell)).unwrap_or(false);
+        host && with_states(surface,|states|states.data_map.get::<smithay::wayland::shell::xdg::XdgToplevelSurfaceData>().unwrap().lock().unwrap().app_id.as_deref()==Some("agentos.monitor"))
+    }).cloned().ok_or("Monitor unavailable")?;
+    state.space.raise_element(&window,true);
+    let surface=window.toplevel().unwrap().wl_surface().clone();
+    if let Some(keyboard)=state.seat.get_keyboard() {keyboard.set_focus(state,Some(surface.clone()),smithay::utils::SERIAL_COUNTER.next_serial());}
+    if let Some(bridge)=&state.bridge {bridge.input(&format!("{:?}",surface.id()),serde_json::json!({"kind":"focus","element_id":null}));}
+    state.arrange();
+    Ok(())
+}

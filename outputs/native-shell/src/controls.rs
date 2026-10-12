@@ -14,6 +14,7 @@ fn request_context(frozen: Option<Value>, current: Value) -> Value {
 
 pub struct Controls {
     pub widget: gtk::Box,
+    commands: Sender<Command>,
     activity: Rc<RefCell<Option<String>>>,
     chooser: gtk::DropDown,
     choices: Rc<RefCell<Vec<String>>>,
@@ -22,7 +23,10 @@ pub struct Controls {
     changing: Rc<Cell<bool>>,
     monitor: gtk::ApplicationWindow,
     pub monitor_content: gtk::Box,
+    pub monitor_actions: gtk::Box,
     jobs: super::job_list::JobList,
+    agents: super::agent_monitor::Monitor,
+    history: gtk::Expander,
     message: ui::StatusView,
     model_text: ui::StatusView,
     inspection: gtk::TextView,
@@ -36,6 +40,13 @@ pub struct Controls {
     output_displayed: Rc<RefCell<Option<log_view::Page>>>,
     voice: voice::Voice,
     voice_button: gtk::Button,
+    cancel_recording: gtk::Button,
+    pending_prompt: Rc<RefCell<Option<String>>>,
+    prior_request: Rc<Cell<Option<i64>>>,
+    last_request: Rc<Cell<Option<i64>>>,
+    stop_request: gtk::Button,
+    request_state: gtk::Label,
+    request_job: Rc<Cell<Option<i64>>>,
     voice_status: ui::StatusView,
     frozen_context: Rc<RefCell<Option<Value>>>,
     context_provider: Rc<RefCell<Option<Rc<dyn Fn() -> Value>>>>,
@@ -79,7 +90,7 @@ impl Controls {
         widget.append(&new_document);
         let import_document = ui::button("Import text file…", ButtonVariant::Outline, false);
         widget.append(&import_document);
-        let shortcuts=gtk::Expander::builder().label("Desktop keyboard shortcuts").child(&ui::text("Ctrl+Alt+Tab: next view (Shift: previous)\nCtrl+Alt+F10: maximize · F9: restore · F8: float\nCtrl+Alt+Arrow: move · Shift+Arrow: resize\nCtrl+Alt+PageUp/PageDown: pan oversized view (Shift: horizontal)\nCtrl+Alt+Delete: close view · Ctrl+Alt+Z: undo arrangement\nSplit, swap and pin controls are available under Arrange workspace in Agent Monitor.",true)).build();
+        let shortcuts=gtk::Expander::builder().label("Desktop keyboard shortcuts").child(&ui::text("Ctrl+Alt+Space: open launcher\nCtrl+Alt+Tab: next view (Shift: previous)\nCtrl+Alt+F10: maximize · F9: restore · F8: float\nCtrl+Alt+Arrow: move · Shift+Arrow: resize\nCtrl+Alt+PageUp/PageDown: pan oversized view (Shift: horizontal)\nCtrl+Alt+Delete: close view · Ctrl+Alt+Z: undo arrangement\nSplit, swap and pin controls are available under Arrange workspace in Agent Monitor.",true)).build();
         widget.append(&shortcuts);
         let appearance = gtk::DropDown::from_strings(&["Dark", "Light"]);
         let scale = gtk::SpinButton::with_range(1.0, 3.0, 0.25);
@@ -114,6 +125,7 @@ impl Controls {
                     s.value(),
                     r.is_active(),
                 );
+                desktop_theme::install(&display, a.selected() == 1, s.value());
                 let _=sender.send(Command::Preferences(json!({"appearance":if a.selected()==0{"dark"}else{"light"},"text_scale":s.value(),"reduced_motion":r.is_active()})));
             }
         });
@@ -166,13 +178,26 @@ impl Controls {
         context_label.set_wrap(false);
         context_label.set_ellipsize(gtk::pango::EllipsizeMode::End);
         widget.append(&context_label);
+        let pending_prompt = Rc::new(RefCell::new(None::<String>));
+        let prior_request = Rc::new(Cell::new(None));
+        let last_request = Rc::new(Cell::new(None));
+        let request_job = Rc::new(Cell::new(None::<i64>));
+        let stop_request = ui::button("Stop request", ButtonVariant::Outline, false);
+        stop_request.set_visible(false);
+        let selected=request_job.clone();let sender=commands.clone();
+        stop_request.connect_clicked(move |_| {if let Some(id)=selected.get(){let _=sender.send(Command::Stop{source:"core".into(),job:json!(id)});}});
         let send = ui::button("Send request", ButtonVariant::Primary, false);
         widget.append(&send);
+        widget.append(&stop_request);
         let (current, commands_now, entry) =
             (activity.clone(), commands.clone(), request.entry.clone());
         let (frozen, provider) = (frozen_context.clone(), context_provider.clone());
         let failure=context_label.clone();
+        let (pending, prior, last)=(pending_prompt.clone(),prior_request.clone(),last_request.clone());
         let submit = Rc::new(move || {
+                if entry.text().trim().is_empty() {return;}
+                *pending.borrow_mut()=Some(entry.text().to_string());
+                prior.set(last.get());
             let id = current
                 .borrow()
                 .as_ref()
@@ -197,8 +222,13 @@ impl Controls {
         let voice_row = ui::row(12);
         voice_row.append(&voice_button);
         voice_row.append(&voice_status.widget);
+        let cancel_recording=ui::button("Cancel recording",ButtonVariant::Ghost,false);
+        cancel_recording.set_visible(false);
+        let recorder=voice.clone();cancel_recording.connect_clicked(move |_|recorder.cancel());
+        voice_row.append(&cancel_recording);
         widget.append(&voice_row);
         let review_content = ui::column(12);
+        review_content.set_margin_start(24); review_content.set_margin_end(24); review_content.set_margin_top(24); review_content.set_margin_bottom(24);
         review_content.append(&ui::text("Review voice request", true));
         let transcript = TextField::new("Edit the transcript before sending", "Transcript", "");
         review_content.append(&transcript.widget);
@@ -216,6 +246,7 @@ impl Controls {
             .child(&review_content)
             .build();
         review.add_css_class("seven-ui");
+        review.add_css_class("agentos-launcher");
         let recorder = voice.clone();
         let (frozen, provider) = (frozen_context.clone(), context_provider.clone());
         voice_button.connect_clicked(move |_| {
@@ -245,22 +276,28 @@ impl Controls {
         let window = review.clone();
         let entry = transcript.entry.clone();
         let sender = commands.clone();
+        let (pending, prior, last)=(pending_prompt.clone(),prior_request.clone(),last_request.clone());
         send_voice.connect_clicked(move |_| {
             if entry.text().trim().is_empty() {
                 return;
             }
             if let Some(context) = recorder.consume() {
-                if let Some(activity) = context["activity_id"].as_i64() {
-                    let _ = sender.send(Command::Ask {
-                        activity: Some(activity),
-                        prompt: entry.text().into(),
-                        grounding: Some(context),
-                    });
-                    window.set_visible(false);
-                }
+                let activity = context["activity_id"].as_i64();
+                *pending.borrow_mut() = Some(entry.text().to_string());
+                prior.set(last.get());
+                let _ = sender.send(Command::Ask {
+                    activity,
+                    prompt: entry.text().into(),
+                    grounding: Some(context),
+                });
+                window.set_visible(false);
             }
         });
-        let message = ui::StatusView::new("Select or create an activity to start work.").unwrap();
+        let request_state=ui::status("Ready when you are.");
+        request_state.set_selectable(false);
+        request_state.set_visible(false);
+        widget.append(&request_state);
+        let message = ui::StatusView::new("Ready when you are.").unwrap();
         widget.append(&message.widget);
         let monitor_content = ui::column(16);
         for side in [0, 1, 2, 3] {
@@ -271,26 +308,32 @@ impl Controls {
                 _ => monitor_content.set_margin_end(20),
             }
         }
-        monitor_content.append(&ui::text("Agent Monitor", true));
+        let history_content = ui::column(16);
+        let history = gtk::Expander::builder().label("Work history and output").child(&history_content).build();
+        let agents = super::agent_monitor::Monitor::new(commands.clone(), &history);
+        let monitor_actions=agents.actions.clone();
+        let monitor_root = ui::column(20);
+        monitor_root.set_margin_top(24); monitor_root.set_margin_bottom(24); monitor_root.set_margin_start(24); monitor_root.set_margin_end(24);
+        monitor_root.append(&agents.widget);
         let model_text = ui::StatusView::new("Model configuration and measured usage unavailable").unwrap();
         model_text.value.remove_css_class("muted");
-        monitor_content.append(&model_text.widget);
+        history_content.append(&model_text.widget);
         let images = image_controls::ImageControls::new(commands.clone());
         widget.append(&images.widget);
         let workspace = workspace_controls::WorkspaceControls::new(commands.clone());
-        monitor_content.append(&workspace.restoration);
+        monitor_root.append(&workspace.restoration);
         monitor_content.append(&workspace.widget);
         let jobs = super::job_list::JobList::new(app, &commands);
-        monitor_content.append(&jobs.widget);
+        history_content.append(&jobs.widget);
         let inspection = gtk::TextView::new();
         inspection.set_editable(false);
         inspection.set_cursor_visible(true);
         inspection.set_monospace(true);
         inspection.set_wrap_mode(gtk::WrapMode::WordChar);
         inspection.update_property(&[gtk::accessible::Property::Label("Selected work output")]);
-        monitor_content.append(&inspection);
+        history_content.append(&inspection);
         let output_label = ui::text("Select work to inspect its output", false);
-        monitor_content.append(&output_label);
+        history_content.append(&output_label);
         let output_previous = ui::button("Previous output page", ButtonVariant::Outline, false);
         let output_next = ui::button("Next output page", ButtonVariant::Outline, false);
         let output_refresh = ui::button("Refresh output page", ButtonVariant::Outline, false);
@@ -312,7 +355,7 @@ impl Controls {
                 let _ = sender.send(Command::PageOutput(direction));
             });
         }
-        monitor_content.append(&pages);
+        history_content.append(&pages);
         let output_follow = gtk::CheckButton::with_label("Follow live output");
         output_follow.set_sensitive(false);
         let output_changing = Rc::new(Cell::new(false));
@@ -349,19 +392,33 @@ impl Controls {
                     output_guard.set(false);
                 }
             });
-        monitor_content.append(&output_follow);
+        history_content.append(&output_follow);
+        monitor_root.append(&history);
+        let desktop_controls = gtk::Expander::builder().label("Desktop controls").child(&monitor_content).build();
+        monitor_root.append(&desktop_controls);
         let scroll = gtk::ScrolledWindow::builder()
             .hscrollbar_policy(gtk::PolicyType::Never)
-            .child(&monitor_content)
+            .child(&monitor_root)
             .build();
         let monitor = gtk::ApplicationWindow::builder()
             .application(app)
             .title("Agent Monitor")
-            .default_width(720)
-            .default_height(600)
+            .default_width(920)
+            .default_height(755)
             .child(&scroll)
             .build();
         monitor.add_css_class("seven-ui");
+        monitor.add_css_class("agentos-monitor");
+        monitor.connect_map(|window| {
+            if let Some(surface)=window.surface().and_then(|surface|surface.downcast::<gdk4_wayland::WaylandToplevel>().ok()) {
+                surface.set_application_id("agentos.monitor");
+            }
+        });
+        let header = gtk::HeaderBar::new();
+        let title=ui::text("Agent Monitor",false);title.set_selectable(false);
+        header.set_title_widget(Some(&title));
+        header.set_decoration_layout(Some(":maximize,close"));
+        monitor.set_titlebar(Some(&header));
         monitor.connect_close_request(|window| {
             // A remapped GTK window gets a new AT-SPI identity. Unroot the
             // retained controls so readers cannot follow a dead frame parent.
@@ -385,6 +442,7 @@ impl Controls {
             );
         });
         Self {
+            commands,
             widget,
             activity,
             chooser,
@@ -394,6 +452,9 @@ impl Controls {
             changing,
             monitor,
             monitor_content,
+            monitor_actions,
+            agents,
+            history,
             jobs,
             message,
             model_text,
@@ -408,6 +469,13 @@ impl Controls {
             output_displayed,
             voice,
             voice_button,
+            cancel_recording,
+            pending_prompt,
+            prior_request,
+            last_request,
+            stop_request,
+            request_state,
+            request_job,
             voice_status,
             frozen_context,
             context_provider,
@@ -469,6 +537,7 @@ impl Controls {
         println!("CHECK: large activity history retains chooser identity and current names/selection across rename, reorder, removal and activity switching");
     }
     pub fn verify_status_updates(&mut self, frame: &Frame, commands: &Sender<Command>) {
+        self.history.set_expanded(true);
         let original_voice = self.voice.state.lock().unwrap().clone();
         let request = self.request_field.entry.text();
         for kind in ["message", "voice", "model"] {
@@ -516,6 +585,7 @@ impl Controls {
         self.update(frame, commands);
     }
     pub fn verify_local_status_requests(&mut self, frame: &Frame, commands: &Sender<Command>) -> Vec<(String, Value)> {
+        self.history.set_expanded(true);
         let previous_provider = self.context_provider.borrow().clone();
         let previous_voice = self.voice.state.lock().unwrap().clone();
         let previous_request = self.request_field.entry.text();
@@ -552,6 +622,7 @@ impl Controls {
         expected
     }
     pub fn verify_work_context(&mut self, frame: &Frame, commands: &Sender<Command>) {
+        self.history.set_expanded(true);
         for source in ["core", "broker"] {
             let case = if source == "core" { "work" } else { "work-broker" };
             if std::env::var("AGENT_OS_STATUS_SELECTION_CASE").is_ok_and(|selected| selected != case) { continue; }
@@ -581,6 +652,7 @@ impl Controls {
         }
     }
     pub fn capture_status(mut self, kind: String, path: String, mut frame: Frame, commands: Sender<Command>, quit: gtk::Application) {
+        self.history.set_expanded(true);
         frame.connected = true;
         frame.error = None;
         frame.notice = Some("Original notice λ 日本語".into());
@@ -647,9 +719,11 @@ impl Controls {
         self.hide_launcher();
     }
     pub fn verify_history(&mut self, frame: &Frame, commands: &Sender<Command>) {
+        self.history.set_expanded(true);
         self.jobs.verify_virtualization(frame, commands);
     }
     pub fn verify_output(&mut self, frame: &Frame, commands: &Sender<Command>) {
+        self.history.set_expanded(true);
         let mut fixture = frame.clone();
         fixture.inspection = Some(log_view::Page {
             text: "Selected λ output".into(),
@@ -793,8 +867,11 @@ impl Controls {
             && self.workspace.restoration.is_visible()
             && system_bar::capture(&self.monitor, path)
     }
+    pub fn preview_size(&self, width: i32, height: i32) { self.monitor.set_default_size(width, height); }
+    pub fn capture_monitor(&self, path: &str) -> bool { self.monitor.is_visible() && system_bar::capture(&self.monitor, path) }
     pub fn present(&self) {
         self.monitor.present();
+        if std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET").is_some() {let _=self.commands.send(Command::PresentMonitor);}
     }
     pub fn update(&mut self, frame: &Frame, _commands: &Sender<Command>) {
         self.images.update(frame);
@@ -803,6 +880,7 @@ impl Controls {
         *self.activity.borrow_mut() = frame.activity.clone();
         self.workspace.update(frame);
         let voice = self.voice.state.lock().unwrap().clone();
+        self.cancel_recording.set_visible(matches!(voice.phase.as_str(),"starting"|"recording"|"transcribing"));
         self.voice_button.set_label(if voice.phase == "recording" {
             "Finish recording"
         } else {
@@ -817,7 +895,7 @@ impl Controls {
                 .unwrap_or(match voice.phase.as_str() {
                     "idle" => "Microphone idle",
                     "starting" => "Starting microphone…",
-                    "recording" => "Recording · finish or discard",
+                    "recording" => "Listening · finish or cancel recording",
                     "transcribing" => "Recognizing speech locally…",
                     "review" => "Review the transcript before sending",
                     _ => "Voice unavailable · discard and retry",
@@ -873,6 +951,32 @@ impl Controls {
                     "Core unavailable · reconnecting"
                 }),
         );
+        self.last_request.set(frame.submitted_request);
+        self.request_state.set_visible(self.pending_prompt.borrow().is_some() || !self.request_field.entry.text().is_empty());
+        if self.pending_prompt.borrow().is_some() {
+            let job=frame.core["jobs"].as_array().into_iter().flatten().find(|job| {
+                frame.submitted_request.is_some() && frame.submitted_request != self.prior_request.get()
+                && job["id"].as_i64()==frame.submitted_request
+            });
+            let status=job.and_then(|j|j["status"].as_str());
+            self.request_job.set(job.and_then(|j|j["id"].as_i64()));
+            let active=matches!(status,Some("starting"|"running"|"cancelling"));
+            self.stop_request.set_visible(active);self.stop_request.set_sensitive(frame.connected && active);
+            let phase=job.map(|j|&frame.usage["agents"][j["id"].to_string()]["phase"]);
+            let feedback=match status {
+                Some("starting")=>"Understanding your request…",
+                Some("running")=>if phase.is_some_and(|p|p=="acting") {"Acting on your request…"} else {"Understanding your request…"},
+                Some("cancelling")=>"Stopping your request…",
+                Some("cancelled")=>"Stopped. Completed work is saved.",
+                Some("succeeded")=>if phase.is_some_and(|p|p=="clarification_needed") {"Your agent needs more information. View its activity, then reply here."}else{"Completed. View the result in Agent Monitor."},
+                Some("failed")=>"The request failed. View its activity for details, then correct or retry it.",
+                _=>if frame.connected {"Submitting your request…"}else{"Connection unavailable. Your draft is retained."},
+            };
+            self.request_state.set_text(feedback);
+        } else if !self.request_field.entry.text().is_empty() && frame.error.is_none() && frame.notice.is_none() {
+            self.request_state.set_text("Composing · send when you’re ready");
+        }
+        self.agents.update(frame);
         self.jobs.update(frame);
         let usage = if frame.usage["unavailable"] == true {
             "Model configuration and measured usage unavailable".into()
@@ -917,6 +1021,7 @@ impl Controls {
         };
         status_projection::update(&self.model_text, &usage);
         if let Some(output) = &frame.inspection {
+            if self.output_page.as_ref().is_none_or(|prior|prior.source!=output.source || prior.job!=output.job) {self.history.set_expanded(true);}
             let buffer = self.inspection.buffer();
             self.output_previous.set_sensitive(output.has_previous);
             self.output_next.set_sensitive(output.has_more);
