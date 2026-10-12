@@ -1,0 +1,44 @@
+dbus-daemon[19250]: [session uid=1000 pid=19250 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.3' (uid=1000 pid=19299 comm="/tmp/agentos-session-test-0ouhi_wb/bin/agent-os-de")
+dbus-daemon[19250]: [session uid=1000 pid=19250 pidfd=5] Successfully activated service 'org.a11y.Bus'
+dbus-daemon[19323]: Activating service name='org.a11y.atspi.Registry' requested by ':1.1' (uid=1000 pid=19299 comm="/tmp/agentos-session-test-0ouhi_wb/bin/agent-os-de")
+dbus-daemon[19323]: Successfully activated service 'org.a11y.atspi.Registry'
+SpiRegistry daemon is running with well-known name - org.a11y.atspi.Registry
+dbus-daemon[19250]: [session uid=1000 pid=19250 pidfd=5] Activating service name='ca.desrt.dconf' requested by ':1.4' (uid=1000 pid=19317 comm="/usr/libexec/at-spi-bus-launcher")
+dbus-daemon[19250]: [session uid=1000 pid=19250 pidfd=5] Successfully activated service 'ca.desrt.dconf'
+PASS: private on-screen keyboard reserves/restores work area, preserves focus, types/edits, releases modifiers, invokes launcher and rejects same-login injection
+PASS: session-owned Orca initializes speech and announces the focused native field
+
+(process:19251): atspi-WARNING **: 09:17:24.256: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:19251): atspi-WARNING **: 09:17:24.515: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: session-owned Orca sends the focused field error and cleared-valid state to speech without changing input or drafts; physical audio and braille remain unqualified
+PASS: on-screen Insert+H reaches Orca, learn-mode grab isolates typing and Escape releases it
+
+(process:19251): atspi-WARNING **: 09:17:28.622: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:19251): atspi-WARNING **: 09:17:28.941: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:19251): atspi-WARNING **: 09:17:29.728: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:19251): atspi-WARNING **: 09:17:29.988: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:19251): atspi-WARNING **: 09:17:30.857: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: independent AT-SPI names survive typed button style/icon updates; unavailable actions stay disabled and invalid declarations preserve the revision
+PASS: independent AT-SPI inline validation exposes literal error relation, preserves durable Unicode draft, rejects invalid transactions and clears without implicit Save
+PASS: independent AT-SPI toggle activation reaches the real durable draft; feedback and clearing retain the boolean without Save; scoped Discard restores committed state
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 0, "committed": "First"}
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 1, "committed": "First"}
+Choice naming observation: {"name": "Available workspace: First", "expected": "Available workspace: First", "iteration": 2, "committed": "First"}
+PASS: independent agentOS Choice retains its field-plus-option name across three rendered feedback revisions
+
+(process:19251): atspi-WARNING **: 09:17:32.242: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:19251): atspi-WARNING **: 09:17:32.296: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:19251): atspi-WARNING **: 09:17:32.705: AT-SPI: Attempt to set unknown state 'invalid_entry'
+
+(process:19251): atspi-WARNING **: 09:17:32.759: AT-SPI: Attempt to set unknown state 'invalid_entry'
+PASS: local callback parse/range errors relate to the exact retained field, never dispatch or Save, clear on edit and retry once with registered typed values
+PASS: independent AT-SPI desktop Unicode editing, deliberate save, discard and real core state
+PASS: owned reader and speech processes reaped after normal logout
+PASS: normal session maps authenticated surfaces and reaps display host, compositor and renderer

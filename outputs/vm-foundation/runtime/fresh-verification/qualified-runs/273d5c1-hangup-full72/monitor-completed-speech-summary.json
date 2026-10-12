@@ -1,0 +1,12 @@
+{
+  "raw_sha256": "54356481dabf0e4951de48d2e74f14044297348ce429c0abc516521d1a808b86",
+  "completed_exact_work_utterances_by_monitor_window_speech_episode": [
+    2,
+    2,
+    2,
+    2
+  ],
+  "reopen_speech_before_tree_inspection_verified_by_direct_probe": 3,
+  "background_failure_announcements": 1,
+  "marker_required_inside_completed_speech_utterance": true
+}

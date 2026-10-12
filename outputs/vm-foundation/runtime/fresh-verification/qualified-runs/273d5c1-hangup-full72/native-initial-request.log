@@ -1,0 +1,289 @@
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+ --> src/document_dialog.rs:8:11
+  |
+8 | ) -> gtk::FileChooserNative {
+  |           ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:10:23
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:61:23
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:10:42
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:11:10
+   |
+11 |         .title(if save {
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:16:10
+   |
+16 |         .action(if save {
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:21:10
+   |
+21 |         .accept_label(if save { "Export" } else { "Import" })
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:22:10
+   |
+22 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:23:10
+   |
+23 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:24:10
+   |
+24 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+  --> src/document_dialog.rs:27:16
+   |
+27 |         dialog.set_current_name("document.txt");
+   |                ^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:31:40
+   |
+31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:61:42
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:62:10
+   |
+62 |         .title("Choose existing text file to review")
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:63:10
+   |
+63 |         .action(gtk::FileChooserAction::Open)
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:64:10
+   |
+64 |         .accept_label("Review replacement")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:65:10
+   |
+65 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:66:10
+   |
+66 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:67:10
+   |
+67 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:72:40
+   |
+72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_file`: Since 4.10
+   --> src/document_dialog.rs:308:20
+    |
+308 |             dialog.set_file(&gtk::gio::File::for_path(&path)).unwrap();
+    |                    ^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+   --> src/document_dialog.rs:310:26
+    |
+310 |             while dialog.file().and_then(|file| file.path()).as_ref() != Some(&path) {
+    |                          ^^^^
+
+warning: `agent-os-desktop` (bin "agent-os-desktop" test) generated 22 warnings
+    Finished `test` profile [unoptimized] target(s) in 0.03s
+     Running unittests src/main.rs (native-shell/target/debug/deps/agent_os_desktop-5a9d9cb94b44b4cd)
+
+running 1 test
+test transport::initial_document_tests::initial_typed_requests_validate_before_creating_and_never_launch_on_broker_failure ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 42 filtered out; finished in 0.41s
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+ --> src/document_dialog.rs:8:11
+  |
+8 | ) -> gtk::FileChooserNative {
+  |           ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:10:23
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated struct `vte4::gtk4::FileChooserNative`: Since 4.10
+  --> src/document_dialog.rs:61:23
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:10:42
+   |
+10 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:11:10
+   |
+11 |         .title(if save {
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:16:10
+   |
+16 |         .action(if save {
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:21:10
+   |
+21 |         .accept_label(if save { "Export" } else { "Import" })
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:22:10
+   |
+22 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:23:10
+   |
+23 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:24:10
+   |
+24 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_current_name`: Since 4.10
+  --> src/document_dialog.rs:27:16
+   |
+27 |         dialog.set_current_name("document.txt");
+   |                ^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:31:40
+   |
+31 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated associated function `vte4::gtk4::FileChooserNative::builder`: Since 4.10
+  --> src/document_dialog.rs:61:42
+   |
+61 |     let dialog = gtk::FileChooserNative::builder()
+   |                                          ^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::title`: Since 4.10
+  --> src/document_dialog.rs:62:10
+   |
+62 |         .title("Choose existing text file to review")
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::action`: Since 4.10
+  --> src/document_dialog.rs:63:10
+   |
+63 |         .action(gtk::FileChooserAction::Open)
+   |          ^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::accept_label`: Since 4.10
+  --> src/document_dialog.rs:64:10
+   |
+64 |         .accept_label("Review replacement")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::cancel_label`: Since 4.10
+  --> src/document_dialog.rs:65:10
+   |
+65 |         .cancel_label("Cancel")
+   |          ^^^^^^^^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::modal`: Since 4.10
+  --> src/document_dialog.rs:66:10
+   |
+66 |         .modal(true)
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::gtk4::builders::FileChooserNativeBuilder::build`: Since 4.10
+  --> src/document_dialog.rs:67:10
+   |
+67 |         .build();
+   |          ^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+  --> src/document_dialog.rs:72:40
+   |
+72 |             if let Some(path) = dialog.file().and_then(|file| file.path()) {
+   |                                        ^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::set_file`: Since 4.10
+   --> src/document_dialog.rs:308:20
+    |
+308 |             dialog.set_file(&gtk::gio::File::for_path(&path)).unwrap();
+    |                    ^^^^^^^^
+
+warning: use of deprecated method `vte4::FileChooserExt::file`: Since 4.10
+   --> src/document_dialog.rs:310:26
+    |
+310 |             while dialog.file().and_then(|file| file.path()).as_ref() != Some(&path) {
+    |                          ^^^^
+
+warning: `agent-os-desktop` (bin "agent-os-desktop" test) generated 22 warnings
+    Finished `test` profile [unoptimized] target(s) in 0.05s
+     Running unittests src/main.rs (native-shell/target/debug/deps/agent_os_desktop-5a9d9cb94b44b4cd)
+
+running 1 test
+PASS: real authenticated core application context rejects changed revisions and disconnection without inference
+test input_context::tests::real_core_application_context_rechecks_registered_revision_and_connection ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 42 filtered out; finished in 0.00s
+
+PASS: blank typed request creates no activity; explicit requests reuse one internal activity; broker failure launches no inference
+PASS: private request-test core reaped
