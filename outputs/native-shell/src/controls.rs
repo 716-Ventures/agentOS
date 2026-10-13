@@ -75,7 +75,7 @@ impl Controls {
         widget.set_margin_end(20);
         widget.set_margin_bottom(16);
         let setup = ui::button(
-            "Setup network, audio and providers",
+            "Open setup…",
             ButtonVariant::Outline,
             false,
         );
@@ -84,7 +84,14 @@ impl Controls {
             let _ = sender.send(Command::Setup);
         });
         setup.set_widget_name("desktop-setup");
-        widget.append(&setup);
+        setup.set_halign(gtk::Align::Start);
+        let setup_section=ui::column(12);
+        let description=ui::text("Configure network, audio and AI providers.",false);
+        description.set_wrap(true);
+        description.set_selectable(false);
+        setup_section.append(&description);
+        setup_section.append(&setup);
+        widget.append(&setup_section);
         let terminal = ui::button("Open terminal", ButtonVariant::Outline, false);
         let sender = commands.clone();
         terminal.connect_clicked(move |_| {

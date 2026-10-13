@@ -33,26 +33,43 @@ pub fn present(app: &gtk::Application, commands: Sender<Command>) {
         return;
     }
     let content = ui::column(16);
-    content.set_margin_start(24);
-    content.set_margin_end(24);
-    content.set_margin_top(24);
-    content.set_margin_bottom(24);
+    let body=ui::column(16);
+    body.set_margin_start(24);body.set_margin_end(24);
+    body.set_margin_top(24);body.set_margin_bottom(24);
     let title=ui::text("Welcome to agentOS",true);title.set_selectable(false);title.add_css_class("desktop-heading");content.append(&title);
     content.append(&ui::text("Describe what you want to do in the launcher, or open a document or terminal and get straight to work.",false));
     content.append(&ui::text("Connect your model providers and check your microphone in Setup. Agents shows your agents, their progress and usage.",false));
     let setup = ui::button("Open setup", ButtonVariant::Primary, false);
     let later = ui::button("Continue to desktop", ButtonVariant::Outline, false);
-    let actions=ui::row(12);actions.set_halign(gtk::Align::End);actions.append(&later);actions.append(&setup);content.append(&actions);
+    let actions=gtk::FlowBox::new();
+    actions.add_css_class("welcome-actions");
+    actions.set_selection_mode(gtk::SelectionMode::None);
+    actions.set_focusable(false);
+    actions.set_min_children_per_line(1);actions.set_max_children_per_line(2);
+    actions.set_column_spacing(12);actions.set_row_spacing(12);
+    actions.set_halign(gtk::Align::End);
+    for button in [&later,&setup] {
+        let group=gtk::FlowBoxChild::builder().child(button).focusable(false).accessible_role(gtk::AccessibleRole::Group).build();
+        actions.insert(&group,-1);
+    }
+    let scale=preferences::read()["text_scale"].as_f64().unwrap_or(1.0).clamp(1.0,3.0);
+    let scroll=gtk::ScrolledWindow::builder().hscrollbar_policy(gtk::PolicyType::Never).min_content_height((80.0*scale) as i32).vexpand(true).child(&content).build();
+    scroll.set_overlay_scrolling(false);
+    body.append(&scroll);body.append(&actions);
     let window = gtk::ApplicationWindow::builder()
         .application(app)
         .title("Welcome to agentOS")
         .default_width(560)
-        .child(&content)
+        .child(&body)
         .build();
     window.add_css_class("seven-ui");
     window.add_css_class("agentos-launcher");
     desktop_theme::titlebar(&window);
     window.connect_map(|window| {
+        if let Ok(path)=std::env::var("AGENT_OS_WELCOME_CAPTURE") {
+            let target=window.downgrade();
+            glib::timeout_add_local_once(Duration::from_millis(350),move || {if let Some(window)=target.upgrade(){let _=system_bar::capture(&window,&path);}});
+        }
         if let Some(surface)=window.surface().and_then(|surface|surface.downcast::<gdk4_wayland::WaylandToplevel>().ok()) {
             surface.set_application_id("agentos.welcome");
         }

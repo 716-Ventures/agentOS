@@ -744,7 +744,7 @@ pub fn control_size(window: &Observed) -> Option<(i32,i32)> {
     if !window.system_control {return None;}
     if window.app_id.starts_with("agentos.local-terminal."){return Some((880,560));}
     match window.app_id.as_str() {
-        "agentos.welcome" => Some((560,320)),
+        "agentos.welcome" => Some((560.max(window.min_width),320.max(window.min_height))),
         "agentos.settings" => Some((760,540)),
         _ => None,
     }
@@ -1128,6 +1128,9 @@ mod tests {
         assert_eq!(initial_control_geometry(&window,Rect{x:-800,y:51,width:640,height:400}),Some(Rect{x:-800,y:51,width:640,height:400}));
         window.app_id="agentos.local-terminal.00000000000000000000000000000001".into();window.system_control=false;
         assert!(control_size(&window).is_none());window.system_control=true;assert_eq!(control_size(&window),Some((880,560)));
+        window.app_id="agentos.welcome".into();window.min_width=560;window.min_height=540;
+        assert_eq!(initial_control_geometry(&window,area),Some(Rect{x:360,y:154,width:560,height:540}));
+        assert_eq!(initial_control_geometry(&window,Rect{x:0,y:36,width:500,height:400}),Some(Rect{x:0,y:36,width:500,height:400}));
     }
     #[test]
     fn new_windows_remain_manageable_in_manually_constrained_workspaces() {

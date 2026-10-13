@@ -37,16 +37,16 @@ def reap(proc):
         except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait(timeout=5)
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--appearance',choices=['dark','light'],default='dark');parser.add_argument('--close-small',action='store_true',help='Qualify 300% close confirmation in a 360px terminal');args=parser.parse_args()
-    output=ROOT/'test-output'/('desktop-design-'+args.appearance+('-close-small' if args.close_small else ''));output.mkdir(parents=True,exist_ok=True)
-    for name in ('monitor.png','system-bar.png','launcher.png','settings.png','terminal.png','terminal.json','terminal-close.png','desktop.png','scene.json'):(output/name).unlink(missing_ok=True)
+    parser=argparse.ArgumentParser();parser.add_argument('--appearance',choices=['dark','light'],default='dark');parser.add_argument('--initial-text-scale',type=float,choices=[1.0,3.0],default=1.0);parser.add_argument('--close-small',action='store_true',help='Qualify 300% close confirmation in a 360px terminal');args=parser.parse_args()
+    output=ROOT/'test-output'/('desktop-design-'+args.appearance+('-close-small' if args.close_small else '')+('-large' if args.initial_text_scale==3 else ''));output.mkdir(parents=True,exist_ok=True)
+    for name in ('monitor.png','system-bar.png','launcher.png','settings.png','terminal.png','terminal.json','terminal-close.png','welcome.png','desktop.png','scene.json'):(output/name).unlink(missing_ok=True)
     desktop_session.enable_subreaper()
     with tempfile.TemporaryDirectory(prefix='agentos-desktop-design-') as directory, (output/'session.log').open('w') as log:
         root=Path(directory);config=root/'config/agent-os';config.mkdir(parents=True)
-        (config/'desktop.json').write_text(json.dumps({'appearance':args.appearance,'text_scale':1.0,'reduced_motion':True}))
+        (config/'desktop.json').write_text(json.dumps({'appearance':args.appearance,'text_scale':args.initial_text_scale,'reduced_motion':True}))
         state=root/'user-state/agent-os';state.mkdir(parents=True)
         endpoint=root/'core.sock';pidfile=root/'compositor.pid'
-        env={**os.environ,'HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':str(config.parent),'XDG_STATE_HOME':str(state.parent),'AGENT_OS_STATE':str(root/'core-state'),'AGENT_OS_SOCKET':str(endpoint),'AGENT_OS_COMPOSITOR_CORE':str(endpoint),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),'AGENT_OS_BROKER_SOCKET':str(root/'absent-broker.sock'),'AGENT_OS_MODEL_USAGE':str(root/'absent-usage.json'),'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','GDK_BACKEND':'wayland','GTK_A11Y':'atspi','G_DEBUG':'fatal-criticals','WINIT_UNIX_BACKEND':'wayland','AGENT_OS_COMPOSITOR_BACKEND':'winit','AGENT_OS_SYSTEM_BAR_CAPTURE':str(output/'system-bar.png'),'AGENT_OS_LAUNCHER_CAPTURE':str(output/'launcher.png'),'AGENT_OS_MONITOR_CAPTURE':str(output/'monitor.png'),'AGENT_OS_SETTINGS_CAPTURE':str(output/'settings.png')}
+        env={**os.environ,'HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':str(config.parent),'XDG_STATE_HOME':str(state.parent),'AGENT_OS_STATE':str(root/'core-state'),'AGENT_OS_SOCKET':str(endpoint),'AGENT_OS_COMPOSITOR_CORE':str(endpoint),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),'AGENT_OS_BROKER_SOCKET':str(root/'absent-broker.sock'),'AGENT_OS_MODEL_USAGE':str(root/'absent-usage.json'),'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','GDK_BACKEND':'wayland','GTK_A11Y':'atspi','G_DEBUG':'fatal-criticals','WINIT_UNIX_BACKEND':'wayland','AGENT_OS_COMPOSITOR_BACKEND':'winit','AGENT_OS_SYSTEM_BAR_CAPTURE':str(output/'system-bar.png'),'AGENT_OS_LAUNCHER_CAPTURE':str(output/'launcher.png'),'AGENT_OS_MONITOR_CAPTURE':str(output/'monitor.png'),'AGENT_OS_SETTINGS_CAPTURE':str(output/'settings.png'),'AGENT_OS_WELCOME_CAPTURE':str(output/'welcome.png')}
         env.pop('WAYLAND_DISPLAY',None);env.pop('DISPLAY',None)
         env['WAYLAND_DEBUG']='client' # Private fixture: inspect initial configure sizes.
         env.update(AGENT_OS_LOCAL_TERMINAL_VERIFY='1',AGENT_OS_LOCAL_TERMINAL_VERIFY_WORK='1',AGENT_OS_TERMINAL_CLOSE_CAPTURE=str(output/'terminal-close.png'),AGENT_OS_LOCAL_TERMINAL_VERIFY_MENU='1',AGENT_OS_LOCAL_TERMINAL_CAPTURE=str(output/'terminal.png'),AGENT_OS_LOCAL_TERMINAL_OBSERVATION=str(output/'terminal.json'))
@@ -69,7 +69,18 @@ def main():
             accessibility.wait(control.exists,'Compositor control missing')
             def scene():return call(control,{'op':'snapshot'})
             accessibility.wait(lambda:any(layer['namespace']=='agentos-wallpaper' and layer['mapped'] for layer in scene()['system_layers']),'Wallpaper did not map')
-            accessibility.activate(accessibility.find('Continue to desktop',pyatspi.ROLE_PUSH_BUTTON))
+            accessibility.wait(lambda:(output/'welcome.png').exists(),'Welcome did not paint')
+            welcome=accessibility.find('Welcome to agentOS',pyatspi.ROLE_FRAME)
+            welcome_window=next(w for w in scene()['windows'] if w['app_id']=='agentos.welcome')
+            actual=welcome_window['geometry']
+            assert actual['height']>=welcome_window['xdg']['client_min_size'][1],'Welcome ignores its minimum readable height'
+            action=accessibility.find('Continue to desktop',pyatspi.ROLE_PUSH_BUTTON,root=welcome)
+            assert not action.parent.getState().contains(pyatspi.STATE_FOCUSABLE),'Welcome layout wrapper adds a focus stop'
+            if args.initial_text_scale==3:
+                for label in ['Continue to desktop','Open setup']:
+                    bounds=accessibility.find(label,pyatspi.ROLE_PUSH_BUTTON,root=welcome).queryComponent().getExtents(pyatspi.WINDOW_COORDS)
+                    assert 0<=bounds.x and 0<=bounds.y and bounds.x+bounds.width<=actual['width'] and bounds.y+bounds.height<=actual['height'],('Welcome action outside viewport',label,bounds,actual)
+            accessibility.activate(action)
             accessibility.wait(lambda:(state/'welcome.json').exists(),'Welcome dismissal was not persisted')
             assert json.loads((state/'welcome.json').read_text()) == {'version':1,'dismissed':True}
             assert not (state/'setup.json').exists(),'Dismissing Welcome falsely completed provider setup'
@@ -83,8 +94,13 @@ def main():
             accessibility.wait(lambda:any(w['app_id']=='agentos.settings' for w in scene()['windows']),'Desktop settings did not map')
             accessibility.wait(lambda:(output/'settings.png').exists(),'Settings capture missing')
             settings=accessibility.find('Desktop settings',pyatspi.ROLE_FRAME)
-            for category,field_name in [('Activities','Current activity'),('Workspace','Arrange workspace'),('Accessibility','Show on-screen keyboard'),('Storage','Stored images'),('Setup','Setup network, audio and providers'),('Appearance','Appearance')]:
+            for category,field_name in [('Activities','Current activity'),('Workspace','Arrange workspace'),('Accessibility','Show on-screen keyboard'),('Storage','Stored images'),('Setup','Open setup…'),('Appearance','Appearance')]:
                 accessibility.activate(accessibility.find(category,pyatspi.ROLE_TOGGLE_BUTTON,root=settings))
+                if category=='Setup' and args.initial_text_scale==3:
+                    setup=accessibility.find('Open setup…',pyatspi.ROLE_PUSH_BUTTON,root=settings)
+                    bounds=setup.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
+                    geometry=next(w for w in scene()['windows'] if w['app_id']=='agentos.settings')['geometry']
+                    assert 0<=bounds.x and 0<=bounds.y and bounds.x+bounds.width<=geometry['width'] and bounds.y+bounds.height<=geometry['height'],('Setup action outside viewport',bounds,geometry)
                 try:accessibility.find(field_name,pyatspi.ROLE_COMBO_BOX if field_name in ('Current activity','Appearance') else None,root=settings)
                 except AssertionError:
                     from collections import deque

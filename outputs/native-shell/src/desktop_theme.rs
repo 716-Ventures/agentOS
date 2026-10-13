@@ -17,7 +17,6 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
             "#1e2a33",
         )
     };
-    let heading_size = (36.0 * scale.clamp(1.0, 3.0)).min(48.0);
     let terminal_bg=if light {"#ffffff"}else{"#11171d"};
     let css = format!(
         r#"
@@ -28,6 +27,7 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
     window.seven-ui .terminal-close-panel button.destructive:hover {{ background: #c13d3e; }}
     window.seven-ui .terminal-close-panel button.destructive:active {{ background: #962729; }}
     window.seven-ui .terminal-close-panel button.destructive label {{ color: #ffffff; }}
+    window.seven-ui .welcome-actions flowboxchild {{ padding: 0; }}
     window.seven-ui decoration {{ border-radius: 12px; border: none; box-shadow: 0 12px 30px rgba(0,0,0,0.28); }}
     window.seven-ui.desktop-inactive decoration {{ box-shadow: 0 6px 16px rgba(0,0,0,0.16); }}
     window.seven-ui headerbar {{ background: {bg}; background-image: none; color: {fg}; min-height: 38px; padding: 0; border: none; border-bottom: 1px solid {line}; box-shadow: none; border-radius: 12px 12px 0 0; }}
@@ -65,7 +65,6 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
     window.agentos-monitor, window.agentos-launcher {{ background: {bg}; color: {fg}; font-family: Commissioner, Inter, sans-serif; font-size: {font_size}px; }}
     .agentos-monitor label {{ color: {fg}; }}
     .agentos-monitor headerbar {{ background: {bg}; color: {muted}; border-bottom: 1px solid {line}; box-shadow: none; }}
-    .agentos-monitor .desktop-heading {{ font-size: {heading_size}px; font-weight: 500; letter-spacing: -0.5px; }}
     .agentos-monitor .desktop-subtitle, .agentos-monitor .desktop-muted {{ color: {muted}; }}
     .agentos-monitor .agent-table {{ background: transparent; border: none; padding: 0; }}
     .agentos-monitor .agent-table row {{ padding: 13px 12px; border-radius: 6px; border-bottom: 1px solid {line}; color: {fg}; }}
@@ -92,7 +91,7 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
     .agentos-system-bar .desktop-menu button:hover {{ background: {selected}; text-decoration: none; }}
     .agentos-system-bar .desktop-menu button:focus-visible {{ outline: 2px solid #5286b9; outline-offset: -2px; }}
     .agentos-system-bar button:focus-visible {{ outline: 2px solid #ffffff; outline-offset: 2px; }}
-    .agentos-launcher .desktop-heading {{ font-size: 22px; font-weight: 600; }}
+    .agentos-launcher .desktop-heading {{ font-size: 1.57em; font-weight: 600; }}
     .agentos-launcher .launcher-request entry {{ font-size: 1.25em; padding: 0.6em 0.7em; min-height: 1.5em; }}
     .agentos-launcher .launcher-context, .agentos-launcher .launcher-voice-status {{ color: {muted}; font-size: 0.93em; }}
     .agentos-launcher .launcher-direct {{ margin-top: 12px; }}
