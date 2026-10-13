@@ -539,8 +539,13 @@ impl Smallvil {
                 *rect = crate::pressure::viewport(*rect, viewport_area, offset);
             }
         }
-        for (id, window) in ids.iter().zip(windows) {
-            if let Some(rect) = placements.get(id) {
+        // Applying committed focus above can raise a window. Smithay's
+        // map_element also raises each remapped element, so remap in the
+        // updated stacking order rather than undoing that focus raise with
+        // the snapshot collected at the start of arrangement.
+        for window in self.space.elements().cloned().collect::<Vec<_>>() {
+            let id=format!("{:?}",window.toplevel().unwrap().wl_surface().id());
+            if let Some(rect) = placements.get(&id) {
                 let observed=observe(&window);
                 if observed.system_control && observed.app_id=="com.agentos.Desktop"
                     && !smithay::backend::renderer::utils::with_renderer_surface_state(
@@ -557,10 +562,10 @@ impl Smallvil {
                     use smithay::reexports::wayland_protocols::xdg::shell::server::xdg_toplevel;
                     let was_maximized = pending.states.contains(xdg_toplevel::State::Maximized);
                     let now_maximized = if self.bridge.is_some() {
-                        maximized.contains(id)
+                        maximized.contains(&id)
                     } else {
                         matches!(
-                            self.policy.current.placements.get(id),
+                            self.policy.current.placements.get(&id),
                             Some(crate::policy::Placement::Maximized)
                         )
                     };

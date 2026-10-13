@@ -662,10 +662,41 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
                 if time.monotonic()>deadline:
                     raise RuntimeError('Kernel focus did not reach its target: '+repr({'focus':current['seat_focus'],'pointer_location':current['pointer_location'],'pointer_routing':current.get('pointer_routing'),'focus_observations':list(observations),'system_layers':current['system_layers'],'last_click':pointer.last_click,'overview':current['shared']['overview'],'workspace_error':current['shared']['error'],'workspaces':current['shared']['workspaces'],'windows':current['windows']}))
                 time.sleep(.05)
+        def cycle_to_editor(target_id=target,backward=False):
+            for _ in range(5):
+                old_focus=scene()['seat_focus']
+                if old_focus==target_id:return
+                keyboard.chord(*((29,56,42,15) if backward else (29,56,15)))
+                await_focus(lambda focus:focus is not None and focus!=old_focus)
+            assert scene()['seat_focus']==target_id
+        # First-run dismissal is persistent. Create a deliberate second view
+        # rather than relying on Welcome being present for focus cycling.
+        assert snapshot('open-monitor')['requested']
+        deadline=time.monotonic()+8
+        while True:
+            observed=scene()
+            monitor=next((row for row in observed['windows'] if row['app_id']=='agentos.monitor'),None)
+            if monitor and observed['seat_focus']==monitor['id']:break
+            if time.monotonic()>deadline:raise RuntimeError('Second focus-cycle view did not open: '+repr(observed['windows']))
+            time.sleep(.05)
+        cycle_to_editor(backward=True)
+        # Keyboard focus must also raise work above overlapping floating
+        # controls, so the subsequent pointer click reaches the editor.
+        click(snapshot()['field']);wait(lambda value:value['focused'])
         keyboard.chord(29,56,15)
         await_focus(lambda focus:focus is not None and focus!=target)
         keyboard.chord(29,56,42,15)
         await_focus(lambda focus:focus==target)
+        # Keep the pointer-typing check after VT recovery unobscured. Reopen
+        # Monitor deliberately below when its undo controls are needed.
+        keyboard.chord(29,56,15)
+        await_focus(lambda focus:focus==monitor['id'])
+        keyboard.chord(29,56,111)
+        deadline=time.monotonic()+8
+        while any(row['id']==monitor['id'] for row in scene()['windows']):
+            if time.monotonic()>deadline:raise RuntimeError('Temporary focus-cycle Monitor did not close')
+            time.sleep(.05)
+        cycle_to_editor()
         before_resume=scene()['direct_frames_presented']
         keyboard.chord(29,56,60) # Ctrl+Alt+F2 uses XKB's VT-switch level.
         try:
@@ -688,8 +719,6 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
         await_geometry(dragged)
         # Open the existing undo controls before close records its placement.
         # Merely opening another window is a distinct layout mutation.
-        keyboard.chord(29,56,15)
-        await_focus(lambda focus:focus is not None and focus!=target)
         assert snapshot('open-monitor')['requested']
         deadline=time.monotonic()+8
         while True:
@@ -710,11 +739,7 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
                 if any(placed(workspace['outputs']) for workspace in observed['shared']['workspaces'].values()):break
             if time.monotonic()>deadline:raise RuntimeError('Agent Monitor was not placed: '+repr({'windows':observed['windows'],'error':observed['shared']['error'],'identities':observed['shared']['identities']}))
             time.sleep(.05)
-        for _ in range(5):
-            old_focus=scene()['seat_focus']
-            if old_focus==target:break
-            keyboard.chord(29,56,15);await_focus(lambda focus:focus is not None and focus!=old_focus)
-        assert scene()['seat_focus']==target
+        cycle_to_editor()
         keyboard.chord(29,56,111)
         deadline=time.monotonic()+8
         while any(row['id']==target for row in scene()['windows']):
@@ -736,8 +761,7 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
         # Transfer from a distinct conventional client, through the compositor.
         logical=core('presentation.get')['surface_id']
         restored_target=wait_for_mapped_surface(scene,logical)
-        if scene()['seat_focus']==restored_target:
-            keyboard.chord(29,56,15);await_focus(lambda focus:focus is not None and focus!=restored_target)
+        cycle_to_editor(restored_target)
         receipts=metrics/'transfer-receipts.json'
         with (metrics/'transfer-source.log').open('w') as log:
             source_client=subprocess.Popen(['runuser','-u',login_user,'--','python3',str(Path(__file__).resolve()),'--transfer-source',str(receipts)],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
@@ -754,7 +778,11 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
             try:
                 result=presentation({'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1',
                     'request_id':'transfer-placement-'+str(time.time_ns()),'expected_revisions':{workspace['workspace_id']:workspace['revision']},
-                    'operations':[{'op':'workspace.edit','workspace_id':workspace['workspace_id'],'edit':{'kind':'float','surface_id':source_id,'output_id':next(iter(workspace['outputs'])),'x':980,'y':0,'width':300,'height':180}}]})
+                    # Keep both transfer endpoints exposed. Correct focus
+                    # stacking raises the editor; an overlapping source would
+                    # then be occluded before the next drag or transfer cycle.
+                    'operations':[{'op':'workspace.edit','workspace_id':workspace['workspace_id'],'edit':{'kind':'float','surface_id':logical,'output_id':next(iter(workspace['outputs'])),'x':0,'y':0,'width':800,'height':600}},
+                                  {'op':'workspace.edit','workspace_id':workspace['workspace_id'],'edit':{'kind':'float','surface_id':source_id,'output_id':next(iter(workspace['outputs'])),'x':980,'y':0,'width':300,'height':180}}]})
             except RuntimeError as exc:
                 if '\"code\":\"stale_revision\"' not in str(exc) or time.monotonic()>deadline:raise
                 time.sleep(.05);continue
@@ -763,12 +791,22 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
             time.sleep(.05)
         while True:
             source_window=next(row for row in scene()['windows'] if row['id']==source_window['id'])
-            if source_window['geometry']=={'x':980,'y':work_area['y'],'width':300,'height':180}:break
+            editor=next(row for row in scene()['windows'] if row['id']==restored_target)
+            if source_window['geometry']=={'x':980,'y':work_area['y'],'width':300,'height':180} and editor['xdg']['committed_size']==[800,600] and not editor['xdg']['pending_count']:break
             if time.monotonic()>deadline:raise RuntimeError('Transfer source geometry was not applied')
             time.sleep(.05)
         destination=next(row['geometry'] for row in scene()['windows'] if row['id']==restored_target)
         def transfer_point(label):
-            point=snapshot('transfer:'+label)['point'];return (source_window['geometry']['x']+point[0],source_window['geometry']['y']+point[1])
+            # Wayland mapping and AT-SPI registration are independent. A
+            # mapped conventional client may not be in the registry yet.
+            deadline=time.monotonic()+8
+            while True:
+                try:
+                    point=snapshot('transfer:'+label)['point']
+                    return (source_window['geometry']['x']+point[0],source_window['geometry']['y']+point[1])
+                except RuntimeError as error:
+                    if 'accessible control unavailable' not in str(error) or time.monotonic()>deadline:raise
+                    time.sleep(.03)
         field=snapshot()['field'];end=(destination['x']+field[0],destination['y']+field[1])
         # Establish source keyboard ownership before publishing a selection,
         # then navigate to the destination before middle-paste.

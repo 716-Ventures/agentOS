@@ -305,6 +305,8 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                     state=call(control,{'op':'snapshot'})
                     return any(w['app_id']=='agentos.surface.session-fixture' and w['id']==state['seat_focus'] for w in state['windows'])
                 wait_for(content_focused,[core,session])
+                focused_scene=call(control,{'op':'snapshot'})
+                assert focused_scene['windows'][-1]['id']==focused_scene['seat_focus'], 'Focused work remained below a floating desktop control'
                 accessibility.activate(accessibility.find('Open launcher',pyatspi.ROLE_PUSH_BUTTON))
                 def launcher_ready():
                     state=call(control,{'op':'snapshot'})
