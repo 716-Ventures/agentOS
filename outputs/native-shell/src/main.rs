@@ -1401,7 +1401,7 @@ fn main() {
             let value: Value = serde_json::from_slice(&std::fs::read(path).expect("Preview snapshot")).expect("Preview JSON");
             let mut controls = controls::Controls::new(app, frontend.borrow().commands.clone());
             controls.temporary_launcher();
-            controls.update(&Frame {core:value["core"].clone(),usage:value["usage"].clone(),connected:value["connected"]==true,..Frame::default()}, &frontend.borrow().commands);
+            controls.update(&Frame {core:Arc::new(value["core"].clone()),usage:value["usage"].clone(),connected:value["connected"]==true,..Frame::default()}, &frontend.borrow().commands);
             controls.preview_size(value["width"].as_i64().unwrap_or(1040) as i32, value["height"].as_i64().unwrap_or(680) as i32);
             controls.present();
             let app=app.clone();

@@ -26,7 +26,7 @@ pub struct Controls {
     chooser: gtk::DropDown,
     choices: Rc<RefCell<Vec<String>>>,
     chooser_model: gtk::StringList,
-    activity_rows: Value,
+    activity_source: Option<Arc<Value>>,
     changing: Rc<Cell<bool>>,
     monitor: gtk::ApplicationWindow,
     pub monitor_content: gtk::Box,
@@ -479,7 +479,7 @@ impl Controls {
             chooser,
             choices,
             chooser_model,
-            activity_rows: Value::Null,
+            activity_source: None,
             changing,
             monitor,
             monitor_content,
@@ -540,7 +540,7 @@ impl Controls {
     pub fn verify_activity_chooser(&mut self, frame: &Frame, commands: &Sender<Command>) {
         let mut observed = frame.clone();
         let rows = (1..=2000).map(|id| json!({"id":id,"name":format!("Activity {id}")})).collect::<Vec<_>>();
-        observed.core["activities"] = json!(rows);
+        Arc::make_mut(&mut observed.core)["activities"] = json!(rows);
         observed.activity = Some("2000".into());
         let chooser = self.chooser.clone();
         self.update(&observed, commands);
@@ -549,15 +549,15 @@ impl Controls {
         let started = std::time::Instant::now();
         for _ in 0..50 { self.update(&observed, commands); }
         println!("Activity chooser unchanged-history CPU measurement {}", json!({"activities":2000,"updates":50,"total_ms":started.elapsed().as_secs_f64()*1000.0,"meaning":"Synthetic host update CPU duration; not input-to-display latency"}));
-        observed.core["activities"][1999]["name"] = json!("Renamed λ 日本語");
+        Arc::make_mut(&mut observed.core)["activities"][1999]["name"] = json!("Renamed λ 日本語");
         self.update(&observed, commands);
         assert_eq!(self.chooser_model.string(1999).as_deref(), Some("Renamed λ 日本語"));
-        observed.core["activities"].as_array_mut().unwrap().reverse();
+        Arc::make_mut(&mut observed.core)["activities"].as_array_mut().unwrap().reverse();
         self.update(&observed, commands);
         assert_eq!(self.chooser.selected(), 0);
         assert_eq!(self.choices.borrow()[0], "2000");
         assert_eq!(self.chooser_model.string(0).as_deref(), Some("Renamed λ 日本語"));
-        observed.core["activities"].as_array_mut().unwrap().remove(1999);
+        Arc::make_mut(&mut observed.core)["activities"].as_array_mut().unwrap().remove(1999);
         self.update(&observed, commands);
         assert_eq!(self.chooser.selected(), 0);
         assert_eq!(self.chooser_model.n_items(), 1999);
@@ -659,12 +659,12 @@ impl Controls {
             let case = if source == "core" { "work" } else { "work-broker" };
             if std::env::var("AGENT_OS_STATUS_SELECTION_CASE").is_ok_and(|selected| selected != case) { continue; }
             let mut fixture = frame.clone();
-            fixture.core["jobs"] = json!([]);
+            Arc::make_mut(&mut fixture.core)["jobs"] = json!([]);
             fixture.broker = json!([]);
             let activity = frame.activity.as_ref().unwrap().parse::<i64>().unwrap();
             let id = if source == "core" { json!(731) } else { json!("0123456789abcdef0123456789abcdef") };
             let job = json!({"id":id,"activity_id":activity,"activity":activity,"status":"running","argv":["Selected work λ 日本語"]});
-            if source == "core" { fixture.core["jobs"] = json!([job]); } else { fixture.broker = json!([job]); }
+            if source == "core" { Arc::make_mut(&mut fixture.core)["jobs"] = json!([job]); } else { fixture.broker = json!([job]); }
             self.update(&fixture, commands);
             for _ in 0..32 { if glib::MainContext::default().pending() { glib::MainContext::default().iteration(false); } else { break; } }
             let key = format!("{source}:{}", if source == "core" { "731" } else { id.as_str().unwrap() });
@@ -689,7 +689,7 @@ impl Controls {
         frame.error = None;
         frame.notice = Some("Original notice λ 日本語".into());
         frame.usage = json!({"configuration":[{"model":"Original model λ 日本語","role":"fixture","configured":false}],"models":{}});
-        frame.core["jobs"] = json!([{"id":731,"status":"running","argv":["Selection verification","λ 日本語"]}]);
+        Arc::make_mut(&mut frame.core)["jobs"] = json!([{"id":731,"status":"running","argv":["Selection verification","λ 日本語"]}]);
         frame.broker = json!([]);
         self.voice.state.lock().unwrap().error = Some("Original microphone λ 日本語".into());
         self.request_field.entry.set_text("Unsent request λ 日本語");
@@ -718,7 +718,7 @@ impl Controls {
             assert!(label.grab_focus());
             frame.notice = Some("Current notice 日本語".into());
             frame.usage["configuration"][0]["model"] = json!("Current model 日本語");
-            frame.core["jobs"][0]["status"] = json!("failed");
+            Arc::make_mut(&mut frame.core)["jobs"][0]["status"] = json!("failed");
             self.voice.state.lock().unwrap().error = Some("Current microphone 日本語".into());
             self.update(&frame, &commands);
             assert_eq!(label.text(), original);
@@ -957,7 +957,8 @@ impl Controls {
         let rows = &frame.core["activities"];
         // A poll often carries the same history. Keep native model reads and
         // row allocation off the input thread until the observed rows change.
-        if &self.activity_rows != rows {
+        if self.activity_source.as_ref().is_none_or(|source|!Arc::ptr_eq(source,&frame.core)) {
+          if self.activity_source.as_ref().is_none_or(|source|&source["activities"]!=rows) {
             let ids = rows.as_array().into_iter().flatten()
                 .map(|a| a["id"].to_string()).collect::<Vec<_>>();
             let names = rows.as_array().into_iter().flatten()
@@ -970,7 +971,8 @@ impl Controls {
                 self.chooser_model.splice(0, self.chooser_model.n_items(), &names);
                 *self.choices.borrow_mut() = ids;
             }
-            self.activity_rows = rows.clone();
+          }
+          self.activity_source = Some(frame.core.clone());
         }
         self.chooser.set_selected(
             self.choices.borrow().iter()

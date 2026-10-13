@@ -517,7 +517,7 @@ pub fn run(socket: PathBuf, capture: Option<String>) {
         let image=transport::request(&socket,&json!({"op":"resource.get","activity_id":doc["activity_id"],"reference":reference})).unwrap();
         frame.resources.insert(reference.into(),Arc::new(ui::content::image_hex(image["png_hex"].as_str().unwrap()).unwrap()));
         let (commands,rx)=mpsc::channel();let drafts=Arc::new(Mutex::new(BTreeMap::new()));
-        frame.core=transport::request(&socket,&json!({"op":"snapshot"})).unwrap();frame.activity=doc["activity_id"].as_str().map(String::from);frame.usage=json!({"unavailable":true});frame.broker=json!([]);
+        frame.core=Arc::new(transport::request(&socket,&json!({"op":"snapshot"})).unwrap());frame.activity=doc["activity_id"].as_str().map(String::from);frame.usage=json!({"unavailable":true});frame.broker=json!([]);
         verify_form_owners(&frame,&commands);
         verify_focused_draft_resolution(app,&frame,&commands);
         verify_validation_feedback(app,&frame,&commands);

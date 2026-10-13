@@ -487,7 +487,7 @@ mod tests {
         let job = |id| json!({"id":id,"activity_id":1,"status":"running","created_at":1,"argv":["/usr/bin/python3","-u","/usr/local/lib/agent-os/services/worker.py","ask","1","Test request"]});
         let mut frame = Frame {
             connected: true,
-            core: json!({"jobs":[job(1),job(2)]}),
+            core: Arc::new(json!({"jobs":[job(1),job(2)]})),
             ..Frame::default()
         };
         monitor.update(&frame);
@@ -497,7 +497,7 @@ mod tests {
         monitor.update(&frame);
         monitor.stop.emit_clicked();
         assert!(matches!(commands.try_recv().unwrap(),Command::Stop{job,..} if job==2));
-        frame.core["jobs"] = json!([job(1)]);
+        Arc::make_mut(&mut frame.core)["jobs"] = json!([job(1)]);
         monitor.update(&frame);
         monitor.view.emit_clicked();
         assert!(history.is_expanded());
@@ -510,7 +510,7 @@ mod tests {
     #[test]
     fn ordinary_commands_are_not_agents() {
         let frame = Frame {
-            core: json!({"jobs":[{"id":1,"argv":["echo","hello"]}]}),
+            core: Arc::new(json!({"jobs":[{"id":1,"argv":["echo","hello"]}]})),
             ..Frame::default()
         };
         assert!(project(&frame).is_empty());

@@ -365,7 +365,7 @@ impl JobList {
     pub fn verify_virtualization(&mut self, frame: &Frame, commands: &Sender<Command>) {
         let mut fixture = frame.clone();
         fixture.broker = json!([]);
-        fixture.core["jobs"] = json!((1..=4000)
+        Arc::make_mut(&mut fixture.core)["jobs"] = json!((1..=4000)
             .map(|id| json!({"id":id,"status":"running","argv":["fixture",id.to_string()]}))
             .collect::<Vec<_>>());
         self.update(&fixture);
@@ -388,7 +388,7 @@ impl JobList {
         label.select_region(0, -1);
         let bounds = label.selection_bounds();
         assert!(bounds.is_some());
-        fixture.core["jobs"][0]["status"] = json!("succeeded");
+        Arc::make_mut(&mut fixture.core)["jobs"][0]["status"] = json!("succeeded");
         self.update(&fixture);
         assert_eq!(label.text(), selected, "work: background refresh replaced selected status");
         assert_eq!(label.selection_bounds(), bounds);
@@ -404,7 +404,7 @@ impl JobList {
             assert!(!row.stop.is_sensitive());
             row.inspect.emit_clicked();
         }
-        fixture.core["jobs"] = json!([]);
+        Arc::make_mut(&mut fixture.core)["jobs"] = json!([]);
         self.update(&fixture);
         for _ in 0..32 {
             if glib::MainContext::default().pending() {

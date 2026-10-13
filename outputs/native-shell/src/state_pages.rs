@@ -1,5 +1,6 @@
 //! Byte-bounded runtime history reads, reconciled against one state revision.
 use serde_json::{json, Value};
+use std::sync::Arc;
 pub fn read(
     mut request: impl FnMut(&Value) -> Result<Value, String>,
     activity: Option<i64>,
@@ -116,9 +117,9 @@ mod tests {
 /// Poll one bounded row to discover revision changes; retain the complete,
 /// consistent history until that revision or the selected activity changes.
 #[derive(Default)]
-pub struct Cache { state: Option<Value>, activity: Option<i64> }
+pub struct Cache { state: Option<Arc<Value>>, activity: Option<i64> }
 impl Cache {
-    pub fn read(&mut self, mut request: impl FnMut(&Value)->Result<Value,String>, activity:Option<i64>, stopped:impl Fn()->bool)->Result<Value,String> {
+    pub fn read(&mut self, mut request: impl FnMut(&Value)->Result<Value,String>, activity:Option<i64>, stopped:impl Fn()->bool)->Result<Arc<Value>,String> {
         if stopped() { return Err("Runtime read cancelled".into()); }
         if self.activity == activity {
             if let Some(state) = &self.state {
@@ -126,7 +127,7 @@ impl Cache {
                 if probe["revision"].as_i64().is_some() && probe["revision"]==state["revision"] {return Ok(state.clone());}
             }
         }
-        let state=read(&mut request,activity,stopped)?;
+        let state=Arc::new(read(&mut request,activity,stopped)?);
         self.state=Some(state.clone());self.activity=activity;Ok(state)
     }
 }
@@ -138,9 +139,11 @@ mod cache_tests {
     fn idle_history_uses_one_probe_and_activity_changes_invalidate() {
         let mut cache=Cache::default();let mut calls=Vec::new();
         let mut request=|q:&Value| {calls.push(q.clone());Ok(json!({"revision":7,"rows":[],"next_before_id":null}))};
-        cache.read(&mut request,Some(1),||false).unwrap();
-        cache.read(&mut request,Some(1),||false).unwrap();
-        cache.read(&mut request,Some(2),||false).unwrap();
+        let first=cache.read(&mut request,Some(1),||false).unwrap();
+        let idle=cache.read(&mut request,Some(1),||false).unwrap();
+        assert!(Arc::ptr_eq(&first,&idle),"Idle history must share its immutable snapshot");
+        let switched=cache.read(&mut request,Some(2),||false).unwrap();
+        assert!(!Arc::ptr_eq(&first,&switched),"Activity changes require a new snapshot");
         assert_eq!(calls.len(),5);assert_eq!(calls[2]["limit"],1);
         assert_eq!(calls[4]["activity_id"],2);
     }

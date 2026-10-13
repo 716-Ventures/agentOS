@@ -70,8 +70,10 @@ pub struct Frame {
     pub bindings: BTreeMap<String, Value>,
     pub actions: BTreeMap<String, Value>,
     pub drafts: BTreeMap<(String, String), Value>,
-    pub core: Value,
-    pub agents: Value,
+    // Revision-cached histories are immutable. Sharing them keeps idle frame
+    // comparisons and projection copies independent of retained history size.
+    pub core: Arc<Value>,
+    pub agents: Arc<Value>,
     pub host_surfaces: Value,
     pub outputs: Value,
     pub compositor: Value,
@@ -605,13 +607,13 @@ fn run(
                     activity.as_ref().and_then(|id| id.parse().ok()),
                     || stop.load(Ordering::Relaxed),
                 )
-                .unwrap_or_else(|e| json!({"unavailable":e}));
+                .unwrap_or_else(|e| Arc::new(json!({"unavailable":e})));
                 let previous_agents = frame.lock().unwrap().agents.clone();
                 next.agents = if previous_agents["revision"] == next.core["revision"] && !previous_agents.is_null() {
                     previous_agents
                 } else {
-                    super::state_pages::read(|query| {let mut query=query.clone();if query["collection"]=="jobs" {query["recent_only"]=json!(true);} request(&socket, &query)}, None, || stop.load(Ordering::Relaxed))
-                        .unwrap_or_else(|error|json!({"unavailable":error}))
+                    Arc::new(super::state_pages::read(|query| {let mut query=query.clone();if query["collection"]=="jobs" {query["recent_only"]=json!(true);} request(&socket, &query)}, None, || stop.load(Ordering::Relaxed))
+                        .unwrap_or_else(|error|json!({"unavailable":error})))
                 };
                 next.broker = super::broker_pages::read(
                     |query| request(&broker_socket(), query),
