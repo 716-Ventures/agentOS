@@ -27,6 +27,7 @@ def main():
     parser.add_argument('--interaction-performance',action='store_true',help='Measure native view opening, titlebar dragging and scroll presentation in the owned fixture')
     parser.add_argument('--input',action='store_true',help='Exercise temporary kernel input devices in this dedicated VM')
     parser.add_argument('--focus-transfers',type=int,choices=range(1,51),default=1,help='Repeat real source publication/destination focus/primary paste/undo cycles (dedicated VM only)')
+    parser.add_argument('--unavailable-output-mode',action='store_true',help='Qualify reachable startup and input with an unavailable saved mode in isolated preferences')
     parser.add_argument('--output-transform',choices=['normal','90','180','270','flipped','flipped-90','flipped-180','flipped-270'],help='Use isolated output preferences on the dedicated single-output virtual KMS guest')
     modes=parser.add_mutually_exclusive_group()
     modes.add_argument('--screen-reader-input',action='store_true',help='Qualify session-owned Orca focus announcements and kernel keyboard commands with a private null audio sink')
@@ -71,6 +72,9 @@ def main():
     if args.terminal_input:args.input=True
     if args.force_session_stop and args.input:
         parser.error('Forced session stop uses a separate mapped-session cleanup journey')
+    if args.unavailable_output_mode:
+        if args.multi_output or args.output_transform:parser.error('Unavailable-mode qualification requires the dedicated normal single-output guest')
+        args.input=True
     ordinary_editor_input=args.input and not args.terminal_input and not collection_kind and not args.native_feedback and not args.presentation_feedback and not args.screen_reader_input and not args.multi_output
     if os.geteuid() != 0:
         raise SystemExit('Run this dedicated-VM display qualification with sudo')
@@ -96,14 +100,18 @@ def main():
         metrics = Path(directory)
         os.chown(metrics, user.pw_uid, user.pw_gid)
         output_config = None
-        if args.output_transform:
+        expected_output_preferences=None
+        if args.output_transform or args.unavailable_output_mode:
             connectors = [path.parent.name.split('-',1)[1] for path in Path('/sys/class/drm').glob('card*-*/status') if path.read_text().strip() == 'connected']
-            assert connectors == ['Virtual-1'], 'Rotation qualification requires the dedicated single-output virtual KMS guest'
+            assert connectors == ['Virtual-1'], 'Output-preference qualification requires the dedicated single-output virtual KMS guest'
             output_config = metrics/'config'
             preference_dir = output_config/'agentos'
             preference_dir.mkdir(parents=True)
             preference = preference_dir/'outputs.json'
-            preference.write_text(json.dumps({'outputs': {'Virtual-1': {'transform': args.output_transform}}}))
+            settings={'transform':args.output_transform or 'normal'}
+            if args.unavailable_output_mode:settings.update(scale=2.0,mode={'width':1234,'height':777,'refresh_millihz':60000})
+            preference.write_text(json.dumps({'outputs': {'Virtual-1': settings}}))
+            expected_output_preferences=preference.read_bytes()
             for path in (output_config,preference_dir,preference):
                 os.chown(path,user.pw_uid,user.pw_gid)
 
@@ -201,6 +209,11 @@ def main():
                     assert time.monotonic()<deadline,('First-run window did not map',snapshot)
                     time.sleep(.05);snapshot=control(endpoint,'snapshot')
             assert all(row['width'] > 0 and row['height'] > 0 for row in snapshot['outputs']), snapshot
+            if args.unavailable_output_mode:
+                assert len(snapshot['outputs'])==1,snapshot
+                observed=snapshot['outputs'][0]
+                assert [round(observed['width']*observed['scale']),round(observed['height']*observed['scale'])]!=[1234,777],observed
+                print('PASS: unavailable saved mode retains a connected fallback output',flush=True)
             if args.output_transform:
                 expected = {'normal':'Normal','90':'_90','180':'_180','270':'_270','flipped':'Flipped','flipped-90':'Flipped90','flipped-180':'Flipped180','flipped-270':'Flipped270'}[args.output_transform]
                 assert len(snapshot['outputs']) == 1 and snapshot['outputs'][0]['transform'] == expected, snapshot
@@ -278,6 +291,8 @@ def main():
                 if running.returncode != 0:
                     break
                 time.sleep(.1)
+            if args.unavailable_output_mode:
+                assert preference.read_bytes()==expected_output_preferences,'Fallback rewrote the saved mode preference'
             verified = True
         finally:
             try:
@@ -351,6 +366,7 @@ def main():
                           'native_feedback_qualified': args.native_feedback,
                           'native_feedback_load_qualified': args.native_feedback_load,
                           'output_transform_qualified': args.output_transform,
+                          'unavailable_output_mode_qualified': args.unavailable_output_mode,
                           'focus_transfer_cycles': args.focus_transfers if args.input and not args.terminal_input and not collection_kind and not args.native_feedback and not args.presentation_feedback and not args.multi_output else None,
                           'not_tested': ['physical input', 'physical connector hotplug', 'physical GPU presentation']+(['audible speech quality','braille hardware','screen-reader pointer location'] if args.screen_reader_input else [])}))
 

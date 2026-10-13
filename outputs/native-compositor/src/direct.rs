@@ -96,20 +96,25 @@ impl Device {
             }
             let name = format!("{:?}-{}", connector.interface(), connector.interface_id());
             let preference = self.config.outputs.get(&name).cloned().unwrap_or_default();
-            let selected = if let Some(requested) = &preference.mode {
+            let requested = preference.mode.as_ref().and_then(|requested| {
                 connector.modes().iter().find(|m| {
                     let mode = Mode::from(**m);
                     mode.size.w == i32::from(requested.width)
                         && mode.size.h == i32::from(requested.height)
                         && mode.refresh == requested.refresh_millihz as i32
                 })
-            } else {
-                connector
-                    .modes()
-                    .iter()
-                    .find(|m| m.mode_type().contains(ModeTypeFlags::PREFERRED))
-                    .or_else(|| connector.modes().first())
-            };
+            });
+            // A saved preference can outlive the monitor or its advertised
+            // modes. Keep the desktop reachable without rewriting that choice.
+            let selected = requested
+                .or_else(|| connector.modes().iter()
+                    .find(|mode| mode.mode_type().contains(ModeTypeFlags::PREFERRED)))
+                .or_else(|| connector.modes().first());
+            if preference.mode.is_some() && requested.is_none() {
+                if let Some(mode) = selected {
+                    eprintln!("Saved mode unavailable for {name}; using advertised mode {:?}", mode.name());
+                }
+            }
             let Some(mode) = selected.copied() else {
                 eprintln!("No matching mode for connector {name}");
                 continue;
