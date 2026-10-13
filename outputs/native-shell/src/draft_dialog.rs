@@ -95,11 +95,11 @@ pub fn verify(parent: &gtk::Window) {
         .unwrap()
         .downcast::<gtk::Box>()
         .unwrap();
-    let save = row
-        .first_child()
-        .unwrap()
-        .downcast::<gtk::Button>()
-        .unwrap();
+    let mut child=row.first_child();
+    let save=std::iter::from_fn(|| {let current=child.take()?;child=current.next_sibling();Some(current)})
+        .filter_map(|widget|widget.downcast::<gtk::Button>().ok())
+        .find(|button|button.label().as_deref()==Some("Save reviewed draft"))
+        .expect("Review action is present");
     assert!(!save.is_sensitive());
     match receiver.try_recv().unwrap() {
         Command::ReviewDraft {

@@ -297,6 +297,14 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
             if system_bar:
                 import accessibility,pyatspi
                 accessibility.activate(accessibility.find('Agents',pyatspi.ROLE_PUSH_BUTTON))
+                # Monitor opening intentionally focuses it. Establish a known
+                # content focus before testing a background focus change.
+                wait_for(lambda:any(w['app_id']=='agentos.monitor' and w['id']==call(control,{'op':'snapshot'})['seat_focus'] for w in call(control,{'op':'snapshot'})['windows']),[core,session])
+                session_focus.focus(lambda value:call(endpoint,value),f'desktop-{activity}','session-fixture','field','launcher-initial-content-focus')
+                def content_focused():
+                    state=call(control,{'op':'snapshot'})
+                    return any(w['app_id']=='agentos.surface.session-fixture' and w['id']==state['seat_focus'] for w in state['windows'])
+                wait_for(content_focused,[core,session])
                 accessibility.activate(accessibility.find('Open launcher',pyatspi.ROLE_PUSH_BUTTON))
                 def launcher_ready():
                     state=call(control,{'op':'snapshot'})
