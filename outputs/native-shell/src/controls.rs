@@ -1,5 +1,12 @@
 //! Direct human controls; authority is dispatched through the existing core/broker.
 use super::*;
+// Responsive layout wrappers must not intercept keyboard activation intended
+// for their controls or add a duplicate stop to the tab order.
+fn flow_insert(flow: &gtk::FlowBox, widget: &impl IsA<gtk::Widget>) {
+    let child=gtk::FlowBoxChild::builder().child(widget).focusable(false)
+        .accessible_role(gtk::AccessibleRole::Group).build();
+    flow.insert(&child,-1);
+}
 // Preserve the launch-time source while typing. A deliberate selection of
 // status text inside the launcher is a new local reference chosen by the user.
 fn request_context(frozen: Option<Value>, current: Value) -> Value {
@@ -163,11 +170,11 @@ impl Controls {
         activity_row.set_column_spacing(12);
         activity_row.set_row_spacing(12);
         let current=ui::column(6);current.append(&ui::text("Current activity",false));current.append(&chooser);
-        activity_row.insert(&current,-1);
+        flow_insert(&activity_row,&current);
         let name = TextField::new("New activity", "Activity name", "");
-        activity_row.insert(&name.widget, -1);
+        flow_insert(&activity_row,&name.widget);
         let new = ui::button("Create activity", ButtonVariant::Outline, false);
-        activity_row.insert(&new, -1);
+        flow_insert(&activity_row,&new);
         let commands_now = commands.clone();
         new.connect_clicked(move |_| {
             if !name.entry.text().trim().is_empty() {
@@ -375,7 +382,7 @@ impl Controls {
             (&output_next, 1),
             (&output_refresh, 0),
         ] {
-            pages.insert(button, -1);
+            flow_insert(&pages,button);
             button.set_sensitive(false);
             let sender = commands.clone();
             button.connect_clicked(move |_| {
@@ -877,7 +884,7 @@ impl Controls {
             if child == self.request_field.widget.clone().upcast::<gtk::Widget>() { break; }
             self.widget.remove(&child);
             let quick = child.downcast_ref::<gtk::Button>().and_then(|button| button.label()).is_some_and(|label| matches!(label.as_str(), "Open terminal" | "New document" | "Import text file…"));
-            if quick { direct.insert(&child, -1); } else {
+            if quick { flow_insert(&direct,&child); } else {
                 let category=match child.widget_name().as_str() {"desktop-appearance"=>"Appearance","desktop-activities"=>"Activities","desktop-shortcuts"=>"Accessibility",_=>"Setup"};
                 self.settings.append(category,&child);
             }
@@ -1171,8 +1178,7 @@ pub(super) fn review_proposal(app: &gtk::Application, proposal: Value, commands:
     actions.set_min_children_per_line(1);actions.set_max_children_per_line(3);
     actions.set_column_spacing(8);actions.set_row_spacing(8);actions.set_halign(gtk::Align::End);
     for button in [&cancel,&reject,&approve] {
-        let child=gtk::FlowBoxChild::builder().child(button).focusable(false).accessible_role(gtk::AccessibleRole::Group).build();
-        actions.insert(&child,-1);
+        flow_insert(&actions,button);
     }
     content.append(&actions);
     let scroll = gtk::ScrolledWindow::builder()

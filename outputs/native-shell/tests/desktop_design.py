@@ -117,6 +117,9 @@ def main():
             for path in output.glob('wayland-screenshot*.png'):path.rename(output/'desktop.png')
             assert (output/'desktop.png').is_file(),'Composed desktop capture missing'
             accessibility.activate(accessibility.find('Open launcher',pyatspi.ROLE_PUSH_BUTTON))
+            for label in ['Open terminal','New document','Import text file…']:
+                button=accessibility.find(label,pyatspi.ROLE_PUSH_BUTTON)
+                assert not button.parent.getState().contains(pyatspi.STATE_FOCUSABLE), 'Layout wrapper adds a duplicate focus stop: '+label
             entry=accessibility.find('Ask Agent',pyatspi.ROLE_TEXT);entry.queryEditableText().setTextContents('Keep this unsent request λ')
             accessibility.activate(accessibility.find('Close launcher',pyatspi.ROLE_PUSH_BUTTON))
             accessibility.wait(lambda:not any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in scene()['system_layers']),'Launcher did not dismiss')
