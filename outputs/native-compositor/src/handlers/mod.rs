@@ -1,4 +1,5 @@
 mod compositor;
+mod dmabuf;
 mod input_method;
 mod xdg_shell;
 

@@ -173,6 +173,10 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
     let result = (|| -> Result<Value, String> {
         match v["op"].as_str() {
             Some("launcher.state") => Ok(json!({"sequence":state.launcher_requests,"keyboard_sequence":state.keyboard_requests,"keyboard_output_height":crate::system_shell::keyboard_output_height(state),"display_zoom":state.output_zoom.factor()})),
+            Some("interaction.status") => {
+                let windows=state.space.elements().map(|w| {let surface=w.toplevel().unwrap().wl_surface();let (title,app_id)=smithay::wayland::compositor::with_states(surface,|states|{let data=states.data_map.get::<smithay::wayland::shell::xdg::XdgToplevelSurfaceData>().unwrap().lock().unwrap();(data.title.clone(),data.app_id.clone())});json!({"id":format!("{:?}",surface.id()),"title":title,"app_id":app_id,"geometry":state.space.element_geometry(w).map(|r|json!({"x":r.loc.x,"y":r.loc.y,"width":r.size.w,"height":r.size.h}))})}).collect::<Vec<_>>();
+                Ok(json!({"error":state.bridge.as_ref().and_then(|b|b.scene.snapshot().error.clone()),"previews":state.bridge.as_ref().map(|b|b.previews.lock().unwrap().iter().map(|(id,p)|(id.clone(),json!({"active":p.active,"x":p.rect.x,"y":p.rect.y}))).collect::<std::collections::BTreeMap<_,_>>()),"pointer":state.seat.get_pointer().map(|p|{let v=p.current_location();json!([v.x,v.y])}),"windows":windows,"seat_focus":state.seat.get_keyboard().and_then(|k|k.current_focus()).map(|s|format!("{:?}",s.id())),"frames":state.direct_frames_presented}))
+            }
             Some("desktop.status") => {
                 let scene = state.bridge.as_ref().map(|b| b.scene.snapshot());
                 Ok(scene.map(|s| json!({"error":s.error,"overview":s.overview})).unwrap_or(Value::Null))

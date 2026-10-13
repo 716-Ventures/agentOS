@@ -870,6 +870,7 @@ impl Controls {
         if std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET").is_some() {let _=self.commands.send(Command::PresentMonitor);}
     }
     pub fn update(&mut self, frame: &Frame, _commands: &Sender<Command>) {
+        let _timing=timings::Span::new("native.controls_update");
         self.images.update(frame);
         self.import_document.set_sensitive(frame.connected);
         self.new_document.set_sensitive(frame.connected);

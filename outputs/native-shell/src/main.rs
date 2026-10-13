@@ -1472,6 +1472,7 @@ fn main() {
         if trusted {
             let window = gtk::ApplicationWindow::builder().application(app).title("agentOS system bar").decorated(false).child(&bar).build();
             window.add_css_class("agentos-system-bar");
+            window.set_size_request(-1,50); // Keep font settling from moving the entire work area.
             wallpaper = Some(wallpaper::Backgrounds::new(app, &display));
             match system_bar::configure(&window, false) {
                 Ok(library) => layer_library = Some(library),
@@ -1551,7 +1552,10 @@ fn main() {
         let mut launcher_captured = false;
         let mut restoration_captured = false;
         let mut monitor_captured = false;
+        let mut metrics_at=std::time::Instant::now();
         glib::timeout_add_local(Duration::from_millis(50), move || {
+            let _timing=timings::Span::new("native.ui_tick");
+            if metrics_at.elapsed()>=Duration::from_secs(1) {timings::publish();metrics_at=std::time::Instant::now();}
             // Keep the layer library and system window alive for this session.
             let _ = (&layer_library, &bar_window, &screen_keyboard, &wallpaper);
             if !bar_captured {
@@ -1584,7 +1588,7 @@ fn main() {
                 }
             }
             let backend = frontend.borrow();
-            let frame = backend.frame.lock().unwrap().clone();
+            let frame = {let _copy=timings::Span::new("native.frame_copy");backend.frame.lock().unwrap().clone()};
             if let Ok(now) = glib::DateTime::now_local() {
                 if let Ok(text) = now.format("%a %e %b · %H:%M") {
                     if clock.text().as_str()!=text.as_str() {clock.set_text(&text);}

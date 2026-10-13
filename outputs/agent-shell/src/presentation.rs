@@ -929,6 +929,7 @@ pub fn init(db: &Connection) -> Result<()> {
         CREATE TABLE IF NOT EXISTS presentation_leases(document TEXT NOT NULL,element TEXT NOT NULL,uid INTEGER NOT NULL,session TEXT NOT NULL,expires INTEGER NOT NULL,draft_revision INTEGER NOT NULL DEFAULT 0,draft TEXT,PRIMARY KEY(document,element));
         CREATE TABLE IF NOT EXISTS presentation_outputs(id TEXT PRIMARY KEY,width REAL NOT NULL,height REAL NOT NULL,connected INTEGER NOT NULL);
         CREATE TABLE IF NOT EXISTS presentation_actions(reference TEXT PRIMARY KEY,uid INTEGER NOT NULL,activity TEXT NOT NULL,revoked INTEGER NOT NULL DEFAULT 0);").map_err(db_error)?;
+    db.execute_batch("CREATE INDEX IF NOT EXISTS presentation_documents_activity ON presentation_documents(CASE WHEN json_valid(body) THEN json_extract(body,'$.activity_id') END);").map_err(db_error)?;
     crate::presentation_hosts::init(db)?;
     crate::presentation_outputs::init(db)?;
     crate::presentation_sources::init(db)?;
@@ -1405,6 +1406,26 @@ fn surface_mut<'a>(
         _ => Err(error("missing_reference", id)),
     }
 }
+/// Validation invariants (references, placements and image budgets) are activity
+/// scoped. Load every peer in each affected activity, including both existing
+/// and proposed owners, while leaving unrelated retained history out of edits.
+fn transaction_documents(db:&Connection, operations:&[Operation])->Result<BTreeMap<String,Document>> {
+    let mut activities=BTreeSet::new();
+    for operation in operations {
+        let owner:Option<String>=db.query_row("SELECT json_extract(body,'$.activity_id') FROM presentation_documents WHERE id=?",[operation.id()],|r|r.get(0)).optional().map_err(db_error)?;
+        if let Some(owner)=owner {activities.insert(owner);}
+        match operation {
+            Operation::Create{document}|Operation::Replace{document}=>{activities.insert(document.activity_id.clone());}
+            Operation::Workspace{document}=>{activities.insert(document.activity_id.clone());}
+            _=>{}
+        }
+    }
+    if activities.is_empty() {return Ok(BTreeMap::new());}
+    let placeholders=vec!["?";activities.len()].join(",");
+    let mut query=db.prepare(&format!("SELECT id,body FROM presentation_documents WHERE (CASE WHEN json_valid(body) THEN json_extract(body,'$.activity_id') END) IN ({placeholders}) ORDER BY id")).map_err(db_error)?;
+    let rows=query.query_map(rusqlite::params_from_iter(activities.iter()),|r|Ok((r.get::<_,String>(0)?,r.get::<_,String>(1)?))).map_err(db_error)?;
+    rows.map(|row|{let(id,body)=row.map_err(db_error)?;Ok((id,serde_json::from_str(&body).map_err(db_error)?))}).collect()
+}
 fn apply(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> {
     if v.to_string().len() > TRANSACTION_LIMIT {
         return Err(error("resource_limit", "Transaction exceeds 4 MiB"));
@@ -1439,7 +1460,7 @@ fn apply(db: &mut Connection, v: &Value, who: &Principal) -> Result<Value> {
         }
         return serde_json::from_str(&receipt).map_err(db_error);
     }
-    let before = documents(&tx)?;
+    let before = transaction_documents(&tx,&req.operations)?;
     let mut after = before.clone();
     let affected: BTreeSet<String> = req.operations.iter().map(|o| o.id().into()).collect();
     if req
@@ -2406,6 +2427,24 @@ mod tests {
         let mut stale = defaults;
         stale["request_id"] = json!("stale-button");
         assert!(handle(&mut db, &stale, &human()).is_err());
+    }
+    #[test]
+    fn transactions_load_all_activity_peers_and_both_ownership_scopes() {
+        let mut db=fixture();create(&mut db);
+        for (id,activity) in [("peer","1"),("foreign","2")] {
+            let mut document=surface();document["surface_id"]=json!(id);document["activity_id"]=json!(activity);
+            handle(&mut db,&json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":id,"expected_revisions":{id:null},"operations":[{"op":"surface.create","document":document}]}),&human()).unwrap();
+        }
+        let edit=Operation::Props{surface_id:"surface-a".into(),element_id:"text".into(),props:BTreeMap::new()};
+        let scope=transaction_documents(&db,&[edit]).unwrap();
+        assert!(scope.contains_key("surface-a") && scope.contains_key("peer"));assert!(!scope.contains_key("foreign"));
+        let mut replacement:SurfaceDocument=serde_json::from_value(surface()).unwrap();replacement.activity_id="2".into();
+        let scope=transaction_documents(&db,&[Operation::Replace{document:replacement}]).unwrap();
+        assert!(scope.contains_key("foreign"),"Ownership changes must include the proposed owner's peers before being validated");
+        let before=documents(&db).unwrap();
+        let mut replacement=surface();replacement["activity_id"]=json!("2");
+        assert!(handle(&mut db,&json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"foreign-replacement","expected_revisions":{"surface-a":0},"operations":[{"op":"surface.replace","document":replacement}]}),&human()).is_err());
+        assert_eq!(documents(&db).unwrap(),before);
     }
     #[test]
     fn repeated_image_references_share_an_aggregate_decoded_pixel_budget() {

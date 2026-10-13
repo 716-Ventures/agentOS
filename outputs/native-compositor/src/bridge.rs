@@ -172,9 +172,10 @@ impl Bridge {
                 return;
             }
             let prefix = nonce.iter().map(|b| format!("{b:02x}")).collect::<String>();
+            let mut ready=None;
             while !stopping.load(Ordering::Relaxed) {
                 // Bounded command queue; each operation has exact core revision checks.
-                for req in rx.try_iter().take(8) {
+                for req in ready.take().into_iter().chain(rx.try_iter()).take(8) {
                     if req.expired() {
                         continue;
                     }
@@ -255,11 +256,12 @@ impl Bridge {
                 let observed = input.lock().unwrap().clone();
                 if let Some(observed) = observed {
                     let result = (|| -> Result<Option<Scene>, String> {
-                        let mut state = document_cache.read(
+                        let _timing=crate::timings::Span::new("bridge.reconcile");
+                        let mut state = {let _read=crate::timings::Span::new("bridge.metadata");document_cache.read(
                             |value| call(&socket, value),
                             None,
                             || stopping.load(Ordering::Relaxed),
-                        )?;
+                        )?};
                         if input_error.is_none() && output.snapshot().error.is_none() && observed.windows.iter().all(|window|output.snapshot().identities.contains_key(&window.id)) && projected.as_ref().is_some_and(|(prior,observation,activity)|Arc::ptr_eq(prior,&state) && observation==&observed && activity==&selected_activity) {
                             return Ok(None);
                         }
@@ -312,6 +314,7 @@ impl Bridge {
                                 published.remove(&runtime);
                             }
                         }
+                        let _placement=crate::timings::Span::new("bridge.placement_and_projection");
                         let mut added = BTreeMap::<String, Vec<String>>::new();
                         first_seen.retain(|id, _| live.contains(id));
                         for w in &observed.windows {
@@ -330,7 +333,7 @@ impl Bridge {
                                 continue;
                             }
                             if !registrations.contains_key(&w.id) {
-                                if seen.elapsed() < Duration::from_millis(300) {
+                                if !system_floating(w) && seen.elapsed() < Duration::from_millis(300) {
                                     continue;
                                 }
                                 counter += 1;
@@ -430,13 +433,16 @@ impl Bridge {
                                 .collect(),
                             ..Scene::default()
                         };
-                        next.workspaces = json!(state["documents"]
-                            .as_object()
-                            .into_iter()
-                            .flat_map(|d| d.iter())
-                            .filter(|(_, d)| d.get("workspace_id").is_some())
-                            .map(|(id, d)| (id.clone(), d.clone()))
-                            .collect::<BTreeMap<_, _>>());
+                        // Input routing needs the selected activity and other
+                        // activities with mapped clients, not all retained history.
+                        let mut relevant=BTreeSet::from([activity.clone()]);
+                        for surface in next.identities.values() {
+                            if let Some(owner)=state["documents"][surface]["activity_id"].as_str() {relevant.insert(owner.into());}
+                        }
+                        for (runtime,(_,owner,_,_)) in &registrations {
+                            if next.identities.contains_key(runtime) {relevant.insert(owner.clone());}
+                        }
+                        next.workspaces=live_workspaces(&state,&relevant);
                         let reverse = next
                             .identities
                             .iter()
@@ -518,7 +524,9 @@ impl Bridge {
                         Err(e) => output.set_error(e),
                     }
                 }
-                thread::sleep(Duration::from_millis(100));
+                // Incoming human commands wake the worker immediately; only
+                // idle state reconciliation uses the polling interval.
+                ready=rx.recv_timeout(Duration::from_millis(100)).ok();
             }
             grabs.stop(&socket);
             for id in output_areas.keys() {
@@ -556,7 +564,10 @@ impl Bridge {
             runtime.into(),
             grabs::Preview {
                 rect,
-                active: false,
+                // A serial-validated human drag previews locally immediately.
+                // The worker still acquires a lease before any durable edit;
+                // denial removes this preview and restores the committed scene.
+                active: true,
             },
         );
         self.grab_command(runtime, "begin");
@@ -647,6 +658,7 @@ impl Drop for Bridge {
     }
 }
 fn call(socket: &PathBuf, value: &Value) -> Result<Value, String> {
+    let _timing=crate::timings::Span::new("bridge.core_roundtrip");
     let conn = UnixStream::connect(socket).map_err(|e| e.to_string())?;
     let line = crate::core_ipc::exchange(conn, format!("{value}\n").as_bytes())?;
     let response: Value = serde_json::from_slice(&line).map_err(|e| e.to_string())?;
@@ -685,6 +697,11 @@ pub fn native_identity(window: &Observed, state: &Value) -> Option<String> {
         return None;
     }
     Some(surface.into())
+}
+fn live_workspaces(state:&Value, activities:&BTreeSet<String>)->Value {
+    json!(state["documents"].as_object().into_iter().flat_map(|d|d.iter())
+        .filter(|(_,d)|d.get("workspace_id").is_some() && d["activity_id"].as_str().is_some_and(|a|activities.contains(a)))
+        .map(|(id,d)|(id.clone(),d.clone())).collect::<BTreeMap<_,_>>())
 }
 fn placed_surfaces(state: &Value) -> BTreeSet<String> {
     fn walk(v: &Value, set: &mut BTreeSet<String>) {
@@ -995,6 +1012,14 @@ mod tests {
         )
         .is_null());
         assert_eq!(rectangles, saved);
+    }
+    #[test]
+    fn input_routing_retains_live_background_activities_without_copying_retired_history() {
+        let state=json!({"documents":{"old":{"workspace_id":"old","activity_id":"1"},"active":{"workspace_id":"active","activity_id":"2"},"background":{"workspace_id":"background","activity_id":"3"},"view":{"surface_id":"view","activity_id":"2"}}});
+        let projected=live_workspaces(&state,&BTreeSet::from(["2".into(),"3".into()]));
+        assert!(projected.get("active").is_some());assert!(projected.get("background").is_some());
+        assert!(projected.get("old").is_none());assert!(projected.get("view").is_none());
+        assert!(state["documents"].get("old").is_some(),"Projection must preserve retained core history");
     }
     #[test]
     fn published_scenes_share_history_and_keep_each_readers_revision_consistent() {

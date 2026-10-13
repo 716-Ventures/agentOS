@@ -173,6 +173,19 @@ def assistive():
                 node=find('Ask Agent',pyatspi.ROLE_TEXT)
                 text=node.queryText()
                 print(json.dumps({'text':text.getText(0,min(text.characterCount,65536)),'focused':node.getState().contains(pyatspi.STATE_FOCUSED)}),flush=True);continue
+            if request=='performance-close-monitor':
+                frame=find('Agent Monitor',pyatspi.ROLE_FRAME)
+                queue=deque([frame]);closed=False
+                while queue:
+                    node=queue.popleft()
+                    if node.name=='Close window' and node.getRole()==pyatspi.ROLE_PUSH_BUTTON:
+                        closed=node.queryAction().doAction(0);break
+                    queue.extend(node[i] for i in range(node.childCount))
+                print(json.dumps({'closed':closed}),flush=True);continue
+            if request=='performance-fill':
+                node=find('Direct input fixture',pyatspi.ROLE_TEXT)
+                node.queryEditableText().setTextContents('\n'.join(f'Line {i}: a repeatable scroll measurement with real GTK text.' for i in range(600)))
+                print(json.dumps({'filled':True}),flush=True);continue
             if request=='monitor-button':
                 node=find('Agents',pyatspi.ROLE_PUSH_BUTTON)
                 r=node.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
@@ -335,7 +348,7 @@ def assistive():
         print(json.dumps(response),flush=True)
 
 
-def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False,presentation_feedback=False,native_feedback=False,native_feedback_load=False,table_input=False,focus_transfers=1,screen_reader=False,multi_output=False,multi_output_shell_hotplug=False,multi_output_restoration=False,multi_output_hotplug=False,multi_output_hotplug_primary=False,multi_output_hotplug_all=False):
+def verify(metrics,output,core,scene,target,login_user,presentation,terminal_input=False,terminal_ime=False,presentation_feedback=False,native_feedback=False,native_feedback_load=False,interaction_performance=False,table_input=False,focus_transfers=1,screen_reader=False,multi_output=False,multi_output_shell_hotplug=False,multi_output_restoration=False,multi_output_hotplug=False,multi_output_hotplug_primary=False,multi_output_hotplug_all=False):
     subprocess.run(['modprobe','uinput'],check=True)
     # Join only this test session's accessibility bus; never inspect other users.
     bus=None;observer_runtime=None;wayland=None;compositor_socket=None;deadline=time.monotonic()+10
@@ -528,6 +541,9 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
         if native_feedback:
             import direct_native_feedback
             direct_native_feedback.verify(metrics,core,login_user,keyboard,wait,load=native_feedback_load,scene=scene)
+            if interaction_performance:
+                import direct_interactions
+                direct_interactions.verify(metrics,keyboard,pointer,output,target,snapshot,scene,core,presentation,env)
             return
         import direct_screen_keyboard_probe
         direct_screen_keyboard_probe.verify(output,scene,target,snapshot,keyboard,pointer,wait)

@@ -102,6 +102,7 @@ struct Recorder {
     queue: EventQueue<State>,
     state: State,
     path: PathBuf,
+    kind: &'static str,
 }
 impl Recorder {
     fn publish(&self) {
@@ -110,7 +111,7 @@ impl Recorder {
         let percentile = |fraction: f64| {
             values.get(((values.len() as f64 * fraction).ceil() as usize).saturating_sub(1))
         };
-        let report = json!({"format":1,"clock_id":self.state.clock,"requested":self.state.requested,"presented":values.len(),"discarded":self.state.discarded,"invalid":self.state.invalid,"pending":self.state.requested-values.len()-self.state.discarded-self.state.invalid,"sample_limit":LIMIT,"p50_ms":percentile(0.5),"p95_ms":percentile(0.95),"max_ms":values.last(),"meaning":"Wayland key event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification"});
+        let report = json!({"input_kind":self.kind,"format":1,"clock_id":self.state.clock,"requested":self.state.requested,"presented":values.len(),"discarded":self.state.discarded,"invalid":self.state.invalid,"pending":self.state.requested-values.len()-self.state.discarded-self.state.invalid,"sample_limit":LIMIT,"p50_ms":percentile(0.5),"p95_ms":percentile(0.95),"max_ms":values.last(),"meaning":"Wayland input event timestamp to acknowledged presentation of the next GTK root surface commit; virtual display evidence is not physical display qualification"});
         let tmp = self.path.with_extension("tmp");
         let result = (|| -> std::io::Result<()> {
             let mut file = std::fs::OpenOptions::new()
@@ -135,9 +136,13 @@ impl Drop for Recorder {
 }
 /// Called once after the native window is mapped; disabled in normal sessions.
 pub fn install(window: &gtk::ApplicationWindow) {
+    install_kind(window,"key");install_kind(window,"scroll");
+}
+fn install_kind(window:&gtk::ApplicationWindow,kind:&'static str) {
     if std::env::var("AGENT_OS_FEEDBACK_METRICS").as_deref() != Ok("1") {
         return;
     }
+    if kind=="key" {eprintln!("Native GTK renderer: {:?}",window.renderer().map(|r|r.type_().name()));}
     let Some(directory) = std::env::var_os("AGENT_OS_METRICS_DIR")
         .map(PathBuf::from)
         .filter(|p| p.is_absolute() && p.is_dir())
@@ -167,18 +172,22 @@ pub fn install(window: &gtk::ApplicationWindow) {
     let recorder = Rc::new(RefCell::new(Recorder {
         queue,
         state,
+        kind,
         path: directory.join(format!(
-            "feedback-{}-{}.json",
+            "feedback-{}-{}-{}.json",
+            kind,
             std::process::id(),
             NEXT.fetch_add(1, Ordering::Relaxed)
         )),
     }));
     recorder.borrow().publish();
-    let controller = gtk::EventControllerKey::new();
+    let controller = gtk::EventControllerLegacy::new();
     controller.set_propagation_phase(gtk::PropagationPhase::Capture);
     let weak_window = window.downgrade();
     let captured = recorder.clone();
-    controller.connect_key_pressed(move |controller, _, _, _| {
+    controller.connect_event(move |controller, event| {
+        let wanted=if kind=="scroll" {gtk::gdk::EventType::Scroll} else {gtk::gdk::EventType::KeyPress};
+        if event.event_type()!=wanted {return glib::Propagation::Proceed;}
         if let Some(surface) = weak_window
             .upgrade()
             .and_then(|w| w.surface())

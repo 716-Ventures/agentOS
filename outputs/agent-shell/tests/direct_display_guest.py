@@ -24,6 +24,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--hold-seconds', type=int, default=0, choices=range(31),
                         help='Keep the verified desktop visible briefly for console inspection (0–30 seconds)')
+    parser.add_argument('--interaction-performance',action='store_true',help='Measure native view opening, titlebar dragging and scroll presentation in the owned fixture')
     parser.add_argument('--input',action='store_true',help='Exercise temporary kernel input devices in this dedicated VM')
     parser.add_argument('--focus-transfers',type=int,choices=range(1,51),default=1,help='Repeat real source publication/destination focus/primary paste/undo cycles (dedicated VM only)')
     parser.add_argument('--output-transform',choices=['normal','90','180','270','flipped','flipped-90','flipped-180','flipped-270'],help='Use isolated output preferences on the dedicated single-output virtual KMS guest')
@@ -58,6 +59,7 @@ def main():
         parser.error('Focus transfer stress requires the ordinary editor input journey')
     if collection_kind or args.screen_reader_input:args.input=True
     if args.native_feedback_load:args.native_feedback=True
+    if args.interaction_performance:args.native_feedback=True
     if args.native_feedback:args.input=True
     if args.multi_output:
         if args.output_transform:parser.error('Two-output qualification uses its own fixed virtual output geometry')
@@ -255,7 +257,7 @@ def main():
                     if target is not None and observed.get('seat_focus')==target:break
                     if time.monotonic()>deadline:raise RuntimeError('Direct input fixture did not receive seat focus')
                     time.sleep(.05)
-                direct_input_probe.verify(metrics,snapshot['outputs'][0],core,lambda:control(endpoint,'snapshot'),target,user.pw_name,presentation,terminal_input=args.terminal_input,terminal_ime=args.terminal_ime,presentation_feedback=args.presentation_feedback,multi_output=args.multi_output,multi_output_shell_hotplug=args.multi_output_shell_hotplug,multi_output_restoration=args.multi_output_restoration,multi_output_hotplug=args.multi_output_hotplug,multi_output_hotplug_primary=args.multi_output_hotplug_primary,multi_output_hotplug_all=args.multi_output_hotplug_all,native_feedback=args.native_feedback,native_feedback_load=args.native_feedback_load,screen_reader=args.screen_reader_input,table_input=collection_kind,focus_transfers=args.focus_transfers)
+                direct_input_probe.verify(metrics,snapshot['outputs'][0],core,lambda:control(endpoint,'snapshot'),target,user.pw_name,presentation,terminal_input=args.terminal_input,terminal_ime=args.terminal_ime,presentation_feedback=args.presentation_feedback,multi_output=args.multi_output,multi_output_shell_hotplug=args.multi_output_shell_hotplug,multi_output_restoration=args.multi_output_restoration,multi_output_hotplug=args.multi_output_hotplug,multi_output_hotplug_primary=args.multi_output_hotplug_primary,multi_output_hotplug_all=args.multi_output_hotplug_all,native_feedback=args.native_feedback,native_feedback_load=args.native_feedback_load,interaction_performance=args.interaction_performance,screen_reader=args.screen_reader_input,table_input=collection_kind,focus_transfers=args.focus_transfers)
             if args.multi_output_restoration:
                 capture=Path(__file__).resolve().parents[1]/'test-output/preferred-output-restoration.png'
                 capture.parent.mkdir(exist_ok=True)
@@ -341,6 +343,7 @@ def main():
                           'virtual_output_hotplug_qualified': args.multi_output_hotplug,
                           'virtual_primary_output_hotplug_qualified': args.multi_output_hotplug_primary,
                           'virtual_all_outputs_removed_qualified': args.multi_output_hotplug_all,
+                          'interaction_performance_qualified': args.interaction_performance,
                           'native_feedback_qualified': args.native_feedback,
                           'native_feedback_load_qualified': args.native_feedback_load,
                           'output_transform_qualified': args.output_transform,

@@ -68,11 +68,11 @@ impl Recorder {
             .iter()
             .map(|(name, values)| (*name, values.snapshot()))
             .collect::<BTreeMap<_, _>>();
-        json!({"format":1,"pid":std::process::id(),"sample_limit_per_stage":SAMPLES,"stages":stages,"meaning":"CPU reconciliation/render-submit durations; not input-to-display latency or hardware presentation evidence"})
+        json!({"format":1,"pid":std::process::id(),"thread":format!("{:?}",std::thread::current().id()),"sample_limit_per_stage":SAMPLES,"stages":stages,"meaning":"Named CPU stages and guest display intervals; not Mac display scanout evidence"})
     }
 }
-impl Drop for Recorder {
-    fn drop(&mut self) {
+impl Recorder {
+    fn publish(&self) {
         let Some(directory) = &self.directory else {
             return;
         };
@@ -94,7 +94,7 @@ impl Drop for Recorder {
                 .mode(0o600)
                 .open(&temporary)?;
             file.write_all(self.snapshot().to_string().as_bytes())?;
-            std::fs::rename(&temporary, directory.join(format!("render-{pid}.json")))
+            std::fs::rename(&temporary, directory.join(format!("render-{pid}-{:?}.json",std::thread::current().id())))
         })();
         if let Err(error) = result {
             let _ = std::fs::remove_file(temporary);
@@ -102,7 +102,12 @@ impl Drop for Recorder {
         }
     }
 }
+impl Drop for Recorder {fn drop(&mut self) {self.publish();}}
+pub fn publish() {RECORDER.with(|r|r.borrow().publish());}
 thread_local! {static RECORDER:RefCell<Recorder>=RefCell::new(Recorder::new());}
+pub fn record(name: &'static str, duration: Duration) {
+    RECORDER.with(|r|r.borrow_mut().record(name,duration));
+}
 pub struct Span {
     name: &'static str,
     started: Option<Instant>,

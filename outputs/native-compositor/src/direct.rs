@@ -62,6 +62,8 @@ struct Head {
     scanout: Scanout,
     damage: OutputDamageTracker,
     pending: bool,
+    queued_at: Option<std::time::Instant>,
+    presented_at: Option<std::time::Instant>,
 }
 struct Device {
     drm: DrmDevice,
@@ -208,6 +210,8 @@ impl Device {
                     scanout,
                     damage,
                     pending: false,
+                    queued_at: None,
+                    presented_at: None,
                 },
             );
             used.insert(crtc);
@@ -328,6 +332,7 @@ impl Device {
                 if let Some(feedback) = feedback {
                     head.scanout.queue_buffer(Some(sync), None, feedback)?;
                     head.pending = true;
+                    head.queued_at=Some(std::time::Instant::now());
                 }
                 if icon_rendered {
                     data.state.drag_icon_render_submissions =
@@ -409,10 +414,15 @@ pub fn init(
         OFlags::RDWR | OFlags::CLOEXEC | OFlags::NONBLOCK | OFlags::NOCTTY,
     )?));
     let (drm, drm_events) = DrmDevice::new(fd.clone(), true)?;
+    let main_device=fd.dev_id()?;
     let gbm = GbmDevice::new(fd)?;
     let display = unsafe { EGLDisplay::new(gbm.clone())? };
     let context = EGLContext::new(&display)?;
     let renderer = unsafe { GlesRenderer::new(context)? };
+    // Advertise this GPU to modern Wayland clients and import their GPU buffers
+    // directly instead of forcing GTK through software/shared-memory rendering.
+    let feedback=smithay::wayland::dmabuf::DmabufFeedbackBuilder::new(main_device,renderer.dmabuf_formats()).build()?;
+    data.state.dmabuf_global=Some(data.state.dmabuf_state.create_global_with_default_feedback::<Smallvil>(&data.display_handle,&feedback));
     let clock = Clock::<Monotonic>::new();
     let device = Rc::new(RefCell::new(Device {
         drm,
@@ -521,6 +531,12 @@ pub fn init(
                                         .unwrap_or(smithay::wayland::presentation::Refresh::Unknown);
                                     feedback.presented(time, refresh, sequence, flags);
                                 }
+                                let now=std::time::Instant::now();
+                                if let Some(queued)=head.queued_at.take() {crate::timings::record("display.queue_to_completion",now.duration_since(queued));}
+                                if let Some(previous)=head.presented_at.replace(now) {
+                                    let interval=now.duration_since(previous);
+                                    if interval < Duration::from_millis(100) {crate::timings::record("display.active_frame_interval",interval);}
+                                }
                                 data.state.direct_frames_presented =
                                     data.state.direct_frames_presented.saturating_add(1);
                             }
@@ -528,10 +544,16 @@ pub fn init(
                         }
                         head.pending = false;
                     }
+                    // The completed scanout makes its next buffer available now.
+                    // Waiting for an independently phased timer can miss the next
+                    // refresh and halve the frame rate for animated clients.
+                    device.render(data);
                 }
                 DrmEvent::Error(error) => eprintln!("DRM event failed: {error}"),
             }
         })?;
+    let importer=device.clone();
+    data.state.dmabuf_importer=Some(Box::new(move |buffer|importer.borrow_mut().renderer.import_dmabuf(buffer,None).is_ok()));
     let hotplug = device.clone();
     event_loop
         .handle()
