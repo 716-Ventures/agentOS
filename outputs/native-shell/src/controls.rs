@@ -875,7 +875,6 @@ impl Controls {
     pub fn focus_request(&self) { self.request_field.entry.grab_focus(); }
     pub fn temporary_launcher(&self) {
         let direct = gtk::FlowBox::new();
-        direct.add_css_class("launcher-direct");
         direct.set_selection_mode(gtk::SelectionMode::None);
         direct.set_min_children_per_line(1);
         direct.set_max_children_per_line(3);
@@ -892,7 +891,9 @@ impl Controls {
         }
         self.widget.remove(&self.images.widget);
         self.settings.append("Storage",&self.images.widget);
-        self.widget.append(&direct);
+        let actions=ui::column(12);actions.add_css_class("launcher-direct");
+        actions.append(&gtk::Separator::new(gtk::Orientation::Horizontal));
+        actions.append(&direct);self.widget.append(&actions);
         self.widget.set_margin_top(16);
 
     }

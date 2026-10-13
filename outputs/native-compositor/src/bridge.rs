@@ -599,10 +599,10 @@ impl Bridge {
             self.scene.set_error("Pointer interaction queue busy".into());
         }
     }
-    pub fn input(&self, runtime: &str, mut edit: Value) {
+    pub fn input(&self, runtime: &str, mut edit: Value) -> bool {
         let scene = self.scene.snapshot();
         let Some(surface) = scene.identities.get(runtime) else {
-            return;
+            return false;
         };
         let Some(document) = scene
             .workspaces
@@ -611,17 +611,17 @@ impl Bridge {
             .flat_map(|d| d.values())
             .find(|d| placed_surfaces(&json!({"documents":{"workspace":d}})).contains(surface))
         else {
-            return;
+            return false;
         };
         if edit["kind"] == "float" {
             if let Err(error) = localize_edit(&scene, &mut edit) {
                 self.scene.set_error(error);
-                return;
+                return false;
             }
         }
         edit["surface_id"] = json!(surface);
         let Some(id) = document["workspace_id"].as_str() else {
-            return;
+            return false;
         };
         let stamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -640,7 +640,8 @@ impl Bridge {
             .is_err()
         {
             self.scene.set_error("Workspace input queue busy; refresh before retrying".into());
-        }
+            false
+        } else {true}
     }
     pub fn observe(&self, windows: Vec<Observed>, outputs: Vec<OutputObservation>) {
         *self.observation.lock().unwrap() = Some(Observation {
@@ -1024,6 +1025,23 @@ mod tests {
         )
         .is_null());
         assert_eq!(rectangles, saved);
+    }
+    #[test]
+    fn focus_dispatch_waits_for_placement_and_reports_queue_rejection() {
+        let (commands,receiver)=mpsc::sync_channel(1);
+        let bridge=Bridge {observation:Arc::new(Mutex::new(None)),scene:SceneStore::default(),commands,
+            stop:Arc::new(AtomicBool::new(false)),last_input:Arc::new(AtomicI64::new(0)),worker:None,
+            previews:Arc::new(Mutex::new(BTreeMap::new()))};
+        let edit=json!({"kind":"focus","element_id":null});
+        assert!(!bridge.input("terminal",edit.clone()));
+        let mut scene=Scene {identities:BTreeMap::from([("terminal".into(),"local-shell".into())]),..Scene::default()};
+        bridge.scene.publish(scene.clone());
+        assert!(!bridge.input("terminal",edit.clone()),"Identity registration alone cannot route focus");
+        scene.workspaces=json!({"desk":{"workspace_id":"desk","revision":1,"outputs":{"head":{"tiles":null,"floating":[{"surface_id":"local-shell"}],"maximized":null}}}});
+        bridge.scene.publish(scene);
+        assert!(bridge.input("terminal",edit.clone()));
+        assert!(!bridge.input("terminal",edit),"A full queue must not acknowledge focus dispatch");
+        assert_eq!(receiver.try_recv().unwrap().value["transaction"]["operations"][0]["edit"]["surface_id"],"local-shell");
     }
     #[test]
     fn input_routing_retains_live_background_activities_without_copying_retired_history() {

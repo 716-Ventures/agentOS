@@ -68,35 +68,21 @@ pub fn open(
     terminal.set_margin_top(8);
     terminal.set_margin_bottom(12);
     let copy = ui::button("Copy", ButtonVariant::Ghost, false);
-    copy.set_sensitive(false);
     let paste = ui::button("Paste", ButtonVariant::Ghost, false);
-    paste.set_sensitive(false);
     let actions = ui::row(4);
     actions.set_halign(gtk::Align::End);
     actions.set_margin_start(8);
     actions.set_margin_end(8);
     actions.append(&copy);
     actions.append(&paste);
-    let selection = copy.downgrade();
-    terminal.connect_selection_changed(move |view| {
-        if let Some(button) = selection.upgrade() {
-            button.set_sensitive(view.has_selection());
-        }
-    });
-    let view = terminal.downgrade();
-    copy.connect_clicked(move |_| {
-        if let Some(view) = view.upgrade() {
-            view.copy_clipboard_format(vte4::Format::Text);
-            view.grab_focus();
-        }
-    });
-    let view = terminal.downgrade();
-    paste.connect_clicked(move |_| {
-        if let Some(view) = view.upgrade() {
-            view.paste_clipboard();
-            view.grab_focus();
-        }
-    });
+    for button in [&copy, &paste] {
+        let view = terminal.downgrade();
+        button.connect_clicked(move |_| {
+            if let Some(view) = view.upgrade() {
+                view.grab_focus();
+            }
+        });
+    }
     let scroll = gtk::ScrolledWindow::builder()
         .hscrollbar_policy(gtk::PolicyType::Never)
         .vexpand(true)
@@ -106,6 +92,14 @@ pub fn open(
     let body = ui::column(0);
     body.append(&actions);
     body.append(&scroll);
+    let input_ready = Rc::new(Cell::new(false));
+    let clipboard = Rc::new(terminal_actions::ClipboardActions::install_local(
+        &terminal,
+        &body,
+        input_ready.clone(),
+    ));
+    copy.set_action_name(Some("terminal.copy"));
+    paste.set_action_name(Some("terminal.paste"));
     let window = gtk::ApplicationWindow::builder()
         .application(app)
         .title(if setup { "Setup" } else { "Terminal" })
@@ -128,19 +122,17 @@ pub fn open(
     let view = terminal.downgrade();
     let target = window.downgrade();
     keys.connect_key_pressed(move |_, key, _, modifiers| {
-        if modifiers
-            .contains(gtk::gdk::ModifierType::CONTROL_MASK | gtk::gdk::ModifierType::SHIFT_MASK)
+        let relevant = gtk::gdk::ModifierType::CONTROL_MASK
+            | gtk::gdk::ModifierType::SHIFT_MASK
+            | gtk::gdk::ModifierType::ALT_MASK
+            | gtk::gdk::ModifierType::SUPER_MASK
+            | gtk::gdk::ModifierType::META_MASK
+            | gtk::gdk::ModifierType::HYPER_MASK;
+        if modifiers & relevant
+            == (gtk::gdk::ModifierType::CONTROL_MASK | gtk::gdk::ModifierType::SHIFT_MASK)
         {
             if let Some(view) = view.upgrade() {
                 match key.to_unicode().map(|c| c.to_ascii_lowercase()) {
-                    Some('c') => {
-                        view.copy_clipboard_format(vte4::Format::Text);
-                        return glib::Propagation::Stop;
-                    }
-                    Some('v') => {
-                        view.paste_clipboard();
-                        return glib::Propagation::Stop;
-                    }
                     Some('w') => {
                         if let Some(window) = target.upgrade() {
                             window.close();
@@ -159,7 +151,12 @@ pub fn open(
     let exited = Rc::new(Cell::new(false));
     let pid = child.clone();
     let closing = closed.clone();
+    let closing_clipboard = clipboard.clone();
+    let closing_input = input_ready.clone();
     window.connect_close_request(move |_| {
+        closing_input.set(false);
+        closing_clipboard.set_attached(false);
+        closing_clipboard.close();
         closing.set(true);
         let pid = pid.get();
         if pid > 0 {
@@ -190,7 +187,6 @@ pub fn open(
     terminal.grab_focus();
     let target = window.downgrade();
     let view = terminal.downgrade();
-    let paste = paste.downgrade();
     let program = if setup {
         "/usr/local/bin/agent-os-setup"
     } else {
@@ -218,9 +214,8 @@ pub fn open(
                     }
                     return;
                 }
-                if let Some(button) = paste.upgrade() {
-                    button.set_sensitive(true);
-                }
+                input_ready.set(true);
+                clipboard.set_attached(true);
                 if std::env::var("AGENT_OS_LOCAL_TERMINAL_VERIFY").as_deref() == Ok("1") {
                     if let Some(view) = view.upgrade() {
                         view.feed_child("printf 'native-terminal-λ\\n'\n".as_bytes());
@@ -228,9 +223,18 @@ pub fn open(
                 }
                 if let Ok(path) = std::env::var("AGENT_OS_LOCAL_TERMINAL_CAPTURE") {
                     let capture = target.clone();
+                    let menu = clipboard.clone();
                     glib::timeout_add_local_once(Duration::from_millis(700), move || {
                         if let Some(window) = capture.upgrade() {
                             let _ = system_bar::capture(&window, &path);
+                            if std::env::var("AGENT_OS_LOCAL_TERMINAL_VERIFY_MENU").as_deref()
+                                == Ok("1")
+                            {
+                                if let Some(view) = view.upgrade() {
+                                    view.select_all();
+                                    menu.verify_popup();
+                                }
+                            }
                         }
                     });
                 }

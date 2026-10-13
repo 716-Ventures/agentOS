@@ -383,7 +383,6 @@ fn present_control(state: &mut Smallvil, peer: Option<u32>, identity: &str) -> R
         let host=surface.client().and_then(|client|client.get_data::<ClientState>().map(|data|data.system_shell)).unwrap_or(false);
         host && with_states(surface,|states|states.data_map.get::<smithay::wayland::shell::xdg::XdgToplevelSurfaceData>().unwrap().lock().unwrap().app_id.as_deref()==Some(identity))
     }).cloned().ok_or("Monitor unavailable")?;
-    state.space.raise_element(&window,true);
     let surface=window.toplevel().unwrap().wl_surface().clone();
     let runtime=format!("{:?}",surface.id());
     if let Some(bridge)=&state.bridge {
@@ -391,10 +390,11 @@ fn present_control(state: &mut Smallvil, peer: Option<u32>, identity: &str) -> R
         // ahead of its scene leaves applied_focus stale and can lose a later
         // deliberate return to the editor. Retry until this window is registered.
         if !bridge.scene.snapshot().identities.contains_key(&runtime) {return Err("Monitor unavailable".into());}
-        bridge.input(&runtime,serde_json::json!({"kind":"focus","element_id":null}));
+        if !bridge.input(&runtime,serde_json::json!({"kind":"focus","element_id":null})) {return Err("Control placement unavailable".into());}
     } else if let Some(keyboard)=state.seat.get_keyboard() {
         keyboard.set_focus(state,Some(surface.clone()),smithay::utils::SERIAL_COUNTER.next_serial());
     }
+    state.space.raise_element(&window,true);
     state.arrange();
     Ok(())
 }

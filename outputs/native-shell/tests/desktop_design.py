@@ -49,7 +49,7 @@ def main():
         env={**os.environ,'HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':str(config.parent),'XDG_STATE_HOME':str(state.parent),'AGENT_OS_STATE':str(root/'core-state'),'AGENT_OS_SOCKET':str(endpoint),'AGENT_OS_COMPOSITOR_CORE':str(endpoint),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),'AGENT_OS_BROKER_SOCKET':str(root/'absent-broker.sock'),'AGENT_OS_MODEL_USAGE':str(root/'absent-usage.json'),'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','GDK_BACKEND':'wayland','GTK_A11Y':'atspi','G_DEBUG':'fatal-criticals','WINIT_UNIX_BACKEND':'wayland','AGENT_OS_COMPOSITOR_BACKEND':'winit','AGENT_OS_SYSTEM_BAR_CAPTURE':str(output/'system-bar.png'),'AGENT_OS_LAUNCHER_CAPTURE':str(output/'launcher.png'),'AGENT_OS_MONITOR_CAPTURE':str(output/'monitor.png'),'AGENT_OS_SETTINGS_CAPTURE':str(output/'settings.png')}
         env.pop('WAYLAND_DISPLAY',None);env.pop('DISPLAY',None)
         env['WAYLAND_DEBUG']='client' # Private fixture: inspect initial configure sizes.
-        env.update(AGENT_OS_LOCAL_TERMINAL_VERIFY='1',AGENT_OS_LOCAL_TERMINAL_CAPTURE=str(output/'terminal.png'),AGENT_OS_LOCAL_TERMINAL_OBSERVATION=str(output/'terminal.json'))
+        env.update(AGENT_OS_LOCAL_TERMINAL_VERIFY='1',AGENT_OS_LOCAL_TERMINAL_VERIFY_MENU='1',AGENT_OS_LOCAL_TERMINAL_CAPTURE=str(output/'terminal.png'),AGENT_OS_LOCAL_TERMINAL_OBSERVATION=str(output/'terminal.json'))
         core=weston=None;owned=None
         try:
             core=subprocess.Popen([str(SHELL/'target/release/agent-os-core')],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
@@ -135,12 +135,17 @@ def main():
             def terminal_ready():
                 observed=scene()
                 terminal=next((w for w in observed['windows'] if w['app_id'].startswith('agentos.local-terminal.')),None)
-                return terminal if terminal and observed['seat_focus']==terminal['id'] and not any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in observed['system_layers']) else None
+                return terminal if terminal and observed['seat_focus']==terminal['id'] and observed['shared']['focus']==terminal['id'] and not any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in observed['system_layers']) else None
             accessibility.wait(terminal_ready,'Native terminal did not open and replace launcher focus')
             terminal_window=terminal_ready()
             terminal=accessibility.find('Local terminal',pyatspi.ROLE_TERMINAL)
             accessibility.wait(lambda:'native-terminal-λ' in accessibility.text(terminal).splitlines(),'Native PTY did not execute the exact Unicode verification line')
             accessibility.wait(lambda:(output/'terminal.png').exists(),'Native terminal did not paint')
+            copy_menu=accessibility.find('Copy',pyatspi.ROLE_MENU_ITEM)
+            assert copy_menu.getState().contains(pyatspi.STATE_SENSITIVE),'Selected local terminal text did not enable context Copy'
+            assert accessibility.find('Paste',pyatspi.ROLE_MENU_ITEM).getState().contains(pyatspi.STATE_SENSITIVE),'Ready local shell did not enable context Paste'
+            accessibility.activate(copy_menu)
+            accessibility.wait(lambda:accessibility.find('Local terminal',pyatspi.ROLE_TERMINAL).getState().contains(pyatspi.STATE_FOCUSED),'Context Copy did not restore terminal keyboard focus')
             terminal_geometry=terminal_ready()['geometry']
             assert [terminal_geometry['width'],terminal_geometry['height']]==[880,560],terminal_geometry
             child=json.loads((output/'terminal.json').read_text())['pid']

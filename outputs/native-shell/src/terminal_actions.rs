@@ -3,17 +3,56 @@ use super::*;
 use gtk::gio;
 use vte4::prelude::*;
 
+struct Host {
+    terminal: vte4::Terminal,
+    widget: gtk::Widget,
+    enabled: Rc<dyn Fn() -> bool>,
+}
+impl Host {
+    fn input_enabled(&self) -> bool {
+        (self.enabled)()
+    }
+}
+
 pub struct ClipboardActions {
+    host: Rc<Host>,
     paste: gio::SimpleAction,
     menu: gtk::Popover,
 }
 
 impl ClipboardActions {
     pub fn install(view: &Rc<ui::TerminalView>) -> Self {
+        let guarded = Rc::downgrade(view);
+        Self::install_host(
+            Rc::new(Host {
+                terminal: view.terminal.clone(),
+                widget: view.widget.clone().upcast(),
+                enabled: Rc::new(move || {
+                    guarded.upgrade().is_some_and(|view| view.input_enabled())
+                }),
+            }),
+            true,
+        )
+    }
+    pub fn install_local(
+        terminal: &vte4::Terminal,
+        parent: &gtk::Box,
+        ready: Rc<Cell<bool>>,
+    ) -> Self {
+        Self::install_host(
+            Rc::new(Host {
+                terminal: terminal.clone(),
+                widget: parent.clone().upcast(),
+                enabled: Rc::new(move || ready.get()),
+            }),
+            false,
+        )
+    }
+    fn install_host(view: Rc<Host>, attached_only: bool) -> Self {
         let group = gio::SimpleActionGroup::new();
         let copy = gio::SimpleAction::new("copy", None);
         copy.set_enabled(view.terminal.has_selection());
-        let terminal = Rc::downgrade(view);
+        let terminal = Rc::downgrade(&view);
         copy.connect_activate(move |_, _| {
             if let Some(view) = terminal.upgrade() {
                 if view.terminal.has_selection() {
@@ -29,7 +68,7 @@ impl ClipboardActions {
         });
         let paste = gio::SimpleAction::new("paste", None);
         paste.set_enabled(view.input_enabled());
-        let terminal = Rc::downgrade(view);
+        let terminal = Rc::downgrade(&view);
         paste.connect_activate(move |_, _| {
             if let Some(view) = terminal.upgrade() {
                 // Recheck at invocation: a menu may remain open across detach.
@@ -66,18 +105,20 @@ impl ClipboardActions {
             items.append(&item);
         }
         menu.set_parent(&view.widget);
-        let terminal = Rc::downgrade(view);
+        let terminal = Rc::downgrade(&view);
         menu.connect_closed(move |_| {
             if let Some(view) = terminal.upgrade() {
-                // Restore the widget focus inside this window; this does not
-                // request global seat focus or reactivate another application.
-                view.terminal.grab_focus();
+                // Restore local widget focus without requesting seat focus
+                // or activating a different application.
+                if view.terminal.root().is_some() {
+                    view.terminal.grab_focus();
+                }
             }
         });
         let click = gtk::GestureClick::new();
         click.set_button(3);
         click.set_propagation_phase(gtk::PropagationPhase::Capture);
-        let (popup, terminal) = (menu.downgrade(), Rc::downgrade(view));
+        let (popup, terminal) = (menu.downgrade(), Rc::downgrade(&view));
         click.connect_pressed(move |gesture, _, x, y| {
             if let (Some(popup), Some(view)) = (popup.upgrade(), terminal.upgrade()) {
                 gesture.set_state(gtk::EventSequenceState::Claimed);
@@ -89,7 +130,7 @@ impl ClipboardActions {
         let keys = gtk::EventControllerKey::new();
         keys.set_propagation_phase(gtk::PropagationPhase::Capture);
         let actions = group.downgrade();
-        let (popup, terminal) = (menu.downgrade(), Rc::downgrade(view));
+        let (popup, terminal) = (menu.downgrade(), Rc::downgrade(&view));
         keys.connect_key_pressed(move |_, key, _, modifiers| {
             use gtk::gdk::{Key, ModifierType as M};
             let relevant = M::CONTROL_MASK
@@ -130,15 +171,41 @@ impl ClipboardActions {
             "Copy: Ctrl+Shift+C · Paste: Ctrl+Shift+V (attached only)",
         ));
         view.terminal.update_property(&[gtk::accessible::Property::Description("Ctrl+Shift+C copies selected terminal text. Ctrl+Shift+V pastes only while attached. Copy and Paste are also available in the context menu. Ctrl+C remains program input.")]);
-        Self { paste, menu }
+        if !attached_only {
+            view.terminal
+                .set_tooltip_text(Some("Copy: Ctrl+Shift+C · Paste: Ctrl+Shift+V"));
+            view.terminal.update_property(&[gtk::accessible::Property::Description("Ctrl+Shift+C copies selected terminal text. Ctrl+Shift+V pastes into the local shell. Copy and Paste are also available in the context menu. Ctrl+C remains program input.")]);
+        }
+        Self {
+            paste,
+            menu,
+            host: view,
+        }
     }
 
+    pub fn verify_popup(&self) {
+        // Capture fixtures have no kernel input serial. Normal mouse/Menu/
+        // Shift+F10 paths above retain their ordinary grabbing popover.
+        self.menu.set_autohide(false);
+        show_menu(
+            &self.menu,
+            &self.host,
+            f64::from(self.host.terminal.width()) / 2.0,
+            f64::from(self.host.terminal.height()) / 2.0,
+        );
+    }
+    pub fn close(&self) {
+        self.menu.popdown();
+        if self.menu.parent().is_some() {
+            self.menu.unparent();
+        }
+    }
     pub fn set_attached(&self, attached: bool) {
         self.paste.set_enabled(attached);
     }
 }
 
-fn show_menu(menu: &gtk::Popover, view: &ui::TerminalView, x: f64, y: f64) {
+fn show_menu(menu: &gtk::Popover, view: &Host, x: f64, y: f64) {
     if let Some(point) = view
         .terminal
         .compute_point(&view.widget, &gtk::graphene::Point::new(x as f32, y as f32))
@@ -155,8 +222,6 @@ fn show_menu(menu: &gtk::Popover, view: &ui::TerminalView, x: f64, y: f64) {
 
 impl Drop for ClipboardActions {
     fn drop(&mut self) {
-        if self.menu.parent().is_some() {
-            self.menu.unparent();
-        }
+        self.close();
     }
 }

@@ -16,11 +16,19 @@ def verify(metrics,output,scene,observe,keyboard,pointer):
         raise RuntimeError(meaning+': '+repr(last))
     def terminal():return next(w for w in scene()['windows'] if w['app_id'].startswith('agentos.local-terminal.'))
     width,height=output['width'],output['height']
+    prior=next(w for w in scene()['windows'] if w['title'].endswith('Kernel terminal fixture'))
+    assert scene()['seat_focus']==prior['id'],'Broker terminal journey did not retain focus'
+    keyboard.chord(29,56,111)
+    wait(lambda:not any(w['id']==prior['id'] for w in scene()['windows']),'Completed broker fixture did not close')
     keyboard.chord(29,56,57)
     launcher=wait(lambda:next((l for l in scene()['system_layers'] if l['namespace']=='agentos-launcher' and l['mapped']),None),'Launcher did not open')
     point=observe('local-terminal:launcher-button')['point'];g=launcher['geometry']
+    assert 0<point[0]<g['width'] and 0<point[1]<g['height'],(point,g)
+    print('CHECK: local launcher terminal point',point,g,flush=True)
     pointer.click(g['x']+point[0],g['y']+point[1],width,height)
-    window=wait(terminal,'Local terminal did not map')
+    try:window=wait(terminal,'Local terminal did not map')
+    except RuntimeError:
+        s=scene();print('Local launch diagnostic',{k:s[k] for k in ['seat_focus','pointer_location','pointer_routing','system_layers','windows']},observe('local-terminal:launcher-button'),flush=True);raise
     wait(lambda:scene()['seat_focus']==window['id'] and scene()['shared']['focus']==window['id'],'Local terminal did not become authoritative focus')
     assert not any(l['namespace']=='agentos-launcher' and l['mapped'] for l in scene()['system_layers'])
     def click_terminal():

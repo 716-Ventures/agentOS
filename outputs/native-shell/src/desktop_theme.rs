@@ -88,7 +88,8 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
     .agentos-launcher .desktop-heading {{ font-size: 22px; font-weight: 600; }}
     .agentos-launcher .launcher-request entry {{ font-size: 1.25em; padding: 0.6em 0.7em; min-height: 1.5em; }}
     .agentos-launcher .launcher-context, .agentos-launcher .launcher-voice-status {{ color: {muted}; font-size: 0.93em; }}
-    .agentos-launcher .launcher-direct {{ margin-top: 12px; padding-top: 12px; border-top: 1px solid {line}; }}
+    .agentos-launcher .launcher-direct {{ margin-top: 12px; }}
+    .agentos-launcher .launcher-direct flowboxchild {{ padding: 0; }}
     .agentos-launcher .launcher-request-actions {{ margin-top: 2px; }}
     window.agentos-settings .settings-navigation {{ background: {panel}; }}
     window.agentos-settings button.settings-category {{ background: transparent; border: none; color: {fg}; padding: 8px 12px; }}

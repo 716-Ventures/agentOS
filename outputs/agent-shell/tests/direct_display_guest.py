@@ -163,6 +163,7 @@ def main():
                     '--setenv=LIBSEAT_BACKEND=logind', '--setenv=AGENT_OS_METRICS_DIR=' + directory,
                     *(['--setenv=XDG_CONFIG_HOME='+str(output_config)] if output_config else []),
                     *(['--setenv=GTK_A11Y=atspi'] if args.input else []),
+                    *(['--setenv=AGENT_OS_LOCAL_TERMINAL_OBSERVATION='+str(metrics/'local-terminal.json')] if args.terminal_input else []),
                     *(['--setenv=AGENT_OS_RESTORATION_CAPTURE='+str(metrics/'restoration.png')] if args.multi_output_restoration else []),
                     *(['--setenv=AGENT_OS_KEYBOARD_GEOMETRY='+str(args.keyboard_geometry.resolve())] if args.keyboard_geometry else []),
                     *(['--setenv=HOME='+str(reader_config),'--setenv=XDG_CONFIG_HOME='+str(reader_config/'.config'),'--setenv=XDG_DATA_HOME='+str(reader_config/'.local/share'),'--setenv=XDG_STATE_HOME='+str(reader_config/'.local/state'),'--setenv=GSETTINGS_BACKEND=keyfile','--setenv=LANG=C.UTF-8'] if reader_config else []),

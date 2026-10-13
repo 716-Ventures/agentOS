@@ -144,8 +144,8 @@ def transfer_source():
 def assistive():
     import pyatspi
     from collections import deque
-    def find(name,role):
-        queue=deque([pyatspi.Registry.getDesktop(0)]);observed=[]
+    def find(name,role,root=None):
+        queue=deque([root if root is not None else pyatspi.Registry.getDesktop(0)]);observed=[]
         for _ in range(2048):
             if not queue:break
             node=queue.popleft()
@@ -249,6 +249,28 @@ def assistive():
                 rect=node.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
                 frame=find('On-screen keyboard',pyatspi.ROLE_FRAME).queryComponent().getExtents(pyatspi.WINDOW_COORDS)
                 print(json.dumps({'point':[rect.x-frame.x+rect.width/2,rect.y-frame.y+rect.height/2]}),flush=True);continue
+            if request.startswith('local-terminal:'):
+                action=request.split(':',1)[1]
+                if action=='launcher-button':
+                    frame=find('Ask Agent',pyatspi.ROLE_TEXT)
+                    while frame.parent is not None and frame.getRole()!=pyatspi.ROLE_FRAME:frame=frame.parent
+                    node=find('Open terminal',pyatspi.ROLE_PUSH_BUTTON,root=frame)
+                    assert node.getState().contains(pyatspi.STATE_SHOWING),'Launcher terminal action is hidden'
+                    r=node.queryComponent().getExtents(pyatspi.WINDOW_COORDS);f=frame.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
+                    response={'point':[r.x-f.x+r.width/2,r.y-f.y+r.height/2],'button_bounds':[r.x,r.y,r.width,r.height],'frame_bounds':[f.x,f.y,f.width,f.height]}
+                elif action.startswith('menu-'):
+                    name='Copy' if action.startswith('menu-copy') else 'Paste'
+                    node=find(name,pyatspi.ROLE_MENU_ITEM)
+                    response={'sensitive':node.getState().contains(pyatspi.STATE_SENSITIVE)}
+                    if action.endswith('-activate'):response['requested']=node.queryAction().doAction(0)
+                else:
+                    node=find('Local terminal',pyatspi.ROLE_TERMINAL)
+                    r=node.queryComponent().getExtents(pyatspi.WINDOW_COORDS);text=node.queryText();value=text.getText(0,min(text.characterCount,65536))
+                    response={'text':value,'point':[r.x+r.width/2,r.y+r.height/2],'focused':node.getState().contains(pyatspi.STATE_FOCUSED)}
+                    if action=='copy-span':
+                        start=value.index('\nlocalok\n')+1;first=text.getCharacterExtents(start,pyatspi.WINDOW_COORDS)
+                        response.update(start=[first[0]+1,first[1]+first[3]/2],end=[first[0]+first[2]*9,first[1]+first[3]/2])
+                print(json.dumps(response),flush=True);continue
             if request.startswith('terminal:'):
                 action=request.split(':',1)[1]
                 if action in ('attach','detach','attach-state'):
@@ -527,6 +549,8 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
             print('CHECK: terminal peer geometry '+json.dumps({'expected':expected,'observed':geometries,'registration_seconds':registered_at-source_started,'placement_seconds':committed_at-registered_at,'geometry_seconds':time.monotonic()-committed_at,'placement_status':receipt['status']}),flush=True)
             import direct_terminal_probe
             direct_terminal_probe.verify(metrics,output,core,scene,login_user,presentation,snapshot,keyboard,pointer)
+            import direct_local_terminal_probe
+            direct_local_terminal_probe.verify(metrics,output,scene,snapshot,keyboard,pointer)
             return
         def click(point):
             geometry=next(row['geometry'] for row in scene()['windows'] if row['id']==target)
