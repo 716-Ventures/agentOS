@@ -24,7 +24,7 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
     window.seven-ui {{ background: {bg}; color: {fg}; font-family: Commissioner, Inter, sans-serif; font-size: {font_size}px; border-radius: 12px; }}
     window.seven-ui .local-terminal-console {{ background: {terminal_bg}; }}
     window.seven-ui decoration {{ border-radius: 12px; border: none; box-shadow: 0 12px 30px rgba(0,0,0,0.28); }}
-    window.seven-ui:backdrop decoration {{ box-shadow: 0 6px 16px rgba(0,0,0,0.16); }}
+    window.seven-ui.desktop-inactive decoration {{ box-shadow: 0 6px 16px rgba(0,0,0,0.16); }}
     window.seven-ui headerbar {{ background: {bg}; background-image: none; color: {fg}; min-height: 38px; padding: 0 12px; border: none; border-bottom: 1px solid {line}; box-shadow: none; border-radius: 12px 12px 0 0; }}
     window.seven-ui label {{ color: {fg}; }}
     window.seven-ui label.muted, window.seven-ui .desktop-muted {{ color: {muted}; }}
@@ -47,7 +47,7 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
     window.seven-ui button:focus-visible, window.seven-ui textview:focus-visible {{ outline: 2px solid #5286b9; outline-offset: 2px; }}
     window.seven-ui selection {{ background: #275d8b; color: white; }}
     window.seven-ui separator {{ background: {line}; min-height: 1px; }}
-    window.seven-ui:backdrop headerbar .title {{ color: {muted}; }}
+    window.seven-ui.desktop-inactive headerbar .title {{ color: {muted}; }}
     window.seven-ui headerbar .title {{ font-size: 13px; font-weight: 600; }}
     window.seven-ui headerbar button.desktop-window-control {{ min-width: 12px; min-height: 12px; padding: 6px; margin: 0; background: transparent; border: none; border-radius: 100%; box-shadow: none; background-image: none; }}
     window.seven-ui headerbar button.desktop-close .desktop-control-disc {{ background: #ed6a5e; }}
@@ -55,7 +55,7 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
     .desktop-control-disc {{ min-width: 12px; min-height: 12px; border-radius: 100%; }}
     window.seven-ui headerbar button.desktop-window-control image {{ opacity: 0; -gtk-icon-size: 10px; }}
     window.seven-ui headerbar button.desktop-window-control:hover image, window.seven-ui headerbar button.desktop-window-control:focus-visible image {{ opacity: 1; }}
-    window.seven-ui:backdrop headerbar button.desktop-window-control .desktop-control-disc {{ background: {line}; }}
+    window.seven-ui.desktop-inactive headerbar button.desktop-window-control .desktop-control-disc {{ background: {line}; }}
     window.seven-ui headerbar button.desktop-window-control:focus-visible {{ outline: 2px solid #527dab; outline-offset: 3px; }}
     window.agentos-monitor, window.agentos-launcher {{ background: {bg}; color: {fg}; font-family: Commissioner, Inter, sans-serif; font-size: {font_size}px; }}
     .agentos-monitor label {{ color: {fg}; }}
@@ -179,6 +179,12 @@ pub fn signed_in_name() -> String {
 /// Shared client-side chrome: native move, resize, maximize and close semantics.
 pub fn titlebar(window: &impl IsA<gtk::Window>) {
     let window = window.upcast_ref::<gtk::Window>();
+    let activation=|window: &gtk::Window| {
+        if window.is_active() {window.remove_css_class("desktop-inactive");}
+        else {window.add_css_class("desktop-inactive");}
+    };
+    activation(window);
+    window.connect_is_active_notify(activation);
     let header=gtk::HeaderBar::new();
     header.set_show_title_buttons(false);
     let title=gtk::Label::new(None);title.add_css_class("title");

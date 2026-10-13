@@ -115,6 +115,8 @@ def main():
                 return observed
             accessibility.wait(ready,'Monitor did not settle as the focused floating host control')
             observed=ready();monitor=next(w for w in observed['windows'] if w['title']=='Agent Monitor')
+            accessibility.wait(lambda:accessibility.find('Agent Monitor',pyatspi.ROLE_FRAME).getState().contains(pyatspi.STATE_ACTIVE),'Foreground Monitor is not active in GTK')
+            assert not accessibility.find('Agent view · Project notes',pyatspi.ROLE_FRAME).getState().contains(pyatspi.STATE_ACTIVE),'Covered document retained GTK activation'
             time.sleep(.35)
             subprocess.run(['weston-screenshooter'],env={**env,'WAYLAND_DISPLAY':'design-host'},cwd=output,stdout=log,stderr=subprocess.STDOUT,check=True,timeout=8)
             for path in output.glob('wayland-screenshot*.png'):path.rename(output/'desktop.png')
