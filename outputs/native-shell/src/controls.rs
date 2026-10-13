@@ -911,6 +911,16 @@ impl Controls {
             && system_bar::capture(&self.monitor, path)
     }
     pub fn preview_size(&self, width: i32, height: i32) { self.monitor.set_default_size(width, height); }
+    /// Explicit visual fixture states; never called in a live desktop session.
+    pub fn preview_chrome_state(&self,inactive:bool) {
+        if inactive {self.monitor.add_css_class("desktop-inactive");} else {self.monitor.remove_css_class("desktop-inactive");}
+        let mut widgets=self.monitor.titlebar().into_iter().collect::<Vec<_>>();
+        while let Some(widget)=widgets.pop() {
+            if widget.has_css_class("desktop-window-control") {widget.set_state_flags(gtk::StateFlags::PRELIGHT,false);}
+            let mut child=widget.first_child();
+            while let Some(next)=child {child=next.next_sibling();widgets.push(next);}
+        }
+    }
     pub fn capture_monitor(&self, path: &str) -> bool { self.monitor.is_visible() && system_bar::capture(&self.monitor, path) }
     pub fn present_settings(&self) {self.settings.present();}
     pub fn append_setting(&self,page:&str,widget:&impl IsA<gtk::Widget>) {self.settings.append(page,widget);}

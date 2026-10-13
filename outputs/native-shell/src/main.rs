@@ -1407,7 +1407,11 @@ fn main() {
             controls.present();
             let app=app.clone();
             let capture=value["capture"].as_str().expect("Preview capture path").to_owned();
-            glib::timeout_add_local_once(Duration::from_millis(700), move || {assert!(controls.capture_monitor(&capture));controls.close();app.quit();});
+            let hover=value["chrome_hover"]==true;let inactive=value["chrome_inactive"]==true;
+            glib::timeout_add_local_once(Duration::from_millis(700), move || {
+                if hover {controls.preview_chrome_state(inactive);}
+                glib::timeout_add_local_once(Duration::from_millis(if hover {100}else{0}),move || {assert!(controls.capture_monitor(&capture));controls.close();app.quit();});
+            });
             return;
         }
         let bar = ui::row(20);

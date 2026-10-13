@@ -60,9 +60,10 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
     window.seven-ui headerbar button.desktop-close .desktop-control-disc {{ background: #ed6a5e; }}
     window.seven-ui headerbar button.desktop-maximize .desktop-control-disc {{ background: #61c454; }}
     .desktop-control-disc {{ min-width: 12px; min-height: 12px; border-radius: 100%; }}
-    window.seven-ui headerbar button.desktop-window-control image {{ opacity: 0; -gtk-icon-size: 10px; }}
+    window.seven-ui headerbar button.desktop-window-control image {{ color: #202630; opacity: 0; -gtk-icon-size: 10px; }}
     window.seven-ui headerbar button.desktop-window-control:hover image, window.seven-ui headerbar button.desktop-window-control:focus-visible image {{ opacity: 1; }}
     window.seven-ui.desktop-inactive headerbar button.desktop-window-control .desktop-control-disc {{ background: {line}; }}
+    window.seven-ui.desktop-inactive headerbar button.desktop-window-control image {{ color: {muted}; }}
     window.seven-ui headerbar button.desktop-window-control:focus-visible {{ outline: 2px solid #527dab; outline-offset: 3px; }}
     window.agentos-monitor, window.agentos-launcher {{ background: {bg}; color: {fg}; font-family: Commissioner, Inter, sans-serif; font-size: {font_size}px; }}
     .agentos-monitor label {{ color: {fg}; }}
