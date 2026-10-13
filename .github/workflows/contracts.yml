@@ -126,6 +126,9 @@ jobs:
           dbus-run-session -- python3 outputs/native-shell/tests/monitor_preview.py
           dbus-run-session -- python3 outputs/native-shell/tests/desktop_design.py
           dbus-run-session -- python3 outputs/native-shell/tests/desktop_design.py --appearance light
+          dbus-run-session -- python3 outputs/native-shell/tests/desktop_design.py --initial-text-scale 3
+          dbus-run-session -- python3 outputs/native-shell/tests/desktop_design.py --initial-text-scale 3 --appearance light
+          dbus-run-session -- python3 outputs/native-shell/tests/desktop_design.py --close-small
       - name: Full graphical login lifecycle and staged release
         run: |
           dbus-run-session -- python3 outputs/native-shell/tests/native_session.py
