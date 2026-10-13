@@ -14,7 +14,7 @@ impl From<&str> for Failure {
         }
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct LocalFeedback {
     pub surface: String,
     pub element: String,

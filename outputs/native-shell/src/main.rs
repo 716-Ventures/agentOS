@@ -1553,6 +1553,7 @@ fn main() {
         let mut restoration_captured = false;
         let mut monitor_captured = false;
         let mut metrics_at=std::time::Instant::now();
+        let mut projected_frame=Frame::default();
         glib::timeout_add_local(Duration::from_millis(50), move || {
             let _timing=timings::Span::new("native.ui_tick");
             if metrics_at.elapsed()>=Duration::from_secs(1) {timings::publish();metrics_at=std::time::Instant::now();}
@@ -1588,7 +1589,12 @@ fn main() {
                 }
             }
             let backend = frontend.borrow();
-            let frame = {let _copy=timings::Span::new("native.frame_copy");backend.frame.lock().unwrap().clone()};
+            let frame = {
+                let _copy=timings::Span::new("native.frame_copy");
+                let observed=backend.frame.lock().unwrap();
+                if *observed!=projected_frame {projected_frame=observed.clone();}
+                &projected_frame
+            };
             if let Ok(now) = glib::DateTime::now_local() {
                 if let Ok(text) = now.format("%a %e %b · %H:%M") {
                     if clock.text().as_str()!=text.as_str() {clock.set_text(&text);}

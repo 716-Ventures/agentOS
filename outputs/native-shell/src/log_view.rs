@@ -1,7 +1,7 @@
 //! Bounded page navigation. Each page retains its source identity and byte offsets.
 use serde_json::{json, Value};
 use std::path::PathBuf;
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Page {
     pub text: String,
     pub source: String,

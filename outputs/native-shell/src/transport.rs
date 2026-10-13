@@ -62,7 +62,7 @@ pub struct Draft {
     // Keep its proof across newer typing; never restore this authority from disk.
     pub acknowledged: Option<(u64, String)>,
 }
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub struct Frame {
     pub documents: BTreeMap<String, Value>,
     pub resources: BTreeMap<String, Arc<Vec<u8>>>,

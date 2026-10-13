@@ -354,9 +354,9 @@ pub fn snapshot_for(
     referenced: &BTreeSet<String>,
     filter: Option<&str>,
 ) -> Result<Value> {
-    let mut query=db.prepare("SELECT h.id,h.activity,h.session,h.title,h.app_id,h.connected,h.observed_at,COALESCE(r.revision,0) FROM presentation_host_surfaces h LEFT JOIN presentation_host_revisions r USING(id) ORDER BY h.id").map_err(|e|e.to_string())?;
+    let mut query=db.prepare("SELECT h.id,h.activity,h.session,h.title,h.app_id,h.connected,h.observed_at,COALESCE(r.revision,0) FROM presentation_host_surfaces h LEFT JOIN presentation_host_revisions r USING(id) WHERE (?1 IS NULL OR h.activity=?1) AND (?2=0 OR h.connected=1) ORDER BY h.id").map_err(|e|e.to_string())?;
     let rows = query
-        .query_map([], |r| {
+        .query_map(params![filter,referenced.is_empty()], |r| {
             Ok((
                 r.get::<_, String>(0)?,
                 r.get::<_, String>(1)?,
