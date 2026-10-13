@@ -737,7 +737,23 @@ fn placed_surfaces(state: &Value) -> BTreeSet<String> {
 // Preserve every existing placement when a human has constrained the workspace.
 // New windows still need durable geometry so they can be focused and managed.
 fn system_monitor(window: &Observed) -> bool {window.system_control && window.app_id=="agentos.monitor"}
-fn system_floating(window: &Observed) -> bool {system_monitor(window) || (window.system_control && matches!(window.app_id.as_str(),"agentos.welcome"|"agentos.settings")) }
+fn system_floating(window: &Observed) -> bool {control_size(window).is_some()}
+
+pub fn control_size(window: &Observed) -> Option<(i32,i32)> {
+    if system_monitor(window) {return Some((920,680));}
+    if !window.system_control {return None;}
+    match window.app_id.as_str() {
+        "agentos.welcome" => Some((560,320)),
+        "agentos.settings" => Some((760,540)),
+        _ => None,
+    }
+}
+
+pub fn initial_control_geometry(window: &Observed, area: Rect) -> Option<Rect> {
+    let (width,height)=control_size(window)?;
+    let width=width.min(area.width).max(1);let height=height.min(area.height).max(1);
+    Some(Rect{x:area.x+(area.width-width)/2,y:area.y+(area.height-height)/2,width,height})
+}
 
 /// A host-authenticated monitor opens over existing work. This preference is
 /// applied once; subsequent human placement and saved workspace state win.
@@ -1093,7 +1109,10 @@ mod tests {
         let mut window=Observed{id:"w".into(),title:"Agent Monitor".into(),app_id:"agentos.monitor".into(),uid:1000,session:"test".into(),system_control:false,min_width:80,min_height:32};
         assert!(!system_monitor(&window));window.system_control=true;assert!(system_monitor(&window));
         window.app_id="agentos.settings".into();window.system_control=false;assert!(!system_floating(&window));
+        assert!(initial_control_geometry(&window,area).is_none());
         window.system_control=true;assert!(system_floating(&window));
+        assert_eq!(initial_control_geometry(&window,area),Some(Rect{x:260,y:154,width:760,height:540}));
+        assert_eq!(initial_control_geometry(&window,Rect{x:-800,y:51,width:640,height:400}),Some(Rect{x:-800,y:51,width:640,height:400}));
     }
     #[test]
     fn new_windows_remain_manageable_in_manually_constrained_workspaces() {

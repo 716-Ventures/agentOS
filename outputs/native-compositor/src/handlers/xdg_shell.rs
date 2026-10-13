@@ -40,6 +40,10 @@ impl XdgShellHandler for Smallvil {
         self.space.map_element(window, (0, 0), false);
     }
 
+    fn app_id_changed(&mut self, _surface: ToplevelSurface) {
+        self.arrange();
+    }
+
     fn maximize_request(&mut self, surface: ToplevelSurface) {
         let id = format!("{:?}", surface.wl_surface().id());
         if let Some(bridge) = &self.bridge {

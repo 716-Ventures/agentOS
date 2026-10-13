@@ -423,6 +423,16 @@ impl Smallvil {
         let mut maximized = std::collections::BTreeSet::new();
         if let Some(bridge) = &self.bridge {
             let scene = bridge.scene.snapshot();
+            // Authenticated desktop controls know their opening size before
+            // the asynchronous core registration completes. Configure that
+            // size immediately instead of briefly presenting a tiled window.
+            for (id,window) in ids.iter().zip(&windows) {
+                if !scene.identities.contains_key(id) {
+                    if let Some(rect)=crate::bridge::initial_control_geometry(&observe(window),area) {
+                        placements.insert(id.clone(),rect);
+                    }
+                }
+            }
             for id in scene
                 .identities
                 .keys()
@@ -531,6 +541,16 @@ impl Smallvil {
         }
         for (id, window) in ids.iter().zip(windows) {
             if let Some(rect) = placements.get(id) {
+                let observed=observe(&window);
+                if observed.system_control && observed.app_id=="com.agentos.Desktop"
+                    && !smithay::backend::renderer::utils::with_renderer_surface_state(
+                        window.toplevel().unwrap().wl_surface(),|state|state.buffer().is_some(),
+                    ).unwrap_or(false) {
+                    // GTK assigns each desktop control's specific app-id when
+                    // mapping. Until then, its initial configure stays unsized
+                    // so the client's preferred dimensions remain available.
+                    continue;
+                }
                 let top = window.toplevel().unwrap();
                 let target = (rect.width, rect.height).into();
                 let changed = top.with_pending_state(|pending| {

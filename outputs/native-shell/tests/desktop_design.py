@@ -7,6 +7,7 @@ Run under dbus-run-session in the Linux verification guest.
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 import shlex
 import signal
@@ -47,6 +48,7 @@ def main():
         endpoint=root/'core.sock';pidfile=root/'compositor.pid'
         env={**os.environ,'HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':str(config.parent),'XDG_STATE_HOME':str(state.parent),'AGENT_OS_STATE':str(root/'core-state'),'AGENT_OS_SOCKET':str(endpoint),'AGENT_OS_COMPOSITOR_CORE':str(endpoint),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),'AGENT_OS_BROKER_SOCKET':str(root/'absent-broker.sock'),'AGENT_OS_MODEL_USAGE':str(root/'absent-usage.json'),'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','GDK_BACKEND':'wayland','GTK_A11Y':'atspi','G_DEBUG':'fatal-criticals','WINIT_UNIX_BACKEND':'wayland','AGENT_OS_COMPOSITOR_BACKEND':'winit','AGENT_OS_SYSTEM_BAR_CAPTURE':str(output/'system-bar.png'),'AGENT_OS_LAUNCHER_CAPTURE':str(output/'launcher.png'),'AGENT_OS_MONITOR_CAPTURE':str(output/'monitor.png'),'AGENT_OS_SETTINGS_CAPTURE':str(output/'settings.png')}
         env.pop('WAYLAND_DISPLAY',None);env.pop('DISPLAY',None)
+        env['WAYLAND_DEBUG']='client' # Private fixture: inspect initial configure sizes.
         core=weston=None;owned=None
         try:
             core=subprocess.Popen([str(SHELL/'target/release/agent-os-core')],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
@@ -128,6 +130,16 @@ def main():
             assert accessibility.text(accessibility.find('Ask Agent',pyatspi.ROLE_TEXT))=='Keep this unsent request λ'
             accessibility.activate(accessibility.find('Close launcher',pyatspi.ROLE_PUSH_BUTTON))
             assert call(endpoint,{'op':'snapshot'})['jobs']==[], 'Rendering or composing started work'
+            log.flush()
+            trace=(output/'session.log').read_text()
+            for app_id,expected in [('agentos.welcome',(560,320)),('agentos.settings',(760,540)),('agentos.monitor',(920,680))]:
+                named=re.search(r'xdg_toplevel[#@](\d+)\.set_app_id\("'+re.escape(app_id)+r'"\)',trace)
+                assert named,'Missing control identity: '+app_id
+                identity=named[1]
+                created=list(re.finditer(r'get_toplevel\(new id xdg_toplevel[#@]'+identity+r'\)',trace[:named.start()]))[-1]
+                configured=re.findall(r'xdg_toplevel[#@]'+identity+r'\.configure\((\d+), (\d+),',trace[created.end():])
+                first=next((tuple(map(int,size)) for size in configured if all(int(v)>0 for v in size)),None)
+                assert first==expected,('Desktop control opened at the wrong size',app_id,first,expected)
             # Restart the private desktop against the same user state. Dismissal
             # must survive without writing setup completion or affecting drafts.
             desktop_session.stop_compositor(root,owned);owned=None
