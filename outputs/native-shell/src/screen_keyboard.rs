@@ -412,8 +412,11 @@ impl Keyboard {
         if output_height <= 0 {
             return;
         }
-        let header_height = self.header.measure(gtk::Orientation::Vertical, -1).1;
-        let limit = (output_height / 2 - header_height - 32).clamp(1, 280);
+        // At fractional scales GTK can allocate a rounded logical pixel more
+        // than its natural measurement. Budget the actual header too, with a
+        // two-pixel rounding allowance, so the keyboard stays below half-screen.
+        let header_height = self.header.height().max(self.header.measure(gtk::Orientation::Vertical, -1).1);
+        let limit = (output_height / 2 - header_height - 34).clamp(1, 280);
         if self.scroller.max_content_height() != limit {
             self.scroller.set_max_content_height(limit);
         }
