@@ -1410,8 +1410,8 @@ fn main() {
         }
         let bar = ui::row(20);
         bar.add_css_class("agentos-system-bar");
-        bar.set_margin_top(12);
-        bar.set_margin_bottom(12);
+        bar.set_margin_top(4);
+        bar.set_margin_bottom(4);
         bar.set_margin_start(20);
         bar.set_margin_end(20);
         let clock = ui::text("", false);
@@ -1440,6 +1440,7 @@ fn main() {
         clock.set_wrap(false);
         clock.set_ellipsize(gtk::pango::EllipsizeMode::End);
         user.set_selectable(false);
+        user.set_wrap(false);
         user.set_hexpand(false);
         user.set_xalign(0.0);
         user.set_ellipsize(gtk::pango::EllipsizeMode::End);
@@ -1483,7 +1484,9 @@ fn main() {
         if trusted {
             let window = gtk::ApplicationWindow::builder().application(app).title("agentOS system bar").decorated(false).child(&bar).build();
             window.add_css_class("agentos-system-bar");
-            window.set_size_request(-1,50); // Keep font settling from moving the entire work area.
+            // Single-line 15px chrome fits below this floor even when fractional
+            // font metrics round upward. Keep the work-area reservation stable.
+            window.set_size_request(-1,36);
             wallpaper = Some(wallpaper::Backgrounds::new(app, &display));
             match system_bar::configure(&window, false) {
                 Ok(library) => layer_library = Some(library),

@@ -396,17 +396,11 @@ impl Monitor {
             .as_object()
             .map(|m| m.values().collect::<Vec<_>>())
             .unwrap_or_default();
-        set_label(&self.summary, &format!(
-            "{} agents · {} working\n{} usage: {} tokens",
-            agents.len(),
-            working,
-            if frame.connected {
-                "this session"
-            } else {
-                "unavailable session"
-            },
-            count(&session, "total")
-        ));
+        let total=count(&session,"total");
+        let usage=if !frame.connected {"Session usage unavailable".into()}
+            else if total=="Not reported" {"Session usage not reported".into()}
+            else {format!("{total} tokens this session")};
+        set_label(&self.summary, &format!("{} agents · {} working\n{}",agents.len(),working,usage));
         self.empty.set_visible(agents.is_empty());
         self.table_region.set_visible(!agents.is_empty());
         self.details.set_visible(!agents.is_empty());
