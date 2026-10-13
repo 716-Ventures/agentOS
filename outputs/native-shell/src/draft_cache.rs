@@ -98,6 +98,49 @@ pub fn encode(drafts: &Drafts) -> Result<Vec<u8>, String> {
     }
     Ok(bytes)
 }
+/// Compare durable fields before allocating or serializing recovery JSON.
+/// A failed write never advances the checkpoint, so the next tick retries it.
+#[derive(Default)]
+pub struct Checkpoint {
+    saved: Option<Drafts>,
+}
+impl Checkpoint {
+    pub fn persist(&mut self, path: &Path, drafts: &Drafts) -> Result<bool, String> {
+        let unchanged = self.saved.as_ref().is_some_and(|saved| {
+            saved.len() == drafts.len()
+                && saved.iter().zip(drafts).all(|((key, a), (next, b))| {
+                    key == next
+                        && a.text == b.text
+                        && a.expected == b.expected
+                        && a.dirty == b.dirty
+                        && a.resolved == b.resolved
+                })
+        });
+        if unchanged {
+            return Ok(false);
+        }
+        save(path, &encode(drafts)?)?;
+        self.saved = Some(
+            drafts
+                .iter()
+                .map(|(key, draft)| {
+                    (
+                        key.clone(),
+                        Draft {
+                            text: draft.text.clone(),
+                            expected: draft.expected,
+                            dirty: draft.dirty,
+                            resolved: draft.resolved,
+                            acknowledged: None,
+                        },
+                    )
+                })
+                .collect(),
+        );
+        Ok(true)
+    }
+}
+
 pub fn save(path: &Path, bytes: &[u8]) -> Result<(), String> {
     if decode(bytes).is_none() {
         return Err("Invalid local draft recovery payload".into());
@@ -159,7 +202,10 @@ mod tests {
             "Unsaved λ 日本語"
         );
         assert_eq!(loaded.values().next().unwrap().expected, 7);
-        assert!(loaded.values().next().unwrap().acknowledged.is_none(), "Recovery files must not grant in-process commit authority");
+        assert!(
+            loaded.values().next().unwrap().acknowledged.is_none(),
+            "Recovery files must not grant in-process commit authority"
+        );
         assert_eq!(
             fs::metadata(&file).unwrap().permissions().mode() & 0o777,
             0o600
@@ -189,6 +235,58 @@ mod tests {
         assert!(backups.iter().any(|p| fs::read(p).unwrap() == b"truncated"));
         save(&file, &encode(&Drafts::new()).unwrap()).unwrap();
         assert_eq!(fs::read_dir(&root).unwrap().count(), 3);
+        fs::remove_dir_all(root).unwrap();
+    }
+    #[test]
+    fn unchanged_checkpoint_preserves_file_and_failed_changes_retry() {
+        use std::os::unix::fs::MetadataExt;
+        let root = std::env::temp_dir().join(format!(
+            "agentos-draft-checkpoint-{}-{}",
+            std::process::id(),
+            super::super::nonce()
+        ));
+        let path = root.join("drafts.json");
+        let key = ("notes".into(), "editor".into());
+        let mut drafts = Drafts::from([(
+            key.clone(),
+            Draft {
+                text: "Unsaved λ 日本語".into(),
+                expected: 7,
+                dirty: true,
+                resolved: None,
+                acknowledged: None,
+            },
+        )]);
+        let mut checkpoint = Checkpoint::default();
+        assert!(checkpoint.persist(&path, &drafts).unwrap());
+        let inode = fs::metadata(&path).unwrap().ino();
+        drafts.get_mut(&key).unwrap().acknowledged = Some((8, "In-process authority only".into()));
+        assert!(!checkpoint.persist(&path, &drafts).unwrap());
+        assert_eq!(fs::metadata(&path).unwrap().ino(), inode);
+        assert!(load(&path)[&key].acknowledged.is_none());
+        // Each durable change must reach disk, including metadata-only changes.
+        for field in 0..4 {
+            let draft = drafts.get_mut(&key).unwrap();
+            match field {
+                0 => draft.text.push_str(" changed"),
+                1 => draft.expected += 1,
+                2 => draft.dirty = false,
+                _ => draft.resolved = Some(9),
+            }
+            assert!(checkpoint.persist(&path, &drafts).unwrap());
+            assert_eq!(encode(&load(&path)).unwrap(), encode(&drafts).unwrap());
+            assert!(!checkpoint.persist(&path, &drafts).unwrap());
+        }
+        fs::remove_file(&path).unwrap();
+        fs::create_dir(&path).unwrap();
+        drafts.get_mut(&key).unwrap().text = "Retry this change".into();
+        assert!(checkpoint.persist(&path, &drafts).is_err());
+        fs::remove_dir(&path).unwrap();
+        assert!(checkpoint.persist(&path, &drafts).unwrap());
+        assert_eq!(load(&path)[&key].text, "Retry this change");
+        drafts.clear();
+        assert!(checkpoint.persist(&path, &drafts).unwrap());
+        assert!(load(&path).is_empty());
         fs::remove_dir_all(root).unwrap();
     }
 }

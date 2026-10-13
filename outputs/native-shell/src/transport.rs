@@ -269,22 +269,12 @@ fn run(
     let mut ensured_sources = std::collections::BTreeSet::<String>::new();
     let mut source_scan = (None::<String>, String::new());
     let mut recovered = drafts.lock().unwrap().keys().cloned().collect::<Vec<_>>();
-    let mut saved_cache = Vec::new();
+    let mut draft_checkpoint = super::draft_cache::Checkpoint::default();
     let approval_pending = Arc::new(AtomicBool::new(false));
     let mut approvals = Vec::<thread::JoinHandle<()>>::new();
     while !stop.load(Ordering::Relaxed) {
-        match super::draft_cache::encode(&drafts.lock().unwrap()) {
-            Ok(bytes) if bytes != saved_cache => {
-                match super::draft_cache::save(&super::draft_cache::path(), &bytes) {
-                    Ok(()) => saved_cache = bytes,
-                    Err(error) => {
-                        frame.lock().unwrap().error =
-                            Some(format!("Local draft recovery unavailable: {error}"))
-                    }
-                }
-            }
-            Err(error) => frame.lock().unwrap().error = Some(error),
-            _ => {}
+        if let Err(error)=draft_checkpoint.persist(&super::draft_cache::path(),&drafts.lock().unwrap()) {
+            frame.lock().unwrap().error=Some(format!("Local draft recovery unavailable: {error}"));
         }
         let mut pending = Vec::new();
         for task in approvals.drain(..) {
