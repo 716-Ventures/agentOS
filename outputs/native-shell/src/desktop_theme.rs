@@ -23,9 +23,14 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
         r#"
     window.seven-ui {{ background: {bg}; color: {fg}; font-family: Commissioner, Inter, sans-serif; font-size: {font_size}px; border-radius: 12px; }}
     window.seven-ui .local-terminal-console {{ background: {terminal_bg}; }}
+    window.seven-ui .terminal-close-panel {{ background: {bg}; border: 1px solid {line}; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); }}
+    window.seven-ui .terminal-close-panel button.destructive {{ background: #b43132; color: #ffffff; }}
+    window.seven-ui .terminal-close-panel button.destructive:hover {{ background: #c13d3e; }}
+    window.seven-ui .terminal-close-panel button.destructive:active {{ background: #962729; }}
+    window.seven-ui .terminal-close-panel button.destructive label {{ color: #ffffff; }}
     window.seven-ui decoration {{ border-radius: 12px; border: none; box-shadow: 0 12px 30px rgba(0,0,0,0.28); }}
     window.seven-ui.desktop-inactive decoration {{ box-shadow: 0 6px 16px rgba(0,0,0,0.16); }}
-    window.seven-ui headerbar {{ background: {bg}; background-image: none; color: {fg}; min-height: 38px; padding: 0 12px; border: none; border-bottom: 1px solid {line}; box-shadow: none; border-radius: 12px 12px 0 0; }}
+    window.seven-ui headerbar {{ background: {bg}; background-image: none; color: {fg}; min-height: 38px; padding: 0; border: none; border-bottom: 1px solid {line}; box-shadow: none; border-radius: 12px 12px 0 0; }}
     window.seven-ui label {{ color: {fg}; }}
     window.seven-ui label.muted, window.seven-ui .desktop-muted {{ color: {muted}; }}
     window.seven-ui button {{ min-height: 1.4em; padding: 0.32em 0.85em; border-radius: 6px; font-weight: 500; }}
@@ -199,6 +204,7 @@ pub fn titlebar(window: &impl IsA<gtk::Window>) {
     header.set_title_widget(Some(&title));
     let controls=gtk::Box::new(gtk::Orientation::Horizontal,0);
     controls.set_valign(gtk::Align::Center);
+    controls.set_margin_start(12);controls.set_margin_end(12);
     for (class,icon,label) in [("desktop-close","window-close-symbolic","Close window"),("desktop-maximize","window-maximize-symbolic","Maximize window")] {
         let image=gtk::Image::from_icon_name(icon);image.set_pixel_size(10);
         let disc=gtk::Box::new(gtk::Orientation::Horizontal,0);

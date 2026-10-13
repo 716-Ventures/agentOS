@@ -61,10 +61,63 @@ def verify(metrics,output,scene,observe,keyboard,pointer):
     keyboard.chord(42,68) # Shift+F10, same native menu as secondary click.
     assert wait(lambda:observe('local-terminal:menu-paste'),'Keyboard context menu missing')['sensitive']
     assert observe('local-terminal:menu-paste-activate')['requested']
-    wait(lambda:'λ 日本語' in observe('local-terminal:snapshot')['text'] and observe('local-terminal:snapshot')['focused'],'Unicode menu Paste or focus return failed')
-    keyboard.chord(29,21) # Ctrl+U clears the pasted shell input without executing it.
+    wait(lambda:'λ 日本語' in observe('local-terminal:snapshot')['text'] and observe('local-terminal:snapshot')['focused'] and scene()['seat_focus']==window['id'],'Unicode menu Paste or focus return failed')
+    keyboard.chord(29,22) # Ctrl+U clears the pasted shell input without executing it.
+    def prompt_ready():
+        lines=[line for line in observe('local-terminal:snapshot')['text'].splitlines() if line.strip()]
+        return bool(lines) and lines[-1].rstrip().endswith('$')
+    wait(prompt_ready,'Clear-line command did not reach the local shell')
     pid=wait(lambda:json.loads((metrics/'local-terminal.json').read_text())['pid'],'Local shell PID was not recorded')
-    keyboard.chord(29,42,17) # Ctrl+Shift+W closes this human-owned terminal.
+    parent=int(Path(f'/proc/{pid}/stat').read_text().split(') ',1)[1].split()[1])
+    assert Path(f'/proc/{pid}/cgroup').read_text()==Path(f'/proc/{parent}/cgroup').read_text(),'Local shell escaped its owned graphical login scope'
+    def work_children():
+        children=Path(f'/proc/{pid}/task/{pid}/children').read_text().split()
+        return [int(child) for child in children if Path(f'/proc/{child}/comm').read_text().strip()=='sleep']
+    def start_sleep(background=False):
+        for key in [31,38,18,18,25,57,7,11]:keyboard.chord(key) # sleep 60
+        if background:keyboard.chord(57);keyboard.chord(42,8) # &
+        keyboard.chord(28)
+        try:return wait(work_children,'Owned sleep did not start')[0]
+        except RuntimeError:
+            print('Owned command diagnostic',observe('local-terminal:snapshot'),scene()['keyboard_pressed_count'],flush=True);raise
+    foreground=start_sleep()
+    keyboard.chord(29,42,17)
+    wait(lambda:observe('local-terminal:close-cancel')['showing'],'Running foreground work did not open close confirmation')
+    assert Path(f'/proc/{pid}').exists() and Path(f'/proc/{foreground}').exists(),'Close terminated work before confirmation'
+    for _ in range(4):
+        keyboard.chord(15) # Tab stays inside the confirmation.
+        wait(lambda:observe('local-terminal:close-cancel')['dialog_focus'],'Confirmation focus escaped into the terminal toolbar')
+    point=observe('local-terminal:close-cancel')['point'];g=terminal()['geometry']
+    pointer.click(g['x']+point[0],g['y']+point[1],width,height)
+    wait(lambda:observe('local-terminal:snapshot')['focused'],'Pointer Cancel did not restore terminal focus')
+    assert Path(f'/proc/{foreground}/stat').read_text().split(') ',1)[1].split()[0]!='Z','Pointer Cancel ended foreground work'
+    keyboard.chord(29,42,17)
+    wait(lambda:observe('local-terminal:close-cancel')['showing'],'Close shortcut did not reopen confirmation')
+    keyboard.chord(1) # Escape also cancels, retaining the foreground program.
+    wait(lambda:observe('local-terminal:snapshot')['focused'],'Cancel did not restore local terminal focus')
+    assert Path(f'/proc/{foreground}').exists() and Path(f'/proc/{foreground}/stat').read_text().split(') ',1)[1].split()[0]!='Z','Cancel ended the foreground program'
+    keyboard.chord(29,46) # Ctrl+C remains program input after Cancel.
+    wait(lambda:not Path(f'/proc/{foreground}').exists(),'Cancel did not restore program input')
+    wait(prompt_ready,'Foreground interrupt did not restore shell prompt')
+    background=start_sleep(True)
+    point=observe('local-terminal:window-close')['point'];g=terminal()['geometry']
+    print('CHECK: native close target',point,g,flush=True)
+    pointer.click(g['x']+point[0],g['y']+point[1],width,height)
+    wait(lambda:observe('local-terminal:close-confirm')['showing'],'Background job did not open close confirmation')
+    assert Path(f'/proc/{background}').exists(),'Background work ended before confirmation'
+    point=observe('local-terminal:close-confirm')['point'];g=terminal()['geometry']
+    pointer.click(g['x']+point[0],g['y']+point[1],width,height)
+    wait(lambda:not Path(f'/proc/{background}').exists(),'Confirmed close leaked background work')
     wait(lambda:not any(w['id']==window['id'] for w in scene()['windows']),'Local close shortcut failed')
     wait(lambda:not Path(f'/proc/{pid}').exists(),'Local close leaked its shell child')
-    print('PASS: local Terminal kernel launch/typing, native mouse/keyboard Copy/Paste menus, exact output and Unicode clipboard, popup focus return, close shortcut and owned child cleanup',flush=True)
+    keyboard.chord(29,56,57)
+    launcher=wait(lambda:next((l for l in scene()['system_layers'] if l['namespace']=='agentos-launcher' and l['mapped']),None),'Launcher did not reopen after terminal close')
+    point=observe('local-terminal:launcher-button')['point'];g=launcher['geometry']
+    pointer.click(g['x']+point[0],g['y']+point[1],width,height)
+    idle=wait(terminal,'Second idle terminal did not map')
+    wait(lambda:scene()['seat_focus']==idle['id'] and scene()['shared']['focus']==idle['id'],'Idle terminal did not receive focus')
+    idle_pid=wait(lambda:json.loads((metrics/'local-terminal.json').read_text())['pid'] if json.loads((metrics/'local-terminal.json').read_text())['pid']!=pid else None,'New shell PID was not recorded')
+    keyboard.chord(29,42,17)
+    wait(lambda:not any(w['id']==idle['id'] for w in scene()['windows']),'Idle terminal unnecessarily blocked closing')
+    wait(lambda:not Path(f'/proc/{idle_pid}').exists(),'Idle close leaked its child')
+    print('PASS: local Terminal kernel launch/typing, mouse/keyboard clipboard menus, exact output and Unicode paste, foreground/background close guard, cancel/input restoration, idle close and owned child cleanup',flush=True)

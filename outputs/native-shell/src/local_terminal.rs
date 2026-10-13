@@ -1,6 +1,9 @@
 //! Human-owned local PTYs, separate from attached broker work terminals.
 use super::*;
 use vte4::prelude::*;
+// vtepty.h: retain child processes in this owned graphical login instead of
+// silently moving them to a separate systemd user scope.
+const VTE_SPAWN_NO_SYSTEMD_SCOPE: u32 = 1 << 26;
 thread_local! {static TERMINALS:RefCell<Vec<glib::WeakRef<vte4::Terminal>>>=const {RefCell::new(Vec::new())};}
 
 fn theme(view: &vte4::Terminal, light: bool, scale: f64) {
@@ -100,12 +103,13 @@ pub fn open(
     ));
     copy.set_action_name(Some("terminal.copy"));
     paste.set_action_name(Some("terminal.paste"));
+    let overlay = gtk::Overlay::builder().child(&body).build();
     let window = gtk::ApplicationWindow::builder()
         .application(app)
         .title(if setup { "Setup" } else { "Terminal" })
         .default_width(880)
         .default_height(560)
-        .child(&body)
+        .child(&overlay)
         .build();
     window.add_css_class("seven-ui");
     desktop_theme::titlebar(&window);
@@ -119,6 +123,7 @@ pub fn open(
         }
     });
     let keys = gtk::EventControllerKey::new();
+    keys.set_propagation_phase(gtk::PropagationPhase::Capture);
     let view = terminal.downgrade();
     let target = window.downgrade();
     keys.connect_key_pressed(move |_, key, _, modifiers| {
@@ -145,19 +150,36 @@ pub fn open(
         }
         glib::Propagation::Proceed
     });
-    terminal.add_controller(keys);
+    window.add_controller(keys);
     let child = Rc::new(Cell::new(0));
     let closed = Rc::new(Cell::new(false));
     let exited = Rc::new(Cell::new(false));
+    let guard = terminal_close::Guard::new(
+        &window,
+        &overlay,
+        &terminal,
+        clipboard.clone(),
+        input_ready.clone(),
+        child.clone(),
+        closed.clone(),
+    );
     let pid = child.clone();
     let closing = closed.clone();
     let closing_clipboard = clipboard.clone();
     let closing_input = input_ready.clone();
+    let close_guard = guard.clone();
+    let closing_terminal = terminal.downgrade();
     window.connect_close_request(move |_| {
+        if !close_guard.allow_close() {
+            return glib::Propagation::Stop;
+        }
+        closing.set(true);
+        if let Some(terminal) = closing_terminal.upgrade() {
+            terminal.set_input_enabled(false);
+        }
         closing_input.set(false);
         closing_clipboard.set_attached(false);
         closing_clipboard.close();
-        closing.set(true);
         let pid = pid.get();
         if pid > 0 {
             unsafe {
@@ -169,16 +191,23 @@ pub fn open(
     let pid = child.clone();
     let target = window.downgrade();
     let ended = exited.clone();
+    let already_closing = closed.clone();
     terminal.connect_child_exited(move |_, status| {
         observe(json!({"pid":pid.get(),"exited":true,"status":status}));
         ended.set(true);
         pid.set(0);
-        if let Some(window) = target.upgrade() {
-            window.close();
+        if !already_closing.get() {
+            if let Some(window) = target.upgrade() {
+                window.close();
+            }
         }
     });
     let target = window.downgrade();
+    let shutdown_guard = Rc::downgrade(&guard);
     app.connect_shutdown(move |_| {
+        if let Some(guard) = shutdown_guard.upgrade() {
+            guard.force();
+        }
         if let Some(window) = target.upgrade() {
             window.close();
         }
@@ -198,7 +227,7 @@ pub fn open(
         Some(&home),
         &[program],
         &["TERM=xterm-256color", "COLORTERM=truecolor"],
-        glib::SpawnFlags::DEFAULT,
+        glib::SpawnFlags::from_bits_retain(VTE_SPAWN_NO_SYSTEMD_SCOPE),
         || {},
         5000,
         gtk::gio::Cancellable::NONE,
@@ -218,7 +247,15 @@ pub fn open(
                 clipboard.set_attached(true);
                 if std::env::var("AGENT_OS_LOCAL_TERMINAL_VERIFY").as_deref() == Ok("1") {
                     if let Some(view) = view.upgrade() {
-                        view.feed_child("printf 'native-terminal-λ\\n'\n".as_bytes());
+                        let command = if std::env::var("AGENT_OS_LOCAL_TERMINAL_VERIFY_WORK")
+                            .as_deref()
+                            == Ok("1")
+                        {
+                            "printf 'native-terminal-λ\\n'; sleep 60\n"
+                        } else {
+                            "printf 'native-terminal-λ\\n'\n"
+                        };
+                        view.feed_child(command.as_bytes());
                     }
                 }
                 if let Ok(path) = std::env::var("AGENT_OS_LOCAL_TERMINAL_CAPTURE") {

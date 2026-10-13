@@ -195,11 +195,12 @@ impl ClipboardActions {
         );
     }
     pub fn close(&self) {
-        self.menu.popdown();
+        self.dismiss();
         if self.menu.parent().is_some() {
             self.menu.unparent();
         }
     }
+    pub fn dismiss(&self) {self.menu.popdown();}
     pub fn set_attached(&self, attached: bool) {
         self.paste.set_enabled(attached);
     }

@@ -258,6 +258,21 @@ def assistive():
                     assert node.getState().contains(pyatspi.STATE_SHOWING),'Launcher terminal action is hidden'
                     r=node.queryComponent().getExtents(pyatspi.WINDOW_COORDS);f=frame.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
                     response={'point':[r.x-f.x+r.width/2,r.y-f.y+r.height/2],'button_bounds':[r.x,r.y,r.width,r.height],'frame_bounds':[f.x,f.y,f.width,f.height]}
+                elif action=='window-close' or action.startswith('close-'):
+                    frame=find('Terminal',pyatspi.ROLE_FRAME)
+                    node=find('Close window' if action=='window-close' else 'Cancel' if action.startswith('close-cancel') else 'Close terminal',pyatspi.ROLE_PUSH_BUTTON,root=frame)
+                    r=node.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
+                    response={'showing':node.getState().contains(pyatspi.STATE_SHOWING),'focused':node.getState().contains(pyatspi.STATE_FOCUSED),'sensitive':node.getState().contains(pyatspi.STATE_SENSITIVE),'point':[r.x+r.width/2,r.y+r.height/2]}
+                    if action.startswith('close-'):
+                        panel=node.parent
+                        while panel is not None and panel.name!='Close terminal?':panel=panel.parent
+                        queue=deque([panel]);response['dialog_focus']=False
+                        while queue:
+                            child=queue.popleft()
+                            if child is None:continue
+                            if child.getState().contains(pyatspi.STATE_FOCUSED):response['dialog_focus']=True;break
+                            queue.extend(child[i] for i in range(min(child.childCount,64)))
+                    if action.endswith('-activate'):response['requested']=node.queryAction().doAction(0)
                 elif action.startswith('menu-'):
                     name='Copy' if action.startswith('menu-copy') else 'Paste'
                     node=find(name,pyatspi.ROLE_MENU_ITEM)

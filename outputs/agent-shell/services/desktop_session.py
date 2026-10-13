@@ -108,9 +108,25 @@ def reap_session_children():
         except (ChildProcessError,ProcessLookupError):pass
 
 
+def reap_exited_orphans(managed=(),cursor=0):
+    """Collect adopted exits without signalling work or stealing managed status.
+
+    At most 64 nonblocking waits per session tick; rotate past live children so
+    they cannot starve later exits. The kernel permits waits only on our children.
+    """
+    try:children=sorted(int(pid) for pid in Path(f'/proc/{os.getpid()}/task/{os.getpid()}/children').read_text().split() if int(pid) not in managed)
+    except (FileNotFoundError,ValueError):return 0
+    ordered=[pid for pid in children if pid>cursor]+[pid for pid in children if pid<=cursor]
+    for pid in ordered[:64]:
+        cursor=pid
+        try:os.waitpid(pid,os.WNOHANG)
+        except (ChildProcessError,ProcessLookupError):pass
+    return cursor if children else 0
+
+
 def direct_session(command,env,runtime,stopped,reader=None):
     """Own the direct compositor; its renderer remains the compositor's child."""
-    proc=None;owned=None
+    proc=None;owned=None;reap_cursor=0
     try:
         proc=subprocess.Popen(command,env={**env,'AGENT_OS_COMPOSITOR_BACKEND':'drm'},start_new_session=True)
         identity=process_identity(proc.pid)
@@ -118,6 +134,9 @@ def direct_session(command,env,runtime,stopped,reader=None):
             owned=(proc.pid,identity)
         while proc.poll() is None and not stopped():
             if reader and owned:reader.poll(runtime,env,owned[0])
+            managed={proc.pid}
+            if reader and reader.process and reader.process.returncode is None:managed.add(reader.process.pid)
+            reap_cursor=reap_exited_orphans(managed,reap_cursor)
             time.sleep(.05)
         stop_compositor(runtime,owned)
         try:return proc.wait(timeout=5)
@@ -175,6 +194,7 @@ def main():
             if args.pixman:argv.append('--use-pixman')
             if args.backend=='headless':argv.extend(['--width=1280','--height=800'])
             proc=subprocess.Popen(argv,env=env,start_new_session=True)
+            reap_cursor=0
             while proc.poll() is None and not stopped:
                 if owned is None and pidfile.exists():
                     try:
@@ -182,6 +202,10 @@ def main():
                         if identity and identity[1]==proc.pid and identity[2]==os.getuid() and identity[3]==Path(command[0]).resolve():owned=(ident,identity)
                     except (OSError,ValueError):pass
                 if reader and owned:reader.poll(root,env,owned[0])
+                managed={proc.pid}
+                if owned:managed.add(owned[0])
+                if reader and reader.process and reader.process.returncode is None:managed.add(reader.process.pid)
+                reap_cursor=reap_exited_orphans(managed,reap_cursor)
                 time.sleep(.05)
             if reader:reader.close()
             # Weston starts autolaunched clients in separate process groups. Bind

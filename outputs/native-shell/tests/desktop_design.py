@@ -37,9 +37,9 @@ def reap(proc):
         except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait(timeout=5)
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--appearance',choices=['dark','light'],default='dark');args=parser.parse_args()
-    output=ROOT/'test-output'/('desktop-design-'+args.appearance);output.mkdir(parents=True,exist_ok=True)
-    for name in ('monitor.png','system-bar.png','launcher.png','settings.png','terminal.png','terminal.json','desktop.png','scene.json'):(output/name).unlink(missing_ok=True)
+    parser=argparse.ArgumentParser();parser.add_argument('--appearance',choices=['dark','light'],default='dark');parser.add_argument('--close-small',action='store_true',help='Qualify 300% close confirmation in a 360px terminal');args=parser.parse_args()
+    output=ROOT/'test-output'/('desktop-design-'+args.appearance+('-close-small' if args.close_small else ''));output.mkdir(parents=True,exist_ok=True)
+    for name in ('monitor.png','system-bar.png','launcher.png','settings.png','terminal.png','terminal.json','terminal-close.png','desktop.png','scene.json'):(output/name).unlink(missing_ok=True)
     desktop_session.enable_subreaper()
     with tempfile.TemporaryDirectory(prefix='agentos-desktop-design-') as directory, (output/'session.log').open('w') as log:
         root=Path(directory);config=root/'config/agent-os';config.mkdir(parents=True)
@@ -49,7 +49,7 @@ def main():
         env={**os.environ,'HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':str(config.parent),'XDG_STATE_HOME':str(state.parent),'AGENT_OS_STATE':str(root/'core-state'),'AGENT_OS_SOCKET':str(endpoint),'AGENT_OS_COMPOSITOR_CORE':str(endpoint),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),'AGENT_OS_BROKER_SOCKET':str(root/'absent-broker.sock'),'AGENT_OS_MODEL_USAGE':str(root/'absent-usage.json'),'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','GDK_BACKEND':'wayland','GTK_A11Y':'atspi','G_DEBUG':'fatal-criticals','WINIT_UNIX_BACKEND':'wayland','AGENT_OS_COMPOSITOR_BACKEND':'winit','AGENT_OS_SYSTEM_BAR_CAPTURE':str(output/'system-bar.png'),'AGENT_OS_LAUNCHER_CAPTURE':str(output/'launcher.png'),'AGENT_OS_MONITOR_CAPTURE':str(output/'monitor.png'),'AGENT_OS_SETTINGS_CAPTURE':str(output/'settings.png')}
         env.pop('WAYLAND_DISPLAY',None);env.pop('DISPLAY',None)
         env['WAYLAND_DEBUG']='client' # Private fixture: inspect initial configure sizes.
-        env.update(AGENT_OS_LOCAL_TERMINAL_VERIFY='1',AGENT_OS_LOCAL_TERMINAL_VERIFY_MENU='1',AGENT_OS_LOCAL_TERMINAL_CAPTURE=str(output/'terminal.png'),AGENT_OS_LOCAL_TERMINAL_OBSERVATION=str(output/'terminal.json'))
+        env.update(AGENT_OS_LOCAL_TERMINAL_VERIFY='1',AGENT_OS_LOCAL_TERMINAL_VERIFY_WORK='1',AGENT_OS_TERMINAL_CLOSE_CAPTURE=str(output/'terminal-close.png'),AGENT_OS_LOCAL_TERMINAL_VERIFY_MENU='1',AGENT_OS_LOCAL_TERMINAL_CAPTURE=str(output/'terminal.png'),AGENT_OS_LOCAL_TERMINAL_OBSERVATION=str(output/'terminal.json'))
         core=weston=None;owned=None
         try:
             core=subprocess.Popen([str(SHELL/'target/release/agent-os-core')],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
@@ -100,6 +100,9 @@ def main():
             accessibility.wait(lambda:json.loads((config/'desktop.json').read_text())['text_scale']==1.25,'Text percentage did not persist as a scale factor')
             size.queryValue().currentValue=100.0
             accessibility.wait(lambda:json.loads((config/'desktop.json').read_text())['text_scale']==1.0,'Text size did not restore')
+            if args.close_small:
+                size.queryValue().currentValue=300.0
+                accessibility.wait(lambda:json.loads((config/'desktop.json').read_text())['text_scale']==3.0,'300% text did not persist')
             accessibility.activate(accessibility.find('Close window',pyatspi.ROLE_PUSH_BUTTON,root=settings))
             accessibility.wait(lambda:not any(w['app_id']=='agentos.settings' for w in scene()['windows']),'Desktop settings did not close')
 
@@ -150,7 +153,42 @@ def main():
             assert [terminal_geometry['width'],terminal_geometry['height']]==[880,560],terminal_geometry
             child=json.loads((output/'terminal.json').read_text())['pid']
             terminal_frame=accessibility.find('Terminal',pyatspi.ROLE_FRAME)
+            if args.close_small:
+                end=time.monotonic()+10
+                while True:
+                    current=scene();workspace=next(iter(current['shared']['workspaces'].values()));logical=current['shared']['identities'][terminal_window['id']]
+                    try:
+                        receipt=call(endpoint,{'op':'presentation.apply','protocol':'agentos.presentation/1','catalog_revision':'native-core/1','request_id':'small-terminal-close-'+str(time.time_ns()),'expected_revisions':{workspace['workspace_id']:workspace['revision']},'operations':[{'op':'workspace.edit','workspace_id':workspace['workspace_id'],'edit':{'kind':'float','surface_id':logical,'output_id':next(iter(workspace['outputs'])),'x':200,'y':0,'width':880,'height':360}},{'op':'workspace.edit','workspace_id':workspace['workspace_id'],'edit':{'kind':'focus','surface_id':logical,'element_id':None}}]})
+                        assert receipt['status']=='committed',receipt
+                        break
+                    except AssertionError as error:
+                        if 'stale_revision' not in str(error) or time.monotonic()>end:raise
+                        time.sleep(.05)
+                try:accessibility.wait(lambda:terminal_ready() and terminal_ready()['geometry']['height']==360 and terminal_ready()['xdg']['pending_count']==0,'Small terminal did not settle')
+                except AssertionError:
+                    print('Small terminal scene',json.dumps(scene()),flush=True);raise
+            programs=Path(f'/proc/{child}/task/{child}/children').read_text().split()
+            assert programs,'Verification foreground program did not start'
+            original_geometry=terminal_ready()['geometry']
             accessibility.activate(accessibility.find('Close window',pyatspi.ROLE_PUSH_BUTTON,root=terminal_frame))
+            cancel=accessibility.find('Cancel',pyatspi.ROLE_PUSH_BUTTON,root=terminal_frame)
+            assert Path(f'/proc/{child}').exists() and all(Path(f'/proc/{pid}').exists() for pid in programs),'Close ended work before confirmation'
+            accessibility.wait(lambda:(output/'terminal-close.png').exists(),'Close guard did not paint')
+            assert terminal_ready()['geometry']==original_geometry,'Close confirmation changed terminal geometry'
+            for name in ['Cancel','Close terminal']:
+                bounds=accessibility.find(name,pyatspi.ROLE_PUSH_BUTTON,root=terminal_frame).queryComponent().getExtents(pyatspi.WINDOW_COORDS)
+                assert 0<=bounds.x and 0<=bounds.y and bounds.width>0 and bounds.height>0 and bounds.x+bounds.width<=original_geometry['width'] and bounds.y+bounds.height<=original_geometry['height'],('Close action outside viewport',name,bounds,original_geometry)
+            accessibility.activate(cancel)
+            accessibility.wait(lambda:accessibility.find('Local terminal',pyatspi.ROLE_TERMINAL).getState().contains(pyatspi.STATE_FOCUSED),'Cancel did not restore terminal focus')
+            assert Path(f'/proc/{child}').exists() and all(Path(f'/proc/{pid}').exists() for pid in programs),'Cancel ended running work'
+            accessibility.activate(accessibility.find('Close window',pyatspi.ROLE_PUSH_BUTTON,root=terminal_frame))
+            accessibility.activate(accessibility.find('Close terminal',pyatspi.ROLE_PUSH_BUTTON,root=terminal_frame))
+            def reaped_programs():
+                for pid in programs:
+                    try:os.waitpid(int(pid),os.WNOHANG)
+                    except ChildProcessError:pass
+                return all(not Path(f'/proc/{pid}').exists() for pid in programs)
+            accessibility.wait(reaped_programs,'Confirmed close leaked foreground work')
             accessibility.wait(lambda:not Path(f'/proc/{child}').exists(),'Closing native terminal leaked its shell child')
             with socket.socket(socket.AF_UNIX) as connection:
                 connection.connect(str(control));connection.sendall(json.dumps({'op':'terminal.present','app_id':terminal_window['app_id']}).encode()+b'\n')

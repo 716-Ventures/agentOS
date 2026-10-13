@@ -28,6 +28,7 @@ mod status_projection;
 mod system_bar;
 mod screen_keyboard;
 mod terminal_actions;
+mod terminal_close;
 mod timings;
 mod transport;
 mod verification;
