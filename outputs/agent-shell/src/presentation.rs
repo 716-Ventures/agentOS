@@ -799,8 +799,8 @@ fn validate(
                 let mut local = BTreeSet::new();
                 let mut locations = BTreeMap::new();
                 for (output, layout) in &w.outputs {
-                    let unchanged = previous
-                        .and_then(|w| w.outputs.get(output))
+                    let old_layout = previous.and_then(|w| w.outputs.get(output));
+                    let unchanged = old_layout
                         .is_some_and(|old| workspace::removes_only(old, layout));
                     let size: Option<(f64, f64, bool,Option<String>)> = db
                         .query_row(
@@ -829,21 +829,26 @@ fn validate(
                     }
                     let before = local.clone();
                     if let Some(t) = &layout.tiles {
+                        let retained_tiles = old_layout.is_some_and(|old| old.tiles == layout.tiles);
                         tile_valid(
                             t,
                             &mut local,
                             1,
-                            if unchanged { f64::INFINITY } else { width },
-                            if unchanged { f64::INFINITY } else { height },
+                            if unchanged || retained_tiles { f64::INFINITY } else { width },
+                            if unchanged || retained_tiles { f64::INFINITY } else { height },
                         )?
                     }
                     for f in &layout.floating {
+                        // Output/work-area changes retain preferred geometry.
+                        // Opening another view must not invalidate those saved
+                        // rectangles; only new or changed geometry needs to fit.
+                        let retained = old_layout.is_some_and(|old| old.floating.contains(f));
                         if ![f.x, f.y, f.width, f.height].iter().all(|v| v.is_finite())
                             || f.width < 80.0
                             || f.height < 32.0
                             || f.x < 0.0
                             || f.y < 0.0
-                            || (!unchanged && (f.x + f.width > width || f.y + f.height > height))
+                            || (!unchanged && !retained && (f.x + f.width > width || f.y + f.height > height))
                         {
                             return Err(error(
                                 "constraint_conflict",
@@ -3034,6 +3039,46 @@ mod tests {
         .unwrap();
         let close = json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":"close-on-removed-output","expected_revisions":{"workspace-a":0,"surface-a":2},"operations":[{"op":"workspace.edit","workspace_id":"workspace-a","edit":{"kind":"remove","surface_id":"surface-a"}},{"op":"surface.close","surface_id":"surface-a"}]});
         assert!(handle(&mut db, &close, &human()).is_ok());
+    }
+    #[test]
+    fn opening_views_after_output_shrink_preserves_old_geometry_and_validates_new_geometry() {
+        for floating in [true, false] {
+            let mut db = fixture();
+            create(&mut db);
+            for id in ["surface-b", "surface-c"] {
+                let mut doc = surface();
+                doc["surface_id"] = json!(id);
+                handle(&mut db, &json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":id,"expected_revisions":{id:null},"operations":[{"op":"surface.create","document":doc}]}), &human()).unwrap();
+            }
+            let output = |width, height| json!({"op":"outputs.register","output_id":"output-a","width":width,"height":height});
+            let compositor = Principal { uid: 0, session: "compositor".into() };
+            handle(&mut db, &output(1280, 800), &compositor).unwrap();
+            let mut w = workspace();
+            if floating {
+                w["outputs"]["output-a"]["tiles"] = Value::Null;
+                w["outputs"]["output-a"]["floating"] = json!([{"surface_id":"surface-a","x":100,"y":0,"width":1000,"height":750}]);
+            } else {
+                w["outputs"]["output-a"]["tiles"] = json!({"kind":"split","axis":"horizontal","ratios":[0.1,0.9],"children":[{"kind":"leaf","surface_id":"surface-a"},{"kind":"leaf","surface_id":"surface-c"}]});
+            }
+            let put = |id, revision, document| json!({"op":"presentation.apply","protocol":PROTOCOL,"catalog_revision":CATALOG,"request_id":id,"expected_revisions":{"workspace-a":revision},"operations":[{"op":"workspace.put","document":document}]});
+            handle(&mut db, &put("initial", Value::Null, w.clone()), &human()).unwrap();
+            handle(&mut db, &output(320, 240), &compositor).unwrap();
+            let old = get_document(&db, &json!({"document_id":"workspace-a"})).unwrap()["outputs"]["output-a"].clone();
+            w["outputs"]["output-a"]["floating"].as_array_mut().unwrap().push(json!({"surface_id":"surface-b","x":20,"y":20,"width":200,"height":100}));
+            handle(&mut db, &put("open-new", json!(0), w.clone()), &human()).unwrap();
+            let saved = get_document(&db, &json!({"document_id":"workspace-a"})).unwrap();
+            assert_eq!(saved["outputs"]["output-a"]["tiles"], old["tiles"]);
+            if floating {assert_eq!(saved["outputs"]["output-a"]["floating"][0], old["floating"][0]);}
+            let mut bad = saved.clone();
+            let entries = bad["outputs"]["output-a"]["floating"].as_array_mut().unwrap();
+            entries.last_mut().unwrap()["width"] = json!(400);
+            assert!(handle(&mut db, &put("bad-new", json!(1), bad), &human()).unwrap_err().contains("constraint_conflict"));
+            let mut bad = saved.clone();
+            if floating {bad["outputs"]["output-a"]["floating"][0]["x"] = json!(101);}
+            else {bad["outputs"]["output-a"]["tiles"]["ratios"] = json!([0.05,0.95]);}
+            assert!(handle(&mut db, &put("bad-old-edit", json!(1), bad), &human()).unwrap_err().contains("constraint_conflict"));
+            assert_eq!(get_document(&db, &json!({"document_id":"workspace-a"})).unwrap(), saved);
+        }
     }
     #[test]
     fn workspace_enforces_outputs_placements_sizes_focus_and_provenance() {
