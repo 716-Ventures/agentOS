@@ -1646,11 +1646,10 @@ fn main() {
             for (requested,handled,setup) in [(frame.local_terminal_requests,&mut terminal_requests,false),(frame.setup_requests,&mut setup_requests,true)] {
                 for _ in 0..requested.saturating_sub(*handled).min(4) {
                     *handled+=1;
-                    let launcher=main.downgrade();let state=backend.frame.clone();let commands=backend.commands.clone();
+                    let state=backend.frame.clone();let commands=backend.commands.clone();
                     local_terminal::open(&application,setup,move |result| match result {
                         Ok(identity)=>{
                             {let mut frame=state.lock().unwrap();frame.error=None;frame.notice=Some(if setup {"Setup opened"}else{"Local terminal opened"}.into());}
-                            if let Some(window)=launcher.upgrade(){if trusted && window.is_visible(){window.close();}}
                             let _=commands.send(Command::PresentTerminal(identity));
                         },
                         Err(error)=>state.lock().unwrap().error=Some(format!("Could not open terminal: {error}")),

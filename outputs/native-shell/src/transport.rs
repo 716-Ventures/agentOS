@@ -355,8 +355,9 @@ fn run(
                     }));
                     continue;
                 }
-                let feedback_only=matches!(&command,Command::ClearFieldFeedback{..}|Command::PresentMonitor|Command::PresentTerminal(_));
+                let feedback_only=matches!(&command,Command::ClearFieldFeedback{..}|Command::PresentMonitor);
                 let navigation=matches!(&command,Command::CreateDocument|Command::ImportDocument{..});
+                let terminal_navigation=matches!(&command,Command::PresentTerminal(_));
                 let submitted_request = matches!(&command, Command::Ask {..});
                 let result=match command {
                     Command::Approve(_)|Command::ReviewInput{..}=>unreachable!(),
@@ -381,8 +382,8 @@ fn run(
                                 if result.is_ok() || stop.load(Ordering::Relaxed){break;}
                                 thread::sleep(Duration::from_millis(25));
                             }
-                            result
-                        }else{Ok(Value::Null)}
+                            result.map(|_|json!({"status":"Terminal opened"})).map_err(|error|format!("Could not focus Terminal: {error}. Select its window to continue."))
+                        }else{Ok(json!({"status":"Terminal opened"}))}
                     },
                     Command::Resume(job)=>super::broker_controls::job_id(&job).and_then(|id|request(&broker_socket(),&json!({"op":"poll","job_id":id}))).and_then(|current|super::broker_controls::continuation_request(&current).ok_or("No approved agent request is associated with this work".into())).and_then(|query|request(&socket,&query)),
                     Command::Attach(job)=>super::broker_controls::attach(&job),
@@ -518,7 +519,7 @@ fn run(
                 if !feedback_only { match result {
                     Err(e) => view.error = Some(e),
                     Ok(value) => {
-                        if navigation && value["status"]=="committed" {view.navigation_sequence=view.navigation_sequence.saturating_add(1);}
+                        if terminal_navigation || (navigation && value["status"]=="committed") {view.navigation_sequence=view.navigation_sequence.saturating_add(1);}
                         if submitted_request { view.submitted_request = value["id"].as_i64(); }
                         view.error = None;
                         view.notice = Some(

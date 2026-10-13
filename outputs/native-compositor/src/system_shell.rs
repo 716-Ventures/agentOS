@@ -389,8 +389,14 @@ fn present_control(state: &mut Smallvil, peer: Option<u32>, identity: &str) -> R
         // Let the acknowledged workspace focus drive the seat. Moving the seat
         // ahead of its scene leaves applied_focus stale and can lose a later
         // deliberate return to the editor. Retry until this window is registered.
-        if !bridge.scene.snapshot().identities.contains_key(&runtime) {return Err("Monitor unavailable".into());}
-        if !bridge.input(&runtime,serde_json::json!({"kind":"focus","element_id":null})) {return Err("Control placement unavailable".into());}
+        let scene=bridge.scene.snapshot();
+        if !scene.identities.contains_key(&runtime) {return Err("Control unavailable".into());}
+        if scene.focus.as_deref()!=Some(runtime.as_str()) {
+            if !bridge.input(&runtime,serde_json::json!({"kind":"focus","element_id":null})) {return Err("Control placement unavailable".into());}
+            // A queued transaction is not a focus receipt. Keep the launcher
+            // owning keyboard input until the committed scene names the target.
+            return Err("Control focus pending".into());
+        }
     } else if let Some(keyboard)=state.seat.get_keyboard() {
         keyboard.set_focus(state,Some(surface.clone()),smithay::utils::SERIAL_COUNTER.next_serial());
     }

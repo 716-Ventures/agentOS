@@ -29,13 +29,20 @@ def verify(metrics,output,scene,observe,keyboard,pointer):
     try:window=wait(terminal,'Local terminal did not map')
     except RuntimeError:
         s=scene();print('Local launch diagnostic',{k:s[k] for k in ['seat_focus','pointer_location','pointer_routing','system_layers','windows']},observe('local-terminal:launcher-button'),flush=True);raise
-    wait(lambda:scene()['seat_focus']==window['id'] and scene()['shared']['focus']==window['id'],'Local terminal did not become authoritative focus')
+    def handoff_ready():
+        current=scene()
+        launcher_visible=any(l['namespace']=='agentos-launcher' and l['mapped'] for l in current['system_layers'])
+        if not launcher_visible:
+            assert current['shared']['focus']==window['id'],'Launcher dismissed before Terminal focus committed'
+            assert current['seat_focus'] in (None,window['id']),'Launcher handed input back to the previous view'
+        return current['seat_focus']==window['id'] and current['shared']['focus']==window['id']
+    wait(handoff_ready,'Local terminal did not become authoritative focus')
     assert not any(l['namespace']=='agentos-launcher' and l['mapped'] for l in scene()['system_layers'])
     def click_terminal():
         point=observe('local-terminal:snapshot')['point'];g=terminal()['geometry']
         pointer.click(g['x']+point[0],g['y']+point[1],width,height)
         wait(lambda:observe('local-terminal:snapshot')['focused'],'Kernel pointer did not focus local shell')
-    click_terminal()
+    wait(lambda:observe('local-terminal:snapshot')['focused'],'New terminal did not receive widget focus without a pointer click')
     for key in [18,46,35,24,57,38,24,46,30,38,24,37]:keyboard.chord(key) # echo localok
     keyboard.chord(28)
     wait(lambda:'\nlocalok\n' in observe('local-terminal:snapshot')['text'],'Kernel typing did not execute in local shell')
