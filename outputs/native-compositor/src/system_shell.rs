@@ -368,11 +368,20 @@ pub fn is_bar(state: &Smallvil, surface: &WlSurface) -> bool {has_namespace(stat
 /// Deliberate native/assistive invocation of the host monitor, independent of
 /// activation tokens that an AT-SPI action does not carry. No arbitrary target.
 pub fn present_monitor(state: &mut Smallvil, peer: Option<u32>) -> Result<(), String> {
+    present_control(state,peer,"agentos.monitor")
+}
+pub fn present_terminal(state:&mut Smallvil,peer:Option<u32>,identity:&str)->Result<(),String> {
+    if !identity.strip_prefix("agentos.local-terminal.").is_some_and(|suffix|suffix.len()==32 && suffix.bytes().all(|c|c.is_ascii_hexdigit())) {
+        return Err("Native terminal identity required".into());
+    }
+    present_control(state,peer,identity)
+}
+fn present_control(state: &mut Smallvil, peer: Option<u32>, identity: &str) -> Result<(), String> {
     trusted_renderer(state,peer)?;
     let window=state.space.elements().find(|window| {
         let surface=window.toplevel().unwrap().wl_surface();
         let host=surface.client().and_then(|client|client.get_data::<ClientState>().map(|data|data.system_shell)).unwrap_or(false);
-        host && with_states(surface,|states|states.data_map.get::<smithay::wayland::shell::xdg::XdgToplevelSurfaceData>().unwrap().lock().unwrap().app_id.as_deref()==Some("agentos.monitor"))
+        host && with_states(surface,|states|states.data_map.get::<smithay::wayland::shell::xdg::XdgToplevelSurfaceData>().unwrap().lock().unwrap().app_id.as_deref()==Some(identity))
     }).cloned().ok_or("Monitor unavailable")?;
     state.space.raise_element(&window,true);
     let surface=window.toplevel().unwrap().wl_surface().clone();

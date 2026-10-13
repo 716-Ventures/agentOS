@@ -18,9 +18,11 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
         )
     };
     let heading_size = (36.0 * scale.clamp(1.0, 3.0)).min(48.0);
+    let terminal_bg=if light {"#ffffff"}else{"#11171d"};
     let css = format!(
         r#"
     window.seven-ui {{ background: {bg}; color: {fg}; font-family: Commissioner, Inter, sans-serif; font-size: {font_size}px; border-radius: 12px; }}
+    window.seven-ui .local-terminal-console {{ background: {terminal_bg}; }}
     window.seven-ui decoration {{ border-radius: 12px; border: none; box-shadow: 0 12px 30px rgba(0,0,0,0.28); }}
     window.seven-ui:backdrop decoration {{ box-shadow: 0 6px 16px rgba(0,0,0,0.16); }}
     window.seven-ui headerbar {{ background: {bg}; background-image: none; color: {fg}; min-height: 38px; padding: 0 12px; border: none; border-bottom: 1px solid {line}; box-shadow: none; border-radius: 12px 12px 0 0; }}
@@ -108,6 +110,7 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
         );
         *slot.borrow_mut() = Some(provider);
     });
+    local_terminal::apply_theme(light,scale);
 }
 /// The licensed face is embedded so the approved desktop does not depend on a network.
 pub fn register_font() {

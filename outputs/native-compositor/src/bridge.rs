@@ -405,10 +405,9 @@ impl Bridge {
                             });
                             place_new_views(&mut doc, primary_id, primary_area, surfaces);
                             for surface in controls {
-                                let welcome=observed.windows.iter().any(|window|window.app_id=="agentos.welcome" && identities.get(&window.id)==Some(&surface));
-                                if welcome {place_control(&mut doc,primary_id,primary_area,surface,(560,320));}
-                                else if observed.windows.iter().any(|window|window.app_id=="agentos.settings" && identities.get(&window.id)==Some(&surface)) {place_control(&mut doc,primary_id,primary_area,surface,(760,540));}
-                                else {place_controls(&mut doc,primary_id,primary_area,vec![surface]);}
+                                if let Some(size)=observed.windows.iter().find(|window|identities.get(&window.id)==Some(&surface)).and_then(control_size) {
+                                    place_control(&mut doc,primary_id,primary_area,surface,size);
+                                }
                             }
                             counter += 1;
                             if let Err(error) =
@@ -742,6 +741,7 @@ fn system_floating(window: &Observed) -> bool {control_size(window).is_some()}
 pub fn control_size(window: &Observed) -> Option<(i32,i32)> {
     if system_monitor(window) {return Some((920,680));}
     if !window.system_control {return None;}
+    if window.app_id.starts_with("agentos.local-terminal."){return Some((880,560));}
     match window.app_id.as_str() {
         "agentos.welcome" => Some((560,320)),
         "agentos.settings" => Some((760,540)),
@@ -757,11 +757,6 @@ pub fn initial_control_geometry(window: &Observed, area: Rect) -> Option<Rect> {
 
 /// A host-authenticated monitor opens over existing work. This preference is
 /// applied once; subsequent human placement and saved workspace state win.
-fn place_controls(doc: &mut Value, output: &str, area: Rect, surfaces: Vec<String>) {
-    for surface in surfaces {
-        place_control(doc,output,area,surface,(920,680));
-    }
-}
 fn place_control(doc:&mut Value,output:&str,area:Rect,surface:String,size:(i32,i32)) {
         let width=area.width.min(size.0).max(1); let height=area.height.min(size.1).max(1);
         doc["outputs"][output]["floating"].as_array_mut().unwrap().push(json!({
@@ -1101,7 +1096,7 @@ mod tests {
         let area=Rect{x:0,y:49,width:1280,height:751};
         let mut doc=json!({"outputs":{"head":{"tiles":{"kind":"leaf","surface_id":"work"},"floating":[],"maximized":null}},"constraints":[],"focus":{"surface_id":"work"}});
         let tiles=doc["outputs"]["head"]["tiles"].clone();
-        place_controls(&mut doc,"head",area,vec!["monitor".into()]);
+        place_control(&mut doc,"head",area,"monitor".into(),(920,680));
         assert_eq!(doc["outputs"]["head"]["tiles"],tiles);
         assert_eq!(doc["focus"]["surface_id"],"work");
         assert_eq!(doc["outputs"]["head"]["floating"][0]["width"],920);
@@ -1113,6 +1108,8 @@ mod tests {
         window.system_control=true;assert!(system_floating(&window));
         assert_eq!(initial_control_geometry(&window,area),Some(Rect{x:260,y:154,width:760,height:540}));
         assert_eq!(initial_control_geometry(&window,Rect{x:-800,y:51,width:640,height:400}),Some(Rect{x:-800,y:51,width:640,height:400}));
+        window.app_id="agentos.local-terminal.00000000000000000000000000000001".into();window.system_control=false;
+        assert!(control_size(&window).is_none());window.system_control=true;assert_eq!(control_size(&window),Some((880,560)));
     }
     #[test]
     fn new_windows_remain_manageable_in_manually_constrained_workspaces() {

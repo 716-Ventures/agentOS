@@ -85,6 +85,9 @@ pub struct Frame {
     pub connected: bool,
     pub error: Option<String>,
     pub local_validation: Option<super::action_parameters::LocalFeedback>,
+    pub local_terminal_requests: u64,
+    pub setup_requests: u64,
+    pub navigation_sequence: u64,
 }
 #[derive(Debug)]
 pub enum Command {
@@ -114,6 +117,7 @@ pub enum Command {
     },
     OpenTerminal,
     PresentMonitor,
+    PresentTerminal(String),
     ImportDocument {
         activity: Option<String>,
         path: PathBuf,
@@ -349,7 +353,8 @@ fn run(
                     }));
                     continue;
                 }
-                let feedback_only=matches!(&command,Command::ClearFieldFeedback{..}|Command::PresentMonitor);
+                let feedback_only=matches!(&command,Command::ClearFieldFeedback{..}|Command::PresentMonitor|Command::PresentTerminal(_));
+                let navigation=matches!(&command,Command::CreateDocument|Command::ImportDocument{..});
                 let submitted_request = matches!(&command, Command::Ask {..});
                 let result=match command {
                     Command::Approve(_)|Command::ReviewInput{..}=>unreachable!(),
@@ -366,11 +371,22 @@ fn run(
                             result
                         } else {Ok(Value::Null)}
                     },
+                    Command::PresentTerminal(identity)=>{
+                        if let Some(path)=std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET") {
+                            let path=PathBuf::from(path);let mut result=Err("Terminal unavailable".into());
+                            for _ in 0..40 {
+                                result=request(&path,&json!({"op":"terminal.present","app_id":identity}));
+                                if result.is_ok() || stop.load(Ordering::Relaxed){break;}
+                                thread::sleep(Duration::from_millis(25));
+                            }
+                            result
+                        }else{Ok(Value::Null)}
+                    },
                     Command::Resume(job)=>super::broker_controls::job_id(&job).and_then(|id|request(&broker_socket(),&json!({"op":"poll","job_id":id}))).and_then(|current|super::broker_controls::continuation_request(&current).ok_or("No approved agent request is associated with this work".into())).and_then(|query|request(&socket,&query)),
                     Command::Attach(job)=>super::broker_controls::attach(&job),
                     Command::EmbedTerminal(job)=>{let current=frame.lock().unwrap().clone();embed_terminal(&socket,&current,&job)},
                     Command::ReleaseImage{activity,reference}=>request(&socket,&json!({"op":"resource.release","activity_id":activity,"reference":reference})),
-                    Command::OpenTerminal=>super::broker_controls::open_terminal(),
+                    Command::OpenTerminal=>{let mut current=frame.lock().unwrap();current.local_terminal_requests=current.local_terminal_requests.saturating_add(1);Ok(json!({"status":"Opening terminal…"}))},
                     Command::ReconnectWindow{missing,live,missing_revision,live_revision}=>reconnect_window(&socket,&missing,&live,missing_revision,live_revision),
                     Command::Navigate{surface,element,revision}=>{let current=frame.lock().unwrap().clone();navigate(&socket,&current,&surface,&element,revision).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt})},
                     Command::WorkspaceEdit{workspace,revision,edit}=>request(&socket,&json!({"op":"presentation.apply","protocol":"agentos.presentation/1","catalog_revision":"native-core/1","request_id":format!("workspace-{}",super::nonce()),"expected_revisions":{workspace.clone():revision},"operations":[{"op":"workspace.edit","workspace_id":workspace,"edit":edit}]})).map(|receipt|{frame.lock().unwrap().workspace_undo=receipt["event_cursor"].as_i64();receipt}),
@@ -385,7 +401,7 @@ fn run(
                     Command::ResolveReviewedDraft{surface,element,revision,draft_revision,text}=>resolve_draft(&socket,&surface,&element,true,revision,Some((draft_revision,text)),&drafts),
                     Command::ResolveDraft{surface,element,commit,revision}=>resolve_draft(&socket,&surface,&element,commit,revision,None,&drafts),
                     Command::Preferences(value)=>super::preferences::save(&value),
-                    Command::Setup=>std::process::Command::new("weston-terminal").args(["--shell","/usr/local/bin/agent-os-setup"]).spawn().map(|mut child|{std::thread::spawn(move||{let _=child.wait();});json!({"status":"Setup opened"})}).map_err(|e|e.to_string()),
+                    Command::Setup=>{let mut current=frame.lock().unwrap();current.setup_requests=current.setup_requests.saturating_add(1);Ok(json!({"status":"Opening Setup…"}))},
                     Command::SelectActivity(id)=>{activity=Some(id);Ok(json!({"status":"Activity selected"}))},
                     Command::ImportDocument{activity:id,path}=>{
                         let mut current=frame.lock().unwrap().clone();
@@ -500,6 +516,7 @@ fn run(
                 if !feedback_only { match result {
                     Err(e) => view.error = Some(e),
                     Ok(value) => {
+                        if navigation && value["status"]=="committed" {view.navigation_sequence=view.navigation_sequence.saturating_add(1);}
                         if submitted_request { view.submitted_request = value["id"].as_i64(); }
                         view.error = None;
                         view.notice = Some(
@@ -827,6 +844,9 @@ fn run(
                 next.submitted_request = old.submitted_request;
                 next.inspection = old.inspection.clone();
                 next.notice = old.notice.take();
+                next.local_terminal_requests=old.local_terminal_requests;
+                next.setup_requests=old.setup_requests;
+                next.navigation_sequence=old.navigation_sequence;
                 *old = next;
             }
             Err(e) => {

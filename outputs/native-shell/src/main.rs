@@ -17,6 +17,7 @@ mod input_context;
 mod interaction_lease;
 mod job_list;
 mod log_view;
+mod local_terminal;
 mod preferences;
 mod presentation_pages;
 mod pty_transport;
@@ -1591,6 +1592,9 @@ fn main() {
         let mut fixture_selected = false;
         let mut launcher_sequence = 0;
         let mut keyboard_sequence = 0;
+        let mut terminal_requests = 0;
+        let mut setup_requests = 0;
+        let mut navigation_sequence = 0;
         let mut bar_captured = false;
         let mut launcher_captured = false;
         let mut restoration_captured = false;
@@ -1638,6 +1642,24 @@ fn main() {
                 if *observed!=projected_frame {projected_frame=observed.clone();}
                 &projected_frame
             };
+            for (requested,handled,setup) in [(frame.local_terminal_requests,&mut terminal_requests,false),(frame.setup_requests,&mut setup_requests,true)] {
+                for _ in 0..requested.saturating_sub(*handled).min(4) {
+                    *handled+=1;
+                    let launcher=main.downgrade();let state=backend.frame.clone();let commands=backend.commands.clone();
+                    local_terminal::open(&application,setup,move |result| match result {
+                        Ok(identity)=>{
+                            {let mut frame=state.lock().unwrap();frame.error=None;frame.notice=Some(if setup {"Setup opened"}else{"Local terminal opened"}.into());}
+                            if let Some(window)=launcher.upgrade(){if trusted && window.is_visible(){window.close();}}
+                            let _=commands.send(Command::PresentTerminal(identity));
+                        },
+                        Err(error)=>state.lock().unwrap().error=Some(format!("Could not open terminal: {error}")),
+                    });
+                }
+            }
+            if frame.navigation_sequence!=navigation_sequence {
+                navigation_sequence=frame.navigation_sequence;
+                if trusted && main.is_visible(){main.close();}
+            }
             if let Ok(now) = glib::DateTime::now_local() {
                 if let Ok(text) = now.format("%a %e %b · %H:%M") {
                     if clock.text().as_str()!=text.as_str() {clock.set_text(&text);}

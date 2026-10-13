@@ -140,6 +140,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let response=match system_shell::present_monitor(&mut data.state,req.peer_pid) {Ok(())=>serde_json::json!({"ok":true,"result":{}}),Err(error)=>serde_json::json!({"ok":false,"error":error})};
                     let _=req.reply.try_send(response);continue;
                 }
+                if req.value["op"]=="terminal.present" {
+                    let response=match system_shell::present_terminal(&mut data.state,req.peer_pid,req.value["app_id"].as_str().unwrap_or("")) {Ok(())=>serde_json::json!({"ok":true,"result":{}}),Err(error)=>serde_json::json!({"ok":false,"error":error})};
+                    let _=req.reply.try_send(response);continue;
+                }
                 if matches!(req.value["op"].as_str(), Some("keyboard.stroke" | "keyboard.restore_focus" | "display.zoom")) {
                     let response = shell_keyboard::handle(&mut data.state, req.peer_pid, &req.value);
                     let _ = req.reply.try_send(response);

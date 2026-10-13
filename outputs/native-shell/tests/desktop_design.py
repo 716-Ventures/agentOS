@@ -39,7 +39,7 @@ def reap(proc):
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--appearance',choices=['dark','light'],default='dark');args=parser.parse_args()
     output=ROOT/'test-output'/('desktop-design-'+args.appearance);output.mkdir(parents=True,exist_ok=True)
-    for name in ('monitor.png','system-bar.png','launcher.png','settings.png','desktop.png','scene.json'):(output/name).unlink(missing_ok=True)
+    for name in ('monitor.png','system-bar.png','launcher.png','settings.png','terminal.png','terminal.json','desktop.png','scene.json'):(output/name).unlink(missing_ok=True)
     desktop_session.enable_subreaper()
     with tempfile.TemporaryDirectory(prefix='agentos-desktop-design-') as directory, (output/'session.log').open('w') as log:
         root=Path(directory);config=root/'config/agent-os';config.mkdir(parents=True)
@@ -49,6 +49,7 @@ def main():
         env={**os.environ,'HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':str(config.parent),'XDG_STATE_HOME':str(state.parent),'AGENT_OS_STATE':str(root/'core-state'),'AGENT_OS_SOCKET':str(endpoint),'AGENT_OS_COMPOSITOR_CORE':str(endpoint),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),'AGENT_OS_BROKER_SOCKET':str(root/'absent-broker.sock'),'AGENT_OS_MODEL_USAGE':str(root/'absent-usage.json'),'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','GDK_BACKEND':'wayland','GTK_A11Y':'atspi','G_DEBUG':'fatal-criticals','WINIT_UNIX_BACKEND':'wayland','AGENT_OS_COMPOSITOR_BACKEND':'winit','AGENT_OS_SYSTEM_BAR_CAPTURE':str(output/'system-bar.png'),'AGENT_OS_LAUNCHER_CAPTURE':str(output/'launcher.png'),'AGENT_OS_MONITOR_CAPTURE':str(output/'monitor.png'),'AGENT_OS_SETTINGS_CAPTURE':str(output/'settings.png')}
         env.pop('WAYLAND_DISPLAY',None);env.pop('DISPLAY',None)
         env['WAYLAND_DEBUG']='client' # Private fixture: inspect initial configure sizes.
+        env.update(AGENT_OS_LOCAL_TERMINAL_VERIFY='1',AGENT_OS_LOCAL_TERMINAL_CAPTURE=str(output/'terminal.png'),AGENT_OS_LOCAL_TERMINAL_OBSERVATION=str(output/'terminal.json'))
         core=weston=None;owned=None
         try:
             core=subprocess.Popen([str(SHELL/'target/release/agent-os-core')],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
@@ -128,11 +129,37 @@ def main():
             accessibility.activate(accessibility.find('Open launcher',pyatspi.ROLE_PUSH_BUTTON))
             accessibility.wait(lambda:any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in scene()['system_layers']),'Launcher did not reopen')
             assert accessibility.text(accessibility.find('Ask Agent',pyatspi.ROLE_TEXT))=='Keep this unsent request λ'
+            accessibility.activate(accessibility.find('Open terminal',pyatspi.ROLE_PUSH_BUTTON))
+            def terminal_ready():
+                observed=scene()
+                terminal=next((w for w in observed['windows'] if w['app_id'].startswith('agentos.local-terminal.')),None)
+                return terminal if terminal and observed['seat_focus']==terminal['id'] and not any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in observed['system_layers']) else None
+            accessibility.wait(terminal_ready,'Native terminal did not open and replace launcher focus')
+            terminal_window=terminal_ready()
+            terminal=accessibility.find('Local terminal',pyatspi.ROLE_TERMINAL)
+            accessibility.wait(lambda:'native-terminal-λ' in accessibility.text(terminal).splitlines(),'Native PTY did not execute the exact Unicode verification line')
+            accessibility.wait(lambda:(output/'terminal.png').exists(),'Native terminal did not paint')
+            terminal_geometry=terminal_ready()['geometry']
+            assert [terminal_geometry['width'],terminal_geometry['height']]==[880,560],terminal_geometry
+            child=json.loads((output/'terminal.json').read_text())['pid']
+            terminal_frame=accessibility.find('Terminal',pyatspi.ROLE_FRAME)
+            accessibility.activate(accessibility.find('Close window',pyatspi.ROLE_PUSH_BUTTON,root=terminal_frame))
+            accessibility.wait(lambda:not Path(f'/proc/{child}').exists(),'Closing native terminal leaked its shell child')
+            with socket.socket(socket.AF_UNIX) as connection:
+                connection.connect(str(control));connection.sendall(json.dumps({'op':'terminal.present','app_id':terminal_window['app_id']}).encode()+b'\n')
+                denied=json.loads(connection.makefile('rb').readline())
+                assert not denied['ok'],'Same-user process gained native terminal focus authority'
+            accessibility.activate(accessibility.find('Open launcher',pyatspi.ROLE_PUSH_BUTTON))
+            assert accessibility.text(accessibility.find('Ask Agent',pyatspi.ROLE_TEXT))=='Keep this unsent request λ'
+            accessibility.activate(accessibility.find('New document',pyatspi.ROLE_PUSH_BUTTON))
+            accessibility.wait(lambda:not any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in scene()['system_layers']),'Successful document creation left the launcher covering work')
+            accessibility.wait(lambda:any(w['app_id'].startswith('agentos.surface.document-') and scene()['seat_focus']==w['id'] for w in scene()['windows']),'New document did not receive focus')
+            accessibility.activate(accessibility.find('Open launcher',pyatspi.ROLE_PUSH_BUTTON))
             accessibility.activate(accessibility.find('Close launcher',pyatspi.ROLE_PUSH_BUTTON))
             assert call(endpoint,{'op':'snapshot'})['jobs']==[], 'Rendering or composing started work'
             log.flush()
             trace=(output/'session.log').read_text()
-            for app_id,expected in [('agentos.welcome',(560,320)),('agentos.settings',(760,540)),('agentos.monitor',(920,680))]:
+            for app_id,expected in [('agentos.welcome',(560,320)),('agentos.settings',(760,540)),('agentos.monitor',(920,680)),(terminal_window['app_id'],(880,560))]:
                 named=re.search(r'xdg_toplevel[#@](\d+)\.set_app_id\("'+re.escape(app_id)+r'"\)',trace)
                 assert named,'Missing control identity: '+app_id
                 identity=named[1]
@@ -155,7 +182,7 @@ def main():
             assert not (state/'setup.json').exists()
 
             (output/'scene.json').write_text(json.dumps(observed,indent=2)+'\n')
-            print('PASS: real wallpaper, transparent bar, floating monitor, work preserved, launcher draft retained, desktop menu works, Welcome dismissal survives restart without completing setup; no model requests')
+            print('PASS: composed desktop, settings and menu; native VTE Unicode output, child cleanup and guarded focus; successful actions dismiss launcher and preserve drafts; Welcome dismissal survives restart without completing setup; no model requests')
         finally:
             if owned and owned[1]:desktop_session.stop_compositor(root,owned)
             reap(weston);reap(core);desktop_session.reap_session_children()
