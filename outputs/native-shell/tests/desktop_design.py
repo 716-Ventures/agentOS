@@ -37,8 +37,7 @@ def reap(proc):
         except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait(timeout=5)
 
 def local_bounds(node,frame):
-    # GTK 4.14 includes the CSD inset in WINDOW_COORDS; newer GTK reports
-    # content-relative coordinates. Both widgets share the frame's origin.
+    # Normalize both widgets against the same accessible frame origin.
     bounds=node.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
     origin=frame.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
     return (bounds.x-origin.x,bounds.y-origin.y,bounds.width,bounds.height)
@@ -90,7 +89,11 @@ def main():
             assert not action.parent.getState().contains(pyatspi.STATE_FOCUSABLE),'Welcome layout wrapper adds a focus stop'
             if args.initial_text_scale==3:
                 for label in ['Continue to desktop','Open setup']:
-                    bounds=local_bounds(accessibility.find(label,pyatspi.ROLE_PUSH_BUTTON,root=welcome),welcome)
+                    # GTK 4.14 reports a padded GtkButton's content origin with its
+                    # border size. Each Welcome button fills its unpadded native
+                    # FlowBox group, whose bounds describe the actual allocation.
+                    button=accessibility.find(label,pyatspi.ROLE_PUSH_BUTTON,root=welcome)
+                    bounds=local_bounds(button.parent,welcome)
                     assert within(bounds,actual),('Welcome action outside viewport',label,bounds,actual)
             accessibility.activate(action)
             accessibility.wait(lambda:(state/'welcome.json').exists(),'Welcome dismissal was not persisted')
@@ -110,7 +113,7 @@ def main():
                 accessibility.activate(accessibility.find(category,pyatspi.ROLE_TOGGLE_BUTTON,root=settings))
                 if category=='Setup' and args.initial_text_scale==3:
                     setup=accessibility.find('Open setup…',pyatspi.ROLE_PUSH_BUTTON,root=settings)
-                    bounds=local_bounds(setup,settings)
+                    bounds=local_bounds(setup.parent,settings)
                     geometry=next(w for w in scene()['windows'] if w['app_id']=='agentos.settings')['geometry']
                     assert within(bounds,geometry),('Setup action outside viewport',bounds,geometry)
                 try:accessibility.find(field_name,pyatspi.ROLE_COMBO_BOX if field_name in ('Current activity','Appearance') else None,root=settings)
@@ -207,7 +210,7 @@ def main():
             accessibility.wait(lambda:(output/'terminal-close.png').exists(),'Close guard did not paint')
             assert terminal_ready()['geometry']==original_geometry,'Close confirmation changed terminal geometry'
             for name in ['Cancel','Close terminal']:
-                bounds=local_bounds(accessibility.find(name,pyatspi.ROLE_PUSH_BUTTON,root=terminal_frame),terminal_frame)
+                bounds=local_bounds(accessibility.find(name,pyatspi.ROLE_PUSH_BUTTON,root=terminal_frame).parent,terminal_frame)
                 assert within(bounds,original_geometry),('Close action outside viewport',name,bounds,original_geometry)
             accessibility.activate(cancel)
             accessibility.wait(lambda:accessibility.find('Local terminal',pyatspi.ROLE_TERMINAL).getState().contains(pyatspi.STATE_FOCUSED),'Cancel did not restore terminal focus')
@@ -242,7 +245,12 @@ def main():
                 created=list(re.finditer(r'get_toplevel\(new id xdg_toplevel[#@]'+identity+r'\)',trace[:named.start()]))[-1]
                 configured=re.findall(r'xdg_toplevel[#@]'+identity+r'\.configure\((\d+), (\d+),',trace[created.end():])
                 first=next((tuple(map(int,size)) for size in configured if all(int(v)>0 for v in size)),None)
-                assert first==expected,('Desktop control opened at the wrong size',app_id,first,expected)
+                acceptable=[expected]
+                if app_id=='agentos.welcome' and args.initial_text_scale==3:
+                    # GTK can disclose the larger minimum before or after the
+                    # initial configure. Both are deliberate floating sizes.
+                    acceptable.append((actual['width'],actual['height']))
+                assert first in acceptable,('Desktop control opened at the wrong size',app_id,first,acceptable)
             # Restart the private desktop against the same user state. Dismissal
             # must survive without writing setup completion or affecting drafts.
             desktop_session.stop_compositor(root,owned);owned=None
