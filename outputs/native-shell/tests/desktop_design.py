@@ -38,14 +38,14 @@ def reap(proc):
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--appearance',choices=['dark','light'],default='dark');args=parser.parse_args()
     output=ROOT/'test-output'/('desktop-design-'+args.appearance);output.mkdir(parents=True,exist_ok=True)
-    for name in ('monitor.png','system-bar.png','launcher.png','desktop.png','scene.json'):(output/name).unlink(missing_ok=True)
+    for name in ('monitor.png','system-bar.png','launcher.png','settings.png','desktop.png','scene.json'):(output/name).unlink(missing_ok=True)
     desktop_session.enable_subreaper()
     with tempfile.TemporaryDirectory(prefix='agentos-desktop-design-') as directory, (output/'session.log').open('w') as log:
         root=Path(directory);config=root/'config/agent-os';config.mkdir(parents=True)
         (config/'desktop.json').write_text(json.dumps({'appearance':args.appearance,'text_scale':1.0,'reduced_motion':True}))
         state=root/'user-state/agent-os';state.mkdir(parents=True)
         endpoint=root/'core.sock';pidfile=root/'compositor.pid'
-        env={**os.environ,'HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':str(config.parent),'XDG_STATE_HOME':str(state.parent),'AGENT_OS_STATE':str(root/'core-state'),'AGENT_OS_SOCKET':str(endpoint),'AGENT_OS_COMPOSITOR_CORE':str(endpoint),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),'AGENT_OS_BROKER_SOCKET':str(root/'absent-broker.sock'),'AGENT_OS_MODEL_USAGE':str(root/'absent-usage.json'),'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','GDK_BACKEND':'wayland','GTK_A11Y':'atspi','G_DEBUG':'fatal-criticals','WINIT_UNIX_BACKEND':'wayland','AGENT_OS_COMPOSITOR_BACKEND':'winit','AGENT_OS_SYSTEM_BAR_CAPTURE':str(output/'system-bar.png'),'AGENT_OS_LAUNCHER_CAPTURE':str(output/'launcher.png'),'AGENT_OS_MONITOR_CAPTURE':str(output/'monitor.png')}
+        env={**os.environ,'HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':str(config.parent),'XDG_STATE_HOME':str(state.parent),'AGENT_OS_STATE':str(root/'core-state'),'AGENT_OS_SOCKET':str(endpoint),'AGENT_OS_COMPOSITOR_CORE':str(endpoint),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),'AGENT_OS_BROKER_SOCKET':str(root/'absent-broker.sock'),'AGENT_OS_MODEL_USAGE':str(root/'absent-usage.json'),'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','GDK_BACKEND':'wayland','GTK_A11Y':'atspi','G_DEBUG':'fatal-criticals','WINIT_UNIX_BACKEND':'wayland','AGENT_OS_COMPOSITOR_BACKEND':'winit','AGENT_OS_SYSTEM_BAR_CAPTURE':str(output/'system-bar.png'),'AGENT_OS_LAUNCHER_CAPTURE':str(output/'launcher.png'),'AGENT_OS_MONITOR_CAPTURE':str(output/'monitor.png'),'AGENT_OS_SETTINGS_CAPTURE':str(output/'settings.png')}
         env.pop('WAYLAND_DISPLAY',None);env.pop('DISPLAY',None)
         core=weston=None;owned=None
         try:
@@ -74,6 +74,31 @@ def main():
             accessibility.activate(accessibility.find('Open launcher',pyatspi.ROLE_PUSH_BUTTON))
             accessibility.wait(lambda:any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in scene()['system_layers']),'Desktop menu did not open launcher')
             accessibility.activate(accessibility.find('Close launcher',pyatspi.ROLE_PUSH_BUTTON))
+
+            accessibility.activate(accessibility.find('Desktop menu',pyatspi.ROLE_TOGGLE_BUTTON))
+            accessibility.activate(accessibility.find('Desktop settings…',pyatspi.ROLE_PUSH_BUTTON))
+            accessibility.wait(lambda:any(w['app_id']=='agentos.settings' for w in scene()['windows']),'Desktop settings did not map')
+            accessibility.wait(lambda:(output/'settings.png').exists(),'Settings capture missing')
+            settings=accessibility.find('Desktop settings',pyatspi.ROLE_FRAME)
+            for category,field_name in [('Activities','Current activity'),('Workspace','Arrange workspace'),('Accessibility','Show on-screen keyboard'),('Storage','Stored images'),('Setup','Setup network, audio and providers'),('Appearance','Appearance')]:
+                accessibility.activate(accessibility.find(category,pyatspi.ROLE_TOGGLE_BUTTON,root=settings))
+                try:accessibility.find(field_name,pyatspi.ROLE_COMBO_BOX if field_name in ('Current activity','Appearance') else None,root=settings)
+                except AssertionError:
+                    from collections import deque
+                    queue=deque([settings]);rows=[]
+                    while queue and len(rows)<120:
+                        node=queue.popleft()
+                        if node is None:continue
+                        try:rows.append([node.name,node.getRoleName()]);queue.extend(node[i] for i in range(min(node.childCount,40)))
+                        except (RuntimeError,LookupError):pass
+                    print('Settings category failure',category,rows,flush=True);raise
+            size=accessibility.find('Text scale',pyatspi.ROLE_SPIN_BUTTON,root=settings)
+            size.queryValue().currentValue=125.0
+            accessibility.wait(lambda:json.loads((config/'desktop.json').read_text())['text_scale']==1.25,'Text percentage did not persist as a scale factor')
+            size.queryValue().currentValue=100.0
+            accessibility.wait(lambda:json.loads((config/'desktop.json').read_text())['text_scale']==1.0,'Text size did not restore')
+            accessibility.activate(accessibility.find('Close window',pyatspi.ROLE_PUSH_BUTTON,root=settings))
+            accessibility.wait(lambda:not any(w['app_id']=='agentos.settings' for w in scene()['windows']),'Desktop settings did not close')
 
             accessibility.activate(accessibility.find('Agents',pyatspi.ROLE_PUSH_BUTTON))
             accessibility.wait(lambda:output.joinpath('monitor.png').exists(),'Monitor did not paint')

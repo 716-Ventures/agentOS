@@ -407,6 +407,7 @@ impl Bridge {
                             for surface in controls {
                                 let welcome=observed.windows.iter().any(|window|window.app_id=="agentos.welcome" && identities.get(&window.id)==Some(&surface));
                                 if welcome {place_control(&mut doc,primary_id,primary_area,surface,(560,320));}
+                                else if observed.windows.iter().any(|window|window.app_id=="agentos.settings" && identities.get(&window.id)==Some(&surface)) {place_control(&mut doc,primary_id,primary_area,surface,(760,540));}
                                 else {place_controls(&mut doc,primary_id,primary_area,vec![surface]);}
                             }
                             counter += 1;
@@ -736,13 +737,13 @@ fn placed_surfaces(state: &Value) -> BTreeSet<String> {
 // Preserve every existing placement when a human has constrained the workspace.
 // New windows still need durable geometry so they can be focused and managed.
 fn system_monitor(window: &Observed) -> bool {window.system_control && window.app_id=="agentos.monitor"}
-fn system_floating(window: &Observed) -> bool {system_monitor(window) || (window.system_control && window.app_id=="agentos.welcome") }
+fn system_floating(window: &Observed) -> bool {system_monitor(window) || (window.system_control && matches!(window.app_id.as_str(),"agentos.welcome"|"agentos.settings")) }
 
 /// A host-authenticated monitor opens over existing work. This preference is
 /// applied once; subsequent human placement and saved workspace state win.
 fn place_controls(doc: &mut Value, output: &str, area: Rect, surfaces: Vec<String>) {
     for surface in surfaces {
-        place_control(doc,output,area,surface,(920,755));
+        place_control(doc,output,area,surface,(920,680));
     }
 }
 fn place_control(doc:&mut Value,output:&str,area:Rect,surface:String,size:(i32,i32)) {
@@ -1088,9 +1089,11 @@ mod tests {
         assert_eq!(doc["outputs"]["head"]["tiles"],tiles);
         assert_eq!(doc["focus"]["surface_id"],"work");
         assert_eq!(doc["outputs"]["head"]["floating"][0]["width"],920);
-        assert_eq!(doc["outputs"]["head"]["floating"][0]["height"],751);
+        assert_eq!(doc["outputs"]["head"]["floating"][0]["height"],680);
         let mut window=Observed{id:"w".into(),title:"Agent Monitor".into(),app_id:"agentos.monitor".into(),uid:1000,session:"test".into(),system_control:false,min_width:80,min_height:32};
         assert!(!system_monitor(&window));window.system_control=true;assert!(system_monitor(&window));
+        window.app_id="agentos.settings".into();window.system_control=false;assert!(!system_floating(&window));
+        window.system_control=true;assert!(system_floating(&window));
     }
     #[test]
     fn new_windows_remain_manageable_in_manually_constrained_workspaces() {

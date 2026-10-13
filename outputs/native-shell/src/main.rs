@@ -4,6 +4,7 @@ mod broker_controls;
 mod broker_pages;
 mod controls;
 mod desktop_theme;
+mod desktop_settings;
 mod agent_monitor;
 mod wallpaper;
 mod document_dialog;
@@ -1549,6 +1550,10 @@ fn main() {
                 button.connect_clicked(move |_| {if let Some(popover)=popup.upgrade(){popover.popdown();}let _=sender.send(command());});
                 menu.append(&button);
             }
+            let preferences=ui::button("Desktop settings…",ButtonVariant::Ghost,false);
+            let settings=controls.clone();let popup=popover.downgrade();
+            preferences.connect_clicked(move |_| {if let Some(popover)=popup.upgrade(){popover.popdown();}settings.borrow().present_settings();});
+            menu.append(&preferences);
             popover.set_child(Some(&menu));desktop_menu.set_popover(Some(&popover));
             let keyboard = match screen_keyboard::Keyboard::new(app) {
                 Ok(keyboard) => Rc::new(keyboard),
@@ -1560,6 +1565,11 @@ fn main() {
             let keys = keyboard.clone();toggle.connect_clicked(move |_|keys.toggle());
             controls.borrow().monitor_content.prepend(&toggle);
             controls.borrow().monitor_content.prepend(&keyboard.zoom_controls());
+            controls.borrow().append_setting("Appearance",&keyboard.additional_zoom_controls());
+            let show_keyboard=ui::button("Show on-screen keyboard",ButtonVariant::Outline,false);
+            show_keyboard.set_halign(gtk::Align::Start);
+            let keys=keyboard.clone();show_keyboard.connect_clicked(move |_|keys.toggle());
+            controls.borrow().append_setting("Accessibility",&show_keyboard);
             screen_keyboard = Some(keyboard);
             window.present();
             bar_window = Some(window);

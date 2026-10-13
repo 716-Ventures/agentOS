@@ -15,7 +15,7 @@ impl ImageControls {
         content.append(&notice);
         let model = gtk::StringList::new(&[]);
         let chooser = gtk::DropDown::new(Some(model.clone()), gtk::Expression::NONE);
-        chooser.update_property(&[gtk::accessible::Property::Label("Stored image")]);
+        desktop_theme::name_dropdown(&chooser,"Stored image");
         content.append(&chooser);
         let remove = ui::button("Remove unused stored image", ButtonVariant::Outline, false);
         content.append(&remove);

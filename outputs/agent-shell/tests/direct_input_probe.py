@@ -225,6 +225,8 @@ def assistive():
                 if request!='open-monitor':
                     section=find('Desktop controls',None)
                     if not section.getState().contains(pyatspi.STATE_EXPANDED):section.queryAction().doAction(0)
+                    find('Desktop settings…',pyatspi.ROLE_PUSH_BUTTON).queryAction().doAction(0)
+                    find('Workspace',pyatspi.ROLE_TOGGLE_BUTTON).queryAction().doAction(0)
                 control=find('Agents' if request=='open-monitor' else 'Arrange workspace',pyatspi.ROLE_PUSH_BUTTON if request=='open-monitor' else None)
                 response={'expanded':control.getState().contains(pyatspi.STATE_EXPANDED)}
                 if request!='arrange-status':response['requested']=control.queryAction().doAction(0)

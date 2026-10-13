@@ -24,6 +24,7 @@ pub struct Controls {
     monitor: gtk::ApplicationWindow,
     pub monitor_content: gtk::Box,
     pub monitor_actions: gtk::Box,
+    settings: desktop_settings::Settings,
     jobs: super::job_list::JobList,
     agents: super::agent_monitor::Monitor,
     history: gtk::Expander,
@@ -75,6 +76,7 @@ impl Controls {
         setup.connect_clicked(move |_| {
             let _ = sender.send(Command::Setup);
         });
+        setup.set_widget_name("desktop-setup");
         widget.append(&setup);
         let terminal = ui::button("Open terminal", ButtonVariant::Outline, false);
         let sender = commands.clone();
@@ -90,26 +92,29 @@ impl Controls {
         widget.append(&new_document);
         let import_document = ui::button("Import text file…", ButtonVariant::Outline, false);
         widget.append(&import_document);
-        let shortcuts=gtk::Expander::builder().label("Desktop keyboard shortcuts").child(&ui::text("Ctrl+Alt+Space: open launcher\nCtrl+Alt+Tab: next view (Shift: previous)\nCtrl+Alt+F10: maximize · F9: restore · F8: float\nCtrl+Alt+Arrow: move · Shift+Arrow: resize\nCtrl+Alt+PageUp/PageDown: pan oversized view (Shift: horizontal)\nCtrl+Alt+Delete: close view · Ctrl+Alt+Z: undo arrangement\nSplit, swap and pin controls are available under Arrange workspace in Agent Monitor.",true)).build();
+        let shortcuts=gtk::Expander::builder().label("Desktop keyboard shortcuts").child(&ui::text("Ctrl+Alt+Space: open launcher\nCtrl+Alt+Tab: next view (Shift: previous)\nCtrl+Alt+F10: maximize · F9: restore · F8: float\nCtrl+Alt+Arrow: move · Shift+Arrow: resize\nCtrl+Alt+PageUp/PageDown: pan oversized view (Shift: horizontal)\nCtrl+Alt+Delete: close view · Ctrl+Alt+Z: undo arrangement\nSplit, swap and pin controls are available under Workspace in Desktop settings.",true)).build();
+        shortcuts.set_widget_name("desktop-shortcuts");
         widget.append(&shortcuts);
         let appearance = gtk::DropDown::from_strings(&["Dark", "Light"]);
-        let scale = gtk::SpinButton::with_range(1.0, 3.0, 0.25);
+        let scale = gtk::SpinButton::with_range(100.0, 300.0, 25.0);
         let preferences = super::preferences::read();
-        scale.set_value(preferences["text_scale"].as_f64().unwrap_or(1.0));
+        scale.set_value(preferences["text_scale"].as_f64().unwrap_or(1.0)*100.0);
+        scale.set_digits(0);
         appearance.set_selected(if preferences["appearance"] == "light" {
             1
         } else {
             0
         });
         let reduced = gtk::CheckButton::with_label("Reduce motion");
-        appearance.update_property(&[gtk::accessible::Property::Label("Appearance")]);
+        desktop_theme::name_dropdown(&appearance,"Appearance");
         scale.update_property(&[gtk::accessible::Property::Label("Text scale")]);
         reduced.set_active(preferences["reduced_motion"] == true);
-        let appearance_row = ui::row(12);
-        appearance_row.append(&appearance);
-        appearance_row.append(&ui::text("Text scale", false));
-        appearance_row.append(&scale);
-        appearance_row.append(&reduced);
+        let appearance_row = ui::column(16);
+        let theme_row=ui::row(12);let label=ui::text("Appearance",false);label.set_hexpand(true);theme_row.append(&label);theme_row.append(&appearance);
+        appearance_row.append(&theme_row);
+        let size_row=ui::row(12);let label=ui::text("Text size",false);label.set_hexpand(true);size_row.append(&label);size_row.append(&scale);size_row.append(&ui::text("%",false));
+        appearance_row.append(&size_row);
+        appearance_row.set_widget_name("desktop-appearance");
         widget.append(&appearance_row);
         let (a, s, r) = (appearance.clone(), scale.clone(), reduced.clone());
         let sender = commands.clone();
@@ -122,11 +127,11 @@ impl Controls {
                     } else {
                         Appearance::Light
                     },
-                    s.value(),
+                    s.value()/100.0,
                     r.is_active(),
                 );
-                desktop_theme::install(&display, a.selected() == 1, s.value());
-                let _=sender.send(Command::Preferences(json!({"appearance":if a.selected()==0{"dark"}else{"light"},"text_scale":s.value(),"reduced_motion":r.is_active()})));
+                desktop_theme::install(&display, a.selected() == 1, s.value()/100.0);
+                let _=sender.send(Command::Preferences(json!({"appearance":if a.selected()==0{"dark"}else{"light"},"text_scale":s.value()/100.0,"reduced_motion":r.is_active()})));
             }
         });
         theme();
@@ -140,7 +145,7 @@ impl Controls {
         let changing = Rc::new(Cell::new(false));
         let chooser_model = gtk::StringList::new(&[]);
         let chooser = gtk::DropDown::new(Some(chooser_model.clone()), gtk::Expression::NONE);
-        chooser.update_property(&[gtk::accessible::Property::Label("Current activity")]);
+        desktop_theme::name_dropdown(&chooser,"Current activity");
         let (ids, changing_now, commands_now) =
             (choices.clone(), changing.clone(), commands.clone());
         chooser.connect_selected_notify(move |control| {
@@ -157,7 +162,8 @@ impl Controls {
         activity_row.set_min_children_per_line(1);
         activity_row.set_column_spacing(12);
         activity_row.set_row_spacing(12);
-        activity_row.insert(&chooser, -1);
+        let current=ui::column(6);current.append(&ui::text("Current activity",false));current.append(&chooser);
+        activity_row.insert(&current,-1);
         let name = TextField::new("New activity", "Activity name", "");
         activity_row.insert(&name.widget, -1);
         let new = ui::button("Create activity", ButtonVariant::Outline, false);
@@ -168,6 +174,7 @@ impl Controls {
                 let _ = commands_now.send(Command::CreateActivity(name.entry.text().into()));
             }
         });
+        activity_row.set_widget_name("desktop-activities");
         widget.append(&activity_row);
         let request = TextField::new("Ask Agent", "Describe the work you want done", "");
         request.widget.add_css_class("launcher-request");
@@ -336,7 +343,13 @@ impl Controls {
         widget.append(&images.widget);
         let workspace = workspace_controls::WorkspaceControls::new(commands.clone());
         monitor_root.append(&workspace.restoration);
-        monitor_content.append(&workspace.widget);
+        let settings=desktop_settings::Settings::new(app);
+        settings.append("Workspace",&workspace.widget);
+        settings.append("Accessibility",&reduced);
+        let preferences=ui::button("Desktop settings…",ButtonVariant::Outline,false);
+        preferences.set_halign(gtk::Align::Start);
+        let target=settings.window.downgrade();preferences.connect_clicked(move |_| {if let Some(window)=target.upgrade(){window.present();}});
+        monitor_content.append(&preferences);
         let jobs = super::job_list::JobList::new(app, &commands);
         history_content.append(&jobs.widget);
         let inspection = gtk::TextView::new();
@@ -462,6 +475,7 @@ impl Controls {
             changing,
             monitor,
             monitor_content,
+            settings,
             monitor_actions,
             agents,
             history,
@@ -838,6 +852,7 @@ impl Controls {
     }
 
     pub fn close(&self) {
+        self.settings.close();
         self.voice.cancel();
     }
     pub fn hide_launcher(&self) {
@@ -851,7 +866,6 @@ impl Controls {
     }
     pub fn focus_request(&self) { self.request_field.entry.grab_focus(); }
     pub fn temporary_launcher(&self) {
-        let settings = ui::column(12);
         let direct = gtk::FlowBox::new();
         direct.add_css_class("launcher-direct");
         direct.set_selection_mode(gtk::SelectionMode::None);
@@ -863,14 +877,16 @@ impl Controls {
             if child == self.request_field.widget.clone().upcast::<gtk::Widget>() { break; }
             self.widget.remove(&child);
             let quick = child.downcast_ref::<gtk::Button>().and_then(|button| button.label()).is_some_and(|label| matches!(label.as_str(), "Open terminal" | "New document" | "Import text file…"));
-            if quick { direct.insert(&child, -1); } else { settings.append(&child); }
+            if quick { direct.insert(&child, -1); } else {
+                let category=match child.widget_name().as_str() {"desktop-appearance"=>"Appearance","desktop-activities"=>"Activities","desktop-shortcuts"=>"Accessibility",_=>"Setup"};
+                self.settings.append(category,&child);
+            }
         }
         self.widget.remove(&self.images.widget);
-        settings.append(&self.images.widget);
+        self.settings.append("Storage",&self.images.widget);
         self.widget.append(&direct);
         self.widget.set_margin_top(16);
-        let section = gtk::Expander::builder().label("Activities, appearance and setup").child(&settings).build();
-        self.monitor_content.append(&section);
+
     }
     /// Opt-in verification capture of the mapped, active restoration controls.
     pub fn capture_output_restoration(&self, path: &str) -> bool {
@@ -880,6 +896,8 @@ impl Controls {
     }
     pub fn preview_size(&self, width: i32, height: i32) { self.monitor.set_default_size(width, height); }
     pub fn capture_monitor(&self, path: &str) -> bool { self.monitor.is_visible() && system_bar::capture(&self.monitor, path) }
+    pub fn present_settings(&self) {self.settings.present();}
+    pub fn append_setting(&self,page:&str,widget:&impl IsA<gtk::Widget>) {self.settings.append(page,widget);}
     pub fn present(&self) {
         self.monitor.present();
         if std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET").is_some() {let _=self.commands.send(Command::PresentMonitor);}

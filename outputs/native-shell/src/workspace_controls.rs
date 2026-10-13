@@ -22,7 +22,7 @@ pub struct WorkspaceControls {
 fn dropdown(label: &str) -> (gtk::DropDown, gtk::StringList) {
     let model = gtk::StringList::new(&[]);
     let control = gtk::DropDown::new(Some(model.clone()), gtk::Expression::NONE);
-    control.update_property(&[gtk::accessible::Property::Label(label)]);
+    desktop_theme::name_dropdown(&control,label);
     (control, model)
 }
 fn spin(label: &str, min: f64, max: f64, step: f64, value: f64) -> gtk::SpinButton {

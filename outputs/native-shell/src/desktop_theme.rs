@@ -36,6 +36,10 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
     window.seven-ui button.outline:active, window.seven-ui button.ghost:active {{ background: {line}; }}
     window.seven-ui button:disabled {{ opacity: 0.45; }}
     window.seven-ui entry {{ background: {panel}; color: {fg}; border: 1px solid {line}; min-height: 1.5em; padding: 0.4em 0.65em; border-radius: 6px; }}
+    window.seven-ui dropdown > button, window.seven-ui spinbutton {{ background: {panel}; color: {fg}; border: 1px solid {line}; border-radius: 6px; background-image: none; }}
+    window.seven-ui spinbutton entry {{ background: transparent; border: none; }}
+    window.seven-ui spinbutton button {{ background: transparent; border: none; padding: 4px 6px; }}
+    window.seven-ui dropdown > button:hover, window.seven-ui spinbutton button:hover {{ background: {selected}; }}
     window.seven-ui entry text placeholder {{ color: {muted}; }}
     window.seven-ui entry:focus-within {{ border-color: #5286b9; outline: 2px solid alpha(#5286b9,0.65); outline-offset: 1px; }}
     window.seven-ui button:focus-visible, window.seven-ui textview:focus-visible {{ outline: 2px solid #5286b9; outline-offset: 2px; }}
@@ -84,6 +88,10 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
     .agentos-launcher .launcher-context, .agentos-launcher .launcher-voice-status {{ color: {muted}; font-size: 0.93em; }}
     .agentos-launcher .launcher-direct {{ margin-top: 12px; padding-top: 12px; border-top: 1px solid {line}; }}
     .agentos-launcher .launcher-request-actions {{ margin-top: 2px; }}
+    window.agentos-settings .settings-navigation {{ background: {panel}; }}
+    window.agentos-settings button.settings-category {{ background: transparent; border: none; color: {fg}; padding: 8px 12px; }}
+    window.agentos-settings button.settings-category:checked {{ background: {selected}; }}
+    window.agentos-settings button.settings-category:hover {{ background: {selected}; }}
     .agentos-monitor .monitor-empty {{ padding: 28px 12px 36px; }}
     "#
     );
@@ -204,4 +212,16 @@ pub fn titlebar(window: &impl IsA<gtk::Window>) {
     }
     header.pack_start(&controls);
     window.set_titlebar(Some(&header));
+}
+
+/// GTK's selected-item label otherwise takes precedence over a field's name.
+/// Keep the authored identity while the trigger still exposes its current value.
+pub fn name_dropdown(control: &gtk::DropDown, name: &str) {
+    fn apply(control: &gtk::DropDown, name: &str) {
+        control.reset_relation(gtk::AccessibleRelation::LabelledBy);
+        control.update_property(&[gtk::accessible::Property::Label(name)]);
+    }
+    apply(control,name);
+    let title=name.to_owned();control.connect_map(move |control|apply(control,&title));
+    let title=name.to_owned();control.connect_selected_notify(move |control|apply(control,&title));
 }

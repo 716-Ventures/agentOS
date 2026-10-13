@@ -103,6 +103,7 @@ pub struct Keyboard {
     zoom_input: Input,
     zoom_controls: gtk::Box,
     zoom_label: gtk::Label,
+    zoom_status: gtk::Label,
     root: gtk::Box,
     scroller: gtk::ScrolledWindow,
     header: gtk::Box,
@@ -396,6 +397,7 @@ impl Keyboard {
             zoom_input,
             zoom_controls,
             zoom_label,
+            zoom_status,
             root,
             scroller,
             header,
@@ -445,6 +447,21 @@ impl Keyboard {
     }
     pub fn zoom_controls(&self) -> gtk::Box {
         self.zoom_controls.clone()
+    }
+    /// A second view of the same zoom commands and observations, without
+    /// reparenting the retained Monitor controls or creating another worker.
+    pub fn additional_zoom_controls(&self) -> gtk::Box {
+        let view=ui::column(8);let label=ui::text("",false);let status=ui::status("");
+        self.zoom_label.bind_property("label",&label,"label").sync_create().build();
+        self.zoom_status.bind_property("label",&status,"label").sync_create().build();
+        let row=ui::row(6);
+        for (label,direction) in [("Zoom out",-1),("Reset zoom",0),("Zoom in",1)] {
+            let button=ui::button(label,ButtonVariant::Outline,false);
+            let commands=self.zoom_input.commands.clone();let status=self.zoom_status.clone();
+            button.connect_clicked(move |_| {let result=commands.send(json!({"op":"display.zoom","direction":direction}));status.set_text(result.err().as_deref().unwrap_or("Changing display zoom…"));});
+            row.append(&button);
+        }
+        view.append(&label);view.append(&row);view.append(&status);view
     }
     pub fn set_zoom(&self, factor: f64) {
         let text = format!("Display zoom {:.0}%", factor * 100.0);

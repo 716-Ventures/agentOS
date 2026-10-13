@@ -29,7 +29,7 @@ The founder's target is 90% of native Apple desktop quality. Automated passes ca
 | Responsiveness | Actual guest input journeys and latency measurements; distinguish guest presentation from Mac-screen latency |
 | Integration | Dark/light composition, ordinary applications, clipboard, file operations, setup and first-run behavior |
 
-The current refinement introduces a username desktop menu, compact request and document actions, consistent desktop button/input/focus styles, larger chrome hit areas, state-correct maximize/restore names, responsive Monitor headers, and separately persisted Welcome dismissal. The desktop still has two functional window controls; minimize is not implemented, and no decorative minimize button is shown. Behind-window blur/vibrancy and final Mac-screen latency are not established by the existing guest tests. These limitations must remain explicit when assessing the target.
+The current refinement introduces a dedicated categorized Desktop settings window and a username desktop menu, compact request and document actions, consistent desktop button/input/focus styles, larger chrome hit areas, state-correct maximize/restore names, responsive Monitor headers, separately persisted Welcome dismissal, named native dropdowns, and percentage-based text sizing. Agent Monitor retains quick keyboard/zoom access; full desktop preferences and workspace controls live in Settings. The desktop still has two functional window controls; minimize is not implemented, and no decorative minimize button is shown. Behind-window blur/vibrancy and final Mac-screen latency are not established by the existing guest tests. These limitations must remain explicit when assessing the target.
 
 ## Reusable component foundation
 
