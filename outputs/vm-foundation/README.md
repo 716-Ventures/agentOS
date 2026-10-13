@@ -233,6 +233,11 @@ Signed candidate-v23 passes fresh account/password sudo, compatible signed updat
 New development bundles use a 2560×1600 virtual framebuffer, UTM native-resolution
 presentation, and Wayland output scale 2. The logical workspace remains 1280×800;
 text and window edges have four times the pixels instead of being enlarged by UTM.
+The display uses linear filtering when UTM must enlarge the framebuffer, avoiding
+nearest-neighbor stair steps at fractional window sizes. This is a fallback;
+native-resolution rendering remains the source of sharp text. For an existing
+bundle, change its upscaling filter to Linear through UTM's display settings or
+configuration API while the guest is stopped.
 The guest preference is `/home/developer/.config/agentos/outputs.json`:
 
 ```json

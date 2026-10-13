@@ -18,7 +18,7 @@
 			<key>NativeResolution</key>
 			<false/>
 			<key>UpscalingFilter</key>
-			<string>Nearest</string>
+			<string>Linear</string>
 		</dict>
 	</array>
 	<key>Drive</key>
