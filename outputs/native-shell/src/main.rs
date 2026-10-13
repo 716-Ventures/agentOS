@@ -7,6 +7,7 @@ mod desktop_theme;
 mod desktop_settings;
 mod agent_monitor;
 mod wallpaper;
+mod bar_contrast;
 mod document_dialog;
 mod draft_cache;
 mod draft_dialog;
@@ -1488,7 +1489,10 @@ fn main() {
         let event_cleanup = launcher_events.clone();
         app.connect_shutdown(move |_| { event_cleanup.borrow_mut().take(); });
         if trusted {
-            let window = gtk::ApplicationWindow::builder().application(app).title("agentOS system bar").decorated(false).child(&bar).build();
+            let background=bar_contrast::background();
+            let bar_content=gtk::Overlay::builder().child(&background).build();
+            bar_content.add_overlay(&bar);bar_content.set_measure_overlay(&bar,true);
+            let window = gtk::ApplicationWindow::builder().application(app).title("agentOS system bar").decorated(false).child(&bar_content).build();
             window.add_css_class("agentos-system-bar");
             // Single-line 15px chrome fits below this floor even when fractional
             // font metrics round upward. Keep the work-area reservation stable.

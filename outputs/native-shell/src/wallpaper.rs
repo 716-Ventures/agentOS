@@ -1,6 +1,15 @@
 //! One inert background per live output; never reserves work area or takes focus.
 use super::*;
 use gtk::glib::translate::ToGlibPtr;
+thread_local! {static TEXTURE:RefCell<Option<gtk::gdk::Texture>>=const {RefCell::new(None)};}
+/// Reuse the approved image across output backgrounds and bar legibility.
+pub fn texture() -> Result<gtk::gdk::Texture,glib::Error> {
+    TEXTURE.with(|cached| {
+        if let Some(texture)=cached.borrow().as_ref(){return Ok(texture.clone());}
+        let texture=gtk::gdk::Texture::from_bytes(&glib::Bytes::from_static(include_bytes!("../assets/alpine-wallpaper.png")))?;
+        *cached.borrow_mut()=Some(texture.clone());Ok(texture)
+    })
+}
 type Background = (
     gtk::gdk::Monitor,
     gtk::ApplicationWindow,
@@ -34,9 +43,7 @@ impl Backgrounds {
                 if windows.iter().any(|(known, _, _)| known == &monitor) {
                     continue;
                 }
-                let texture = match gtk::gdk::Texture::from_bytes(&glib::Bytes::from_static(
-                    include_bytes!("../assets/alpine-wallpaper.png"),
-                )) {
+                let texture = match texture() {
                     Ok(texture) => texture,
                     Err(error) => {
                         eprintln!("Wallpaper unavailable: {error}");

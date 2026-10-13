@@ -34,6 +34,8 @@ The current refinement introduces a dedicated categorized Desktop settings windo
 
 The refinement also protects running local Terminal work with an accessible close confirmation and restores input on Cancel/Escape. Launcher dismissal waits for committed Terminal focus. Agent Monitor uses a compact utility header and native spacing around its details; Welcome keeps its actions outside scrolling prose and adapts to large text. GTK 4 window shadows use the actual window node with stable active/inactive extents. Close/maximize glyphs use dark ink on their colored discs, with muted ink on inactive controls. Explicit synthetic previews cover both themes and hover/activation styles; real guest input separately qualifies behavior. CI includes initial 300% text and a short-window Terminal confirmation.
 
+The transparent system bar uses a crop-aware black tint to keep its white text legible over the approved wallpaper. The image remains visible; this is a contrast treatment and does not claim backdrop blur or vibrancy. Its inert background neither takes focus nor adds input targets.
+
 Guest profiling removed repeated immutable history copying and unchanged recovery-draft serialization. Recovery still writes changes atomically and retries failed writes. Current measurements and their exact revisions belong in `outputs/vm-foundation/runtime/fresh-verification/desktop-refinement-verification.json`; they do not establish a percentage of native macOS quality or final host-display latency.
 
 ## Reusable component foundation
