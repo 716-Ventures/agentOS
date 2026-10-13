@@ -235,6 +235,11 @@ impl Smallvil {
                 let button_state = event.state();
 
                 if ButtonState::Pressed == button_state && !pointer.is_grabbed() {
+                    // A surface may have mapped under a stationary pointer since
+                    // its last motion. Establish enter/focus before delivering
+                    // the press; otherwise ClickGrab retains an empty or stale
+                    // target for the entire click. Existing grabs own routing.
+                    self.move_pointer(pointer.current_location(), event.time_msec());
                     if let Some((surface, _)) =
                         crate::system_shell::surface_under(self, pointer.current_location())
                     {

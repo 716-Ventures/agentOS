@@ -15,6 +15,8 @@ UTM is the development VM platform. The verified guest uses UTM’s QEMU backend
 - For serial login, use the account and generated password in `runtime/console-credentials.txt`.
 - If stopped, open **Start.command** to start the VM and enter it.
 
+For graphical desktop testing, select **Use Command+Option for input capture/release** in UTM Settings → Input. The default Control+Option chord overlaps agentOS’s Control+Alt desktop shortcuts. Command+Option then captures or releases the VM pointer and keyboard.
+
 Use `AGENT_OS_VM_RUNTIME` and `AGENT_OS_VM_SSH_PORT` together to select an alternate guest for `vm.py`, deployment and terminal tests. The bundle UUID and forwarded port are checked before operations so lifecycle controls and SSH cannot silently select different guests.
 
 From a terminal in this directory:

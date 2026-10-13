@@ -446,7 +446,23 @@ def verify(metrics,output,core,scene,target,login_user,presentation,terminal_inp
                 while closed['seat_focus']!=target:
                     if time.monotonic()>deadline:raise RuntimeError('Launcher did not restore workspace focus: '+json.dumps(closed))
                     time.sleep(.05);closed=scene()
-            print('PASS: kernel Ctrl+Alt+Space opens temporary launcher; Escape and Ctrl+Alt+Delete close it, preserving work and restoring typing',flush=True)
+            # Map the launcher beneath a stationary pointer. No motion follows
+            # mapping: the first press must enter the newly visible surface,
+            # rather than retaining the underlying editor in its click grab.
+            launcher=next(layer for layer in opened['system_layers'] if layer['namespace']=='agentos-launcher')
+            g=launcher['geometry']
+            pointer.click(g['x']+g['width']//2,g['y']+g['height']//2,width,height)
+            keyboard.chord(29,56,57)
+            stationary=layer_state(True)
+            launcher=next(layer for layer in stationary['system_layers'] if layer['namespace']=='agentos-launcher' and layer['mapped'])
+            time.sleep(.05) # Separate physical presses past libinput debounce.
+            pointer.chord(272)
+            deadline=time.monotonic()+5
+            while scene()['pointer_routing']['focus']!=launcher['id']:
+                if time.monotonic()>deadline:raise RuntimeError('Stationary click missed newly mapped launcher: '+json.dumps(scene()['pointer_routing']))
+                time.sleep(.03)
+            keyboard.chord(1);layer_state(False)
+            print('PASS: stationary kernel click enters a newly mapped launcher; shortcuts close it, preserving work and restoring typing',flush=True)
         if table_input:
             import direct_table_probe
             direct_table_probe.verify(metrics,output,core,scene,login_user,presentation,snapshot,keyboard,pointer,env,kind=table_input)
