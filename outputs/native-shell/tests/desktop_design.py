@@ -43,7 +43,7 @@ def main():
     with tempfile.TemporaryDirectory(prefix='agentos-desktop-design-') as directory, (output/'session.log').open('w') as log:
         root=Path(directory);config=root/'config/agent-os';config.mkdir(parents=True)
         (config/'desktop.json').write_text(json.dumps({'appearance':args.appearance,'text_scale':1.0,'reduced_motion':True}))
-        state=root/'user-state/agent-os';state.mkdir(parents=True);(state/'setup.json').write_text('{"version":1,"completed_at":1.0}')
+        state=root/'user-state/agent-os';state.mkdir(parents=True)
         endpoint=root/'core.sock';pidfile=root/'compositor.pid'
         env={**os.environ,'HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':str(config.parent),'XDG_STATE_HOME':str(state.parent),'AGENT_OS_STATE':str(root/'core-state'),'AGENT_OS_SOCKET':str(endpoint),'AGENT_OS_COMPOSITOR_CORE':str(endpoint),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),'AGENT_OS_BROKER_SOCKET':str(root/'absent-broker.sock'),'AGENT_OS_MODEL_USAGE':str(root/'absent-usage.json'),'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','GDK_BACKEND':'wayland','GTK_A11Y':'atspi','G_DEBUG':'fatal-criticals','WINIT_UNIX_BACKEND':'wayland','AGENT_OS_COMPOSITOR_BACKEND':'winit','AGENT_OS_SYSTEM_BAR_CAPTURE':str(output/'system-bar.png'),'AGENT_OS_LAUNCHER_CAPTURE':str(output/'launcher.png'),'AGENT_OS_MONITOR_CAPTURE':str(output/'monitor.png')}
         env.pop('WAYLAND_DISPLAY',None);env.pop('DISPLAY',None)
@@ -66,6 +66,15 @@ def main():
             accessibility.wait(control.exists,'Compositor control missing')
             def scene():return call(control,{'op':'snapshot'})
             accessibility.wait(lambda:any(layer['namespace']=='agentos-wallpaper' and layer['mapped'] for layer in scene()['system_layers']),'Wallpaper did not map')
+            accessibility.activate(accessibility.find('Continue to desktop',pyatspi.ROLE_PUSH_BUTTON))
+            accessibility.wait(lambda:(state/'welcome.json').exists(),'Welcome dismissal was not persisted')
+            assert json.loads((state/'welcome.json').read_text()) == {'version':1,'dismissed':True}
+            assert not (state/'setup.json').exists(),'Dismissing Welcome falsely completed provider setup'
+            accessibility.activate(accessibility.find('Desktop menu',pyatspi.ROLE_TOGGLE_BUTTON))
+            accessibility.activate(accessibility.find('Open launcher',pyatspi.ROLE_PUSH_BUTTON))
+            accessibility.wait(lambda:any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in scene()['system_layers']),'Desktop menu did not open launcher')
+            accessibility.activate(accessibility.find('Close launcher',pyatspi.ROLE_PUSH_BUTTON))
+
             accessibility.activate(accessibility.find('Agents',pyatspi.ROLE_PUSH_BUTTON))
             accessibility.wait(lambda:output.joinpath('monitor.png').exists(),'Monitor did not paint')
             def ready():
@@ -91,8 +100,22 @@ def main():
             assert accessibility.text(accessibility.find('Ask Agent',pyatspi.ROLE_TEXT))=='Keep this unsent request λ'
             accessibility.activate(accessibility.find('Close launcher',pyatspi.ROLE_PUSH_BUTTON))
             assert call(endpoint,{'op':'snapshot'})['jobs']==[], 'Rendering or composing started work'
+            # Restart the private desktop against the same user state. Dismissal
+            # must survive without writing setup completion or affecting drafts.
+            desktop_session.stop_compositor(root,owned);owned=None
+            reap(weston);weston=None
+            pidfile.unlink(missing_ok=True)
+            weston=subprocess.Popen(['weston','--debug','--config='+str(configuration),'--socket=design-host','--width=1280','--height=800','--use-pixman'],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+            accessibility.wait(lambda:pidfile.exists() and pidfile.read_text().strip(),'Restarted compositor did not start')
+            pid=int(pidfile.read_text());owned=(pid,desktop_session.process_identity(pid));control=root/f'agentos-compositor-{pid}.sock'
+            accessibility.wait(control.exists,'Restarted compositor control missing')
+            accessibility.wait(lambda:any(w['app_id'].startswith('agentos.surface.') for w in scene()['windows']),'Restored document did not map')
+            time.sleep(.5)
+            assert not any(w['title']=='Welcome to agentOS' for w in scene()['windows']),'Welcome reappeared after dismissal'
+            assert not (state/'setup.json').exists()
+
             (output/'scene.json').write_text(json.dumps(observed,indent=2)+'\n')
-            print('PASS: real wallpaper, transparent bar, floating monitor, work preserved, launcher draft retained; no model requests')
+            print('PASS: real wallpaper, transparent bar, floating monitor, work preserved, launcher draft retained, desktop menu works, Welcome dismissal survives restart without completing setup; no model requests')
         finally:
             if owned and owned[1]:desktop_session.stop_compositor(root,owned)
             reap(weston);reap(core);desktop_session.reap_session_children()

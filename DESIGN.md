@@ -10,6 +10,27 @@ Desktop verification includes actual composed Wayland scenes in both appearances
 
 The following sections document the **implemented terminal** design. Terminal palette indices and the six-tile limit do not constrain the graphical specification.
 
+## Desktop refinement standard
+
+The quality reference is Apple's [macOS guidance](https://developer.apple.com/design/human-interface-guidelines/designing-for-macos/), [windows](https://developer.apple.com/design/human-interface-guidelines/windows), [toolbars](https://developer.apple.com/design/human-interface-guidelines/toolbars), and [focus and selection](https://developer.apple.com/design/human-interface-guidelines/focus-and-selection/). AppKit's [material implementation](https://developer.apple.com/documentation/appkit/nsvisualeffectview) distinguishes content, navigation, and transient surfaces. Apply that role-based discipline to GTK; translucent unblurred content is not a substitute for a material. Preserve the approved agentOS identity, typography, wallpaper, and absence of a dock.
+
+The founder's target is 90% of native Apple desktop quality. Automated passes cannot establish that subjective comparison. Assess the complete user journey against these criteria, with no credit for unimplemented or unobserved behavior:
+
+| Area | Required evidence |
+| --- | --- |
+| Typography | Crisp Retina text; consistent hierarchy, readable secondary text, useful enlarged-text layouts |
+| Window craft | Coherent active/inactive chrome, usable pointer targets, accurate control names, drag/resize/maximize/restore behavior |
+| Controls | Consistent appearance and geometry; visible focus, hover, pressed, disabled, selection and error states |
+| Composition | Content takes priority; secondary actions stay compact; narrow windows and larger text keep tasks reachable |
+| Navigation | Common tasks reachable by mouse and keyboard without agent inference; clear dismissal and return paths |
+| Continuity | Unsent requests and document drafts survive dismissal, activity changes, and recovery |
+| Feedback | Real progress and usage; errors offer recovery; missing telemetry stays unknown |
+| Accessibility | Named actionable controls, logical keyboard traversal, non-color status, retained selection, reduced-motion preference |
+| Responsiveness | Actual guest input journeys and latency measurements; distinguish guest presentation from Mac-screen latency |
+| Integration | Dark/light composition, ordinary applications, clipboard, file operations, setup and first-run behavior |
+
+The current refinement introduces a username desktop menu, compact request and document actions, consistent desktop button/input/focus styles, larger chrome hit areas, state-correct maximize/restore names, responsive Monitor headers, and separately persisted Welcome dismissal. The desktop still has two functional window controls; minimize is not implemented, and no decorative minimize button is shown. Behind-window blur/vibrancy and final Mac-screen latency are not established by the existing guest tests. These limitations must remain explicit when assessing the target.
+
 ## Reusable component foundation
 
 [716 UI](https://github.com/716-Ventures/716-ui) is the standalone public native component library, to be consumed by agentOS through versioned releases. The desktop consumes a pinned versioned release of this library. shadcn is the reference for corresponding component visuals, interaction and motion. Pin a concrete upstream style/theme/revision and verify parity in a standalone component gallery. The library owns reusable controls and tokens; agentOS owns desktop composition and system behavior. See the [library boundary](outputs/agent-os-windowing-specification.md#standalone-component-library--september-19-decision).

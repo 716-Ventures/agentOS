@@ -239,6 +239,8 @@ pub(super) fn panel(
         .default_height(600)
         .modal(true)
         .build();
+    window.add_css_class("seven-ui");
+    desktop_theme::titlebar(&window);
     window.set_transient_for(parent);
     window.set_application(parent.and_then(|p| p.application()).as_ref());
     let content = ui::column(12);
@@ -276,8 +278,9 @@ pub(super) fn panel(
     save.set_sensitive(false);
     let cancel = ui::button("Cancel", ButtonVariant::Outline, false);
     let row = ui::row(8);
-    row.append(&save);
+    row.set_halign(gtk::Align::End);
     row.append(&cancel);
+    row.append(&save);
     content.append(&row);
     window.set_child(Some(&content));
     ReviewPanel {

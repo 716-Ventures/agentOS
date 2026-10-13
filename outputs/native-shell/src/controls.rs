@@ -170,6 +170,7 @@ impl Controls {
         });
         widget.append(&activity_row);
         let request = TextField::new("Ask Agent", "Describe the work you want done", "");
+        request.widget.add_css_class("launcher-request");
         widget.append(&request.widget);
         let frozen_context = Rc::new(RefCell::new(None::<Value>));
         let context_provider = Rc::new(RefCell::new(None::<Rc<dyn Fn() -> Value>>));
@@ -177,6 +178,7 @@ impl Controls {
         context_label.set_selectable(false);
         context_label.set_wrap(false);
         context_label.set_ellipsize(gtk::pango::EllipsizeMode::End);
+        context_label.add_css_class("launcher-context");
         widget.append(&context_label);
         let pending_prompt = Rc::new(RefCell::new(None::<String>));
         let prior_request = Rc::new(Cell::new(None));
@@ -187,8 +189,13 @@ impl Controls {
         let selected=request_job.clone();let sender=commands.clone();
         stop_request.connect_clicked(move |_| {if let Some(id)=selected.get(){let _=sender.send(Command::Stop{source:"core".into(),job:json!(id)});}});
         let send = ui::button("Send request", ButtonVariant::Primary, false);
-        widget.append(&send);
-        widget.append(&stop_request);
+        let request_actions = ui::row(8);
+        request_actions.add_css_class("launcher-request-actions");
+        request_actions.set_halign(gtk::Align::End);
+        send.set_tooltip_text(Some("Send request (Enter)"));
+        request_actions.append(&stop_request);
+        request_actions.append(&send);
+        widget.append(&request_actions);
         let (current, commands_now, entry) =
             (activity.clone(), commands.clone(), request.entry.clone());
         let (frozen, provider) = (frozen_context.clone(), context_provider.clone());
@@ -226,7 +233,12 @@ impl Controls {
         cancel_recording.set_visible(false);
         let recorder=voice.clone();cancel_recording.connect_clicked(move |_|recorder.cancel());
         voice_row.append(&cancel_recording);
-        widget.append(&voice_row);
+        voice_row.set_valign(gtk::Align::Center);
+        voice_status.value.add_css_class("launcher-voice-status");
+        // Voice and typing are peer input paths; neither needs a full-width button.
+        request_actions.prepend(&voice_row);
+        request_actions.set_halign(gtk::Align::Fill);
+        voice_row.set_hexpand(true);
         let review_content = ui::column(12);
         review_content.set_margin_start(24); review_content.set_margin_end(24); review_content.set_margin_top(24); review_content.set_margin_bottom(24);
         review_content.append(&ui::text("Review voice request", true));
@@ -235,8 +247,9 @@ impl Controls {
         let review_actions = ui::row(12);
         let send_voice = ui::button("Send reviewed request", ButtonVariant::Primary, false);
         let discard = ui::button("Discard recording", ButtonVariant::Outline, false);
-        review_actions.append(&send_voice);
+        review_actions.set_halign(gtk::Align::End);
         review_actions.append(&discard);
+        review_actions.append(&send_voice);
         review_content.append(&review_actions);
         let review = gtk::ApplicationWindow::builder()
             .application(app)
@@ -247,6 +260,7 @@ impl Controls {
             .build();
         review.add_css_class("seven-ui");
         review.add_css_class("agentos-launcher");
+        desktop_theme::titlebar(&review);
         let recorder = voice.clone();
         let (frozen, provider) = (frozen_context.clone(), context_provider.clone());
         voice_button.connect_clicked(move |_| {
@@ -404,7 +418,7 @@ impl Controls {
             .application(app)
             .title("Agent Monitor")
             .default_width(920)
-            .default_height(755)
+            .default_height(680)
             .child(&scroll)
             .build();
         monitor.add_css_class("seven-ui");
@@ -839,6 +853,7 @@ impl Controls {
     pub fn temporary_launcher(&self) {
         let settings = ui::column(12);
         let direct = gtk::FlowBox::new();
+        direct.add_css_class("launcher-direct");
         direct.set_selection_mode(gtk::SelectionMode::None);
         direct.set_min_children_per_line(1);
         direct.set_max_children_per_line(3);
@@ -1133,9 +1148,15 @@ pub(super) fn review_proposal(app: &gtk::Application, proposal: Value, commands:
     let approve = ui::button("Approve this operation", ButtonVariant::Destructive, false);
     let reject = ui::button("Reject this operation", ButtonVariant::Outline, false);
     let cancel = ui::button("Keep pending", ButtonVariant::Ghost, false);
-    content.append(&approve);
-    content.append(&reject);
-    content.append(&cancel);
+    let actions=gtk::FlowBox::new();
+    actions.set_selection_mode(gtk::SelectionMode::None);
+    actions.set_min_children_per_line(1);actions.set_max_children_per_line(3);
+    actions.set_column_spacing(8);actions.set_row_spacing(8);actions.set_halign(gtk::Align::End);
+    for button in [&cancel,&reject,&approve] {
+        let child=gtk::FlowBoxChild::builder().child(button).focusable(false).accessible_role(gtk::AccessibleRole::Group).build();
+        actions.insert(&child,-1);
+    }
+    content.append(&actions);
     let scroll = gtk::ScrolledWindow::builder()
         .hscrollbar_policy(gtk::PolicyType::Never)
         .child(&content)
@@ -1148,6 +1169,7 @@ pub(super) fn review_proposal(app: &gtk::Application, proposal: Value, commands:
         .child(&scroll)
         .build();
     window.add_css_class("seven-ui");
+    desktop_theme::titlebar(&window);
     let (view, sender, current) = (window.downgrade(), commands.clone(), proposal.clone());
     approve.connect_clicked(move |button| {
         button.set_sensitive(false);

@@ -495,7 +495,14 @@ fn construct(
                         );
                     });
                     // Keep Save/Discard as the last toolbar for keyboard traversal and verification.
-                    widget.insert_child_after(&button, None::<&gtk::Widget>);
+                    let file_actions=gtk::FlowBox::new();
+                    file_actions.set_selection_mode(gtk::SelectionMode::None);
+                    file_actions.set_min_children_per_line(1);file_actions.set_max_children_per_line(2);
+                    file_actions.set_column_spacing(8);file_actions.set_row_spacing(8);
+                    file_actions.set_halign(gtk::Align::Start);file_actions.set_focusable(false);
+                    let child=gtk::FlowBoxChild::builder().child(&button).focusable(false).accessible_role(gtk::AccessibleRole::Group).build();
+                    file_actions.insert(&child,-1);
+                    widget.insert_child_after(&file_actions,None::<&gtk::Widget>);
                     let replace = ui::button(
                         "Review replacement of existing file…",
                         ButtonVariant::Outline,
@@ -514,7 +521,8 @@ fn construct(
                             sender.clone(),
                         );
                     });
-                    widget.insert_child_after(&replace, Some(&button));
+                    let child=gtk::FlowBoxChild::builder().child(&replace).focusable(false).accessible_role(gtk::AccessibleRole::Group).build();
+                    file_actions.insert(&child,-1);
                 }
                 result.widget = widget.clone().upcast();
                 if kind == "DocumentEditor@1" {
@@ -748,13 +756,6 @@ impl Surface {
             .hscrollbar_policy(gtk::PolicyType::Never)
             .build();
         let content = ui::column(0);
-        let provenance = ui::text("Agent view", false);
-        // Window chrome must not become the initial selectable focus target:
-        // GTK would select this label and replace PRIMARY on every restore.
-        provenance.set_selectable(false);
-        provenance.set_margin_start(24);
-        provenance.set_margin_top(8);
-        content.append(&provenance);
         content.append(&scroll);
         scroll.set_vexpand(true);
         let window = gtk::ApplicationWindow::builder()
@@ -1418,7 +1419,16 @@ fn main() {
             false,
         );
         let status = ui::button("Agents", ButtonVariant::Ghost, false);
-        bar.append(&user);
+        let desktop_menu = gtk::MenuButton::builder().child(&user).has_frame(false).build();
+        desktop_menu.add_css_class("desktop-user-menu");
+        desktop_menu.set_tooltip_text(Some("Desktop menu"));
+        // GtkMenuButton is a container; the inner toggle owns its AT-SPI action.
+        if let Some(button)=desktop_menu.first_child() {
+            button.update_property(&[gtk::accessible::Property::Label("Desktop menu")]);
+        }
+        desktop_menu.set_hexpand(true);
+        desktop_menu.set_halign(gtk::Align::Start);
+        bar.append(&desktop_menu);
         bar.append(&status);
         bar.append(&clock);
         let logout=ui::button("End desktop session",ButtonVariant::Outline,false);
@@ -1429,7 +1439,7 @@ fn main() {
         clock.set_wrap(false);
         clock.set_ellipsize(gtk::pango::EllipsizeMode::End);
         user.set_selectable(false);
-        user.set_hexpand(true);
+        user.set_hexpand(false);
         user.set_xalign(0.0);
         user.set_ellipsize(gtk::pango::EllipsizeMode::End);
         let surfaces = Rc::new(RefCell::new(BTreeMap::<String, Surface>::new()));
@@ -1520,6 +1530,26 @@ fn main() {
             let focus = controls.clone();
             open.connect_clicked(move |_| { if let Some(window) = weak.upgrade() { focus.borrow().open_launcher(); window.present(); } });
             controls.borrow().monitor_actions.append(&open);
+            let popover=gtk::Popover::new();popover.add_css_class("desktop-menu");
+            popover.set_has_arrow(false);popover.set_halign(gtk::Align::Start);
+            let menu=ui::column(2);
+            let launch=ui::button("Open launcher",ButtonVariant::Ghost,false);
+            launch.set_tooltip_text(Some("Ctrl+Alt+Space"));
+            let weak=main.downgrade();let focus=controls.clone();let popup=popover.downgrade();
+            launch.connect_clicked(move |_| {
+                if let Some(popover)=popup.upgrade(){popover.popdown();}
+                if let Some(window)=weak.upgrade(){focus.borrow().open_launcher();window.present();}
+            });
+            menu.append(&launch);
+            menu.append(&gtk::Separator::new(gtk::Orientation::Horizontal));
+            for (label, command) in [("New document",(|| Command::CreateDocument) as fn()->Command),("Open terminal",|| Command::OpenTerminal),("Setup…",|| Command::Setup)] {
+                let button=ui::button(label,ButtonVariant::Ghost,false);
+                button.set_halign(gtk::Align::Fill);
+                let sender=frontend.borrow().commands.clone();let popup=popover.downgrade();
+                button.connect_clicked(move |_| {if let Some(popover)=popup.upgrade(){popover.popdown();}let _=sender.send(command());});
+                menu.append(&button);
+            }
+            popover.set_child(Some(&menu));desktop_menu.set_popover(Some(&popover));
             let keyboard = match screen_keyboard::Keyboard::new(app) {
                 Ok(keyboard) => Rc::new(keyboard),
                 Err(error) => {eprintln!("On-screen keyboard unavailable: {error}");app.quit();return;}

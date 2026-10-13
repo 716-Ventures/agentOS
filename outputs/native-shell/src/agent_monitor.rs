@@ -236,9 +236,15 @@ impl Monitor {
         titles.append(&heading);
         let aside = ui::column(10);
         aside.append(&actions);
-        let header = ui::row(16);
-        header.append(&titles);
-        header.append(&aside);
+        let header = gtk::FlowBox::new();
+        header.set_selection_mode(gtk::SelectionMode::None);
+        header.set_min_children_per_line(1);header.set_max_children_per_line(2);
+        header.set_column_spacing(16);header.set_row_spacing(12);
+        header.set_focusable(false);
+        for child in [&titles,&aside] {
+            let group=gtk::FlowBoxChild::builder().child(child).focusable(false).accessible_role(gtk::AccessibleRole::Group).build();
+            header.insert(&group,-1);
+        }
         widget.append(&header);
         let subtitle = ui::text("See what your agents are doing", false);
         subtitle.add_css_class("desktop-subtitle");
@@ -279,6 +285,9 @@ impl Monitor {
         widget.append(&region);
         let empty=ui::text("Your agents will appear here when you send a request.\nOpen the launcher with Ctrl+Alt+Space to start working.",false);
         empty.add_css_class("desktop-muted");
+        empty.add_css_class("monitor-empty");
+        empty.set_justify(gtk::Justification::Center);
+        empty.set_halign(gtk::Align::Center);
         widget.append(&empty);
         let details = gtk::FlowBox::new();
         details.set_selection_mode(gtk::SelectionMode::None);
@@ -379,7 +388,7 @@ impl Monitor {
     pub fn update(&mut self, frame: &Frame) {
         let agents = project(frame);
         self.table_region
-            .set_min_content_height((40 + agents.len().min(4) as i32 * 72).min(260));
+            .set_min_content_height((32 + agents.len().min(4) as i32 * 64).min(240));
         let working = agents.iter().filter(|a| a.active).count();
         let session = &frame.usage["sessions"]
             [frame.usage["current_session"].as_str().unwrap_or("")]["models"];
@@ -399,6 +408,7 @@ impl Monitor {
             count(&session, "total")
         ));
         self.empty.set_visible(agents.is_empty());
+        self.table_region.set_visible(!agents.is_empty());
         self.details.set_visible(!agents.is_empty());
         let removed = self
             .rows
