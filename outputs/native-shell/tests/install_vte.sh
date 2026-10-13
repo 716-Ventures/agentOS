@@ -8,7 +8,9 @@ trap 'rm -rf "$root"' EXIT HUP INT TERM
 curl -fsSL https://download.gnome.org/sources/vte/0.78/vte-0.78.2.tar.xz -o "$root/vte.tar.xz"
 echo "35d7bcde07356846b4a12881c8e016705b70a9004a9082285eee5834ccc49890  $root/vte.tar.xz" | sha256sum -c -
 tar xf "$root/vte.tar.xz" -C "$root"
-meson setup "$root/build" "$root/vte-0.78.2" --prefix=/usr/local --libdir=lib \
+# Use the runner's system library directory: GTK's link flags put it before
+# /usr/local/lib, otherwise the linker still selects Ubuntu's older VTE.
+meson setup "$root/build" "$root/vte-0.78.2" --prefix=/usr --libdir="lib/$(cc -dumpmachine)" \
   -Dgtk3=false -Dgtk4=true -Da11y=true -Dgir=false -Dvapi=false -Ddocs=false \
   -Dglade=false -Dgnutls=false -Dicu=false -D_systemd=false
 meson compile -C "$root/build" -j 2
