@@ -47,7 +47,7 @@ pub fn present(app: &gtk::Application, commands: Sender<Command>) {
     actions.set_focusable(false);
     actions.set_min_children_per_line(1);actions.set_max_children_per_line(2);
     actions.set_column_spacing(12);actions.set_row_spacing(12);
-    actions.set_halign(gtk::Align::End);
+    actions.set_halign(gtk::Align::Fill);
     for button in [&later,&setup] {
         let group=gtk::FlowBoxChild::builder().child(button).focusable(false).accessible_role(gtk::AccessibleRole::Group).build();
         actions.insert(&group,-1);

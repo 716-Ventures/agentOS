@@ -261,8 +261,8 @@ def assistive():
                 elif action=='window-close' or action.startswith('close-'):
                     frame=find('Terminal',pyatspi.ROLE_FRAME)
                     node=find('Close window' if action=='window-close' else 'Cancel' if action.startswith('close-cancel') else 'Close terminal',pyatspi.ROLE_PUSH_BUTTON,root=frame)
-                    r=node.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
-                    response={'showing':node.getState().contains(pyatspi.STATE_SHOWING),'focused':node.getState().contains(pyatspi.STATE_FOCUSED),'sensitive':node.getState().contains(pyatspi.STATE_SENSITIVE),'point':[r.x+r.width/2,r.y+r.height/2]}
+                    r=node.queryComponent().getExtents(pyatspi.WINDOW_COORDS);f=frame.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
+                    response={'showing':node.getState().contains(pyatspi.STATE_SHOWING),'focused':node.getState().contains(pyatspi.STATE_FOCUSED),'sensitive':node.getState().contains(pyatspi.STATE_SENSITIVE),'point':[r.x-f.x+r.width/2,r.y-f.y+r.height/2]}
                     if action.startswith('close-'):
                         panel=node.parent
                         while panel is not None and panel.name!='Close terminal?':panel=panel.parent
@@ -280,8 +280,8 @@ def assistive():
                     if action.endswith('-activate'):response['requested']=node.queryAction().doAction(0)
                 else:
                     node=find('Local terminal',pyatspi.ROLE_TERMINAL)
-                    r=node.queryComponent().getExtents(pyatspi.WINDOW_COORDS);text=node.queryText();value=text.getText(0,min(text.characterCount,65536))
-                    response={'text':value,'point':[r.x+r.width/2,r.y+r.height/2],'focused':node.getState().contains(pyatspi.STATE_FOCUSED)}
+                    r=node.queryComponent().getExtents(pyatspi.WINDOW_COORDS);f=find('Terminal',pyatspi.ROLE_FRAME).queryComponent().getExtents(pyatspi.WINDOW_COORDS);text=node.queryText();value=text.getText(0,min(text.characterCount,65536))
+                    response={'text':value,'point':[r.x-f.x+r.width/2,r.y-f.y+r.height/2],'focused':node.getState().contains(pyatspi.STATE_FOCUSED)}
                     if action=='copy-span':
                         start=value.index('\nlocalok\n')+1;first=text.getCharacterExtents(start,pyatspi.WINDOW_COORDS)
                         response.update(start=[first[0]+1,first[1]+first[3]/2],end=[first[0]+first[2]*9,first[1]+first[3]/2])

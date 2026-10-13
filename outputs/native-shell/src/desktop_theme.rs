@@ -28,8 +28,10 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
     window.seven-ui .terminal-close-panel button.destructive:active {{ background: #962729; }}
     window.seven-ui .terminal-close-panel button.destructive label {{ color: #ffffff; }}
     window.seven-ui .welcome-actions flowboxchild {{ padding: 0; }}
-    window.seven-ui decoration {{ border-radius: 12px; border: none; box-shadow: 0 12px 30px rgba(0,0,0,0.28); }}
-    window.seven-ui.desktop-inactive decoration {{ box-shadow: 0 6px 16px rgba(0,0,0,0.16); }}
+    window.seven-ui.csd {{ border-radius: 12px; border: none; outline: none; box-shadow: 0 12px 30px rgba(0,0,0,0.28); transition: none; }}
+    window.seven-ui.csd.desktop-inactive {{ box-shadow: 0 12px 30px transparent, 0 6px 16px rgba(0,0,0,0.16); }}
+    window.seven-ui.csd.maximized, window.seven-ui.csd.fullscreen {{ border-radius: 0; box-shadow: none; }}
+    window.seven-ui.maximized headerbar, window.seven-ui.fullscreen headerbar {{ border-radius: 0; }}
     window.seven-ui headerbar {{ background: {bg}; background-image: none; color: {fg}; min-height: 38px; padding: 0; border: none; border-bottom: 1px solid {line}; box-shadow: none; border-radius: 12px 12px 0 0; }}
     window.seven-ui label {{ color: {fg}; }}
     window.seven-ui label.muted, window.seven-ui .desktop-muted {{ color: {muted}; }}

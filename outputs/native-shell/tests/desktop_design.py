@@ -36,6 +36,18 @@ def reap(proc):
         try:proc.wait(timeout=8)
         except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait(timeout=5)
 
+def local_bounds(node,frame):
+    # GTK 4.14 includes the CSD inset in WINDOW_COORDS; newer GTK reports
+    # content-relative coordinates. Both widgets share the frame's origin.
+    bounds=node.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
+    origin=frame.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
+    return (bounds.x-origin.x,bounds.y-origin.y,bounds.width,bounds.height)
+
+def within(bounds,geometry):
+    x,y,width,height=bounds
+    return x>=0 and y>=0 and width>0 and height>0 and x+width<=geometry['width'] and y+height<=geometry['height']
+
+
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--appearance',choices=['dark','light'],default='dark');parser.add_argument('--initial-text-scale',type=float,choices=[1.0,3.0],default=1.0);parser.add_argument('--close-small',action='store_true',help='Qualify 300% close confirmation in a 360px terminal');args=parser.parse_args()
     output=ROOT/'test-output'/('desktop-design-'+args.appearance+('-close-small' if args.close_small else '')+('-large' if args.initial_text_scale==3 else ''));output.mkdir(parents=True,exist_ok=True)
@@ -78,8 +90,8 @@ def main():
             assert not action.parent.getState().contains(pyatspi.STATE_FOCUSABLE),'Welcome layout wrapper adds a focus stop'
             if args.initial_text_scale==3:
                 for label in ['Continue to desktop','Open setup']:
-                    bounds=accessibility.find(label,pyatspi.ROLE_PUSH_BUTTON,root=welcome).queryComponent().getExtents(pyatspi.WINDOW_COORDS)
-                    assert 0<=bounds.x and 0<=bounds.y and bounds.x+bounds.width<=actual['width'] and bounds.y+bounds.height<=actual['height'],('Welcome action outside viewport',label,bounds,actual)
+                    bounds=local_bounds(accessibility.find(label,pyatspi.ROLE_PUSH_BUTTON,root=welcome),welcome)
+                    assert within(bounds,actual),('Welcome action outside viewport',label,bounds,actual)
             accessibility.activate(action)
             accessibility.wait(lambda:(state/'welcome.json').exists(),'Welcome dismissal was not persisted')
             assert json.loads((state/'welcome.json').read_text()) == {'version':1,'dismissed':True}
@@ -98,9 +110,9 @@ def main():
                 accessibility.activate(accessibility.find(category,pyatspi.ROLE_TOGGLE_BUTTON,root=settings))
                 if category=='Setup' and args.initial_text_scale==3:
                     setup=accessibility.find('Open setup…',pyatspi.ROLE_PUSH_BUTTON,root=settings)
-                    bounds=setup.queryComponent().getExtents(pyatspi.WINDOW_COORDS)
+                    bounds=local_bounds(setup,settings)
                     geometry=next(w for w in scene()['windows'] if w['app_id']=='agentos.settings')['geometry']
-                    assert 0<=bounds.x and 0<=bounds.y and bounds.x+bounds.width<=geometry['width'] and bounds.y+bounds.height<=geometry['height'],('Setup action outside viewport',bounds,geometry)
+                    assert within(bounds,geometry),('Setup action outside viewport',bounds,geometry)
                 try:accessibility.find(field_name,pyatspi.ROLE_COMBO_BOX if field_name in ('Current activity','Appearance') else None,root=settings)
                 except AssertionError:
                     from collections import deque
@@ -157,6 +169,9 @@ def main():
                 return terminal if terminal and observed['seat_focus']==terminal['id'] and observed['shared']['focus']==terminal['id'] and not any(layer['namespace']=='agentos-launcher' and layer['mapped'] for layer in observed['system_layers']) else None
             accessibility.wait(terminal_ready,'Native terminal did not open and replace launcher focus')
             terminal_window=terminal_ready()
+            inactive_monitor=next(w for w in scene()['windows'] if w['id']==monitor['id'])
+            assert inactive_monitor['geometry']==monitor['geometry'],'Deactivation shifted Monitor placement'
+            assert inactive_monitor['xdg']['client_geometry']==monitor['xdg']['client_geometry'],'Deactivation changed client shadow extents'
             terminal=accessibility.find('Local terminal',pyatspi.ROLE_TERMINAL)
             accessibility.wait(lambda:'native-terminal-λ' in accessibility.text(terminal).splitlines(),'Native PTY did not execute the exact Unicode verification line')
             accessibility.wait(lambda:(output/'terminal.png').exists(),'Native terminal did not paint')
@@ -192,8 +207,8 @@ def main():
             accessibility.wait(lambda:(output/'terminal-close.png').exists(),'Close guard did not paint')
             assert terminal_ready()['geometry']==original_geometry,'Close confirmation changed terminal geometry'
             for name in ['Cancel','Close terminal']:
-                bounds=accessibility.find(name,pyatspi.ROLE_PUSH_BUTTON,root=terminal_frame).queryComponent().getExtents(pyatspi.WINDOW_COORDS)
-                assert 0<=bounds.x and 0<=bounds.y and bounds.width>0 and bounds.height>0 and bounds.x+bounds.width<=original_geometry['width'] and bounds.y+bounds.height<=original_geometry['height'],('Close action outside viewport',name,bounds,original_geometry)
+                bounds=local_bounds(accessibility.find(name,pyatspi.ROLE_PUSH_BUTTON,root=terminal_frame),terminal_frame)
+                assert within(bounds,original_geometry),('Close action outside viewport',name,bounds,original_geometry)
             accessibility.activate(cancel)
             accessibility.wait(lambda:accessibility.find('Local terminal',pyatspi.ROLE_TERMINAL).getState().contains(pyatspi.STATE_FOCUSED),'Cancel did not restore terminal focus')
             assert Path(f'/proc/{child}').exists() and all(Path(f'/proc/{pid}').exists() for pid in programs),'Cancel ended running work'
