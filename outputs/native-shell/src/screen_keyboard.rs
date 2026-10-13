@@ -130,6 +130,9 @@ impl Keyboard {
         let header = ui::row(12);
         let title = ui::text("On-screen keyboard", true);
         title.set_selectable(false);
+        // Header content is a single line. Combining wrapping with ellipsis
+        // makes GTK's fractional-scale height-for-width measurements disagree.
+        title.set_wrap(false);
         title.set_ellipsize(gtk::pango::EllipsizeMode::End);
         let status = ui::status("Keyboard ready");
         status.set_selectable(false);
