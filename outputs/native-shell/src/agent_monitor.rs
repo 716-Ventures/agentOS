@@ -212,7 +212,7 @@ pub struct Monitor {
     selected: Rc<Cell<Option<i64>>>,
     summary: gtk::Label,
     empty: gtk::Label,
-    details: gtk::FlowBox,
+    details: gtk::Box,
     title: gtk::Label,
     task: gtk::Label,
     timeline: gtk::Label,
@@ -223,8 +223,8 @@ pub struct Monitor {
 impl Monitor {
     pub fn new(commands: Sender<Command>, history: &gtk::Expander) -> Self {
         let widget = ui::column(14);
-        let heading = ui::text("Agent Monitor", true);
-        heading.add_css_class("desktop-heading");
+        let heading = ui::text("Agents", true);
+        heading.add_css_class("monitor-heading");
         heading.set_selectable(false);
         heading.set_hexpand(true);
         heading.set_wrap(true);
@@ -246,18 +246,13 @@ impl Monitor {
             header.insert(&group,-1);
         }
         widget.append(&header);
-        let subtitle = ui::text("See what your agents are doing", false);
-        subtitle.add_css_class("desktop-subtitle");
-        subtitle.set_selectable(false);
-        subtitle.set_margin_top(0);
-        titles.append(&subtitle);
         let summary = ui::text("Connecting to your agents…", false);
         summary.add_css_class("desktop-muted");
         summary.set_selectable(false);
-        summary.set_xalign(1.0);
+        summary.set_xalign(0.0);
         summary.set_wrap(true);
         summary.set_max_width_chars(35);
-        aside.append(&summary);
+        titles.append(&summary);
         let table = ui::column(10);
         let (header, _) = columns(&[
             "Agent",
@@ -291,6 +286,7 @@ impl Monitor {
         widget.append(&empty);
         let details = gtk::FlowBox::new();
         details.set_selection_mode(gtk::SelectionMode::None);
+        details.set_focusable(false);
         details.set_min_children_per_line(1);
         details.set_max_children_per_line(2);
         details.set_homogeneous(false);
@@ -300,7 +296,7 @@ impl Monitor {
         let left = ui::column(12);
         left.add_css_class("agent-detail");
         left.set_hexpand(true);
-        left.set_width_request(440);
+        left.set_width_request(320);
         let title = ui::text("No agent selected", true);
         title.add_css_class("agent-name");
         left.append(&title);
@@ -331,9 +327,14 @@ impl Monitor {
         view.set_halign(gtk::Align::Start);
         view.set_sensitive(false);
         right.append(&view);
-        details.insert(&left, -1);
-        details.insert(&right, -1);
-        widget.append(&details);
+        for child in [&left, &right] {
+            let group=gtk::FlowBoxChild::builder().child(child).focusable(false).accessible_role(gtk::AccessibleRole::Group).build();
+            details.insert(&group,-1);
+        }
+        let detail_region=ui::column(24);
+        detail_region.append(&gtk::Separator::new(gtk::Orientation::Horizontal));
+        detail_region.append(&details);
+        widget.append(&detail_region);
         let selected = Rc::new(Cell::new(None));
         let data = Rc::new(RefCell::new(Vec::<Agent>::new()));
         let identity = selected.clone();
@@ -376,7 +377,7 @@ impl Monitor {
             selected,
             summary,
             empty,
-            details,
+            details: detail_region,
             title,
             task,
             timeline,

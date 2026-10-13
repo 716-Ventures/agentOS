@@ -73,7 +73,9 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
     .agentos-monitor .agent-table row:hover {{ background: {panel}; }}
     .agentos-monitor .agent-table row:selected:hover {{ background: {selected}; }}
     .agentos-monitor .agent-table-header {{ color: {muted}; padding: 0 16px; font-size: 0.85em; font-weight: 500; }}
-    .agentos-monitor .agent-details {{ border-top: 1px solid {line}; padding-top: 23px; }}
+    .agentos-monitor .agent-details {{ padding: 0; border: none; }}
+    .agentos-monitor flowboxchild {{ padding: 0; }}
+    .agentos-monitor .monitor-heading {{ font-size: 1.15em; font-weight: 600; }}
     .agentos-monitor .agent-detail {{ background: transparent; padding: 0; }}
     .agentos-monitor button.desktop-primary label {{ color: #ffffff; }}
     .agentos-monitor .agent-name {{ font-weight: 600; }}
