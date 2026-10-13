@@ -141,7 +141,8 @@ impl Controls {
                 let _=sender.send(Command::Preferences(json!({"appearance":if a.selected()==0{"dark"}else{"light"},"text_scale":s.value()/100.0,"reduced_motion":r.is_active()})));
             }
         });
-        theme();
+        // Startup styling is already installed. Persist preferences only from
+        // the explicit change handlers, without a spurious "saved" notice.
         let change = theme.clone();
         appearance.connect_selected_notify(move |_| change());
         let change = theme.clone();

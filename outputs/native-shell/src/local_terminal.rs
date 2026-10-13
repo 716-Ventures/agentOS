@@ -42,6 +42,7 @@ pub fn open(
 ) {
     let identity = format!("agentos.local-terminal.{:032x}", nonce());
     let terminal = vte4::Terminal::new();
+    terminal.set_enable_a11y(true);
     terminal.set_scrollback_lines(10000);
     terminal.set_hexpand(true);
     terminal.set_vexpand(true);

@@ -1,5 +1,10 @@
 # Native desktop client
 
+The local terminal requires VTE GTK4 0.78 or newer for assistive text access,
+enabled explicitly on every terminal. Debian 13 supplies 0.80; Ubuntu 24.04 CI
+builds checksum-pinned upstream 0.78.2 with accessibility enabled rather than
+skipping the real terminal text/Unicode journey.
+
 Rust/GTK 4 client over the authenticated, durable presentation contract in `../agent-shell`. Reusable controls come from a versioned public 716 UI release. Documents contain inert data; the renderer keeps stable native widgets, preserves selected text and local drafts, reads live core job bindings, and dispatches opaque host action references. IPC runs separately from GTK input/rendering.
 
 New document and Import are available on an empty desktop. They create a “Personal” activity internally after a valid request; later documents reuse the selected activity. Cancelling file selection or rejecting an unreadable file does not create an activity.
