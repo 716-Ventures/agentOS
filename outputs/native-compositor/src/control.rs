@@ -74,13 +74,15 @@ impl Control {
                             let (reply, rx) = mpsc::sync_channel(1);
                             let deadline = if matches!(value["op"].as_str(),Some("keyboard.stroke" | "keyboard.restore_focus")) {
                                 Duration::from_millis(150)
+                            } else if matches!(value["op"].as_str(),Some("monitor.present"|"settings.present"|"terminal.present"|"voice_review.present")) {
+                                Duration::from_millis(250)
                             } else {Duration::from_secs(5)};
                             if sender
                                 .try_send(Request {
                                     value,
                                     peer_pid,
                                     reply,
-                                    // The bridge may wait up to two seconds for one core reply.
+                                    // General bridge commands may wait for a two-second core reply.
                                     // Queueing remains bounded and expired mutations are skipped.
                                     deadline: Some(Instant::now() + deadline),
                                 })
@@ -276,6 +278,24 @@ pub fn handle(state: &mut crate::Smallvil, v: &Value) -> Value {
 #[cfg(test)]
 mod deadline_tests {
     use super::*;
+    #[test]
+    fn expired_native_focus_requests_cannot_steal_focus_after_recovery() {
+        let path=std::env::temp_dir().join(format!("agentos-focus-deadline-{}.sock",std::process::id()));
+        let control=Control::start_at(path).unwrap();
+        for operation in ["monitor.present","settings.present","terminal.present","voice_review.present"] {
+            let mut stream=std::os::unix::net::UnixStream::connect(&control.path).unwrap();
+            stream.set_read_timeout(Some(Duration::from_secs(1))).unwrap();
+            writeln!(stream,"{}",json!({"op":operation})).unwrap();
+            let request=control.requests.recv_timeout(Duration::from_secs(1)).unwrap();
+            assert_eq!(request.peer_pid,Some(std::process::id()));
+            assert!(!request.expired());
+            thread::sleep(Duration::from_millis(280));
+            assert!(request.expired(),"Late {operation} can still change focus");
+            request.reply.send(json!({"ok":false,"error":"Focus expired"})).unwrap();
+            let mut line=String::new();BufReader::new(stream).read_line(&mut line).unwrap();
+            assert_eq!(serde_json::from_str::<Value>(&line).unwrap()["error"],"Focus expired");
+        }
+    }
     #[test]
     fn keyboard_requests_expire_before_late_input_and_carry_kernel_peer_identity() {
         let path = std::env::temp_dir().join(format!("agentos-keyboard-deadline-{}.sock",std::process::id()));

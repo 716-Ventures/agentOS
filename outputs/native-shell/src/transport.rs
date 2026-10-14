@@ -360,35 +360,19 @@ fn run(
                     command @ (Command::PresentMonitor | Command::PresentSettings) => {
                         let settings=matches!(command,Command::PresentSettings);
                         if let Some(path)=std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET") {
-                            let path=PathBuf::from(path);
-                            let mut result=Err("Control unavailable".into());
-                            for _ in 0..40 {
-                                result=request(&path,&json!({"op":if settings {"settings.present"}else{"monitor.present"}}));
-                                if result.is_ok() || stop.load(Ordering::Relaxed) {break;}
-                                thread::sleep(Duration::from_millis(25));
-                            }
+                            let result=super::control_focus::present(&PathBuf::from(path),if settings {super::control_focus::Target::Settings}else{super::control_focus::Target::Monitor},&stop).map(|_|Value::Null);
                             if settings {result.map_err(|error|format!("Could not focus Settings: {error}. Select its window to continue."))}else{result}
                         } else {Ok(Value::Null)}
                     },
                     Command::PresentTerminal(identity)=>{
                         if let Some(path)=std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET") {
-                            let path=PathBuf::from(path);let mut result=Err("Terminal unavailable".into());
-                            for _ in 0..40 {
-                                result=request(&path,&json!({"op":"terminal.present","app_id":identity}));
-                                if result.is_ok() || stop.load(Ordering::Relaxed){break;}
-                                thread::sleep(Duration::from_millis(25));
-                            }
+                            let result=super::control_focus::present(&PathBuf::from(path),super::control_focus::Target::Terminal(&identity),&stop);
                             result.map(|_|json!({"status":"Terminal opened"})).map_err(|error|format!("Could not focus Terminal: {error}. Select its window to continue."))
                         }else{Ok(json!({"status":"Terminal opened"}))}
                     },
                     Command::PresentVoiceReview=>{
                         if let Some(path)=std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET") {
-                            let path=PathBuf::from(path);let mut result=Err("Voice review unavailable".into());
-                            for _ in 0..40 {
-                                result=request(&path,&json!({"op":"voice_review.present"}));
-                                if result.is_ok() || stop.load(Ordering::Relaxed){break;}
-                                thread::sleep(Duration::from_millis(25));
-                            }
+                            let result=super::control_focus::present(&PathBuf::from(path),super::control_focus::Target::VoiceReview,&stop);
                             result.map(|_|json!({"status":"Voice review opened"})).map_err(|error|format!("Could not focus voice review: {error}. Select its window to continue."))
                         }else{Ok(json!({"status":"Voice review opened"}))}
                     },

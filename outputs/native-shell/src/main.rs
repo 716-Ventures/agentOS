@@ -3,6 +3,7 @@ mod action_parameters;
 mod broker_controls;
 mod broker_pages;
 mod controls;
+mod control_focus;
 mod desktop_theme;
 mod desktop_settings;
 mod agent_monitor;

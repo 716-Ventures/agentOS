@@ -42,6 +42,8 @@ Voice review hands focus to a dedicated floating window before dismissing the la
 
 Guest profiling removed repeated immutable history copying and unchanged recovery-draft serialization. Recovery still writes changes atomically and retries failed writes. Current measurements and their exact revisions belong in `outputs/vm-foundation/runtime/fresh-verification/desktop-refinement-verification.json`; they do not establish a percentage of native macOS quality or final host-display latency.
 
+Native window focus handoffs share a nonblocking transport with a two-second deadline across connection, partial replies and retries. Shutdown cancellation stops new requests. The compositor expires focus requests waiting in its render queue after 250 ms. Successful handoffs still require committed workspace focus before dismissing the launcher.
+
 ## Reusable component foundation
 
 [716 UI](https://github.com/716-Ventures/716-ui) is the standalone public native component library, to be consumed by agentOS through versioned releases. The desktop consumes a pinned versioned release of this library. shadcn is the reference for corresponding component visuals, interaction and motion. Pin a concrete upstream style/theme/revision and verify parity in a standalone component gallery. The library owns reusable controls and tokens; agentOS owns desktop composition and system behavior. See the [library boundary](outputs/agent-os-windowing-specification.md#standalone-component-library--september-19-decision).
