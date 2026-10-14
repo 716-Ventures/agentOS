@@ -18,6 +18,7 @@ import tempfile
 import time
 import pyatspi
 import accessibility
+import voice_review
 ROOT=Path(__file__).resolve().parents[1]
 SHELL=ROOT.parent if (ROOT.parent/'install_runtime.py').is_file() else ROOT.parent/'agent-shell'
 sys.path.insert(0,str(SHELL/'services'))
@@ -50,7 +51,7 @@ def within(bounds,geometry):
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--appearance',choices=['dark','light'],default='dark');parser.add_argument('--initial-text-scale',type=float,choices=[1.0,3.0],default=1.0);parser.add_argument('--close-small',action='store_true',help='Qualify 300% close confirmation in a 360px terminal');args=parser.parse_args()
     output=ROOT/'test-output'/('desktop-design-'+args.appearance+('-close-small' if args.close_small else '')+('-large' if args.initial_text_scale==3 else ''));output.mkdir(parents=True,exist_ok=True)
-    for name in ('monitor.png','system-bar.png','launcher.png','settings.png','terminal.png','terminal.json','terminal-close.png','welcome.png','desktop.png','scene.json'):(output/name).unlink(missing_ok=True)
+    for name in ('monitor.png','system-bar.png','launcher.png','settings.png','terminal.png','terminal.json','terminal-close.png','welcome.png','desktop.png','scene.json','voice-error.png','voice-transcript.png'):(output/name).unlink(missing_ok=True)
     desktop_session.enable_subreaper()
     with tempfile.TemporaryDirectory(prefix='agentos-desktop-design-') as directory, (output/'session.log').open('w') as log:
         root=Path(directory);config=root/'config/agent-os';config.mkdir(parents=True)
@@ -59,6 +60,8 @@ def main():
         endpoint=root/'core.sock';pidfile=root/'compositor.pid'
         env={**os.environ,'HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':str(config.parent),'XDG_STATE_HOME':str(state.parent),'AGENT_OS_STATE':str(root/'core-state'),'AGENT_OS_SOCKET':str(endpoint),'AGENT_OS_COMPOSITOR_CORE':str(endpoint),'AGENT_OS_COMPOSITOR_UID':str(os.getuid()),'AGENT_OS_BROKER_SOCKET':str(root/'absent-broker.sock'),'AGENT_OS_MODEL_USAGE':str(root/'absent-usage.json'),'LIBGL_ALWAYS_SOFTWARE':'1','GSK_RENDERER':'cairo','GDK_BACKEND':'wayland','GTK_A11Y':'atspi','G_DEBUG':'fatal-criticals','WINIT_UNIX_BACKEND':'wayland','AGENT_OS_COMPOSITOR_BACKEND':'winit','AGENT_OS_SYSTEM_BAR_CAPTURE':str(output/'system-bar.png'),'AGENT_OS_LAUNCHER_CAPTURE':str(output/'launcher.png'),'AGENT_OS_MONITOR_CAPTURE':str(output/'monitor.png'),'AGENT_OS_SETTINGS_CAPTURE':str(output/'settings.png'),'AGENT_OS_WELCOME_CAPTURE':str(output/'welcome.png')}
         env.pop('WAYLAND_DISPLAY',None);env.pop('DISPLAY',None)
+        voice_fixture=voice_review.Fixture(root)
+        env.update(voice_fixture.env,AGENT_OS_VOICE_REVIEW_CAPTURE=str(output/'voice'))
         env['WAYLAND_DEBUG']='client' # Private fixture: inspect initial configure sizes.
         env.update(AGENT_OS_LOCAL_TERMINAL_VERIFY='1',AGENT_OS_LOCAL_TERMINAL_VERIFY_WORK='1',AGENT_OS_TERMINAL_CLOSE_CAPTURE=str(output/'terminal-close.png'),AGENT_OS_LOCAL_TERMINAL_VERIFY_MENU='1',AGENT_OS_LOCAL_TERMINAL_CAPTURE=str(output/'terminal.png'),AGENT_OS_LOCAL_TERMINAL_OBSERVATION=str(output/'terminal.json'))
         core=weston=None;owned=None
@@ -212,6 +215,8 @@ def main():
             accessibility.activate(accessibility.find('Agents',pyatspi.ROLE_PUSH_BUTTON))
             accessibility.wait(ready,'Monitor did not regain committed focus after Settings')
             accessibility.activate(accessibility.find('Open launcher',pyatspi.ROLE_PUSH_BUTTON))
+            voice_minimum_geometry=voice_review.verify(voice_fixture,scene,output)
+            accessibility.activate(accessibility.find('Open launcher',pyatspi.ROLE_PUSH_BUTTON))
             for label in ['Open terminal','New document','Import text file…']:
                 button=accessibility.find(label,pyatspi.ROLE_PUSH_BUTTON)
                 assert not button.parent.getState().contains(pyatspi.STATE_FOCUSABLE), 'Layout wrapper adds a duplicate focus stop: '+label
@@ -294,7 +299,7 @@ def main():
             assert call(endpoint,{'op':'snapshot'})['jobs']==[], 'Rendering or composing started work'
             log.flush()
             trace=(output/'session.log').read_text()
-            for app_id,expected in [('agentos.welcome',(560,320)),('agentos.settings',(760,540)),('agentos.monitor',(920,680)),(terminal_window['app_id'],(880,560))]:
+            for app_id,expected in [('agentos.welcome',(560,320)),('agentos.settings',(760,540)),('agentos.monitor',(920,680)),('agentos.voice-review',(700,220)),(terminal_window['app_id'],(880,560))]:
                 named=re.search(r'xdg_toplevel[#@](\d+)\.set_app_id\("'+re.escape(app_id)+r'"\)',trace)
                 assert named,'Missing control identity: '+app_id
                 identity=named[1]
@@ -306,6 +311,8 @@ def main():
                     # GTK can disclose the larger minimum before or after the
                     # initial configure. Both are deliberate floating sizes.
                     acceptable.append((actual['width'],actual['height']))
+                if app_id=='agentos.voice-review':
+                    acceptable.append((voice_minimum_geometry['width'],voice_minimum_geometry['height']))
                 assert first in acceptable,('Desktop control opened at the wrong size',app_id,first,acceptable)
             # Restart the private desktop against the same user state. Dismissal
             # must survive without writing setup completion or affecting drafts.
@@ -324,6 +331,8 @@ def main():
             (output/'scene.json').write_text(json.dumps(observed,indent=2)+'\n')
             print('PASS: composed desktop, settings and menu; native VTE Unicode output, child cleanup and guarded focus; successful actions dismiss launcher and preserve drafts; Welcome dismissal survives restart without completing setup; no model requests')
         finally:
-            if owned and owned[1]:desktop_session.stop_compositor(root,owned)
-            reap(weston);reap(core);desktop_session.reap_session_children()
+            try:
+                if owned and owned[1]:desktop_session.stop_compositor(root,owned)
+                reap(weston);reap(core);desktop_session.reap_session_children()
+            finally:voice_fixture.close()
 if __name__=='__main__':main()

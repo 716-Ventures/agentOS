@@ -373,6 +373,9 @@ pub fn present_monitor(state: &mut Smallvil, peer: Option<u32>) -> Result<(), St
 pub fn present_settings(state: &mut Smallvil, peer: Option<u32>) -> Result<(), String> {
     present_control(state,peer,"agentos.settings")
 }
+pub fn present_voice_review(state: &mut Smallvil, peer: Option<u32>) -> Result<(), String> {
+    present_control(state,peer,"agentos.voice-review")
+}
 pub fn present_terminal(state:&mut Smallvil,peer:Option<u32>,identity:&str)->Result<(),String> {
     if !identity.strip_prefix("agentos.local-terminal.").is_some_and(|suffix|suffix.len()==32 && suffix.bytes().all(|c|c.is_ascii_hexdigit())) {
         return Err("Native terminal identity required".into());

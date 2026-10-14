@@ -38,6 +38,8 @@ The transparent system bar uses a crop-aware black tint to keep its white text l
 
 Settings uses committed workspace focus when opened from the desktop menu or Monitor. Appearance rows and zoom actions wrap at enlarged text sizes; the category sidebar scrolls without breaking category names. Native Tab navigation must reveal offscreen categories and controls. Window titles follow the text-size preference.
 
+Voice review hands focus to a dedicated floating window before dismissing the launcher. Recording failures show recovery guidance, diagnostic Details and Dismiss; transcript review remains editable and disables Send for blank or oversized text without truncating edits. Dismiss and Discard return to the preserved launcher draft with typing focus. Concise actions and a readable field viewport fit above the on-screen keyboard at 300% text. Private transport fixtures qualify these states without using a microphone, provider, or fabricated production agent telemetry.
+
 Guest profiling removed repeated immutable history copying and unchanged recovery-draft serialization. Recovery still writes changes atomically and retries failed writes. Current measurements and their exact revisions belong in `outputs/vm-foundation/runtime/fresh-verification/desktop-refinement-verification.json`; they do not establish a percentage of native macOS quality or final host-display latency.
 
 ## Reusable component foundation

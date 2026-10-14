@@ -746,6 +746,7 @@ pub fn control_size(window: &Observed) -> Option<(i32,i32)> {
     match window.app_id.as_str() {
         "agentos.welcome" => Some((560.max(window.min_width),320.max(window.min_height))),
         "agentos.settings" => Some((760,540)),
+        "agentos.voice-review" => Some((700.max(window.min_width),220.max(window.min_height))),
         _ => None,
     }
 }
@@ -1131,6 +1132,9 @@ mod tests {
         window.app_id="agentos.welcome".into();window.min_width=560;window.min_height=540;
         assert_eq!(initial_control_geometry(&window,area),Some(Rect{x:360,y:154,width:560,height:540}));
         assert_eq!(initial_control_geometry(&window,Rect{x:0,y:36,width:500,height:400}),Some(Rect{x:0,y:36,width:500,height:400}));
+        window.app_id="agentos.voice-review".into();window.min_width=700;window.min_height=530;
+        assert_eq!(control_size(&window),Some((700,530)));
+        window.system_control=false;assert!(control_size(&window).is_none());
     }
     #[test]
     fn new_windows_remain_manageable_in_manually_constrained_workspaces() {

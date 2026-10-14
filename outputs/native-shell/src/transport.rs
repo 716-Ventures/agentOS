@@ -90,6 +90,7 @@ pub struct Frame {
     pub local_terminal_requests: u64,
     pub setup_requests: u64,
     pub navigation_sequence: u64,
+    pub launcher_returns: u64,
 }
 #[derive(Debug)]
 pub enum Command {
@@ -120,6 +121,8 @@ pub enum Command {
     OpenTerminal,
     PresentMonitor,
     PresentSettings,
+    PresentVoiceReview,
+    ReturnLauncher,
     PresentTerminal(String),
     ImportDocument {
         activity: Option<String>,
@@ -346,13 +349,14 @@ fn run(
                     }));
                     continue;
                 }
-                let feedback_only=matches!(&command,Command::ClearFieldFeedback{..}|Command::PresentMonitor);
+                let feedback_only=matches!(&command,Command::ClearFieldFeedback{..}|Command::PresentMonitor|Command::ReturnLauncher);
                 let navigation=matches!(&command,Command::CreateDocument|Command::ImportDocument{..});
-                let terminal_navigation=matches!(&command,Command::PresentTerminal(_));
+                let terminal_navigation=matches!(&command,Command::PresentTerminal(_)|Command::PresentVoiceReview);
                 let submitted_request = matches!(&command, Command::Ask {..});
                 let result=match command {
                     Command::Approve(_)|Command::ReviewInput{..}=>unreachable!(),
                     Command::ClearFieldFeedback{..}=>Ok(Value::Null),
+                    Command::ReturnLauncher=>{let mut view=frame.lock().unwrap();view.launcher_returns=view.launcher_returns.saturating_add(1);Ok(Value::Null)},
                     command @ (Command::PresentMonitor | Command::PresentSettings) => {
                         let settings=matches!(command,Command::PresentSettings);
                         if let Some(path)=std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET") {
@@ -376,6 +380,17 @@ fn run(
                             }
                             result.map(|_|json!({"status":"Terminal opened"})).map_err(|error|format!("Could not focus Terminal: {error}. Select its window to continue."))
                         }else{Ok(json!({"status":"Terminal opened"}))}
+                    },
+                    Command::PresentVoiceReview=>{
+                        if let Some(path)=std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET") {
+                            let path=PathBuf::from(path);let mut result=Err("Voice review unavailable".into());
+                            for _ in 0..40 {
+                                result=request(&path,&json!({"op":"voice_review.present"}));
+                                if result.is_ok() || stop.load(Ordering::Relaxed){break;}
+                                thread::sleep(Duration::from_millis(25));
+                            }
+                            result.map(|_|json!({"status":"Voice review opened"})).map_err(|error|format!("Could not focus voice review: {error}. Select its window to continue."))
+                        }else{Ok(json!({"status":"Voice review opened"}))}
                     },
                     Command::Resume(job)=>super::broker_controls::job_id(&job).and_then(|id|request(&broker_socket(),&json!({"op":"poll","job_id":id}))).and_then(|current|super::broker_controls::continuation_request(&current).ok_or("No approved agent request is associated with this work".into())).and_then(|query|request(&socket,&query)),
                     Command::Attach(job)=>super::broker_controls::attach(&job),
@@ -842,6 +857,7 @@ fn run(
                 next.local_terminal_requests=old.local_terminal_requests;
                 next.setup_requests=old.setup_requests;
                 next.navigation_sequence=old.navigation_sequence;
+                next.launcher_returns=old.launcher_returns;
                 *old = next;
             }
             Err(e) => {

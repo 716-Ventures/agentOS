@@ -1604,6 +1604,7 @@ fn main() {
         let mut terminal_requests = 0;
         let mut setup_requests = 0;
         let mut navigation_sequence = 0;
+        let mut launcher_returns = 0;
         let mut bar_captured = false;
         let mut launcher_captured = false;
         let mut restoration_captured = false;
@@ -1667,6 +1668,10 @@ fn main() {
             if frame.navigation_sequence!=navigation_sequence {
                 navigation_sequence=frame.navigation_sequence;
                 if trusted && main.is_visible(){main.close();}
+            }
+            if frame.launcher_returns!=launcher_returns {
+                launcher_returns=frame.launcher_returns;
+                if trusted {controls.borrow().open_launcher();main.present();}
             }
             if let Ok(now) = glib::DateTime::now_local() {
                 if let Ok(text) = now.format("%a %e %b · %H:%M") {

@@ -18,6 +18,9 @@ fn request_context(frozen: Option<Value>, current: Value) -> Value {
             matches!(element, "message-status" | "microphone-status" | "model-status"));
     if local_status { current } else { frozen.unwrap_or(current) }
 }
+fn voice_request_ready(text: &str) -> bool {
+    !text.trim().is_empty() && text.chars().count()<=4000
+}
 
 pub struct Controls {
     pub widget: gtk::Box,
@@ -61,6 +64,12 @@ pub struct Controls {
     context_label: gtk::Label,
     review: gtk::ApplicationWindow,
     transcript: TextField,
+    review_status: gtk::Label,
+    review_scroll: gtk::ScrolledWindow,
+    review_details: gtk::Expander,
+    review_error: gtk::Label,
+    send_voice: gtk::Button,
+    discard_voice: gtk::Button,
     review_ready: bool,
     request_field: TextField,
     new_document: gtk::Button,
@@ -265,27 +274,50 @@ impl Controls {
         request_actions.set_halign(gtk::Align::Fill);
         voice_row.set_hexpand(true);
         let review_content = ui::column(12);
-        review_content.set_margin_start(24); review_content.set_margin_end(24); review_content.set_margin_top(24); review_content.set_margin_bottom(24);
-        review_content.append(&ui::text("Review voice request", true));
-        let transcript = TextField::new("Edit the transcript before sending", "Transcript", "");
+        let transcript = TextField::new("Transcript", "Edit before sending", "");
+        let review_status=ui::text("",false);
+        review_status.set_visible(false);
+        review_status.set_selectable(false);
+        review_status.set_wrap(true);review_status.set_wrap_mode(gtk::pango::WrapMode::WordChar);
+        review_content.append(&review_status);
+        let review_error=ui::text("",false);review_error.set_wrap(true);review_error.set_wrap_mode(gtk::pango::WrapMode::WordChar);
+        let review_details=gtk::Expander::builder().label("Details").child(&review_error).visible(false).build();
+        review_content.append(&review_details);
         review_content.append(&transcript.widget);
-        let review_actions = ui::row(12);
-        let send_voice = ui::button("Send reviewed request", ButtonVariant::Primary, false);
-        let discard = ui::button("Discard recording", ButtonVariant::Outline, false);
-        review_actions.set_halign(gtk::Align::End);
-        review_actions.append(&discard);
-        review_actions.append(&send_voice);
-        review_content.append(&review_actions);
+        let send_voice = ui::button("Send request", ButtonVariant::Primary, false);
+        send_voice.set_tooltip_text(Some("Send a request of 1–4,000 characters"));
+        let discard = ui::button("Discard", ButtonVariant::Outline, false);
+        send_voice.set_sensitive(false);
+        let send=send_voice.downgrade();
+        transcript.entry.connect_changed(move |entry| {if let Some(send)=send.upgrade(){send.set_sensitive(entry.is_sensitive() && voice_request_ready(&entry.text()));}});
+        let review_actions=desktop_settings::wrapping_controls([discard.clone().upcast(),send_voice.clone().upcast()]);
+        let body=ui::column(16);body.set_margin_start(24);body.set_margin_end(24);body.set_margin_top(24);body.set_margin_bottom(24);
+        let viewport_height=|value:f64|(80.0*value/100.0).clamp(80.0,160.0) as i32;
+        let review_scroll=gtk::ScrolledWindow::builder().accessible_role(gtk::AccessibleRole::Group).hscrollbar_policy(gtk::PolicyType::Never).min_content_height(viewport_height(scale.value())).vexpand(true).child(&review_content).build();
+        let viewport=review_scroll.downgrade();
+        scale.connect_value_changed(move |scale| {if let Some(scroll)=viewport.upgrade(){scroll.set_min_content_height(viewport_height(scale.value()));}});
+        review_scroll.set_overlay_scrolling(false);
+        review_scroll.update_property(&[gtk::accessible::Property::Label("Voice review content")]);
+        body.append(&review_scroll);body.append(&review_actions);
         let review = gtk::ApplicationWindow::builder()
             .application(app)
             .title("Review voice request")
             .default_width(700)
             .default_height(220)
-            .child(&review_content)
+            .child(&body)
             .build();
         review.add_css_class("seven-ui");
         review.add_css_class("agentos-launcher");
+        review.add_css_class("agentos-voice-review");
         desktop_theme::titlebar(&review);
+        review.connect_map(|window| {
+            if let Some(surface)=window.surface().and_then(|s|s.downcast::<gdk4_wayland::WaylandToplevel>().ok()){surface.set_application_id("agentos.voice-review");}
+            if let Ok(prefix)=std::env::var("AGENT_OS_VOICE_REVIEW_CAPTURE") {
+                let path=format!("{prefix}-{}.png",if window.title().as_deref()==Some("Voice recording failed"){"error"}else{"transcript"});
+                let target=window.downgrade();
+                glib::timeout_add_local_once(Duration::from_millis(350),move || {if let Some(window)=target.upgrade(){let _=system_bar::capture(&window,&path);}});
+            }
+        });
         let recorder = voice.clone();
         let (frozen, provider) = (frozen_context.clone(), context_provider.clone());
         voice_button.connect_clicked(move |_| {
@@ -299,25 +331,28 @@ impl Controls {
                 }
             }
         });
-        let recorder = voice.clone();
-        let window = review.clone();
+        let window = review.downgrade();
         discard.connect_clicked(move |_| {
-            recorder.cancel();
-            window.set_visible(false);
+            if let Some(window)=window.upgrade(){window.close();}
         });
         let recorder = voice.clone();
+        let sender=commands.clone();
         review.connect_close_request(move |window| {
+            let return_to_launcher=matches!(recorder.state.lock().unwrap().phase.as_str(),"review"|"error");
             recorder.cancel();
+            let content=window.child();window.set_child(gtk::Widget::NONE);
             window.set_visible(false);
+            window.set_child(content.as_ref());
+            if return_to_launcher && std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET").is_some(){let _=sender.send(Command::ReturnLauncher);}
             glib::Propagation::Stop
         });
         let recorder = voice.clone();
-        let window = review.clone();
+        let window = review.downgrade();
         let entry = transcript.entry.clone();
         let sender = commands.clone();
         let (pending, prior, last)=(pending_prompt.clone(),prior_request.clone(),last_request.clone());
         send_voice.connect_clicked(move |_| {
-            if entry.text().trim().is_empty() {
+            if !voice_request_ready(&entry.text()) {
                 return;
             }
             if let Some(context) = recorder.consume() {
@@ -329,7 +364,7 @@ impl Controls {
                     prompt: entry.text().into(),
                     grounding: Some(context),
                 });
-                window.set_visible(false);
+                if let Some(window)=window.upgrade(){window.close();}
             }
         });
         let request_state=ui::status("Ready when you are.");
@@ -525,6 +560,12 @@ impl Controls {
             context_label,
             review,
             transcript,
+            review_status,
+            review_scroll,
+            review_details,
+            review_error,
+            send_voice,
+            discard_voice: discard,
             review_ready: false,
             request_field: request,
             new_document,
@@ -756,6 +797,15 @@ impl Controls {
         let capture=source.clone();self.context_provider(Rc::new(move ||capture.borrow().clone()));
         self.open_launcher();
         source.borrow_mut()["selection"]=json!("Later selection must not replace captured evidence");
+        let previous_voice=self.voice.state.lock().unwrap().clone();
+        for phase in ["review","error"] {
+            self.voice.state.lock().unwrap().phase=phase.into();
+            self.hide_launcher();
+            self.voice.state.lock().unwrap().phase="idle".into();
+            self.open_launcher();
+            assert_eq!(self.frozen_context.borrow().as_ref().unwrap()["selection"],"Original selected λ 日本語","Voice handoff replaced the typed draft's source");
+        }
+        *self.voice.state.lock().unwrap()=previous_voice;
         self.request_field.entry.set_text("Contextual native request λ");self.request_field.entry.emit_activate();
         self.hide_launcher();self.open_launcher();
         self.request_field.entry.set_text("Refreshed contextual request");self.request_field.entry.emit_activate();
@@ -875,12 +925,14 @@ impl Controls {
         self.voice.cancel();
     }
     pub fn hide_launcher(&self) {
-        self.frozen_context.borrow_mut().take();
+        let phase = self.voice.state.lock().unwrap().phase.clone();
+        // A voice handoff continues the same composition. Its return must keep
+        // the unsent typed request tied to the original captured source.
+        if !matches!(phase.as_str(),"review"|"error") {self.frozen_context.borrow_mut().take();}
         // Closed launcher statuses cannot become stale selections in a later
         // request. The request entry and selected monitor/domain views persist.
         self.message.value.select_region(0, 0);
         self.voice_status.value.select_region(0, 0);
-        let phase = self.voice.state.lock().unwrap().phase.clone();
         if phase == "starting" || phase == "recording" { self.voice.cancel(); }
     }
     pub fn focus_request(&self) { self.request_field.entry.grab_focus(); }
@@ -964,18 +1016,27 @@ impl Controls {
                     _ => "Voice unavailable · discard and retry",
                 }),
         );
-        if voice.phase == "review" && !self.review_ready {
-            self.transcript
-                .entry
-                .set_text(voice.text.as_deref().unwrap_or(""));
+        if matches!(voice.phase.as_str(),"review"|"error") && !self.review_ready {
+            let failed=voice.phase=="error";
+            self.transcript.widget.set_visible(!failed);
+            if let Some(group)=self.send_voice.parent(){group.set_visible(!failed);}
+            self.transcript.entry.set_sensitive(!failed);
+            self.transcript.entry.set_text(if failed {""}else{voice.text.as_deref().unwrap_or("")});
+            self.review_status.set_text(if failed {"Voice recording failed. Try Setup or type your request."}else{""});
+            self.review_status.set_visible(failed);
+            self.review_error.set_text(voice.error.as_deref().unwrap_or("The recording could not be completed."));
+            self.review_details.set_expanded(false);self.review_details.set_visible(failed);
+            self.discard_voice.set_label(if failed {"Dismiss"}else{"Discard"});
+            self.review.set_title(Some(if failed {"Voice recording failed"}else{"Review voice request"}));
+            if failed {let adjustment=self.review_scroll.vadjustment();adjustment.set_value(adjustment.lower());}
             self.review.present();
+            if failed {self.discard_voice.grab_focus();}else{self.transcript.entry.grab_focus();}
+            if std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET").is_some(){let _=self.commands.send(Command::PresentVoiceReview);}
             self.review_ready = true;
         }
-        if voice.phase != "review" {
+        self.send_voice.set_sensitive(voice.phase=="review" && voice_request_ready(&self.transcript.entry.text()));
+        if !matches!(voice.phase.as_str(),"review"|"error") {
             self.review_ready = false;
-        }
-        if voice.phase == "error" {
-            self.review.present();
         }
 
         self.changing.set(true);

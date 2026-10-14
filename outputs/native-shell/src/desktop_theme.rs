@@ -102,6 +102,7 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
     .agentos-launcher .launcher-request-actions {{ margin-top: 2px; }}
     window.agentos-settings .settings-navigation {{ background: {panel}; }}
     window.agentos-settings flowboxchild {{ padding: 0; }}
+    window.agentos-voice-review flowboxchild {{ padding: 0; }}
     window.agentos-settings button.settings-category {{ background: transparent; border: none; color: {fg}; padding: 8px 12px; }}
     window.agentos-settings button.settings-category:checked {{ background: {selected}; }}
     window.agentos-settings button.settings-category:hover {{ background: {selected}; }}
