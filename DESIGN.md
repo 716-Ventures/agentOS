@@ -36,6 +36,8 @@ The refinement also protects running local Terminal work with an accessible clos
 
 The transparent system bar uses a crop-aware black tint to keep its white text legible over the approved wallpaper. The image remains visible; this is a contrast treatment and does not claim backdrop blur or vibrancy. Its inert background neither takes focus nor adds input targets.
 
+Settings uses committed workspace focus when opened from the desktop menu or Monitor. Appearance rows and zoom actions wrap at enlarged text sizes; the category sidebar scrolls without breaking category names. Native Tab navigation must reveal offscreen categories and controls. Window titles follow the text-size preference.
+
 Guest profiling removed repeated immutable history copying and unchanged recovery-draft serialization. Recovery still writes changes atomically and retries failed writes. Current measurements and their exact revisions belong in `outputs/vm-foundation/runtime/fresh-verification/desktop-refinement-verification.json`; they do not establish a percentage of native macOS quality or final host-display latency.
 
 ## Reusable component foundation

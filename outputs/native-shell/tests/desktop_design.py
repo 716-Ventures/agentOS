@@ -108,6 +108,7 @@ def main():
             accessibility.activate(accessibility.find('Desktop settings…',pyatspi.ROLE_PUSH_BUTTON))
             accessibility.wait(lambda:any(w['app_id']=='agentos.settings' for w in scene()['windows']),'Desktop settings did not map')
             accessibility.wait(lambda:(output/'settings.png').exists(),'Settings capture missing')
+            accessibility.wait(lambda:any(w['app_id']=='agentos.settings' and w['id']==scene()['seat_focus'] for w in scene()['windows']),'Settings did not receive keyboard focus')
             settings=accessibility.find('Desktop settings',pyatspi.ROLE_FRAME)
             for category,field_name in [('Activities','Current activity'),('Workspace','Arrange workspace'),('Accessibility','Show on-screen keyboard'),('Storage','Stored images'),('Setup','Open setup…'),('Appearance','Appearance')]:
                 accessibility.activate(accessibility.find(category,pyatspi.ROLE_TOGGLE_BUTTON,root=settings))
@@ -127,6 +128,54 @@ def main():
                         except (RuntimeError,LookupError):pass
                     print('Settings category failure',category,rows,flush=True);raise
             size=accessibility.find('Text scale',pyatspi.ROLE_SPIN_BUTTON,root=settings)
+            if args.initial_text_scale==3:
+                geometry=next(w for w in scene()['windows'] if w['app_id']=='agentos.settings')['geometry']
+                # A horizontal scroll must not be needed to reveal either half
+                # of a preference row. Inspect unpadded native layout wrappers.
+                for name,role in [('Appearance',pyatspi.ROLE_COMBO_BOX),('Text size',pyatspi.ROLE_LABEL),('Text scale',pyatspi.ROLE_SPIN_BUTTON)]:
+                    target=accessibility.find(name,role,root=settings)
+                    x,y,width,height=local_bounds(target.parent,settings)
+                    assert x>=0 and x+width<=geometry['width'],('Preference row needs horizontal scrolling',name,x,width,geometry)
+                accessibility.activate(accessibility.find('Accessibility',pyatspi.ROLE_TOGGLE_BUTTON,root=settings))
+                accessibility.activate(accessibility.find('Show on-screen keyboard',pyatspi.ROLE_PUSH_BUTTON,root=settings))
+                accessibility.activate(accessibility.find('Appearance',pyatspi.ROLE_TOGGLE_BUTTON,root=settings))
+                from collections import deque
+                import ime_accessibility
+                def focused(target):
+                    queue=deque([target])
+                    visited=0
+                    while queue and visited<128:
+                        node=queue.popleft()
+                        visited+=1
+                        if node is None:continue
+                        if node.getState().contains(pyatspi.STATE_FOCUSED):return True
+                        queue.extend(node[i] for i in range(min(node.childCount,32)))
+                    return False
+                def navigate(target):
+                    for _ in range(48):
+                        if focused(target):return
+                        accessibility.activate(accessibility.find('Tab',pyatspi.ROLE_PUSH_BUTTON))
+                        try:accessibility.wait(lambda:ime_accessibility.rendered_text('Keyboard ready'),'Settings navigation stroke did not finish')
+                        except AssertionError:
+                            print('Settings keyboard diagnostics',scene(),accessibility.accessible_labels(),flush=True);raise
+                        time.sleep(.05)
+                    raise AssertionError('Keyboard cannot reach Settings control: '+target.name)
+                for category in ['Appearance','Activities','Workspace','Accessibility','Storage','Setup']:
+                    button=accessibility.find(category,pyatspi.ROLE_TOGGLE_BUTTON,root=settings)
+                    navigate(button)
+                    geometry=next(w for w in scene()['windows'] if w['app_id']=='agentos.settings')['geometry']
+                    # Read the actual label; older GTK reports a padded button's
+                    # content origin with its full border width.
+                    label=button[0]
+                    accessibility.wait(lambda:within(local_bounds(label,settings),geometry),
+                        'Settings category does not scroll into view: '+category)
+                for name in ['Zoom out','Reset zoom','Zoom in']:
+                    target=accessibility.find(name,pyatspi.ROLE_PUSH_BUTTON,root=settings)
+                    navigate(target)
+                    accessibility.wait(lambda:within(local_bounds(target.parent,settings),geometry),
+                        'Zoom control does not wrap or scroll into view: '+name)
+                accessibility.activate(accessibility.find('Hide keyboard',pyatspi.ROLE_PUSH_BUTTON))
+                print('PASS: 300% Settings rows fit horizontally; native Tab reaches and reveals every category and zoom control',flush=True)
             size.queryValue().currentValue=125.0
             accessibility.wait(lambda:json.loads((config/'desktop.json').read_text())['text_scale']==1.25,'Text percentage did not persist as a scale factor')
             size.queryValue().currentValue=100.0
@@ -155,6 +204,13 @@ def main():
             subprocess.run(['weston-screenshooter'],env={**env,'WAYLAND_DISPLAY':'design-host'},cwd=output,stdout=log,stderr=subprocess.STDOUT,check=True,timeout=8)
             for path in output.glob('wayland-screenshot*.png'):path.rename(output/'desktop.png')
             assert (output/'desktop.png').is_file(),'Composed desktop capture missing'
+            accessibility.disclose('Desktop controls')
+            accessibility.activate(accessibility.find('Desktop settings…',pyatspi.ROLE_PUSH_BUTTON))
+            accessibility.wait(lambda:any(w['app_id']=='agentos.settings' and w['id']==scene()['seat_focus'] for w in scene()['windows']),'Settings did not receive focus when reopened from Monitor')
+            settings=accessibility.find('Desktop settings',pyatspi.ROLE_FRAME)
+            accessibility.activate(accessibility.find('Close window',pyatspi.ROLE_PUSH_BUTTON,root=settings))
+            accessibility.activate(accessibility.find('Agents',pyatspi.ROLE_PUSH_BUTTON))
+            accessibility.wait(ready,'Monitor did not regain committed focus after Settings')
             accessibility.activate(accessibility.find('Open launcher',pyatspi.ROLE_PUSH_BUTTON))
             for label in ['Open terminal','New document','Import text file…']:
                 button=accessibility.find(label,pyatspi.ROLE_PUSH_BUTTON)

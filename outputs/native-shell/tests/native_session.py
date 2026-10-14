@@ -131,7 +131,7 @@ with tempfile.TemporaryDirectory(prefix='agentos-session-test-') as directory:
                 field=accessibility.find('Accessible session draft',pyatspi.ROLE_TEXT)
                 wait_for(lambda:field.getState().contains(pyatspi.STATE_FOCUSED),[core,session])
                 original=call(control,{'op':'snapshot'})['seat_focus']
-                for operation in ('keyboard.stroke','keyboard.restore_focus'):
+                for operation in ('keyboard.stroke','keyboard.restore_focus','settings.present'):
                     with socket.socket(socket.AF_UNIX) as connection:
                         connection.settimeout(3);connection.connect(str(control))
                         connection.sendall(json.dumps({'op':operation,'keycode':38,'modifiers':0}).encode()+b'\n')

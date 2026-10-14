@@ -458,15 +458,16 @@ impl Keyboard {
     /// reparenting the retained Monitor controls or creating another worker.
     pub fn additional_zoom_controls(&self) -> gtk::Box {
         let view=ui::column(8);let label=ui::text("",false);let status=ui::status("");
+        label.set_wrap(true);status.set_wrap(true);
         self.zoom_label.bind_property("label",&label,"label").sync_create().build();
         self.zoom_status.bind_property("label",&status,"label").sync_create().build();
-        let row=ui::row(6);
-        for (label,direction) in [("Zoom out",-1),("Reset zoom",0),("Zoom in",1)] {
+        let buttons=[("Zoom out",-1),("Reset zoom",0),("Zoom in",1)].map(|(label,direction)| {
             let button=ui::button(label,ButtonVariant::Outline,false);
             let commands=self.zoom_input.commands.clone();let status=self.zoom_status.clone();
             button.connect_clicked(move |_| {let result=commands.send(json!({"op":"display.zoom","direction":direction}));status.set_text(result.err().as_deref().unwrap_or("Changing display zoom…"));});
-            row.append(&button);
-        }
+            button.upcast::<gtk::Widget>()
+        });
+        let row=desktop_settings::wrapping_controls(buttons);
         view.append(&label);view.append(&row);view.append(&status);view
     }
     pub fn set_zoom(&self, factor: f64) {

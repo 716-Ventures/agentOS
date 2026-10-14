@@ -370,6 +370,9 @@ pub fn is_bar(state: &Smallvil, surface: &WlSurface) -> bool {has_namespace(stat
 pub fn present_monitor(state: &mut Smallvil, peer: Option<u32>) -> Result<(), String> {
     present_control(state,peer,"agentos.monitor")
 }
+pub fn present_settings(state: &mut Smallvil, peer: Option<u32>) -> Result<(), String> {
+    present_control(state,peer,"agentos.settings")
+}
 pub fn present_terminal(state:&mut Smallvil,peer:Option<u32>,identity:&str)->Result<(),String> {
     if !identity.strip_prefix("agentos.local-terminal.").is_some_and(|suffix|suffix.len()==32 && suffix.bytes().all(|c|c.is_ascii_hexdigit())) {
         return Err("Native terminal identity required".into());
@@ -382,7 +385,7 @@ fn present_control(state: &mut Smallvil, peer: Option<u32>, identity: &str) -> R
         let surface=window.toplevel().unwrap().wl_surface();
         let host=surface.client().and_then(|client|client.get_data::<ClientState>().map(|data|data.system_shell)).unwrap_or(false);
         host && with_states(surface,|states|states.data_map.get::<smithay::wayland::shell::xdg::XdgToplevelSurfaceData>().unwrap().lock().unwrap().app_id.as_deref()==Some(identity))
-    }).cloned().ok_or("Monitor unavailable")?;
+    }).cloned().ok_or("Control unavailable")?;
     let surface=window.toplevel().unwrap().wl_surface().clone();
     let runtime=format!("{:?}",surface.id());
     if let Some(bridge)=&state.bridge {

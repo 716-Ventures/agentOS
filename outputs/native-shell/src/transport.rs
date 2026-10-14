@@ -119,6 +119,7 @@ pub enum Command {
     },
     OpenTerminal,
     PresentMonitor,
+    PresentSettings,
     PresentTerminal(String),
     ImportDocument {
         activity: Option<String>,
@@ -352,16 +353,17 @@ fn run(
                 let result=match command {
                     Command::Approve(_)|Command::ReviewInput{..}=>unreachable!(),
                     Command::ClearFieldFeedback{..}=>Ok(Value::Null),
-                    Command::PresentMonitor => {
+                    command @ (Command::PresentMonitor | Command::PresentSettings) => {
+                        let settings=matches!(command,Command::PresentSettings);
                         if let Some(path)=std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET") {
                             let path=PathBuf::from(path);
-                            let mut result=Err("Monitor unavailable".into());
+                            let mut result=Err("Control unavailable".into());
                             for _ in 0..40 {
-                                result=request(&path,&json!({"op":"monitor.present"}));
+                                result=request(&path,&json!({"op":if settings {"settings.present"}else{"monitor.present"}}));
                                 if result.is_ok() || stop.load(Ordering::Relaxed) {break;}
                                 thread::sleep(Duration::from_millis(25));
                             }
-                            result
+                            if settings {result.map_err(|error|format!("Could not focus Settings: {error}. Select its window to continue."))}else{result}
                         } else {Ok(Value::Null)}
                     },
                     Command::PresentTerminal(identity)=>{

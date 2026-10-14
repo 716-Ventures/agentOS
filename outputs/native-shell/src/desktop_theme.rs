@@ -55,7 +55,7 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
     window.seven-ui selection {{ background: #275d8b; color: white; }}
     window.seven-ui separator {{ background: {line}; min-height: 1px; }}
     window.seven-ui.desktop-inactive headerbar .title {{ color: {muted}; }}
-    window.seven-ui headerbar .title {{ font-size: 13px; font-weight: 600; }}
+    window.seven-ui headerbar .title {{ font-size: 0.93em; font-weight: 600; }}
     window.seven-ui headerbar button.desktop-window-control {{ min-width: 12px; min-height: 12px; padding: 6px; margin: 0; background: transparent; border: none; border-radius: 100%; box-shadow: none; background-image: none; }}
     window.seven-ui headerbar button.desktop-close .desktop-control-disc {{ background: #ed6a5e; }}
     window.seven-ui headerbar button.desktop-maximize .desktop-control-disc {{ background: #61c454; }}
@@ -101,6 +101,7 @@ pub fn install(display: &gtk::gdk::Display, light: bool, scale: f64) {
     .agentos-launcher .launcher-direct flowboxchild {{ padding: 0; }}
     .agentos-launcher .launcher-request-actions {{ margin-top: 2px; }}
     window.agentos-settings .settings-navigation {{ background: {panel}; }}
+    window.agentos-settings flowboxchild {{ padding: 0; }}
     window.agentos-settings button.settings-category {{ background: transparent; border: none; color: {fg}; padding: 8px 12px; }}
     window.agentos-settings button.settings-category:checked {{ background: {selected}; }}
     window.agentos-settings button.settings-category:hover {{ background: {selected}; }}

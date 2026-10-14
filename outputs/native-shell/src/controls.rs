@@ -124,9 +124,12 @@ impl Controls {
         scale.update_property(&[gtk::accessible::Property::Label("Text scale")]);
         reduced.set_active(preferences["reduced_motion"] == true);
         let appearance_row = ui::column(16);
-        let theme_row=ui::row(12);let label=ui::text("Appearance",false);label.set_hexpand(true);theme_row.append(&label);theme_row.append(&appearance);
+        let label=ui::text("Appearance",false);label.set_hexpand(true);
+        let theme_row=desktop_settings::wrapping_controls([label.upcast(),appearance.clone().upcast()]);
         appearance_row.append(&theme_row);
-        let size_row=ui::row(12);let label=ui::text("Text size",false);label.set_hexpand(true);size_row.append(&label);size_row.append(&scale);size_row.append(&ui::text("%",false));
+        let label=ui::text("Text size",false);label.set_hexpand(true);
+        let input=ui::row(12);input.append(&scale);input.append(&ui::text("%",false));
+        let size_row=desktop_settings::wrapping_controls([label.upcast(),input.upcast()]);
         appearance_row.append(&size_row);
         appearance_row.set_widget_name("desktop-appearance");
         widget.append(&appearance_row);
@@ -363,7 +366,8 @@ impl Controls {
         settings.append("Accessibility",&reduced);
         let preferences=ui::button("Desktop settings…",ButtonVariant::Outline,false);
         preferences.set_halign(gtk::Align::Start);
-        let target=settings.window.downgrade();preferences.connect_clicked(move |_| {if let Some(window)=target.upgrade(){window.present();}});
+        let target=settings.window.downgrade();let sender=commands.clone();
+        preferences.connect_clicked(move |_| {if let Some(window)=target.upgrade(){window.present();if std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET").is_some(){let _=sender.send(Command::PresentSettings);}}});
         monitor_content.append(&preferences);
         let jobs = super::job_list::JobList::new(app, &commands);
         history_content.append(&jobs.widget);
@@ -922,7 +926,10 @@ impl Controls {
         }
     }
     pub fn capture_monitor(&self, path: &str) -> bool { self.monitor.is_visible() && system_bar::capture(&self.monitor, path) }
-    pub fn present_settings(&self) {self.settings.present();}
+    pub fn present_settings(&self) {
+        self.settings.present();
+        if std::env::var_os("AGENT_OS_COMPOSITOR_SOCKET").is_some(){let _=self.commands.send(Command::PresentSettings);}
+    }
     pub fn append_setting(&self,page:&str,widget:&impl IsA<gtk::Widget>) {self.settings.append(page,widget);}
     pub fn present(&self) {
         self.monitor.present();

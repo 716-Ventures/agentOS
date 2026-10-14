@@ -1,5 +1,19 @@
 //! Direct desktop preferences, independent of model availability and agent telemetry.
 use super::*;
+/// Natural-width controls wrap without adding selectable rows or tab stops.
+pub fn wrapping_controls<const N: usize>(children: [gtk::Widget; N]) -> gtk::FlowBox {
+    let row = gtk::FlowBox::new();
+    row.set_selection_mode(gtk::SelectionMode::None);
+    row.set_min_children_per_line(1);
+    row.set_max_children_per_line(N as u32);
+    row.set_column_spacing(12);
+    row.set_row_spacing(12);
+    for widget in children {
+        row.insert(&gtk::FlowBoxChild::builder().child(&widget).focusable(false)
+            .accessible_role(gtk::AccessibleRole::Group).build(), -1);
+    }
+    row
+}
 pub struct Settings {
     pub window: gtk::ApplicationWindow,
     pages: BTreeMap<&'static str, gtk::Box>,
@@ -34,6 +48,8 @@ impl Settings {
             page.set_margin_end(24);
             let heading = ui::text(title, true);
             heading.set_selectable(false);
+            heading.set_wrap(true);
+            heading.set_wrap_mode(gtk::pango::WrapMode::WordChar);
             page.append(&heading);
             let scroll = gtk::ScrolledWindow::builder()
                 .hscrollbar_policy(gtk::PolicyType::Automatic)
@@ -59,7 +75,11 @@ impl Settings {
             pages.insert(title, page);
         }
         let body = ui::row(0);
-        body.append(&navigation);
+        let navigation_scroll = gtk::ScrolledWindow::builder()
+            .hscrollbar_policy(gtk::PolicyType::Never)
+            .vscrollbar_policy(gtk::PolicyType::Automatic)
+            .width_request(174).child(&navigation).build();
+        body.append(&navigation_scroll);
         body.append(&gtk::Separator::new(gtk::Orientation::Vertical));
         body.append(&stack);
         let window = gtk::ApplicationWindow::builder()
